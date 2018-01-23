@@ -47,6 +47,9 @@ Mixnets?!
 `Team <team.html>`_
 ===================
 
+`Contact <contact.html>`_
+=========================
+
 .. rubric:: Supported by
 
 .. image:: /_static/images/eu-flag.jpg
