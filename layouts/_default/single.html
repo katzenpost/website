@@ -1,0 +1,18 @@
+{{define "main" -}}
+<div class="container">
+    <article>
+        <h1>{{ .Title }}</h1>
+        {{ if (isset .Params "subtitle") }}
+        <h2 class="top light-font">
+            {{ .Params.subtitle }}
+        </h2>
+        {{ end }}
+        <time class="post-date" datetime='{{ .Date.Format "2006-01-02T15:04:05Z0700" }}'>
+            {{ .Date.Format "Jan 2, 2006" }}
+        </time>
+        <main>
+            {{ .Content }}
+        </main>
+    </article>
+</div>
+{{- end }}
