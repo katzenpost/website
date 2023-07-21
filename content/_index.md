@@ -57,8 +57,3 @@ only good for chat clients but also other types of applications:
 - transporting interactions to DHTs
 - database transaction anonymization
 - 'crypto currency' anonymization
-
-
-For further discussion regarding Zcash usage with Katzenpost please see:
-:doc:`zcash`.
-
