@@ -15,9 +15,9 @@ Communication
 Contribution Guidelines
 =======================
 
-#. Get familiar with the various repositories on our [Github](https://www.github.com/katzenpost).
-#. Developers should look at the [Developer Guide](docs/HACKING/) and the [Setup Guide](docs/setup) to build and run a local Katzenpost mixnet.
-#. Open a pull request on Github. We will help with occurring problems and merge your changes back into the main project.
+#. Get familiar with the various repositories on our [Github](https://www.github.com/katzenpost), in particular the [monorepo](https://www.github.com/katzenpost/katzenpost)
+#. Developers should look at the [Developer Guide](https://github.com/katzenpost/katzenpost/blob/main/docs/handbook/index.rst) and the [Dockerized Mixnet Readme](https://github.com/katzenpost/katzenpost/blob/main/docker/README.rst) to build and run a local Katzenpost mixnet.
+#. Open a pull request on [Github](https://github.com/katzenpost/katzenpost/pulls). We will help with occurring problems and merge your changes back into the main project.
 
 Where to Start
 ==============
