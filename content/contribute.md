@@ -26,11 +26,10 @@ We have a lot of repositories! The top-level packages that you'll probably want 
 
 * [Katzen](https://github.com/katzenpost/katzen) a cross-platform minimum viable messenger app in purely in Go using Gioui framework that has extended beyond catchat
 * [Catchat](https://github.com/katzenpost/catchat) a QT cross-platform metadata minimizing messenger application utilizing catshadow.
-* [Catshadow](https://github.com/katzenpost/katzenpost/catshadow) is a mix network messaging system. This repository contains a client library which can be used with a Katzenpost mix network. It not only uses strong modern end to end encryption (Noise + Double Ratchet), but it is also designed to reduce the amount of metadata leaked onto the network.
-* [Client](https://github.com/katzenpost/katzenpost/client) is a mixnet client library you can use to write applications that interact with mixnet services.
-* [Server](https://github.com/katzenpost/katzenpost/server) is the mix and provider daemons that route messages and run services.
-* [Authority](https://github.com/katzenpost/katzenpost/authority) are the PKI daemons that provide key and service information to the network.
-* [Mailproxy](https://github.com/katzenpost/mailproxy) is a POP3/SMTP proxy to use email clients with katzenpost
+* [Catshadow](https://github.com/katzenpost/katzenpost/tree/main/catshadow) is a mix network messaging system. This repository contains a client library which can be used with a Katzenpost mix network. It not only uses strong modern end to end encryption (Noise + Double Ratchet), but it is also designed to reduce the amount of metadata leaked onto the network.
+* [Client](https://github.com/katzenpost/katzenpost/tree/main/client) is a mixnet client library you can use to write applications that interact with mixnet services.
+* [Server](https://github.com/katzenpost/katzenpost/tree/main/server) is the mix and provider daemons that route messages and run services.
+* [Authority](https://github.com/katzenpost/katzenpost/tree/main/authority) are the PKI daemons that provide key and service information to the network.
 * [Server_Plugins](https://github.com/katzenpost/server_plugins) are examples of a mixnet service plugins written in golang and rust.
 
 ### Project Ideas
