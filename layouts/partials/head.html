@@ -1,0 +1,69 @@
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        {{ $isHomePage := eq .Title .Site.Title }}
+        {{ if eq $isHomePage false }}
+            {{ if eq .Type "item" }}{{ i18n .Title . }}
+            {{ else }}{{ .Title }}{{ end }}
+            : {{ .Site.Title }}
+        {{ else }}
+            {{ .Title }}
+        {{ end }}
+    </title>
+    <meta name="description" content="{{ $isHomePage := eq .Title .Site.Title }}{{ if eq $isHomePage false }}{{ .Description }}{{ else }}{{ .Site.Params.description }}{{ end }}" />
+    <meta name="robots" content="index, follow" />
+
+    <meta property="og:title" content="{{ $isHomePage := eq .Title .Site.Title }}{{ .Title }}{{ if eq $isHomePage false }} | {{ .Site.Title }}{{ end }}">
+    <meta property="og:description" content="{{ $isHomePage := eq .Title .Site.Title }}{{ if eq $isHomePage false }}{{ .Description }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ .Permalink }}" />
+    <meta property="og:locale" content="utf-8" />
+    <meta property="og:site_name" content="{{ .Site.Params.openGraphSiteName }}" />
+    <meta property="og:image" content="/images/katzenpost.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="200" />
+    <meta property="og:image:height" content="200" />
+
+    <link rel="icon" href="/images/katzenpost-32x32.png" sizes="32x32">
+
+    <script type="application/ld+json">
+    {
+        "@context" : "http://schema.org",
+        "@type" : "BlogPosting",
+        "mainEntityOfPage": {
+             "@type": "WebPage",
+             "@id": "{{ .Site.BaseURL }}"
+        },
+        "articleSection" : "{{ .Section }}",
+        "name" : "{{ .Title }}",
+        "headline" : "{{ .Title }}",
+        "description" : "{{ if .Description }}{{ .Description }}{{ else }}{{if .IsPage}}{{ .Summary }}{{ end }}{{ end }}",
+        "inLanguage" : "{{ .Language.Lang }}",
+        "author" : "Katzenpost",
+        "image" : "{{ .Site.BaseURL }}images/katzenpost.png",
+        "publisher":  {
+            "@type": "Organization",
+            "name": "Katzenpost",
+            "logo": "{{ .Site.BaseURL }}images/katzenpost.png"
+        },
+        "datePublished": "{{ .Date }}",
+        "dateModified" : "{{ .Date }}",
+        "url" : "{{ .Permalink }}"
+    }
+    </script>
+    <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="/css/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="/css/custom.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="/js/documentation_options.js"></script>
+    <script src="/js/jquery.js"></script>
+    <script src="/js/underscore.js"></script>
+    <script src="/js/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Katzenpost Blog Posts" href="blog/index.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+    {{ hugo.Generator }}
+</head>

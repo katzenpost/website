@@ -1,0 +1,29 @@
+languageCode: "en"
+defaultContentLanguage: "en"
+title: "Katzenpost Network"
+enableRobotsTXT: true
+canonifyURLs: true
+
+permalinks:
+  posts: "/blog/:slug/"
+
+# You can add your own taxonomies
+taxonomies:
+  tag: "tags"
+
+taxonomy:
+  # set taxonomyCloud: [] to hide taxonomy clouds
+  taxonomyCloud: ["tags"] 
+  # If used, must have same lang as taxonomyCloud
+  taxonomyCloudTitle: ["Tag Cloud"] 
+  # set taxonomyPageHeader: [] to hide taxonomies on the page headers
+  taxonomyPageHeader: ["tags"] 
+
+menu:
+  main:
+   - identifier: "blog"
+     pre: ""
+     page: "blog"
+     name: "Blog"
+     url: "/blog/"
+     weight: -180

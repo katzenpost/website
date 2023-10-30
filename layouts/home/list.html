@@ -1,0 +1,31 @@
+{{ define "main" -}}
+
+    {{ .Content }}
+
+    <!--{{ partial "widget_blog.html" }} -->
+
+    {{ partial "widget_docs.html" }}
+
+    {{ partial "widget_development.html" }}
+
+    {{ partial "widget_what_mixnet.html" }}
+
+    <ul>
+        {{ range .Site.Data.links }}
+        <li>
+            <a href="{{ .url }}">{{ .title }}</a>
+        </li>
+        {{ end }}
+    </ul>
+
+    <h2>Supported by</h2>
+    <ul>
+        {{ range .Site.Data.funding }}
+        <li>
+            <strong>{{ .title }}</strong>
+            {{ .description }}
+        </li>
+        {{ end }}
+    </ul>
+
+{{- end }}
