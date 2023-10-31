@@ -1,3 +1,0 @@
-[submodule "katzenpost"]
-	path = katzenpost
-	url = ssh://git@github.com/katzenpost/katzenpost
