@@ -1,7 +1,6 @@
 ---
 title: "Team"
 draft: false
-type: "page"
 permalink: "/team/"
 ---
 

@@ -1,19 +1,18 @@
 ---
 title: "Contribute"
 draft: false
-type: "page"
+menu: {main: {weight: 40}}
+type: "community"
 permalink: "/contribute/"
 ---
 
 
-Communication
-=============
+### Communication
 
  * IRC: irc.oftc.net #katzenpost <irc://irc.oftc.net/#katzenpost>
  * Mailing List <https://lists.mixnetworks.org/listinfo/katzenpost>
 
-Contribution Guidelines
-=======================
+### Contribution Guidelines
 
 * Get familiar with the various repositories on our [Github](https://www.github.com/katzenpost), in particular the [monorepo](https://www.github.com/katzenpost/katzenpost)
 
@@ -21,8 +20,7 @@ Contribution Guidelines
 
 * Open a pull request on [Github](https://github.com/katzenpost/katzenpost/pulls). We will help with occurring problems and merge your changes back into the main project.
 
-Where to Start
-==============
+### Where to Start
 
 We have a lot of repositories! The top-level packages that you'll probably want to look at first are:
 

@@ -19,7 +19,6 @@ unidirectional channel contains the required information to write to a
 correspondant's remote message spool.
 
 
-Android client
---------------
+### Android client
 
-`Glenn Sorrentino has created an Android user interface mock-up <./_static/slides/catshadow_android_ui_mock_up.pdf>`_
+Glenn Sorrentino has created an Android user interface mock-up [PDF](/slides/catshadow_android_ui_mock_up.pdf)
