@@ -11,7 +11,7 @@ permalink: "#"
 >  is the most fundamental privacy problem in cryptography: how can parties
 >  communicate in such a way that nobody knows who said what. More than a
 >  decade after the problem was introduced, [Rackoff and Simon](http://sci-hub.tw/10.1145/167088.167260) would comment on
->  the near-absence of attention being paid to the it." [Phillip Rogaway, The Moral Character of Cryptographic Work](moralcharacter.html) 
+>  the near-absence of attention being paid to the it." [Phillip Rogaway, The Moral Character of Cryptographic Work](/moral-character/) 
 
 ![](/images/katzenpost-overview.jpg)
 

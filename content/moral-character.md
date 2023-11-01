@@ -3,6 +3,8 @@ title: "The Moral Character of Cryptographic Work"
 draft: false
 type: "page"
 permalink: "/moral-character/"
+aliases:
+  - "/moralcharacter.html"
 ---
 
 
