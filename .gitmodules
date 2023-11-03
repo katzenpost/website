@@ -1,0 +1,4 @@
+[submodule "katzenpost"]
+	path = katzenpost
+	url = http://github.com/katzenpost/katzenpost
+	shallow = true
