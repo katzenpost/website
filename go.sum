@@ -16,6 +16,8 @@ github.com/google/docsy/dependencies v0.5.1/go.mod h1:EDGc2znMbGUw0RW5kWwy2oGgLt
 github.com/google/docsy/dependencies v0.6.0/go.mod h1:EDGc2znMbGUw0RW5kWwy2oGgLt0iVXBmoq4UOqstuNE=
 github.com/google/docsy/dependencies v0.7.0/go.mod h1:gihhs5gmgeO+wuoay4FwOzob+jYJVyQbNaQOh788lD4=
 github.com/google/docsy/dependencies v0.7.1/go.mod h1:gihhs5gmgeO+wuoay4FwOzob+jYJVyQbNaQOh788lD4=
+github.com/hugomods/decap-cms v0.2.0 h1:7n57pKxc8LLw2WB+XOiF6PFIl/Q+DkL0tHcEwj2eLs0=
+github.com/hugomods/decap-cms v0.2.0/go.mod h1:P9gUtk59PZYBCNVIqiovRPqI13WiKkutMtJl2YQLkMA=
 github.com/twbs/bootstrap v4.6.2+incompatible h1:TDa+R51BTiy1wEHSYjmqDb8LxNl/zaEjAOpRE9Hwh/o=
 github.com/twbs/bootstrap v4.6.2+incompatible/go.mod h1:fZTSrkpSf0/HkL0IIJzvVspTt1r9zuf7XlZau8kpcY0=
 github.com/twbs/bootstrap v5.2.3+incompatible h1:lOmsJx587qfF7/gE7Vv4FxEofegyJlEACeVV+Mt7cgc=
