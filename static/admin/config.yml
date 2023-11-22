@@ -1,0 +1,111 @@
+site_url: "http://localhost:1313"
+display_url: "http://localhost:1313"
+logo_url: "http://localhost:1313/branding/kp-logo-blue.png"
+backend:
+  name: "github"
+  branch: "hugoify-documentation"
+  repo: "katzenpost/katzenpost"
+  #preview_context: "my-provider/deployment"
+  api_root: "https://api.github.com"
+  site_domain: "http://localhost:1313"
+  base_url: "https://api.netlify.com"
+  auth_endpoint: "auth"
+  squash_merges: true
+  commit_messages:
+    create: "Create {{collection}} {{slug}}"
+    update: "Update {{collection}} {{slug}}"
+    delete: "Delete {{collection}} {{slug}}"
+    uploadMedia: "Upload {{path}}"
+    deleteMedia: "Delete {{path}}"
+publish_mode: "editorial_workflow"
+media_folder: "static/uploads"
+public_folder: "/uploads"
+summary: "{{title}} ({{date}})"
+locale: 'en'
+i18n:
+  structure: "multiple_folders"
+  locales: ["en"]
+  default_locale: "en"
+slug:
+  encoding: "ascii"
+  clean_accents: true
+  sanitize_replacement: "-"
+collections:
+  - name: "blog"
+    label: "Blog"
+    folder: "content/en/blog/news/"
+    extension: "md"
+    format: "frontmatter"
+    widget: "list"
+    create: true
+    slug: "{{slug}}"
+    preview_path: "blog/{{slug}}"
+    editor:
+      preview: true
+    path: "{{slug}}"
+    fields:
+      - label: "Title"
+        name: "title"
+        widget: "string"
+      - label: "Description"
+        name: "description"
+        widget: "string"
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        time_format: false
+        picker_utc: true
+      - label: "Author"
+        name: "author"
+        widget: "string"
+      - label: "Language"
+        name: "language"
+        widget: "select"
+        default: "English"
+        options:
+          - { value: "English", label: "English" }
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        max: 5
+        min: 1
+        allow_add: true
+      - label: "Body"
+        name: "body"
+        widget: "markdown"
+
+  - name: "docs"
+    label: "Documentation"
+    folder: "docs/"
+    nested:
+      depth: 2
+      summary: "{{title}}"
+    meta: { path: { widget: "string", label: "Path", index_file: "_index" } }
+    extension: "md"
+    format: "frontmatter"
+    widget: "list"
+    create: true
+    slug: "{{slug}}"
+    preview_path: "blog/{{slug}}"
+    editor:
+      preview: true
+    path: "{{slug}}"
+    fields:
+      - label: "Title"
+        name: "title"
+        widget: "string"
+      - label: "Link Title"
+        name: "linkTitle"
+        widget: "string"
+      - label: "Description"
+        name: "description"
+        widget: "string"
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        max: 5
+        min: 1
+        allow_add: true
+      - label: "Body"
+        name: "body"
+        widget: "markdown"
