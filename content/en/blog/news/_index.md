@@ -1,4 +1,6 @@
 ---
-title: News
-weight: 20
+title: "News"
+draft: false
+permalink: "/blog/"
 ---
+ 
