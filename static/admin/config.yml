@@ -1,13 +1,12 @@
-site_url: "http://localhost:1313"
-display_url: "http://localhost:1313"
-logo_url: "http://localhost:1313/branding/kp-logo-blue.png"
+site_url: "https://katzenpost.network"
+display_url: "https://katzenpost.network"
+logo_url: "https://katzenpost.network/branding/kp-logo-blue.png"
 backend:
   name: "github"
-  branch: "hugoify-documentation"
-  repo: "katzenpost/katzenpost"
-  #preview_context: "my-provider/deployment"
+  branch: "docsy"
+  repo: "katzenpost/website"
   api_root: "https://api.github.com"
-  site_domain: "http://localhost:1313"
+  site_domain: "https://katzenpost.network"
   base_url: "https://api.netlify.com"
   auth_endpoint: "auth"
   squash_merges: true
@@ -33,22 +32,18 @@ slug:
 collections:
   - name: "blog"
     label: "Blog"
-    folder: "content/en/blog/news/"
+    folder: "content/en/blog"
     extension: "md"
     format: "frontmatter"
     widget: "list"
     create: true
-    slug: "{{slug}}"
+    slug: "{{date}}-{{slug}}"
     preview_path: "blog/{{slug}}"
     editor:
       preview: true
-    path: "{{slug}}"
     fields:
       - label: "Title"
         name: "title"
-        widget: "string"
-      - label: "Description"
-        name: "description"
         widget: "string"
       - label: "Date"
         name: "date"
@@ -70,42 +65,25 @@ collections:
         max: 5
         min: 1
         allow_add: true
-      - label: "Body"
-        name: "body"
-        widget: "markdown"
-
-  - name: "docs"
-    label: "Documentation"
-    folder: "docs/"
-    nested:
-      depth: 2
-      summary: "{{title}}"
-    meta: { path: { widget: "string", label: "Path", index_file: "_index" } }
-    extension: "md"
-    format: "frontmatter"
-    widget: "list"
-    create: true
-    slug: "{{slug}}"
-    preview_path: "blog/{{slug}}"
-    editor:
-      preview: true
-    path: "{{slug}}"
-    fields:
-      - label: "Title"
-        name: "title"
-        widget: "string"
-      - label: "Link Title"
-        name: "linkTitle"
-        widget: "string"
       - label: "Description"
         name: "description"
         widget: "string"
-      - label: "Tags"
-        name: "tags"
-        widget: "list"
-        max: 5
-        min: 1
-        allow_add: true
       - label: "Body"
         name: "body"
         widget: "markdown"
+      - label: "Image"
+        name: "resources"
+        widget: "list"
+        allow_add: true
+        fields:
+          - { label: "Image", name: "src", widget: "image", default: "Everything is awesome!" }
+          - { label: "Title", name: "title", widget: "text"  }
+          - { label: "Credit", name: "params.byline", widget: "text" }
+      - label: "Version"
+        name: "version"
+        widget: "string"
+        default: ""
+      - label: "Draft"
+        name: "draft"
+        widget: "boolean"
+
