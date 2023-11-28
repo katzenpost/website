@@ -1,0 +1,8 @@
+baseURL: "http://localhost:1313/"
+languageCode: "en-us"
+title: "Katzenpost (dev)"
+enableRobotsTXT: true
+canonifyURLs: true
+summaryLength: 20
+cleanDestinationDir: true
+buildDrafts: true

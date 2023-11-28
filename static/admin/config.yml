@@ -53,21 +53,19 @@ collections:
       - label: "Author"
         name: "author"
         widget: "string"
+      - label: "Description"
+        name: "description"
+        widget: "string"
       - label: "Language"
         name: "language"
-        widget: "select"
+        widget: "hidden"
         default: "English"
-        options:
-          - { value: "English", label: "English" }
       - label: "Tags"
         name: "tags"
         widget: "list"
         max: 5
         min: 1
         allow_add: true
-      - label: "Description"
-        name: "description"
-        widget: "string"
       - label: "Body"
         name: "body"
         widget: "markdown"
@@ -87,3 +85,48 @@ collections:
         name: "draft"
         widget: "boolean"
 
+  - name: "pages"
+    label: "Pages"
+    folder: "content/en/pages"
+    extension: "md"
+    format: "frontmatter"
+    widget: "list"
+    create: true
+    slug: "{{slug}}"
+    preview_path: "{{slug}}"
+    editor:
+      preview: true
+    fields:
+      - label: "Title"
+        name: "title"
+        widget: "string"
+      - label: "Link Title"
+        name: "linkTitlte"
+        widget: "string"
+      - label: "Language"
+        name: "language"
+        widget: "hidden"
+        default: "English"
+      - label: "Description"
+        name: "description"
+        widget: "string"
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        max: 5
+        min: 1
+        allow_add: true
+      - label: "Body"
+        name: "body"
+        widget: "markdown"
+      - label: "Image"
+        name: "resources"
+        widget: "list"
+        allow_add: true
+        fields:
+          - { label: "Image", name: "src", widget: "image", default: "Everything is awesome!" }
+          - { label: "Title", name: "title", widget: "text"  }
+          - { label: "Credit", name: "params.byline", widget: "text" }
+      - label: "Draft"
+        name: "draft"
+        widget: "boolean"
