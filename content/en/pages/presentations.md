@@ -1,8 +1,8 @@
 ---
 title: "Presentations"
 draft: false
-type: "page"
-permalink: "/presentations/"
+type: "pages"
+slug: "/presentations/"
 ---
 
 Did you talk about mixnets somewhere? Send your slides and video links so we can add them! Also, you can use any of the material in our slides for your own presentations!

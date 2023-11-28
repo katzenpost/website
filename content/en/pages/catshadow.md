@@ -1,8 +1,9 @@
 ---
 title: "Catshadow"
+linkTitle: "Catshadow"
 draft: false
-type: "page"
-permalink: "/catshadow/"
+slug: "/catshadow/"
+type: "pages"
 ---
 
 Our premiere mix network client, catshadow is a work-in-progress:
