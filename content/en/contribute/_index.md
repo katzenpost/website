@@ -1,7 +1,6 @@
 ---
 title: "Contribute"
 draft: false
-menu: {main: {weight: 40}}
 type: "community"
 permalink: "/contribute/"
 ---
