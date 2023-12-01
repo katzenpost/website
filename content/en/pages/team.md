@@ -1,28 +1,54 @@
 ---
 title: "Katzenpost Team"
 linkTitle: "Team"
-permalink: "/team/"
+slug: "/team/"
 type: "pages"
 ---
 
 ## Current Team
 
-**masala**
-![Avatar masala](/images/team/masala.jpg)
-https://github.com/mixmasala
+{{<
+  teammate
+  name="masala"
+  role=""
+  img="/images/team/masala.jpg"
+  github="mixmasala"
+>}}
 
-**David Stainton**
-- ![Avatar David Stainton](/images/team/david.jpg)
-- https://github.com/david415
+{{<
+  teammate
+  name="David Stainton"
+  img="/images/team/david.jpg"
+  github="david415"
+>}}
 
-**Leif Ryge**
-- ![Avatar Leif Ryge](/images/team/leif.png)
-- https://github.com/leif
+{{<
+  teammate
+  name="Leif Ryge"
+  img="/images/team/leif.png"
+  github="leif"
+>}}
 
-**threebithacker**
-- ![Avatar threebithacker](/images/team/threebit.jpg)
-- https://github.com/threebithacker
+{{<
+  teammate
+  name="Eva Infeld, Ph.D."
+  img="/images/team/eva.jpeg"
+  github="evainfeld"
+>}}
 
+{{<
+  teammate
+  name="threebithacker"
+  img="/images/team/threebit.jpg"
+  github="threebithacker"
+>}}
+
+{{<
+  teammate
+  name="David Robinson, Ph.D."
+  img="/images/team/jdormansteele.png"
+  github="jdormansteele"
+>}}
 
 ### Contributors
 
