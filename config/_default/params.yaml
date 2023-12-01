@@ -24,7 +24,7 @@ taxonomy:
 
 ui:
   breadcrumb_disable: false
-  footer_about_disable: false
+  footer_about_disable: true
   navbar_logo: true
   navbar_translucent_over_cover_disable: true
   sidebar_menu_compact: true
@@ -43,72 +43,19 @@ ui:
     enable: false
 links:
   user:
-    - name: "User mailing list"
-      url: "https://lists.mixnetworks.org/listinfo/katzenpost"
-      icon: "fa fa-envelope"
-      desc: "Discussion and help from your fellow users"
-
     - name: "Developer mailing list"
       url: "https://lists.mixnetworks.org/listinfo/katzenpost"
       icon: "fa fa-envelope"
       desc: "Discuss development issues around the project"
-
     - name: "IRC #katzenpost (OFTC)"
       url: "irc://irc.oftc.net/#katzenpost"
       icon: "fa fa-comments"
       desc: "Chat with other project developers"
-
-    - name: "Technical Specifications"
-      url: "/docs/specifications"
-      icon: "fa fa-file-alt"
-      desc: "Cryptography and networking engineering specifications"
-
-    - name: "Dockerized Katzenpost"
-      url: "https://github.com/katzenpost/katzenpost/blob/main/docker/README.rst"
-      icon: "fa fa-file-alt"
-      desc: "Build and run a local Katzenpost mixnet for development and research"
-
-    - name: "Mixnet Academy"
-      url: "/mixnet-academy/"
-      icon: "fa fa-file-alt"
-      desc: "Papers, presentations, and general mixnet research which has influenced Katzenpost"
-
   developer:
     - name: "GitHub"
       url: "https://github.com/katzenpost/katzenpost"
       icon: "fab fa-github"
-      desc: "Our monorepo codebase is here!"
-
-    - name: "Katzenpost Client"
-      url: "https://github.com/katzenpost/katzenpost/tree/main/client"
-      icon: "fa fa-code"
-      desc: "Mixnet client library you can use to write applications that interact with mixnet services."
-
-    - name: "Katzenpost Server"
-      url: "https://github.com/katzenpost/katzenpost/tree/main/server"
-      icon: "fa fa-code"
-      desc: "The mix and provider daemons that route messages and run services"
-
-    - name: "Katzenpost Authority"
-      url: "https://github.com/katzenpost/katzenpost/tree/main/authority"
-      icon: "fa fa-code"
-      desc: "PKI daemons that provide key and service information to the network"
-
-    - name: "Server Plugins"
-      url: "https://github.com/katzenpost/katzenpost/tree/main/server_plugins"
-      icon: "fa fa-code"
-      desc: "are examples of a mixnet service plugins written in Golang and Rust"
-
-    - name: "Catshadow"
-      url: "https://github.com/katzenpost/katzenpost/tree/main/catshadow"
-      icon: "fa fa-code"
-      desc: "A messaging system which contains the client library and is used with a Katzenpost Mix Network designed to reduce metadata leaked onto the network."
-
-    - name: "Katzen"
-      url: "https://github.com/katzenpost/katzen"
-      icon: "fa fa-comments"
-      desc: "A cross-platform messenger app written in Go with the Gioui framework and Catshadow messaging service."
-
+      desc: "Katzenpost monorepo codebase is here!"
 
 decap_cms:
   media_folder: "static/images/uploads"
