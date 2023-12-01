@@ -6,21 +6,19 @@ description: ">
   Our site was a migration from Sphincs to Hugo and utilizes the well crafted
   and maintained Docsy theme." 
 date: 2023-11-24
-author: "Team"
+author: "yippyskippy"
 tags: ["website", "launches", "hugo"]
 resources:
-  - src: "**.{png,jpg}"
-    title: "Image #:counter"
-    params:
-      byline: "Photo: Frei Katz Union / CC-BY-CA"
-draft: true
+draft: false
 ---
 
 To match all the code development in Katzenpost in the last year, it was time
-for a website relaunch. Our site was a migration from Sphincs to Hugo and
-utilizes the well crafted and maintained Docsy theme.
+for a website relaunch. Our site was a migration from Sphinx, which is primarily
+for documentation, to Hugo which is wildly configurable for all sorts of
+websites. Given the technical nature and need for nice documentation interface,
+we used the well crafted and maintained Docsy theme.
 
-**Tools**
+**Website Dependencies**
 
 - [Hugo](https://gohugo.io) static site generator
 - [Docsy](https://docsy.dev) theme for Hugo
