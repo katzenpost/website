@@ -115,3 +115,6 @@ decap_cms:
   public_folder: "/images/uploads"
   publish_mode: "editorial_workflow"
   search: true
+  preview_styles:
+    - "/scss/main.css"
+

@@ -25,6 +25,8 @@ github.com/hugomods/decap-cms v0.3.0 h1:TXv9VVQLxXTuWy50KtK8nFzEVCjGNNqsQV6GR+4h
 github.com/hugomods/decap-cms v0.3.0/go.mod h1:P9gUtk59PZYBCNVIqiovRPqI13WiKkutMtJl2YQLkMA=
 github.com/hugomods/decap-cms v0.6.0 h1:PzeN7kHfmh6UWME1jTgsh6z9PK/hl+VgC18N6iqqyMw=
 github.com/hugomods/decap-cms v0.6.0/go.mod h1:P9gUtk59PZYBCNVIqiovRPqI13WiKkutMtJl2YQLkMA=
+github.com/hugomods/decap-cms v0.7.0 h1:Gg0eKyZe/P++GTRgu0b6w0FJb5SCl+ysEHQNQ9DMTEM=
+github.com/hugomods/decap-cms v0.7.0/go.mod h1:P9gUtk59PZYBCNVIqiovRPqI13WiKkutMtJl2YQLkMA=
 github.com/twbs/bootstrap v4.6.2+incompatible h1:TDa+R51BTiy1wEHSYjmqDb8LxNl/zaEjAOpRE9Hwh/o=
 github.com/twbs/bootstrap v4.6.2+incompatible/go.mod h1:fZTSrkpSf0/HkL0IIJzvVspTt1r9zuf7XlZau8kpcY0=
 github.com/twbs/bootstrap v5.2.3+incompatible h1:lOmsJx587qfF7/gE7Vv4FxEofegyJlEACeVV+Mt7cgc=
