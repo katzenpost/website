@@ -5,16 +5,18 @@
     <div class="container text-center td-arrow-down">
       <span class="h4 mb-0">
         <h1>{{ .Title }}</h1>
-        list.html
+        {{ if .Description }}<p>{{ .Description }}</p>{{ end }}
       </span>
     </div>
   </div>
 </section>
 
-{{ with .Content -}}
-<div class="td-content">
-{{ . }}
+<div class="container">
+    {{ with .Content -}}
+    <div class="td-content">
+    {{ . }}
+    </div>
+    {{- end -}}
 </div>
-{{- end -}}
 
 {{ end }}

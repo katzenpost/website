@@ -11,10 +11,12 @@
   </div>
 </section>
 
-{{ with .Content -}}
-<div class="td-content">
-{{ . }}
+<div class="container">
+    {{ with .Content -}}
+    <div class="td-content">
+    {{ . }}
+    </div>
+    {{- end -}}
 </div>
-{{- end -}}
 
 {{ end }}
