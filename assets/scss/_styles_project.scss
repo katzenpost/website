@@ -1,0 +1,109 @@
+/* Bootstrap classes - _styles_project.scss */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/FiraSans-LightItalic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/FiraSans-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/FiraSans-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/FiraSans-Light.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/FiraSans-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/FiraSans-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/FiraSans-Bold.woff2') format('woff2');
+}
+
+
+/* Stylez */
+.h1,
+.h2,
+.h3 {
+    font-weight: 700 !important;
+}
+
+.td-navbar {
+    .nav-link {
+        font-weight: 400 !important;
+
+        &:hover {
+            color: $white;
+        }
+    }
+
+    .td-search__input {
+        background-color: darken($primary, 5%);
+    }
+}
+
+.td-sidebar-link {
+    &:hover {
+        color: $primary !important;
+    }
+}
+
+.td-box {
+    div { div { p {
+                img {
+                    max-width: 100%;
+                    display: inline-block;
+                }
+            }
+        }
+    }
+}
+
+
+div.td-arrow-down p {
+    font-weight: 300 !important;
+}
+
+header.article-meta {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid $gray-400;
+}
+
+.td-overlay--dark::after {
+    background-color: transparent !important;
+}
