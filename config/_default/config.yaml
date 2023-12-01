@@ -57,4 +57,3 @@ module:
     - path: "github.com/google/docsy/dependencies"
       disable: false
     - path: "github.com/hugomods/decap-cms"
-
