@@ -34,7 +34,7 @@ enhancing technology for the last two decades.
 Browse recent and past talks and presentations about Katzenpost and mixnets designs.
 {{% /blocks/feature %}}
 
-{{% blocks/feature icon="fa fa-code" title="Contributions Welcome" url="/contributions" %}}
+{{% blocks/feature icon="fa fa-code" title="Contributions Welcome" url="/contribute" %}}
 We welcome code contributions, review, and academic research about our mixnet
 designs and cryptography.
 {{% /blocks/feature %}}
