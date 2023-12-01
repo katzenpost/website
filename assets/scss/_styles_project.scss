@@ -83,8 +83,14 @@
     }
 }
 
+section.header p {
+    font-weight: 400 !important;
+}
+
 .td-box {
-    div { div { p {
+    div {
+        div {
+            p {
                 img {
                     max-width: 100%;
                     display: inline-block;

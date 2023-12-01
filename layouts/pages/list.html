@@ -1,19 +1,19 @@
 {{ define "main" -}}
 <div><a class="td-offset-anchor"></a></div>
-<section class="row td-box td-box--primary position-relative td-box--height-auto">
+<section class="header row td-box td-box--primary position-relative td-box--height-auto">
   <div class="col-12">
-    <div class="container text-center td-arrow-down">
+    <div class="container text-center">
       <span class="h4 mb-0">
         <h1>{{ .Title }}</h1>
-        {{ if .Description }}<p>{{ .Description }}</p>{{ end }}
       </span>
+      {{ if .Description }}<p>{{ .Description }}</p>{{ end }}
     </div>
   </div>
 </section>
 
 <div class="container">
     {{ with .Content -}}
-    <div class="td-content">
+    <div class="td-content mb-5">
     {{ . }}
     </div>
     {{- end -}}
