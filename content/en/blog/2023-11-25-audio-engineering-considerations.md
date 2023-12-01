@@ -1,9 +1,9 @@
 ---
 title: 'Audio Engineering Considerations for a Modern Mixnet'
-description: ""
+description: "Original research into audio engineering considerations for apps on low latency mixnetworks"
 date: 2023-11-25
 language: "English"
-author: "Team"
+author: "Brett Preston"
 tags: ["research", "audio", "apps"]
 draft: false
 ---
@@ -17,4 +17,12 @@ unique setting, we present a set of recommendations for implementing codecs,
 DSPs, and sophisticated noise reduction tools, to deliver either impressive
 quality at low bandwidth or good quality at impressively low bandwidth.
 
-- [Read Research Paper](/research/#)
+**Read Research Paper**
+
+{{<
+    download
+    name="Audio Engineering Considerations for a Modern Mixnet"
+    url="/research/Audio%20Engineering%20Considerations%20for%20a%20Modern%20Mixnet%20-%20Brett%20Preston.pdf"
+    ext="PDF"
+    size="295K"
+>}}
