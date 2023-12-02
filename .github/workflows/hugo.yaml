@@ -38,8 +38,10 @@ jobs:
       - name: Install node v18
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-        run: npm install -D postcss
+          node-version: 18.19
+
+      - name: Install PostCSS
+        run: npm install -D autoprefixer postcss postcss-cli
 
       - name: Setup Pages
         id: pages
