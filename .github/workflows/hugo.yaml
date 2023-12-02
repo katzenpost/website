@@ -28,14 +28,23 @@ jobs:
         run: |
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
           && sudo dpkg -i ${{ runner.temp }}/hugo.deb          
+
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
+
+      - name: Install node v18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+        run: npm install -D postcss
+
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v3.0.6
+
       - name: Build with Hugo
         env:
           HUGO_ENVIRONMENT: production
@@ -44,6 +53,7 @@ jobs:
           hugo \
             --gc \
             --baseURL "https://katzenpost.network/"          
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:

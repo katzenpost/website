@@ -7,7 +7,7 @@ url_latest_version: "https://katzenpost.network"
 github_repo: "https://github.com/katzenpost/website"
 github_project_repo: "https://github.com/katzenpost/katzenpost"
 github_branch: "main"
-algolia_docsearch: false
+algolia: false
 offlineSearch: true
 prism_syntax_highlighting: false
 
