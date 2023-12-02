@@ -1,0 +1,67 @@
+copyright: "Katzenpost"
+privacy_policy: "/privacy"
+version_menu: "Releases"
+archived_version: false
+version: '0.0'
+url_latest_version: "https://katzenpost.network"
+github_repo: "https://github.com/katzenpost/website"
+github_project_repo: "https://github.com/katzenpost/katzenpost"
+github_branch: "main"
+algolia_docsearch: false
+offlineSearch: true
+prism_syntax_highlighting: false
+
+taxonomy:
+  taxonomyCloud:
+    - "tags"
+    - "categories"
+  taxonomyCloudTitle:
+    - "Browse by Tag"
+    - "Categories"
+  taxonomyPageHeader:
+    - "tags"
+    - "categories"
+
+ui:
+  breadcrumb_disable: false
+  footer_about_disable: true
+  navbar_logo: true
+  navbar_translucent_over_cover_disable: true
+  sidebar_menu_compact: true
+  sidebar_search_disable: false
+  feedback:
+    enable: true
+    'yes': >-
+      Glad to hear it! Please <a
+      href="https://github.com/katzenpost/website/issues/new">tell us how we can
+      improve</a>.
+    'no': >-
+      Sorry to hear that. Please <a
+      href="https://github.com/katzenpost/website/issues/new">tell us how we can
+      improve</a>.
+  readingtime:
+    enable: false
+links:
+  user:
+    - name: "Developer mailing list"
+      url: "https://lists.mixnetworks.org/listinfo/katzenpost"
+      icon: "fa fa-envelope"
+      desc: "Discuss development issues around the project"
+    - name: "IRC #katzenpost (OFTC)"
+      url: "irc://irc.oftc.net/#katzenpost"
+      icon: "fa fa-comments"
+      desc: "Chat with other project developers"
+  developer:
+    - name: "GitHub"
+      url: "https://github.com/katzenpost/katzenpost"
+      icon: "fab fa-github"
+      desc: "Katzenpost monorepo codebase is here!"
+
+decap_cms:
+  media_folder: "static/images/uploads"
+  public_folder: "/images/uploads"
+  publish_mode: "editorial_workflow"
+  search: true
+  preview_styles:
+    - "/scss/main.css"
+

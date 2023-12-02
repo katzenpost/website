@@ -1,29 +1,59 @@
-languageCode: "en"
+baseURL: "/"
+title: "Katzenpost"
+contentDir: "content/en"
 defaultContentLanguage: "en"
-title: "Katzenpost Network"
+defaultContentLanguageInSubdir: false
+enableMissingTranslationPlaceholders: true
 enableRobotsTXT: true
-canonifyURLs: true
-
-permalinks:
-  posts: "/blog/:slug/"
-
-# You can add your own taxonomies
+enableGitInfo: true
 taxonomies:
   tag: "tags"
+  category: "categories"
+  pygmentsCodeFences: true
+  pygmentsUseClasses: false
+  pygmentsUseClassic: false
+  pygmentsStyle: "tango"
+permalinks:
+  page:
+    pages: "/:slug"
+  section: 
+    docs: "/:slug"
+    blog: "/:slug"
 
-taxonomy:
-  # set taxonomyCloud: [] to hide taxonomy clouds
-  taxonomyCloud: ["tags"] 
-  # If used, must have same lang as taxonomyCloud
-  taxonomyCloudTitle: ["Tag Cloud"] 
-  # set taxonomyPageHeader: [] to hide taxonomies on the page headers
-  taxonomyPageHeader: ["tags"] 
+imaging:
+  resampleFilter: "CatmullRom"
+  quality: 75
+  anchor: "smart"
+languages:
+  en:
+    languageName: "English"
+    weight: 1
+    params:
+      title: "Katzenpost"
+      description: "A next generation privacy preserving mixnet with post-quantum cryptography"
 
-menu:
-  main:
-   - identifier: "blog"
-     pre: ""
-     page: "blog"
-     name: "Blog"
-     url: "/blog/"
-     weight: -180
+markup:
+  goldmark:
+    parser:
+      attribute:
+        block: true
+    renderer:
+      unsafe: true
+  highlight:
+    style: "tango"
+outputs:
+  section:
+    - "HTML"
+    - "print"
+    - "RSS"
+    - "DecapCMSConfig"
+module:
+  hugoVersion:
+    extended: true
+    min: "0.110.0"
+  imports:
+    - path: "github.com/google/docsy"
+      disable: false
+    - path: "github.com/google/docsy/dependencies"
+      disable: false
+    - path: "github.com/hugomods/decap-cms"
