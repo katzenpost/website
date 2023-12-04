@@ -13,12 +13,12 @@ taxonomies:
   pygmentsUseClasses: false
   pygmentsUseClassic: false
   pygmentsStyle: "tango"
+
 permalinks:
   page:
     pages: "/:slug"
   section: 
-    docs: "/:slug"
-    blog: "/:slug"
+    blog: "/blog/:slug"
 
 imaging:
   resampleFilter: "CatmullRom"
