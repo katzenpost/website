@@ -19,8 +19,14 @@ description: "Welcome to the Katzenpost project. We are creating traffic analysi
 {{< /blocks/cover >}}
 
 
-{{% blocks/lead color="primary" title="Bleep. Bloop" %}}
-Katzenpost is a free software project. We write mix network protocol libraries. What is a mix network? It is an anonymous communications system… however the word anonymous is problematic because some government authorities equate anonymity with terrorism. We prefer to instead call it “network security” because you can feel more secure when you communicate using traffic analysis resistant communications protocols.
+{{% blocks/lead color="primary" title="" %}}
+Katzenpost is a free software project. We write mix network protocol
+libraries. What is a mix network? It is an anonymous communications
+system… however the word anonymous is problematic because some
+government authorities equate anonymity with terrorism. We prefer to
+instead call it “network security” because you can feel more secure
+when you communicate using traffic analysis resistant communications
+protocols.
 {{% /blocks/lead %}}
 
 <!-- Triplet Section: Gray -->
@@ -34,8 +40,4 @@ enhancing technology for the last two decades.
 Browse recent and past talks and presentations about Katzenpost and mixnets designs.
 {{% /blocks/feature %}}
 
-{{% blocks/feature icon="fa fa-code" title="Contributions Welcome" url="/contribute" %}}
-We welcome code contributions, review, and academic research about our mixnet
-designs and cryptography.
-{{% /blocks/feature %}}
 {{% /blocks/section %}}
