@@ -20,5 +20,7 @@ We thank Wau Holland Stiftung for funding this work.
 
 
 
-Note form Eva: I understand that the tone of some of this analysis may come across as harsh. I personally take full responsibility for this tone and critique in particular. I can't help but approach some of the Mixnet research from a point of view of the mathematician that I am, and point out when it lacks rigor or makes false claims. When we talk about security and privacy, carelessness has a real, human cost. The Katzenpost Project believes in treating modern threats seriously, rather than dealing with toy models and superficial designs. At the same time, the point of this doc is not to present original research. Some exploitable mistakes in existing research were withheld from this version, and original contributions are included if I, personally, feel like they are merely reinventing the wheel in bridging some of the gaps between Mixnets and Mathematics. Some of the other original research is mentioned, but will be expanded on elsewhere.
+Note form Eva: I understand that the tone of some of this analysis may come across as harsh. I personally take full responsibility for this tone and critique in particular.
+
+At the same time, the point of this doc is not to present original research. Some exploitable mistakes in existing research were withheld from this version, and original contributions are included if I, personally, feel like they are merely reinventing the wheel in bridging some of the gaps between Mixnets and Mathematics. Some of the other original research is mentioned, but will be expanded on elsewhere.
 
