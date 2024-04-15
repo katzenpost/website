@@ -8,10 +8,17 @@ tags: ["research", "cryptography", "design", "outreach", "mathematics"]
 draft: true
 ---
 
-We are presenting our overview of existing Mixnet literature. It includes some proposed changes to how we define certain terms, and points out a few of the shortcomings of some existing papers. It also endeavors to introduce the reader to the language of anonymity systems, and take first steps towards a true rigorous framework of the field.
+We are presenting our overview of existing Mixnet literature. It takes some liberties with what is included or not. It proposes new ways to talk about some issues, and provides a critical analysis of some of the existing papers. It also endeavors to introduce the reader to the language of anonymity systems, while maintaining mathematical rigor.
+
+This doc, in particular, does not talk about the Katzenpost design. It does introduce the reader to some of the reasons why we've been making certain design decisions, and a keen eye might be led to some of the similar conclusions. But here we focus on already published research. We also stick to theory and don't focus on any practical systems being built today.
+
+The specific networking decisions implemented in Katzenpost so far, and the threats they mitigate and don't, will be addressed in an upcoming, detailed threat model document.
+
+We thank Wau Holland Stiftung for funding this work.
+
+[Lit Review Doc](https://github.com/katzenpost/website/tree/main/content/en/pages/Literature_overview__website_version.pdf)
 
 
 
-Note form Eva: I understand that the tone of some of this analysis may come across as harsh. I personally take full responsibility for this tone and critique in particular. I can't help but approach some of the Mixnet research from a point of view of the mathematician that I am, and point out when it lacks rigor or makes false claims. When we talk about security and privacy, carelessness has a very real, human cost. The Katzenpost project treats modern threats seriously, and toy models and superficial designs may produce sub-par papers, but are not productive. At the same time, the point of this doc is not to present original research. Some exploitable mistakes in existing research were withheld from this version, and original contributions are included if I, personally, feel like they are merely reinventing the wheel in bridging some of the gaps between Mixnets and Mathematics. Some other original research is mentioned, but will be expanded on elsewhere. Bring on the scorn.
+Note form Eva: I understand that the tone of some of this analysis may come across as harsh. I personally take full responsibility for this tone and critique in particular. I can't help but approach some of the Mixnet research from a point of view of the mathematician that I am, and point out when it lacks rigor or makes false claims. When we talk about security and privacy, carelessness has a real, human cost. The Katzenpost Project believes in treating modern threats seriously, rather than dealing with toy models and superficial designs. At the same time, the point of this doc is not to present original research. Some exploitable mistakes in existing research were withheld from this version, and original contributions are included if I, personally, feel like they are merely reinventing the wheel in bridging some of the gaps between Mixnets and Mathematics. Some of the other original research is mentioned, but will be expanded on elsewhere.
 
-Literature_overview__website_version.pdf
