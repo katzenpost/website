@@ -16,7 +16,7 @@ The specific networking decisions implemented in Katzenpost so far, and the thre
 
 We thank Wau Holland Stiftung for funding this work.
 
-[Lit Review Doc](https://github.com/katzenpost/website/tree/main/content/en/pages/Literature_overview__website_version.pdf)
+[Lit Review Doc](https://github.com/katzenpost/website/static/research/Literature_overview__website_version.pdf)
 
 
 
