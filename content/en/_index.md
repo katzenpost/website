@@ -10,9 +10,6 @@ description: "Welcome to the Katzenpost project. We are creating traffic analysi
 </div>
 <h1 class="display-3 mt-0 mt-md-3">Welcome to Katzenpost</h1>
 <p class="lead">We are creating traffic analysis resistant messaging</p>
-<a class="btn btn-lg btn-primary me-3 mb-4" href="/about/">
-  Learn More <i class="fas fa-arrow-alt-circle-right ms-2"></i>
-</a>
 <a class="btn btn-lg btn-secondary me-3 mb-4" href="https://github.com/katzenpost/katzenpost">
   Codebase <i class="fab fa-github ms-2 "></i>
 </a>
