@@ -5,7 +5,7 @@ date: 2024-04-15
 language: "English"
 author: "E. Infeld, D. Stainton"
 tags: ["research", "cryptography", "design", "outreach", "mathematics"]
-draft: true
+draft: false
 ---
 
 We are presenting our overview of existing Mixnet literature. It takes some liberties with what is included or not. It proposes new ways to talk about some issues, and provides a critical analysis of some of the existing papers. It also endeavors to introduce the reader to the language of anonymity systems, while maintaining mathematical rigor.
