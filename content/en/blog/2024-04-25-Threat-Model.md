@@ -4,7 +4,7 @@ date: 2024-04-25
 description: ""
 author: "D. Stainton, E. Infeld"
 tags: ["research", "design", "threat model", "security", "privacy", "cryptography"]
-draft: true
+draft: false
 ---
 
 Here we present a draft of the Katzenpost mixnet threat model document.
