@@ -15,9 +15,9 @@ and we have arrnaged attacks in a table with corresponding attacker
 capabilities. Later sections of the document present a deep dive into the core cryptographic
 protocols that comprise Katzenpost, namely these three:
 
-1. Katzenpost Directory Authority PKI protocols
+1. Katzenpost Directory Authority PKI protocol
 2. PQ Noise based wire protocol (on top of TCP or QUIC)
-3. Sphinx nest encrypted packet routing protocol
+3. Sphinx nested encrypted packet routing protocol
 
 Those are the basics necessary for point to point communications through the mix network.
 However mixnet protocols will then add their own cryptographic protocols which simply
