@@ -11,7 +11,7 @@ Here we present a draft of the Katzenpost mixnet threat model document.
 We regard the threat model document as a living document which is frequently
 edited and in need of ongoing maintenance as we continue to develop newer
 mixnet protocols. Currently it is being organized by mixnet attack category
-and we have arrnaged attacks in a table with corresponding attacker
+and we have arranged attacks in a table with corresponding attacker
 capabilities. Later sections of the document present a deep dive into the core cryptographic
 protocols that comprise Katzenpost, namely these three:
 
