@@ -2,16 +2,16 @@
 title: "Katzenpost threat model document"
 date: 2024-04-25
 description: ""
-author: "E. Infeld, D. Stainton"
+author: "D. Stainton, E. Infeld"
 tags: ["research", "design", "threat model", "security", "privacy", "cryptography"]
 draft: true
 ---
 
 Here we present a draft of the Katzenpost mixnet threat model document.
 We regard the threat model document as a living document which is frequently
-edited and in need of ongoing maintenance as we continue to develope newer
+edited and in need of ongoing maintenance as we continue to develop newer
 mixnet protocols. Currently it is being organized by mixnet attack category
-and we have attempted to present of table of attacks and corresponding attacker
+and we have arrnaged attacks in a table with corresponding attacker
 capabilities. Later sections of the document present a deep dive into the core cryptographic
 protocols that comprise Katzenpost, namely these three:
 
