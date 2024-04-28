@@ -22,7 +22,7 @@ quality at low bandwidth or good quality at impressively low bandwidth.
 {{<
     download
     name="Audio Engineering Considerations for a Modern Mixnet"
-    url="/research/Audio%20Engineering%20Considerations%20for%20a%20Modern%20Mixnet%20-%20Brett%20Preston.pdf"
+    url="/research/Audio_Engineering_Considerations_for_a_Modern_Mixnet.pdf"
     ext="PDF"
     size="295K"
 >}}
