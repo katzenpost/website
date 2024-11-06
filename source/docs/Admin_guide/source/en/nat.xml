@@ -5,7 +5,8 @@
 
 <?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 
-<!--A DOCTYPE declaration declaring a DTD is not need for DocBook 5.x, which uses RelaxNG and  Schematron instead. It is used here as a container for entity declarations.-->
+<!--A DOCTYPE declaration declaring a DTD is not need for DocBook 5.x, which uses RelaxNG and  Schematron instead. 
+    It is used here as a container for entity declarations.-->
 
 <!DOCTYPE chapter 
 [
@@ -15,8 +16,8 @@
 
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="components">
-    <title xml:id="components.title">Using echomix from behind a NAT device</title>
-    <para>echomix can be used from behind NAT devices. Both mix and dirauth nodes.</para>
+    <title xml:id="components.title">Using &program_name; from behind a NAT device</title>
+    <para>&program_name; can be used from behind NAT devices. Both mix and dirauth nodes.</para>
     <para>Some networking scenearios do not require any manual port forwarding, such as operating an ec2 node on AWS,
     the node listens on an internal IP address yet can receive connections that get routed to a public IP address.
     There is a NAT device involved here but it's default policy is to route all trafic to the node.
