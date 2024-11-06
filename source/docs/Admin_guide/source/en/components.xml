@@ -5,7 +5,7 @@
 [
    <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
     %shared-content;
- 
+<!-- 
     <!ELEMENT xi:include (xi:fallback?) > 
     <!ATTLIST xi:include 
         xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
@@ -25,7 +25,7 @@
     <!ENTITY % local.divcomponent.mix "| xi:include"> 
     <!ENTITY % local.para.char.mix "| xi:include"> 
     <!ENTITY % local.info.class "| xi:include"> 
-    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
 ]> 
     
 <chapter id="components">
@@ -72,11 +72,8 @@
             <para>The following configuration is drawn from the reference implementation in
                     <filename>katzenpost/docker/voting_mixnet/auth1/authority.toml</filename>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
-                more information about the test mixnet, see <olink targetdoc="docker.xml"
-                    targetptr="container">Using the &program_name; test network</olink> .</para>
-            
-            <para></para>
-            
+                more information about the test mixnet, see 
+                <emphasis role="bold"><xref endterm="container.title" linkend="container"/></emphasis>.</para>
             
             <!--General TOML note:
 
@@ -606,8 +603,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             <para>The following configuration is drawn from the reference implementation in
                     <filename>katzenpost/docker/voting_mixnet/mix1/katzenpost.toml</filename>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
-                more information about the test mixnet, <!--see <link linkend="container"
-                    endterm="container.title">Using the &program_name; test network</link>.--></para>
+                more information about the test mixnet, see 
+                <emphasis role="bold"><xref endterm="container.title" linkend="container"/></emphasis>.</para>
             <section id="mix-server-section-config">
                 <title id="mix-server-section-config.title">Server section</title>
                 <para/>
@@ -670,8 +667,9 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             <para>The following configuration is drawn from the reference implementation in
                     <filename>katzenpost/docker/voting_mixnet/gateway1/katzenpost.toml</filename>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
-                address. For more information about the test mixnet, <!--see <link linkend="container"
-                    endterm="container.title">Using the &program_name; test network</link>.--></para>
+                address. For
+                more information about the test mixnet, see 
+                <emphasis role="bold"><xref endterm="container.title" linkend="container"/></emphasis>.</para>
             <section id="gateway-server-section-config">
                 <title id="gateway-server-section-config.title">Server section</title>
                 <para/>
@@ -797,8 +795,9 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             <para>The following configuration is drawn from the reference implementation in
                 <filename>katzenpost/docker/voting_mixnet/servicenode1/authority.toml</filename>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
-                address. For more information about the test mixnet, see <!--<link linkend="container"
-                    endterm="container.title">Using the Katzenpost test network</link>.--></para>
+                address. For
+                more information about the test mixnet, see 
+                <emphasis role="bold"><xref endterm="container.title" linkend="container"/></emphasis>.</para>
             <section id="service-server-section-config">
                 <title id="service-server-section-config.title">Server section</title>
                 <para>The Server section contains mandatory information common to all nodes, for
