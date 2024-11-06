@@ -10,11 +10,11 @@
     <title id="xincludes.title">XIncludes repository</title>
     
 <!--  serverconfig  -->
-    <simplesect id="serverconfig">
-        <title id="serverconfig.title"></title>
+    <simplesect>
+        <title></title>
         <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/server/config/config.go#L84-->
         <!--The config code varies by role so it is not included in this entity.-->       
-        <informalexample id="XInclude_serverconfig"> 
+        <informalexample> 
             <itemizedlist>
                 <listitem>
                     <para><emphasis role="bold">Identifier</emphasis></para>
@@ -89,10 +89,10 @@
 
 <!-- logging -->
 
-    <simplesect id="logging">
-        <title id="logging.title"></title>
+    <simplesect>
+        <title></title>
         <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L78-->
-        <informalexample id="XInclude_logging"> 
+        <informalexample> 
             <para>The logging configuration section controls logging behavior across &program_name;.</para>
             <programlisting>[Logging]
                 Disable = false
@@ -131,10 +131,10 @@
     
 <!--  sphinxgeometry  -->
     
-    <simplesect id="sphinxgeometry">
-        <title id="sphinxgeometry.title">sphinxgeometry</title>
+    <simplesect>
+        <title>sphinxgeometry</title>
         <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/core/sphinx/geo/geo.go#L40-->
-        <informalexample id="XInclude_sphinxgeometry">        
+        <informalexample>        
             <para/>
             <programlisting>[SphinxGeometry]
                 PacketLength = 3082
@@ -253,10 +253,10 @@
     
 <!--  management  -->
     
-    <simplesect id="management">
-        <title id="management.title">management</title>
+    <simplesect>
+        <title>management</title>
         <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/server/config/config.go#L729-->
-           <informalexample id="XInclude_management"> 
+           <informalexample> 
            <para>Management is the &program_name; management interface configuration. The management section specifies connectivity information for the &program_name;
                control protocol which can be used to make configuration changes during
                run-time. An example configuration looks like this:</para>
@@ -284,9 +284,9 @@
     
 <!--  pki  -->
         
-    <simplesect id="pki">
-        <title id="pki.title">pki</title>     
-        <informalexample id="XInclude_pki"> 
+    <simplesect>
+        <title>pki</title>     
+        <informalexample> 
             <para>The PKI section contains the directory authority configuration for a mix, gateway, or service node.</para>
             <programlisting>[PKI]
 [PKI.Voting]
@@ -365,9 +365,9 @@
     
 <!--  serverdebug  -->
     
-    <simplesect id="serverdebug">
-        <title id="serverdebug.title">serverdebug</title>     
-        <informalexample id="XInclude_serverdebug">    
+    <simplesect>
+        <title>serverdebug</title>     
+        <informalexample>    
             <para>Debug is the &program_name; server debug configuration for advanced tuning.</para>   
             <programlisting>[Debug]
                 NumSphinxWorkers = 16

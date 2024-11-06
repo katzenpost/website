@@ -259,8 +259,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <title id="auth-logging.title">Logging section</title>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_logging"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/3)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />   
             </section>
             <section id="auth-parameters">
                 <title id="auth-parameters.title">Parameters section</title>
@@ -577,8 +577,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     validation by its peer dirauths. </para>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_sphinxgeometry"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/4)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />    
             </section>
         </section>
     </section>
@@ -626,45 +626,43 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 </para>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_serverconfig"  
+                    xpointer="element(/1/2)"  
                     xmlns:xi="http://www.w3.org/2001/XInclude" />     
             </section>
             <section id="mix-logging-config">
                 <title id="mix-logging-config.title">Logging section</title>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_logging" 
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/3)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />   
             </section>
             <section id="mix-pki-config">
                 <title id="mix-pki-config.title">PKI section</title>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_pki"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />                      
+                    xpointer="element(/1/6)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />                        
             </section>
             <section id="mix-management-config">
-                <title id="mix-management-config.title">Management section</title>
+                <title id="mix-management-config.title">Management section</title>              
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_management"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/5)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />                    
             </section>
             <section id="mix-sphinx-config">
                 <title id="mix-sphinx-config.title">SphinxGeometry section</title>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_sphinxgeometry"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/4)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />    
             </section>
             <section id="mix-debug-config">
-                <title id="mix-debug-config.title">Debug section</title>
-                
+                <title id="mix-debug-config.title">Debug section</title>                
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_serverdebug"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />  
-                
+                    xpointer="element(/1/7)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />                    
             </section>
         </section>
         <section id="gateway-config">
@@ -691,15 +689,15 @@ ldMtDsvvc9KUfE4I0+c+XQ==
         TCP = ["localhost:30004"]</programlisting>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_serverconfig"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/2)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />      
             </section>
             <section id="gateway-logging-config">
                 <title id="gateway-logging-config.title">Logging section</title>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_logging"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/3)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />      
             </section>
             <section id="gateway-gateway-section-config">
                 <?oxy_comment_start author="dwrob" timestamp="20240816T143000-0700" comment="Information needed."?>
@@ -769,31 +767,29 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <title id="gateway-pki-config.title">PKI section</title>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_pki"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/6)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />          
             </section>
             <section id="gateway-management-config">
                 <title id="gateway-management-config.title">Management section</title>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_management"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/5)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />  
             </section>
             <section id="gateway-sphinx-config">
                 <title id="gateway-sphinx-config.title">SphinxGeometry section</title>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_sphinxgeometry"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/4)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />    
             </section>
             <section id="gateway-debug-config">
                 <title id="gateway-debug-config.title">Debug section</title>
-                
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_serverdebug"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />  
-                               
+                    xpointer="element(/1/7)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />    
             </section>
         </section>
         <section id="service-config">
@@ -820,14 +816,14 @@ ldMtDsvvc9KUfE4I0+c+XQ==
     [Server.AltAddresses]</programlisting>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_serverconfig"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/2)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />   
             </section>
             <section id="service-logging-config">
                 <title id="service-logging-config.title">Logging section</title>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_logging"  
+                    xpointer="element(/1/3)"  
                     xmlns:xi="http://www.w3.org/2001/XInclude" />     
             </section>
             <section id="service-servicenode-section-config">
@@ -1044,31 +1040,29 @@ Package cborplugin is a plugin system allowing mix network services to be added 
                 <title id="service-pki-config.title">PKI section</title>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_pki"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/6)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />         
             </section>
             <section id="service-management-config">
                 <title id="service-management-config.title">Management section</title>
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_management"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/5)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" /> 
             </section>
             <section id="service-sphinx-config">
                 <title id="service-sphinx-config.title">SphinxGeometry section</title>
-                <xi:include  
+                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_sphinxgeometry"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                    xpointer="element(/1/4)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />    
             </section>
             <section id="service-debug-config">
                 <title id="service-debug-config.title">Debug section</title>
-
                 <xi:include  
                     href="includes/xincludes.xml"
-                    xpointer="XInclude_serverdebug"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />
-                
+                    xpointer="element(/1/7)"  
+                    xmlns:xi="http://www.w3.org/2001/XInclude" />                         
            </section>
         </section>
     </section>
