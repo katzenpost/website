@@ -120,7 +120,7 @@ type Config struct {
                         <para>Specifies the human-readable identifier for a node, and must be unique
                             per mixnet. Identifier can be an FQDN but does not have to be.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     &WireKEMScheme;
                     <listitem>
@@ -133,7 +133,7 @@ type Config struct {
                             "Ed25519 Sphincs+", "Ed448-Sphincs+", "Ed25519-Dilithium2",
                             "Ed448-Dilithium3" </para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Addresses</emphasis></para>
@@ -143,7 +143,7 @@ type Config struct {
                             start with either "tcp://" or "quic://" such as:
                             ["tcp://192.168.1.1:30001"] and ["quic://192.168.1.1:40001"].</para>
                         <para>Type: []string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">DataDir</emphasis></para>
@@ -152,7 +152,7 @@ type Config struct {
                             cryptographic key materials will be written to disk when started with
                             the "-g" commmand-line option.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
                 <para/>
@@ -211,7 +211,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             unique per mixnet. Identifier can be an FQDN but does not have to
                             be.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKey</emphasis></para>
@@ -220,7 +220,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             verify cryptographic signatures produced by its private identity
                             key.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
@@ -228,7 +228,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             authority nodes. PKISignatureScheme must match the scheme specified in
                             the Server section of the configuration. </para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
                     <listitem>
@@ -237,7 +237,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <para>String containing the peer's public link-layer key in PEM format.
                             LinkPublicKey must match the specified WireKEMScheme.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     &WireKEMScheme;
                     <listitem>
@@ -248,7 +248,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             start with either "tcp://" or "quic://" such as:
                             ["tcp://192.168.1.1:30001"] and ["quic://192.168.1.1:40001"].</para>
                         <para>Type: []string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
             </section>
@@ -284,14 +284,14 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <para>Specifies the maximum allowed rate of packets per client per gateway
                             node. Rate limiting is done on the gateway nodes.</para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Mu</emphasis></para>
                         <para>Specifies the inverse of the mean of the exponential distribution from
                             which the Sphinx packet per-hop mixing delay will be sampled.</para>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">MuMaxDelay</emphasis></para>
@@ -299,7 +299,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             milliseconds. </para>
                         <para>Type:
                             uint64<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                        <para><?oxy_custom_end?>Required:<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
+                        <para><?oxy_custom_end?>Required: Yes<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
                     </listitem><?oxy_custom_end?>
                     <listitem>
                         <para><emphasis role="bold">LambdaP</emphasis></para>
@@ -308,14 +308,14 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             whether actual messages from the FIFO egress queue or decoy messages if
                             the queue is empty.</para>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaPMaxDelay</emphasis></para>
                         <para>Specifies the maximum send delay interval for LambdaP in
                             milliseconds.</para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaL</emphasis></para>
@@ -323,14 +323,14 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             clients sample to determine the delay interval between loop
                             decoys.</para>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaLMaxDelay</emphasis></para>
                         <para>Specifies the maximum send delay interval for LambdaL in
                             milliseconds.</para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaD</emphasis></para>
@@ -338,13 +338,13 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             that clients sample to determine the delay interval between decoy drop
                             messages. </para>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaDMaxDelay</emphasis></para>
                         <para>Specifies the maximum send interval in for LambdaD in milliseconds. </para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaM</emphasis></para>
@@ -352,7 +352,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             that mix nodes sample to determine the delay between mix loop
                             decoys.</para>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaG</emphasis></para>
@@ -364,13 +364,13 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                 field is used internally by the dirauth server state machine.</para>
                         </warning>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaMMaxDelay</emphasis></para>
                         <para>Specifies the maximum delay for LambdaM in milliseconds.</para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
                     <listitem>
@@ -378,7 +378,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             >LambdaGMaxDelay</emphasis></para>
                         <para>Specifies the maximum delay for LambdaG in milliseconds.</para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
                 <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
@@ -396,21 +396,21 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <para><emphasis role="bold">Layers</emphasis></para>
                         <para>Number of non-service-provider layers in the network topology.</para>
                         <para>Type: int</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">MinNodesrPerLayer</emphasis></para>
                         <para>Minimum number of nodes per layer required to form a valid consensus
                             document.</para>
                         <para>Type: int</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">GenerateOnly</emphasis></para>
                         <para>If set to true, the server halts and cleans up the data directory
                             immediately after long-term key generation.</para>
                         <para>Type: bool</para>
-                        <para>Required:</para>
+                        <para>Required: No</para>
                     </listitem>
                 </itemizedlist>
             </section>
@@ -437,14 +437,14 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             per mixnet. Identifier can be an FQDN but does not have to be.</para>
                         <para>Type:
                             string<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem><?oxy_custom_end?>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKeyPem</emphasis></para>
                         <para>Path and file name of a mix node's public identity signing key, also
                             known as the identity key, in PEM format.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
             </section>
@@ -462,14 +462,14 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             per mixnet. Identifier can be an FQDN but does not have to be.</para>
                         <para>Type:
                             string<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem><?oxy_custom_end?>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKeyPem</emphasis></para>
                         <para>Path and file name of a gateway node's public identity signing key,
                             also known as the identity key, in PEM format.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
             </section>
@@ -487,14 +487,14 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             per mixnet. Identifier can be an FQDN but does not have to be.</para>
                         <para>Type:
                             string<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem><?oxy_custom_end?>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKeyPem</emphasis></para>
                         <para>Path and file name of a service node's public identity signing key,
                             also known as the identity key, in PEM format.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
             </section>
@@ -534,7 +534,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <para>Path and file name of a mix node's public identity signing key, also
                             known as the identity key, in PEM format.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
             </section>
@@ -942,7 +942,7 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
                         <para><emphasis role="bold">Capability</emphasis></para>
                         <para>The capability exposed by the agent.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Endpoint</emphasis></para>
@@ -951,32 +951,32 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
                             only supports Endpoints that are lower-case local-parts of an
                             e-mail address.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Command</emphasis></para>
                         <para>Command is the full file path to the external plugin program
                         that implements this Kaetzchen service.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">MaxConcurrency</emphasis></para>
                         <para>MaxConcurrency is the number of worker goroutines to start for this service.</para>
                         <para>Type: int</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Config</emphasis></para>
                         <para>The extra per agent arguments to be passed to the agent's initialization routine.</para>
                         <para>Type: map[string]interface{}</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Disable</emphasis></para>
                         <para>disabled a configured agent.</para>
                         <para>Type: bool</para>
-                        <para>Required:</para>
+                        <para>Required: No</para>
                     </listitem>
                 </itemizedlist>
                 <?oxy_comment_start author="dwrob" timestamp="20240816T141621-0700" comment="About CBOR:
@@ -1000,13 +1000,13 @@ Package cborplugin is a plugin system allowing mix network services to be added 
                                     <para><emphasis role="bold">data_store</emphasis></para>
                                     <para/>
                                     <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
                                     <para/>
                                     <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
@@ -1017,13 +1017,13 @@ Package cborplugin is a plugin system allowing mix network services to be added 
                                     <para><emphasis role="bold">db</emphasis></para>
                                     <para/>
                                     <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
                                     <para/>
                                     <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
@@ -1034,13 +1034,13 @@ Package cborplugin is a plugin system allowing mix network services to be added 
                                     <para><emphasis role="bold">fileStore</emphasis></para>
                                     <para/>
                                     <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
                                     <para/>
                                     <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_level</emphasis></para>
@@ -1051,8 +1051,8 @@ Package cborplugin is a plugin system allowing mix network services to be added 
                                             use.</para>
                                     </warning>
                                     <para>Type: string</para>
-                                    <para>Required:</para>
-                        <para>Required:</para>
+                                    <para>Required: Yes</para>
+                        <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
@@ -1063,28 +1063,28 @@ Package cborplugin is a plugin system allowing mix network services to be added 
                                     <para><emphasis role="bold">host</emphasis></para>
                                     <para/>
                                     <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
                                     <para/>
                                     <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_level</emphasis></para>
                                     <para>Supported values are ERROR | WARNING | NOTICE |INFO |
                                         DEBUG.</para>
                                     <para>Type: string</para>
-                                    <para>Required:</para>
-                        <para>Required:</para>
+                                    <para>Required: Yes</para>
+                        <para>Required: Yes</para>
                                     <warning>
                                         <para>The DEBUG log level is unsafe for production
                                             use.</para>
                                     </warning>
                                     <para>Type: string</para>
-                                    <para>Required:</para>
-                        <para>Required:</para>
+                                    <para>Required: Yes</para>
+                        <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
