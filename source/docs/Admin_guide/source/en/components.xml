@@ -255,10 +255,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             <section id="auth-logging">
                 <title id="auth-logging.title">Logging section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/3)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />   
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>   
             </section>
             <section id="auth-parameters">
                 <title id="auth-parameters.title">Parameters section</title>
@@ -584,6 +582,13 @@ what do you think?
                 </note>
                 <para>The &program_name; Sphinx implementation supports the following additional
                     cryptographic primitives: </para>
+                <?oxy_insert_start author="dwrob" timestamp="20241106T195305-0800"?>
+                <para/>
+                <para>Although the dirauths use the Sphinx geometry hash to validate... so does
+                    everyone else. Clients and mix servers hash their own Sphinx geometries and
+                    compare it to the hash in the PKI doc.</para>
+                <para/>
+                <?oxy_insert_end?>
                 <itemizedlist>
                     <listitem>
                         <para>Stream cipher: CTR-AES256</para>
@@ -651,55 +656,43 @@ what do you think?
                 </para>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. --> 
                 <!--serverconfig (/1/2)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/2)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>     
             </section>
             <section id="mix-logging-config">
                 <title id="mix-logging-config.title">Logging section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--logging (/1/3)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/3)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />   
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>   
             </section>
             <section id="mix-pki-config">
                 <title id="mix-pki-config.title">PKI section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--pki (/1/6)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/6)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />                        
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                        
             </section>
             <section id="mix-management-config">
                 <title id="mix-management-config.title">Management section</title>              
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--management (/1/5)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/5)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />                    
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                    
             </section>
             <section id="mix-sphinx-config">
                 <title id="mix-sphinx-config.title">SphinxGeometry section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--sphinxgeometry (/1/4)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/4)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />    
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>    
             </section>
             <section id="mix-debug-config">
                 <title id="mix-debug-config.title">Debug section</title>                
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--serverdebug (/1/7)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/7)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />                    
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                    
             </section>
         </section>
         <section id="gateway-config">
@@ -727,19 +720,15 @@ what do you think?
         TCP = ["localhost:30004"]</programlisting>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--serverconfig (/1/2)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/2)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />      
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>      
             </section>
             <section id="gateway-logging-config">
                 <title id="gateway-logging-config.title">Logging section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--logging (/1/3)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/3)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />      
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>      
             </section>
             <section id="gateway-gateway-section-config">
                 <?oxy_comment_start author="dwrob" timestamp="20240816T143000-0700" comment="Information needed."?>
@@ -809,37 +798,29 @@ what do you think?
                 <title id="gateway-pki-config.title">PKI section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--pki (/1/6)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/6)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />          
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>          
             </section>
             <section id="gateway-management-config">
                 <title id="gateway-management-config.title">Management section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--management (/1/5)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/5)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />  
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>  
             </section>
             <section id="gateway-sphinx-config">
                 <title id="gateway-sphinx-config.title">SphinxGeometry section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--sphinxgeometry (/1/4)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/4)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />    
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>    
             </section>
             <section id="gateway-debug-config">
                 <title id="gateway-debug-config.title">Debug section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--serverdebug (/1/7)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/7)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />    
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>    
             </section>
         </section>
         <section id="service-config">
@@ -867,19 +848,15 @@ what do you think?
     [Server.AltAddresses]</programlisting>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--serverconfig (/1/2)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/2)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />   
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>   
             </section>
             <section id="service-logging-config">
                 <title id="service-logging-config.title">Logging section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--logging (/1/3)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/3)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />     
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>     
             </section>
             <section id="service-servicenode-section-config">
                 <title id="service-servicenode-section-config.title">ServiceNode section</title>
@@ -1095,37 +1072,29 @@ Package cborplugin is a plugin system allowing mix network services to be added 
                 <title id="service-pki-config.title">PKI section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. --> 
                 <!--pki (/1/6)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/6)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />         
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>         
             </section>
             <section id="service-management-config">
                 <title id="service-management-config.title">Management section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--management (/1/5)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/5)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" /> 
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/> 
             </section>
             <section id="service-sphinx-config">
                 <title id="service-sphinx-config.title">SphinxGeometry section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--sphinxgeometry (/1/4)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/4)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />    
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>    
             </section>
             <section id="service-debug-config">
                 <title id="service-debug-config.title">Debug section</title>
                 <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--serverdebug (/1/7)-->
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/7)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />                         
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                         
            </section>
         </section>
     </section>

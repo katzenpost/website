@@ -194,7 +194,7 @@ serverdebug (/1/7)
 <!-- sphinxgeometry (/1/4) -->
     
     <simplesect>
-        <title>sphinxgeometry</title>
+        <title></title>
         <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/core/sphinx/geo/geo.go#L40-->
         <informalexample>        
             <para/>
@@ -216,96 +216,97 @@ serverdebug (/1/7)
             <itemizedlist>
                 <listitem>
                     <para><emphasis role="bold">PacketLength</emphasis></para>
-                    <para>PacketLength is the length of a packet.</para>
+                    <para>Specifies the length of a Sphinx packet in bytes.</para>
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">NrHops</emphasis></para>
-                    <para>NrHops is the number of hops through the mixnet, which determines the size</para>
-                    <para>of the Sphinx packet header.</para>
+                    <para>Specifies the number of hops a Sphinx packet takes through the mixnet. 
+                        This determines the size</para>
+                    <para>of the packet header.</para>
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">HeaderLength</emphasis></para>
-                    <para>HeaderLength is the length of the Sphinx packet header in
-                        bytes.</para>
+                    <para>Specifies the length of the Sphinx packet header in bytes.</para>
+                    
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">RoutingInfoLength</emphasis></para>
-                    <para>RoutingInfoLength is the length of the routing info portion of the
-                        header.</para>
+                    <para>Specifies the length of the routing information portion of the S
+                        phinx packet header.</para>
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">PerHopRoutingInfoLength</emphasis></para>
-                    <para>PerHopRoutingInfoLength is the length of the per hop routing
-                        info.</para>
+                    <para>Specifies the length of the per-hop routing information 
+                        in the Sphinx packet header.</para>
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">SURBLength</emphasis></para>
-                    <para>SURBLength is the length of SURB.</para>
+                    <para>Specifies the length of a single-use reply block (SURB).</para>
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">SphinxPlaintextHeaderLength</emphasis></para>
-                    <para>SphinxPlaintextHeaderLength is the length of the plaintext
-                        header.</para>
+                    <para>Specifies the length of the plaintext Sphinx packet header.</para>
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">PayloadTagLength</emphasis></para>
-                    <para>PayloadTagLength is the length of the payload tag.</para>
+                    <para>Specifies the length of the payload tag.</para>
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">ForwardPayloadLength</emphasis></para>
-                    <para>ForwardPayloadLength is the size of the payload.</para>
+                    <para>Specifies the size of the payload.</para>
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">UserForwardPayloadLength</emphasis></para>
-                    <para>the size of the usable payload.</para>
+                    <para>Specifies the size of the usable payload.</para>
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>       
                 <listitem>
                     <para><emphasis role="bold">NextNodeHopLength</emphasis></para>
-                    <para>NextNodeHopLength is derived off the largest routing info</para>
-                    <para>block that we expect to encounter. Everything else just has
-                        a NextNodeHop + NodeDelay, or a Recipient, both cases which
+                    <para>NextNodeHopLength is derived from the largest routing-information 
+                        block that we expect to encounter. Other packets have 
+                        NextNodeHop + NodeDelay sections, or a Recipient section, both of which
                         are shorter.</para>
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>  
                 <listitem>
                     <para><emphasis role="bold">SPRPKeyMaterialLength</emphasis></para>
-                    <para>SPRPKeyMaterialLength is the length of the SPRP key.</para>
+                    <para>Specifies the length of the SPRP key.</para>
                     <para>Type: int</para>
                     <para>Required:</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">NIKEName</emphasis></para>
-                    <para>NIKEName is the name of the NIKE (non-interactive key exchange) 
-                    scheme used by the mixnet&apos;s Sphinx
-                    packets. NIKEName and KEMName are mutually exclusive.</para>
+                    <para>Specifies the name of the non-interactive key exchange (NIKE)
+                    scheme used by Sphinx packets.</para>
+                    <para>NIKEName and KEMName are mutually exclusive.</para>
                     <para>Type: string</para>
                     <para>Required:</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">KEMName</emphasis></para>
-                    <para>KEMName is the name of the KEM scheme used by the mixnet&apos;s Sphinx
-                        packet. NIKEName and KEMName are mutually exclusive.</para>
+                    <para>Specifies the name of the key encapsulation mechanism (KEM) used by Sphinx
+                        packets.</para>
+                    <para>NIKEName and KEMName are mutually exclusive.</para>
                     <para>Type: string</para>
                     <para>Required:</para>
                 </listitem>
@@ -316,7 +317,7 @@ serverdebug (/1/7)
 <!-- management (/1/5) -->
     
     <simplesect>
-        <title>management</title>
+        <title></title>
         <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/server/config/config.go#L729-->
            <informalexample> 
            <para>Management is the &program_name; management interface configuration. The management section specifies connectivity information for the &program_name;
@@ -347,7 +348,7 @@ serverdebug (/1/7)
 <!-- pki (/1/6)-->
         
     <simplesect>
-        <title>pki</title>     
+        <title></title>     
         <informalexample> 
             <para>The PKI section contains the directory authority configuration for a mix, gateway, or service node.</para>
             <programlisting>[PKI]
@@ -428,7 +429,7 @@ serverdebug (/1/7)
 <!-- serverdebug (/1/7) -->
     
     <simplesect>
-        <title>serverdebug</title>     
+        <title></title>     
         <informalexample>    
             <para>Debug is the &program_name; server debug configuration for advanced tuning.</para>   
             <programlisting>[Debug]
