@@ -6,7 +6,7 @@
     %shared-content;
 ]>
 
-<!--Using these includes multiple times in a document creats problems with ID duplication, breaking validation. 
+<!--Using these includes multiple times in a document creates problems with ID duplication, breaking validation. 
 This group of includes is fashioned to have block-level wrappers that do not reference an ID. To invoke them, I
 instead use the "XPointer element() Scheme", which permits me to reference them using a DOM-like address. The result 
 is quite fragile. The order of the includes cannot be changed without also changing the xpointer configurations in the 
@@ -216,7 +216,7 @@ serverdebug (/1/7)
             <itemizedlist>
                 <listitem>
                     <para><emphasis role="bold">PacketLength</emphasis></para>
-                    <para>PacketLength is the length of a packet.</para>
+                    <para>Specifies the length of a Sphinx packet.</para>
                     <para>Type: int</para>
                     <para>Required: Yes</para>
                 </listitem>
@@ -319,9 +319,9 @@ serverdebug (/1/7)
         <title>management</title>
         <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/server/config/config.go#L729-->
            <informalexample> 
-           <para>Management is the &program_name; management interface configuration. The management section specifies connectivity information for the &program_name;
-               control protocol which can be used to make configuration changes during
-               run-time. An example configuration looks like this:</para>
+           <para>Management is the &program_name; management interface configuration. The management section specifies 
+               connectivity information for the &program_name; control protocol which can be used to make run-time 
+               configuration changes. A configuration resembles the following:</para>
            <programlisting>[Management]
    Enable = false
    Path = "/voting_mixnet/mix1/management_sock"</programlisting>
@@ -334,9 +334,8 @@ serverdebug (/1/7)
                </listitem>
                <listitem>
                    <para><emphasis role="bold">Path</emphasis></para>
-                   <para>Specifies the path to the management interface socket.
-                       <?oxy_comment_start author="dwrob" timestamp="20240814T171718-0700" comment="Confusing wording."?>If
-                       left empty, then management_sock will be used under the DataDir.</para><?oxy_comment_end?>
+                   <para>Specifies the path to the management interface socket. If left empty, then management_sock 
+                       will be used under the DataDir.</para><?oxy_comment_end?>
                    <para>Type: string</para>
                    <para>Required: No</para>
                </listitem>
@@ -364,26 +363,7 @@ tqN6tpOVotHWXKCszVn2kS7vAZjQpvJjQF3Qz/Qwhyg=
 JnJ8ztQEIjAkKJcpuZvJAdkWjBim/5G5d8yoosEQHeGJeeBqNPdm2AitUbpiQPcd
 tNCo9DxuC9Ieqmsfw0YpV6AtOOsaInA6QnHDYcuBfZcQL5MU4+t2TzpBZQYlrSED
 hPCKrAG+8GEUl6akseG371WQzEtPpEWWCJCJOiS/VDFZT7eKrldlumN6gfiB84sR
-ufpZ9tVt04FOQTUOAiegt/OzI8MGfRKwd+iVBTKEHGotzoMWuaoDLJK9EHFUznFH
-8pKyx2aI0aax8ymfDhFKoVd3Dvlw0fmjuslgsiS17YV61jCdyAdGQ6a9PUBy36Eq
-wCsDwNg8pwKkXPZU6DYZC+ofeRnJZeE8ptar1eGav/xVztCCQmm0wCMpzZwHJCYs
-K0NIGUjDO2gWzQapfNsKFoJoy6V+FMMeSpJ9HmoTEJLP+TA2LKizoFkwNcrMKKe2
-ArBAwzx56gQCyhQiKMNR4QB0KFJ2J3Wo8tUV1MdbxvQUMreTa2ea6dTCu7FMM/gu
-frcCT0kpcBipkXmzDvas4weAkxYhFqAy+GcZaFIBHbWBKdlEiDFXnsdhzehtIpkp
-dsU51GR/jVG4ueSAQuNpjDafW1oAbEjIS1BhatFd6EYivCcPeTVVEMFIaLsxkidL
-VxZjdUA66gcQkVmICaILIdJFfIY73faON4bPtAoUHJJsQtZHE+ZMLcy4bfm9CLu5
-ZvdksLFrffyfOqdl4QWBXHJmsKJ4S4K1qfYgqDkKrEa/QDCnG9RhwHtaF1e3Wik3
-ERAGZwyq90sNDMmQB+vPEzhqNxfOtGKK97UixRNagYhlgLLK0kIGM4nA1JgoubKf
-ckSDa6XCCeVtrxBuSIyPDgVZzJi8kIwswhMszepyIGaUB/c12DZ45jfCEPeoOZKB
-PkVs8BckiAikdwtuy+J+6ETIEmcNsAuM7ZJGbIJiSQuTCSO2Mlm7I7cao7FG43k1
-OYuToRt44+Aw1npy/9BM8Aa5x5ICOJgJTcbFnyow/MK+iwUbJWMu/JlN7NhS7Zoc
-e2yCwAM1eNxS3FJiMAFfTmMx0TUlo+Wj2CiwqcVoBud0PGiHtYSWtalHUDgoHUUv
-/nvHx8U6EnqqgOiHmxaBvgu1XHWkpsWC1Lib0hCsTHGhB2CPSEEPJHBcK9hGLsgO
-VTy7PQJ2+taFmpwMffg+QfRdljU5qCrN31iuC2UHCjJi67t+UquNe7WNemd813Z/
-ZlW7PilppyiWLUqX4uk7pSGSQAi9OtiEpdlZMrwY/ydyhbpN35sI3iaIEyQmADvH
-iOVujeoj8/R105oWr1xFJOcafuN5pdNGBscJUdQj7Gpkh5l5TtoIp+F6q7qxy+t1
-txe9nkFVFPSdPqwXJ5Yk8DIvKdagSSljnJlLbffK/ruLqQMF3GUAm5JOxCJ44MF3
-HTAhkec6M3V91QCi9xxtdepJWosh1OV0/xoOMMlwhTikhOQTn6AVLAqOohcZD+QT
+...
 arFh/WKwYJUj+aGBsFYSqGdzC6MdY4x/YyFe2ze0MJEjThQE91y1d/LCQ3Sb7Ri+
 u6PBi3JU2qzlPEejDKwK0t5tMNEAkq8iNrpRTdD/hS0gR+ZIN8Z9QKh7Xf94FWG2
 H+r8OaqImQhgHabrWRDyLg==
@@ -403,26 +383,7 @@ O51Ty2WLu4C1ETMa29s03bMXV72gnjJfTfwLV++LVBI=
 TtQkg2XKUnY602FFBaPJ+zpN0Twy20cwyyFxh7FNUjaXA9MAJXs0vUwFbJc6BjYv
 f+olKnlIKFSmDvcF74U6w1F0ObugwTNKNxeYKPKhX4FiencUbRwkHoYHdtZdSctz
 TKy08qKQyCAccqCRpdo6ZtYXPAU+2rthjYTOL7Zn+7SHUKCuJClcPnvEYjVcJxtZ
-nRPAfbVvEmuzrvifxpuiBJpFqVK5gyegv0d6QjNRUbOVSrxMu0dv6dag4AfF3Xoa
-lEBwFQWFysWYZmQqUMOyhTNNxGZuEEHOpsVPAUKujfsXbFOOaTbBRebJ5cegr1aj
-DWQBncpv4gMnpDFuK0sxjRBQoanC+qyrFYh0EjFmTCNUxhNtVAdleyqVV7k2vxDC
-DcUOAIJM+AVWw7gp3NkD/yCD/aFiRZkrKLpeMJMTHHd3soGI+FdaVDl2jvQVIrmk
-5gaJz4mD/WkoVpB2NisEZHpIXzE4PwdCZowEhjOBhLgkjPpFmcilwvl/pPyfWcy5
-YqBCCNuxEmqEcdsW3LtiepwcojOMEvC/ZLGNGFedwrOnPjFiNGlfm0YkxYdwGJx3
-HglhD5c4G9NVP0l6pAlg7WmvRCVpTVgnSZKPp2QwYsARDySGRVIT6oiKbSJ/5Yu2
-rAQIDGRXBayioFjJdvm8YWCSramYazydqVS3ucSGRoCVNQmcR0aJDdekrEqyzgmE
-JxwE0bw1VsETekkkmEw0S3WWTWsBCnuDGhfD+jgNMuSDMwqTkEZDp6Z2Zymzzguf
-kQEojWUsByNIoTg3kvwKz3FpBJt76/kxhgkWPDrGWPmGRol9C/iuT6ZlnqMZiaoD
-M4p7UPJABWsl3Mk2v9FBkHcyZOEXFsBIuGnNCThstucmMQSY2eFhH8aTl7aMWCBd
-szdWg5oI+IUFPQgWQUg4l7e89TIV7JyA6Yu0Ehp62WWORbaIVotlMbWtF6oTJkCB
-XCRWduKqaMl61ihG2mRehHNn+TA/oqgAWgyxRsN8jWJJqVzP/nmlExxaLVtuges3
-aiy24flgmWNA9YoV49nLNLF1YKSzwNW1KSRy4rObRHq3t/OTAjO4CgqqmDZ6+cpo
-LQJmFqJhF/UHR2GUPolUK/NT37e/aZPDjgiho7aYVKtZ57d9R2KviFGJyZW+VKBr
-fbh9v4KyINTDB3s79iVUJTPCyeozYFVaQ4Ktu4CQTVCbC+eCkgGGvJi5Rro/Mytq
-shyzvLNA+GicK8At0bJArXdeHrIjolLNrAyAMqKZNCViOgEM50ok4DhtkajCOKOD
-tjifADQIkEGYl9uUXeCsXWCuW/Bxp4q1t7FSklZkqwQBbwcRfgqYIAkBWdESu4At
-XWKVyceIOzShJEkieMyFmkEvymY+Ihos8eu5kVpCZLhv0zOrJMmdoclXyNcs5gbB
-BtOBa2NFTAKMbLcanrmcXhFdQbhPROqnpUN7ObuX5vgqpvFut6OqPde61bcr3tsW
+...
 ubJIe5U4nMJbBkOqr7Kq6niaEkiLODa0tkpB8tKMYTMBdcYyHSXCzpo7U9sb6LAR
 HktiTBDtRXviu2vbw7VRXhkMW2kjYZDtReQ5sAse04DvmD49zgTp1YxYW+wWFaL3
 37X7/SNuLdHX4PHZXIWHBQ==
@@ -443,26 +404,7 @@ zQvydRYJq3npeLcg1NqIf+SswEKE5wFmiwNsI9Z1whQ=
 OYK9FiC53xwZ1VST3jDOO4tR+cUMSVRSekmigZMChSjDCPZbKut8TblxtlUfc/yi
 Ugorz4NIvYPMWUt3QPwS2UWq8/HMWXNGPUiAevg12+oV+jOJXaJeCfY24UekJnSw
 TNcdGaFZFSR0FocFcPBBnrK1M2B8w8eEUKQIsXRDM3x/8aRIuDif+ve8rSwpgKeh
-xqkpdmXDCMuVYLpghyaAYgdtQCdQrarItSjEiQEVtHMdTYTPC4N+aDhelMs7DpOR
-B8RoVgE29wdy5egz9lRax9LJOne2i8jNMhckkiA9cUIOZsBAgJpMy2e+sqiAVzek
-KeRe2TQMgaM1hbiMsLK1Iiw4QidDaUqkr1ZqmRS95DZ1HAS/xtUxBjXPaxBqHNmo
-wmvHXtYGlYS6/+UE0HdRr/Mb6hOb1EFKJ8oBAeFR9hG6+eg7WXyHBnOMvApPe0Js
-PRIY2dGUFwCSGcDEESApf2iyBsMgb4XPwEO9apaX9AZmbAmEeiPKySBhA9vJQKm1
-wIs22bQTJXdZKlU1mvdB+hy9+zhwbHeVzzCWc6UkdZDKNERcaloJMSUh14iQW9qc
-LUWAczdZvYqHwToodDcE8PkAfFmKWlM8Uhi654tPARwO9piBjCYPgIlvjNStD9Y/
-B9ZmvrI4GVZP/ZFkaHoKSdJxi4Jj6QE3LLaP1qwjupJhNOu4l8AEfMu2VwmwVkJ7
-SIIHPSV80mxvoSIgT+YNCTI+oxmHN2J51EJ610Rn7kh1bFUKf4GnUFJTEEFUD1ay
-G4ymMJbH4QaC3BsT47BV+RVd2SSqLlasRqqv5LImcYM9h6aGWAmZY9cz8KY/ZBLN
-t6EJx2B7kLwYV/lniobH/2tF9rKdfWpm79IugEtLy6kLNvSOERc1xIN1X4aGcewR
-snCWR0CiT0el8RgRYgFKEdWhccJs+gE0dLyegOBikdduAbeDiSNR/EKaChgwn3w0
-upsutfV8WvheQ5w1KidL0hl/rLKVkrqV2DVtsPp4d0WhLHyLaxQM3VJ7Y4quMjUF
-3/Y43dLOrbgVVaBpA4TCtoYPEztyYOjJyjbJ+niAHYmpBPG4BjeioSGBjsARYnsl
-kndLQjx/r4mvxXXJaRVDPAc5C/jFbDIfS6NRUdAJ//OJLaJaQJWJWTgF7fE4LvOX
-DiWu1wxkhISJrscFxtsHGJFqlRy4YqcqASuh+YeeERIeSOUHz4Ar2MkuC+Q9vRvH
-MOVo+XEbMSG6ZaSAEMOw8Au7kbGA/vmVPPJQXxYvjvCzjlPKnaiSSmvA2rQVJwYZ
-YHR+5ZwOJprIWWlch+xUfwZe3EBqeGuKABA39iPKFkY1BhFGExhW2rjBcgMk0NRG
-4ci5yOvGuTYjUywrVcoiJDUqkjuxqLNtFPMOINSqwGeqKhlpDaFKWYKwubK9a2AG
-13ivg4leANvMnUaztWhyYEg/zrqF0pq7ZXpLj7BTk1BBbvILGuHPd1hhGzA19utq
+...
 OdVD3yw7OOS8uPZLORGQFyJbHtVmFPVvwja4G/o2gntAoHUZ2LiJJakpVhhlSyrI
 yuzvwwFtZVfWtNb5gAKZCyg0aduR3qgd7MPerRF+YopZk3OCRpC02YxfUZrHv398
 FZWJFK0R8iU52CEUxVpXTA==
@@ -473,7 +415,7 @@ FZWJFK0R8iU52CEUxVpXTA==
             <itemizedlist>
                 <listitem>
                     <para><emphasis role="bold">Identifier</emphasis></para>
-                    <para>Specifies the human-readable identifier for a node, and must be unique per mixnet. 
+                    <para>Specifies the human-readable identifier for a node, which must be unique per mixnet. 
                     Identifier can be an FQDN but does not have to be.</para>
                     <para>Type: string</para>
                     <para>Required: Yes</para>
@@ -496,21 +438,22 @@ FZWJFK0R8iU52CEUxVpXTA==
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">LinkPublicKey</emphasis></para>
-                    <para>String containing the peer&apos;s public link-layer key in PEM format. LinkPublicKey must match the specified WireKEMScheme.</para>
+                    <para>String containing the peer&apos;s public link-layer key in PEM format. LinkPublicKey must 
+                        match the specified WireKEMScheme.</para>
                     <para>Type: string</para>
                     <para>Required: Yes</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">WireKEMScheme</emphasis></para>
-                    <para>WireKEMScheme is the wire protocol KEM scheme to use.</para>
+                    <para>The name of the wire protocol key-encapsulation mechanism (KEM) to use.</para>
                     <para>Type: string</para>
                     <para>Required: Yes</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">Addresses</emphasis></para>
                     <para>Specifies a list of one or more Address URLs in a format that contains the transport protocol, 
-                    IP address, and port number that the server will bind to for incoming connections. EchoMix supports 
-                    URLs with that start with either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] 
+                    IP address, and port number that the server will bind to for incoming connections. &program_name; supports 
+                    URLs that start with either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] 
                     and ["quic://192.168.1.1:40001"].</para>
                     <para>Type: []string</para>
                     <para>Required: Yes</para>
@@ -549,35 +492,35 @@ FZWJFK0R8iU52CEUxVpXTA==
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">NumSphinxWorkers</emphasis></para>
-                        <para> specifies the number of worker instances to use for inbound Sphinx
+                        <para>Specifies the number of worker instances to use for inbound Sphinx
                             packet processing.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
-                    </listitem>[
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">NumProviderWorkers</emphasis></para>
-                        <para> specifies the number of worker instances to use for provider specific
+                        <para>Specifies the number of worker instances to use for provider specific
                             packet processing.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">NumKaetzchenWorkers</emphasis></para>
-                        <para> specifies the number of worker instances to use for Kaetzchen
+                        <para>Specifies the number of worker instances to use for Kaetzchen
                             specific packet processing.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">SchedulerExternalMemoryQueue</emphasis></para>
-                        <para> will enable the experimental external memory queue that is backed by
+                        <para>Enables the experimental external memory queue that is backed by
                             disk.</para>
                         <para>Type: bool</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">SchedulerQueueSize</emphasis></para>
-                        <para> is the maximum allowed scheduler queue size before random entries
+                        <para>Specifies the maximum scheduler queue size before random entries
                             will start getting dropped. A value &lt;= 0 is treated as
                             unlimited.</para>
                         <para>Type: int</para>
@@ -585,49 +528,48 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">SchedulerMaxBurst</emphasis></para>
-                        <para> is the maximum number of packets that will be dispatched per
+                        <para>Specifies the maximum number of packets that will be dispatched per
                             scheduler wakeup event.</para>
                         <para>Type: </para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">UnwrapDelay</emphasis></para>
-                        <para> is the maximum allowed unwrap delay due to queueing in
+                        <para>Specifies the maximum unwrap delay due to queueing in
                             milliseconds.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">GatewayDelay</emphasis></para>
-                        <para>the maximum allowed gateway node worker delay due to queueing</para>
-                        <para> in milliseconds.</para>
+                        <para>Specifies the maximum gateway node worker delay due to queueing in milliseconds.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">ServiceDelay</emphasis></para>
-                        <para> is the maximum allowed provider delay due to queueing in
+                        <para>Specifies the maximum provider delay due to queueing in
                             milliseconds.</para>
                         <para>Type: int</para>
                         <para>Required: No</para> 
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">KaetzchenDelay</emphasis></para>
-                        <para> is the maximum allowed kaetzchen delay due to queueing in
+                        <para>Specifies the maximum kaetzchen delay due to queueing in
                             milliseconds.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">SchedulerSlack</emphasis></para>
-                        <para> is the maximum allowed scheduler slack due to queueing and or
+                        <para>Specifies the maximum scheduler slack due to queueing and/or
                             processing in milliseconds.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">SendSlack</emphasis></para>
-                        <para> is the maximum allowed send queue slack due to queueing and or
+                        <para>Specifies the maximum send-queue slack due to queueing and/or
                             congestion in milliseconds.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
@@ -635,7 +577,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     <listitem>
                         <para><emphasis role="bold">DecoySlack</emphasis><emphasis role="bold"
                             /></para>
-                        <para> is the maximum allowed decoy sweep slack due to various external
+                        <para>Specifies the maximum decoy sweep slack due to external
                             delays such as latency before a loop decoy packet will be considered
                             lost.</para>
                         <para>Type: int</para>
@@ -643,43 +585,47 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">ConnectTimeout</emphasis></para>
-                        <para> specifies the maximum time a connection can take to establish a
+                        <para>Specifies the maximum time a connection can take to establish a
                             TCP/IP connection in milliseconds.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">HandshakeTimeout</emphasis></para>
-                        <para> specifies the maximum time a connection can take for a link protocol
+                        <para>Specifies the maximum time a connection can take for a link-protocol
                             handshake in milliseconds.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">ReauthInterval</emphasis></para>
-                        <para> specifies the interval at which a connection will be reauthenticated
+                        <para>Specifies the interval at which a connection will be reauthenticated
                             in milliseconds.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">SendDecoyTraffic</emphasis></para>
-                        <para>enables sending decoy traffic. This is still experimental and untuned
-                            and thus is disabled by default. WARNING: This option will go away once
-                            decoy traffic is more concrete.</para>
+                        <para>Enables sending decoy traffic. This parameter is still experimental and untuned
+                            and thus is disabled by default.</para>
+                        <note>
+                            <para>This option will be removed once decoy traffic is fully implemented.</para>
+                        </note>
                         <para>Type: bool</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">DisableRateLimit</emphasis></para>
-                        <para> disables the per-client rate limiter. This option should only be used
-                            for testing.</para>
+                        <para>Disables the per-client rate limiter.</para>
+                        <note>
+                            <para>This option should only be used for testing.</para>
+                        </note>
                         <para>Type: bool</para>
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">GenerateOnly</emphasis></para>
-                        <para> halts and cleans up the server right after long term key
+                        <para>Halts and cleans up the server immediately after long term key
                             generation.</para>
                         <para>Type: bool</para>
                         <para>Required: No</para>
