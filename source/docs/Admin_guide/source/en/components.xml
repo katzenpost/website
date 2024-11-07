@@ -254,6 +254,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="auth-logging">
                 <title id="auth-logging.title">Logging section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/3)"  
@@ -261,9 +262,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="auth-parameters">
                 <title id="auth-parameters.title">Parameters section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L103
--->
-                <para>The Parameters section contains network parameters.</para>
+                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L103-->
+                <para>The Parameters section contains the network parameter configuration.</para>
                 <programlisting>[Parameters]
     SendRatePerMinute = 0
     Mu = 0.005
@@ -541,23 +541,52 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             <section id="auth-sphinx-config">
                 <title id="auth-sphinx-config.title">SphinxGeometry section</title>
                 <warning>
-                    <para>Do not modify the SphinxGeometry section by hand. This configuration must
-                        be prommatically generated.</para>
+                    <para><?oxy_comment_start author="dwrob" timestamp="20241106T174803-0800" comment="We need an explanation of how to generate this properly.
+
+So... our docs probably need to discuss &quot;genconfig&quot; CLI usage.
+
+we probably need to demonstrate how to use genconfig so that it&apos;s clear that you can extract the Sphinx geometry from the dirauth config outputs.
+2:53 PM
+
+it could otherwise be confusing because genconfig isn&apos;t otherwise useful for production mixnets per se...
+
+like... you definitely do not need to use genconfig in order to generate your configuration files... and probably most people should not use genconfig for that.
+
+i mean... as a software project we are only using genconfig for configuring the docker mixnet
+dawuud
+2:56 PM
+
+okay... actually... maybe i need to go and write a tiny specific CLI tool that generates the Sphinx geometry TOML output?
+
+that would probably be far less confusing
+dawuud
+2:56 PM
+
+what do you think?
+"?>This configuration must be programmatically generated. Do not modify the
+                        SphinxGeometry section by hand.</para><?oxy_comment_end?>
                 </warning>
-                <para>The
-                    <?oxy_comment_start author="dwrob" timestamp="20241025T132943-0700" comment="provide reference"?>original
-                    Sphinx paper<?oxy_comment_end?> introduces the Sphinx nested encrypted packet
-                    format using a non-interactive key exchange (NIKE). Sphinx can be turned into a
-                    hybrid post-quantum construction simply by using a hybrid NIKE. The
-                    &program_name; Sphinx implementation has a completely configurable Sphinx
-                    geometry that allows for any NIKE or key encapsulation mechanism (KEM) to be
-                    used. A trade-off when using a KEM is that packet headers have additional
-                    overhead because they must store a KEM ciphertext for each hop.</para>
-                <para>The &program_name; Sphinx implementation also supports the following
-                    additional cryptographic primitives: </para>
+                <para>Sphinx is an encrypted nested-packet format designed for mixnets. The <ulink
+                        url="https://www.freehaven.net/anonbib/cache/DBLP:conf/sp/DanezisG09.pdf"
+                        >original Sphinx paper</ulink> used a non-interactive key exchange (NIKE),
+                    while the <ulink
+                        url="https://github.com/katzenpost/website/blob/main/source/docs/Specificatons/pdf/sphinx.pdf"
+                        >&program_name; Sphinx implementation</ulink> contributes a hybrid NIKE to
+                    create a hybrid post-quantum construction. &program_name; Sphinx has a
+                    completely configurable geometry that allows for any NIKE or key encapsulation
+                    mechanism (KEM) to be used. A trade-off when using a KEM is that packet headers
+                    have additional overhead because they must store a KEM ciphertext for each
+                    hop.</para>
+                <note>
+                    <para>Sphinx, the nested-packet format, should not be confused with <ulink
+                            url="http://sphincs.org/index.html">Sphincs or Sphincs+</ulink>, which
+                        are post-quantum signature schemes.</para>
+                </note>
+                <para>The &program_name; Sphinx implementation supports the following additional
+                    cryptographic primitives: </para>
                 <itemizedlist>
                     <listitem>
-                        <para>stream cipher: CTR-AES256</para>
+                        <para>Stream cipher: CTR-AES256</para>
                     </listitem>
                     <listitem>
                         <para>MAC: HMAC-SHA256</para>
@@ -569,13 +598,12 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <para>SPRP: AEZv5</para>
                     </listitem>
                 </itemizedlist>
-                <para>In &program_name;, all dirauths must configure the same SphinxGeometry. Each
-                    dirauth publishes the hash of its SphinxGeometry in the PKI document for
-                    validation by its peer dirauths. </para>
-                <xi:include  
-                    href="includes/xincludes.xml"
-                    xpointer="element(/1/4)"  
-                    xmlns:xi="http://www.w3.org/2001/XInclude" />    
+                <para>All dirauths must be configured to use the same SphinxGeometry. Any geometry
+                    not advertised by the PKI document will fail. Each dirauth publishes the hash of
+                    its SphinxGeometry in the PKI document for validation by its peer dirauths. </para>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
         </section>
     </section>
@@ -621,6 +649,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
   IsServiceNode = false
   [Server.AltAddresses]</programlisting>
                 </para>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. --> 
+                <!--serverconfig (/1/2)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/2)"  
@@ -628,6 +658,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="mix-logging-config">
                 <title id="mix-logging-config.title">Logging section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--logging (/1/3)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/3)"  
@@ -635,6 +667,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="mix-pki-config">
                 <title id="mix-pki-config.title">PKI section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--pki (/1/6)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/6)"  
@@ -642,6 +676,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="mix-management-config">
                 <title id="mix-management-config.title">Management section</title>              
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--management (/1/5)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/5)"  
@@ -649,6 +685,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="mix-sphinx-config">
                 <title id="mix-sphinx-config.title">SphinxGeometry section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--sphinxgeometry (/1/4)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/4)"  
@@ -656,6 +694,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="mix-debug-config">
                 <title id="mix-debug-config.title">Debug section</title>                
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--serverdebug (/1/7)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/7)"  
@@ -685,6 +725,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
     IsServiceNode = false
     [Server.AltAddresses]
         TCP = ["localhost:30004"]</programlisting>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--serverconfig (/1/2)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/2)"  
@@ -692,6 +734,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="gateway-logging-config">
                 <title id="gateway-logging-config.title">Logging section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--logging (/1/3)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/3)"  
@@ -763,6 +807,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="gateway-pki-config">
                 <title id="gateway-pki-config.title">PKI section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--pki (/1/6)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/6)"  
@@ -770,6 +816,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="gateway-management-config">
                 <title id="gateway-management-config.title">Management section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--management (/1/5)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/5)"  
@@ -777,6 +825,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="gateway-sphinx-config">
                 <title id="gateway-sphinx-config.title">SphinxGeometry section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--sphinxgeometry (/1/4)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/4)"  
@@ -784,6 +834,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="gateway-debug-config">
                 <title id="gateway-debug-config.title">Debug section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--serverdebug (/1/7)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/7)"  
@@ -813,6 +865,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
     IsGatewayNode = false
     IsServiceNode = true
     [Server.AltAddresses]</programlisting>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--serverconfig (/1/2)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/2)"  
@@ -820,6 +874,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="service-logging-config">
                 <title id="service-logging-config.title">Logging section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--logging (/1/3)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/3)"  
@@ -1037,6 +1093,8 @@ Package cborplugin is a plugin system allowing mix network services to be added 
             </section>
             <section id="service-pki-config">
                 <title id="service-pki-config.title">PKI section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. --> 
+                <!--pki (/1/6)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/6)"  
@@ -1044,6 +1102,8 @@ Package cborplugin is a plugin system allowing mix network services to be added 
             </section>
             <section id="service-management-config">
                 <title id="service-management-config.title">Management section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--management (/1/5)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/5)"  
@@ -1051,13 +1111,17 @@ Package cborplugin is a plugin system allowing mix network services to be added 
             </section>
             <section id="service-sphinx-config">
                 <title id="service-sphinx-config.title">SphinxGeometry section</title>
-                 <xi:include  
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--sphinxgeometry (/1/4)-->
+                <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/4)"  
                     xmlns:xi="http://www.w3.org/2001/XInclude" />    
             </section>
             <section id="service-debug-config">
                 <title id="service-debug-config.title">Debug section</title>
+                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--serverdebug (/1/7)-->
                 <xi:include  
                     href="includes/xincludes.xml"
                     xpointer="element(/1/7)"  
@@ -1066,3 +1130,4 @@ Package cborplugin is a plugin system allowing mix network services to be added 
         </section>
     </section>
 </chapter>
+<?oxy_options track_changes="on"?>

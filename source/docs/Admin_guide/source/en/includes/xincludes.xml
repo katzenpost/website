@@ -6,10 +6,72 @@
     %shared-content;
 ]>
 
+<!--Using these includes multiple times in a document creats problems with ID duplication, breaking validation. 
+This group of includes is fashioned to have block-level wrappers that do not reference an ID. To invoke them, I
+instead use the "XPointer element() Scheme", which permits me to reference them using a DOM-like address. The result 
+is quite fragile. The order of the includes cannot be changed without also changing the xpointer configurations in the 
+documents where they occur.
+
+References:
+
+XPointer element() Scheme: 
+https://www.w3.org/TR/2003/REC-xptr-element-20030325/
+https://en.wikipedia.org/wiki/XPointer#Positional_element_addressing
+
+Practical guidance on address syntax: 
+https://stackoverflow.com/questions/16563106/how-to-use-xpointer-with-xinclude-to-reference-elements
+https://github.com/tomschr/xpointer-example
+
+From Wikipedia:
+
+<foobar id="foo">
+  <bar/>
+  <baz>
+    <bom a="1"/>
+  </baz>
+  <bom a="2"/>
+</foobar>
+
+results as the following examples:
+
+ xpointer(id("foo")) => foobar
+ xpointer(/foobar/1) => bar
+ xpointer(//bom) => bom (a=1), bom (a=2)
+ element(/1/2/1) => bom (a=1) (/1 descend into first element (foobar),
+                               /2 descend into second child element (baz),
+                               /1 select first child element (bom))
+
+In these documents, we reference items in THIS FILE as follows:
+
+    <xi:include  
+        href="includes/xincludes.xml"
+        xpointer="element(/1/7)"  
+        xmlns:xi="http://www.w3.org/2001/XInclude" />
+        
+This means, "Descend into the first element (chapter), then descend into its seventh direct child element (<simplesect>),
+which happens to be the serverdebug include include below. Calling /1/7 returns all content of that <simplesect>
+element recursively. I have to depend on comment tags to keep track of what is what.
+
+-->
+
+
+<!-- 
+    
+TOC (with element number)
+
+serverconfig (/1/2)
+logging (/1/3)
+sphinxgeometry (/1/4)
+management (/1/5)
+pki (/1/6)
+serverdebug (/1/7)
+
+-->
+
 <chapter id="xincludes">
     <title id="xincludes.title">XIncludes repository</title>
     
-<!--  serverconfig  -->
+<!-- 1. serverconfig (/1/2) -->
     <simplesect>
         <title></title>
         <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/server/config/config.go#L84-->
@@ -87,7 +149,7 @@
         </informalexample>
     </simplesect>
 
-<!-- logging -->
+<!-- logging (/1/3) -->
 
     <simplesect>
         <title></title>
@@ -129,7 +191,7 @@
         </informalexample>
     </simplesect> 
     
-<!--  sphinxgeometry  -->
+<!-- sphinxgeometry (/1/4) -->
     
     <simplesect>
         <title>sphinxgeometry</title>
@@ -251,7 +313,7 @@
         </informalexample>
     </simplesect>           
     
-<!--  management  -->
+<!-- management (/1/5) -->
     
     <simplesect>
         <title>management</title>
@@ -282,7 +344,7 @@
        </informalexample>
     </simplesect> 
     
-<!--  pki  -->
+<!-- pki (/1/6)-->
         
     <simplesect>
         <title>pki</title>     
@@ -363,7 +425,7 @@
         </informalexample>
     </simplesect> 
     
-<!--  serverdebug  -->
+<!-- serverdebug (/1/7) -->
     
     <simplesect>
         <title>serverdebug</title>     
