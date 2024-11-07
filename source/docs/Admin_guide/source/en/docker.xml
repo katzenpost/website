@@ -33,7 +33,7 @@
     
     <para>&program_name; provides a ready-to-deploy Docker
             image for developers who need a non-production test environment for developing
-        and testing client applications. By running this image on a single computer, you avoid the
+        and testing client applications and server side plugins. By running this image on a single computer, you avoid the
         need to build and manage a complex multi-node mix net. The image can also be run using <ulink url="https://podman.io/">Podman</ulink></para>
     <para>The test mix network includes the following components:</para>
     <itemizedlist>
