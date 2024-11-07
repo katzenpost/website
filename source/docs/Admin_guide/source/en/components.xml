@@ -734,6 +734,8 @@ what do you think?
                 <?oxy_comment_start author="dwrob" timestamp="20240816T143000-0700" comment="Information needed."?>
                 <title id="gateway-gateway-section-config.title">Gateway section<?oxy_comment_end?></title>
                 <para/>
+		<para>The Gateway section of the configuration is only required for configuring a Gateway node.
+This section must contain UserDB and SpoolDB definitions.</para>
                 <programlisting>[Gateway]
     [Gateway.UserDB]
         Backend = "bolt"
