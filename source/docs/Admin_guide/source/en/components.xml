@@ -30,6 +30,7 @@
     
 <chapter id="components">
     <title id="components.title">Components of the &program_name; mixnet</title>
+    <para><emphasis role="bold">Overview and diagram</emphasis></para>
 
     <!--
         
@@ -793,17 +794,19 @@ what do you think?
                 <title id="service-servicenode-section-config.title">ServiceNode section</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/main/server/config/config.go#L470 defines the top level configuration.
 https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 defines the per-service configurations.-->
-                <para>The service node configuration section contains subsections with settings for
-                each service that Katzenpost supports. In a production network it's important
-		to run the echo service on every service node so that decoy traffic works properly.
-		</para>
-		<para>The panda and reunion service currently do not work properly and must be fixed or rewritten.</para>
-		<para>memspool service is deprecated and supports our old catshadow protocol along with panda/reunion</para>
-		<para>The pigeonhole service is also known as the courier service will be used to support our new
-		BACAP based protocols the details of which are in our unpublished paper. In the future, most or all of our
-		protocols will use the pigeonhole courier service.</para>
-		<para>The HTTP proxy service is completely optional but allows the mix network to be used as an HTTP proxy
-		which may assist in integrating with existing software systems.</para>
+                <para>The <code>ServiceNode</code> section contains  configurations for each network
+                    service that &program_name; supports. </para>
+                <para>Services, termed <ulink
+                        url="https://github.com/katzenpost/katzenpost/blob/main/docs/Specificatons/pdf/kaetzchen.pdf"
+                        >Kaetzchen</ulink>, can be divided into built-in and external services.
+                    External services are provided through the <ulink
+                        url="https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.35/server/cborplugin#ResponseFactory"
+                        >CBORPlugin</ulink>, a  Go programming language implementation of the <ulink
+                        url="https://datatracker.ietf.org/doc/html/rfc8949">Concise Binary Object
+                        Representation (CBOR)</ulink>, a binary data serialization format. While
+                    native services need simply to be activated, external services are invoked by a
+                    separate command and connected to the mixnet over a Unix socket. The plugin
+                    allows mixnet services to be added in any programming language.</para>
                 <programlisting>[ServiceNode]
                     
     [[ServiceNode.Kaetzchen]]
@@ -873,7 +876,7 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
                     <listitem>
                         <para><emphasis role="bold">Command</emphasis></para>
                         <para>Specifies the full path to the external plugin program that implements
-                            this Kaetzchen service.</para>
+                            this <code>Kaetzchen</code> service.</para>
                         <para>Type: string</para>
                         <para>Required: Yes</para>
                     </listitem>
@@ -899,66 +902,79 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
                         <para>Required: No</para>
                     </listitem>
                 </itemizedlist>
-                <?oxy_comment_start author="dwrob" timestamp="20240816T141621-0700" comment="About CBOR:
-
-https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.35/server/cborplugin#ResponseFactory
-
-Package cborplugin is a plugin system allowing mix network services to be added in any language. It communicates queries and responses to and from the mix server using CBOR over UNIX domain socket. Beyond that, a client supplied SURB is used to route the response back to the client as described in our Kaetzchen specification document: "?>
-                <para><emphasis role="bold">Per-service
-                    parameters:<?oxy_comment_end?></emphasis></para>
+                <para><emphasis role="bold">Per-service parameters:</emphasis></para>
                 <para>
                     <itemizedlist>
                         <listitem>
-                            <para><?oxy_comment_start author="dwrob" timestamp="20240816T124622-0700" comment="Needs explanation"?><emphasis
-                                    role="bold">Kaetzchen</emphasis><?oxy_comment_end?></para>
+                            <para><emphasis role="bold">echo</emphasis></para>
+                            <para>The <code>echo</code> service must be enabled on every service
+                                node of a production mixnet for decoy traffic to work properly.
+                            </para>
                         </listitem>
                         <listitem>
                             <para><emphasis role="bold">spool</emphasis></para>
+                            <para>The <code>spool</code> service, which supports the outdated
+                                    <code>catshadow</code> storage protocol along as well as
+                                    <code>panda</code> and <code>reunion</code>, is deprecated.<note>
+                                    <para><code>Spool</code>, properly <code>memspool</code>, should
+                                        not be confused with the spool database on gateway nodes. on
+                                        the gateway</para>
+                                </note></para>
                             <itemizedlist>
                                 <listitem>
                                     <para><emphasis role="bold">data_store</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
+                                    <para>Specifies the full path to the service database
+                                        file.</para>
+                                    <para>Type: string</para>
                                     <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
+                                    <para>Specifies the path to the node's log directory.</para>
+                                    <para>Type: string</para>
                                     <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
                         <listitem>
                             <para><emphasis role="bold">pigeonhole</emphasis></para>
+                            <para>The <code>pigeonhole</code> courier service supports the
+                                Blinding-and-Capability scheme (BACAP)-based unlinkable messaging
+                                protocols detailed in our unpublished paper. Most of our future
+                                protocols will use the <code>pigeonhole</code> courier
+                                service.</para>
                             <itemizedlist>
                                 <listitem>
                                     <para><emphasis role="bold">db</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
+                                    <para>Specifies the full path to the service database
+                                        file.</para>
+                                    <para>Type: string</para>
                                     <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
+                                    <para>Specifies the path to the node's log directory.</para>
+                                    <para>Type: string</para>
                                     <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
                         <listitem>
                             <para><emphasis role="bold">panda</emphasis></para>
+                            <para>The <code>panda</code> storage and authentication service
+                                currently does not work properly.</para>
                             <itemizedlist>
                                 <listitem>
                                     <para><emphasis role="bold">fileStore</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
+                                    <para>Specifies the full path to the service database
+                                        file.</para>
+                                    <para>Type: string</para>
                                     <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
+                                    <para>Specifies the path to the node's log directory.</para>
+                                    <para>Type: string</para>
                                     <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
@@ -971,23 +987,26 @@ Package cborplugin is a plugin system allowing mix network services to be added 
                                     </warning>
                                     <para>Type: string</para>
                                     <para>Required: Yes</para>
-                        <para>Required: Yes</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
                         <listitem>
                             <para><emphasis role="bold">http</emphasis></para>
+                            <para>The <code>http</code> service is completely optional, but allows
+                                the mixbet to be used as an HTTP proxy. This may be useful for
+                                integrating with existing software systems.</para>
                             <itemizedlist>
                                 <listitem>
                                     <para><emphasis role="bold">host</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
+                                    <para>The hostname and TCP port of the service.</para>
+                                    <para>Type: string</para>
                                     <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
+                                    <para>Specifies the path to the node's log directory.</para>
+                                    <para>Type: string</para>
                                     <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
@@ -996,14 +1015,13 @@ Package cborplugin is a plugin system allowing mix network services to be added 
                                         DEBUG.</para>
                                     <para>Type: string</para>
                                     <para>Required: Yes</para>
-                        <para>Required: Yes</para>
+                                    <para>Required: Yes</para>
                                     <warning>
                                         <para>The DEBUG log level is unsafe for production
                                             use.</para>
                                     </warning>
                                     <para>Type: string</para>
                                     <para>Required: Yes</para>
-                        <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
@@ -1041,4 +1059,3 @@ Package cborplugin is a plugin system allowing mix network services to be added 
         </section>
     </section>
 </chapter>
-
