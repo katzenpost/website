@@ -794,8 +794,16 @@ what do you think?
                 <!--https://github.com/katzenpost/katzenpost/blob/main/server/config/config.go#L470 defines the top level configuration.
 https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 defines the per-service configurations.-->
                 <para>The service node configuration section contains subsections with settings for
-                    each service that Katzenpost supports. In a production network, the various
-                    services would be hosted on dedicated systems.</para>
+                each service that Katzenpost supports. In a production network it's important
+		to run the echo service on every service node so that decoy traffic works properly.
+		</para>
+		<para>The panda and reunion service currently do not work properly and must be fixed or rewritten.</para>
+		<para>memspool service is deprecated and supports our old catshadow protocol along with panda/reunion</para>
+		<para>The pigeonhole service is also known as the courier service will be used to support our new
+		BACAP based protocols the details of which are in our unpublished paper. In the future, most or all of our
+		protocols will use the pigeonhole courier service.</para>
+		<para>The HTTP proxy service is completely optional but allows the mix network to be used as an HTTP proxy
+		which may assist in integrating with existing software systems.</para>
                 <programlisting>[ServiceNode]
                     
     [[ServiceNode.Kaetzchen]]
