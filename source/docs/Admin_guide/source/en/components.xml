@@ -735,7 +735,12 @@ what do you think?
                 <title id="gateway-gateway-section-config.title">Gateway section<?oxy_comment_end?></title>
                 <para/>
 		<para>The Gateway section of the configuration is only required for configuring a Gateway node.
-This section must contain UserDB and SpoolDB definitions.</para>
+		This section must contain UserDB and SpoolDB definitions. Bolt is an embedded database library for golang
+		and we use it for the user and spool databases. However, in the future, these two databases are probably going to be
+		deprecated in favour of in-memory concurrenty structures since it is no longer a goal for us to persist data
+		on the Gateway nodes; Our newer designs persist data on the Service nodes instead. In order to configure a
+		Gateway node you must copy the configuration below but replace the file paths as necessary:
+		</para>
                 <programlisting>[Gateway]
     [Gateway.UserDB]
         Backend = "bolt"
