@@ -111,8 +111,9 @@ serverdebug (/1/7)
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">BindAddresses</emphasis></para>
-                    <para>BindAddresses are listener addresses that the server will bind to and accept connections on.
-                        These addresses are not advertised in the PKI.</para>
+                    <para>If <emphasis role="bold">true></emphasis>, allows setting of listener
+                        addresses that the server will bind to and accept connections on. These
+                        addresses are not advertised in the PKI.</para>
                     <para>Type: bool</para>
                     <para>Required: No</para>
                 </listitem>
@@ -123,7 +124,7 @@ serverdebug (/1/7)
                     <para>Type: string</para>
                     <para>Required: No</para>
                 </listitem>
-                <listitem>
+                <listitem id="datadir">
                     <para><emphasis role="bold">DataDir</emphasis></para>
                     <para>DataDir is the absolute path to the directory authority server state directory
                         where persistence.db will be written to disk and
@@ -134,13 +135,15 @@ serverdebug (/1/7)
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">IsGatewayNode</emphasis></para>
-                    <para>IsGatewayNode specifies if the server is a gateway or not.</para>
+                    <para>If <emphasis role="bold">true></emphasis>, the server is a gateway
+                        node.</para>
                     <para>Type: bool</para>
                     <para>Required: No</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">IsServiceNode</emphasis></para>
-                    <para>IsServiceNode specifies if the server is a service node or not.</para>
+                    <para>If <emphasis role="bold">true></emphasis>, the server is a service
+                        node.</para>
                     <para>Type: bool</para>
                     <para>Required: No</para>
                 </listitem>
@@ -163,14 +166,13 @@ serverdebug (/1/7)
             <itemizedlist>
                 <listitem>
                     <para><emphasis role="bold">Disable</emphasis></para>
-                    <para>Disables logging if set to <emphasis role="bold"
-                        >true</emphasis>.</para>
+                    <para>If <emphasis role="bold">true></emphasis>, logging is disabled.</para>
                     <para>Type: bool</para>
                     <para>Required: No</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">File</emphasis></para>
-                    <para>Specifies the log file. If omitted, stdout is used.</para>
+                    <para>Specifies the log file. If omitted, <code>stdout</code> is used.</para>
                     <para>An absolute or relative file path can be specified. A relative path is 
                     relative to the DataDir specified in the Server section of the 
                     configuration.</para>
@@ -230,8 +232,7 @@ serverdebug (/1/7)
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">HeaderLength</emphasis></para>
-                    <para>Specifies the length of the Sphinx packet header in bytes.</para>
-                    
+                    <para>Specifies the length of the Sphinx packet header in bytes.</para>                   
                     <para>Type: int</para>
                     <para>Required: Yes</para>
                 </listitem>                    
@@ -281,7 +282,7 @@ serverdebug (/1/7)
                 </listitem>       
                 <listitem>
                     <para><emphasis role="bold">NextNodeHopLength</emphasis></para>
-                    <para>NextNodeHopLength is derived from the largest routing-information 
+                    <para>The NextNodeHopLength is derived from the largest routing-information 
                         block that we expect to encounter. Other packets have 
                         NextNodeHop + NodeDelay sections, or a Recipient section, both of which
                         are shorter.</para>
@@ -329,14 +330,14 @@ serverdebug (/1/7)
            <itemizedlist>
                <listitem>
                    <para><emphasis role="bold">Enable</emphasis></para>
-                   <para>Enables the management interface if set to true.</para>
+                   <para>If <emphasis role="bold">true></emphasis>, the management interface enabled.</para>
                    <para>Type: bool</para>
                    <para>Required: No</para>
                </listitem>
                <listitem>
                    <para><emphasis role="bold">Path</emphasis></para>
                    <para>Specifies the path to the management interface socket. If left empty, then management_sock 
-                       will be used under the DataDir.</para><?oxy_comment_end?>
+                       will be used under the <link linkend="datadir">DataDir</link>.</para>
                    <para>Type: string</para>
                    <para>Required: No</para>
                </listitem>
@@ -514,8 +515,8 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">SchedulerExternalMemoryQueue</emphasis></para>
-                        <para>Enables the experimental external memory queue that is backed by
-                            disk.</para>
+                        <para>If <emphasis role="bold">true></emphasis>, the experimental disk-backed external memory 
+                            queue is enabled.</para>
                         <para>Type: bool</para>
                         <para>Required: No</para>
                     </listitem>
@@ -607,8 +608,9 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">SendDecoyTraffic</emphasis></para>
-                        <para>Enables sending decoy traffic. This parameter is still experimental and untuned
-                            and thus is disabled by default.</para>
+                        <para>If <emphasis role="bold">true></emphasis>, decoy traffic is enabled. 
+                            This parameter is experimental and untuned, 
+                            and is disabled by default.</para>
                         <note>
                             <para>This option will be removed once decoy traffic is fully implemented.</para>
                         </note>
@@ -617,7 +619,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">DisableRateLimit</emphasis></para>
-                        <para>Disables the per-client rate limiter.</para>
+                        <para>If <emphasis role="bold">true></emphasis>, the per-client rate limiter is disabled.</para>
                         <note>
                             <para>This option should only be used for testing.</para>
                         </note>
@@ -626,8 +628,8 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">GenerateOnly</emphasis></para>
-                        <para>Halts and cleans up the server immediately after long term key
-                            generation.</para>
+                        <para>If <emphasis role="bold">true></emphasis>, the server immediately
+                        halts and cleans up after long-term key generation.</para>
                         <para>Type: bool</para>
                         <para>Required: No</para>
                     </listitem>

@@ -49,12 +49,11 @@
     <section id="auth">
         <title id="auth.title">Directory authorities</title>
 
-		<para>Directory authorities, or <emphasis>dirauths</emphasis>, are nodes in &program_name;'s
-            decentralized public key infrastructure (PKI), which forms the security root of the
-            &program_name; system. Clients and mixnet nodes rely on the PKI to maintain and sign an
-            up-to-date <emphasis>consensus</emphasis> document, providing a view of the entire
-            network including connection information and public cryptographic key materials and
-            signatures. </para>
+		<para>Directory authorities, or <emphasis>dirauths</emphasis>, are nodes in the decentralized
+            public key infrastructure (PKI)  that forms the security root of the &program_name;
+            system. Clients and mixnet nodes rely on the PKI to maintain and sign an up-to-date
+                <emphasis>consensus</emphasis> document, providing a view of the entire network
+            including connection information and public cryptographic key materials and signatures. </para>
         <para>Every 20 minutes (the current value for an <emphasis>epoch</emphasis>), each mix node
             signs a descriptor and uploads it to the dirauth nodes. The dirauths then vote on a new
             consensus document. If consensus is reached, each dirauth signs the document. Clients
@@ -177,26 +176,7 @@ dYpXpbozjFfqhR45ZC2q97SOOsXMANdHaEdXrP42CJk=
 ooQBPYNdmfwnxXmvnljPA2mG5gWgurfHhbY87DMRY2tbMeZpinJ5BlSiIecprnmm
 QqxcS9o36IS62SVMlOUkw+XEZGVvc9wJqHpgEgVJRAs1PCR8cUAdM6QIYLWt/lkf
 SPKDCtZ3GiSIOzMuaglo2tarIPEv1AY7r9B0xXOgSKMkGyBkCfw1VBZf46MM26NL
-opKx+rAKBzjKBJgGg9AHt9rNQsBbCVFBO+KKbpHHXFCBztK1Hhei3LeeYxcqL4bC
-Rzi2kfBvQLPNzIuHOktKX7m39CxMByMNm4qL6dSVbtZaMOenpUlsIHOR5vyF2bgX
-syRS3WnPRaIOarkMXUwJpzasNzuPUSAmJyaAQVwgrTSJyXp91usF6wBHKApqlDVY
-dldqH7O90EI1tYNiOYpBCgwGBIK+xOkjoVNY91B/PVbA5ngcXgt8xQp02WXF1lVN
-+ixu2XF8ndJXtLmlTIMUb0YwHsEo9UqdN7yLMPqcVScqR+ZKyCpaIPS+dpF20AAu
-fvVVlxKVLqonUkJLCMgR/4morUOXVHwRgkKr0mIuw9RTWwSlSGxasFiVFZM5p6kS
-ElIgPlCX94xV52BjcerPQ1R2TJdlVdWgLUAO7UNhyETCGrdxjxZSYmxNjfsOLHk7
-qFNNDhUqHBjJmYOSDis0qHNXW8oZ9SF6pFN9NlctH8Uq10c/fNltykEbTkgLdMJP
-phWWVQWD1YIU+/ktO5ZNVIVK/CHOqdc41+mRyxh/OmbEWMaaicuijLNR3KV9QoHG
-9JWw9RtrPeE+jbgUX0g0asFf0nibfWqdV5QfAfwV/shYuIJR4nZMb6B4R9t8wYd0
-gCSZg1M7gJW1J5B17cPM6+OCz2JaYhgAHfvJhSYK3zGzWWvGWvKTJrSTjiIhX8wM
-H/KiX5U8+nkWPDiu/nqyRVej8/ELYvg7T2R7tKJzB0Gr5GUFd3B1TzvAcIRBl+yd
-9ma5tRE44cu1yONuc1N8ITp8xqezSjwdavoMeuphryd6xbacZCVCcnM2R5mGOAhI
-xzQWA5teHxoBTnliRQq1HriKX8N8Ogq3GPYu0Lue+MwEkkRkxSJdNpSLE/yzOQkf
-DrlBbbURIfe1T6aeA1SuXeacTzqd6lfPWvjCgXMYriwhAazKwgS+WwcXd5RKbWEN
-PIISgRavtoahEdOVSJJbVMUYptA3+CcY9eEi/rWOc1RgTWGNtWW0FYnFyiq6UdPM
-NiO/z7S9uJJI/2wWMlJi+OoTx9cf3mjIMOPLkzEOhpVRhCZvcSvFIoF6ItcETnda
-HmmOFwFg2reqlPioBORUufk7zdhs0MuuMYlaG+E0OqxTOKiZg0qbgMZqtOlsXkp8
-QdY8R/W4ePiVAI2iZnMzEqMl3LLEDlRdMOkBYzOkR2GSvpYv6tetgoNAu8vFkpc6
-Rma3y7KnihWaYhwEFbEqV2kD2GO9cMV+AcFvuCE9dVGVSatdxsSNX6ZXaFGlmHCp
+...
 gHtNyQJnXski52O03JpZRIhR40pFOhAAcMMAZDpMTVoxlcdR6WA4SlBiSceeJBgY
 Yp9PlGhCimx9am99TrdLoLCdTHB6oowt8tss3POpIOxaSlguyeym/sBhkUrnXOgN
 ldMtDsvvc9KUfE4I0+c+XQ==
@@ -254,7 +234,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="auth-logging">
                 <title id="auth-logging.title">Logging section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: logging (/1/3)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>   
             </section>
@@ -405,8 +386,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">GenerateOnly</emphasis></para>
-                        <para>If set to true, the server halts and cleans up the data directory
-                            immediately after long-term key generation.</para>
+                        <para>If <emphasis role="bold">true></emphasis>, the server halts and cleans
+                            up the data directory immediately after long-term key generation.</para>
                         <para>Type: bool</para>
                         <para>Required: No</para>
                     </listitem>
@@ -582,13 +563,6 @@ what do you think?
                 </note>
                 <para>The &program_name; Sphinx implementation supports the following additional
                     cryptographic primitives: </para>
-                <?oxy_insert_start author="dwrob" timestamp="20241106T195305-0800"?>
-                <para/>
-                <para>Although the dirauths use the Sphinx geometry hash to validate... so does
-                    everyone else. Clients and mix servers hash their own Sphinx geometries and
-                    compare it to the hash in the PKI doc.</para>
-                <para/>
-                <?oxy_insert_end?>
                 <itemizedlist>
                     <listitem>
                         <para>Stream cipher: CTR-AES256</para>
@@ -606,7 +580,8 @@ what do you think?
                 <para>All dirauths must be configured to use the same SphinxGeometry. Any geometry
                     not advertised by the PKI document will fail. Each dirauth publishes the hash of
                     its SphinxGeometry in the PKI document for validation by its peer dirauths. </para>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: sphinxgeometry (/1/4)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
@@ -654,43 +629,43 @@ what do you think?
   IsServiceNode = false
   [Server.AltAddresses]</programlisting>
                 </para>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. --> 
+                <!--See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--serverconfig (/1/2)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>     
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="mix-logging-config">
                 <title id="mix-logging-config.title">Logging section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--logging (/1/3)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>   
             </section>
             <section id="mix-pki-config">
                 <title id="mix-pki-config.title">PKI section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--pki (/1/6)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>                        
             </section>
             <section id="mix-management-config">
                 <title id="mix-management-config.title">Management section</title>              
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--management (/1/5)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: management (/1/5)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>                    
             </section>
             <section id="mix-sphinx-config">
                 <title id="mix-sphinx-config.title">SphinxGeometry section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--sphinxgeometry (/1/4)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: sphinxgeometry (/1/4)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>    
             </section>
             <section id="mix-debug-config">
                 <title id="mix-debug-config.title">Debug section</title>                
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--serverdebug (/1/7)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: serverdebug (/1/7)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>                    
             </section>
@@ -718,15 +693,15 @@ what do you think?
     IsServiceNode = false
     [Server.AltAddresses]
         TCP = ["localhost:30004"]</programlisting>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--serverconfig (/1/2)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: serverconfig (/1/2)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>      
             </section>
             <section id="gateway-logging-config">
                 <title id="gateway-logging-config.title">Logging section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--logging (/1/3)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: logging (/1/3)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>      
             </section>
@@ -796,29 +771,29 @@ what do you think?
             </section>
             <section id="gateway-pki-config">
                 <title id="gateway-pki-config.title">PKI section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--pki (/1/6)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: pki (/1/6)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>          
             </section>
             <section id="gateway-management-config">
                 <title id="gateway-management-config.title">Management section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--management (/1/5)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: management (/1/5)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>  
             </section>
             <section id="gateway-sphinx-config">
                 <title id="gateway-sphinx-config.title">SphinxGeometry section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--sphinxgeometry (/1/4)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: sphinxgeometry (/1/4)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>    
             </section>
             <section id="gateway-debug-config">
                 <title id="gateway-debug-config.title">Debug section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--serverdebug (/1/7)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: serverdebug (/1/7)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>    
             </section>
@@ -846,15 +821,15 @@ what do you think?
     IsGatewayNode = false
     IsServiceNode = true
     [Server.AltAddresses]</programlisting>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--serverconfig (/1/2)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: serverconfig (/1/2)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>   
             </section>
             <section id="service-logging-config">
                 <title id="service-logging-config.title">Logging section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--logging (/1/3)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: logging (/1/3)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>     
             </section>
@@ -917,41 +892,45 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Capability</emphasis></para>
-                        <para>The capability exposed by the agent.</para>
+                        <para>Specifies the protocol capability exposed by the agent.</para>
                         <para>Type: string</para>
                         <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Endpoint</emphasis></para>
-                        <para>Endpoint is the provider side endpoint that the agent will
-                            accept requests at. While not required by the spec, this server
-                            only supports Endpoints that are lower-case local-parts of an
-                            e-mail address.</para>
+                        <para>Specifies the provider-side Endpoint where the agent will accept
+                            requests. While not required by the specification, this server only
+                            supports Endpoints that are
+                            <?oxy_comment_start author="dwrob" timestamp="20241107T101141-0800" comment="Example?"?>lower-case
+                            local parts<?oxy_comment_end?> of an email address.</para>
                         <para>Type: string</para>
                         <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Command</emphasis></para>
-                        <para>Command is the full file path to the external plugin program
-                        that implements this Kaetzchen service.</para>
+                        <para>Specifies the full path to the external plugin program that implements
+                            this Kaetzchen service.</para>
                         <para>Type: string</para>
                         <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">MaxConcurrency</emphasis></para>
-                        <para>MaxConcurrency is the number of worker goroutines to start for this service.</para>
+                        <para>Specifies the number of worker goroutines to start for this
+                            service.</para>
                         <para>Type: int</para>
                         <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Config</emphasis></para>
-                        <para>The extra per agent arguments to be passed to the agent's initialization routine.</para>
+                        <para>Specifies extra per-agent arguments to be passed to the agent's
+                            initialization routine.</para>
                         <para>Type: map[string]interface{}</para>
                         <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Disable</emphasis></para>
-                        <para>disabled a configured agent.</para>
+                        <para>If <emphasis role="bold">true</emphasis>, disables a configured
+                            agent.</para>
                         <para>Type: bool</para>
                         <para>Required: No</para>
                     </listitem>
@@ -1070,33 +1049,34 @@ Package cborplugin is a plugin system allowing mix network services to be added 
             </section>
             <section id="service-pki-config">
                 <title id="service-pki-config.title">PKI section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. --> 
-                <!--pki (/1/6)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. --> 
+                <!--Configuration section: pki (/1/6)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>         
             </section>
             <section id="service-management-config">
                 <title id="service-management-config.title">Management section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--management (/1/5)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: management (/1/5)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/> 
             </section>
             <section id="service-sphinx-config">
                 <title id="service-sphinx-config.title">SphinxGeometry section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--sphinxgeometry (/1/4)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: sphinxgeometry (/1/4)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>    
             </section>
             <section id="service-debug-config">
                 <title id="service-debug-config.title">Debug section</title>
-                <!-- See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
-                <!--serverdebug (/1/7)-->
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
+                <!--Configuration section: serverdebug (/1/7)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>                         
            </section>
         </section>
     </section>
 </chapter>
-<?oxy_options track_changes="on"?>
+
+
