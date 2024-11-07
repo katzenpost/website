@@ -107,21 +107,21 @@ serverdebug (/1/7)
                         URLs with that start with either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and 
                         ["quic://192.168.1.1:40001"].</para>
                     <para>Type: []string</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">BindAddresses</emphasis></para>
                     <para>BindAddresses are listener addresses that the server will bind to and accept connections on.
                         These addresses are not advertised in the PKI.</para>
                     <para>Type: bool</para>
-                    <para>Required:</para>
+                    <para>Required: No</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">MetricsAddress</emphasis></para>
                     <para>MetricsAddress is the address/port to bind the Prometheus metrics
                         endpoint to.</para>
                     <para>Type: string</para>
-                    <para>Required:</para>
+                    <para>Required: No</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">DataDir</emphasis></para>
@@ -130,19 +130,19 @@ serverdebug (/1/7)
                         where the servers&apos; cryptographic key materials
                         will be written to disk when the serrver is started with the "-g" commmand-line option.</para>
                     <para>Type: string</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">IsGatewayNode</emphasis></para>
                     <para>IsGatewayNode specifies if the server is a gateway or not.</para>
                     <para>Type: bool</para>
-                    <para>Required:</para>
+                    <para>Required: No</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">IsServiceNode</emphasis></para>
                     <para>IsServiceNode specifies if the server is a service node or not.</para>
                     <para>Type: bool</para>
-                    <para>Required:</para>
+                    <para>Required: No</para>
                 </listitem>
             </itemizedlist>
             
@@ -166,7 +166,7 @@ serverdebug (/1/7)
                     <para>Disables logging if set to <emphasis role="bold"
                         >true</emphasis>.</para>
                     <para>Type: bool</para>
-                    <para>Required:</para>
+                    <para>Required: No</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">File</emphasis></para>
@@ -175,13 +175,13 @@ serverdebug (/1/7)
                     relative to the DataDir specified in the Server section of the 
                     configuration.</para>
                     <para>Type: string</para>
-                    <para>Required:</para>
+                    <para>Required: No</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">Level</emphasis></para>
                     <para>Supported logging level values are ERROR | WARNING | NOTICE |INFO | DEBUG.</para>
                     <para>Type: string</para>
-                    <para>Required:</para>
+                    <para>Required: No</para>
                     <warning>
                         <para>The DEBUG log level is unsafe for
                             production use.</para>
@@ -218,66 +218,66 @@ serverdebug (/1/7)
                     <para><emphasis role="bold">PacketLength</emphasis></para>
                     <para>PacketLength is the length of a packet.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">NrHops</emphasis></para>
                     <para>NrHops is the number of hops through the mixnet, which determines the size</para>
                     <para>of the Sphinx packet header.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">HeaderLength</emphasis></para>
                     <para>HeaderLength is the length of the Sphinx packet header in
                         bytes.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">RoutingInfoLength</emphasis></para>
                     <para>RoutingInfoLength is the length of the routing info portion of the
                         header.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">PerHopRoutingInfoLength</emphasis></para>
                     <para>PerHopRoutingInfoLength is the length of the per hop routing
                         info.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">SURBLength</emphasis></para>
                     <para>SURBLength is the length of SURB.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">SphinxPlaintextHeaderLength</emphasis></para>
                     <para>SphinxPlaintextHeaderLength is the length of the plaintext
                         header.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">PayloadTagLength</emphasis></para>
                     <para>PayloadTagLength is the length of the payload tag.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">ForwardPayloadLength</emphasis></para>
                     <para>ForwardPayloadLength is the size of the payload.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">UserForwardPayloadLength</emphasis></para>
                     <para>the size of the usable payload.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>       
                 <listitem>
                     <para><emphasis role="bold">NextNodeHopLength</emphasis></para>
@@ -286,28 +286,28 @@ serverdebug (/1/7)
                         a NextNodeHop + NodeDelay, or a Recipient, both cases which
                         are shorter.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>  
                 <listitem>
                     <para><emphasis role="bold">SPRPKeyMaterialLength</emphasis></para>
                     <para>SPRPKeyMaterialLength is the length of the SPRP key.</para>
                     <para>Type: int</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">NIKEName</emphasis></para>
                     <para>NIKEName is the name of the NIKE (non-interactive key exchange) 
                     scheme used by the mixnet&apos;s Sphinx
-                    packets. NIKEName and KEMName are mutually exclusive.</para>
+                    packets. NIKEName and KEMName are mutually exclusive, one of them must be set to empty string.</para>
                     <para>Type: string</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">KEMName</emphasis></para>
                     <para>KEMName is the name of the KEM scheme used by the mixnet&apos;s Sphinx
-                        packet. NIKEName and KEMName are mutually exclusive.</para>
+                        packet. NIKEName and KEMName are mutually exclusive, one of them must be set to empty string.</para>
                     <para>Type: string</para>
-                    <para>Required:</para>
+                    <para>Required: Yes</para>
                 </listitem>
             </itemizedlist>            
         </informalexample>
@@ -330,7 +330,7 @@ serverdebug (/1/7)
                    <para><emphasis role="bold">Enable</emphasis></para>
                    <para>Enables the management interface if set to true.</para>
                    <para>Type: bool</para>
-                   <para>Required:</para>
+                   <para>Required: No</para>
                </listitem>
                <listitem>
                    <para><emphasis role="bold">Path</emphasis></para>
@@ -338,7 +338,7 @@ serverdebug (/1/7)
                        <?oxy_comment_start author="dwrob" timestamp="20240814T171718-0700" comment="Confusing wording."?>If
                        left empty, then management_sock will be used under the DataDir.</para><?oxy_comment_end?>
                    <para>Type: string</para>
-                   <para>Required:</para>
+                   <para>Required: No</para>
                </listitem>
            </itemizedlist>
        </informalexample>
@@ -355,25 +355,119 @@ serverdebug (/1/7)
 
     [[PKI.Voting.Authorities]]
         Identifier = "auth1"
-        IdentityPublicKey = "-----BEGIN ED25519 PUBLIC KEY-----\n/v3qYgh2TvV5ZqEVgwcjJHG026KlRV6HC16xZS3TkiI=\n-----END ED25519 PUBLIC KEY-----\n"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+tqN6tpOVotHWXKCszVn2kS7vAZjQpvJjQF3Qz/Qwhyg=
+-----END ED25519 PUBLIC KEY-----
+"""
         PKISignatureScheme = "Ed25519"
-        LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nJeFaZoYQEOO71zPFFWjL7DyDp4gckGiiqLCB2RNwMacZ7wuroYugiXyir+eqvkpe\nw5k3sqm9LlS5xaEqsmJpRxYCOmaHdXARwNA6rOFwEAN>
+        LinkPublicKey = """-----BEGIN XWING PUBLIC KEY-----
+JnJ8ztQEIjAkKJcpuZvJAdkWjBim/5G5d8yoosEQHeGJeeBqNPdm2AitUbpiQPcd
+tNCo9DxuC9Ieqmsfw0YpV6AtOOsaInA6QnHDYcuBfZcQL5MU4+t2TzpBZQYlrSED
+hPCKrAG+8GEUl6akseG371WQzEtPpEWWCJCJOiS/VDFZT7eKrldlumN6gfiB84sR
+ufpZ9tVt04FOQTUOAiegt/OzI8MGfRKwd+iVBTKEHGotzoMWuaoDLJK9EHFUznFH
+8pKyx2aI0aax8ymfDhFKoVd3Dvlw0fmjuslgsiS17YV61jCdyAdGQ6a9PUBy36Eq
+wCsDwNg8pwKkXPZU6DYZC+ofeRnJZeE8ptar1eGav/xVztCCQmm0wCMpzZwHJCYs
+K0NIGUjDO2gWzQapfNsKFoJoy6V+FMMeSpJ9HmoTEJLP+TA2LKizoFkwNcrMKKe2
+ArBAwzx56gQCyhQiKMNR4QB0KFJ2J3Wo8tUV1MdbxvQUMreTa2ea6dTCu7FMM/gu
+frcCT0kpcBipkXmzDvas4weAkxYhFqAy+GcZaFIBHbWBKdlEiDFXnsdhzehtIpkp
+dsU51GR/jVG4ueSAQuNpjDafW1oAbEjIS1BhatFd6EYivCcPeTVVEMFIaLsxkidL
+VxZjdUA66gcQkVmICaILIdJFfIY73faON4bPtAoUHJJsQtZHE+ZMLcy4bfm9CLu5
+ZvdksLFrffyfOqdl4QWBXHJmsKJ4S4K1qfYgqDkKrEa/QDCnG9RhwHtaF1e3Wik3
+ERAGZwyq90sNDMmQB+vPEzhqNxfOtGKK97UixRNagYhlgLLK0kIGM4nA1JgoubKf
+ckSDa6XCCeVtrxBuSIyPDgVZzJi8kIwswhMszepyIGaUB/c12DZ45jfCEPeoOZKB
+PkVs8BckiAikdwtuy+J+6ETIEmcNsAuM7ZJGbIJiSQuTCSO2Mlm7I7cao7FG43k1
+OYuToRt44+Aw1npy/9BM8Aa5x5ICOJgJTcbFnyow/MK+iwUbJWMu/JlN7NhS7Zoc
+e2yCwAM1eNxS3FJiMAFfTmMx0TUlo+Wj2CiwqcVoBud0PGiHtYSWtalHUDgoHUUv
+/nvHx8U6EnqqgOiHmxaBvgu1XHWkpsWC1Lib0hCsTHGhB2CPSEEPJHBcK9hGLsgO
+VTy7PQJ2+taFmpwMffg+QfRdljU5qCrN31iuC2UHCjJi67t+UquNe7WNemd813Z/
+ZlW7PilppyiWLUqX4uk7pSGSQAi9OtiEpdlZMrwY/ydyhbpN35sI3iaIEyQmADvH
+iOVujeoj8/R105oWr1xFJOcafuN5pdNGBscJUdQj7Gpkh5l5TtoIp+F6q7qxy+t1
+txe9nkFVFPSdPqwXJ5Yk8DIvKdagSSljnJlLbffK/ruLqQMF3GUAm5JOxCJ44MF3
+HTAhkec6M3V91QCi9xxtdepJWosh1OV0/xoOMMlwhTikhOQTn6AVLAqOohcZD+QT
+arFh/WKwYJUj+aGBsFYSqGdzC6MdY4x/YyFe2ze0MJEjThQE91y1d/LCQ3Sb7Ri+
+u6PBi3JU2qzlPEejDKwK0t5tMNEAkq8iNrpRTdD/hS0gR+ZIN8Z9QKh7Xf94FWG2
+H+r8OaqImQhgHabrWRDyLg==
+-----END XWING PUBLIC KEY-----
+"""
         WireKEMScheme = "xwing"
         Addresses = ["127.0.0.1:30001"]
 
     [[PKI.Voting.Authorities]]
         Identifier = "auth2"
-        IdentityPublicKey = "-----BEGIN ED25519 PUBLIC KEY-----\n60KQRhG7njt+kLQuwWlfRzJeOp4elM1/k26U/k52SjI=\n-----END ED25519 PUBLIC KEY-----\n"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+O51Ty2WLu4C1ETMa29s03bMXV72gnjJfTfwLV++LVBI=
+-----END ED25519 PUBLIC KEY-----	
+"""
         PKISignatureScheme = "Ed25519"
-        LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nHVR2m7i6G6cf1qxUvyEr3KC7JvAMv5Or1rgzvUcllnmhN8BGmOmWhrWLggBNsyyS\nx+gbkfczC8WZr4GDAXOmGchhEYRy9opjqxEBENW9IHU>
+        LinkPublicKey = """-----BEGIN XWING PUBLIC KEY-----
+TtQkg2XKUnY602FFBaPJ+zpN0Twy20cwyyFxh7FNUjaXA9MAJXs0vUwFbJc6BjYv
+f+olKnlIKFSmDvcF74U6w1F0ObugwTNKNxeYKPKhX4FiencUbRwkHoYHdtZdSctz
+TKy08qKQyCAccqCRpdo6ZtYXPAU+2rthjYTOL7Zn+7SHUKCuJClcPnvEYjVcJxtZ
+nRPAfbVvEmuzrvifxpuiBJpFqVK5gyegv0d6QjNRUbOVSrxMu0dv6dag4AfF3Xoa
+lEBwFQWFysWYZmQqUMOyhTNNxGZuEEHOpsVPAUKujfsXbFOOaTbBRebJ5cegr1aj
+DWQBncpv4gMnpDFuK0sxjRBQoanC+qyrFYh0EjFmTCNUxhNtVAdleyqVV7k2vxDC
+DcUOAIJM+AVWw7gp3NkD/yCD/aFiRZkrKLpeMJMTHHd3soGI+FdaVDl2jvQVIrmk
+5gaJz4mD/WkoVpB2NisEZHpIXzE4PwdCZowEhjOBhLgkjPpFmcilwvl/pPyfWcy5
+YqBCCNuxEmqEcdsW3LtiepwcojOMEvC/ZLGNGFedwrOnPjFiNGlfm0YkxYdwGJx3
+HglhD5c4G9NVP0l6pAlg7WmvRCVpTVgnSZKPp2QwYsARDySGRVIT6oiKbSJ/5Yu2
+rAQIDGRXBayioFjJdvm8YWCSramYazydqVS3ucSGRoCVNQmcR0aJDdekrEqyzgmE
+JxwE0bw1VsETekkkmEw0S3WWTWsBCnuDGhfD+jgNMuSDMwqTkEZDp6Z2Zymzzguf
+kQEojWUsByNIoTg3kvwKz3FpBJt76/kxhgkWPDrGWPmGRol9C/iuT6ZlnqMZiaoD
+M4p7UPJABWsl3Mk2v9FBkHcyZOEXFsBIuGnNCThstucmMQSY2eFhH8aTl7aMWCBd
+szdWg5oI+IUFPQgWQUg4l7e89TIV7JyA6Yu0Ehp62WWORbaIVotlMbWtF6oTJkCB
+XCRWduKqaMl61ihG2mRehHNn+TA/oqgAWgyxRsN8jWJJqVzP/nmlExxaLVtuges3
+aiy24flgmWNA9YoV49nLNLF1YKSzwNW1KSRy4rObRHq3t/OTAjO4CgqqmDZ6+cpo
+LQJmFqJhF/UHR2GUPolUK/NT37e/aZPDjgiho7aYVKtZ57d9R2KviFGJyZW+VKBr
+fbh9v4KyINTDB3s79iVUJTPCyeozYFVaQ4Ktu4CQTVCbC+eCkgGGvJi5Rro/Mytq
+shyzvLNA+GicK8At0bJArXdeHrIjolLNrAyAMqKZNCViOgEM50ok4DhtkajCOKOD
+tjifADQIkEGYl9uUXeCsXWCuW/Bxp4q1t7FSklZkqwQBbwcRfgqYIAkBWdESu4At
+XWKVyceIOzShJEkieMyFmkEvymY+Ihos8eu5kVpCZLhv0zOrJMmdoclXyNcs5gbB
+BtOBa2NFTAKMbLcanrmcXhFdQbhPROqnpUN7ObuX5vgqpvFut6OqPde61bcr3tsW
+ubJIe5U4nMJbBkOqr7Kq6niaEkiLODa0tkpB8tKMYTMBdcYyHSXCzpo7U9sb6LAR
+HktiTBDtRXviu2vbw7VRXhkMW2kjYZDtReQ5sAse04DvmD49zgTp1YxYW+wWFaL3
+37X7/SNuLdHX4PHZXIWHBQ==
+-----END XWING PUBLIC KEY-----	
+"""
         WireKEMScheme = "xwing"
         Addresses = ["127.0.0.1:30002"]
 
     [[PKI.Voting.Authorities]]
         Identifier = "auth3"
-        IdentityPublicKey = "-----BEGIN ED25519 PUBLIC KEY-----\naZUXqznyLO2mKDceIDs0obU6GAFZa3eKUDXo2RyWpBk=\n-----END ED25519 PUBLIC KEY-----\n"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+zQvydRYJq3npeLcg1NqIf+SswEKE5wFmiwNsI9Z1whQ=
+-----END ED25519 PUBLIC KEY-----
+"""
         PKISignatureScheme = "Ed25519"
-        LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nEZukXtZwHTjGj7tCI0kmUcq0QEtA4HMIz2OPiXQVeaK9XVBDNQUKq8iGRvzJAodM\nmJiEXYw6vvTJhPaik4OgMpZvwQYNn9BmwrcE7VxQfua>
+        LinkPublicKey = """
+-----BEGIN XWING PUBLIC KEY-----
+OYK9FiC53xwZ1VST3jDOO4tR+cUMSVRSekmigZMChSjDCPZbKut8TblxtlUfc/yi
+Ugorz4NIvYPMWUt3QPwS2UWq8/HMWXNGPUiAevg12+oV+jOJXaJeCfY24UekJnSw
+TNcdGaFZFSR0FocFcPBBnrK1M2B8w8eEUKQIsXRDM3x/8aRIuDif+ve8rSwpgKeh
+xqkpdmXDCMuVYLpghyaAYgdtQCdQrarItSjEiQEVtHMdTYTPC4N+aDhelMs7DpOR
+B8RoVgE29wdy5egz9lRax9LJOne2i8jNMhckkiA9cUIOZsBAgJpMy2e+sqiAVzek
+KeRe2TQMgaM1hbiMsLK1Iiw4QidDaUqkr1ZqmRS95DZ1HAS/xtUxBjXPaxBqHNmo
+wmvHXtYGlYS6/+UE0HdRr/Mb6hOb1EFKJ8oBAeFR9hG6+eg7WXyHBnOMvApPe0Js
+PRIY2dGUFwCSGcDEESApf2iyBsMgb4XPwEO9apaX9AZmbAmEeiPKySBhA9vJQKm1
+wIs22bQTJXdZKlU1mvdB+hy9+zhwbHeVzzCWc6UkdZDKNERcaloJMSUh14iQW9qc
+LUWAczdZvYqHwToodDcE8PkAfFmKWlM8Uhi654tPARwO9piBjCYPgIlvjNStD9Y/
+B9ZmvrI4GVZP/ZFkaHoKSdJxi4Jj6QE3LLaP1qwjupJhNOu4l8AEfMu2VwmwVkJ7
+SIIHPSV80mxvoSIgT+YNCTI+oxmHN2J51EJ610Rn7kh1bFUKf4GnUFJTEEFUD1ay
+G4ymMJbH4QaC3BsT47BV+RVd2SSqLlasRqqv5LImcYM9h6aGWAmZY9cz8KY/ZBLN
+t6EJx2B7kLwYV/lniobH/2tF9rKdfWpm79IugEtLy6kLNvSOERc1xIN1X4aGcewR
+snCWR0CiT0el8RgRYgFKEdWhccJs+gE0dLyegOBikdduAbeDiSNR/EKaChgwn3w0
+upsutfV8WvheQ5w1KidL0hl/rLKVkrqV2DVtsPp4d0WhLHyLaxQM3VJ7Y4quMjUF
+3/Y43dLOrbgVVaBpA4TCtoYPEztyYOjJyjbJ+niAHYmpBPG4BjeioSGBjsARYnsl
+kndLQjx/r4mvxXXJaRVDPAc5C/jFbDIfS6NRUdAJ//OJLaJaQJWJWTgF7fE4LvOX
+DiWu1wxkhISJrscFxtsHGJFqlRy4YqcqASuh+YeeERIeSOUHz4Ar2MkuC+Q9vRvH
+MOVo+XEbMSG6ZaSAEMOw8Au7kbGA/vmVPPJQXxYvjvCzjlPKnaiSSmvA2rQVJwYZ
+YHR+5ZwOJprIWWlch+xUfwZe3EBqeGuKABA39iPKFkY1BhFGExhW2rjBcgMk0NRG
+4ci5yOvGuTYjUywrVcoiJDUqkjuxqLNtFPMOINSqwGeqKhlpDaFKWYKwubK9a2AG
+13ivg4leANvMnUaztWhyYEg/zrqF0pq7ZXpLj7BTk1BBbvILGuHPd1hhGzA19utq
+OdVD3yw7OOS8uPZLORGQFyJbHtVmFPVvwja4G/o2gntAoHUZ2LiJJakpVhhlSyrI
+yuzvwwFtZVfWtNb5gAKZCyg0aduR3qgd7MPerRF+YopZk3OCRpC02YxfUZrHv398
+FZWJFK0R8iU52CEUxVpXTA==
+-----END XWING PUBLIC KEY-----	
+"""
         WireKEMScheme = "xwing"
         Addresses = ["127.0.0.1:30003"]</programlisting>
             <itemizedlist>
