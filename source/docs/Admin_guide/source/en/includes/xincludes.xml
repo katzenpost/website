@@ -81,7 +81,7 @@ serverdebug (/1/7)
                 <listitem>
                     <para><emphasis role="bold">Identifier</emphasis></para>
                     <para>Specifies the human-readable identifier for a node, and must be unique per mixnet. 
-                        Identifier can be an FQDN but does not have to be.</para>
+                        The identifier can be an FQDN but does not have to be.</para>
                     <para>Type: string</para>
                     <para>Required: Yes</para>
                 </listitem>
@@ -90,9 +90,10 @@ serverdebug (/1/7)
                 
                 <listitem>
                     <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
-                    <para>Specifies the cryptographic signature scheme which will be used by all components of the mix network 
-                        when interacting with the PKI system. Mix nodes sign their descriptors using this signature scheme, and 
-                        dirauth nodes similarly sign PKI documents using this signature scheme.</para>
+                    <para>Specifies the cryptographic signature scheme that will be used by all
+                        components of the mix network when interacting with the PKI system. Mix
+                        nodes sign their descriptors using this signature scheme, and dirauth nodes
+                        similarly sign PKI documents using the same scheme.</para>
                     <para>The following signature schemes are supported:
                         "ed25519", "ed448", "Ed25519 Sphincs+", "Ed448-Sphincs+", "Ed25519-Dilithium2", "Ed448-Dilithium3"
                     </para>
@@ -102,7 +103,7 @@ serverdebug (/1/7)
                 
                 <listitem>
                     <para><emphasis role="bold">Addresses</emphasis></para>
-                    <para>Specifies a list of one or more Address URLs in a format that contains the transport protocol, 
+                    <para>Specifies a list of one or more address URLs in a format that contains the transport protocol, 
                         IP address, and port number that the server will bind to for incoming connections. EchoMix supports 
                         URLs with that start with either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and 
                         ["quic://192.168.1.1:40001"].</para>
@@ -124,12 +125,12 @@ serverdebug (/1/7)
                     <para>Type: string</para>
                     <para>Required: No</para>
                 </listitem>
-                <listitem id="datadir">
+                <listitem>
                     <para><emphasis role="bold">DataDir</emphasis></para>
-                    <para>DataDir is the absolute path to the directory authority server state directory
-                        where persistence.db will be written to disk and
-                        where the servers&apos; cryptographic key materials
-                        will be written to disk when the serrver is started with the "-g" commmand-line option.</para>
+                    <para>Specifies the absolute path to a node's state directory. This is 
+                        where persistence.db is written to disk and where a node stores its 
+                        cryptographic key materials when started with the "-g" commmand-line 
+                        option.</para>
                     <para>Type: string</para>
                     <para>Required: Yes</para>
                 </listitem>
@@ -158,7 +159,7 @@ serverdebug (/1/7)
         <title></title>
         <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L78-->
         <informalexample> 
-            <para>The logging configuration section controls logging behavior across &program_name;.</para>
+            <para>The <code>Logging</code> configuration section controls logging behavior across &program_name;.</para>
             <programlisting>[Logging]
                 Disable = false
                 File = "katzenpost.log"
@@ -174,7 +175,7 @@ serverdebug (/1/7)
                     <para><emphasis role="bold">File</emphasis></para>
                     <para>Specifies the log file. If omitted, <code>stdout</code> is used.</para>
                     <para>An absolute or relative file path can be specified. A relative path is 
-                    relative to the DataDir specified in the Server section of the 
+                    relative to the DataDir specified in the <code>Server</code> section of the 
                     configuration.</para>
                     <para>Type: string</para>
                     <para>Required: No</para>
@@ -199,7 +200,8 @@ serverdebug (/1/7)
         <title></title>
         <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/core/sphinx/geo/geo.go#L40-->
         <informalexample>        
-            <para/>
+            <para>The <code>SphinxGeometry</code> section defines parameters for the Sphinx encrypted nested-packet format 
+                used internally by &program_name;. </para>
             <programlisting>[SphinxGeometry]
                 PacketLength = 3082
                 NrHops = 5
@@ -238,8 +240,8 @@ serverdebug (/1/7)
                 </listitem>                    
                 <listitem>
                     <para><emphasis role="bold">RoutingInfoLength</emphasis></para>
-                    <para>Specifies the length of the routing information portion of the S
-                        phinx packet header.</para>
+                    <para>Specifies the length of the routing information portion of the 
+                        Sphinx packet header.</para>
                     <para>Type: int</para>
                     <para>Required: Yes</para>
                 </listitem>                    
@@ -282,16 +284,17 @@ serverdebug (/1/7)
                 </listitem>       
                 <listitem>
                     <para><emphasis role="bold">NextNodeHopLength</emphasis></para>
-                    <para>The NextNodeHopLength is derived from the largest routing-information 
+                    <para>The <code>NextNodeHopLength</code> is derived from the largest routing-information 
                         block that we expect to encounter. Other packets have 
-                        NextNodeHop + NodeDelay sections, or a Recipient section, both of which
+                        <code>NextNodeHop</code> + <code>NodeDelay</code> sections, or a <code>Recipient</code> section, both of which
                         are shorter.</para>
                     <para>Type: int</para>
                     <para>Required: Yes</para>
                 </listitem>  
                 <listitem>
                     <para><emphasis role="bold">SPRPKeyMaterialLength</emphasis></para>
-                    <para>Specifies the length of the SPRP key.</para>
+                    <para>Specifies the length of the  strong pseudo-random permutation (SPRP)
+                        key.</para>
                     <para>Type: int</para>
                     <para>Required: Yes</para>
                 </listitem>
@@ -299,7 +302,8 @@ serverdebug (/1/7)
                     <para><emphasis role="bold">NIKEName</emphasis></para>
                     <para>Specifies the name of the non-interactive key exchange (NIKE)
                     scheme used by Sphinx packets.</para>
-                    <para>NIKEName and KEMName are mutually exclusive.</para>
+                    <para><code>NIKEName</code> and <code>KEMName</code> are mutually
+                        exclusive.</para>
                     <para>Type: string</para>
                     <para>Required: Yes</para>
                 </listitem>
@@ -307,7 +311,7 @@ serverdebug (/1/7)
                     <para><emphasis role="bold">KEMName</emphasis></para>
                     <para>Specifies the name of the key encapsulation mechanism (KEM) used by Sphinx
                         packets.</para>
-                    <para>NIKEName and KEMName are mutually exclusive.</para>
+                    <para><code>NIKEName</code> and <code>KEMName</code> are mutually exclusive.</para>
                     <para>Type: string</para>
                     <para>Required: Yes</para>
                 </listitem>
@@ -321,7 +325,7 @@ serverdebug (/1/7)
         <title></title>
         <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/server/config/config.go#L729-->
            <informalexample> 
-           <para>Management is the &program_name; management interface configuration. The management section specifies 
+           <para>The <code>Management</code> section specifies 
                connectivity information for the &program_name; control protocol which can be used to make run-time 
                configuration changes. A configuration resembles the following:</para>
            <programlisting>[Management]
@@ -330,14 +334,15 @@ serverdebug (/1/7)
            <itemizedlist>
                <listitem>
                    <para><emphasis role="bold">Enable</emphasis></para>
-                   <para>If <emphasis role="bold">true></emphasis>, the management interface enabled.</para>
+                   <para>If <emphasis role="bold">true></emphasis>, the management interface is
+                        enabled.</para>
                    <para>Type: bool</para>
                    <para>Required: No</para>
                </listitem>
                <listitem>
                    <para><emphasis role="bold">Path</emphasis></para>
-                   <para>Specifies the path to the management interface socket. If left empty, then management_sock 
-                       will be used under the <link linkend="datadir">DataDir</link>.</para>
+                   <para>Specifies the path to the management interface socket. If left empty, then <code>management_sock</code> 
+                       is located in the configuration's defined <code>DataDir</code>>.</para>
                    <para>Type: string</para>
                    <para>Required: No</para>
                </listitem>
@@ -350,7 +355,7 @@ serverdebug (/1/7)
     <simplesect>
         <title></title>     
         <informalexample> 
-            <para>The PKI section contains the directory authority configuration for a mix, gateway, or service node.</para>
+            <para>The <code>PKI</code> section contains the directory authority configuration for a mix, gateway, or service node.</para>
             <programlisting>[PKI]
 [PKI.Voting]
 
@@ -418,30 +423,33 @@ FZWJFK0R8iU52CEUxVpXTA==
                 <listitem>
                     <para><emphasis role="bold">Identifier</emphasis></para>
                     <para>Specifies the human-readable identifier for a node, which must be unique per mixnet. 
-                    Identifier can be an FQDN but does not have to be.</para>
+                    The identifier can be an FQDN but does not have to be.</para>
                     <para>Type: string</para>
                     <para>Required: Yes</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">IdentityPublicKey</emphasis></para>
-                    <para>String containing the node&apos;s public identity key in PEM format. IdentityPublicKey is 
-                    the node&apos;s permanent identifier and is used to verify cryptographic signatures produced 
-                    by its private identity key.</para>
+                    <para>String containing the node&apos;s public identity key in PEM format.
+                            <code>IdentityPublicKey</code> is the node&apos;s permanent identifier
+                        and is used to verify cryptographic signatures produced by its private
+                        identity key.</para>
                     <para>Type: string</para>
                     <para>Required: Yes</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
-                    <para>Specifies the cryptographic signature scheme which will be used by all components of 
-                    the mix network when interacting with the PKI system. Mix nodes sign their descriptors using 
-                    this signature scheme, and dirauth nodes similarly sign PKI documents using this signature scheme.</para>
+                    <para>Specifies the cryptographic signature scheme that will be used by all
+                        components of the mix network when interacting with the PKI system. Mix
+                        nodes sign their descriptors using this signature scheme, and dirauth nodes
+                        similarly sign PKI documents using the same scheme.</para>
                     <para>Type: string</para>
                     <para>Required: Yes</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">LinkPublicKey</emphasis></para>
-                    <para>String containing the peer&apos;s public link-layer key in PEM format. LinkPublicKey must 
-                        match the specified WireKEMScheme.</para>
+                    <para>String containing the peer&apos;s public link-layer key in PEM format.
+                            <code>LinkPublicKey</code> must match the specified
+                            <code>WireKEMScheme</code>.</para>
                     <para>Type: string</para>
                     <para>Required: Yes</para>
                 </listitem>
@@ -453,10 +461,11 @@ FZWJFK0R8iU52CEUxVpXTA==
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">Addresses</emphasis></para>
-                    <para>Specifies a list of one or more Address URLs in a format that contains the transport protocol, 
-                    IP address, and port number that the server will bind to for incoming connections. &program_name; supports 
-                    URLs that start with either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] 
-                    and ["quic://192.168.1.1:40001"].</para>
+                    <para>Specifies a list of one or more address URLs in a format that contains the
+                        transport protocol, IP address, and port number that the server will bind to
+                        for incoming connections. &program_name; supports URLs that start with
+                        either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
+                        ["quic://192.168.1.1:40001"].</para>
                     <para>Type: []string</para>
                     <para>Required: Yes</para>
                 </listitem>
@@ -469,7 +478,8 @@ FZWJFK0R8iU52CEUxVpXTA==
     <simplesect>
         <title></title>     
         <informalexample>    
-            <para>Debug is the &program_name; server debug configuration for advanced tuning.</para>   
+            <para>The <code>Debug</code> section is the &program_name; server debug configuration
+                for advanced tuning.</para>   
             <programlisting>[Debug]
                 NumSphinxWorkers = 16
                 NumServiceWorkers = 3
@@ -522,9 +532,9 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">SchedulerQueueSize</emphasis></para>
-                        <para>Specifies the maximum scheduler queue size before random entries
-                            will start getting dropped. A value &lt;= 0 is treated as
-                            unlimited.</para>
+                        <para>Specifies the maximum scheduler queue size before random entries will
+                        start getting dropped. A value less than or equal to zero is treated as
+                        unlimited.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
                     </listitem>

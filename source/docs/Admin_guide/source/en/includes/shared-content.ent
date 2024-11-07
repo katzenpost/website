@@ -109,7 +109,7 @@
                                         "x448"</para>
                                      <note><para>X25519 and X448 are actually non-interactive key-exchanges
                                             (NIKEs), not KEMs. &program_name; uses
-                                            a Hashed ElGamal cryptographic construction
+                                            a hashed ElGamal cryptographic construction
                                             to convert them from NIKEs to KEMs.</para></note>
                                 </listitem>
                             </itemizedlist><itemizedlist>

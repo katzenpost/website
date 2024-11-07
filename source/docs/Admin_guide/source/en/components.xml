@@ -71,9 +71,8 @@
             <para>The following configuration is drawn from the reference implementation in
                     <filename>katzenpost/docker/voting_mixnet/auth1/authority.toml</filename>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
-                more information about the test mixnet, see 
-                <emphasis role="bold"><xref endterm="container.title" linkend="container"/></emphasis>.</para>
-            
+                more information about the test mixnet, see <emphasis role="bold"><xref
+                        endterm="container.title" linkend="container"/></emphasis>.</para>
             <!--General TOML note:
 
 https://toml.io/en/v1.0.0
@@ -106,7 +105,8 @@ type Config struct {
             <section id="auth-server-section-config">
                 <title id="auth-server-section-config.title">Server section</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L415-->
-                <para/>
+                <para>The <code>Server</code> section configures mandatory basic parameters for each
+                    directory authority</para>
                 <programlisting>[Server]
     Identifier = "auth1"
     WireKEMScheme = "xwing"
@@ -117,7 +117,8 @@ type Config struct {
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
                         <para>Specifies the human-readable identifier for a node, and must be unique
-                            per mixnet. Identifier can be an FQDN but does not have to be.</para>
+                            per mixnet. The identifier can be an FQDN but does not have to
+                            be.</para>
                         <para>Type: string</para>
                         <para>Required: Yes</para>
                     </listitem>
@@ -127,7 +128,7 @@ type Config struct {
                         <para>Specifies the cryptographic signature scheme which will be used by all
                             components of the mix network when interacting with the PKI system. Mix
                             nodes sign their descriptors using this signature scheme, and dirauth
-                            nodes similarly sign PKI documents using this signature scheme.</para>
+                            nodes similarly sign PKI documents using the same scheme.</para>
                         <para>The following signature schemes are supported: "ed25519", "ed448",
                             "Ed25519 Sphincs+", "Ed448-Sphincs+", "Ed25519-Dilithium2",
                             "Ed448-Dilithium3" </para>
@@ -136,8 +137,8 @@ type Config struct {
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Addresses</emphasis></para>
-                        <para>Specifies a list of one or more Address URLs in a format that contains
-                            the transport protocol, IP address, and port number that the server will
+                        <para>Specifies a list of one or more address URLs in a format that contains
+                            the transport protocol, IP address, and port number that the node will
                             bind to for incoming connections. &program_name; supports URLs with that
                             start with either "tcp://" or "quic://" such as:
                             ["tcp://192.168.1.1:30001"] and ["quic://192.168.1.1:40001"].</para>
@@ -146,9 +147,9 @@ type Config struct {
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">DataDir</emphasis></para>
-                        <para>Specifies the absolute path to the dirauth's state directory where
-                            persistence.db will be written to disk and where the server's
-                            cryptographic key materials will be written to disk when started with
+                        <para>Specifies the absolute path to a node's state directory. This is
+                                where<filename> persistence.db</filename> is written to disk and
+                            where a node stores its cryptographic key materials when started with
                             the "-g" commmand-line option.</para>
                         <para>Type: string</para>
                         <para>Required: Yes</para>
@@ -159,10 +160,9 @@ type Config struct {
             <section id="auth-authorities-section-config">
                 <title id="auth-authorities-section-config.title">Authorities section</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L266-->
-                <para>An Authorities section is configured for each peer authority. We recommend
-                    using
-                    <?oxy_comment_start author="dwrob" timestamp="20241024T125441-0700" comment="provide a ref"?>TOML's
-                    multi-line<?oxy_comment_end?> quotes for key materials.</para>
+                <para>An <code>Authorities</code> section is configured for each peer authority. We
+                    recommend using <ulink url="https://quickref.me/toml.html">TOML's style</ulink>
+                    for multi-line quotations for key materials.</para>
                 <programlisting>[[Authorities]]
     Identifier = "auth1"
     IdentityPublicKey = """
@@ -188,7 +188,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
                         <para>Specifies the human-readable identifier for the node which must be
-                            unique per mixnet. Identifier can be an FQDN but does not have to
+                            unique per mixnet. The identifier can be an FQDN but does not have to
                             be.</para>
                         <para>Type: string</para>
                         <para>Required: Yes</para>
@@ -196,34 +196,33 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKey</emphasis></para>
                         <para>String containing the node's public identity key in PEM format.
-                            IdentityPublicKey is the node's permanent identifier and is used to
-                            verify cryptographic signatures produced by its private identity
-                            key.</para>
+                                <code>IdentityPublicKey</code> is the node's permanent identifier
+                            and is used to verify cryptographic signatures produced by its private
+                            identity key.</para>
                         <para>Type: string</para>
                         <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
-                        <para>Specifies the cryptographic signature scheme used by the directory
-                            authority nodes. PKISignatureScheme must match the scheme specified in
-                            the Server section of the configuration. </para>
+                        <para>Specifies the cryptographic signature scheme used by all directory
+                            authority nodes. <code>PKISignatureScheme</code> must match the scheme
+                            specified in the <code>Server</code> section of the configuration. </para>
                         <para>Type: string</para>
                         <para>Required: Yes</para>
                     </listitem>
-                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
                     <listitem>
-                        <para><?oxy_custom_end?><emphasis role="bold"
-                            >LinkPublicKey</emphasis></para>
+                        <para><emphasis role="bold">LinkPublicKey</emphasis></para>
                         <para>String containing the peer's public link-layer key in PEM format.
-                            LinkPublicKey must match the specified WireKEMScheme.</para>
+                                <code>LinkPublicKey</code> must match the specified
+                                <code>WireKEMScheme</code>.</para>
                         <para>Type: string</para>
                         <para>Required: Yes</para>
                     </listitem>
                     &WireKEMScheme;
                     <listitem>
                         <para><emphasis role="bold">Addresses</emphasis></para>
-                        <para>Specifies a list of one or more Address URLs in a format that contains
-                            the transport protocol, IP address, and port number that the server will
+                        <para>Specifies a list of one or more address URLs in a format that contains
+                            the transport protocol, IP address, and port number that the node will
                             bind to for incoming connections. &program_name; supports URLs with that
                             start with either "tcp://" or "quic://" such as:
                             ["tcp://192.168.1.1:30001"] and ["quic://192.168.1.1:40001"].</para>
@@ -237,12 +236,12 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: logging (/1/3)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>   
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="auth-parameters">
                 <title id="auth-parameters.title">Parameters section</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L103-->
-                <para>The Parameters section contains the network parameter configuration.</para>
+                <para>The <code>Parameters </code>section contains the network parameters.</para>
                 <programlisting>[Parameters]
     SendRatePerMinute = 0
     Mu = 0.005
@@ -276,10 +275,9 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <para><emphasis role="bold">MuMaxDelay</emphasis></para>
                         <para>Specifies the maximum Sphinx packet per-hop mixing delay in
                             milliseconds. </para>
-                        <para>Type:
-                            uint64<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                        <para><?oxy_custom_end?>Required: Yes<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                    </listitem><?oxy_custom_end?>
+                        <para>Type: uint64</para>
+                        <para>Required: Yes</para>
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaP</emphasis></para>
                         <para>Specifies the inverse of the mean of the exponential distribution that
@@ -351,17 +349,14 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <para>Type: uint64</para>
                         <para>Required: Yes</para>
                     </listitem>
-                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
                     <listitem>
-                        <para><?oxy_custom_end?><emphasis role="bold"
-                            >LambdaGMaxDelay</emphasis></para>
+                        <para><emphasis role="bold">LambdaGMaxDelay</emphasis></para>
                         <para>Specifies the maximum delay for LambdaG in milliseconds.</para>
                         <para>Type: uint64</para>
                         <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
-                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
-            </section><?oxy_custom_end?>
+            </section>
             <section id="auth-debug">
                 <title id="auth-debug.title">Debug section</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L235-->
@@ -373,14 +368,15 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Layers</emphasis></para>
-                        <para>Number of non-service-provider layers in the network topology.</para>
+                        <para>Specifies the number of non-service-provider layers in the network
+                            topology.</para>
                         <para>Type: int</para>
                         <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">MinNodesrPerLayer</emphasis></para>
-                        <para>Minimum number of nodes per layer required to form a valid consensus
-                            document.</para>
+                        <para>Specifies the minimum number of nodes per layer required to form a
+                            valid consensus document.</para>
                         <para>Type: int</para>
                         <para>Required: Yes</para>
                     </listitem>
@@ -396,8 +392,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             <section id="auth-mixes-section-config">
                 <title id="auth-mixes-section-config.title">Mixes sections</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L383-->
-                <para>The Mixes configuration sections list mix nodes that are known to the
-                    authority.</para>
+                <para>The <code>Mixes</code> configuration sections list mix nodes that are known to
+                    the authority.</para>
                 <programlisting>[[Mixes]]
     Identifier = "mix1"
     IdentityPublicKeyPem = "../mix1/identity.public.pem"
@@ -408,16 +404,16 @@ ldMtDsvvc9KUfE4I0+c+XQ==
 
 [[Mixes]]
     Identifier = "mix3"
-    IdentityPublicKeyPem = "../mix3/identity.public.pem"<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></programlisting><?oxy_custom_end?>
+    IdentityPublicKeyPem = "../mix3/identity.public.pem"</programlisting>
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
-                        <para>Specifies the human-readable identifier for a node, and must be unique
-                            per mixnet. Identifier can be an FQDN but does not have to be.</para>
-                        <para>Type:
-                            string<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
+                        <para>Specifies the human-readable identifier for a mix node, and must be
+                            unique per mixnet. The identifier can be an FQDN but does not have to
+                            be.</para>
+                        <para>Type: string</para>
                         <para>Required: Yes</para>
-                    </listitem><?oxy_custom_end?>
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKeyPem</emphasis></para>
                         <para>Path and file name of a mix node's public identity signing key, also
@@ -429,7 +425,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="auth-gatewaynodes-section-config">
                 <title id="auth-gatewaynodes-section-config.title">GatewayNodes section</title>
-                <para>The GatewayNodes configuration sections list gateway nodes that are known to
+                <para>The <code>GatewayNodes</code> sections list gateway nodes that are known to
                     the authority.</para>
                 <programlisting>[[GatewayNodes]]
     Identifier = "gateway1"
@@ -437,12 +433,12 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
-                        <para>Specifies the human-readable identifier for a node, and must be unique
-                            per mixnet. Identifier can be an FQDN but does not have to be.</para>
-                        <para>Type:
-                            string<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
+                        <para>Specifies the human-readable identifier for a gateway node, and must
+                            be unique per mixnet. Identifier can be an FQDN but does not have to
+                            be.</para>
+                        <para>Type: string</para>
                         <para>Required: Yes</para>
-                    </listitem><?oxy_custom_end?>
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKeyPem</emphasis></para>
                         <para>Path and file name of a gateway node's public identity signing key,
@@ -454,7 +450,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="auth-servicenodes-section-config">
                 <title id="auth-servicenodes-section-config.title">ServiceNodes sections</title>
-                <para>The ServiceNodes configuration sections list service nodes that are known to
+                <para>The <code>ServiceNodes</code> sections list service nodes that are known to
                     the authority.</para>
                 <programlisting>[[ServiceNodes]]
     Identifier = "servicenode1"
@@ -462,12 +458,12 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
-                        <para>Specifies the human-readable identifier for a node, and must be unique
-                            per mixnet. Identifier can be an FQDN but does not have to be.</para>
-                        <para>Type:
-                            string<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
+                        <para>Specifies the human-readable identifier for a service node, and must
+                            be unique per mixnet. Identifier can be an FQDN but does not have to
+                            be.</para>
+                        <para>Type: string</para>
                         <para>Required: Yes</para>
-                    </listitem><?oxy_custom_end?>
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKeyPem</emphasis></para>
                         <para>Path and file name of a service node's public identity signing key,
@@ -479,7 +475,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="auth-topology">
                 <title id="auth-topology.title">Topology section</title>
-                <para>The Topology configuration section defines the layers of the mix network and
+                <para>The <code>Topology</code> section defines the layers of the mix network and
                     the mix nodes in each layer.</para>
                 <programlisting>[Topology]
                     
@@ -504,10 +500,10 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
                         <para>Specifies the human-readable identifier for a node, and must be unique
-                            per mixnet. Identifier can be an FQDN but does not have to be.</para>
-                        <para>Type:
-                            string<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                    </listitem><?oxy_custom_end?>
+                            per mixnet. The identifier can be an FQDN but does not have to
+                            be.</para>
+                        <para>Type: string</para>
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKeyPem</emphasis></para>
                         <para>Path and file name of a mix node's public identity signing key, also
@@ -615,7 +611,8 @@ what do you think?
                 <emphasis role="bold"><xref endterm="container.title" linkend="container"/></emphasis>.</para>
             <section id="mix-server-section-config">
                 <title id="mix-server-section-config.title">Server section</title>
-                <para/>
+                <para>The <code>Server</code> section configures mandatory basic parameters for each
+                    server node.</para>
                 <para>
                     <programlisting>[Server]
   Identifier = "mix1"
@@ -680,7 +677,8 @@ what do you think?
                 <emphasis role="bold"><xref endterm="container.title" linkend="container"/></emphasis>.</para>
             <section id="gateway-server-section-config">
                 <title id="gateway-server-section-config.title">Server section</title>
-                <para/>
+                <para>The <code>Server</code> section configures mandatory basic parameters for each
+                    server node.</para>
                 <programlisting>[Server]
     Identifier = "gateway1"
     WireKEM = "xwing"
@@ -706,16 +704,17 @@ what do you think?
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>      
             </section>
             <section id="gateway-gateway-section-config">
-                <?oxy_comment_start author="dwrob" timestamp="20240816T143000-0700" comment="Information needed."?>
-                <title id="gateway-gateway-section-config.title">Gateway section<?oxy_comment_end?></title>
+                <title id="gateway-gateway-section-config.title">Gateway section</title>
                 <para/>
-		<para>The Gateway section of the configuration is only required for configuring a Gateway node.
-		This section must contain UserDB and SpoolDB definitions. Bolt is an embedded database library for golang
-		and we use it for the user and spool databases. However, in the future, these two databases are probably going to be
-		deprecated in favour of in-memory concurrenty structures since it is no longer a goal for us to persist data
-		on the Gateway nodes; Our newer designs persist data on the Service nodes instead. In order to configure a
-		Gateway node you must copy the configuration below but replace the file paths as necessary:
-		</para>
+                <para>The Gateway section of the configuration is required for configuring a Gateway
+                    node. The section must contain <code>UserDB </code>and <code>SpoolDB</code>
+                    definitions. <ulink url="https://github.com/boltdb/bolt">Bolt</ulink> is an
+                    embedded database library for golang that &program_name; has used in the past
+                    for its user and spool databases. Because &program_name; currently persists data
+                    on Service nodes instead of Gateways, these databases will probably be
+                    deprecated in favour of in-memory concurrency structures. In the meantime, it
+                    remains necessary to configure a Gateway node as shown below, only changing the
+                    file paths as needed: </para>
                 <programlisting>[Gateway]
     [Gateway.UserDB]
         Backend = "bolt"
@@ -725,56 +724,6 @@ what do you think?
         Backend = "bolt"
             [Gateway.SpoolDB.Bolt]
                 SpoolDB = "/voting_mixnet/gateway1/spool.db"</programlisting>
-                <itemizedlist>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                </itemizedlist>
             </section>
             <section id="gateway-pki-config">
                 <title id="gateway-pki-config.title">PKI section</title>
@@ -815,8 +764,8 @@ what do you think?
                 <emphasis role="bold"><xref endterm="container.title" linkend="container"/></emphasis>.</para>
             <section id="service-server-section-config">
                 <title id="service-server-section-config.title">Server section</title>
-                <para>The Server section contains mandatory information common to all nodes, for
-                    example:</para>
+                <para>The <code>Server</code> section configures mandatory basic parameters for each
+                    server node.</para>
                 <programlisting>[Server]
     Identifier = "servicenode1"
     WireKEM = "xwing"
@@ -952,9 +901,8 @@ Package cborplugin is a plugin system allowing mix network services to be added 
                 <para>
                     <itemizedlist>
                         <listitem>
-                            <para><?oxy_comment_start author="dwrob" timestamp="20240816T124622-0700" comment="Needs explanation"?><?oxy_custom_start type="oxy_content_highlight" color="255,255,0" mid="36"?><emphasis
-                                    role="bold"
-                            >Kaetzchen</emphasis><?oxy_comment_end?></para><?oxy_custom_end mid="36"?>
+                            <para><?oxy_comment_start author="dwrob" timestamp="20240816T124622-0700" comment="Needs explanation"?><emphasis
+                                    role="bold">Kaetzchen</emphasis><?oxy_comment_end?></para>
                         </listitem>
                         <listitem>
                             <para><emphasis role="bold">spool</emphasis></para>
@@ -1085,5 +1033,4 @@ Package cborplugin is a plugin system allowing mix network services to be added 
         </section>
     </section>
 </chapter>
-
 
