@@ -151,7 +151,7 @@ type Config struct {
                         <para>Specifies the absolute path to a node's state directory. This is
                                 where<filename> persistence.db</filename> is written to disk and
                             where a node stores its cryptographic key materials when started with
-                            the "-g" commmand-line option.</para>
+                            the "-g" command-line option.</para>
                         <para>Type: string</para>
                         <para>Required: Yes</para>
                     </listitem>
@@ -710,12 +710,12 @@ what do you think?
                 <para>The Gateway section of the configuration is required for configuring a Gateway
                     node. The section must contain <code>UserDB </code>and <code>SpoolDB</code>
                     definitions. <ulink url="https://github.com/boltdb/bolt">Bolt</ulink> is an
-                    embedded database library for golang that &program_name; has used in the past
-                    for its user and spool databases. Because &program_name; currently persists data
-                    on Service nodes instead of Gateways, these databases will probably be
-                    deprecated in favour of in-memory concurrency structures. In the meantime, it
-                    remains necessary to configure a Gateway node as shown below, only changing the
-                    file paths as needed: </para>
+                    embedded database library for the Go programming language that &program_name;
+                    has used in the past for its user and spool databases. Because &program_name;
+                    currently persists data on Service nodes instead of Gateways, these databases
+                    will probably be deprecated in favour of in-memory concurrency structures. In
+                    the meantime, it remains necessary to configure a Gateway node as shown below,
+                    only changing the file paths as needed: </para>
                 <programlisting>[Gateway]
     [Gateway.UserDB]
         Backend = "bolt"
@@ -994,12 +994,12 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
                         <listitem>
                             <para><emphasis role="bold">http</emphasis></para>
                             <para>The <code>http</code> service is completely optional, but allows
-                                the mixbet to be used as an HTTP proxy. This may be useful for
+                                the mixnet to be used as an HTTP proxy. This may be useful for
                                 integrating with existing software systems.</para>
                             <itemizedlist>
                                 <listitem>
                                     <para><emphasis role="bold">host</emphasis></para>
-                                    <para>The hostname and TCP port of the service.</para>
+                                    <para>The host name and TCP port of the service.</para>
                                     <para>Type: string</para>
                                     <para>Required: Yes</para>
                                 </listitem>

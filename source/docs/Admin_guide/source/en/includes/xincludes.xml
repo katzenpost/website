@@ -103,9 +103,10 @@ serverdebug (/1/7)
                 
                 <listitem>
                     <para><emphasis role="bold">Addresses</emphasis></para>
-                    <para>Specifies a list of one or more address URLs in a format that contains the transport protocol, 
-                        IP address, and port number that the server will bind to for incoming connections. EchoMix supports 
-                        URLs with that start with either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and 
+                    <para>Specifies a list of one or more address URLs in a format that contains the
+                        transport protocol, IP address, and port number that the server will bind to
+                        for incoming connections. &program_name; supports URLs with that start with
+                        either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
                         ["quic://192.168.1.1:40001"].</para>
                     <para>Type: []string</para>
                     <para>Required: Yes</para>
@@ -120,8 +121,8 @@ serverdebug (/1/7)
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">MetricsAddress</emphasis></para>
-                    <para>MetricsAddress is the address/port to bind the Prometheus metrics
-                        endpoint to.</para>
+                    <para>Specifies the address/port to bind the Prometheus metrics endpoint
+                        to.</para>
                     <para>Type: string</para>
                     <para>Required: No</para>
                 </listitem>
@@ -518,8 +519,8 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">NumKaetzchenWorkers</emphasis></para>
-                        <para>Specifies the number of worker instances to use for Kaetzchen
-                            specific packet processing.</para>
+                        <para>Specifies the number of worker instances to use for Kaetzchen-specific
+                        packet processing.</para>
                         <para>Type: int</para>
                         <para>Required: No</para>
                     </listitem>
@@ -587,8 +588,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <para>Required: No</para>
                     </listitem>
                     <listitem>
-                        <para><emphasis role="bold">DecoySlack</emphasis><emphasis role="bold"
-                            /></para>
+                        <para><emphasis role="bold">DecoySlack</emphasis></para>
                         <para>Specifies the maximum decoy sweep slack due to external
                             delays such as latency before a loop decoy packet will be considered
                             lost.</para>
@@ -638,8 +638,8 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">GenerateOnly</emphasis></para>
-                        <para>If <emphasis role="bold">true></emphasis>, the server immediately
-                        halts and cleans up after long-term key generation.</para>
+                        <para>If <emphasis role="bold">true</emphasis>, the server immediately halts
+                        and cleans up after long-term key generation.</para>
                         <para>Type: bool</para>
                         <para>Required: No</para>
                     </listitem>
