@@ -31,7 +31,17 @@
 <chapter id="components">
     <title id="components.title">Components of the &program_name; mixnet</title>
     <para><emphasis role="bold">Overview and diagram</emphasis></para>
-
+    <para/>
+    <figure>
+        <title></title>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="pix/components-production.png"  scale="75"/>
+            </imageobject>
+        </mediaobject>
+    </figure>
+    <para></para>
+    
     <!--
         
     AWS model for APIs:

@@ -458,7 +458,7 @@
             <title>Test network topology</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="pix/katzenpost-docker-net-4.png"  scale="75"/>
+                    <imagedata fileref="pix/katzenpost-docker.png"  scale="75"/>
                 </imageobject>
             </mediaobject>
         </figure>
