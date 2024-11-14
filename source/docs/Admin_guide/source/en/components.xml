@@ -116,65 +116,70 @@
         </section>
         <section id="intro-gateway">
             <title id="intro-gateway.title">Gateway nodes</title>
-            <para>In contrast to [14], we believe that the nodes on the edge of the network should
-                have as little information on the client behavior as possible, as they are the ones
-                that can identify the client. Gateways have no persistent relationship with the
-                client, and no knowledge of whether client’s packets are decoys or not.</para>
-        
-
-        <para>If the client traffic crossing the node is low, the gate- ways additionally generate
-            decoy traffic. We propose a new heuristic, the Coupon Collector’s bound in order to
-            ensure that all links of the network are active, resulting in a reliable mixing of
-            packets.  </para>
-        <para></para>
+            <para>Gateway nodes provide external client access to the mix network. Because gateways
+                are uniquely positioned to identify clients, they are designed to have as little
+                information about client behavior as possible. Gateways have no persistent
+                relationship with clients and no knowledge of whether a client's packets are decoys
+                or not. When client traffic through a gateway is slow, the node additionally
+                generates decoy traffic. </para>
         </section>
         <section id="intro-service">
             <title id="intro-service.title">Service nodes</title>
-            <para>Service nodes are positioned behind the mix network and handle functionality
-                requested by the client. This could be storing messages, publishing information
-                outside of the mixnet, interfacing with a blockchain node etc. They also process and
-                execture the SURBs of decoy packets. Any application should be constructed so that
-                the following conditions are met: 1) Separate service requests of a client are
-                unlinkable. Repeating the same request may be linkable. 2) Services have no
-                persistent relationship to a client. 3) The traffic from a client to the service is
-                correctly coupled with the decoy traffic. The last condition means that either the
-                service is chosen in a way that is independent from traffic history and
-                indistinguishable from uniformly random for each query to a service, or the packet
-                will replace a decoy packet that was meant to go to the specific service. We achieve
-                that in several ways in section 5.</para>
+            <para>Service nodes provide functionality requested by clients. They are logically
+                positioned at the deepest point of the mix network, with incoming queries and
+                outgoing replies both traversing the entire triple-layering of mix node clusters.  A
+                service node's functionality may involve storing messages, publishing information
+                outside of the mixnet, interfacing with a blockchain node, and so on. Service nodes
+                also process decoy packets. </para>
         </section>
         <section id="intro-client">
             <title id="intro-client.title">Clients</title>
-            <para>There are two kinds of client: legacy and Client2-supporting.</para>
-       
-        <para>There is a Client2 daemon that runs on local client hosts. Client2 supports
-            mulitplexing and privilege separation of clients, so you don't need a separate daemon
-            instance for every cleint. It mediates between Client2-supporting applications and the
-            mixnet. accessing the latter through the thin-client library.</para>
-        <para>Client2 supports Pigeonhole storage and BACAP.</para>
-        <para>Client2 spec: <ulink
-                url="https://github.com/katzenpost/website/blob/main/source/docs/Specificatons/pdf/client2.pdf"
-            /></para>
-
-
-        <itemizedlist>
+            <para>Clients applications should be designed so that the following conditions are
+                met:</para>
+            <itemizedlist>
                 <listitem>
-                    <para>Ping</para>
+                    <para>Separate service requests from  a client are unlinkable. Repeating the
+                        same request may be lead to linkability.  </para>
                 </listitem>
-            <listitem>
-                <para>Katzen</para>
-            </listitem>
-        </itemizedlist>
-        <itemizedlist>
-            <listitem>
-                <para>Status (requires Client2)</para>
-            </listitem>
-            <listitem>
-                <para>World (requires Client2)</para>
-            </listitem>
-        </itemizedlist>
-
-
+                <listitem>
+                    <para>Service nodes have no persistent relationship with a client.</para>
+                </listitem>
+                <listitem>
+                    <para>Traffic from a client to a service is correctly coupled with the decoy
+                        traffic. This can mean that the service node is chosen independently from
+                        traffic history, or that the transmitted packet replaces a decoy packet that
+                        was meant to go to the specific service.</para>
+                </listitem>
+            </itemizedlist>
+            <para>&program_name; currently supports the following client applications. Newer clients
+                require a connection through the client <emphasis>connector</emphasis>, which
+                provides multiplexing and and privilege separation with a consequent reduction in
+                processing overhead. They also  implement the Pigeonhole storage and BACAP protocols
+                detailed in <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>THE
+                PAPER<?oxy_custom_end?>.</para>
+            <para>
+                <itemizedlist>
+                    <listitem>
+                        <para><emphasis role="bold">Ping</emphasis> &ndash; The mix network
+                            equivalent of an ICMP utility, used for network testing.</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">Katzen</emphasis> &ndash; A text chat client
+                            with file-transfer support.</para>
+                    </listitem>
+                </itemizedlist>
+                <itemizedlist>
+                    <listitem>
+                        <para><emphasis role="bold">Status</emphasis> (requires connector) &ndash;
+                            An HTML page containing status information about the mix network.</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">World</emphasis> (requires connector) &ndash; An
+                            HTML page with a world map showing geographic locations of mix network
+                            nodes.</para>
+                    </listitem>
+                </itemizedlist>
+            </para>
         </section>
 
     </section>
