@@ -29,20 +29,162 @@
 ]> 
     
 <chapter id="components">
-    <title id="components.title">Components of the &program_name; mixnet</title>
-    <para><emphasis role="bold">Overview and diagram</emphasis></para>
-    <para/>
-    <figure>
-        <title></title>
-        <mediaobject>
-            <imageobject>
-                <imagedata fileref="pix/components-production.png"  scale="75"/>
-            </imageobject>
-        </mediaobject>
-    </figure>
-    <para></para>
-    
-    <!--
+    <title id="components.title">Components and configuration of the &program_name; mixnet</title>
+    <para>This section of the &program_name; technical documentation provides an introduction to the
+        software components that make up &program_name; and guidance on how to configure each
+        component.  The intended reader is a system administrator who wants to implement a working,
+        production &program_name; network. </para>
+        
+        
+       
+   
+    <para>For information about the theory and design of this software, see <xref
+            linkend="introduction" endterm="introduction.title"/>. For a quickly deployable,
+        non-production test network (primarily for use by developers), see <xref linkend="container"
+            endterm="container.title"/>.</para>    
+    <section id="overview">
+        <title id="overview.title">Understanding the &program_name; components</title>
+        <para>The core of &program_name; consists of two program executables, <link
+                linkend="voter-usage">voting</link> and <link linkend="server-usage">server</link>.
+            Running the <command>voting </command>commmand creates a <emphasis>directory
+                authority</emphasis> node, or <emphasis>dirauth</emphasis>, that functions as part
+            of an internal public-key infrastructure (PKI). Running the <command>server</command>
+            creates either a <emphasis>mix</emphasis> node, a <emphasis>gateway</emphasis> node, or
+            a <emphasis>service</emphasis> node, depending on the configuration. Configuration
+            settings are provided in an associated <filename>katzenpost-authority.toml</filename> or
+                <filename>katzenpost.toml</filename> file respectively. A configuration guide is
+            provided in <xref linkend="configuration"/>.</para>
+        <para>In addition to the core components, &program_name; also supports connections to client
+            applications hosted externally to the mix network and communicating with it through
+            gateway nodes. A model mix network is shown in Figure 1..</para>
+        <figure>
+            <title/>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="pix/components-production.png" scale="75"/>
+                </imageobject>
+                <caption> 
+                    <para><emphasis role="bold">Figure 1.</emphasis> The element types in this
+                        diagram correspond to discrete client and server programs that
+                        &program_name; requires to function. The core of the network is a
+                        three-layer topology of mix-node clusters, with three nodes per layer in
+                        this example. Sphinx packets, which carry internal mix-network
+                        communications, move deterministically between layers and randomly through
+                        the constituent nodes of a cluster, undergoing mix operations at each hop.
+                        The two gateway nodes in the example convert traffic between Sphinx and
+                        external packet protocols, such as TCP, and communicate with external
+                        clients. The two service nodes in the example provide services such as ping,
+                        chat, and HTML. Both gateway and service nodes also apply mix operations. A
+                        typical message from a client is handed to a connecter daemon hosted on the
+                        client system, passed across the Internet to a gateway, and then relayed to
+                        a service node by way of the nine mix nodes. The service node sends its
+                        reply back across the three layers of mix node to a gateway, which transmits
+                        it across the Internet to be received by the targeted client. The mix,
+                        gateway, and service nodes send regular status updates to the directory
+                        authority cluster, which returns a consensus document that informs each node
+                        about the location and status of other nodes in the network. </para>
+                </caption>
+            </mediaobject>
+        </figure>
+        <section id="intro-dirauth">
+            <title id="intro-dirauth.title">Directory authorities (dirauths)</title>
+            <para>Directory authorities, or <emphasis>dirauths</emphasis>, are nodes in the
+                decentralized public key infrastructure (PKI) that compose the security root of the
+                &program_name; system. Clients, mix nodes, gateways nodes, and service nodes all
+                rely on the PKI to maintain and sign an up-to-date <emphasis>consensus</emphasis>
+                document, providing a view of the entire network including connection information
+                and public cryptographic key materials and signatures.</para>      
+        <para>Every 20 minutes (the current value for an <emphasis>epoch</emphasis>), each mix,
+                gateway, and service node signs a descriptor and uploads it to the dirauths. The
+                dirauths then vote on a new consensus document. If consensus is reached, each
+                dirauth signs the document. Clients and nodes download the document as needed and
+                verify the signatures. Consensus fails when 1/2 + 1 nodes fail, which yields greater
+                fault tolerance than, for example, Byzantine Fault Tolerance, which fails when 1/3 +
+                1 of the nodes fail.</para>
+        <para>The PKI signature scheme is fully configurable by the dirauths. Our recommendation is
+                to use a hybrid signature scheme consisting of classical Ed25519 and the
+                post-quantum, stateless, hash-based signature scheme known as Sphincs+ (with the
+                parameters: "sphincs-shake-256f"), which is designated in &program_name;
+                configurations as "Ed25519 Sphincs+". Examples are provided below.</para>
+  </section>
+        <section id="intro-mix">
+            <title id="intro-mix.title">Mix nodes</title>
+            <para>Mix nodes are the fundamental building blocks of the mix network. Gateway and
+                service nodes are also mix nodes, instantiated from the same binary but with
+                different configuration. </para>
+            <para>WHAT DO THEY DO?</para>
+        </section>
+        <section id="intro-gateway">
+            <title id="intro-gateway.title">Gateway nodes</title>
+            <para>In contrast to [14], we believe that the nodes on the edge of the network should
+                have as little information on the client behavior as possible, as they are the ones
+                that can identify the client. Gateways have no persistent relationship with the
+                client, and no knowledge of whether client’s packets are decoys or not.</para>
+        
+
+        <para>If the client traffic crossing the node is low, the gate- ways additionally generate
+            decoy traffic. We propose a new heuristic, the Coupon Collector’s bound in order to
+            ensure that all links of the network are active, resulting in a reliable mixing of
+            packets.  </para>
+        <para></para>
+        </section>
+        <section id="intro-service">
+            <title id="intro-service.title">Service nodes</title>
+            <para>Service nodes are positioned behind the mix network and handle functionality
+                requested by the client. This could be storing messages, publishing information
+                outside of the mixnet, interfacing with a blockchain node etc. They also process and
+                execture the SURBs of decoy packets. Any application should be constructed so that
+                the following conditions are met: 1) Separate service requests of a client are
+                unlinkable. Repeating the same request may be linkable. 2) Services have no
+                persistent relationship to a client. 3) The traffic from a client to the service is
+                correctly coupled with the decoy traffic. The last condition means that either the
+                service is chosen in a way that is independent from traffic history and
+                indistinguishable from uniformly random for each query to a service, or the packet
+                will replace a decoy packet that was meant to go to the specific service. We achieve
+                that in several ways in section 5.</para>
+        </section>
+        <section id="intro-client">
+            <title id="intro-client.title">Clients</title>
+            <para>There are two kinds of client: legacy and Client2-supporting.</para>
+       
+        <para>There is a Client2 daemon that runs on local client hosts. Client2 supports
+            mulitplexing and privilege separation of clients, so you don't need a separate daemon
+            instance for every cleint. It mediates between Client2-supporting applications and the
+            mixnet. accessing the latter through the thin-client library.</para>
+        <para>Client2 supports Pigeonhole storage and BACAP.</para>
+        <para>Client2 spec: <ulink
+                url="https://github.com/katzenpost/website/blob/main/source/docs/Specificatons/pdf/client2.pdf"
+            /></para>
+
+
+        <itemizedlist>
+                <listitem>
+                    <para>Ping</para>
+                </listitem>
+            <listitem>
+                <para>Katzen</para>
+            </listitem>
+        </itemizedlist>
+        <itemizedlist>
+            <listitem>
+                <para>Status (requires Client2)</para>
+            </listitem>
+            <listitem>
+                <para>World (requires Client2)</para>
+            </listitem>
+        </itemizedlist>
+
+
+        </section>
+
+    </section>
+    <section id="configuration">
+        <title id="configuration.title">Using the &program_name; configuration API</title>
+ 
+        
+        <para/>
+
+        <!--
         
     AWS model for APIs:
     
@@ -57,25 +199,6 @@
     Required: No
     
     -->
-    <section id="auth">
-        <title id="auth.title">Directory authorities</title>
-
-		<para>Directory authorities, or <emphasis>dirauths</emphasis>, are nodes in the decentralized
-            public key infrastructure (PKI)  that forms the security root of the &program_name;
-            system. Clients and mixnet nodes rely on the PKI to maintain and sign an up-to-date
-                <emphasis>consensus</emphasis> document, providing a view of the entire network
-            including connection information and public cryptographic key materials and signatures. </para>
-        <para>Every 20 minutes (the current value for an <emphasis>epoch</emphasis>), each mix node
-            signs a descriptor and uploads it to the dirauth nodes. The dirauths then vote on a new
-            consensus document. If consensus is reached, each dirauth signs the document. Clients
-            and nodes download the document as needed and verify the signatures. Consensus fails
-            when 1/2 + 1 nodes fail, which yields greater fault tolerance than, for example,
-            Byzantine Fault Tolerance, which fails when 1/3 + 1 of the nodes fail.</para>
-		<para>The PKI signature scheme is fully configurable by the dirauth nodes. Our recommendation is
-            to use a hybrid signature scheme consisting of the classical Ed25519 and the
-            post-quantum, stateless, hash-based signature scheme known as Sphincs+ (with the
-            parameters: "sphincs-shake-256f"), which is designated in &program_name; configurations
-            as "Ed25519 Sphincs+". Examples are provided below.</para>        
 
         <section id="auth-config">
             <title id="auth-config.title">Configuring directory authorities</title>
@@ -84,37 +207,101 @@
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
                 more information about the test mixnet, see <emphasis role="bold"><xref
                         endterm="container.title" linkend="container"/></emphasis>.</para>
+            <table frame="all">
+                <title>Directory authority (dirauth) configuration sections</title>
+                <tgroup cols="1">
+                    <colspec colname="c1" colnum="1" colwidth="1*"/>
+                    <tbody>
+                        <row>
+                            <entry>            
+                                <para><xref linkend="auth-server-section-config" endterm="auth-server-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-authorities-section-config" endterm="auth-authorities-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-logging" endterm="auth-logging.title"/></para>
+                            </entry>
+                        </row>
+
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-parameters" endterm="auth-parameters.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-debug" endterm="auth-debug.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-mixes-section-config" endterm="auth-mixes-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-gatewaynodes-section-config" endterm="auth-gatewaynodes-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-servicenodes-section-config" endterm="auth-servicenodes-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-topology" endterm="auth-topology.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-sphinx-config" endterm="auth-sphinx-config.title"/></para>
+                            </entry>
+                        </row>              
+                    </tbody>
+                </tgroup>
+            </table>
+            
+
+            
+            
             <!--General TOML note:
+    
+    https://toml.io/en/v1.0.0
+    
+    Array of Tables
+    
+    The last syntax that has not yet been described allows writing arrays of tables. These can be expressed by using a header with a name in double brackets. The first instance of that header defines the array and its first table element, and each subsequent instance creates and defines a new table element in that array. The tables are inserted into the array in the order encountered.
+    
+    So single brackets define a "table". Double brackets define an array of "tables". AND the initial double-bracket block serves as both an array definition and an element of the array it created. 
+    
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    
+    https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L475
+    
+    // Config is the top level authority configuration.
+    type Config struct {
+    	Server      *Server
+    	Authorities []*Authority
+    	Logging     *Logging
+    	Parameters  *Parameters
+    	Debug       *Debug
+    
+    	Mixes        []*Node
+    	GatewayNodes []*Node
+    	ServiceNodes []*Node
+    	Topology     *Topology
+    
+    	SphinxGeometry *geo.Geometry
+    }-->
 
-https://toml.io/en/v1.0.0
-
-Array of Tables
-
-The last syntax that has not yet been described allows writing arrays of tables. These can be expressed by using a header with a name in double brackets. The first instance of that header defines the array and its first table element, and each subsequent instance creates and defines a new table element in that array. The tables are inserted into the array in the order encountered.
-
-So single brackets define a "table". Double brackets define an array of "tables". AND the initial double-bracket block serves as both an array definition and an element of the array it created. 
-
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                
-https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L475
-
-// Config is the top level authority configuration.
-type Config struct {
-	Server      *Server
-	Authorities []*Authority
-	Logging     *Logging
-	Parameters  *Parameters
-	Debug       *Debug
-
-	Mixes        []*Node
-	GatewayNodes []*Node
-	ServiceNodes []*Node
-	Topology     *Topology
-
-	SphinxGeometry *geo.Geometry
-}-->
             <section id="auth-server-section-config">
-                <title id="auth-server-section-config.title">Server section</title>
+                <title id="auth-server-section-config.title">Dirauth: Server section</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L415-->
                 <para>The <code>Server</code> section configures mandatory basic parameters for each
                     directory authority</para>
@@ -169,7 +356,8 @@ type Config struct {
                 <para/>
             </section>
             <section id="auth-authorities-section-config">
-                <title id="auth-authorities-section-config.title">Authorities section</title>
+                <title id="auth-authorities-section-config.title">Dirauth: <code>Authorities</code>
+                    section</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L266-->
                 <para>An <code>Authorities</code> section is configured for each peer authority. We
                     recommend using <ulink url="https://quickref.me/toml.html">TOML's style</ulink>
@@ -243,16 +431,16 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 </itemizedlist>
             </section>
             <section id="auth-logging">
-                <title id="auth-logging.title">Logging section</title>
+                <title id="auth-logging.title">Dirauth: Logging section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: logging (/1/3)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="auth-parameters">
-                <title id="auth-parameters.title">Parameters section</title>
+                <title id="auth-parameters.title">Dirauth: Parameters section</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L103-->
-                <para>The <code>Parameters </code>section contains the network parameters.</para>
+                <para>The <code>Parameters</code> section contains the network parameters.</para>
                 <programlisting>[Parameters]
     SendRatePerMinute = 0
     Mu = 0.005
@@ -369,7 +557,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 </itemizedlist>
             </section>
             <section id="auth-debug">
-                <title id="auth-debug.title">Debug section</title>
+                <title id="auth-debug.title">Dirauth: Debug section</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L235-->
                 <para/>
                 <programlisting>[Debug]
@@ -401,7 +589,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 </itemizedlist>
             </section>
             <section id="auth-mixes-section-config">
-                <title id="auth-mixes-section-config.title">Mixes sections</title>
+                <title id="auth-mixes-section-config.title">Dirauth: Mixes
+                    sections</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L383-->
                 <para>The <code>Mixes</code> configuration sections list mix nodes that are known to
                     the authority.</para>
@@ -435,7 +624,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 </itemizedlist>
             </section>
             <section id="auth-gatewaynodes-section-config">
-                <title id="auth-gatewaynodes-section-config.title">GatewayNodes section</title>
+                <title id="auth-gatewaynodes-section-config.title">Dirauth:
+                        GatewayNodes section</title>
                 <para>The <code>GatewayNodes</code> sections list gateway nodes that are known to
                     the authority.</para>
                 <programlisting>[[GatewayNodes]]
@@ -460,7 +650,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 </itemizedlist>
             </section>
             <section id="auth-servicenodes-section-config">
-                <title id="auth-servicenodes-section-config.title">ServiceNodes sections</title>
+                <title id="auth-servicenodes-section-config.title">Dirauth:
+                        ServiceNodes sections</title>
                 <para>The <code>ServiceNodes</code> sections list service nodes that are known to
                     the authority.</para>
                 <programlisting>[[ServiceNodes]]
@@ -485,7 +676,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 </itemizedlist>
             </section>
             <section id="auth-topology">
-                <title id="auth-topology.title">Topology section</title>
+                <title id="auth-topology.title">Dirauth: Topology section</title>
                 <para>The <code>Topology</code> section defines the layers of the mix network and
                     the mix nodes in each layer.</para>
                 <programlisting>[Topology]
@@ -525,79 +716,51 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 </itemizedlist>
             </section>
             <section id="auth-sphinx-config">
-                <title id="auth-sphinx-config.title">SphinxGeometry section</title>
-                <warning>
-                    <para><?oxy_comment_start author="dwrob" timestamp="20241106T174803-0800" comment="We need an explanation of how to generate this properly.
-
-So... our docs probably need to discuss &quot;genconfig&quot; CLI usage.
-
-we probably need to demonstrate how to use genconfig so that it&apos;s clear that you can extract the Sphinx geometry from the dirauth config outputs.
-2:53 PM
-
-it could otherwise be confusing because genconfig isn&apos;t otherwise useful for production mixnets per se...
-
-like... you definitely do not need to use genconfig in order to generate your configuration files... and probably most people should not use genconfig for that.
-
-i mean... as a software project we are only using genconfig for configuring the docker mixnet
-dawuud
-2:56 PM
-
-okay... actually... maybe i need to go and write a tiny specific CLI tool that generates the Sphinx geometry TOML output?
-
-that would probably be far less confusing
-dawuud
-2:56 PM
-
-what do you think?
-"?>This configuration must be programmatically generated. Do not modify the
-                        SphinxGeometry section by hand.</para><?oxy_comment_end?>
-                </warning>
-                <para>Sphinx is an encrypted nested-packet format designed for mixnets. The <ulink
+                <title id="auth-sphinx-config.title">Dirauth: SphinxGeometry
+                    section</title>
+                <para>Sphinx is an encrypted nested-packet format designed primarily for mixnets.
+                    The <ulink
                         url="https://www.freehaven.net/anonbib/cache/DBLP:conf/sp/DanezisG09.pdf"
-                        >original Sphinx paper</ulink> used a non-interactive key exchange (NIKE),
-                    while the <ulink
-                        url="https://github.com/katzenpost/website/blob/main/source/docs/Specificatons/pdf/sphinx.pdf"
-                        >&program_name; Sphinx implementation</ulink> contributes a hybrid NIKE to
-                    create a hybrid post-quantum construction. &program_name; Sphinx has a
-                    completely configurable geometry that allows for any NIKE or key encapsulation
-                    mechanism (KEM) to be used. A trade-off when using a KEM is that packet headers
-                    have additional overhead because they must store a KEM ciphertext for each
-                    hop.</para>
+                        >original Sphinx paper</ulink> described a non-interactive key exchange
+                    (NIKE) employing classical encryption. The &program_name; implementation
+                    strongly emphasizes configurability, supporting key encapsulation mechanisms
+                    (KEMs) as well as NIKEs, and enabling the use of either classical or hybrid
+                    post-quantum cryptography. Hybrid constructions offset the newness of
+                    post-quantum algorithms by offering heavily tested classical algorithms as a
+                    fallback.</para>
                 <note>
                     <para>Sphinx, the nested-packet format, should not be confused with <ulink
                             url="http://sphincs.org/index.html">Sphincs or Sphincs+</ulink>, which
                         are post-quantum signature schemes.</para>
                 </note>
-                <para>The &program_name; Sphinx implementation supports the following additional
-                    cryptographic primitives: </para>
+                <para>&program_name; Sphinx also relies on the following classical cryptographic
+                    primitives: </para>
                 <itemizedlist>
                     <listitem>
-                        <para>Stream cipher: CTR-AES256</para>
+                        <para>CTR-AES256, a stream cipher</para>
                     </listitem>
                     <listitem>
-                        <para>MAC: HMAC-SHA256</para>
+                        <para>HMAC-SHA256, a message authentication code (MAC) function</para>
                     </listitem>
                     <listitem>
-                        <para>KDF: HKDF-SHA256</para>
+                        <para>HKDF-SHA256, a key derivation function (KDF)</para>
                     </listitem>
                     <listitem>
-                        <para>SPRP: AEZv5</para>
+                        <para>AEZv5, a strong pseudorandom permutation (SPRP)</para>
                     </listitem>
                 </itemizedlist>
-                <para>All dirauths must be configured to use the same SphinxGeometry. Any geometry
-                    not advertised by the PKI document will fail. Each dirauth publishes the hash of
-                    its SphinxGeometry in the PKI document for validation by its peer dirauths. </para>
+                <para>All dirauths must be configured to use the same <code>SphinxGeometry</code>
+                    parameters. Any geometry not advertised by the PKI document will fail. Each
+                    dirauth publishes the hash of its <code>SphinxGeometry</code> parameters in the
+                    PKI document for validation by its peer dirauths. </para>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
         </section>
-    </section>
-    <section id="server">
-        <title id="server.title">Mix, gateway, and service nodes</title>
-        
-<!--
+
+        <!--
             https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/server/config/config.go    
         
         // Config is the top level Katzenpost server configuration.
@@ -613,15 +776,55 @@ what do you think?
         }        
         
 -->
-         <section id="mix-config">
+        <section id="mix-config">
             <title id="mix-config.title">Configuring mix nodes</title>
             <para>The following configuration is drawn from the reference implementation in
                     <filename>katzenpost/docker/voting_mixnet/mix1/katzenpost.toml</filename>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
-                more information about the test mixnet, see 
-                <emphasis role="bold"><xref endterm="container.title" linkend="container"/></emphasis>.</para>
+                more information about the test mixnet, see <emphasis role="bold"><xref
+                        endterm="container.title" linkend="container"/></emphasis>.</para>
+            <para>
+                <table frame="all">
+                    <title>Mix node configuration sections</title>
+                    <tgroup cols="1">
+                        <colspec colname="c1" colnum="1" colwidth="1*"/>
+                        <tbody>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-server-section-config" endterm="mix-server-section-config.title"/></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-logging-config" endterm="mix-logging-config.title"/></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-pki-config" endterm="mix-pki-config.title"/></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-management-config" endterm="mix-management-config.title"/></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-sphinx-config" endterm="mix-sphinx-config.title"/></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-debug-config" endterm="mix-debug-config.title"/></para>
+                                </entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </table>
+            </para>
             <section id="mix-server-section-config">
-                <title id="mix-server-section-config.title">Server section</title>
+                <title id="mix-server-section-config.title">Mix node: Server section</title>
                 <para>The <code>Server</code> section configures mandatory basic parameters for each
                     server node.</para>
                 <para>
@@ -643,39 +846,39 @@ what do you think?
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="mix-logging-config">
-                <title id="mix-logging-config.title">Logging section</title>
+                <title id="mix-logging-config.title">Mix node: Logging section</title>
                 <!--See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--logging (/1/3)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>   
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="mix-pki-config">
-                <title id="mix-pki-config.title">PKI section</title>
+                <title id="mix-pki-config.title">Mix node: PKI section</title>
                 <!--See comment in includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--pki (/1/6)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                        
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="mix-management-config">
-                <title id="mix-management-config.title">Management section</title>              
+                <title id="mix-management-config.title">Mix node: Management section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: management (/1/5)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                    
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="mix-sphinx-config">
-                <title id="mix-sphinx-config.title">SphinxGeometry section</title>
+                <title id="mix-sphinx-config.title">Mix node: SphinxGeometry section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>    
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="mix-debug-config">
-                <title id="mix-debug-config.title">Debug section</title>                
+                <title id="mix-debug-config.title">Mix node: Debug section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: serverdebug (/1/7)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                    
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
         </section>
         <section id="gateway-config">
@@ -683,11 +886,53 @@ what do you think?
             <para>The following configuration is drawn from the reference implementation in
                     <filename>katzenpost/docker/voting_mixnet/gateway1/katzenpost.toml</filename>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
-                address. For
-                more information about the test mixnet, see 
-                <emphasis role="bold"><xref endterm="container.title" linkend="container"/></emphasis>.</para>
+                address. For more information about the test mixnet, see <emphasis role="bold"><xref
+                        endterm="container.title" linkend="container"/></emphasis>.</para>
+            <table frame="all">
+                <title>Gateway node configuration sections</title>
+                <tgroup cols="1">
+                    <colspec colname="c1" colnum="1" colwidth="1*"/>
+                    <tbody>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-server-section-config" endterm="gateway-server-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-logging-config" endterm="gateway-logging-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-gateway-section-config" endterm="gateway-gateway-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-pki-config" endterm="gateway-pki-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-management-config" endterm="gateway-management-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-sphinx-config" endterm="gateway-sphinx-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-debug-config" endterm="gateway-debug-config.title"/></para>
+                            </entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
             <section id="gateway-server-section-config">
-                <title id="gateway-server-section-config.title">Server section</title>
+                <title id="gateway-server-section-config.title">Gateway node: Server section</title>
                 <para>The <code>Server</code> section configures mandatory basic parameters for each
                     server node.</para>
                 <programlisting>[Server]
@@ -705,19 +950,20 @@ what do you think?
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: serverconfig (/1/2)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>      
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="gateway-logging-config">
-                <title id="gateway-logging-config.title">Logging section</title>
+                <title id="gateway-logging-config.title">Gateway node: Logging section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: logging (/1/3)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>      
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="gateway-gateway-section-config">
-                <title id="gateway-gateway-section-config.title">Gateway section</title>
+                <title id="gateway-gateway-section-config.title">Gateway node: Gateway
+                    section</title>
                 <para/>
-                <para>The Gateway section of the configuration is required for configuring a Gateway
+                <para>The <code>Gateway</code> section of the configuration is required for configuring a Gateway
                     node. The section must contain <code>UserDB </code>and <code>SpoolDB</code>
                     definitions. <ulink url="https://github.com/boltdb/bolt">Bolt</ulink> is an
                     embedded database library for the Go programming language that &program_name;
@@ -737,44 +983,86 @@ what do you think?
                 SpoolDB = "/voting_mixnet/gateway1/spool.db"</programlisting>
             </section>
             <section id="gateway-pki-config">
-                <title id="gateway-pki-config.title">PKI section</title>
+                <title id="gateway-pki-config.title">Gateway node: PKI section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: pki (/1/6)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>          
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="gateway-management-config">
-                <title id="gateway-management-config.title">Management section</title>
+                <title id="gateway-management-config.title">Gateway node: Management section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: management (/1/5)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>  
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="gateway-sphinx-config">
-                <title id="gateway-sphinx-config.title">SphinxGeometry section</title>
+                <title id="gateway-sphinx-config.title">Gateway node: SphinxGeometry section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>    
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="gateway-debug-config">
-                <title id="gateway-debug-config.title">Debug section</title>
+                <title id="gateway-debug-config.title">Gateway node: Debug section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: serverdebug (/1/7)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>    
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
         </section>
         <section id="service-config">
             <title id="service-config.title">Configuring service nodes</title>
             <para>The following configuration is drawn from the reference implementation in
-                <filename>katzenpost/docker/voting_mixnet/servicenode1/authority.toml</filename>.
+                    <filename>katzenpost/docker/voting_mixnet/servicenode1/authority.toml</filename>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
-                address. For
-                more information about the test mixnet, see 
-                <emphasis role="bold"><xref endterm="container.title" linkend="container"/></emphasis>.</para>
+                address. For more information about the test mixnet, see <emphasis role="bold"><xref
+                        endterm="container.title" linkend="container"/></emphasis>.</para>
+            <table frame="all">
+                <title>Mix node configuration sections</title>
+                <tgroup cols="1">
+                    <colspec colname="c1" colnum="1" colwidth="1*"/>
+                    <tbody>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-server-section-config" endterm="service-server-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-logging-config" endterm="service-logging-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-servicenode-section-config" endterm="service-servicenode-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-pki-config" endterm="service-pki-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-management-config" endterm="service-management-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-sphinx-config" endterm="service-sphinx-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-debug-config" endterm="service-debug-config.title"/></para>
+                            </entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
             <section id="service-server-section-config">
-                <title id="service-server-section-config.title">Server section</title>
+                <title id="service-server-section-config.title">Service node: Server section</title>
                 <para>The <code>Server</code> section configures mandatory basic parameters for each
                     server node.</para>
                 <programlisting>[Server]
@@ -791,27 +1079,28 @@ what do you think?
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: serverconfig (/1/2)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>   
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="service-logging-config">
-                <title id="service-logging-config.title">Logging section</title>
+                <title id="service-logging-config.title">Service node: Logging section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: logging (/1/3)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>     
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="service-servicenode-section-config">
-                <title id="service-servicenode-section-config.title">ServiceNode section</title>
+                <title id="service-servicenode-section-config.title">Service node: ServiceNode
+                    section</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/main/server/config/config.go#L470 defines the top level configuration.
 https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 defines the per-service configurations.-->
-                <para>The <code>ServiceNode</code> section contains  configurations for each network
+                <para>The <code>ServiceNode</code> section contains configurations for each network
                     service that &program_name; supports. </para>
                 <para>Services, termed <ulink
                         url="https://github.com/katzenpost/katzenpost/blob/main/docs/Specificatons/pdf/kaetzchen.pdf"
                         >Kaetzchen</ulink>, can be divided into built-in and external services.
                     External services are provided through the <ulink
                         url="https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.35/server/cborplugin#ResponseFactory"
-                        >CBORPlugin</ulink>, a  Go programming language implementation of the <ulink
+                        >CBORPlugin</ulink>, a Go programming language implementation of the <ulink
                         url="https://datatracker.ietf.org/doc/html/rfc8949">Concise Binary Object
                         Representation (CBOR)</ulink>, a binary data serialization format. While
                     native services need simply to be activated, external services are invoked by a
@@ -917,18 +1206,20 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
                     <itemizedlist>
                         <listitem>
                             <para><emphasis role="bold">echo</emphasis></para>
-                            <para>The <code>echo</code> service must be enabled on every service
-                                node of a production mixnet for decoy traffic to work properly.
-                            </para>
+                            <para>The internal <code>echo</code> service must be enabled on every
+                                service node of a production mixnet for decoy traffic to work
+                                properly. </para>
                         </listitem>
                         <listitem>
                             <para><emphasis role="bold">spool</emphasis></para>
-                            <para>The <code>spool</code> service, which supports the outdated
-                                    <code>catshadow</code> storage protocol along as well as
-                                    <code>panda</code> and <code>reunion</code>, is deprecated.<note>
+                            <para>The <code>spool</code> service supports the <code>catshadow</code>
+                                storage protocol,
+                                <?oxy_comment_start author="dwrob" timestamp="20241113T174007-0800" comment="There was also something here about Panda and Reunion being don&apos;t-say-deprecated and needing this spool. They both appear to be configured as enabled in the example. What should be the messaging on this? See also highlighted below."?>which
+                                is required by the &chat_client; chat client<?oxy_comment_end?>. The
+                                example configuration above shows spool enabled with the setting:<programlisting>Disable = false</programlisting><note>
                                     <para><code>Spool</code>, properly <code>memspool</code>, should
-                                        not be confused with the spool database on gateway nodes. on
-                                        the gateway</para>
+                                        not be confused with the spool database on gateway
+                                        nodes.</para>
                                 </note></para>
                             <itemizedlist>
                                 <listitem>
@@ -970,7 +1261,8 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
                             </itemizedlist>
                         </listitem>
                         <listitem>
-                            <para><emphasis role="bold">panda</emphasis></para>
+                            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><emphasis
+                                    role="bold">panda</emphasis></para>
                             <para>The <code>panda</code> storage and authentication service
                                 currently does not work properly.</para>
                             <itemizedlist>
@@ -980,7 +1272,7 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
                                         file.</para>
                                     <para>Type: string</para>
                                     <para>Required: Yes</para>
-                                </listitem>
+                                </listitem><?oxy_custom_end?>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
                                     <para>Specifies the path to the node's log directory.</para>
@@ -1039,33 +1331,35 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
                 </para>
             </section>
             <section id="service-pki-config">
-                <title id="service-pki-config.title">PKI section</title>
-                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. --> 
+                <title id="service-pki-config.title">Service node: PKI section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: pki (/1/6)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>         
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="service-management-config">
-                <title id="service-management-config.title">Management section</title>
+                <title id="service-management-config.title">Service node: Management section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: management (/1/5)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/> 
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="service-sphinx-config">
-                <title id="service-sphinx-config.title">SphinxGeometry section</title>
+                <title id="service-sphinx-config.title">Service node: SphinxGeometry section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>    
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
             <section id="service-debug-config">
-                <title id="service-debug-config.title">Debug section</title>
+                <title id="service-debug-config.title">Service node: Debug section</title>
                 <!--See includes/xincludes.xml for an explanation of the cursed addressing scheme used here. -->
                 <!--Configuration section: serverdebug (/1/7)-->
                 <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                         
-           </section>
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+            </section>
+
+
         </section>
     </section>
 </chapter>
