@@ -42,10 +42,10 @@
         <title id="overview.title">Understanding the &program_name; components</title>
         <para>The core of &program_name; consists of two program executables, <link
                 linkend="voter-usage">dirauth</link> and <link linkend="server-usage">server</link>.
-            Running the <command>dirauth </command>commmand creates a <emphasis>directory
+            Running the <command>dirauth </command>commmand runs a  <emphasis>directory
                 authority</emphasis> node, or <emphasis>dirauth</emphasis>, that functions as part
-            of an internal public-key infrastructure (PKI). Running the <command>server</command>
-            creates either a <emphasis>mix</emphasis> node, a <emphasis>gateway</emphasis> node, or
+            of the mixnet's public-key infrastructure (PKI). Running the <command>server</command>
+            runs either a <emphasis>mix</emphasis> node, a <emphasis>gateway</emphasis> node, or
             a <emphasis>service</emphasis> node, depending on the configuration. Configuration
             settings are provided in an associated <filename>katzenpost-authority.toml</filename> or
                 <filename>katzenpost.toml</filename> file respectively. </para>
@@ -63,19 +63,15 @@
             </mediaobject>
         </figure>
         
-        <para>The mix network contains a three-layer topology of mix-node clusters, with three nodes
-            per layer in this example. Sphinx packets, which carry internal mix-network
-            communications, move deterministically between layers and randomly through the
-            constituent nodes of a cluster, undergoing mix operations at each hop. The gateway nodes
-            convert traffic between Sphinx and external packet protocols, such as TCP, and
-            communicate with external clients. The service nodes provide services such as ping,
-            chat, and HTML. Both gateway and service nodes also apply mix operations. A typical
-            message from a client is handed to a connecter daemon hosted on the client system,
+        <para>The mix network contains a n-layer topology of mix-nodes, with three nodes
+            per layer in this example. Sphinx packets traverse the network in one direction only.
+	    The gateway nodes allow clients to interact with the mix network. The service nodes provide mix network services
+	    that mix network clients can interact with. All messages sent by clients are handed to a connecter daemon hosted on the client system,
             passed across the Internet to a gateway, and then relayed to a service node by way of
             the nine mix nodes. The service node sends its reply back across the three layers of mix
             node to a gateway, which transmits it across the Internet to be received by the targeted
-            client. The mix, gateway, and service nodes send regular status updates to the directory
-            authority cluste, which returns a consensus document that informs each node about the
+            client. The mix, gateway, and service nodes send Mix Descriptors to the directory
+            authority, which returns a consensus document that informs each node about the
             location and status of other nodes in the network. </para>
         <para>In addition to the server components, &program_name; also supports connections to
             client applications hosted externally to the mix network and communicating with it
