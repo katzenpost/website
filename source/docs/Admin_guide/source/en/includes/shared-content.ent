@@ -5,6 +5,7 @@
 <!ENTITY chat_client_binary 'katzen'>
 <!ENTITY mixserver_binary 'mixserver'>
 <!ENTITY dirauth_binary 'dirauth'> 
+<!ENTITY research_paper_link 'Place-holder for research paper link'>
   
 <!-- The following two are entities, not includes, because their XML is ill-formed.-->
 

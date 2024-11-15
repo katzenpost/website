@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
@@ -28,9 +28,8 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
 ]> 
 
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
-    version="5.1" xml:id="ops">
-    <title xml:id="ops.title">Running and managing &program_name;</title>
+<chapter id="ops">
+    <title id="ops.title">Running and managing &program_name;</title>
     <para/>
     <para>
         <itemizedlist>
@@ -118,8 +117,7 @@
                                         </listitem>
                                     </itemizedlist>
 
-    <para>
-        <constraintdef>
+  
             <itemizedlist>
                 <listitem>
                     <para><emphasis role="bold">configuration</emphasis></para>
@@ -146,8 +144,6 @@
             <para>Prometheus logging and graphing is to be recommended (has its own
                 documents)</para>
             <para/>
-        </constraintdef>
-    </para>
     <para>
  
             <itemizedlist>
@@ -165,9 +161,9 @@
                         example graphs and log messages</para>
                     <para>It's useful Info for future ops users </para>
                     <para>here's an example of one of our "lab reports" where we investigated
-                        packetloss within the mixnet <link
-                            xlink:href="https://dox.0kn.tech/s/snqcrQ_3C"
-                            >https://dox.0kn.tech/s/snqcrQ_3C</link>#</para>
+                        packetloss within the mixnet <ulink
+                            url="https://dox.0kn.tech/s/snqcrQ_3C"
+                            >https://dox.0kn.tech/s/snqcrQ_3C</ulink>.</para>
                 </listitem>
             </itemizedlist>
             <itemizedlist>

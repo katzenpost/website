@@ -6,6 +6,8 @@
    <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
     %shared-content;
  
+ <!ENTITY program_name 'Katzenpost'>
+ 
     <!ELEMENT xi:include (xi:fallback?) > 
     <!ATTLIST xi:include 
         xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
@@ -29,15 +31,14 @@
 ]> 
 
 <book> 
-    <title>The Whole Thing</title>
-   <preface>
-       <title>Preface</title>
+    <title>&program_name; administrator's guide</title>
+   <preface id="introduction">
+       <title id="introduction.title">Introduction</title>
        <para>blah blah</para>
-       <para>xxxxxx</para>
+       <para>To Do</para>
    </preface>
-    
-   
-    
-    <xi:include href="docker.xml"></xi:include>  
+      
     <xi:include href="components.xml"></xi:include> 
+    <xi:include href="operations.xml"></xi:include>
+    <xi:include href="docker.xml"></xi:include>
 </book> 

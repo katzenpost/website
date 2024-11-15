@@ -34,10 +34,6 @@
         software components that make up &program_name; and guidance on how to configure each
         component.  The intended reader is a system administrator who wants to implement a working,
         production &program_name; network. </para>
-        
-        
-       
-   
     <para>For information about the theory and design of this software, see <xref
             linkend="introduction" endterm="introduction.title"/>. For a quickly deployable,
         non-production test network (primarily for use by developers), see <xref linkend="container"
@@ -52,40 +48,39 @@
             creates either a <emphasis>mix</emphasis> node, a <emphasis>gateway</emphasis> node, or
             a <emphasis>service</emphasis> node, depending on the configuration. Configuration
             settings are provided in an associated <filename>katzenpost-authority.toml</filename> or
-                <filename>katzenpost.toml</filename> file respectively. A configuration guide is
-            provided in <xref linkend="configuration"/>.</para>
-        <para>In addition to the core components, &program_name; also supports connections to client
-            applications hosted externally to the mix network and communicating with it through
-            gateway nodes. A model mix network is shown in Figure 1..</para>
+                <filename>katzenpost.toml</filename> file respectively. </para>
+        <para>In addition to the server components, &program_name; also supports connections to
+            client applications hosted externally to the mix network and communicating with it
+            through gateway nodes. </para>
+        <para>A model mix network is shown in Figure 1.</para>
         <figure>
-            <title/>
+            <title>The pictured element types  correspond to discrete client and server programs
+                that &program_name; requires to function. </title>
             <mediaobject>
                 <imageobject>
                     <imagedata fileref="pix/components-production.png" scale="75"/>
                 </imageobject>
-                <caption> 
-                    <para><emphasis role="bold">Figure 1.</emphasis> The element types in this
-                        diagram correspond to discrete client and server programs that
-                        &program_name; requires to function. The core of the network is a
-                        three-layer topology of mix-node clusters, with three nodes per layer in
-                        this example. Sphinx packets, which carry internal mix-network
-                        communications, move deterministically between layers and randomly through
-                        the constituent nodes of a cluster, undergoing mix operations at each hop.
-                        The two gateway nodes in the example convert traffic between Sphinx and
-                        external packet protocols, such as TCP, and communicate with external
-                        clients. The two service nodes in the example provide services such as ping,
-                        chat, and HTML. Both gateway and service nodes also apply mix operations. A
-                        typical message from a client is handed to a connecter daemon hosted on the
-                        client system, passed across the Internet to a gateway, and then relayed to
-                        a service node by way of the nine mix nodes. The service node sends its
-                        reply back across the three layers of mix node to a gateway, which transmits
-                        it across the Internet to be received by the targeted client. The mix,
-                        gateway, and service nodes send regular status updates to the directory
-                        authority cluster, which returns a consensus document that informs each node
-                        about the location and status of other nodes in the network. </para>
-                </caption>
             </mediaobject>
         </figure>
+        
+        <para>The mix network contains a three-layer topology of mix-node clusters, with three nodes
+            per layer in this example. Sphinx packets, which carry internal mix-network
+            communications, move deterministically between layers and randomly through the
+            constituent nodes of a cluster, undergoing mix operations at each hop. The gateway nodes
+            convert traffic between Sphinx and external packet protocols, such as TCP, and
+            communicate with external clients. The service nodes provide services such as ping,
+            chat, and HTML. Both gateway and service nodes also apply mix operations. A typical
+            message from a client is handed to a connecter daemon hosted on the client system,
+            passed across the Internet to a gateway, and then relayed to a service node by way of
+            the nine mix nodes. The service node sends its reply back across the three layers of mix
+            node to a gateway, which transmits it across the Internet to be received by the targeted
+            client. The mix, gateway, and service nodes send regular status updates to the directory
+            authority cluste, which returns a consensus document that informs each node about the
+            location and status of other nodes in the network. </para>
+        <para>In addition to the server components, &program_name; also supports connections to
+            client applications hosted externally to the mix network and communicating with it
+            through gateway nodes and, in some cases, a client connector.</para>
+        
         <section id="intro-dirauth">
             <title id="intro-dirauth.title">Directory authorities (dirauths)</title>
             <para>Directory authorities, or <emphasis>dirauths</emphasis>, are nodes in the
@@ -109,77 +104,169 @@
   </section>
         <section id="intro-mix">
             <title id="intro-mix.title">Mix nodes</title>
-            <para>Mix nodes are the fundamental building blocks of the mix network. Gateway and
-                service nodes are also mix nodes, instantiated from the same binary but with
-                different configuration. </para>
-            <para>WHAT DO THEY DO?</para>
-        </section>
-        <section id="intro-gateway">
+            <para>The mix node is the fundamental building block of the mix network. Mix nodes relay
+                messages between clients while taking measures to block adversaries from determining
+                which clients are communicating with each other. Several methods contribute to the
+                protection of client anonymity:</para>    
+            <itemizedlist>
+                    <listitem>
+                        <para>Reordering or mixing multiple messages.</para>
+                    </listitem>
+                    <listitem>
+                        <para>Padding all packets to a common size.</para>
+                    </listitem>
+                    <listitem>
+                        <para>Reencrypting packets at each hop.</para>
+                    </listitem>
+                    <listitem>
+                        <para>Delaying packets on each node for a random period of time in order to
+                            prevent timing correlation attacks.</para>
+                    </listitem>
+            </itemizedlist>
+            <para>&program_name; mix nodes are arranged in a layered topology to achieve the best
+                levels of anonymity and ease of analysis while being flexible enough to scale with
+                traffic demands. </para>
+        </section>           
+            <section id="intro-gateway">
             <title id="intro-gateway.title">Gateway nodes</title>
             <para>Gateway nodes provide external client access to the mix network. Because gateways
                 are uniquely positioned to identify clients, they are designed to have as little
-                information about client behavior as possible. Gateways have no persistent
-                relationship with clients and no knowledge of whether a client's packets are decoys
-                or not. When client traffic through a gateway is slow, the node additionally
-                generates decoy traffic. </para>
+                information about client behavior as possible. Gateways are randomly selected and
+                have no persistent relationship with clients and no knowledge of whether a client's
+                packets are decoys or not. When client traffic through a gateway is slow, the node
+                additionally generates decoy traffic. </para>
         </section>
         <section id="intro-service">
             <title id="intro-service.title">Service nodes</title>
-            <para>Service nodes provide functionality requested by clients. They are logically
-                positioned at the deepest point of the mix network, with incoming queries and
-                outgoing replies both traversing the entire triple-layering of mix node clusters.  A
-                service node's functionality may involve storing messages, publishing information
-                outside of the mixnet, interfacing with a blockchain node, and so on. Service nodes
-                also process decoy packets. </para>
+            <para><?oxy_comment_start author="dwrob" timestamp="20241114T125846-0800" comment="Division of service nodes into replicas and couriers is not addressed here."?>Service
+                nodes <?oxy_comment_end?>provide functionality requested by clients. They are
+                logically positioned at the deepest point of the mix network, with incoming queries
+                and outgoing replies both needing to traverse the entire triple-layering of mix node
+                clusters. A service node's functionality may involve storing messages, publishing
+                information outside of the mixnet, interfacing with a blockchain node, and so on.
+                Service nodes also process decoy packets. </para>
         </section>
         <section id="intro-client">
-            <title id="intro-client.title">Clients</title>
-            <para>Clients applications should be designed so that the following conditions are
+            <title id="intro-client.title"
+                ><?oxy_comment_start author="dwrob" timestamp="20241114T164534-0800" comment="This will be removed or reworked when we have a client user guide."?>Clients<?oxy_comment_end?></title>
+            <para>Client applications should be designed so that the following conditions are
                 met:</para>
             <itemizedlist>
                 <listitem>
-                    <para>Separate service requests from  a client are unlinkable. Repeating the
-                        same request may be lead to linkability.  </para>
+                    <para>Separate service requests from a client are unlinkable. Repeating the same
+                        request may be lead to linkability. </para>
                 </listitem>
                 <listitem>
-                    <para>Service nodes have no persistent relationship with a client.</para>
+                    <para>Service nodes and clients have no persistent relationship.</para>
                 </listitem>
                 <listitem>
-                    <para>Traffic from a client to a service is correctly coupled with the decoy
-                        traffic. This can mean that the service node is chosen independently from
-                        traffic history, or that the transmitted packet replaces a decoy packet that
-                        was meant to go to the specific service.</para>
+                    <para>Cleints generate a stream of packets addressed to random or pseudorandom
+                        services regardless of whether a real service request is being made. Most of
+                        these packets will be decoy traffic.</para>
+                </listitem>
+                <listitem>
+                    <para>Traffic from a client to a service node must be correctly coupled with
+                        decoy traffic. This can mean that the service node is chosen independently
+                        from traffic history, or that the transmitted packet replaces a decoy packet
+                        that was meant to go to the desired service.</para>
                 </listitem>
             </itemizedlist>
-            <para>&program_name; currently supports the following client applications. Newer clients
+            <para>&program_name; currently includes several client applications. All applications
+                make extensive use of Sphinx single-use reply blocks (SURBs), which enable service
+                nodes to send replies without knowing the location of the client. Newer clients
                 require a connection through the client <emphasis>connector</emphasis>, which
-                provides multiplexing and and privilege separation with a consequent reduction in
-                processing overhead. They also  implement the Pigeonhole storage and BACAP protocols
-                detailed in <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>THE
-                PAPER<?oxy_custom_end?>.</para>
-            <para>
-                <itemizedlist>
-                    <listitem>
-                        <para><emphasis role="bold">Ping</emphasis> &ndash; The mix network
-                            equivalent of an ICMP utility, used for network testing.</para>
-                    </listitem>
-                    <listitem>
-                        <para><emphasis role="bold">Katzen</emphasis> &ndash; A text chat client
-                            with file-transfer support.</para>
-                    </listitem>
-                </itemizedlist>
-                <itemizedlist>
-                    <listitem>
-                        <para><emphasis role="bold">Status</emphasis> (requires connector) &ndash;
-                            An HTML page containing status information about the mix network.</para>
-                    </listitem>
-                    <listitem>
-                        <para><emphasis role="bold">World</emphasis> (requires connector) &ndash; An
-                            HTML page with a world map showing geographic locations of mix network
-                            nodes.</para>
-                    </listitem>
-                </itemizedlist>
-            </para>
+                provides multiplexing and privilege separation with a consequent reduction in
+                processing overhead. These clients also implement the Pigeonhole storage and BACAP
+                protocols detailed in <emphasis role="bold">&research_paper_link;</emphasis>. </para>
+            <para>The following client applications are available.<table frame="all">
+                    <title>&program_name; clients</title>
+                    <tgroup cols="4">
+                        <colspec colname="c1" colnum="1" colwidth="1*"/>
+                        <colspec colname="newCol2" colnum="2" colwidth="1*"/>
+                        <colspec colname="c2" colnum="3" colwidth="1*"/>
+                        <colspec colname="c3" colnum="4" colwidth="1*"/>
+                        <thead>
+                            <row>
+                                <entry>
+                                    <para>Name</para>
+                                </entry>
+                                <entry>
+                                    <para>Needs connector</para>
+                                </entry>
+                                <entry>
+                                    <para>Description</para>
+                                </entry>
+                                <entry>
+                                    <para>GitHub repository</para>
+                                </entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry>
+                                    <para><emphasis role="bold">Ping</emphasis></para>
+                                </entry>
+                                <entry>
+                                    <para>no</para>
+                                </entry>
+                                <entry>
+                                    <para>The mix network equivalent of an ICMP ping utility, used
+                                        for network testing.</para>
+                                </entry>
+                                <entry>
+                                    <para><ulink
+                                            url="https://github.com/katzenpost/katzenpost/tree/main/ping"
+                                            >ping</ulink></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><emphasis role="bold">Katzen</emphasis></para>
+                                </entry>
+                                <entry>
+                                    <para>no</para>
+                                </entry>
+                                <entry>
+                                    <para>A text chat client with file-transfer support.</para>
+                                </entry>
+                                <entry>
+                                    <para><ulink url="https://github.com/katzenpost/katzen"
+                                            >katzen</ulink></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><emphasis role="bold">Status</emphasis></para>
+                                </entry>
+                                <entry>
+                                    <para>yes</para>
+                                </entry>
+                                <entry>
+                                    <para>An HTML page containing status information about the mix
+                                        network.</para>
+                                </entry>
+                                <entry>
+                                    <para><ulink url="https://github.com/katzenpost/status"
+                                            >status</ulink></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><emphasis role="bold">Worldmap</emphasis></para>
+                                </entry>
+                                <entry>yes</entry>
+                                <entry>
+                                    <para>An HTML page with a world map showing geographic locations
+                                        of mix network nodes. </para>
+                                </entry>
+                                <entry>
+                                    <para><ulink url="https://github.com/katzenpost/worldmap"
+                                            >worldmap</ulink></para>
+                                </entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </table></para>
         </section>
 
     </section>
@@ -187,23 +274,9 @@
         <title id="configuration.title">Using the &program_name; configuration API</title>
  
         
-        <para/>
-
-        <!--
-        
-    AWS model for APIs:
-    
-    [Definition] 
-    
-    Type: String
-    
-    Length Constraints: Maximum length of 256.
-    
-    Pattern: ^[A-Za-z0-9+/=]+$
-   
-    Required: No
-    
-    -->
+        <para>This section documents the configuration parameters for each type of &program_name;
+            server node. Each node has its own configuration file in <ulink
+                url="https://toml.io/en/v1.0.0">TOML</ulink> format. </para>
 
         <section id="auth-config">
             <title id="auth-config.title">Configuring directory authorities</title>
@@ -278,38 +351,13 @@
             <!--General TOML note:
     
     https://toml.io/en/v1.0.0
-    
-    Array of Tables
-    
-    The last syntax that has not yet been described allows writing arrays of tables. These can be expressed by using a header with a name in double brackets. The first instance of that header defines the array and its first table element, and each subsequent instance creates and defines a new table element in that array. The tables are inserted into the array in the order encountered.
-    
-    So single brackets define a "table". Double brackets define an array of "tables". AND the initial double-bracket block serves as both an array definition and an element of the array it created. 
-    
-    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                    
-    https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L475
-    
-    // Config is the top level authority configuration.
-    type Config struct {
-    	Server      *Server
-    	Authorities []*Authority
-    	Logging     *Logging
-    	Parameters  *Parameters
-    	Debug       *Debug
-    
-    	Mixes        []*Node
-    	GatewayNodes []*Node
-    	ServiceNodes []*Node
-    	Topology     *Topology
-    
-    	SphinxGeometry *geo.Geometry
-    }-->
+    \-->
 
             <section id="auth-server-section-config">
                 <title id="auth-server-section-config.title">Dirauth: Server section</title>
                 <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L415-->
                 <para>The <code>Server</code> section configures mandatory basic parameters for each
-                    directory authority</para>
+                    directory authority.</para>
                 <programlisting>[Server]
     Identifier = "auth1"
     WireKEMScheme = "xwing"
@@ -1246,9 +1294,9 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
                             <para><emphasis role="bold">pigeonhole</emphasis></para>
                             <para>The <code>pigeonhole</code> courier service supports the
                                 Blinding-and-Capability scheme (BACAP)-based unlinkable messaging
-                                protocols detailed in our unpublished paper. Most of our future
-                                protocols will use the <code>pigeonhole</code> courier
-                                service.</para>
+                                protocols detailed in <emphasis role="bold"
+                                    >&research_paper_link;</emphasis>. Most of our future protocols
+                                will use the <code>pigeonhole</code> courier service.</para>
                             <itemizedlist>
                                 <listitem>
                                     <para><emphasis role="bold">db</emphasis></para>
