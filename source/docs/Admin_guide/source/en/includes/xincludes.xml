@@ -169,7 +169,7 @@ serverdebug (/1/7)
 
     <simplesect>
         <title></title>
-        <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L78-->
+        <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/dirauth/server/config/config.go#L78-->
         <informalexample> 
             <para>The <code>Logging</code> configuration section controls logging behavior across &program_name;.</para>
             <programlisting>[Logging]
@@ -350,7 +350,7 @@ serverdebug (/1/7)
                configuration changes. A configuration resembles the following:</para>
            <programlisting>[Management]
    Enable = false
-   Path = "/voting_mixnet/mix1/management_sock"</programlisting>
+   Path = "/dirauth_mixnet/mix1/management_sock"</programlisting>
            <itemizedlist>
                <listitem>
                    <para><emphasis role="bold">Enable</emphasis></para>
@@ -377,9 +377,9 @@ serverdebug (/1/7)
         <informalexample> 
             <para>The <code>PKI</code> section contains the directory authority configuration for a mix, gateway, or service node.</para>
             <programlisting>[PKI]
-[PKI.Voting]
+[PKI.dirauth]
 
-    [[PKI.Voting.Authorities]]
+    [[PKI.dirauth.Authorities]]
         Identifier = "auth1"
         IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
 tqN6tpOVotHWXKCszVn2kS7vAZjQpvJjQF3Qz/Qwhyg=
@@ -399,7 +399,7 @@ H+r8OaqImQhgHabrWRDyLg==
         WireKEMScheme = "xwing"
         Addresses = ["127.0.0.1:30001"]
 
-    [[PKI.Voting.Authorities]]
+    [[PKI.dirauth.Authorities]]
         Identifier = "auth2"
         IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
 O51Ty2WLu4C1ETMa29s03bMXV72gnjJfTfwLV++LVBI=
@@ -419,7 +419,7 @@ HktiTBDtRXviu2vbw7VRXhkMW2kjYZDtReQ5sAse04DvmD49zgTp1YxYW+wWFaL3
         WireKEMScheme = "xwing"
         Addresses = ["127.0.0.1:30002"]
 
-    [[PKI.Voting.Authorities]]
+    [[PKI.dirauth.Authorities]]
         Identifier = "auth3"
         IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
 zQvydRYJq3npeLcg1NqIf+SswEKE5wFmiwNsI9Z1whQ=

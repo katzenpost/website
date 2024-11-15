@@ -41,8 +41,8 @@
     <section id="overview">
         <title id="overview.title">Understanding the &program_name; components</title>
         <para>The core of &program_name; consists of two program executables, <link
-                linkend="voter-usage">voting</link> and <link linkend="server-usage">server</link>.
-            Running the <command>voting </command>commmand creates a <emphasis>directory
+                linkend="voter-usage">dirauth</link> and <link linkend="server-usage">server</link>.
+            Running the <command>dirauth </command>commmand creates a <emphasis>directory
                 authority</emphasis> node, or <emphasis>dirauth</emphasis>, that functions as part
             of an internal public-key infrastructure (PKI). Running the <command>server</command>
             creates either a <emphasis>mix</emphasis> node, a <emphasis>gateway</emphasis> node, or
@@ -281,7 +281,7 @@
         <section id="auth-config">
             <title id="auth-config.title">Configuring directory authorities</title>
             <para>The following configuration is drawn from the reference implementation in
-                    <filename>katzenpost/docker/voting_mixnet/auth1/authority.toml</filename>. In a
+                    <filename>katzenpost/docker/dirauth_mixnet/auth1/authority.toml</filename>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
                 more information about the test mixnet, see <emphasis role="bold"><xref
                         endterm="container.title" linkend="container"/></emphasis>.</para>
@@ -355,7 +355,7 @@
 
             <section id="auth-server-section-config">
                 <title id="auth-server-section-config.title">Dirauth: Server section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L415-->
+                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/dirauth/server/config/config.go#L415-->
                 <para>The <code>Server</code> section configures mandatory basic parameters for each
                     directory authority.</para>
                 <programlisting>[Server]
@@ -363,7 +363,7 @@
     WireKEMScheme = "xwing"
     PKISignatureScheme = "Ed25519 Sphincs+"
     Addresses = ["tcp://127.0.0.1:30001"]
-    DataDir = "/voting_mixnet/auth1"</programlisting>
+    DataDir = "/dirauth_mixnet/auth1"</programlisting>
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
@@ -411,7 +411,7 @@
             <section id="auth-authorities-section-config">
                 <title id="auth-authorities-section-config.title">Dirauth: <code>Authorities</code>
                     section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L266-->
+                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/dirauth/server/config/config.go#L266-->
                 <para>An <code>Authorities</code> section is configured for each peer authority. We
                     recommend using <ulink url="https://quickref.me/toml.html">TOML's style</ulink>
                     for multi-line quotations for key materials.</para>
@@ -492,7 +492,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="auth-parameters">
                 <title id="auth-parameters.title">Dirauth: Parameters section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L103-->
+                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/dirauth/server/config/config.go#L103-->
                 <para>The <code>Parameters</code> section contains the network parameters.</para>
                 <programlisting>[Parameters]
     SendRatePerMinute = 0
@@ -611,7 +611,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="auth-debug">
                 <title id="auth-debug.title">Dirauth: Debug section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L235-->
+                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/dirauth/server/config/config.go#L235-->
                 <para/>
                 <programlisting>[Debug]
     Layers = 3
@@ -644,7 +644,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             <section id="auth-mixes-section-config">
                 <title id="auth-mixes-section-config.title">Dirauth: Mixes
                     sections</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L383-->
+                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/dirauth/server/config/config.go#L383-->
                 <para>The <code>Mixes</code> configuration sections list mix nodes that are known to
                     the authority.</para>
                 <programlisting>[[Mixes]]
@@ -832,7 +832,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
         <section id="mix-config">
             <title id="mix-config.title">Configuring mix nodes</title>
             <para>The following configuration is drawn from the reference implementation in
-                    <filename>katzenpost/docker/voting_mixnet/mix1/katzenpost.toml</filename>. In a
+                    <filename>katzenpost/docker/dirauth_mixnet/mix1/katzenpost.toml</filename>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
                 more information about the test mixnet, see <emphasis role="bold"><xref
                         endterm="container.title" linkend="container"/></emphasis>.</para>
@@ -888,7 +888,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
   Addresses = ["127.0.0.1:30008"]
   OnlyAdvertiseAltAddresses = false
   MetricsAddress = "127.0.0.1:30009"
-  DataDir = "/voting_mixnet/mix1"
+  DataDir = "/dirauth_mixnet/mix1"
   IsGatewayNode = false
   IsServiceNode = false
   [Server.AltAddresses]</programlisting>
@@ -937,7 +937,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
         <section id="gateway-config">
             <title id="gateway-config.title">Configuring gateway nodes</title>
             <para>The following configuration is drawn from the reference implementation in
-                    <filename>katzenpost/docker/voting_mixnet/gateway1/katzenpost.toml</filename>.
+                    <filename>katzenpost/docker/dirauth_mixnet/gateway1/katzenpost.toml</filename>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
                 address. For more information about the test mixnet, see <emphasis role="bold"><xref
                         endterm="container.title" linkend="container"/></emphasis>.</para>
@@ -995,7 +995,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
     Addresses = ["127.0.0.1:30004"]
     OnlyAdvertiseAltAddresses = false
     MetricsAddress = "127.0.0.1:30005"
-    DataDir = "/voting_mixnet/gateway1"
+    DataDir = "/dirauth_mixnet/gateway1"
     IsGatewayNode = true
     IsServiceNode = false
     [Server.AltAddresses]
@@ -1029,11 +1029,11 @@ ldMtDsvvc9KUfE4I0+c+XQ==
     [Gateway.UserDB]
         Backend = "bolt"
             [Gateway.UserDB.Bolt]
-                UserDB = "/voting_mixnet/gateway1/users.db"
+                UserDB = "/dirauth_mixnet/gateway1/users.db"
     [Gateway.SpoolDB]
         Backend = "bolt"
             [Gateway.SpoolDB.Bolt]
-                SpoolDB = "/voting_mixnet/gateway1/spool.db"</programlisting>
+                SpoolDB = "/dirauth_mixnet/gateway1/spool.db"</programlisting>
             </section>
             <section id="gateway-pki-config">
                 <title id="gateway-pki-config.title">Gateway node: PKI section</title>
@@ -1067,7 +1067,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
         <section id="service-config">
             <title id="service-config.title">Configuring service nodes</title>
             <para>The following configuration is drawn from the reference implementation in
-                    <filename>katzenpost/docker/voting_mixnet/servicenode1/authority.toml</filename>.
+                    <filename>katzenpost/docker/dirauth_mixnet/servicenode1/authority.toml</filename>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
                 address. For more information about the test mixnet, see <emphasis role="bold"><xref
                         endterm="container.title" linkend="container"/></emphasis>.</para>
@@ -1125,7 +1125,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
     Addresses = ["127.0.0.1:30006"]
     OnlyAdvertiseAltAddresses = false
     MetricsAddress = "127.0.0.1:30007"
-    DataDir = "/voting_mixnet/servicenode1"
+    DataDir = "/dirauth_mixnet/servicenode1"
     IsGatewayNode = false
     IsServiceNode = true
     [Server.AltAddresses]</programlisting>
@@ -1169,43 +1169,43 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
     [[ServiceNode.CBORPluginKaetzchen]]
         Capability = "spool"
         Endpoint = "+spool"
-        Command = "/voting_mixnet/memspool.alpine"
+        Command = "/dirauth_mixnet/memspool.alpine"
         MaxConcurrency = 1
         Disable = false
         [ServiceNode.CBORPluginKaetzchen.Config]
-            data_store = "/voting_mixnet/servicenode1/memspool.storage"
-            log_dir = "/voting_mixnet/servicenode1"
+            data_store = "/dirauth_mixnet/servicenode1/memspool.storage"
+            log_dir = "/dirauth_mixnet/servicenode1"
     
     [[ServiceNode.CBORPluginKaetzchen]]
         Capability = "pigeonhole"
         Endpoint = "+pigeonhole"
-        Command = "/voting_mixnet/pigeonhole.alpine"
+        Command = "/dirauth_mixnet/pigeonhole.alpine"
         MaxConcurrency = 1
         Disable = false
         [ServiceNode.CBORPluginKaetzchen.Config]
-            db = "/voting_mixnet/servicenode1/map.storage"
-            log_dir = "/voting_mixnet/servicenode1"
+            db = "/dirauth_mixnet/servicenode1/map.storage"
+            log_dir = "/dirauth_mixnet/servicenode1"
     
     [[ServiceNode.CBORPluginKaetzchen]]
         Capability = "panda"
         Endpoint = "+panda"
-        Command = "/voting_mixnet/panda_server.alpine"
+        Command = "/dirauth_mixnet/panda_server.alpine"
         MaxConcurrency = 1
         Disable = false
         [ServiceNode.CBORPluginKaetzchen.Config]
-            fileStore = "/voting_mixnet/servicenode1/panda.storage"
-            log_dir = "/voting_mixnet/servicenode1"
+            fileStore = "/dirauth_mixnet/servicenode1/panda.storage"
+            log_dir = "/dirauth_mixnet/servicenode1"
             log_level = "INFO"
     
     [[ServiceNode.CBORPluginKaetzchen]]
         Capability = "http"
         Endpoint = "+http"
-        Command = "/voting_mixnet/proxy_server.alpine"
+        Command = "/dirauth_mixnet/proxy_server.alpine"
         MaxConcurrency = 1
         Disable = false
         [ServiceNode.CBORPluginKaetzchen.Config]
             host = "localhost:4242"
-            log_dir = "/voting_mixnet/servicenode1"
+            log_dir = "/dirauth_mixnet/servicenode1"
             log_level = "DEBUG"</programlisting>
                 <para><emphasis role="bold">Common parameters:</emphasis></para>
                 <itemizedlist>
