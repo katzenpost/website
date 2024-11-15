@@ -124,7 +124,7 @@ serverdebug (/1/7)
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">BindAddresses</emphasis></para>
-                    <para>If <emphasis role="bold">true></emphasis>, allows setting of listener
+                    <para>If <emphasis role="bold">true</emphasis>, allows setting of listener
                         addresses that the server will bind to and accept connections on. These
                         addresses are not advertised in the PKI.</para>
                     <para>Type: bool</para>
