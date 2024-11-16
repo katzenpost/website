@@ -63,15 +63,16 @@
             </mediaobject>
         </figure>
         
-        <para>The mix network contains a n-layer topology of mix-nodes, with three nodes
-            per layer in this example. Sphinx packets traverse the network in one direction only.
-	    The gateway nodes allow clients to interact with the mix network. The service nodes provide mix network services
-	    that mix network clients can interact with. All messages sent by clients are handed to a connecter daemon hosted on the client system,
-            passed across the Internet to a gateway, and then relayed to a service node by way of
-            the nine mix nodes. The service node sends its reply back across the three layers of mix
-            node to a gateway, which transmits it across the Internet to be received by the targeted
-            client. The mix, gateway, and service nodes send Mix Descriptors to the directory
-            authority, which returns a consensus document that informs each node about the
+        <para>The mix network contains an <emphasis>n</emphasis>-layer topology of mix-nodes, with
+            three nodes per layer in this example. Sphinx packets traverse the network in one
+            direction only. The gateway nodes allow clients to interact with the mix network. The
+            service nodes provide mix network services that mix network clients can interact with.
+            All messages sent by clients are handed to a connecter daemon hosted on the client
+            system, passed across the Internet to a gateway, and then relayed to a service node by
+            way of the nine mix nodes. The service node sends its reply back across the three layers
+            of mix node to a gateway, which transmits it across the Internet to be received by the
+            targeted client. The mix, gateway, and service nodes send Mix Descriptors to the
+            directory authority, which returns a consensus document that informs each node about the
             location and status of other nodes in the network. </para>
         <para>In addition to the server components, &program_name; also supports connections to
             client applications hosted externally to the mix network and communicating with it
@@ -137,8 +138,8 @@
             <para><?oxy_comment_start author="dwrob" timestamp="20241114T125846-0800" comment="Division of service nodes into replicas and couriers is not addressed here."?>Service
                 nodes <?oxy_comment_end?>provide functionality requested by clients. They are
                 logically positioned at the deepest point of the mix network, with incoming queries
-                and outgoing replies both needing to traverse the entire triple-layering of mix node
-                clusters. A service node's functionality may involve storing messages, publishing
+                and outgoing replies both needing to traverse all <emphasis>n</emphasis> layers of
+                mix nodes. A service node's functionality may involve storing messages, publishing
                 information outside of the mixnet, interfacing with a blockchain node, and so on.
                 Service nodes also process decoy packets. </para>
         </section>
@@ -193,7 +194,7 @@
                                     <para>Description</para>
                                 </entry>
                                 <entry>
-                                    <para>GitHub repository</para>
+                                    <para>Code</para>
                                 </entry>
                             </row>
                         </thead>
@@ -210,7 +211,7 @@
                                         for network testing.</para>
                                 </entry>
                                 <entry>
-                                    <para><ulink
+                                    <para>GitHub: <ulink
                                             url="https://github.com/katzenpost/katzenpost/tree/main/ping"
                                             >ping</ulink></para>
                                 </entry>
@@ -226,7 +227,7 @@
                                     <para>A text chat client with file-transfer support.</para>
                                 </entry>
                                 <entry>
-                                    <para><ulink url="https://github.com/katzenpost/katzen"
+                                    <para>GitHub: <ulink url="https://github.com/katzenpost/katzen"
                                             >katzen</ulink></para>
                                 </entry>
                             </row>
@@ -242,7 +243,7 @@
                                         network.</para>
                                 </entry>
                                 <entry>
-                                    <para><ulink url="https://github.com/katzenpost/status"
+                                    <para>GitHub: <ulink url="https://github.com/katzenpost/status"
                                             >status</ulink></para>
                                 </entry>
                             </row>
@@ -256,7 +257,8 @@
                                         of mix network nodes. </para>
                                 </entry>
                                 <entry>
-                                    <para><ulink url="https://github.com/katzenpost/worldmap"
+                                    <para>GitHub: <ulink
+                                            url="https://github.com/katzenpost/worldmap"
                                             >worldmap</ulink></para>
                                 </entry>
                             </row>
@@ -352,7 +354,6 @@
 
             <section id="auth-server-section-config">
                 <title id="auth-server-section-config.title">Dirauth: Server section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/dirauth/server/config/config.go#L415-->
                 <para>The <code>Server</code> section configures mandatory basic parameters for each
                     directory authority.</para>
                 <programlisting>[Server]
@@ -408,7 +409,6 @@
             <section id="auth-authorities-section-config">
                 <title id="auth-authorities-section-config.title">Dirauth: <code>Authorities</code>
                     section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/dirauth/server/config/config.go#L266-->
                 <para>An <code>Authorities</code> section is configured for each peer authority. We
                     recommend using <ulink url="https://quickref.me/toml.html">TOML's style</ulink>
                     for multi-line quotations for key materials.</para>
@@ -489,7 +489,6 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="auth-parameters">
                 <title id="auth-parameters.title">Dirauth: Parameters section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/dirauth/server/config/config.go#L103-->
                 <para>The <code>Parameters</code> section contains the network parameters.</para>
                 <programlisting>[Parameters]
     SendRatePerMinute = 0
@@ -608,8 +607,6 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             </section>
             <section id="auth-debug">
                 <title id="auth-debug.title">Dirauth: Debug section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/dirauth/server/config/config.go#L235-->
-                <para/>
                 <programlisting>[Debug]
     Layers = 3
     MinNodesPerLayer = 1
@@ -641,7 +638,6 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             <section id="auth-mixes-section-config">
                 <title id="auth-mixes-section-config.title">Dirauth: Mixes
                     sections</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/dirauth/server/config/config.go#L383-->
                 <para>The <code>Mixes</code> configuration sections list mix nodes that are known to
                     the authority.</para>
                 <programlisting>[[Mixes]]
@@ -809,23 +805,6 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
         </section>
-
-        <!--
-            https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/server/config/config.go    
-        
-        // Config is the top level Katzenpost server configuration.
-        type Config struct {
-        Server         *Server
-        Logging        *Logging
-        ServiceNode    *ServiceNode
-        Gateway        *Gateway
-        PKI            *PKI
-        Management     *Management
-        SphinxGeometry *geo.Geometry
-        Debug *Debug
-        }        
-        
--->
         <section id="mix-config">
             <title id="mix-config.title">Configuring mix nodes</title>
             <para>The following configuration is drawn from the reference implementation in
@@ -1141,8 +1120,6 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             <section id="service-servicenode-section-config">
                 <title id="service-servicenode-section-config.title">Service node: ServiceNode
                     section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/main/server/config/config.go#L470 defines the top level configuration.
-https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 defines the per-service configurations.-->
                 <para>The <code>ServiceNode</code> section contains configurations for each network
                     service that &program_name; supports. </para>
                 <para>Services, termed <ulink
