@@ -72,8 +72,9 @@
             way of the nine mix nodes. The service node sends its reply back across the three layers
             of mix node to a gateway, which transmits it across the Internet to be received by the
             targeted client. The mix, gateway, and service nodes send Mix Descriptors to the
-            directory authority, which returns a consensus document that informs each node about the
-            location and status of other nodes in the network. </para>
+            directory authority. These mix network components retrieve the "PKI document" from these
+	    dirauth nodes so that it can inform the node about the connection information and public
+	    cryptographic key materials. </para>
         <para>In addition to the server components, &program_name; also supports connections to
             client applications hosted externally to the mix network and communicating with it
             through gateway nodes and, in some cases, a client connector.</para>
