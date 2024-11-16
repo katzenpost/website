@@ -35,19 +35,22 @@
         <itemizedlist>
             <listitem>
                 <para><emphasis role="bold">Management</emphasis></para>
-                <para>I'd like to see description of new "Management" feature making it easy to
+                <para>TODO: write description of new "Management" feature making it easy to
                     install/restart service plugins without restarting whole mix net ... management
-                    socket for restarted services without restarting the service node</para>
+                    socket for restarting services without restarting the service node</para>
             </listitem>
             <listitem>
-                <para><emphasis role="bold">Production vs. whatever</emphasis></para>
-                <para>could use a section describing difference from a "production" network. Like
-                    how the epoch is (or can be, or not) warped a 2 min vs 20min.</para>
+                <para><emphasis role="bold">Production vs. docker test mix network</emphasis></para>
+                <para>
+		Currently our Epoch duration is hardcoded to 20 minutes. The docker
+		test mix network uses an Epoch duration of 2 minutes and this setting is known a "warped epoch".
+		In the future we'll make the Epoch duration configuration via bash environmental variable,
+		see github issue: https://github.com/katzenpost/katzenpost/issues/744
+		</para>
             </listitem>
             <listitem>
                 <para><emphasis role="bold">Management</emphasis> struct – a management interface,
-                    off by default – need s to be documented. For restarting plugins without
-                    restarting the whole thing. More for devs than Admins, thoguh.</para>
+                    off by default</para>
 
                                     <para>The <code>socat</code> commandline utility can be use to
                                         connect to the management socket and issue commands. Connect
@@ -118,26 +121,6 @@
                                     </itemizedlist>
 
   
-            <itemizedlist>
-                <listitem>
-                    <para><emphasis role="bold">configuration</emphasis></para>
-                    <para>yes, perhaps the paper will be helpful. however in my mind these two
-                        source code files are also immediately relevant to our server side
-                        operator</para>
-                    <para>handbook:https://github.com/katzenpost/katzenpost/blob/main/server/config/config.gohttps://github.com/katzenpost/katzenpost/blob/main/authority/voting/server/config/config.go</para>
-                    <para>there probably should be a section that describes each and every
-                        configuration parameter/optionbut also we probably want to give some general
-                        purpose configuration examples that might be useful for getting
-                        started</para>
-                    <para>also... Xen and I while working for 0kn, we "tuned" the mix server debug
-                        settings based on packet loss visible with debug logging turned on... or
-                        with collecting Prometheus metrics</para>
-                    <para>so... for the mix server, we probably need a chapter on tuning in order to
-                        reduce packet loss</para>
-                    <para>i can write most of that... but we should probably collaborate on
-                        it</para>
-                </listitem>
-            </itemizedlist>
             <para> Parameters (all) in server/config. </para>
             <para> Go autogeneted docs: go to godocs.org and search for katezenpost/katzenpost. --
                 Baseic dev docs</para>
@@ -146,36 +129,7 @@
             <para/>
     <para>
  
-            <itemizedlist>
-                <listitem>
-                    <para><emphasis role="bold">tuning</emphasis></para>
-                    <para>Yes we should perhaps have weekly meetings to see if any of us can assist
-                        you in the documentation? My work on Katzenpost is currently being funded by
-                        a commercial crypto company called 0kn and we've had some interesting
-                        experiences "tuning" mixnets for performance by tweaking many of the server
-                        debug configuration parameters. We used performance graphs and debug log
-                        lines to help us track down the various causes for packetloss... and then
-                        one by one we fixed the various causes... tuned the mixnet for higher
-                        performance etc.</para>
-                    <para>I think 0kn can be useful to us for providing an example scenario with
-                        example graphs and log messages</para>
-                    <para>It's useful Info for future ops users </para>
-                    <para>here's an example of one of our "lab reports" where we investigated
-                        packetloss within the mixnet <ulink
-                            url="https://dox.0kn.tech/s/snqcrQ_3C"
-                            >https://dox.0kn.tech/s/snqcrQ_3C</ulink>.</para>
-                </listitem>
-            </itemizedlist>
-            <itemizedlist>
-                <listitem>
-                    <para>we had several rounds of this for weeks actually... one of our prior
-                        graphs show packetloss every 20 minutes... the exact time of the katzenpost
-                        epoch…</para>
-                </listitem>
-            </itemizedlist>
     </para>
-        <para>Python tuning script exists.</para>
-
             </listitem>
         </itemizedlist>
     </para>
