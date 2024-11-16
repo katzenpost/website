@@ -282,7 +282,8 @@
                 more information about the test mixnet, see <emphasis role="bold"><xref
                         endterm="container.title" linkend="container"/></emphasis>.</para>
             <table frame="all">
-                <title>Directory authority (dirauth) configuration sections</title>
+                <title><emphasis role="bold">Directory authority (dirauth) configuration
+                        sections</emphasis></title>
                 <tgroup cols="1">
                     <colspec colname="c1" colnum="1" colwidth="1*"/>
                     <tbody>
