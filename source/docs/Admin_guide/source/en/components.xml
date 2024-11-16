@@ -102,25 +102,7 @@
   </section>
         <section id="intro-mix">
             <title id="intro-mix.title">Mix nodes</title>
-            <para>The mix node is the fundamental building block of the mix network. Mix nodes relay
-                messages between clients while taking measures to block adversaries from determining
-                which clients are communicating with each other. Several methods contribute to the
-                protection of client anonymity:</para>    
-            <itemizedlist>
-                    <listitem>
-                        <para>Reordering or mixing multiple messages.</para>
-                    </listitem>
-                    <listitem>
-                        <para>Padding all packets to a common size.</para>
-                    </listitem>
-                    <listitem>
-                        <para>Reencrypting packets at each hop.</para>
-                    </listitem>
-                    <listitem>
-                        <para>Delaying packets on each node for a random period of time in order to
-                            prevent timing correlation attacks.</para>
-                    </listitem>
-            </itemizedlist>
+            <para>The mix node is the fundamental building block of the mix network.
             <para>&program_name; mix nodes are arranged in a layered topology to achieve the best
                 levels of anonymity and ease of analysis while being flexible enough to scale with
                 traffic demands. </para>
