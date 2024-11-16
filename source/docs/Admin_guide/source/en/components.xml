@@ -82,9 +82,9 @@
         <section id="intro-dirauth">
             <title id="intro-dirauth.title">Directory authorities (dirauths)</title>
             <para>Directory authorities, or <emphasis>dirauths</emphasis>, are nodes in the
-                decentralized public key infrastructure (PKI) that compose the security root of the
-                &program_name; system. Clients, mix nodes, gateways nodes, and service nodes all
-                rely on the PKI to maintain and sign an up-to-date <emphasis>consensus</emphasis>
+                decentralized public key infrastructure (PKI) that compose the root of security of the
+                entire mix network. Clients, mix nodes, gateways nodes, and service nodes all
+                rely on the PKI/dirauth system to maintain and sign an up-to-date <emphasis>consensus</emphasis>
                 document, providing a view of the entire network including connection information
                 and public cryptographic key materials and signatures.</para>      
         <para>Every 20 minutes (the current value for an <emphasis>epoch</emphasis>), each mix,
