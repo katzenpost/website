@@ -155,24 +155,10 @@
                     </row>
                     <row>
                         <entry>
-                            <para><emphasis role="bold">run</emphasis></para>
-                        </entry>
-                        <?oxy_comment_start author="dwrob" timestamp="20240614T163648-0700" comment="https://github.com/katzenpost/katzenpost/blob/main/docker/Makefile
-                            
-                            These run commands are backwards.
-                            
-                            They also should be given less ambiguous names, maybe run-background and run-foreground."?>
-                        <entry>
-                            <para>Run the test network in the background.</para>
-                        </entry><?oxy_comment_end?>
-                    </row>
-                    <row>
-                        <entry>
                             <para><emphasis role="bold">start</emphasis></para>
                         </entry>
                         <entry>
-                            <para>Run the test network in the foreground until
-                                <command>Ctrl-C</command>.</para>
+                            <para>Run the test network in the background.</para>
                         </entry>
                     </row>
                     <row>
