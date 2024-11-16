@@ -102,7 +102,7 @@
   </section>
         <section id="intro-mix">
             <title id="intro-mix.title">Mix nodes</title>
-            <para>The mix node is the fundamental building block of the mix network.
+            <para>The mix node is the fundamental building block of the mix network. </para>    
             <para>&program_name; mix nodes are arranged in a layered topology to achieve the best
                 levels of anonymity and ease of analysis while being flexible enough to scale with
                 traffic demands. </para>
