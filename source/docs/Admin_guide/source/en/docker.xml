@@ -467,7 +467,6 @@
                         <entry>Identifier</entry>
                         <entry>IP</entry>
                         <entry>Port</entry>
-                        <entry>Panda</entry>
                     </row>
                 </thead>
                 <tbody>
@@ -544,9 +543,6 @@
                         <entry>
                             <para>30006 </para>
                         </entry>
-                        <entry>
-                            <para>yes</para>
-                        </entry>
                     </row>
                     <row>
                         <entry>
@@ -560,9 +556,6 @@
                         </entry>
                         <entry>
                             <para>30008</para>
-                        </entry>
-                        <entry>
-                            <para/>
                         </entry>
                     </row>
                     <row>
@@ -594,9 +587,6 @@
                         </entry>
                         <entry>
                             <para>30012</para>
-                        </entry>
-                        <entry>
-                            <para/>
                         </entry>
                     </row>
                 </tbody>
