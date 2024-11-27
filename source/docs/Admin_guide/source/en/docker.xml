@@ -428,9 +428,29 @@
         </section>
     </section>
     <section id="topology">
-        <title id="topology.title">Network components and topology</title>
-        <para>There needs to be an interpretation of this diagram. including the ways that the
-            testnet differs from production network.</para>
+        <title id="topology.title">Network topology and components</title>
+        <para>The Docker image deploys a working mixnet with all  components and component groups
+            needed to perform essential mixnet functions: </para>
+        <itemizedlist>
+            <listitem>
+                <para>message mixing (including packet reordering, timing randomization, injection
+                    of decoy traffic, obfuscation of senders and receivers, and so on)</para>
+            </listitem>
+            <listitem>
+                <para>service provisioning</para>
+            </listitem>
+            <listitem>
+                <para>internal authentication and integrity monitoring</para>
+            </listitem>
+            <listitem>
+                <para>interfacing with external clients</para>
+            </listitem>
+        </itemizedlist>
+
+            <warning><para>While suited for client development and testing, the test mixnet omits performance and
+                security redundancies. <emphasis>Do not use it in production.</emphasis></para></warning>
+        <para>The following diagram illustrates the components and their network interactions. The
+            gray blocks represent nodes, and the arrows represent information transfer. </para>
         <figure>
             <title>Test network topology</title>
             <mediaobject>
@@ -439,9 +459,22 @@
                 </imageobject>
             </mediaobject>
         </figure>
-        <para>Discuss how to view these components, where their configuration files are, etc.</para>
+        <para>On the left, the <emphasis role="bold">Client</emphasis> transmits a message (shown by
+            purple arrows) through the <emphasis role="bold">Gateway node</emphasis>, across three
+                <emphasis role="bold">mix node</emphasis> layers, to the <emphasis role="bold"
+                >Service node</emphasis>.  The <emphasis role="bold">Service node</emphasis>
+            processes the request and responds with a reply (shown by the green arrows) that
+            traverses the <emphasis role="bold">mix node</emphasis> layers before exiting the mixnet
+            via the <emphasis role="bold">Gateway node</emphasis> and arriving at the <emphasis
+                role="bold">Client</emphasis>.</para>
+        <para>On the right, directory authorities <emphasis role="bold">Dirauth 1</emphasis>,
+                <emphasis role="bold">Dirauth 2</emphasis>, and <emphasis role="bold">Dirauth
+                3</emphasis> provide PKI services. The directory authorities receive <emphasis
+                role="bold">mix descriptors</emphasis> from the other nodes, collate these into a
+                <emphasis role="bold">consensus document</emphasis> containing validated network
+            status and authentication materials , and make that available to the other nodes. </para>
         <table frame="all">
-            <title>Network hosts</title>
+            <title>Test mixnet  hosts</title>
             <tgroup cols="5">
                 <colspec colname="c1" colnum="1" colwidth="1*"/>
                 <colspec colname="c2" colnum="2" colwidth="1*"/>
@@ -452,7 +485,7 @@
                     <row>
                         <entry>Node type</entry>
                         <entry>Docker ID</entry>
-                        <entry>Diagram name</entry>
+                        <entry>Diagram label</entry>
                         <entry>IP address</entry>
                         <entry>TCP Port</entry>
                     </row>
@@ -540,6 +573,8 @@
                 </tbody>
             </tgroup>
         </table>
+        <para>configuration files </para>
+        <para>Discuss how to view these components, where their are, etc.</para>
     </section>
     
     
