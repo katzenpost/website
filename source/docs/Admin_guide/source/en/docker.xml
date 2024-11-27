@@ -138,7 +138,7 @@
         <para>Running <command>make</command> with no target specified returns a list of available
             targets.:</para>
         <table>
-            <title>Makefile targets</title>
+            <title>Table 1: Makefile targets</title>
             <tgroup cols="2">
                 <tbody>
                     <row>
@@ -374,7 +374,7 @@
                         the logs.</para>
                 </listitem>
                 <listitem>
-                    <para><command><?oxy_comment_start author="dwrob" timestamp="20240628T130750-0700" comment="I need more description of what this is removing.  Run/start still very quickly start the network after this clean operation."?>clean-local<?oxy_comment_end?></command></para>
+                    <para><command>clean-local</command></para>
                     <para>To delete both compiled binaries and data, run the following
                         command:</para>
                     <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make clean-local</command>
@@ -406,7 +406,7 @@
                         Your branch is up to date with 'origin/main'.</programlisting>
                 </listitem>
                 <listitem>
-                    <para><command><?oxy_comment_start author="dwrob" timestamp="20240628T130820-0700" comment="Again, I need a fuller inventory. I see that a lot of repo code is removed, and the cache. We could be more descriptive. Also, as noted, there is something weird with permissions needed for this command.. It makes no sense that I can set the testnet up as a reegular user, but I need to be root to remove it"?>clean<?oxy_comment_end?></command></para>
+                    <para><command>clean</command></para>
                     <para>To stop the the network and delete the binaries, the data, and the go_deps
                         image, run the following command as superuser: </para>
                     <programlisting><prompt>~/katzenpost/docker$ </prompt><command>sudo make clean</command></programlisting>
@@ -473,8 +473,12 @@
                 role="bold">mix descriptors</emphasis> from the other nodes, collate these into a
                 <emphasis role="bold">consensus document</emphasis> containing validated network
             status and authentication materials , and make that available to the other nodes. </para>
+        <para>The elements in the topology diagram map to the mixnet's component nodes as shown in
+            the following table. Note that all nodes share the same IP address (127.0.0.1, i.e.,
+            localhost), but are accessed through different ports. Each node type links to additional
+            information in <xref linkend="components" endterm="components.title"/>.</para>
         <table frame="all">
-            <title>Test mixnet  hosts</title>
+            <title>Table 2: Test mixnet hosts</title>
             <tgroup cols="5">
                 <colspec colname="c1" colnum="1" colwidth="1*"/>
                 <colspec colname="c2" colnum="2" colwidth="1*"/>
@@ -487,7 +491,7 @@
                         <entry>Docker ID</entry>
                         <entry>Diagram label</entry>
                         <entry>IP address</entry>
-                        <entry>TCP Port</entry>
+                        <entry>TCP port</entry>
                     </row>
                 </thead>
                 <tbody>
@@ -573,8 +577,100 @@
                 </tbody>
             </tgroup>
         </table>
-        <para>configuration files </para>
-        <para>Discuss how to view these components, where their are, etc.</para>
+        <para>The following <ulink url="https://manpages.debian.org/bookworm/tree/tree.1.en.html"
+                >tree</ulink> output shows the location, relative to the
+                <filename>katzenpost</filename> repository root, of the TOML configuration file for
+            each node. For help in understanding these files and a complete list of configuration
+            options, follow the links in <guilabel>Table 2: Test mixnet hosts</guilabel>.</para>
+        <programlisting>katzenpost/docker/voting_mixnet/
+|---<emphasis role="bold">auth1</emphasis>
+|   |---<emphasis role="bold">authority.toml</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---link.private.pem
+|   |---link.public.pem
+|   |---persistence.db
+|---<emphasis role="bold">auth2</emphasis>
+|   |---<emphasis role="bold">authority.toml</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---link.private.pem
+|   |---link.public.pem
+|   |---persistence.db
+|---<emphasis role="bold">auth3</emphasis>
+|   |---<emphasis role="bold">authority.toml</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---link.private.pem
+|   |---link.public.pem
+|   |---persistence.db
+|---client
+|   |---client.toml
+|---client2
+|   |---client.toml
+|---dirauth.alpine
+|---docker-compose.yml
+|---echo_server.alpine
+|---fetch.alpine
+|---<emphasis role="bold">gateway1</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---<emphasis role="bold">katzenpost.toml</emphasis>
+|   |---link.private.pem
+|   |---link.public.pem
+|   |---management_sock
+|   |---spool.db
+|   |---users.db
+|---memspool.alpine
+|---<emphasis role="bold">mix1</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---<emphasis role="bold">katzenpost.toml</emphasis>
+|   |---link.private.pem
+|   |---link.public.pem
+|---<emphasis role="bold">mix2</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---<emphasis role="bold">katzenpost.toml</emphasis>
+|   |---link.private.pem
+|   |---link.public.pem
+|---<emphasis role="bold">mix3</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---<emphasis role="bold">katzenpost.toml</emphasis>
+|   |---link.private.pem
+|   |---link.public.pem
+|---panda_server.alpine
+|---pigeonhole.alpine
+|---ping.alpine
+|---prometheus.yml
+|---proxy_client.alpine
+|---proxy_server.alpine
+|---running.stamp
+|---server.alpine
+|---<emphasis role="bold">servicenode1</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---<emphasis role="bold">katzenpost.toml</emphasis>
+|   |---link.private.pem
+|   |---link.public.pem
+|   |---management_sock
+|   |---map.storage
+|   |---memspool.13.log
+|   |---memspool.storage
+|   |---panda.25.log
+|   |---panda.storage
+|   |---pigeonHole.19.log
+|   |---proxy.31.log
+|---voting_mixnet</programlisting>
     </section>
     
     

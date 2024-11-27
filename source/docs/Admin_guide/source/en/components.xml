@@ -1219,7 +1219,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             <para><emphasis role="bold">spool</emphasis></para>
                             <para>The <code>spool</code> service supports the <code>catshadow</code>
                                 storage protocol,
-                                <?oxy_comment_start author="dwrob" timestamp="20241113T174007-0800" comment="There was also something here about Panda and Reunion being don&apos;t-say-deprecated and needing this spool. They both appear to be configured as enabled in the example. What should be the messaging on this? See also highlighted below."?>which
+                                <?oxy_comment_start author="dwrob" timestamp="20241113T174007-0800" comment="Wasn&apos;t there also something about Panda and Reunion being don&apos;t-say-deprecated and needing this spool? They both appear to be configured as enabled in the example. What should be the messaging on this?  See highlighted text below."?>which
                                 is required by the &chat_client; chat client<?oxy_comment_end?>. The
                                 example configuration above shows spool enabled with the setting:<programlisting>Disable = false</programlisting><note>
                                     <para><code>Spool</code>, properly <code>memspool</code>, should

@@ -34,11 +34,10 @@
     <title>&program_name; administrator's guide</title>
    <preface id="introduction">
        <title id="introduction.title">Introduction</title>
-       <para>blah blah</para>
        <para>To Do</para>
    </preface>
       
     <xi:include href="components.xml"></xi:include> 
-    <xi:include href="operations.xml"></xi:include>
+<!--    <xi:include href="operations.xml"></xi:include>-->
     <xi:include href="docker.xml"></xi:include>
 </book> 
