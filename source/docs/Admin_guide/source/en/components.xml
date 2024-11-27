@@ -42,11 +42,11 @@
         <title id="overview.title">Understanding the &program_name; components</title>
         <para>The core of &program_name; consists of two program executables, <link
                 linkend="voter-usage">dirauth</link> and <link linkend="server-usage">server</link>.
-            Running the <command>dirauth </command>commmand runs a  <emphasis>directory
+            Running the <command>dirauth </command>commmand runs a <emphasis>directory
                 authority</emphasis> node, or <emphasis>dirauth</emphasis>, that functions as part
             of the mixnet's public-key infrastructure (PKI). Running the <command>server</command>
-            runs either a <emphasis>mix</emphasis> node, a <emphasis>gateway</emphasis> node, or
-            a <emphasis>service</emphasis> node, depending on the configuration. Configuration
+            runs either a <emphasis>mix</emphasis> node, a <emphasis>gateway</emphasis> node, or a
+                <emphasis>service</emphasis> node, depending on the configuration. Configuration
             settings are provided in an associated <filename>katzenpost-authority.toml</filename> or
                 <filename>katzenpost.toml</filename> file respectively. </para>
         <para>In addition to the server components, &program_name; also supports connections to
@@ -54,60 +54,56 @@
             through gateway nodes. </para>
         <para>A model mix network is shown in Figure 1.</para>
         <figure>
-            <title>The pictured element types  correspond to discrete client and server programs
-                that &program_name; requires to function. </title>
+            <title>The pictured element types correspond to discrete client and server programs that
+                &program_name; requires to function. </title>
             <mediaobject>
                 <imageobject>
                     <imagedata fileref="pix/components-production.png" scale="75"/>
                 </imageobject>
             </mediaobject>
         </figure>
-        
         <para>The mix network contains an <emphasis>n</emphasis>-layer topology of mix-nodes, with
             three nodes per layer in this example. Sphinx packets traverse the network in one
             direction only. The gateway nodes allow clients to interact with the mix network. The
             service nodes provide mix network services that mix network clients can interact with.
-            All messages sent by clients are handed to a connecter daemon hosted on the client
-            system, passed across the Internet to a gateway, and then relayed to a service node by
-            way of the nine mix nodes. The service node sends its reply back across the three layers
-            of mix node to a gateway, which transmits it across the Internet to be received by the
-            targeted client. The mix, gateway, and service nodes send Mix Descriptors to the
-            directory authority. These mix network components retrieve the "PKI document" from these
-	    dirauth nodes so that it can inform the node about the connection information and public
-	    cryptographic key materials. </para>
-        <para>In addition to the server components, &program_name; also supports connections to
-            client applications hosted externally to the mix network and communicating with it
-            through gateway nodes and, in some cases, a client connector.</para>
-        
+            All messages sent by clients are handed to a <emphasis>connector</emphasis> daemon
+            hosted on the client system, passed across the Internet to a gateway, and then relayed
+            to a service node by way of the nine mix nodes. The service node sends its reply back
+            across the mix-node layers to a gateway, which transmits it across the Internet to be
+            received by the targeted client. The mix, gateway, and service nodes send <emphasis>mix
+                descriptors</emphasis> to the dirauths and retrieve a <emphasis>consensus
+                document</emphasis> from them, described below.</para>
+        <para>In addition to the server components, &program_name; supports connections to client
+            applications hosted externally to the mix network and communicating with it through
+            gateway nodes and, in some cases, a client connector.</para>
         <section id="intro-dirauth">
             <title id="intro-dirauth.title">Directory authorities (dirauths)</title>
-            <para>Directory authorities, or <emphasis>dirauths</emphasis>, are nodes in the
-                decentralized public key infrastructure (PKI) that compose the root of security of the
-                entire mix network. Clients, mix nodes, gateways nodes, and service nodes all
-                rely on the PKI/dirauth system to maintain and sign an up-to-date <emphasis>consensus</emphasis>
-                document, providing a view of the entire network including connection information
-                and public cryptographic key materials and signatures.</para>      
-        <para>Every 20 minutes (the current value for an <emphasis>epoch</emphasis>), each mix,
-                gateway, and service node signs a descriptor and uploads it to the dirauths. The
+            <para>Dirauths compose the decentralized public key infrastructure (PKI) that serves as
+                the root of security for the entire mix network. Clients, mix nodes, gateways nodes,
+                and service nodes rely on the PKI/dirauth system to maintain and sign an up-to-date
+                consensus document, providing a view of the network including connection information
+                and public cryptographic key materials and signatures.</para>
+            <para>Every 20 minutes (the current value for an <emphasis>epoch</emphasis>), each mix,
+                gateway, and service node signs a mix descriptor and uploads it to the dirauths. The
                 dirauths then vote on a new consensus document. If consensus is reached, each
                 dirauth signs the document. Clients and nodes download the document as needed and
                 verify the signatures. Consensus fails when 1/2 + 1 nodes fail, which yields greater
                 fault tolerance than, for example, Byzantine Fault Tolerance, which fails when 1/3 +
                 1 of the nodes fail.</para>
-        <para>The PKI signature scheme is fully configurable by the dirauths. Our recommendation is
-                to use a hybrid signature scheme consisting of classical Ed25519 and the
+            <para>The PKI signature scheme is fully configurable by the dirauths. Our recommendation
+                is to use a hybrid signature scheme consisting of classical Ed25519 and the
                 post-quantum, stateless, hash-based signature scheme known as Sphincs+ (with the
                 parameters: "sphincs-shake-256f"), which is designated in &program_name;
                 configurations as "Ed25519 Sphincs+". Examples are provided below.</para>
-  </section>
+        </section>
         <section id="intro-mix">
             <title id="intro-mix.title">Mix nodes</title>
-            <para>The mix node is the fundamental building block of the mix network. </para>    
+            <para>The mix node is the fundamental building block of the mix network. </para>
             <para>&program_name; mix nodes are arranged in a layered topology to achieve the best
                 levels of anonymity and ease of analysis while being flexible enough to scale with
                 traffic demands. </para>
-        </section>           
-            <section id="intro-gateway">
+        </section>
+        <section id="intro-gateway">
             <title id="intro-gateway.title">Gateway nodes</title>
             <para>Gateway nodes provide external client access to the mix network. Because gateways
                 are uniquely positioned to identify clients, they are designed to have as little
@@ -249,7 +245,6 @@
                     </tgroup>
                 </table></para>
         </section>
-
     </section>
     <section id="configuration">
         <title id="configuration.title">Using the &program_name; configuration API</title>

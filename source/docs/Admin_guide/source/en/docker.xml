@@ -137,12 +137,8 @@
         <programlisting> <prompt>~/katzenpost/docker$ </prompt><command>make<replaceable> target</replaceable></command></programlisting>
         <para>Running <command>make</command> with no target specified returns a list of available
             targets.:</para>
-        <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
         <table>
-            <?oxy_comment_start author="dwrob" timestamp="20240612T164030-0700" comment="Each of the targets needs a non-trivial description, including an explanation of when you would use it and why.
-                
-                Also note suggested edits."?>
-            <title>Makefile targets<?oxy_comment_end?></title>
+            <title>Makefile targets</title>
             <tgroup cols="2">
                 <tbody>
                     <row>
@@ -174,8 +170,7 @@
                             <para><emphasis role="bold">wait</emphasis></para>
                         </entry>
                         <entry>
-                            <para><?oxy_comment_start author="dwrob" timestamp="20240614T163316-0700" comment="What is the difference between doing this and not doing this? Is something gated by it?"?>Wait
-                                for the test network to have consensus.<?oxy_comment_end?></para>
+                            <para>Wait for the test network to have consensus.</para>
                         </entry>
                     </row>
                     <row>
@@ -216,11 +211,10 @@
                     </row>
                     <row>
                         <entry>
-                            <para><emphasis role="bold"
-                                ><?oxy_comment_start author="dwrob" timestamp="20240614T172928-0700" comment="These description names could be clearer. &quot;Local&quot; doesn&apos;t say much to me, and the &quot;clean&quot; should probably be &quot;clean-all&quot;, with an explanationof what &quot;all&quot; means."?>clean-local<?oxy_comment_end?></emphasis></para>
+                            <para><emphasis role="bold">clean-local</emphasis></para>
                         </entry>
                         <entry>
-                            <para>Stop all components, delete binaries, and delete data..</para>
+                            <para>Stop all components, delete binaries, and delete data.</para>
                         </entry>
                     </row>
                     <row>
@@ -236,13 +230,12 @@
                             <para><emphasis role="bold">clean</emphasis></para>
                         </entry>
                         <entry>
-                            <para>The above, plus cleans includes
-                                <?oxy_comment_start author="dwrob" timestamp="20240614T172951-0700" comment="We need to explain what this is."?>go_deps
-                                image<?oxy_comment_end?>.</para>
+                            <para>Same as <emphasis role="bold">clean-local</emphasis>, but also
+                                deletes <code>go_deps</code> image.</para>
                         </entry>
                     </row>
                 </tbody>
-            </tgroup><?oxy_custom_end?>
+            </tgroup>
         </table>
         <section id="start-mixnet">
             <title id="start-mixnet.title">Starting and monitoring the mixnet</title>
@@ -258,8 +251,8 @@
                         <para>If you intend to use Docker, you need to run <command>make</command>
                             as superuser. If you are using <command>sudo</command> to elevate your
                             privileges, you need to edit
-                            <filename>katzenpost/docker/Makefile</filename> to prepend
-                            <command>sudo</command> to each command contained in it.</para>
+                                <filename>katzenpost/docker/Makefile</filename> to prepend
+                                <command>sudo</command> to each command contained in it.</para>
                     </listitem>
                     <listitem>
                         <para>If you have Podman installed on your system and you nonetheless want
@@ -269,9 +262,8 @@
                     </listitem>
                 </itemizedlist>
             </note>
-            <para>The first time that you use the <command>start</command> target,
-                the docker image will be downloaded, built, and installed. This takes several
-                minutes. </para>
+            <para>The first time that you use the <command>start</command> target, the docker image
+                will be downloaded, built, and installed. This takes several minutes. </para>
             <para>
                 <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make start</command>
                     ...
@@ -281,10 +273,9 @@
                     ...</programlisting>
             </para>
             <para>Once installation is complete, there is a further delay as the mix servers vote
-                and reach a consensus. You can use the <command>wait</command> target
-                to wait for the mixnet to get consensus and be ready to use. This can also take
-                several minutes:</para>
-
+                and reach a consensus. You can use the <command>wait</command> target to wait for
+                the mixnet to get consensus and be ready to use. This can also take several
+                minutes:</para>
             <para>
                 <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make wait</command>
                     ...
@@ -292,7 +283,7 @@
                     ...</programlisting>
             </para>
             <para>You can confirm that installation and configuration are complete by issuing the
-                <command>status</command> command from the same or another terminal. When the
+                    <command>status</command> command from the same or another terminal. When the
                 network is ready for use, <command>status</command> begins returning consensus
                 information similar to the following:</para>
             <para>
@@ -325,7 +316,7 @@
                     with an error message or hang indefinitely. If this happens, issue (if
                     necessary) a <command>Ctrl-C</command> key sequence to abort, check the
                     consensus status with the <command>status</command> command, and then retry
-                    <command>ping</command>.</para>
+                        <command>ping</command>.</para>
             </note>
         </section>
         <section id="shutdown-mixnet">
@@ -450,141 +441,98 @@
         </figure>
         <para>Discuss how to view these components, where their configuration files are, etc.</para>
         <table frame="all">
-            <title><?oxy_comment_start author="dwrob" timestamp="20240617T174147-0700" comment="I will define/describe each of these component types in a separate section, because they are general and not specific to the testnet. These host types will be linked to that.
-                
-                [Update: Deferring discussion of Spool.DB and User.DB until documentations for indivdual components; not relevant for Docker image. These DBs live on the Gateway host.]
-                
-                [Update: adding gateway host.]"?>Network hosts<?oxy_comment_end?></title>
+            <title>Network hosts</title>
             <tgroup cols="5">
                 <colspec colname="c1" colnum="1" colwidth="1*"/>
                 <colspec colname="c2" colnum="2" colwidth="1*"/>
-                <colspec colname="c3" colnum="3" colwidth="1*"/>
-                <colspec colname="c4" colnum="4" colwidth="1*"/>
-                <colspec colname="newCol8" colnum="5" colwidth="1*"/>
+                <colspec colname="newCol3" colnum="3" colwidth="1*"/>
+                <colspec colname="c3" colnum="4" colwidth="1*"/>
+                <colspec colname="c4" colnum="5" colwidth="1*"/>
                 <thead>
                     <row>
-                        <entry>Host type</entry>
-                        <entry>Identifier</entry>
-                        <entry>IP</entry>
-                        <entry>Port</entry>
+                        <entry>Node type</entry>
+                        <entry>Docker ID</entry>
+                        <entry>Diagram name</entry>
+                        <entry>IP address</entry>
+                        <entry>TCP Port</entry>
                     </row>
                 </thead>
                 <tbody>
                     <row>
-                        <entry>
-                            <para>Directory authority</para>
+                        <entry morerows="2">
+                            <para><link linkend="intro-dirauth">Directory authority</link></para>
                         </entry>
                         <entry>auth1</entry>
-                        <entry>
-                            <para>127.0.0.1</para>
+                        <entry>Dirauth1</entry>
+                        <entry morerows="7">
+                            <para>127.0.0.1 (localhost)</para>
                         </entry>
                         <entry>
                             <para>30001</para>
                         </entry>
-                        <entry>
-                            <para/>
-                        </entry>
                     </row>
                     <row>
-                        <entry>
-                            <para>Directory authority</para>
-                        </entry>
                         <entry>
                             <para>auth2</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Dirauth 2</entry>
                         <entry>
                             <para>30002</para>
                         </entry>
-                        <entry>
-                            <para/>
-                        </entry>
                     </row>
                     <row>
-                        <entry>
-                            <para>Directory authority</para>
-                        </entry>
                         <entry>
                             <para>auth3</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Dirauth 3</entry>
                         <entry>
                             <para>30003</para>
                         </entry>
-                        <entry>
-                            <para/>
-                        </entry>
                     </row>
                     <row>
-                        <entry>Gateway node</entry>
+                        <entry><link linkend="intro-gateway">Gateway node</link></entry>
                         <entry>gateway1</entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Gateway node</entry>
                         <entry>30004</entry>
-                        <entry>
-                            <para/>
-                        </entry>
                     </row>
                     <row>
                         <entry>
-                            <para>Service  node</para>
+                            <para><link linkend="intro-service">Service node</link></para>
                         </entry>
                         <entry>
                             <para>servicenode1</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Service node</entry>
                         <entry>
                             <para>30006 </para>
                         </entry>
                     </row>
                     <row>
-                        <entry>
-                            <para>Mix node</para>
+                        <entry morerows="2">
+                            <para><link linkend="intro-mix">Mix node</link></para>
                         </entry>
                         <entry>
                             <para>mix1</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Layer 1 mix node</entry>
                         <entry>
                             <para>30008</para>
                         </entry>
                     </row>
                     <row>
                         <entry>
-                            <para>Mix node</para>
-                        </entry>
-                        <entry>
                             <para>mix2</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Layer 2 mix node</entry>
                         <entry>
                             <para>30010</para>
-                        </entry>
-                        <entry>
-                            <para/>
                         </entry>
                     </row>
                     <row>
                         <entry>
-                            <para>Mix node</para>
-                        </entry>
-                        <entry>
                             <para>mix3</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Layer 3 mix node</entry>
                         <entry>
                             <para>30012</para>
                         </entry>
