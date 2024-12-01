@@ -70,6 +70,10 @@
                 <para><ulink url="https://www.gnu.org/software/make/">GNU Make</ulink></para>
             </listitem>
             <listitem>
+                <para><ulink url="https://prometheus.io/docs/introduction/overview/"
+                        >Prometheus</ulink></para>
+            </listitem>
+            <listitem>
                 <para><ulink url="https://www.docker.com">Docker</ulink>, <ulink
                     url="https://docs.docker.com/compose/">Docker Compose</ulink>, and
                     (optionally) <ulink url="https://podman.io">Podman</ulink></para>
