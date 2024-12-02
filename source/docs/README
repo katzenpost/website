@@ -1,4 +1,27 @@
-***Notes on these documentation files***
+*** Notes on the documentation source files ***
+
+**************** BEGIN QUICKSTART ****************
+
+1. The document source files are here: 
+
+     ./source/docs/<project>/source/en/
+     
+2. If you edit a source file, please validate that it builds, as described below, before
+     checking it into Git. You can build PDFs and HTML trees using Pandoc and XMLlint. 
+
+3. Building
+
+     A. Build a PDF of a whole project:
+
+          $ xmllint --xinclude book.xml --output out.xml
+          $ pandoc -f docbook out.xml --toc --toc-depth=5 --pdf-engine lualatex -o out.pdf
+     
+     B. Build HTML of a whole project:
+
+          $ xmllint --xinclude book.xml --output out.xml
+          $ pandoc -s --highlight-style=tango -f docbook -t html out.xml -o out.html
+
+***************** END QUICKSTART *****************
 
 The XML files in this directory are components of a DocBook project. They can be read and
 edited using either a plain text editor or a dedicated XML editor. Dedicated editors
@@ -12,10 +35,9 @@ These may include file types such as PDF, EPUB, HTML, and many others. Eclipse i
 best-of-class FLOSS solution for processing DocBook.
 
 Transforms are typically carried out using XSLT files (which provide mapping between XML
-elements and elements native to other file types) and an executable. Common executables or
-executable frameworks include Pandoc, Saxon, and Ant. When manipulating these DocBook
-files, you are not constrained in selecting a transform method. Eclipse+Ant is merely
-offered as a default choice, and primarily for PDF.
+elements and elements native to other file types) and an executable such as Saxon. 
+Alternatively, with less flexibility but greater convenience, you can use Pandoc to 
+transform DocBook into many other file formats. 
 
 These DocBook XML files fall into three groups:
 
@@ -35,5 +57,3 @@ All of these components are assembled during a transform (i.e., a build). The de
 builds for Eclipse create target files for *each* of the *.XML files present in the project.
 This means that an Ant build creates a PDF for each constituent content file and also for
 the BOOK.XML file, which contains all of the content files as a single PDF.
-
-

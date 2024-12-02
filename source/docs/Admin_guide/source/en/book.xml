@@ -40,4 +40,6 @@
     <xi:include href="components.xml"></xi:include> 
 <!--    <xi:include href="operations.xml"></xi:include>-->
     <xi:include href="docker.xml"></xi:include>
+    <xi:include href="docker-config-appendix.xml"></xi:include>
+    <xi:include href="gensphinx-appendix.xml"></xi:include>
 </book> 

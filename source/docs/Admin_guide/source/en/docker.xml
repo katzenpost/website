@@ -675,6 +675,7 @@
 |   |---pigeonHole.19.log
 |   |---proxy.31.log
 |---voting_mixnet</programlisting>
+        <para>Examples of complete TOML configuration files are provided in <xref linkend="docker-config" endterm="docker-config.title"/>.</para>
     </section>
     
     
