@@ -1,63 +1,82 @@
-<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml version="1.0" encoding="UTF-8" ?> 
 
-<!--A DOCTYPE declaration declaring a DTD is not need for DocBook 5.x, which uses RelaxNG and  Schematron instead. It is used here as a container for entity declarations.-->
-
-<!DOCTYPE chapter 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
 [
-    <!ENTITY % shared-content SYSTEM "shared-content.ent">
+   <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
     %shared-content;
-]>
+<!-- 
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
+]> 
 
-<chapter xmlns="http://docbook.org/ns/docbook"
-    xmlns:xlink="http://www.w3.org/1999/xlink" 
-    version="5.1"
-    xml:id="container">
-    <title xml:id="container.title">Using the &program_name; Docker test network</title>    
+<chapter id="container">
+    <title id="container.title">Using the &program_name; Docker test network</title>    
     
-    <para>&program_name; provides a ready-to-deploy <link
-            xlink:href="https://github.com/katzenpost/katzenpost/tree/main/docker">Docker
-            image</link> for developers who need a non-production test environment for developing
-        and testing client applications. By running this image on a single computer, you avoid the
-        need to build and manage a complex multi-node mix net. The image can also be run using <link
-            xlink:href="https://podman.io/">Podman</link></para>
+    <para>&program_name; provides a ready-to-deploy Docker
+            image for developers who need a non-production test environment for developing
+        and testing client applications and server side plugins. By running this image on a single computer, you avoid the
+        need to build and manage a complex multi-node mix net. The image can also be run using <ulink url="https://podman.io/">Podman</ulink></para>
     <para>The test mix network includes the following components:</para>
     <itemizedlist>
         <listitem>
-            <para>Three directory authority (<link
-                xlink:href="https://katzenpost.network/docs/specs/pki/">PKI</link>) nodes</para>
+            <para>Three directory authority (<ulink
+                url="https://katzenpost.network/docs/specs/pki/">PKI</ulink>) nodes</para>
         </listitem>
         <listitem>
-            <para>Six <link xlink:href="https://katzenpost.network/docs/specs/mixnet/">mix</link> nodes,
+            <para>Six <ulink url="https://katzenpost.network/docs/specs/mixnet/">mix</ulink> nodes,
                 including one node serving also as both gateway and service provider</para>
         </listitem>
         <listitem>
-            <para>A ping utility</para>
+            <para>A ping utility, <command>run-ping</command></para>
         </listitem>
     </itemizedlist>
     
-    <section xml:id="requirements">         
-        <title xml:id="requirements.title">Requirements</title>
+    <section id="requirements">         
+        <title id="requirements.title">Requirements</title>
         <para>Before running the &program_name; docker image, make sure that the
             following<?oxy_comment_start author="dwrob" timestamp="20240607T121424-0700" comment="Add minimum hardware specs?"?>
             software<?oxy_comment_end?> is installed. </para>
         <itemizedlist>
             <listitem>
-                <para>A <link xlink:href="https://debian.org">Debian GNU Linux</link> or <link
-                    xlink:href="https://ubuntu.com">Ubuntu</link> system</para>
+                <para>A <ulink url="https://debian.org">Debian GNU Linux</ulink> or <ulink
+                    url="https://ubuntu.com">Ubuntu</ulink> system</para>
             </listitem>
             <listitem>
-                <para><link xlink:href="https://git-scm.com/">Git</link></para>
+                <para><ulink url="https://git-scm.com/">Git</ulink></para>
             </listitem>
             <listitem>
-                <para><link xlink:href="https://go.dev/">Go</link></para>
+                <para><ulink url="https://go.dev/">Go</ulink></para>
             </listitem>
             <listitem>
-                <para><link xlink:href="https://www.gnu.org/software/make/">GNU Make</link></para>
+                <para><ulink url="https://www.gnu.org/software/make/">GNU Make</ulink></para>
             </listitem>
             <listitem>
-                <para><link xlink:href="https://www.docker.com">Docker</link>, <link
-                    xlink:href="https://docs.docker.com/compose/">Docker Compose</link>, and
-                    (optionally) <link xlink:href="https://podman.io">Podman</link></para>
+                <para><ulink url="https://prometheus.io/docs/introduction/overview/"
+                        >Prometheus</ulink></para>
+            </listitem>
+            <listitem>
+                <para><ulink url="https://www.docker.com">Docker</ulink>, <ulink
+                    url="https://docs.docker.com/compose/">Docker Compose</ulink>, and
+                    (optionally) <ulink url="https://podman.io">Podman</ulink></para>
                 <note>
                     <para>If both Docker and Podman are present on your system, &program_name; uses
                         Podman. Podman is a drop-in daemonless equivalent to Docker that does not
@@ -69,27 +88,27 @@
             (running as superuser). <command>Apt</command> will pull in the needed
             dependencies.</para>
         <programlisting><prompt># </prompt><command>apt update</command>
-            <prompt># </prompt><command>apt install git golang make docker docker-compose podman</command></programlisting>       
+<prompt># </prompt><command>apt install git golang make docker docker-compose podman</command></programlisting>       
     </section>   
-    <section xml:id="install_kp">
-        <title xml:id="install_kp.title">Preparing to run the container image</title>
+    <section id="install_kp">
+        <title id="install_kp.title">Preparing to run the container image</title>
         <para>Complete the following procedure to obtain, build, and deploy the &program_name; test
             network. </para>
         <procedure>
             <step>
-                <para>Install the &program_name; code repository, hosted at <link
-                        xlink:href="https://github.com/katzenpost"/>. The main &program_name;
+                <para>Install the &program_name; code repository, hosted at <ulink
+                    url="https://github.com/katzenpost"/>. The main &program_name;
                     repository contains code for the server components as well as the docker image.
                     Clone the repository with the following command (your directory location may
                     vary):</para>
                 <programlisting><prompt>~$ </prompt><command>git clone https://github.com/katzenpost/katzenpost.git</command></programlisting>
             </step>
             <step>
-                <para>Navigate to the new <filename>katzenpost</filename> subdirectory and
-                    ensure that the code is up to date.
+                <para>Navigate to the new <filename>katzenpost</filename> subdirectory and ensure
+                    that the code is up to date.
                     <programlisting><prompt>~$ </prompt><command>cd katzenpost</command>
-                        <prompt>~/katzenpost$ </prompt><command>git checkout main</command>
-                        <prompt>~/katzenpost$ </prompt><command>git pull</command></programlisting></para>
+<prompt>~/katzenpost$ </prompt><command>git checkout main</command>
+<prompt>~/katzenpost$ </prompt><command>git pull</command></programlisting></para>
             </step>
             <step>
                 <para>(Optional) Create a development branch and check it
@@ -106,28 +125,24 @@
                     <step>
                         <para> Set up and start the Podman server (as superuser).</para>
                         <programlisting><prompt>$ </prompt><command>podman system service -t 0 $DOCKER_HOST &amp;</command>
-                            <prompt>$ </prompt><command>systemctl --user enable --now podman.socket</command>
+<prompt>$ </prompt><command>systemctl --user enable --now podman.socket</command>
                         </programlisting>
                     </step>
                 </procedure>
             </step>
         </procedure>        
     </section>           
-    <section xml:id="basic-ops">
-        <title xml:id="basic-ops.title">Operating the test mixnet</title>
+    <section id="basic-ops">
+        <title id="basic-ops.title">Operating the test mixnet</title>
         <para>Navigate to <filename>katzenpost/docker</filename>. The <filename>Makefile</filename>
             contains target operations to create, manage, and test the self-contained &program_name;
             container network. To invoke a target, run a command with the using the following
             pattern:</para>
         <programlisting> <prompt>~/katzenpost/docker$ </prompt><command>make<replaceable> target</replaceable></command></programlisting>
         <para>Running <command>make</command> with no target specified returns a list of available
-            targets.:</para>
-        <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+            targets.</para>
         <table>
-            <?oxy_comment_start author="dwrob" timestamp="20240612T164030-0700" comment="Each of the targets needs a non-trivial description, including an explanation of when you would use it and why.
-                
-                Also note suggested edits."?>
-            <title>Makefile targets<?oxy_comment_end?></title>
+            <title>Table 1: Makefile targets</title>
             <tgroup cols="2">
                 <tbody>
                     <row>
@@ -140,24 +155,10 @@
                     </row>
                     <row>
                         <entry>
-                            <para><emphasis role="bold">run</emphasis></para>
-                        </entry>
-                        <?oxy_comment_start author="dwrob" timestamp="20240614T163648-0700" comment="https://github.com/katzenpost/katzenpost/blob/main/docker/Makefile
-                            
-                            These run commands are backwards.
-                            
-                            They also should be given less ambiguous names, maybe run-background and run-foreground."?>
-                        <entry>
-                            <para>Run the test network in the background.</para>
-                        </entry><?oxy_comment_end?>
-                    </row>
-                    <row>
-                        <entry>
                             <para><emphasis role="bold">start</emphasis></para>
                         </entry>
                         <entry>
-                            <para>Run the test network in the foreground until
-                                <command>Ctrl-C</command>.</para>
+                            <para>Run the test network in the background.</para>
                         </entry>
                     </row>
                     <row>
@@ -173,8 +174,7 @@
                             <para><emphasis role="bold">wait</emphasis></para>
                         </entry>
                         <entry>
-                            <para><?oxy_comment_start author="dwrob" timestamp="20240614T163316-0700" comment="What is the difference between doing this and not doing this? Is something gated by it?"?>Wait
-                                for the test network to have consensus.<?oxy_comment_end?></para>
+                            <para>Wait for the test network to have consensus.</para>
                         </entry>
                     </row>
                     <row>
@@ -215,11 +215,10 @@
                     </row>
                     <row>
                         <entry>
-                            <para><emphasis role="bold"
-                                ><?oxy_comment_start author="dwrob" timestamp="20240614T172928-0700" comment="These description names could be clearer. &quot;Local&quot; doesn&apos;t say much to me, and the &quot;clean&quot; should probably be &quot;clean-all&quot;, with an explanationof what &quot;all&quot; means."?>clean-local<?oxy_comment_end?></emphasis></para>
+                            <para><emphasis role="bold">clean-local</emphasis></para>
                         </entry>
                         <entry>
-                            <para>Stop all components, delete binaries, and delete data..</para>
+                            <para>Stop all components, delete binaries, and delete data.</para>
                         </entry>
                     </row>
                     <row>
@@ -235,30 +234,37 @@
                             <para><emphasis role="bold">clean</emphasis></para>
                         </entry>
                         <entry>
-                            <para>The above, plus cleans includes
-                                <?oxy_comment_start author="dwrob" timestamp="20240614T172951-0700" comment="We need to explain what this is."?>go_deps
-                                image<?oxy_comment_end?>.</para>
+                            <para>Same as <emphasis role="bold">clean-local</emphasis>, but also
+                                deletes <code>go_deps</code> image.</para>
                         </entry>
                     </row>
                 </tbody>
-            </tgroup><?oxy_custom_end?>
+            </tgroup>
         </table>
-        <section xml:id="start-mixnet">
-            <title xml:id="start-mixnet.title">Starting and monitoring the mixnet</title>
-            <para>Either of two command targets, <command>run</command> and
-                <command>start</command>, can be used to start the mix network. The first They
-                differ only in that <command>start</command> quickly detaches and runs the network
-                in the background, while <command>run</command> runs the network in the foreground. </para>
+        <section id="start-mixnet">
+            <title id="start-mixnet.title">Starting and monitoring the mixnet</title>
+            <para>The first time that you run <command>make start</command>, the Docker image is
+                downloaded, built, installed, and started. This takes several minutes. When the
+                build is complete, the command exits while the network remains running in the
+                background.</para>
+            <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make start</command></programlisting>
+            <para>Subsequent runs of <command>make start</command> either start or restart the
+                network without building the components from scratch. The exception to this is when
+                you delete any of the &program_name; binaries (dirauth.alpine, server.alpine, etc.).
+                In that case, <command>make start</command> rebuilds just the parts of the network
+                dependent on the deleted binary. For more information about the files created during
+                the Docker build, see <xref linkend="topology"/>.</para>
+            <para/>
             <note>
-                <para>When running <command>run</command> or <command>start</command> , be aware of
-                    the following considerations:</para>
+                <para>When running <command>make start</command> , be aware of the following
+                    considerations:</para>
                 <itemizedlist>
                     <listitem>
                         <para>If you intend to use Docker, you need to run <command>make</command>
                             as superuser. If you are using <command>sudo</command> to elevate your
                             privileges, you need to edit
-                            <filename>katzenpost/docker/Makefile</filename> to prepend
-                            <command>sudo</command> to each command contained in it.</para>
+                                <filename>katzenpost/docker/Makefile</filename> to prepend
+                                <command>sudo</command> to each command contained in it.</para>
                     </listitem>
                     <listitem>
                         <para>If you have Podman installed on your system and you nonetheless want
@@ -268,67 +274,63 @@
                     </listitem>
                 </itemizedlist>
             </note>
-            <para>The first time that you use the <command>start</command> target,
-                the docker image will be downloaded, built, and installed. This takes several
-                minutes. </para>
+            <para>After the <command>make start</command> command exits, the mixnet runs in the
+                background, and you can run <command>make watch</command> to display a live log of
+                the network activity.</para>
             <para>
-                <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make start</command>
-                    ...
-                    <prompt>~/katzenpost/docker$ </prompt><command>make watch</command>
-                    ...
-                    &lt;output&gt;
-                    ...</programlisting>
+                <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make watch</command>
+    ...
+    &lt;output&gt;
+    ...</programlisting>
             </para>
-            <para>Once installation is complete, there is a further delay as the mix servers vote
-                and reach a consensus. You can use the <command>wait</command> target
-                to wait for the mixnet to get consensus and be ready to use. This can also take
-                several minutes:</para>
-
+            <para>When installation is complete, the mix servers vote and reach a consensus. You can
+                use the <command>wait</command> target to wait for the mixnet to get consensus and
+                be ready to use. This can also take several minutes:</para>
             <para>
                 <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make wait</command>
-                    ...
-                    &lt;output&gt;
-                    ...</programlisting>
+    ...
+    &lt;output&gt;
+    ...</programlisting>
             </para>
             <para>You can confirm that installation and configuration are complete by issuing the
-                <command>status</command> command from the same or another terminal. When the
+                    <command>status</command> command from the same or another terminal. When the
                 network is ready for use, <command>status</command> begins returning consensus
                 information similar to the following:</para>
             <para>
                 <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make status</command>
-                    ...
-                    00:15:15.003 NOTI state: Consensus made for epoch 1851128 with 3/3 signatures: &amp;{Epoch: 1851128 GenesisEpoch: 1851118
-                    ...</programlisting>
+    ...
+    00:15:15.003 NOTI state: Consensus made for epoch 1851128 with 3/3 signatures: &amp;{Epoch: 1851128 GenesisEpoch: 1851118
+    ...</programlisting>
             </para>
         </section>
-        <section xml:id="test-mixnet">
-            <title xml:id="test-mixnet.title">Testing the mixnet</title>
+        <section id="test-mixnet">
+            <title id="test-mixnet.title">Testing the mixnet</title>
             <para>At this point, you should have a locally running mix network. You can test whether
-                it is working correctly by using <command>ping</command>, which launches a packet
-                into the network and watches for a successful reply. Run the following
+                it is working correctly by using <command>run-ping</command>, which launches a
+                packet into the network and watches for a successful reply. Run the following
                 command:<programlisting><prompt>~/katzenpost/docker$ </prompt><command>make run-ping</command></programlisting></para>
             <para>If the network is functioning properly, the resulting output contains lines
                 similar to the following:</para>
             <programlisting>19:29:53.541 INFO gateway1_client: sending loop decoy
-                !19:29:54.108 INFO gateway1_client: sending loop decoy
-                19:29:54.632 INFO gateway1_client: sending loop decoy
-                19:29:55.160 INFO gateway1_client: sending loop decoy
-                !19:29:56.071 INFO gateway1_client: sending loop decoy
-                !19:29:59.173 INFO gateway1_client: sending loop decoy
-                !Success rate is 100.000000 percent 10/10)</programlisting>
-            <para>lf <command>ping</command> fails to receive a reply, it eventually times out with
-                an error message. If this happens, try the command again. </para>
+    !19:29:54.108 INFO gateway1_client: sending loop decoy
+    19:29:54.632 INFO gateway1_client: sending loop decoy
+    19:29:55.160 INFO gateway1_client: sending loop decoy
+    !19:29:56.071 INFO gateway1_client: sending loop decoy
+    !19:29:59.173 INFO gateway1_client: sending loop decoy
+    !Success rate is 100.000000 percent 10/10)</programlisting>
+            <para>lf <command>run-ping</command> fails to receive a reply, it eventually times out
+                with an error message. If this happens, try the command again. </para>
             <note>
-                <para>If you attempt use <emphasis role="bold">ping</emphasis> too quickly after
+                <para>If you attempt use <emphasis role="bold">run-ping</emphasis> too quickly after
                     starting the mixnet, and consensus has not been reached, the utility may crash
                     with an error message or hang indefinitely. If this happens, issue (if
                     necessary) a <command>Ctrl-C</command> key sequence to abort, check the
                     consensus status with the <command>status</command> command, and then retry
-                    <command>ping</command>.</para>
+                        <command>run-ping</command>.</para>
             </note>
         </section>
-        <section xml:id="shutdown-mixnet">
-            <title xml:id="shutdown-mixnet.title">Shutting down the mixnet</title>
+        <section id="shutdown-mixnet">
+            <title id="shutdown-mixnet.title">Shutting down the mixnet</title>
             <para>The mix network continues to run in the terminal where you started it until you
                 issue a <command>Ctrl-C</command> key sequence, or until you issue the following
                 command in another terminal:</para>
@@ -336,271 +338,353 @@
             <para>When you stop the network, the binaries and data are left in place. This allows
                 for a quick restart.</para>
         </section>
-        <section xml:id="uninstall-mixnet">
-            <title xml:id="uninstall-mixnet.title">Uninstalling and cleaning up</title>
+        <section id="uninstall-mixnet">
+            <title id="uninstall-mixnet.title">Uninstalling and cleaning up</title>
             <para>Several command targets can be used to uninstall the Docker image and restore your
                 system to a clean state. The following examples demonstrate the commands and their
                 output.</para>
             <itemizedlist>
                 <listitem>
-                    <para><command><?oxy_comment_start author="dwrob" timestamp="20240628T130504-0700" comment="*make clean* requires superuser privileges. That seems strange since I installed via podman without elevated privileges. Is this a bug?  The problems seems to be with cache and code repo files."?>clean-bin<?oxy_comment_end?></command></para>
+                    <para><command>clean-bin</command></para>
                     <para>To stop the network and delete the compiled binaries, run the following
                         command:</para>
                     <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make clean-bin</command>
-                        
-                        [ -e voting_mixnet ] &amp;&amp; cd voting_mixnet &amp;&amp; DOCKER_HOST=unix:///run/user/1000/podman/podman.sock docker-compose down --remove-orphans; rm -fv running.stamp
-                        Stopping voting_mixnet_auth3_1        ... done
-                        Stopping voting_mixnet_servicenode1_1 ... done
-                        Stopping voting_mixnet_metrics_1      ... done
-                        Stopping voting_mixnet_mix3_1         ... done
-                        Stopping voting_mixnet_auth2_1        ... done
-                        Stopping voting_mixnet_mix2_1         ... done
-                        Stopping voting_mixnet_gateway1_1     ... done
-                        Stopping voting_mixnet_auth1_1        ... done
-                        Stopping voting_mixnet_mix1_1         ... done
-                        Removing voting_mixnet_auth3_1        ... done
-                        Removing voting_mixnet_servicenode1_1 ... done
-                        Removing voting_mixnet_metrics_1      ... done
-                        Removing voting_mixnet_mix3_1         ... done
-                        Removing voting_mixnet_auth2_1        ... done
-                        Removing voting_mixnet_mix2_1         ... done
-                        Removing voting_mixnet_gateway1_1     ... done
-                        Removing voting_mixnet_auth1_1        ... done
-                        Removing voting_mixnet_mix1_1         ... done
-                        removed 'running.stamp'
-                        rm -vf ./voting_mixnet/*.alpine
-                        removed './voting_mixnet/echo_server.alpine'
-                        removed './voting_mixnet/fetch.alpine'
-                        removed './voting_mixnet/memspool.alpine'
-                        removed './voting_mixnet/panda_server.alpine'
-                        removed './voting_mixnet/pigeonhole.alpine'
-                        removed './voting_mixnet/ping.alpine'
-                        removed './voting_mixnet/reunion_katzenpost_server.alpine'
-                        removed './voting_mixnet/server.alpine'
-                        removed './voting_mixnet/voting.alpine'</programlisting>
+    
+    [ -e voting_mixnet ] &amp;&amp; cd voting_mixnet &amp;&amp; DOCKER_HOST=unix:///run/user/1000/podman/podman.sock docker-compose down --remove-orphans; rm -fv running.stamp
+    Stopping voting_mixnet_auth3_1        ... done
+    Stopping voting_mixnet_servicenode1_1 ... done
+    Stopping voting_mixnet_metrics_1      ... done
+    Stopping voting_mixnet_mix3_1         ... done
+    Stopping voting_mixnet_auth2_1        ... done
+    Stopping voting_mixnet_mix2_1         ... done
+    Stopping voting_mixnet_gateway1_1     ... done
+    Stopping voting_mixnet_auth1_1        ... done
+    Stopping voting_mixnet_mix1_1         ... done
+    Removing voting_mixnet_auth3_1        ... done
+    Removing voting_mixnet_servicenode1_1 ... done
+    Removing voting_mixnet_metrics_1      ... done
+    Removing voting_mixnet_mix3_1         ... done
+    Removing voting_mixnet_auth2_1        ... done
+    Removing voting_mixnet_mix2_1         ... done
+    Removing voting_mixnet_gateway1_1     ... done
+    Removing voting_mixnet_auth1_1        ... done
+    Removing voting_mixnet_mix1_1         ... done
+    removed 'running.stamp'
+    rm -vf ./voting_mixnet/*.alpine
+    removed './voting_mixnet/echo_server.alpine'
+    removed './voting_mixnet/fetch.alpine'
+    removed './voting_mixnet/memspool.alpine'
+    removed './voting_mixnet/panda_server.alpine'
+    removed './voting_mixnet/pigeonhole.alpine'
+    removed './voting_mixnet/ping.alpine'
+    removed './voting_mixnet/reunion_katzenpost_server.alpine'
+    removed './voting_mixnet/server.alpine'
+    removed './voting_mixnet/voting.alpine'</programlisting>
                     <para>This command leaves in place the cryptographic keys, the state data, and
                         the logs.</para>
                 </listitem>
                 <listitem>
-                    <para><command><?oxy_comment_start author="dwrob" timestamp="20240628T130750-0700" comment="I need more description of what this is removing.  Run/start still very quickly start the network after this clean operation."?>clean-local<?oxy_comment_end?></command></para>
+                    <para><command>clean-local-dryrun</command></para>
+                    <para>To diplay a preview of what <command>clean-local</command> would remove,
+                        without actually deleting anything, run the following command:</para>
+                    <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make clean-local-dryrun</command></programlisting>
+                </listitem>
+                <listitem>
+                    <para><command>clean-local</command></para>
                     <para>To delete both compiled binaries and data, run the following
                         command:</para>
                     <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make clean-local</command>
                         
-                        [ -e voting_mixnet ] &amp;&amp; cd voting_mixnet &amp;&amp; DOCKER_HOST=unix:///run/user/1000/podman/podman.sock docker-compose down --remove-orphans; rm -fv running.stamp
-                        Removing voting_mixnet_mix2_1         ... done
-                        Removing voting_mixnet_auth1_1        ... done
-                        Removing voting_mixnet_auth2_1        ... done
-                        Removing voting_mixnet_gateway1_1     ... done
-                        Removing voting_mixnet_mix1_1         ... done
-                        Removing voting_mixnet_auth3_1        ... done
-                        Removing voting_mixnet_mix3_1         ... done
-                        Removing voting_mixnet_servicenode1_1 ... done
-                        Removing voting_mixnet_metrics_1      ... done
-                        removed 'running.stamp'
-                        rm -vf ./voting_mixnet/*.alpine
-                        removed './voting_mixnet/echo_server.alpine'
-                        removed './voting_mixnet/fetch.alpine'
-                        removed './voting_mixnet/memspool.alpine'
-                        removed './voting_mixnet/panda_server.alpine'
-                        removed './voting_mixnet/pigeonhole.alpine'
-                        removed './voting_mixnet/reunion_katzenpost_server.alpine'
-                        removed './voting_mixnet/server.alpine'
-                        removed './voting_mixnet/voting.alpine'
-                        git clean -f -x voting_mixnet
-                        Removing voting_mixnet/
-                        git status .
-                        On branch main
-                        Your branch is up to date with 'origin/main'.</programlisting>
+    [ -e voting_mixnet ] &amp;&amp; cd voting_mixnet &amp;&amp; DOCKER_HOST=unix:///run/user/1000/podman/podman.sock docker-compose down --remove-orphans; rm -fv running.stamp
+    Removing voting_mixnet_mix2_1         ... done
+    Removing voting_mixnet_auth1_1        ... done
+    Removing voting_mixnet_auth2_1        ... done
+    Removing voting_mixnet_gateway1_1     ... done
+    Removing voting_mixnet_mix1_1         ... done
+    Removing voting_mixnet_auth3_1        ... done
+    Removing voting_mixnet_mix3_1         ... done
+    Removing voting_mixnet_servicenode1_1 ... done
+    Removing voting_mixnet_metrics_1      ... done
+    removed 'running.stamp'
+    rm -vf ./voting_mixnet/*.alpine
+    removed './voting_mixnet/echo_server.alpine'
+    removed './voting_mixnet/fetch.alpine'
+    removed './voting_mixnet/memspool.alpine'
+    removed './voting_mixnet/panda_server.alpine'
+    removed './voting_mixnet/pigeonhole.alpine'
+    removed './voting_mixnet/reunion_katzenpost_server.alpine'
+    removed './voting_mixnet/server.alpine'
+    removed './voting_mixnet/voting.alpine'
+    git clean -f -x voting_mixnet
+    Removing voting_mixnet/
+    git status .
+    On branch main
+    Your branch is up to date with 'origin/main'.</programlisting>
                 </listitem>
                 <listitem>
-                    <para><command><?oxy_comment_start author="dwrob" timestamp="20240628T130820-0700" comment="Again, I need a fuller inventory. I see that a lot of repo code is removed, and the cache. We could be more descriptive. Also, as noted, there is something weird with permissions needed for this command.. It makes no sense that I can set the testnet up as a reegular user, but I need to be root to remove it"?>clean<?oxy_comment_end?></command></para>
+                    <para><command>clean</command></para>
                     <para>To stop the the network and delete the binaries, the data, and the go_deps
                         image, run the following command as superuser: </para>
                     <programlisting><prompt>~/katzenpost/docker$ </prompt><command>sudo make clean</command></programlisting>
                 </listitem>
-                <listitem>
-                    <para><command>clean-local-dryrun</command></para>
-                    <para/>
-                    <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make clean-local-dryrun</command>
-                        git clean -n -x voting_mixnet
-                        Would remove voting_mixnet/</programlisting>
-                    <para/>
-                </listitem>
             </itemizedlist>
-            <para/>
-            <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make clean</command></programlisting>
-            <para>For a preview of the components that <command>clean-local</command> would remove,
-                without actually deleting anything, running <command>clean-local-dryrun</command>
-                generates output as follows:</para>
         </section>
     </section>
-    <section xml:id="topology">
-        <title xml:id="topology.title">Network components and topology</title>
-        <para>There needs to be an interpretation of this diagram. including the ways that the
-            testnet differs from production network.</para>
+    <section id="topology">
+        <title id="topology.title">Network topology and components</title>
+        <para>The Docker image deploys a working mixnet with all components and component groups
+            needed to perform essential mixnet functions: </para>
+        <itemizedlist>
+            <listitem>
+                <para>message mixing (including packet reordering, timing randomization, injection
+                    of decoy traffic, obfuscation of senders and receivers, and so on)</para>
+            </listitem>
+            <listitem>
+                <para>service provisioning</para>
+            </listitem>
+            <listitem>
+                <para>internal authentication and integrity monitoring</para>
+            </listitem>
+            <listitem>
+                <para>interfacing with external clients</para>
+            </listitem>
+        </itemizedlist>
+        <warning>
+            <para>While suited for client development and testing, the test mixnet omits performance
+                and security redundancies. <emphasis>Do not use it in production.</emphasis></para>
+        </warning>
+        <para>The following diagram illustrates the components and their network interactions. The
+            gray blocks represent nodes, and the arrows represent information transfer. </para>
         <figure>
             <title>Test network topology</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="images/katzenpost-docker-net-4.png"  scale="75"/>
+                    <imagedata fileref="pix/katzenpost-docker.png" scale="75"/>
                 </imageobject>
             </mediaobject>
         </figure>
-        <para>Discuss how to view these components, where their configuration files are, etc.</para>
+        <para>On the left, the <emphasis role="bold">Client</emphasis> transmits a message (shown by
+            purple arrows) through the <emphasis role="bold">Gateway node</emphasis>, across three
+                <emphasis role="bold">mix node</emphasis> layers, to the <emphasis role="bold"
+                >Service node</emphasis>. The <emphasis role="bold">Service node</emphasis>
+            processes the request and responds with a reply (shown by the green arrows) that
+            traverses the <emphasis role="bold">mix node</emphasis> layers before exiting the mixnet
+            via the <emphasis role="bold">Gateway node</emphasis> and arriving at the <emphasis
+                role="bold">Client</emphasis>.</para>
+        <para>On the right, directory authorities <emphasis role="bold">Dirauth 1</emphasis>,
+                <emphasis role="bold">Dirauth 2</emphasis>, and <emphasis role="bold">Dirauth
+                3</emphasis> provide PKI services. The directory authorities receive <emphasis
+                role="bold">mix descriptors</emphasis> from the other nodes, collate these into a
+                <emphasis role="bold">consensus document</emphasis> containing validated network
+            status and authentication materials , and make that available to the other nodes. </para>
+        <para>The elements in the topology diagram map to the mixnet's component nodes as shown in
+            the following table. Note that all nodes share the same IP address (127.0.0.1, i.e.,
+            localhost), but are accessed through different ports. Each node type links to additional
+            information in <xref linkend="components" endterm="components.title"/>.</para>
         <table frame="all">
-            <title><?oxy_comment_start author="dwrob" timestamp="20240617T174147-0700" comment="I will define/describe each of these component types in a separate section, because they are general and not specific to the testnet. These host types will be linked to that.
-                
-                [Update: Deferring discussion of Spool.DB and User.DB until documentations for indivdual components; not relevant for Docker image. These DBs live on the Gateway host.]
-                
-                [Update: adding gateway host.]"?>Network hosts<?oxy_comment_end?></title>
+            <title>Table 2: Test mixnet hosts</title>
             <tgroup cols="5">
                 <colspec colname="c1" colnum="1" colwidth="1*"/>
                 <colspec colname="c2" colnum="2" colwidth="1*"/>
-                <colspec colname="c3" colnum="3" colwidth="1*"/>
-                <colspec colname="c4" colnum="4" colwidth="1*"/>
-                <colspec colname="newCol8" colnum="5" colwidth="1*"/>
+                <colspec colname="newCol3" colnum="3" colwidth="1*"/>
+                <colspec colname="c3" colnum="4" colwidth="1*"/>
+                <colspec colname="c4" colnum="5" colwidth="1*"/>
                 <thead>
                     <row>
-                        <entry>Host type</entry>
-                        <entry>Identifier</entry>
-                        <entry>IP</entry>
-                        <entry>Port</entry>
-                        <entry>Panda</entry>
+                        <entry>Node type</entry>
+                        <entry>Docker ID</entry>
+                        <entry>Diagram label</entry>
+                        <entry>IP address</entry>
+                        <entry>TCP port</entry>
                     </row>
                 </thead>
                 <tbody>
                     <row>
-                        <entry>
-                            <para>Directory authority</para>
+                        <entry morerows="2">
+                            <para><link linkend="intro-dirauth">Directory authority</link></para>
                         </entry>
                         <entry>auth1</entry>
-                        <entry>
-                            <para>127.0.0.1</para>
+                        <entry>Dirauth1</entry>
+                        <entry morerows="7">
+                            <para>127.0.0.1 (localhost)</para>
                         </entry>
                         <entry>
                             <para>30001</para>
                         </entry>
-                        <entry>
-                            <para/>
-                        </entry>
                     </row>
                     <row>
-                        <entry>
-                            <para>Directory authority</para>
-                        </entry>
                         <entry>
                             <para>auth2</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Dirauth 2</entry>
                         <entry>
                             <para>30002</para>
                         </entry>
-                        <entry>
-                            <para/>
-                        </entry>
                     </row>
                     <row>
-                        <entry>
-                            <para>Directory authority</para>
-                        </entry>
                         <entry>
                             <para>auth3</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Dirauth 3</entry>
                         <entry>
                             <para>30003</para>
                         </entry>
-                        <entry>
-                            <para/>
-                        </entry>
                     </row>
                     <row>
-                        <entry>Gateway node</entry>
+                        <entry><link linkend="intro-gateway">Gateway node</link></entry>
                         <entry>gateway1</entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Gateway node</entry>
                         <entry>30004</entry>
-                        <entry>
-                            <para/>
-                        </entry>
                     </row>
                     <row>
                         <entry>
-                            <para>Service  node</para>
+                            <para><link linkend="intro-service">Service node</link></para>
                         </entry>
                         <entry>
                             <para>servicenode1</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Service node</entry>
                         <entry>
                             <para>30006 </para>
                         </entry>
-                        <entry>
-                            <para>✓</para>
-                        </entry>
                     </row>
                     <row>
-                        <entry>
-                            <para>Mix node</para>
+                        <entry morerows="2">
+                            <para><link linkend="intro-mix">Mix node</link></para>
                         </entry>
                         <entry>
                             <para>mix1</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Layer 1 mix node</entry>
                         <entry>
                             <para>30008</para>
                         </entry>
-                        <entry>
-                            <para/>
-                        </entry>
                     </row>
                     <row>
-                        <entry>
-                            <para>Mix node</para>
-                        </entry>
                         <entry>
                             <para>mix2</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Layer 2 mix node</entry>
                         <entry>
                             <para>30010</para>
-                        </entry>
-                        <entry>
-                            <para/>
                         </entry>
                     </row>
                     <row>
                         <entry>
-                            <para>Mix node</para>
-                        </entry>
-                        <entry>
                             <para>mix3</para>
                         </entry>
-                        <entry>
-                            <para>127.0.0.1</para>
-                        </entry>
+                        <entry>Layer 3 mix node</entry>
                         <entry>
                             <para>30012</para>
-                        </entry>
-                        <entry>
-                            <para/>
                         </entry>
                     </row>
                 </tbody>
             </tgroup>
         </table>
+        <section>
+            <title>The Docker file tree</title>
+            <para>The following <ulink
+                    url="https://manpages.debian.org/bookworm/tree/tree.1.en.html">tree</ulink>
+                output shows the location, relative to the <filename>katzenpost</filename>
+                repository root, of the files created by the Docker build. During testing and use,
+                you would normally touch only the TOML configuration file associated with each node,
+                as highlighted in the listing. For help in understanding these files and a complete
+                list of configuration options, follow the links in <guilabel>Table 2: Test mixnet
+                    hosts</guilabel>.</para>
+        </section>
+    </section>
+    <section>
+        <programlisting>katzenpost/docker/voting_mixnet/
+|---<emphasis role="bold">auth1</emphasis>
+|   |---<emphasis role="bold">authority.toml</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---link.private.pem
+|   |---link.public.pem
+|   |---persistence.db
+|---<emphasis role="bold">auth2</emphasis>
+|   |---<emphasis role="bold">authority.toml</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---link.private.pem
+|   |---link.public.pem
+|   |---persistence.db
+|---<emphasis role="bold">auth3</emphasis>
+|   |---<emphasis role="bold">authority.toml</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---link.private.pem
+|   |---link.public.pem
+|   |---persistence.db
+|---client
+|   |---client.toml
+|---client2
+|   |---client.toml
+|---dirauth.alpine
+|---docker-compose.yml
+|---echo_server.alpine
+|---fetch.alpine
+|---<emphasis role="bold">gateway1</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---<emphasis role="bold">katzenpost.toml</emphasis>
+|   |---link.private.pem
+|   |---link.public.pem
+|   |---management_sock
+|   |---spool.db
+|   |---users.db
+|---memspool.alpine
+|---<emphasis role="bold">mix1</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---<emphasis role="bold">katzenpost.toml</emphasis>
+|   |---link.private.pem
+|   |---link.public.pem
+|---<emphasis role="bold">mix2</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---<emphasis role="bold">katzenpost.toml</emphasis>
+|   |---link.private.pem
+|   |---link.public.pem
+|---<emphasis role="bold">mix3</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---<emphasis role="bold">katzenpost.toml</emphasis>
+|   |---link.private.pem
+|   |---link.public.pem
+|---panda_server.alpine
+|---pigeonhole.alpine
+|---ping.alpine
+|---prometheus.yml
+|---proxy_client.alpine
+|---proxy_server.alpine
+|---running.stamp
+|---server.alpine
+|---<emphasis role="bold">servicenode1</emphasis>
+|   |---identity.private.pem
+|   |---identity.public.pem
+|   |---katzenpost.log
+|   |---<emphasis role="bold">katzenpost.toml</emphasis>
+|   |---link.private.pem
+|   |---link.public.pem
+|   |---management_sock
+|   |---map.storage
+|   |---memspool.13.log
+|   |---memspool.storage
+|   |---panda.25.log
+|   |---panda.storage
+|   |---pigeonHole.19.log
+|   |---proxy.31.log
+|---voting_mixnet</programlisting>
+        <para>Examples of complete TOML configuration files are provided in <xref
+                linkend="docker-config" endterm="docker-config.title"/>.</para>
     </section>
     
     

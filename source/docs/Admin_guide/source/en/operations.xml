@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
+[
+   <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
+    %shared-content;
+<!-- 
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
+]> 
+
+<chapter id="ops">
+    <title id="ops.title">Running and managing &program_name;</title>
+    <para/>
+    <para>
+        <itemizedlist>
+            <listitem>
+                <para><emphasis role="bold">Management</emphasis></para>
+                <para>TODO: write description of new "Management" feature making it easy to
+                    install/restart service plugins without restarting whole mix net ... management
+                    socket for restarting services without restarting the service node</para>
+            </listitem>
+            <listitem>
+                <para><emphasis role="bold">Production vs. docker test mix network</emphasis></para>
+                <para>Currently our Epoch duration is hardcoded to 20 minutes. The docker test mix
+                    network uses an Epoch duration of 2 minutes and this setting is known a "warped
+                    epoch". In the future we'll make the Epoch duration configuration via bash
+                    environmental variable, see github issue:
+                    https://github.com/katzenpost/katzenpost/issues/744 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis role="bold">Management</emphasis> struct – a management interface,
+                    off by default</para>
+
+                                    <para>The <code>socat</code> commandline utility can be use to
+                                        connect to the management socket and issue commands. Connect
+                                        with a commandline like so:</para>
+                                    <programlisting>socat unix:/&lt;path-to-data-dir>/management_sock STDOUT
+</programlisting>
+                                    <para>The following commands are possible:</para>
+                                    <itemizedlist>
+                                        <listitem>
+                                            <para>QUIT - Exit this management socket session.</para>
+                                        </listitem>
+                                        <listitem>
+                                            <para>SHUTDOWN - Cause the server to gracefully
+                                                shutdown.</para>
+                                        </listitem>
+                                        <listitem>
+                                            <para>ADD_USER - Add a user and associate it with the
+                                                given link key in either hex or base64. The syntax
+                                                of the command is as follows:</para>
+                                            <programlisting>ADD_USER alice X25519_public_key_in_hex_or_base64
+</programlisting>
+                                        </listitem>
+                                        <listitem>
+                                            <para>UPDATE_USER - Update the link key of a given user.
+                                                The syntax of the command is as follows:</para>
+                                            <programlisting>UPDATE_USER alice X25519_public_key_in_hex_or_base64
+</programlisting>
+                                        </listitem>
+                                        <listitem>
+                                            <para>REMOVE_USER - Remove a given user. The syntax of
+                                                the command is as follows:</para>
+                                            <programlisting>REMOVE_USER alice
+</programlisting>
+                                        </listitem>
+                                        <listitem>
+                                            <para>SET_USER_IDENTITY - Set a given user's identity
+                                                key. The syntax of the command is as follows:</para>
+                                            <programlisting>SET_USER_IDENTITY alice X25519_public_key_in_hex_or_base64
+</programlisting>
+                                        </listitem>
+                                        <listitem>
+                                            <para>REMOVE_USER_IDENTITY - Remove a given user's
+                                                identity key. MUST be called before removing the
+                                                user with the <code>REMOVE_USER</code> command. The
+                                                synx of this command is as follows:</para>
+                                            <programlisting>REMOVE_USER_IDENTITY alice
+</programlisting>
+                                        </listitem>
+                                        <listitem>
+                                            <para>USER_IDENTITY - Retrieve the identity key of the
+                                                given user. The syntax of the command is as
+                                                follows:</para>
+                                            <programlisting>USER_IDENTITY alice
+</programlisting>
+                                        </listitem>
+                                        <listitem>
+                                            <para>SEND_RATE - Sets the rate limiter to the given
+                                                packets per minute rate.</para>
+                                            <programlisting>SEND_RATE 30
+</programlisting>
+                                        </listitem>
+                                        <listitem>
+                                            <para>SEND_BURST - Sets the rate limiter burst to the
+                                                given maximum.</para>
+                                            <programlisting>SEND_BURST 4
+</programlisting>
+                                        </listitem>
+                                    </itemizedlist>
+
+  
+            <para> Parameters (all) in server/config. </para>
+            <para> Go autogeneted docs: go to godocs.org and search for katezenpost/katzenpost. --
+                Baseic dev docs</para>
+            <para>Prometheus logging and graphing is to be recommended (has its own
+                documents)</para>
+            <para/>
+    <para>
+ 
+    </para>
+            </listitem>
+        </itemizedlist>
+    </para>
+    <section id="voter-usage">
+        <title id="voter-usage.title">CLI usage for directory authorities</title>
+        <para>The voting authority has the following commandline usage:</para>
+        <?oxy_comment_start author="dwrob" timestamp="20241112T164058-0800" comment="&quot;voting&quot; is the only dirauth cersion and the name of the binary will be chyange. Tokenized as &quot;dirauth_binary&quot;, currently called &quot;dirauth&quot;"?>
+        <programlisting>./voting -h
+Usage of ./voting:
+  -f string
+        Path to the authority config file. (default "katzenpost-authority.toml")
+  -g    Generate the keys and exit immediately.
+</programlisting><?oxy_comment_end?>
+        <para>The <code>-g</code> option is used to generate the public and private signing and link
+            keys.</para>
+        <para/>
+    </section>
+    <section id="server-usage">
+        <title id="server-usage.title">CLI usage for servers</title>
+        <para>The <code>server</code> commandline usage is as follows:</para>
+        <programlisting>./server -h
+<?oxy_comment_start author="dwrob" timestamp="20241112T164237-0800" comment="&quot;server&quot; may be rename &quot;mixserver&quot; so tokenized as &quot;mixserver_binary&quot; with value &quot;mixserver&quot;.  "?>Usage of ./server:
+  -f string
+        Path to the server config file. (default "katzenpost.toml")
+  -g    Generate the keys and exit immediately.
+<?oxy_comment_end?></programlisting>
+        <para>The command output when generating keys looks like this:</para>
+        <programlisting>./server -f my_katzenpost_mix_server.toml -g
+22:51:55.377 NOTI server: Katzenpost is still pre-alpha.  DO NOT DEPEND ON IT FOR STRONG SECURITY OR ANONYMITY.
+22:51:55.377 NOTI server: AEZv5 implementation is hardware accelerated.
+22:51:55.377 NOTI server: Server identifier is: 'example.com'
+22:51:55.379 NOTI server: Server identity public key is: 2628F87F2806048C95F060DA9CD3D8F9BE7550BFB9EE85F213381BC04C047650
+22:51:55.379 NOTI server: Server link public key is: CCDC5C105E649D543DF1CF397A17638F812F95B7E572288F4602F8EC01EC4F3C
+</programlisting>
+        <para>Note that if you choose to configure logging to a file one disk, you can implement log
+            rotation by moving the log file and then sending the <code>HUP</code> to the authority
+            server process. This will cause the daemon to rewrite the log file in the location
+            specified by the config file.</para>
+    </section>
+</chapter>
+

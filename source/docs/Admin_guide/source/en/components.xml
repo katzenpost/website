@@ -1,111 +1,353 @@
-<!--<?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="http://docbook.org/xml/5.2/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<?xml-model href="http://docbook.org/xml/5.2/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
--->
+<?xml version="1.0" encoding="UTF-8"?>
 
-<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-
-<!--A DOCTYPE declaration declaring a DTD is not need for DocBook 5.x, which uses RelaxNG and  Schematron instead. It is used here as a container for entity declarations.-->
-
-<!DOCTYPE chapter 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
 [
-    <!ENTITY % shared-content SYSTEM "shared-content.ent">
+   <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
     %shared-content;
-]>
-
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
-    version="5.1" xml:id="components">
-    <title xml:id="components.title">Components of the &program_name; mixnet</title>
-
-    <!--
+<!-- 
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
+]> 
+    
+<chapter id="components">
+    <title id="components.title">Components and configuration of the &program_name; mixnet</title>
+    <para>This section of the &program_name; technical documentation provides an introduction to the
+        software components that make up &program_name; and guidance on how to configure each
+        component.  The intended reader is a system administrator who wants to implement a working,
+        production &program_name; network. </para>
+    <para>For information about the theory and design of this software, see <xref
+            linkend="introduction" endterm="introduction.title"/>. For a quickly deployable,
+        non-production test network (primarily for use by developers), see <xref linkend="container"
+            endterm="container.title"/>.</para>    
+    <section id="overview">
+        <title id="overview.title">Understanding the &program_name; components</title>
+        <para>The core of &program_name; consists of two program executables, <link
+                linkend="voter-usage">dirauth</link> and <link linkend="server-usage">server</link>.
+            Running the <command>dirauth </command>commmand runs a <emphasis>directory
+                authority</emphasis> node, or <emphasis>dirauth</emphasis>, that functions as part
+            of the mixnet's public-key infrastructure (PKI). Running the <command>server</command>
+            runs either a <emphasis>mix</emphasis> node, a <emphasis>gateway</emphasis> node, or a
+                <emphasis>service</emphasis> node, depending on the configuration. Configuration
+            settings are provided in an associated <filename>katzenpost-authority.toml</filename> or
+                <filename>katzenpost.toml</filename> file respectively. </para>
+        <para>In addition to the server components, &program_name; also supports connections to
+            client applications hosted externally to the mix network and communicating with it
+            through gateway nodes. </para>
+        <para>A model mix network is shown in Figure 1.</para>
+        <figure>
+            <title>The pictured element types correspond to discrete client and server programs that
+                &program_name; requires to function. </title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="pix/components-production.png" scale="75"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>The mix network contains an <emphasis>n</emphasis>-layer topology of mix-nodes, with
+            three nodes per layer in this example. Sphinx packets traverse the network in one
+            direction only. The gateway nodes allow clients to interact with the mix network. The
+            service nodes provide mix network services that mix network clients can interact with.
+            All messages sent by clients are handed to a <emphasis>connector</emphasis> daemon
+            hosted on the client system, passed across the Internet to a gateway, and then relayed
+            to a service node by way of the nine mix nodes. The service node sends its reply back
+            across the mix-node layers to a gateway, which transmits it across the Internet to be
+            received by the targeted client. The mix, gateway, and service nodes send <emphasis>mix
+                descriptors</emphasis> to the dirauths and retrieve a <emphasis>consensus
+                document</emphasis> from them, described below.</para>
+        <para>In addition to the server components, &program_name; supports connections to client
+            applications hosted externally to the mix network and communicating with it through
+            gateway nodes and, in some cases, a client connector.</para>
+        <section id="intro-dirauth">
+            <title id="intro-dirauth.title">Directory authorities (dirauths)</title>
+            <para>Dirauths compose the decentralized public key infrastructure (PKI) that serves as
+                the root of security for the entire mix network. Clients, mix nodes, gateways nodes,
+                and service nodes rely on the PKI/dirauth system to maintain and sign an up-to-date
+                consensus document, providing a view of the network including connection information
+                and public cryptographic key materials and signatures.</para>
+            <para>Every 20 minutes (the current value for an <emphasis>epoch</emphasis>), each mix,
+                gateway, and service node signs a mix descriptor and uploads it to the dirauths. The
+                dirauths then vote on a new consensus document. If consensus is reached, each
+                dirauth signs the document. Clients and nodes download the document as needed and
+                verify the signatures. Consensus fails when 1/2 + 1 nodes fail, which yields greater
+                fault tolerance than, for example, Byzantine Fault Tolerance, which fails when 1/3 +
+                1 of the nodes fail.</para>
+            <para>The PKI signature scheme is fully configurable by the dirauths. Our recommendation
+                is to use a hybrid signature scheme consisting of classical Ed25519 and the
+                post-quantum, stateless, hash-based signature scheme known as Sphincs+ (with the
+                parameters: "sphincs-shake-256f"), which is designated in &program_name;
+                configurations as "Ed25519 Sphincs+". Examples are provided below.</para>
+        </section>
+        <section id="intro-mix">
+            <title id="intro-mix.title">Mix nodes</title>
+            <para>The mix node is the fundamental building block of the mix network. </para>
+            <para>&program_name; mix nodes are arranged in a layered topology to achieve the best
+                levels of anonymity and ease of analysis while being flexible enough to scale with
+                traffic demands. </para>
+        </section>
+        <section id="intro-gateway">
+            <title id="intro-gateway.title">Gateway nodes</title>
+            <para>Gateway nodes provide external client access to the mix network. Because gateways
+                are uniquely positioned to identify clients, they are designed to have as little
+                information about client behavior as possible. Gateways are randomly selected and
+                have no persistent relationship with clients and no knowledge of whether a client's
+                packets are decoys or not. When client traffic through a gateway is slow, the node
+                additionally generates decoy traffic. </para>
+        </section>
+        <section id="intro-service">
+            <title id="intro-service.title">Service nodes</title>
+            <para><?oxy_comment_start author="dwrob" timestamp="20241114T125846-0800" comment="Division of service nodes into replicas and couriers is not addressed here."?>Service
+                nodes <?oxy_comment_end?>provide functionality requested by clients. They are
+                logically positioned at the deepest point of the mix network, with incoming queries
+                and outgoing replies both needing to traverse all <emphasis>n</emphasis> layers of
+                mix nodes. A service node's functionality may involve storing messages, publishing
+                information outside of the mixnet, interfacing with a blockchain node, and so on.
+                Service nodes also process decoy packets. </para>
+        </section>
+        <section id="intro-client">
+            <title id="intro-client.title"
+                ><?oxy_comment_start author="dwrob" timestamp="20241114T164534-0800" comment="This will be removed or reworked when we have a client user guide."?>Clients<?oxy_comment_end?></title>
+            <para>Client applications should be designed so that the following conditions are
+                met:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Separate service requests from a client are unlinkable. Repeating the same
+                        request may be lead to linkability. </para>
+                </listitem>
+                <listitem>
+                    <para>Service nodes and clients have no persistent relationship.</para>
+                </listitem>
+                <listitem>
+                    <para>Cleints generate a stream of packets addressed to random or pseudorandom
+                        services regardless of whether a real service request is being made. Most of
+                        these packets will be decoy traffic.</para>
+                </listitem>
+                <listitem>
+                    <para>Traffic from a client to a service node must be correctly coupled with
+                        decoy traffic. This can mean that the service node is chosen independently
+                        from traffic history, or that the transmitted packet replaces a decoy packet
+                        that was meant to go to the desired service.</para>
+                </listitem>
+            </itemizedlist>
+            <para>&program_name; currently includes several client applications. All applications
+                make extensive use of Sphinx single-use reply blocks (SURBs), which enable service
+                nodes to send replies without knowing the location of the client. Newer clients
+                require a connection through the client <emphasis>connector</emphasis>, which
+                provides multiplexing and privilege separation with a consequent reduction in
+                processing overhead. These clients also implement the Pigeonhole storage and BACAP
+                protocols detailed in <emphasis role="bold">&research_paper_link;</emphasis>. </para>
+            <para>The following client applications are available.<table frame="all">
+                    <title>&program_name; clients</title>
+                    <tgroup cols="4">
+                        <colspec colname="c1" colnum="1" colwidth="1*"/>
+                        <colspec colname="newCol2" colnum="2" colwidth="1*"/>
+                        <colspec colname="c2" colnum="3" colwidth="1*"/>
+                        <colspec colname="c3" colnum="4" colwidth="1*"/>
+                        <thead>
+                            <row>
+                                <entry>
+                                    <para>Name</para>
+                                </entry>
+                                <entry>
+                                    <para>Needs connector</para>
+                                </entry>
+                                <entry>
+                                    <para>Description</para>
+                                </entry>
+                                <entry>
+                                    <para>Code</para>
+                                </entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry>
+                                    <para><emphasis role="bold">Ping</emphasis></para>
+                                </entry>
+                                <entry>
+                                    <para>no</para>
+                                </entry>
+                                <entry>
+                                    <para>The mix network equivalent of an ICMP ping utility, used
+                                        for network testing.</para>
+                                </entry>
+                                <entry>
+                                    <para>GitHub: <ulink
+                                            url="https://github.com/katzenpost/katzenpost/tree/main/ping"
+                                            >ping</ulink></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><emphasis role="bold">Katzen</emphasis></para>
+                                </entry>
+                                <entry>
+                                    <para>no</para>
+                                </entry>
+                                <entry>
+                                    <para>A text chat client with file-transfer support.</para>
+                                </entry>
+                                <entry>
+                                    <para>GitHub: <ulink url="https://github.com/katzenpost/katzen"
+                                            >katzen</ulink></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><emphasis role="bold">Status</emphasis></para>
+                                </entry>
+                                <entry>
+                                    <para>yes</para>
+                                </entry>
+                                <entry>
+                                    <para>An HTML page containing status information about the mix
+                                        network.</para>
+                                </entry>
+                                <entry>
+                                    <para>GitHub: <ulink url="https://github.com/katzenpost/status"
+                                            >status</ulink></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><emphasis role="bold">Worldmap</emphasis></para>
+                                </entry>
+                                <entry>yes</entry>
+                                <entry>
+                                    <para>An HTML page with a world map showing geographic locations
+                                        of mix network nodes. </para>
+                                </entry>
+                                <entry>
+                                    <para>GitHub: <ulink
+                                            url="https://github.com/katzenpost/worldmap"
+                                            >worldmap</ulink></para>
+                                </entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </table></para>
+        </section>
+    </section>
+    <section id="configuration">
+        <title id="configuration.title">Configuring &program_name;</title>
+ 
         
-    AWS model for APIs:
-    
-    [Definition] 
-    
-    Type: String
-    
-    Length Constraints: Maximum length of 256.
-    
-    Pattern: ^[A-Za-z0-9+/=]+$
-    
-    Required: No
-    
-    -->
-    <section xml:id="auth">
-        <title xml:id="auth.title">Directory authorities</title>
+        <para>This section documents the configuration parameters for each type of &program_name;
+            server node. Each node has its own configuration file in <ulink
+                url="https://toml.io/en/v1.0.0">TOML</ulink> format. </para>
 
-		<para>Directory authorities, or <emphasis>dirauths</emphasis>, are nodes in &program_name;'s
-            decentralized public key infrastructure (PKI), which forms the security root of the
-            &program_name; system. Clients and mixnet nodes rely on the PKI to maintain and sign an
-            up-to-date <emphasis>consensus</emphasis> document, providing a view of the entire
-            network including connection information and public cryptographic key materials and
-            signatures. </para>
-        <para>Every 20 minutes (the current value for an <emphasis>epoch</emphasis>), each mix node
-            signs a descriptor and uploads it to the dirauth nodes. The dirauths then vote on a new
-            consensus document. If consensus is reached, each dirauth signs the document. Clients
-            and nodes download the document as needed and verify the signatures. Consensus fails
-            when 1/2 + 1 nodes fail, which yields greater fault tolerance than, for example,
-            Byzantine Fault Tolerance, which fails when 1/3 + 1 of the nodes fail.</para>
-		<para>The PKI signature scheme is fully configurable by the dirauth nodes. Our recommendation is
-            to use a hybrid signature scheme consisting of the classical Ed25519 and the
-            post-quantum, stateless, hash-based signature scheme known as Sphincs+ (with the
-            parameters: "sphincs-shake-256f"), which is designated in &program_name; configurations
-            as "Ed25519 Sphincs+". Examples are provided below.</para>        
-
-        <section xml:id="auth-config">
-            <title xml:id="auth-config.title">Configuring directory authorities</title>
+        <section id="auth-config">
+            <title id="auth-config.title">Configuring directory authorities</title>
             <para>The following configuration is drawn from the reference implementation in
-                    <filename>katzenpost/docker/voting_mixnet/auth1/authority.toml</filename>. In a
+                    <filename>katzenpost/docker/dirauth_mixnet/auth1/authority.toml</filename>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
-                more information about the test mixnet, see <link linkend="container"
-                    endterm="container.title">Using the &program_name; test network</link>.</para>
+                more information about the test mixnet, see <emphasis role="bold"><xref
+                        endterm="container.title" linkend="container"/></emphasis>.</para>
+            <table frame="all">
+                <title><emphasis role="bold">Directory authority (dirauth) configuration
+                        sections</emphasis></title>
+                <tgroup cols="1">
+                    <colspec colname="c1" colnum="1" colwidth="1*"/>
+                    <tbody>
+                        <row>
+                            <entry>            
+                                <para><xref linkend="auth-server-section-config" endterm="auth-server-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-authorities-section-config" endterm="auth-authorities-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-logging" endterm="auth-logging.title"/></para>
+                            </entry>
+                        </row>
+
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-parameters" endterm="auth-parameters.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-debug" endterm="auth-debug.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-mixes-section-config" endterm="auth-mixes-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-gatewaynodes-section-config" endterm="auth-gatewaynodes-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-servicenodes-section-config" endterm="auth-servicenodes-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-topology" endterm="auth-topology.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="auth-sphinx-config" endterm="auth-sphinx-config.title"/></para>
+                            </entry>
+                        </row>              
+                    </tbody>
+                </tgroup>
+            </table>
+            
+
+            
+            
             <!--General TOML note:
+    
+    https://toml.io/en/v1.0.0
+    \-->
 
-https://toml.io/en/v1.0.0
-
-Array of Tables
-
-The last syntax that has not yet been described allows writing arrays of tables. These can be expressed by using a header with a name in double brackets. The first instance of that header defines the array and its first table element, and each subsequent instance creates and defines a new table element in that array. The tables are inserted into the array in the order encountered.
-
-So single brackets define a "table". Double brackets define an array of "tables". AND the initial double-bracket block serves as both an array definition and an element of the array it created. 
-
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                
-https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L475
-
-// Config is the top level authority configuration.
-type Config struct {
-	Server      *Server
-	Authorities []*Authority
-	Logging     *Logging
-	Parameters  *Parameters
-	Debug       *Debug
-
-	Mixes        []*Node
-	GatewayNodes []*Node
-	ServiceNodes []*Node
-	Topology     *Topology
-
-	SphinxGeometry *geo.Geometry
-}-->
-            <section xml:id="auth-server-section-config">
-                <title xml:id="auth-server-section-config.title">Server section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L415-->
-                <para/>
+            <section id="auth-server-section-config">
+                <title id="auth-server-section-config.title">Dirauth: Server section</title>
+                <para>The <code>Server</code> section configures mandatory basic parameters for each
+                    directory authority.</para>
                 <programlisting>[Server]
     Identifier = "auth1"
     WireKEMScheme = "xwing"
     PKISignatureScheme = "Ed25519 Sphincs+"
     Addresses = ["tcp://127.0.0.1:30001"]
-    DataDir = "/voting_mixnet/auth1"</programlisting>
+    DataDir = "/dirauth_mixnet/auth1"</programlisting>
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
                         <para>Specifies the human-readable identifier for a node, and must be unique
-                            per mixnet. Identifier can be an FQDN but does not have to be.</para>
+                            per mixnet. The identifier can be an FQDN but does not have to
+                            be.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     &WireKEMScheme;
                     <listitem>
@@ -113,42 +355,41 @@ type Config struct {
                         <para>Specifies the cryptographic signature scheme which will be used by all
                             components of the mix network when interacting with the PKI system. Mix
                             nodes sign their descriptors using this signature scheme, and dirauth
-                            nodes similarly sign PKI documents using this signature scheme.</para>
+                            nodes similarly sign PKI documents using the same scheme.</para>
                         <para>The following signature schemes are supported: "ed25519", "ed448",
                             "Ed25519 Sphincs+", "Ed448-Sphincs+", "Ed25519-Dilithium2",
                             "Ed448-Dilithium3" </para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Addresses</emphasis></para>
-                        <para>Specifies a list of one or more Address URLs in a format that contains
-                            the transport protocol, IP address, and port number that the server will
+                        <para>Specifies a list of one or more address URLs in a format that contains
+                            the transport protocol, IP address, and port number that the node will
                             bind to for incoming connections. &program_name; supports URLs with that
                             start with either "tcp://" or "quic://" such as:
                             ["tcp://192.168.1.1:30001"] and ["quic://192.168.1.1:40001"].</para>
                         <para>Type: []string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">DataDir</emphasis></para>
-                        <para>Specifies the absolute path to the dirauth's state directory where
-                            persistence.db will be written to disk and where the server's
-                            cryptographic key materials will be written to disk when started with
-                            the "-g" commmand-line option.</para>
+                        <para>Specifies the absolute path to a node's state directory. This is
+                                where<filename> persistence.db</filename> is written to disk and
+                            where a node stores its cryptographic key materials when started with
+                            the "-g" command-line option.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
                 <para/>
             </section>
-            <section xml:id="auth-authorities-section-config">
-                <title xml:id="auth-authorities-section-config.title">Authorities section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L266-->
-                <para>An Authorities section is configured for each peer authority. We recommend
-                    using
-                    <?oxy_comment_start author="dwrob" timestamp="20241024T125441-0700" comment="provide a ref"?>TOML's
-                    multi-line<?oxy_comment_end?> quotes for key materials.</para>
+            <section id="auth-authorities-section-config">
+                <title id="auth-authorities-section-config.title">Dirauth: <code>Authorities</code>
+                    section</title>
+                <para>An <code>Authorities</code> section is configured for each peer authority. We
+                    recommend using <ulink url="https://quickref.me/toml.html">TOML's style</ulink>
+                    for multi-line quotations for key materials.</para>
                 <programlisting>[[Authorities]]
     Identifier = "auth1"
     IdentityPublicKey = """
@@ -162,26 +403,7 @@ dYpXpbozjFfqhR45ZC2q97SOOsXMANdHaEdXrP42CJk=
 ooQBPYNdmfwnxXmvnljPA2mG5gWgurfHhbY87DMRY2tbMeZpinJ5BlSiIecprnmm
 QqxcS9o36IS62SVMlOUkw+XEZGVvc9wJqHpgEgVJRAs1PCR8cUAdM6QIYLWt/lkf
 SPKDCtZ3GiSIOzMuaglo2tarIPEv1AY7r9B0xXOgSKMkGyBkCfw1VBZf46MM26NL
-opKx+rAKBzjKBJgGg9AHt9rNQsBbCVFBO+KKbpHHXFCBztK1Hhei3LeeYxcqL4bC
-Rzi2kfBvQLPNzIuHOktKX7m39CxMByMNm4qL6dSVbtZaMOenpUlsIHOR5vyF2bgX
-syRS3WnPRaIOarkMXUwJpzasNzuPUSAmJyaAQVwgrTSJyXp91usF6wBHKApqlDVY
-dldqH7O90EI1tYNiOYpBCgwGBIK+xOkjoVNY91B/PVbA5ngcXgt8xQp02WXF1lVN
-+ixu2XF8ndJXtLmlTIMUb0YwHsEo9UqdN7yLMPqcVScqR+ZKyCpaIPS+dpF20AAu
-fvVVlxKVLqonUkJLCMgR/4morUOXVHwRgkKr0mIuw9RTWwSlSGxasFiVFZM5p6kS
-ElIgPlCX94xV52BjcerPQ1R2TJdlVdWgLUAO7UNhyETCGrdxjxZSYmxNjfsOLHk7
-qFNNDhUqHBjJmYOSDis0qHNXW8oZ9SF6pFN9NlctH8Uq10c/fNltykEbTkgLdMJP
-phWWVQWD1YIU+/ktO5ZNVIVK/CHOqdc41+mRyxh/OmbEWMaaicuijLNR3KV9QoHG
-9JWw9RtrPeE+jbgUX0g0asFf0nibfWqdV5QfAfwV/shYuIJR4nZMb6B4R9t8wYd0
-gCSZg1M7gJW1J5B17cPM6+OCz2JaYhgAHfvJhSYK3zGzWWvGWvKTJrSTjiIhX8wM
-H/KiX5U8+nkWPDiu/nqyRVej8/ELYvg7T2R7tKJzB0Gr5GUFd3B1TzvAcIRBl+yd
-9ma5tRE44cu1yONuc1N8ITp8xqezSjwdavoMeuphryd6xbacZCVCcnM2R5mGOAhI
-xzQWA5teHxoBTnliRQq1HriKX8N8Ogq3GPYu0Lue+MwEkkRkxSJdNpSLE/yzOQkf
-DrlBbbURIfe1T6aeA1SuXeacTzqd6lfPWvjCgXMYriwhAazKwgS+WwcXd5RKbWEN
-PIISgRavtoahEdOVSJJbVMUYptA3+CcY9eEi/rWOc1RgTWGNtWW0FYnFyiq6UdPM
-NiO/z7S9uJJI/2wWMlJi+OoTx9cf3mjIMOPLkzEOhpVRhCZvcSvFIoF6ItcETnda
-HmmOFwFg2reqlPioBORUufk7zdhs0MuuMYlaG+E0OqxTOKiZg0qbgMZqtOlsXkp8
-QdY8R/W4ePiVAI2iZnMzEqMl3LLEDlRdMOkBYzOkR2GSvpYv6tetgoNAu8vFkpc6
-Rma3y7KnihWaYhwEFbEqV2kD2GO9cMV+AcFvuCE9dVGVSatdxsSNX6ZXaFGlmHCp
+...
 gHtNyQJnXski52O03JpZRIhR40pFOhAAcMMAZDpMTVoxlcdR6WA4SlBiSceeJBgY
 Yp9PlGhCimx9am99TrdLoLCdTHB6oowt8tss3POpIOxaSlguyeym/sBhkUrnXOgN
 ldMtDsvvc9KUfE4I0+c+XQ==
@@ -193,59 +415,59 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
                         <para>Specifies the human-readable identifier for the node which must be
-                            unique per mixnet. Identifier can be an FQDN but does not have to
+                            unique per mixnet. The identifier can be an FQDN but does not have to
                             be.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKey</emphasis></para>
                         <para>String containing the node's public identity key in PEM format.
-                            IdentityPublicKey is the node's permanent identifier and is used to
-                            verify cryptographic signatures produced by its private identity
-                            key.</para>
+                                <code>IdentityPublicKey</code> is the node's permanent identifier
+                            and is used to verify cryptographic signatures produced by its private
+                            identity key.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
-                        <para>Specifies the cryptographic signature scheme used by the directory
-                            authority nodes. PKISignatureScheme must match the scheme specified in
-                            the Server section of the configuration. </para>
+                        <para>Specifies the cryptographic signature scheme used by all directory
+                            authority nodes. <code>PKISignatureScheme</code> must match the scheme
+                            specified in the <code>Server</code> section of the configuration. </para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
-                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
                     <listitem>
-                        <para><?oxy_custom_end?><emphasis role="bold"
-                            >LinkPublicKey</emphasis></para>
+                        <para><emphasis role="bold">LinkPublicKey</emphasis></para>
                         <para>String containing the peer's public link-layer key in PEM format.
-                            LinkPublicKey must match the specified WireKEMScheme.</para>
+                                <code>LinkPublicKey</code> must match the specified
+                                <code>WireKEMScheme</code>.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     &WireKEMScheme;
                     <listitem>
                         <para><emphasis role="bold">Addresses</emphasis></para>
-                        <para>Specifies a list of one or more Address URLs in a format that contains
-                            the transport protocol, IP address, and port number that the server will
+                        <para>Specifies a list of one or more address URLs in a format that contains
+                            the transport protocol, IP address, and port number that the node will
                             bind to for incoming connections. &program_name; supports URLs with that
                             start with either "tcp://" or "quic://" such as:
                             ["tcp://192.168.1.1:30001"] and ["quic://192.168.1.1:40001"].</para>
                         <para>Type: []string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
             </section>
-            <section xml:id="auth-logging">
-                <title xml:id="auth-logging.title">Logging section</title>
-                &logging;
+            <section id="auth-logging">
+                <title id="auth-logging.title">Dirauth: Logging section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: logging (/1/3)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="auth-parameters">
-                <title xml:id="auth-parameters.title">Parameters section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L103
--->
-                <para>The Parameters section contains network parameters.</para>
+            <section id="auth-parameters">
+                <title id="auth-parameters.title">Dirauth: Parameters section</title>
+                <para>The <code>Parameters</code> section contains the network parameters.</para>
                 <programlisting>[Parameters]
     SendRatePerMinute = 0
     Mu = 0.005
@@ -266,23 +488,22 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <para>Specifies the maximum allowed rate of packets per client per gateway
                             node. Rate limiting is done on the gateway nodes.</para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Mu</emphasis></para>
                         <para>Specifies the inverse of the mean of the exponential distribution from
                             which the Sphinx packet per-hop mixing delay will be sampled.</para>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">MuMaxDelay</emphasis></para>
                         <para>Specifies the maximum Sphinx packet per-hop mixing delay in
                             milliseconds. </para>
-                        <para>Type:
-                            uint64<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                        <para><?oxy_custom_end?>Required:<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                    </listitem><?oxy_custom_end?>
+                        <para>Type: uint64</para>
+                        <para>Required: Yes</para>
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaP</emphasis></para>
                         <para>Specifies the inverse of the mean of the exponential distribution that
@@ -290,14 +511,14 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             whether actual messages from the FIFO egress queue or decoy messages if
                             the queue is empty.</para>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaPMaxDelay</emphasis></para>
                         <para>Specifies the maximum send delay interval for LambdaP in
                             milliseconds.</para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaL</emphasis></para>
@@ -305,14 +526,14 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             clients sample to determine the delay interval between loop
                             decoys.</para>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaLMaxDelay</emphasis></para>
                         <para>Specifies the maximum send delay interval for LambdaL in
                             milliseconds.</para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaD</emphasis></para>
@@ -320,13 +541,13 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             that clients sample to determine the delay interval between decoy drop
                             messages. </para>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaDMaxDelay</emphasis></para>
                         <para>Specifies the maximum send interval in for LambdaD in milliseconds. </para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaM</emphasis></para>
@@ -334,7 +555,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             that mix nodes sample to determine the delay between mix loop
                             decoys.</para>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaG</emphasis></para>
@@ -346,29 +567,24 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                 field is used internally by the dirauth server state machine.</para>
                         </warning>
                         <para>Type: float64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">LambdaMMaxDelay</emphasis></para>
                         <para>Specifies the maximum delay for LambdaM in milliseconds.</para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
-                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
                     <listitem>
-                        <para><?oxy_custom_end?><emphasis role="bold"
-                            >LambdaGMaxDelay</emphasis></para>
+                        <para><emphasis role="bold">LambdaGMaxDelay</emphasis></para>
                         <para>Specifies the maximum delay for LambdaG in milliseconds.</para>
                         <para>Type: uint64</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
-                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
-            </section><?oxy_custom_end?>
-            <section xml:id="auth-debug">
-                <title xml:id="auth-debug.title">Debug section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L235-->
-                <para/>
+            </section>
+            <section id="auth-debug">
+                <title id="auth-debug.title">Dirauth: Debug section</title>
                 <programlisting>[Debug]
     Layers = 3
     MinNodesPerLayer = 1
@@ -376,31 +592,32 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Layers</emphasis></para>
-                        <para>Number of non-service-provider layers in the network topology.</para>
+                        <para>Specifies the number of non-service-provider layers in the network
+                            topology.</para>
                         <para>Type: int</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">MinNodesrPerLayer</emphasis></para>
-                        <para>Minimum number of nodes per layer required to form a valid consensus
-                            document.</para>
+                        <para>Specifies the minimum number of nodes per layer required to form a
+                            valid consensus document.</para>
                         <para>Type: int</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">GenerateOnly</emphasis></para>
-                        <para>If set to true, the server halts and cleans up the data directory
-                            immediately after long-term key generation.</para>
+                        <para>If <emphasis role="bold">true></emphasis>, the server halts and cleans
+                            up the data directory immediately after long-term key generation.</para>
                         <para>Type: bool</para>
-                        <para>Required:</para>
+                        <para>Required: No</para>
                     </listitem>
                 </itemizedlist>
             </section>
-            <section xml:id="auth-mixes-section-config">
-                <title xml:id="auth-mixes-section-config.title">Mixes sections</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/authority/voting/server/config/config.go#L383-->
-                <para>The Mixes configuration sections list mix nodes that are known to the
-                    authority.</para>
+            <section id="auth-mixes-section-config">
+                <title id="auth-mixes-section-config.title">Dirauth: Mixes
+                    sections</title>
+                <para>The <code>Mixes</code> configuration sections list mix nodes that are known to
+                    the authority.</para>
                 <programlisting>[[Mixes]]
     Identifier = "mix1"
     IdentityPublicKeyPem = "../mix1/identity.public.pem"
@@ -411,28 +628,29 @@ ldMtDsvvc9KUfE4I0+c+XQ==
 
 [[Mixes]]
     Identifier = "mix3"
-    IdentityPublicKeyPem = "../mix3/identity.public.pem"<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></programlisting><?oxy_custom_end?>
+    IdentityPublicKeyPem = "../mix3/identity.public.pem"</programlisting>
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
-                        <para>Specifies the human-readable identifier for a node, and must be unique
-                            per mixnet. Identifier can be an FQDN but does not have to be.</para>
-                        <para>Type:
-                            string<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                        <para>Required:</para>
-                    </listitem><?oxy_custom_end?>
+                        <para>Specifies the human-readable identifier for a mix node, and must be
+                            unique per mixnet. The identifier can be an FQDN but does not have to
+                            be.</para>
+                        <para>Type: string</para>
+                        <para>Required: Yes</para>
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKeyPem</emphasis></para>
                         <para>Path and file name of a mix node's public identity signing key, also
                             known as the identity key, in PEM format.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
             </section>
-            <section xml:id="auth-gatewaynodes-section-config">
-                <title xml:id="auth-gatewaynodes-section-config.title">GatewayNodes section</title>
-                <para>The GatewayNodes configuration sections list gateway nodes that are known to
+            <section id="auth-gatewaynodes-section-config">
+                <title id="auth-gatewaynodes-section-config.title">Dirauth:
+                        GatewayNodes section</title>
+                <para>The <code>GatewayNodes</code> sections list gateway nodes that are known to
                     the authority.</para>
                 <programlisting>[[GatewayNodes]]
     Identifier = "gateway1"
@@ -440,24 +658,25 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
-                        <para>Specifies the human-readable identifier for a node, and must be unique
-                            per mixnet. Identifier can be an FQDN but does not have to be.</para>
-                        <para>Type:
-                            string<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                        <para>Required:</para>
-                    </listitem><?oxy_custom_end?>
+                        <para>Specifies the human-readable identifier for a gateway node, and must
+                            be unique per mixnet. Identifier can be an FQDN but does not have to
+                            be.</para>
+                        <para>Type: string</para>
+                        <para>Required: Yes</para>
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKeyPem</emphasis></para>
                         <para>Path and file name of a gateway node's public identity signing key,
                             also known as the identity key, in PEM format.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
             </section>
-            <section xml:id="auth-servicenodes-section-config">
-                <title xml:id="auth-servicenodes-section-config.title">ServiceNodes sections</title>
-                <para>The ServiceNodes configuration sections list service nodes that are known to
+            <section id="auth-servicenodes-section-config">
+                <title id="auth-servicenodes-section-config.title">Dirauth:
+                        ServiceNodes sections</title>
+                <para>The <code>ServiceNodes</code> sections list service nodes that are known to
                     the authority.</para>
                 <programlisting>[[ServiceNodes]]
     Identifier = "servicenode1"
@@ -465,24 +684,24 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
-                        <para>Specifies the human-readable identifier for a node, and must be unique
-                            per mixnet. Identifier can be an FQDN but does not have to be.</para>
-                        <para>Type:
-                            string<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                        <para>Required:</para>
-                    </listitem><?oxy_custom_end?>
+                        <para>Specifies the human-readable identifier for a service node, and must
+                            be unique per mixnet. Identifier can be an FQDN but does not have to
+                            be.</para>
+                        <para>Type: string</para>
+                        <para>Required: Yes</para>
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKeyPem</emphasis></para>
                         <para>Path and file name of a service node's public identity signing key,
                             also known as the identity key, in PEM format.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
             </section>
-            <section xml:id="auth-topology">
-                <title xml:id="auth-topology.title">Topology section</title>
-                <para>The Topology configuration section defines the layers of the mix network and
+            <section id="auth-topology">
+                <title id="auth-topology.title">Dirauth: Topology section</title>
+                <para>The <code>Topology</code> section defines the layers of the mix network and
                     the mix nodes in each layer.</para>
                 <programlisting>[Topology]
                     
@@ -507,86 +726,114 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     <listitem>
                         <para><emphasis role="bold">Identifier</emphasis></para>
                         <para>Specifies the human-readable identifier for a node, and must be unique
-                            per mixnet. Identifier can be an FQDN but does not have to be.</para>
-                        <para>Type:
-                            string<?oxy_custom_start type="oxy_content_highlight" color="235,192,230"?></para>
-                    </listitem><?oxy_custom_end?>
+                            per mixnet. The identifier can be an FQDN but does not have to
+                            be.</para>
+                        <para>Type: string</para>
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">IdentityPublicKeyPem</emphasis></para>
                         <para>Path and file name of a mix node's public identity signing key, also
                             known as the identity key, in PEM format.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                 </itemizedlist>
             </section>
-            <section xml:id="auth-sphinx-config">
-                <title xml:id="auth-sphinx-config.title">SphinxGeometry section</title>
-                <warning>
-                    <para>Do not modify the SphinxGeometry section by hand. This configuration must
-                        be prommatically generated.</para>
-                </warning>
-                <para>The
-                    <?oxy_comment_start author="dwrob" timestamp="20241025T132943-0700" comment="provide reference"?>original
-                    Sphinx paper<?oxy_comment_end?> introduces the Sphinx nested encrypted packet
-                    format using a non-interactive key exchange (NIKE). Sphinx can be turned into a
-                    hybrid post-quantum construction simply by using a hybrid NIKE. The
-                    &program_name; Sphinx implementation has a completely configurable Sphinx
-                    geometry that allows for any NIKE or key encapsulation mechanism (KEM) to be
-                    used. A trade-off when using a KEM is that packet headers have additional
-                    overhead because they must store a KEM ciphertext for each hop.</para>
-                <para>The &program_name; Sphinx implementation also supports the following
-                    additional cryptographic primitives: </para>
+            <section id="auth-sphinx-config">
+                <title id="auth-sphinx-config.title">Dirauth: SphinxGeometry
+                    section</title>
+                <para>Sphinx is an encrypted nested-packet format designed primarily for mixnets.
+                    The <ulink
+                        url="https://www.freehaven.net/anonbib/cache/DBLP:conf/sp/DanezisG09.pdf"
+                        >original Sphinx paper</ulink> described a non-interactive key exchange
+                    (NIKE) employing classical encryption. The &program_name; implementation
+                    strongly emphasizes configurability, supporting key encapsulation mechanisms
+                    (KEMs) as well as NIKEs, and enabling the use of either classical or hybrid
+                    post-quantum cryptography. Hybrid constructions offset the newness of
+                    post-quantum algorithms by offering heavily tested classical algorithms as a
+                    fallback.</para>
+                <note>
+                    <para>Sphinx, the nested-packet format, should not be confused with <ulink
+                            url="http://sphincs.org/index.html">Sphincs or Sphincs+</ulink>, which
+                        are post-quantum signature schemes.</para>
+                </note>
+                <para>&program_name; Sphinx also relies on the following classical cryptographic
+                    primitives: </para>
                 <itemizedlist>
                     <listitem>
-                        <para>stream cipher: CTR-AES256</para>
+                        <para>CTR-AES256, a stream cipher</para>
                     </listitem>
                     <listitem>
-                        <para>MAC: HMAC-SHA256</para>
+                        <para>HMAC-SHA256, a message authentication code (MAC) function</para>
                     </listitem>
                     <listitem>
-                        <para>KDF: HKDF-SHA256</para>
+                        <para>HKDF-SHA256, a key derivation function (KDF)</para>
                     </listitem>
                     <listitem>
-                        <para>SPRP: AEZv5</para>
+                        <para>AEZv5, a strong pseudorandom permutation (SPRP)</para>
                     </listitem>
                 </itemizedlist>
-                <para>In &program_name;, all dirauths must configure the same SphinxGeometry. Each
-                    dirauth publishes the hash of its SphinxGeometry in the PKI document for
-                    validation by its peer dirauths. </para>
-                &sphinxgeometry;
+                <para>All dirauths must be configured to use the same <code>SphinxGeometry</code>
+                    parameters. Any geometry not advertised by the PKI document will fail. Each
+                    dirauth publishes the hash of its <code>SphinxGeometry</code> parameters in the
+                    PKI document for validation by its peer dirauths. </para>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: sphinxgeometry (/1/4)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
         </section>
-    </section>
-    <section xml:id="server">
-        <title xml:id="server.title">Mix, gateway, and service nodes</title>
-        
-<!--
-            https://github.com/katzenpost/katzenpost/blob/c255fbbf421d5d9820553c18dc5dc6c9881ad547/server/config/config.go    
-        
-        // Config is the top level Katzenpost server configuration.
-        type Config struct {
-        Server         *Server
-        Logging        *Logging
-        ServiceNode    *ServiceNode
-        Gateway        *Gateway
-        PKI            *PKI
-        Management     *Management
-        SphinxGeometry *geo.Geometry
-        Debug *Debug
-        }        
-        
--->
-         <section xml:id="mix-config">
-            <title xml:id="mix-config.title">Configuring mix nodes</title>
+        <section id="mix-config">
+            <title id="mix-config.title">Configuring mix nodes</title>
             <para>The following configuration is drawn from the reference implementation in
-                    <filename>katzenpost/docker/voting_mixnet/mix1/katzenpost.toml</filename>. In a
+                    <filename>katzenpost/docker/dirauth_mixnet/mix1/katzenpost.toml</filename>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
-                more information about the test mixnet, see <link linkend="container"
-                    endterm="container.title">Using the &program_name; test network</link>.</para>
-            <section xml:id="mix-server-section-config">
-                <title xml:id="mix-server-section-config.title">Server section</title>
-                <para/>
+                more information about the test mixnet, see <emphasis role="bold"><xref
+                        endterm="container.title" linkend="container"/></emphasis>.</para>
+            <para>
+                <table frame="all">
+                    <title>Mix node configuration sections</title>
+                    <tgroup cols="1">
+                        <colspec colname="c1" colnum="1" colwidth="1*"/>
+                        <tbody>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-server-section-config" endterm="mix-server-section-config.title"/></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-logging-config" endterm="mix-logging-config.title"/></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-pki-config" endterm="mix-pki-config.title"/></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-management-config" endterm="mix-management-config.title"/></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-sphinx-config" endterm="mix-sphinx-config.title"/></para>
+                                </entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para><xref linkend="mix-debug-config" endterm="mix-debug-config.title"/></para>
+                                </entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </table>
+            </para>
+            <section id="mix-server-section-config">
+                <title id="mix-server-section-config.title">Mix node: Server section</title>
+                <para>The <code>Server</code> section configures mandatory basic parameters for each
+                    server node.</para>
                 <para>
                     <programlisting>[Server]
   Identifier = "mix1"
@@ -595,44 +842,106 @@ ldMtDsvvc9KUfE4I0+c+XQ==
   Addresses = ["127.0.0.1:30008"]
   OnlyAdvertiseAltAddresses = false
   MetricsAddress = "127.0.0.1:30009"
-  DataDir = "/voting_mixnet/mix1"
+  DataDir = "/dirauth_mixnet/mix1"
   IsGatewayNode = false
   IsServiceNode = false
   [Server.AltAddresses]</programlisting>
                 </para>
-                    &serverconfig;
+                <!--See comment in includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--serverconfig (/1/2)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="mix-logging-config">
-                <title xml:id="mix-logging-config.title">Logging section</title>
-                    &logging;
+            <section id="mix-logging-config">
+                <title id="mix-logging-config.title">Mix node: Logging section</title>
+                <!--See comment in includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--logging (/1/3)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="mix-pki-config">
-                <title xml:id="mix-pki-config.title">PKI section</title>
-                    &pki;                
+            <section id="mix-pki-config">
+                <title id="mix-pki-config.title">Mix node: PKI section</title>
+                <!--See comment in includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--pki (/1/6)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="mix-management-config">
-                <title xml:id="mix-management-config.title">Management section</title>
-                    &management;
+            <section id="mix-management-config">
+                <title id="mix-management-config.title">Mix node: Management section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: management (/1/5)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="mix-sphinx-config">
-                <title xml:id="mix-sphinx-config.title">SphinxGeometry section</title>
-                &sphinxgeometry;
+            <section id="mix-sphinx-config">
+                <title id="mix-sphinx-config.title">Mix node: SphinxGeometry section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: sphinxgeometry (/1/4)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="mix-debug-config">
-                <title xml:id="mix-debug-config.title">Debug section</title>
-                    &serverdebug;
+            <section id="mix-debug-config">
+                <title id="mix-debug-config.title">Mix node: Debug section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: serverdebug (/1/7)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
         </section>
-        <section xml:id="gateway-config">
-            <title xml:id="gateway-config.title">Configuring gateway nodes</title>
+        <section id="gateway-config">
+            <title id="gateway-config.title">Configuring gateway nodes</title>
             <para>The following configuration is drawn from the reference implementation in
-                    <filename>katzenpost/docker/voting_mixnet/gateway1/katzenpost.toml</filename>.
+                    <filename>katzenpost/docker/dirauth_mixnet/gateway1/katzenpost.toml</filename>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
-                address. For more information about the test mixnet, see <link linkend="container"
-                    endterm="container.title">Using the &program_name; test network</link>.</para>
-            <section xml:id="gateway-server-section-config">
-                <title xml:id="gateway-server-section-config.title">Server section</title>
-                <para/>
+                address. For more information about the test mixnet, see <emphasis role="bold"><xref
+                        endterm="container.title" linkend="container"/></emphasis>.</para>
+            <table frame="all">
+                <title>Gateway node configuration sections</title>
+                <tgroup cols="1">
+                    <colspec colname="c1" colnum="1" colwidth="1*"/>
+                    <tbody>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-server-section-config" endterm="gateway-server-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-logging-config" endterm="gateway-logging-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-gateway-section-config" endterm="gateway-gateway-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-pki-config" endterm="gateway-pki-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-management-config" endterm="gateway-management-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-sphinx-config" endterm="gateway-sphinx-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="gateway-debug-config" endterm="gateway-debug-config.title"/></para>
+                            </entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+            <section id="gateway-server-section-config">
+                <title id="gateway-server-section-config.title">Gateway node: Server section</title>
+                <para>The <code>Server</code> section configures mandatory basic parameters for each
+                    server node.</para>
                 <programlisting>[Server]
     Identifier = "gateway1"
     WireKEM = "xwing"
@@ -640,112 +949,129 @@ ldMtDsvvc9KUfE4I0+c+XQ==
     Addresses = ["127.0.0.1:30004"]
     OnlyAdvertiseAltAddresses = false
     MetricsAddress = "127.0.0.1:30005"
-    DataDir = "/voting_mixnet/gateway1"
+    DataDir = "/dirauth_mixnet/gateway1"
     IsGatewayNode = true
     IsServiceNode = false
     [Server.AltAddresses]
         TCP = ["localhost:30004"]</programlisting>
-                &serverconfig;
-
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: serverconfig (/1/2)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="gateway-logging-config">
-                <title xml:id="gateway-logging-config.title">Logging section</title>
-                &logging;
+            <section id="gateway-logging-config">
+                <title id="gateway-logging-config.title">Gateway node: Logging section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: logging (/1/3)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="gateway-gateway-section-config">
-                <?oxy_comment_start author="dwrob" timestamp="20240816T143000-0700" comment="Information needed."?>
-                <title xml:id="gateway-gateway-section-config.title">Gateway section<?oxy_comment_end?></title>
+            <section id="gateway-gateway-section-config">
+                <title id="gateway-gateway-section-config.title">Gateway node: Gateway
+                    section</title>
                 <para/>
+                <para>The <code>Gateway</code> section of the configuration is required for configuring a Gateway
+                    node. The section must contain <code>UserDB </code>and <code>SpoolDB</code>
+                    definitions. <ulink url="https://github.com/boltdb/bolt">Bolt</ulink> is an
+                    embedded database library for the Go programming language that &program_name;
+                    has used in the past for its user and spool databases. Because &program_name;
+                    currently persists data on Service nodes instead of Gateways, these databases
+                    will probably be deprecated in favour of in-memory concurrency structures. In
+                    the meantime, it remains necessary to configure a Gateway node as shown below,
+                    only changing the file paths as needed: </para>
                 <programlisting>[Gateway]
     [Gateway.UserDB]
         Backend = "bolt"
             [Gateway.UserDB.Bolt]
-                UserDB = "/voting_mixnet/gateway1/users.db"
+                UserDB = "/dirauth_mixnet/gateway1/users.db"
     [Gateway.SpoolDB]
         Backend = "bolt"
             [Gateway.SpoolDB.Bolt]
-                SpoolDB = "/voting_mixnet/gateway1/spool.db"</programlisting>
-                <itemizedlist>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                    <listitem>
-                        <para/>
-                        <para/>
-                    </listitem>
-                </itemizedlist>
+                SpoolDB = "/dirauth_mixnet/gateway1/spool.db"</programlisting>
             </section>
-            <section xml:id="gateway-pki-config">
-                <title xml:id="gateway-pki-config.title">PKI section</title>
-                    &pki;
+            <section id="gateway-pki-config">
+                <title id="gateway-pki-config.title">Gateway node: PKI section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: pki (/1/6)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="gateway-management-config">
-                <title xml:id="gateway-management-config.title">Management section</title>
-                    &management;
+            <section id="gateway-management-config">
+                <title id="gateway-management-config.title">Gateway node: Management section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: management (/1/5)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="gateway-sphinx-config">
-                <title xml:id="gateway-sphinx-config.title">SphinxGeometry section</title>
-                    &sphinxgeometry;
+            <section id="gateway-sphinx-config">
+                <title id="gateway-sphinx-config.title">Gateway node: SphinxGeometry section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: sphinxgeometry (/1/4)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="gateway-debug-config">
-                <title xml:id="gateway-debug-config.title">Debug section</title>
-                &serverdebug;
-
-                
+            <section id="gateway-debug-config">
+                <title id="gateway-debug-config.title">Gateway node: Debug section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: serverdebug (/1/7)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
         </section>
-        <section xml:id="service-config">
-            <title xml:id="service-config.title">Configuring service nodes</title>
+        <section id="service-config">
+            <title id="service-config.title">Configuring service nodes</title>
             <para>The following configuration is drawn from the reference implementation in
-                <filename>katzenpost/docker/voting_mixnet/servicenode1/authority.toml</filename>.
+                    <filename>katzenpost/docker/dirauth_mixnet/servicenode1/authority.toml</filename>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
-                address. For more information about the test mixnet, see <link linkend="container"
-                    endterm="container.title">Using the Katzenpost test network</link>.</para>
-            <section xml:id="service-server-section-config">
-                <title xml:id="service-server-section-config.title">Server section</title>
-                <para>The Server section contains mandatory information common to all nodes, for
-                    example:</para>
+                address. For more information about the test mixnet, see <emphasis role="bold"><xref
+                        endterm="container.title" linkend="container"/></emphasis>.</para>
+            <table frame="all">
+                <title>Mix node configuration sections</title>
+                <tgroup cols="1">
+                    <colspec colname="c1" colnum="1" colwidth="1*"/>
+                    <tbody>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-server-section-config" endterm="service-server-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-logging-config" endterm="service-logging-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-servicenode-section-config" endterm="service-servicenode-section-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-pki-config" endterm="service-pki-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-management-config" endterm="service-management-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-sphinx-config" endterm="service-sphinx-config.title"/></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para><xref linkend="service-debug-config" endterm="service-debug-config.title"/></para>
+                            </entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+            <section id="service-server-section-config">
+                <title id="service-server-section-config.title">Service node: Server section</title>
+                <para>The <code>Server</code> section configures mandatory basic parameters for each
+                    server node.</para>
                 <programlisting>[Server]
     Identifier = "servicenode1"
     WireKEM = "xwing"
@@ -753,24 +1079,38 @@ ldMtDsvvc9KUfE4I0+c+XQ==
     Addresses = ["127.0.0.1:30006"]
     OnlyAdvertiseAltAddresses = false
     MetricsAddress = "127.0.0.1:30007"
-    DataDir = "/voting_mixnet/servicenode1"
+    DataDir = "/dirauth_mixnet/servicenode1"
     IsGatewayNode = false
     IsServiceNode = true
     [Server.AltAddresses]</programlisting>
-                &serverconfig;
-
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: serverconfig (/1/2)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="service-logging-config">
-                <title xml:id="service-logging-config.title">Logging section</title>
-                &logging;
+            <section id="service-logging-config">
+                <title id="service-logging-config.title">Service node: Logging section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: logging (/1/3)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="service-servicenode-section-config">
-                <title xml:id="service-servicenode-section-config.title">ServiceNode section</title>
-                <!--https://github.com/katzenpost/katzenpost/blob/main/server/config/config.go#L470 defines the top level configuration.
-https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 defines the per-service configurations.-->
-                <para>The service node configuration section contains subsections with settings for
-                    each service that Katzenpost supports. In a production network, the various
-                    services would be hosted on dedicated systems.</para>
+            <section id="service-servicenode-section-config">
+                <title id="service-servicenode-section-config.title">Service node: ServiceNode
+                    section</title>
+                <para>The <code>ServiceNode</code> section contains configurations for each network
+                    service that &program_name; supports. </para>
+                <para>Services, termed <ulink
+                        url="https://github.com/katzenpost/katzenpost/blob/main/docs/Specificatons/pdf/kaetzchen.pdf"
+                        >Kaetzchen</ulink>, can be divided into built-in and external services.
+                    External services are provided through the <ulink
+                        url="https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.35/server/cborplugin#ResponseFactory"
+                        >CBORPlugin</ulink>, a Go programming language implementation of the <ulink
+                        url="https://datatracker.ietf.org/doc/html/rfc8949">Concise Binary Object
+                        Representation (CBOR)</ulink>, a binary data serialization format. While
+                    native services need simply to be activated, external services are invoked by a
+                    separate command and connected to the mixnet over a Unix socket. The plugin
+                    allows mixnet services to be added in any programming language.</para>
                 <programlisting>[ServiceNode]
                     
     [[ServiceNode.Kaetzchen]]
@@ -781,149 +1121,168 @@ https://github.com/katzenpost/katzenpost/blob/main/genconfig/main.go#L207 define
     [[ServiceNode.CBORPluginKaetzchen]]
         Capability = "spool"
         Endpoint = "+spool"
-        Command = "/voting_mixnet/memspool.alpine"
+        Command = "/dirauth_mixnet/memspool.alpine"
         MaxConcurrency = 1
         Disable = false
         [ServiceNode.CBORPluginKaetzchen.Config]
-            data_store = "/voting_mixnet/servicenode1/memspool.storage"
-            log_dir = "/voting_mixnet/servicenode1"
+            data_store = "/dirauth_mixnet/servicenode1/memspool.storage"
+            log_dir = "/dirauth_mixnet/servicenode1"
     
     [[ServiceNode.CBORPluginKaetzchen]]
         Capability = "pigeonhole"
         Endpoint = "+pigeonhole"
-        Command = "/voting_mixnet/pigeonhole.alpine"
+        Command = "/dirauth_mixnet/pigeonhole.alpine"
         MaxConcurrency = 1
         Disable = false
         [ServiceNode.CBORPluginKaetzchen.Config]
-            db = "/voting_mixnet/servicenode1/map.storage"
-            log_dir = "/voting_mixnet/servicenode1"
+            db = "/dirauth_mixnet/servicenode1/map.storage"
+            log_dir = "/dirauth_mixnet/servicenode1"
     
     [[ServiceNode.CBORPluginKaetzchen]]
         Capability = "panda"
         Endpoint = "+panda"
-        Command = "/voting_mixnet/panda_server.alpine"
+        Command = "/dirauth_mixnet/panda_server.alpine"
         MaxConcurrency = 1
         Disable = false
         [ServiceNode.CBORPluginKaetzchen.Config]
-            fileStore = "/voting_mixnet/servicenode1/panda.storage"
-            log_dir = "/voting_mixnet/servicenode1"
+            fileStore = "/dirauth_mixnet/servicenode1/panda.storage"
+            log_dir = "/dirauth_mixnet/servicenode1"
             log_level = "INFO"
     
     [[ServiceNode.CBORPluginKaetzchen]]
         Capability = "http"
         Endpoint = "+http"
-        Command = "/voting_mixnet/proxy_server.alpine"
+        Command = "/dirauth_mixnet/proxy_server.alpine"
         MaxConcurrency = 1
         Disable = false
         [ServiceNode.CBORPluginKaetzchen.Config]
             host = "localhost:4242"
-            log_dir = "/voting_mixnet/servicenode1"
+            log_dir = "/dirauth_mixnet/servicenode1"
             log_level = "DEBUG"</programlisting>
                 <para><emphasis role="bold">Common parameters:</emphasis></para>
                 <itemizedlist>
                     <listitem>
                         <para><emphasis role="bold">Capability</emphasis></para>
-                        <para>The capability exposed by the agent.</para>
+                        <para>Specifies the protocol capability exposed by the agent.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Endpoint</emphasis></para>
-                        <para>Endpoint is the provider side endpoint that the agent will
-                            accept requests at. While not required by the spec, this server
-                            only supports Endpoints that are lower-case local-parts of an
-                            e-mail address.</para>
+                        <para>Specifies the provider-side Endpoint where the agent will accept
+                            requests. While not required by the specification, this server only
+                            supports Endpoints that are
+                            <?oxy_comment_start author="dwrob" timestamp="20241107T101141-0800" comment="Example?"?>lower-case
+                            local parts<?oxy_comment_end?> of an email address.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Command</emphasis></para>
-                        <para>Command is the full file path to the external plugin program
-                        that implements this Kaetzchen service.</para>
+                        <para>Specifies the full path to the external plugin program that implements
+                            this <code>Kaetzchen</code> service.</para>
                         <para>Type: string</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">MaxConcurrency</emphasis></para>
-                        <para>MaxConcurrency is the number of worker goroutines to start for this service.</para>
+                        <para>Specifies the number of worker goroutines to start for this
+                            service.</para>
                         <para>Type: int</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Config</emphasis></para>
-                        <para>The extra per agent arguments to be passed to the agent's initialization routine.</para>
+                        <para>Specifies extra per-agent arguments to be passed to the agent's
+                            initialization routine.</para>
                         <para>Type: map[string]interface{}</para>
-                        <para>Required:</para>
+                        <para>Required: Yes</para>
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Disable</emphasis></para>
-                        <para>disabled a configured agent.</para>
+                        <para>If <emphasis role="bold">true</emphasis>, disables a configured
+                            agent.</para>
                         <para>Type: bool</para>
-                        <para>Required:</para>
+                        <para>Required: No</para>
                     </listitem>
                 </itemizedlist>
-                <?oxy_comment_start author="dwrob" timestamp="20240816T141621-0700" comment="About CBOR:
-
-https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.35/server/cborplugin#ResponseFactory
-
-Package cborplugin is a plugin system allowing mix network services to be added in any language. It communicates queries and responses to and from the mix server using CBOR over UNIX domain socket. Beyond that, a client supplied SURB is used to route the response back to the client as described in our Kaetzchen specification document: "?>
-                <para><emphasis role="bold">Per-service
-                    parameters:<?oxy_comment_end?></emphasis></para>
+                <para><emphasis role="bold">Per-service parameters:</emphasis></para>
                 <para>
                     <itemizedlist>
                         <listitem>
-                            <para><?oxy_comment_start author="dwrob" timestamp="20240816T124622-0700" comment="Needs explanation"?><?oxy_custom_start type="oxy_content_highlight" color="255,255,0" mid="36"?><emphasis
-                                    role="bold"
-                            >Kaetzchen</emphasis><?oxy_comment_end?></para><?oxy_custom_end mid="36"?>
+                            <para><emphasis role="bold">echo</emphasis></para>
+                            <para>The internal <code>echo</code> service must be enabled on every
+                                service node of a production mixnet for decoy traffic to work
+                                properly. </para>
                         </listitem>
                         <listitem>
                             <para><emphasis role="bold">spool</emphasis></para>
+                            <para>The <code>spool</code> service supports the <code>catshadow</code>
+                                storage protocol,
+                                <?oxy_comment_start author="dwrob" timestamp="20241113T174007-0800" comment="Wasn&apos;t there also something about Panda and Reunion being don&apos;t-say-deprecated and needing this spool? They both appear to be configured as enabled in the example. What should be the messaging on this?  See highlighted text below."?>which
+                                is required by the &chat_client; chat client<?oxy_comment_end?>. The
+                                example configuration above shows spool enabled with the setting:<programlisting>Disable = false</programlisting><note>
+                                    <para><code>Spool</code>, properly <code>memspool</code>, should
+                                        not be confused with the spool database on gateway
+                                        nodes.</para>
+                                </note></para>
                             <itemizedlist>
                                 <listitem>
                                     <para><emphasis role="bold">data_store</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Specifies the full path to the service database
+                                        file.</para>
+                                    <para>Type: string</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Specifies the path to the node's log directory.</para>
+                                    <para>Type: string</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
                         <listitem>
                             <para><emphasis role="bold">pigeonhole</emphasis></para>
+                            <para>The <code>pigeonhole</code> courier service supports the
+                                Blinding-and-Capability scheme (BACAP)-based unlinkable messaging
+                                protocols detailed in <emphasis role="bold"
+                                    >&research_paper_link;</emphasis>. Most of our future protocols
+                                will use the <code>pigeonhole</code> courier service.</para>
                             <itemizedlist>
                                 <listitem>
                                     <para><emphasis role="bold">db</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Specifies the full path to the service database
+                                        file.</para>
+                                    <para>Type: string</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Specifies the path to the node's log directory.</para>
+                                    <para>Type: string</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
                         <listitem>
-                            <para><emphasis role="bold">panda</emphasis></para>
+                            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><emphasis
+                                    role="bold">panda</emphasis></para>
+                            <para>The <code>panda</code> storage and authentication service
+                                currently does not work properly.</para>
                             <itemizedlist>
                                 <listitem>
                                     <para><emphasis role="bold">fileStore</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
-                                    <para>Required:</para>
-                                </listitem>
+                                    <para>Specifies the full path to the service database
+                                        file.</para>
+                                    <para>Type: string</para>
+                                    <para>Required: Yes</para>
+                                </listitem><?oxy_custom_end?>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Specifies the path to the node's log directory.</para>
+                                    <para>Type: string</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_level</emphasis></para>
@@ -934,62 +1293,78 @@ Package cborplugin is a plugin system allowing mix network services to be added 
                                             use.</para>
                                     </warning>
                                     <para>Type: string</para>
-                                    <para>Required:</para>
-                        <para>Required:</para>
+                                    <para>Required: Yes</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
                         <listitem>
                             <para><emphasis role="bold">http</emphasis></para>
+                            <para>The <code>http</code> service is completely optional, but allows
+                                the mixnet to be used as an HTTP proxy. This may be useful for
+                                integrating with existing software systems.</para>
                             <itemizedlist>
                                 <listitem>
                                     <para><emphasis role="bold">host</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>The host name and TCP port of the service.</para>
+                                    <para>Type: string</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_dir</emphasis></para>
-                                    <para/>
-                                    <para>Type: </para>
-                                    <para>Required:</para>
+                                    <para>Specifies the path to the node's log directory.</para>
+                                    <para>Type: string</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                                 <listitem>
                                     <para><emphasis role="bold">log_level</emphasis></para>
                                     <para>Supported values are ERROR | WARNING | NOTICE |INFO |
                                         DEBUG.</para>
                                     <para>Type: string</para>
-                                    <para>Required:</para>
-                        <para>Required:</para>
+                                    <para>Required: Yes</para>
+                                    <para>Required: Yes</para>
                                     <warning>
                                         <para>The DEBUG log level is unsafe for production
                                             use.</para>
                                     </warning>
                                     <para>Type: string</para>
-                                    <para>Required:</para>
-                        <para>Required:</para>
+                                    <para>Required: Yes</para>
                                 </listitem>
                             </itemizedlist>
                         </listitem>
                     </itemizedlist>
                 </para>
             </section>
-            <section xml:id="service-pki-config">
-                <title xml:id="service-pki-config.title">PKI section</title>
-                    &pki;
+            <section id="service-pki-config">
+                <title id="service-pki-config.title">Service node: PKI section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: pki (/1/6)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="service-management-config">
-                <title xml:id="service-management-config.title">Management section</title>
-                    &management;
+            <section id="service-management-config">
+                <title id="service-management-config.title">Service node: Management section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: management (/1/5)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="service-sphinx-config">
-                <title xml:id="service-sphinx-config.title">SphinxGeometry section</title>
-                    &sphinxgeometry;
+            <section id="service-sphinx-config">
+                <title id="service-sphinx-config.title">Service node: SphinxGeometry section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: sphinxgeometry (/1/4)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
             </section>
-            <section xml:id="service-debug-config">
-                <title xml:id="service-debug-config.title">Debug section</title>
-                &serverdebug;
-           </section>
+            <section id="service-debug-config">
+                <title id="service-debug-config.title">Service node: Debug section</title>
+                <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
+                <!--Configuration section: serverdebug (/1/7)-->
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
+                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+            </section>
+
+
         </section>
     </section>
 </chapter>

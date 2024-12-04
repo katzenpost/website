@@ -1,18 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="http://docbook.org/xml/5.1/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml version='1.0'?> 
 
-<book xmlns="http://docbook.org/ns/docbook" 
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1">
-    <info>
-        <title>Katzenpost Administrator's Guide</title>
-    </info>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
+[
+   <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
+    %shared-content;
+ 
+ <!ENTITY program_name 'Katzenpost'>
+ 
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > 
+]> 
 
-<!--    <xi:include href="quickstart.xml"/>
-    <xi:include href="introduction.xml"/>-->
-    <xi:include href="components.xml"/>
-<!--    <xi:include href="operations.xml"/>-->
-    <xi:include href="docker.xml"/>
-
-</book>
+<book> 
+    <title>&program_name; administrator's guide</title>
+   <preface id="introduction">
+       <title id="introduction.title">Introduction</title>
+       <para>To Do</para>
+   </preface>
+      
+    <xi:include href="components.xml"></xi:include> 
+<!--    <xi:include href="operations.xml"></xi:include>-->
+    <xi:include href="docker.xml"></xi:include>
+    <xi:include href="docker-config-appendix.xml"></xi:include>
+    <xi:include href="gensphinx-appendix.xml"></xi:include>
+</book> 
