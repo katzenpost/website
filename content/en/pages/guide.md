@@ -2,6 +2,7 @@
 title: "Katzenpost Admin Guide"
 linkTitle: "admin guide"
 description: ""
+menu: {main: {weight: 20}}
 slug: "/admin_guide/"
 type: "pages"
 ---
