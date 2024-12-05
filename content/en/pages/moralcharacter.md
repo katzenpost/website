@@ -1,5 +1,5 @@
 ---
-title: "Our Values & Morals"
+title: "Our Values"
 linkTitle: "Values"
 description: "Why we started creating Katzenpost and what principles guide us."
 draft: false
