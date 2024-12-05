@@ -3,7 +3,7 @@ title: "Katzenpost Admin Guide"
 linkTitle: "admin guide"
 description: "sys admin's guide to katzenpost server side"
 menu: {main: {weight: 20}}
-slug: "/admin_guide/"
+slug: "/guide/"
 type: "pages"
 ---
 
@@ -1093,9 +1093,6 @@ server node.
 
     -   **Classical:** \"ed25519\", \"ed448\"
 
-    ```{=html}
-    <!-- -->
-    ```
     -   **Hybrid post-quantum:** \"Ed25519 Sphincs+\",
         \"Ed448-Sphincs+\", \"Ed25519-Dilithium2\", \"Ed448-Dilithium3\"
 

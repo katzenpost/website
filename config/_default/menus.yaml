@@ -4,7 +4,7 @@ main:
     url: "/moral-character"
   - name: "Admin Guide"
     weight: 20
-    url: "/admin_guide"
+    url: "/guide"
   - name: "Code"
     weight: 50
     url: "https://github.com/katzenpost"
