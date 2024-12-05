@@ -1,7 +1,7 @@
 ---
 title: "Katzenpost Admin Guide"
 linkTitle: "admin guide"
-description: ""
+description: "sys admin's guide to katzenpost server side"
 menu: {main: {weight: 20}}
 slug: "/admin_guide/"
 type: "pages"
