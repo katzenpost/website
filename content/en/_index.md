@@ -1,6 +1,6 @@
 ---
 title: "Katzenpost"
-description: "Welcome to the Katzenpost project. We are creating traffic analysis resistant messaging. kthxbai"
+description: "Welcome to the Katzenpost project. We are creating traffic analysis resistant messaging."
 ---
 
 <!-- Hero -->
