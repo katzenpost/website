@@ -90,11 +90,8 @@ serverdebug (/1/7)-->
                     <para>The following signature schemes are supported:</para>
                     <itemizedlist>
                         <listitem>
-                            <para><emphasis role="bold">Classical:</emphasis>  "ed25519",
-                                "ed448"</para>
+                            <para><emphasis role="bold">Classical:</emphasis>  "ed25519", "ed448"</para>
                         </listitem>
-                    </itemizedlist>
-                    <itemizedlist>
                         <listitem>
                             <para><emphasis role="bold">Hybrid post-quantum:</emphasis> "Ed25519
                                 Sphincs+", "Ed448-Sphincs+", "Ed25519-Dilithium2",
