@@ -138,14 +138,14 @@ serverdebug (/1/7)-->
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">IsGatewayNode</emphasis></para>
-                    <para>If <emphasis role="bold">true></emphasis>, the server is a gateway
+                    <para>If <emphasis role="bold">true</emphasis>, the server is a gateway
                         node.</para>
                     <para>Type: bool</para>
                     <para>Required: No</para>
                 </listitem>
                 <listitem>
                     <para><emphasis role="bold">IsServiceNode</emphasis></para>
-                    <para>If <emphasis role="bold">true></emphasis>, the server is a service
+                    <para>If <emphasis role="bold">true</emphasis>, the server is a service
                         node.</para>
                     <para>Type: bool</para>
                     <para>Required: No</para>
@@ -168,7 +168,7 @@ serverdebug (/1/7)-->
             <itemizedlist>
                 <listitem>
                     <para><emphasis role="bold">Disable</emphasis></para>
-                    <para>If <emphasis role="bold">true></emphasis>, logging is disabled.</para>
+                    <para>If <emphasis role="bold">true</emphasis>, logging is disabled.</para>
                     <para>Type: bool</para>
                     <para>Required: No</para>
                 </listitem>
@@ -353,7 +353,7 @@ serverdebug (/1/7)-->
            <itemizedlist>
                <listitem>
                    <para><emphasis role="bold">Enable</emphasis></para>
-                   <para>If <emphasis role="bold">true></emphasis>, the management interface is
+                   <para>If <emphasis role="bold">true</emphasis>, the management interface is
                         enabled.</para>
                    <para>Type: bool</para>
                    <para>Required: No</para>
@@ -544,7 +544,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">SchedulerExternalMemoryQueue</emphasis></para>
-                        <para>If <emphasis role="bold">true></emphasis>, the experimental disk-backed external memory 
+                        <para>If <emphasis role="bold">true</emphasis>, the experimental disk-backed external memory 
                             queue is enabled.</para>
                         <para>Type: bool</para>
                         <para>Required: No</para>
@@ -636,7 +636,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">SendDecoyTraffic</emphasis></para>
-                        <para>If <emphasis role="bold">true></emphasis>, decoy traffic is enabled. 
+                        <para>If <emphasis role="bold">true</emphasis>, decoy traffic is enabled. 
                             This parameter is experimental and untuned, 
                             and is disabled by default.</para>
                         <note>
@@ -647,7 +647,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">DisableRateLimit</emphasis></para>
-                        <para>If <emphasis role="bold">true></emphasis>, the per-client rate limiter is disabled.</para>
+                        <para>If <emphasis role="bold">true</emphasis>, the per-client rate limiter is disabled.</para>
                         <note>
                             <para>This option should only be used for testing.</para>
                         </note>

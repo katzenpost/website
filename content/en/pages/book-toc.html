@@ -6,12 +6,11 @@ slug: "/admin_guide/"
 type: "pages"
 ---
 
-
 <html xmlns:ng="http://docbook.org/docbook-ng"><head>
       <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-   <title>Katzenpost administrator's guide</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book"><div class="titlepage"><div><div><h1 class="title"><a name="d6e1"></a>Katzenpost administrator's guide</h1></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="preface"><a href="#introduction">Introduction</a></span></dt><dt><span class="chapter"><a href="#components">1. Components and configuration of the Katzenpost mixnet</a></span></dt><dd><dl><dt><span class="section"><a href="#overview">Understanding the Katzenpost components</a></span></dt><dd><dl><dt><span class="section"><a href="#intro-dirauth">Directory authorities (dirauths)</a></span></dt><dt><span class="section"><a href="#intro-mix">Mix nodes</a></span></dt><dt><span class="section"><a href="#intro-gateway">Gateway nodes</a></span></dt><dt><span class="section"><a href="#intro-service">Service nodes</a></span></dt><dt><span class="section"><a href="#intro-client">Clients</a></span></dt></dl></dd><dt><span class="section"><a href="#configuration">Configuring Katzenpost</a></span></dt><dd><dl><dt><span class="section"><a href="#auth-config">Configuring directory authorities</a></span></dt><dt><span class="section"><a href="#mix-config">Configuring mix nodes</a></span></dt><dt><span class="section"><a href="#gateway-config">Configuring gateway nodes</a></span></dt><dt><span class="section"><a href="#service-config">Configuring service nodes</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#container">2. Using the Katzenpost Docker test network</a></span></dt><dd><dl><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#install_kp">Preparing to run the container image</a></span></dt><dt><span class="section"><a href="#basic-ops">Operating the test mixnet</a></span></dt><dd><dl><dt><span class="section"><a href="#start-mixnet">Starting and monitoring the mixnet</a></span></dt><dt><span class="section"><a href="#test-mixnet">Testing the mixnet</a></span></dt><dt><span class="section"><a href="#shutdown-mixnet">Shutting down the mixnet</a></span></dt><dt><span class="section"><a href="#uninstall-mixnet">Uninstalling and cleaning up</a></span></dt></dl></dd><dt><span class="section"><a href="#topology">Network topology and components</a></span></dt><dd><dl><dt><span class="section"><a href="#d6e2651">The Docker file tree</a></span></dt></dl></dd><dt><span class="section"><a href="#d6e2657"></a></span></dt></dl></dd><dt><span class="chapter"><a href="#docker-config">3. Appendix: Configuration files from the Docker test mixnet </a></span></dt><dd><dl><dt><span class="section"><a href="#dirauth-config">Directory authority</a></span></dt><dt><span class="section"><a href="#mix-node-config">Mix node</a></span></dt><dt><span class="section"><a href="#gateway-node-config">Gateway node</a></span></dt><dt><span class="section"><a href="#service-node-config">Service node</a></span></dt></dl></dd><dt><span class="chapter"><a href="#gensphinx">4. Appendix: Using <span class="emphasis"><em>gensphinx</em></span></a></span></dt></dl></div><div class="list-of-figures"><p><b>List of Figures</b></p><dl><dt>1.1. <a href="#d6e28">The pictured element types correspond to discrete client and server programs that
-                Katzenpost requires to function. </a></dt><dt>2.1. <a href="#d6e2555">Test network topology</a></dt></dl></div><div class="list-of-tables"><p><b>List of Tables</b></p><dl><dt>1.1. <a href="#d6e72">Katzenpost clients</a></dt><dt>1.2. <a href="#d6e143"><span class="bold">Directory authority (dirauth) configuration
-                        sections</span></a></dt><dt>1.3. <a href="#d6e657">Mix node configuration sections</a></dt><dt>1.4. <a href="#d6e1134">Gateway node configuration sections</a></dt><dt>1.5. <a href="#d6e1623">Mix node configuration sections</a></dt><dt>2.1. <a href="#d6e2356">Table 1: Makefile targets</a></dt><dt>2.2. <a href="#d6e2577">Table 2: Test mixnet hosts</a></dt></dl></div> 
+   <title>Katzenpost administrator's guide</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book"><div class="titlepage"><div><div><h1 class="title"><a name="d6e1"></a>Katzenpost administrator's guide</h1></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="preface"><a href="#introduction">Introduction</a></span></dt><dt><span class="chapter"><a href="#components">1. Components and configuration of the Katzenpost mixnet</a></span></dt><dd><dl><dt><span class="section"><a href="#overview">Understanding the Katzenpost components</a></span></dt><dd><dl><dt><span class="section"><a href="#intro-dirauth">Directory authorities (dirauths)</a></span></dt><dt><span class="section"><a href="#intro-mix">Mix nodes</a></span></dt><dt><span class="section"><a href="#intro-gateway">Gateway nodes</a></span></dt><dt><span class="section"><a href="#intro-service">Service nodes</a></span></dt><dt><span class="section"><a href="#intro-client">Clients</a></span></dt></dl></dd><dt><span class="section"><a href="#configuration">Configuring Katzenpost</a></span></dt><dd><dl><dt><span class="section"><a href="#auth-config">Configuring directory authorities</a></span></dt><dt><span class="section"><a href="#mix-config">Configuring mix nodes</a></span></dt><dt><span class="section"><a href="#gateway-config">Configuring gateway nodes</a></span></dt><dt><span class="section"><a href="#service-config">Configuring service nodes</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#container">2. Using the Katzenpost Docker test network</a></span></dt><dd><dl><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#install_kp">Preparing to run the container image</a></span></dt><dt><span class="section"><a href="#basic-ops">Operating the test mixnet</a></span></dt><dd><dl><dt><span class="section"><a href="#start-mixnet">Starting and monitoring the mixnet</a></span></dt><dt><span class="section"><a href="#test-mixnet">Testing the mixnet</a></span></dt><dt><span class="section"><a href="#shutdown-mixnet">Shutting down the mixnet</a></span></dt><dt><span class="section"><a href="#uninstall-mixnet">Uninstalling and cleaning up</a></span></dt></dl></dd><dt><span class="section"><a href="#topology">Network topology and components</a></span></dt><dd><dl><dt><span class="section"><a href="#d6e2648">The Docker file tree</a></span></dt></dl></dd><dt><span class="section"><a href="#d6e2654"></a></span></dt></dl></dd><dt><span class="chapter"><a href="#docker-config">3. Appendix: Configuration files from the Docker test mixnet </a></span></dt><dd><dl><dt><span class="section"><a href="#dirauth-config">Directory authority</a></span></dt><dt><span class="section"><a href="#mix-node-config">Mix node</a></span></dt><dt><span class="section"><a href="#gateway-node-config">Gateway node</a></span></dt><dt><span class="section"><a href="#service-node-config">Service node</a></span></dt></dl></dd><dt><span class="chapter"><a href="#gensphinx">4. Appendix: Using <span class="emphasis"><em>gensphinx</em></span></a></span></dt></dl></div><div class="list-of-figures"><p><b>List of Figures</b></p><dl><dt>1.1. <a href="#d6e28">The pictured element types correspond to discrete client and server programs that
+                Katzenpost requires to function. </a></dt><dt>2.1. <a href="#d6e2552">Test network topology</a></dt></dl></div><div class="list-of-tables"><p><b>List of Tables</b></p><dl><dt>1.1. <a href="#d6e72">Katzenpost clients</a></dt><dt>1.2. <a href="#d6e143"><span class="bold">Directory authority (dirauth) configuration
+                        sections</span></a></dt><dt>1.3. <a href="#d6e657">Mix node configuration sections</a></dt><dt>1.4. <a href="#d6e1133">Gateway node configuration sections</a></dt><dt>1.5. <a href="#d6e1621">Mix node configuration sections</a></dt><dt>2.1. <a href="#d6e2353">Table 1: Makefile targets</a></dt><dt>2.2. <a href="#d6e2574">Table 2: Test mixnet hosts</a></dt></dl></div> 
     
    <div class="preface"><div class="titlepage"><div><div><h1 class="title"><a name="introduction"></a>Introduction</h1></div></div></div>
        
@@ -422,7 +421,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 Level = "INFO"</pre>
             <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
                     <p><span class="bold"><strong>Disable</strong></span></p>
-                    <p>If <span class="bold"><strong>true&gt;</strong></span>, logging is disabled.</p>
+                    <p>If <span class="bold"><strong>true</strong></span>, logging is disabled.</p>
                     <p>Type: bool</p>
                     <p>Required: No</p>
                 </li><li class="listitem">
@@ -570,7 +569,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <p>Required: Yes</p>
                     </li><li class="listitem">
                         <p><span class="bold"><strong>GenerateOnly</strong></span></p>
-                        <p>If <span class="bold"><strong>true&gt;</strong></span>, the server halts and cleans
+                        <p>If <span class="bold"><strong>true</strong></span>, the server halts and cleans
                             up the data directory immediately after long-term key generation.</p>
                         <p>Type: bool</p>
                         <p>Required: No</p>
@@ -939,10 +938,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         similarly sign PKI documents using the same scheme.</p>
                     <p>The following signature schemes are supported:</p>
                     <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
-                            <p><span class="bold"><strong>Classical:</strong></span>  "ed25519",
-                                "ed448"</p>
-                        </li></ul></div>
-                    <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+                            <p><span class="bold"><strong>Classical:</strong></span>  "ed25519", "ed448"</p>
+                        </li><li class="listitem">
                             <p><span class="bold"><strong>Hybrid post-quantum:</strong></span> "Ed25519
                                 Sphincs+", "Ed448-Sphincs+", "Ed25519-Dilithium2",
                                 "Ed448-Dilithium3" </p>
@@ -981,13 +978,13 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     <p>Required: Yes</p>
                 </li><li class="listitem">
                     <p><span class="bold"><strong>IsGatewayNode</strong></span></p>
-                    <p>If <span class="bold"><strong>true&gt;</strong></span>, the server is a gateway
+                    <p>If <span class="bold"><strong>true</strong></span>, the server is a gateway
                         node.</p>
                     <p>Type: bool</p>
                     <p>Required: No</p>
                 </li><li class="listitem">
                     <p><span class="bold"><strong>IsServiceNode</strong></span></p>
-                    <p>If <span class="bold"><strong>true&gt;</strong></span>, the server is a service
+                    <p>If <span class="bold"><strong>true</strong></span>, the server is a service
                         node.</p>
                     <p>Type: bool</p>
                     <p>Required: No</p>
@@ -1000,7 +997,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e776"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e775"></a></h5></div></div></div>
         
         <div class="informalexample"> 
             <p>The <code class="code">Logging</code> configuration section controls logging behavior across Katzenpost.</p>
@@ -1010,7 +1007,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 Level = "INFO"</pre>
             <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
                     <p><span class="bold"><strong>Disable</strong></span></p>
-                    <p>If <span class="bold"><strong>true&gt;</strong></span>, logging is disabled.</p>
+                    <p>If <span class="bold"><strong>true</strong></span>, logging is disabled.</p>
                     <p>Type: bool</p>
                     <p>Required: No</p>
                 </li><li class="listitem">
@@ -1038,7 +1035,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e809"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e808"></a></h5></div></div></div>
              
         <div class="informalexample"> 
             <p>The <code class="code">PKI</code> section contains the directory authority configuration for a mix, gateway, or service node.</p>
@@ -1156,7 +1153,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e857"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e856"></a></h5></div></div></div>
         
            <div class="informalexample"> 
            <p>The <code class="code">Management</code> section specifies 
@@ -1167,7 +1164,7 @@ FZWJFK0R8iU52CEUxVpXTA==
    Path = "/dirauth_mixnet/mix1/management_sock"</pre>
            <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
                    <p><span class="bold"><strong>Enable</strong></span></p>
-                   <p>If <span class="bold"><strong>true&gt;</strong></span>, the management interface is
+                   <p>If <span class="bold"><strong>true</strong></span>, the management interface is
                         enabled.</p>
                    <p>Type: bool</p>
                    <p>Required: No</p>
@@ -1185,7 +1182,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e881"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e880"></a></h5></div></div></div>
         
         <div class="informalexample">        
             <p>The <code class="code">SphinxGeometry</code> section defines parameters for the Sphinx
@@ -1312,7 +1309,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e999"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e998"></a></h5></div></div></div>
              
         <div class="informalexample">    
             <p>The <code class="code">Debug</code> section is the Katzenpost server debug configuration
@@ -1358,7 +1355,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>Required: No</p>
                     </li><li class="listitem">
                         <p><span class="bold"><strong>SchedulerExternalMemoryQueue</strong></span></p>
-                        <p>If <span class="bold"><strong>true&gt;</strong></span>, the experimental disk-backed external memory 
+                        <p>If <span class="bold"><strong>true</strong></span>, the experimental disk-backed external memory 
                             queue is enabled.</p>
                         <p>Type: bool</p>
                         <p>Required: No</p>
@@ -1437,7 +1434,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>Required: No</p>
                     </li><li class="listitem">
                         <p><span class="bold"><strong>SendDecoyTraffic</strong></span></p>
-                        <p>If <span class="bold"><strong>true&gt;</strong></span>, decoy traffic is enabled. 
+                        <p>If <span class="bold"><strong>true</strong></span>, decoy traffic is enabled. 
                             This parameter is experimental and untuned, 
                             and is disabled by default.</p>
                         <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
@@ -1447,7 +1444,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>Required: No</p>
                     </li><li class="listitem">
                         <p><span class="bold"><strong>DisableRateLimit</strong></span></p>
-                        <p>If <span class="bold"><strong>true&gt;</strong></span>, the per-client rate limiter is disabled.</p>
+                        <p>If <span class="bold"><strong>true</strong></span>, the per-client rate limiter is disabled.</p>
                         <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                             <p>This option should only be used for testing.</p>
                         </td></tr></table></div>
@@ -1470,7 +1467,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     <code class="filename">katzenpost/docker/dirauth_mixnet/gateway1/katzenpost.toml</code>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
                 address. For more information about the test mixnet, see <span class="bold"><strong><a class="xref" href="#container" title="Chapter&nbsp;2.&nbsp;Using the Katzenpost Docker test network">Using the Katzenpost Docker test network</a></strong></span>.</p>
-            <div class="table"><a name="d6e1134"></a><p class="title"><b>Table&nbsp;1.4.&nbsp;Gateway node configuration sections</b></p><div class="table-contents">
+            <div class="table"><a name="d6e1133"></a><p class="title"><b>Table&nbsp;1.4.&nbsp;Gateway node configuration sections</b></p><div class="table-contents">
                 
                 <table class="table" summary="Gateway node configuration sections" border="1"><colgroup><col class="c1"></colgroup><tbody><tr><td>
                                 <p><a class="xref" href="#gateway-server-section-config" title="Gateway node: Server section">Gateway node: Server section</a></p>
@@ -1507,7 +1504,7 @@ FZWJFK0R8iU52CEUxVpXTA==
         TCP = ["localhost:30004"]</pre>
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1172"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1171"></a></h5></div></div></div>
         
                
         <div class="informalexample"> 
@@ -1557,10 +1554,8 @@ FZWJFK0R8iU52CEUxVpXTA==
                         similarly sign PKI documents using the same scheme.</p>
                     <p>The following signature schemes are supported:</p>
                     <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
-                            <p><span class="bold"><strong>Classical:</strong></span>  "ed25519",
-                                "ed448"</p>
-                        </li></ul></div>
-                    <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+                            <p><span class="bold"><strong>Classical:</strong></span>  "ed25519", "ed448"</p>
+                        </li><li class="listitem">
                             <p><span class="bold"><strong>Hybrid post-quantum:</strong></span> "Ed25519
                                 Sphincs+", "Ed448-Sphincs+", "Ed25519-Dilithium2",
                                 "Ed448-Dilithium3" </p>
@@ -1599,13 +1594,13 @@ FZWJFK0R8iU52CEUxVpXTA==
                     <p>Required: Yes</p>
                 </li><li class="listitem">
                     <p><span class="bold"><strong>IsGatewayNode</strong></span></p>
-                    <p>If <span class="bold"><strong>true&gt;</strong></span>, the server is a gateway
+                    <p>If <span class="bold"><strong>true</strong></span>, the server is a gateway
                         node.</p>
                     <p>Type: bool</p>
                     <p>Required: No</p>
                 </li><li class="listitem">
                     <p><span class="bold"><strong>IsServiceNode</strong></span></p>
-                    <p>If <span class="bold"><strong>true&gt;</strong></span>, the server is a service
+                    <p>If <span class="bold"><strong>true</strong></span>, the server is a service
                         node.</p>
                     <p>Type: bool</p>
                     <p>Required: No</p>
@@ -1618,7 +1613,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1256"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1254"></a></h5></div></div></div>
         
         <div class="informalexample"> 
             <p>The <code class="code">Logging</code> configuration section controls logging behavior across Katzenpost.</p>
@@ -1628,7 +1623,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 Level = "INFO"</pre>
             <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
                     <p><span class="bold"><strong>Disable</strong></span></p>
-                    <p>If <span class="bold"><strong>true&gt;</strong></span>, logging is disabled.</p>
+                    <p>If <span class="bold"><strong>true</strong></span>, logging is disabled.</p>
                     <p>Type: bool</p>
                     <p>Required: No</p>
                 </li><li class="listitem">
@@ -1679,7 +1674,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1298"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1296"></a></h5></div></div></div>
              
         <div class="informalexample"> 
             <p>The <code class="code">PKI</code> section contains the directory authority configuration for a mix, gateway, or service node.</p>
@@ -1797,7 +1792,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1346"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1344"></a></h5></div></div></div>
         
            <div class="informalexample"> 
            <p>The <code class="code">Management</code> section specifies 
@@ -1808,7 +1803,7 @@ FZWJFK0R8iU52CEUxVpXTA==
    Path = "/dirauth_mixnet/mix1/management_sock"</pre>
            <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
                    <p><span class="bold"><strong>Enable</strong></span></p>
-                   <p>If <span class="bold"><strong>true&gt;</strong></span>, the management interface is
+                   <p>If <span class="bold"><strong>true</strong></span>, the management interface is
                         enabled.</p>
                    <p>Type: bool</p>
                    <p>Required: No</p>
@@ -1826,7 +1821,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1370"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1368"></a></h5></div></div></div>
         
         <div class="informalexample">        
             <p>The <code class="code">SphinxGeometry</code> section defines parameters for the Sphinx
@@ -1953,7 +1948,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1488"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1486"></a></h5></div></div></div>
              
         <div class="informalexample">    
             <p>The <code class="code">Debug</code> section is the Katzenpost server debug configuration
@@ -1999,7 +1994,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>Required: No</p>
                     </li><li class="listitem">
                         <p><span class="bold"><strong>SchedulerExternalMemoryQueue</strong></span></p>
-                        <p>If <span class="bold"><strong>true&gt;</strong></span>, the experimental disk-backed external memory 
+                        <p>If <span class="bold"><strong>true</strong></span>, the experimental disk-backed external memory 
                             queue is enabled.</p>
                         <p>Type: bool</p>
                         <p>Required: No</p>
@@ -2078,7 +2073,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>Required: No</p>
                     </li><li class="listitem">
                         <p><span class="bold"><strong>SendDecoyTraffic</strong></span></p>
-                        <p>If <span class="bold"><strong>true&gt;</strong></span>, decoy traffic is enabled. 
+                        <p>If <span class="bold"><strong>true</strong></span>, decoy traffic is enabled. 
                             This parameter is experimental and untuned, 
                             and is disabled by default.</p>
                         <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
@@ -2088,7 +2083,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>Required: No</p>
                     </li><li class="listitem">
                         <p><span class="bold"><strong>DisableRateLimit</strong></span></p>
-                        <p>If <span class="bold"><strong>true&gt;</strong></span>, the per-client rate limiter is disabled.</p>
+                        <p>If <span class="bold"><strong>true</strong></span>, the per-client rate limiter is disabled.</p>
                         <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                             <p>This option should only be used for testing.</p>
                         </td></tr></table></div>
@@ -2111,7 +2106,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     <code class="filename">katzenpost/docker/dirauth_mixnet/servicenode1/authority.toml</code>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
                 address. For more information about the test mixnet, see <span class="bold"><strong><a class="xref" href="#container" title="Chapter&nbsp;2.&nbsp;Using the Katzenpost Docker test network">Using the Katzenpost Docker test network</a></strong></span>.</p>
-            <div class="table"><a name="d6e1623"></a><p class="title"><b>Table&nbsp;1.5.&nbsp;Mix node configuration sections</b></p><div class="table-contents">
+            <div class="table"><a name="d6e1621"></a><p class="title"><b>Table&nbsp;1.5.&nbsp;Mix node configuration sections</b></p><div class="table-contents">
                 
                 <table class="table" summary="Mix node configuration sections" border="1"><colgroup><col class="c1"></colgroup><tbody><tr><td>
                                 <p><a class="xref" href="#service-server-section-config" title="Service node: Server section">Service node: Server section</a></p>
@@ -2147,7 +2142,7 @@ FZWJFK0R8iU52CEUxVpXTA==
     [Server.AltAddresses]</pre>
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1661"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1659"></a></h5></div></div></div>
         
                
         <div class="informalexample"> 
@@ -2197,10 +2192,8 @@ FZWJFK0R8iU52CEUxVpXTA==
                         similarly sign PKI documents using the same scheme.</p>
                     <p>The following signature schemes are supported:</p>
                     <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
-                            <p><span class="bold"><strong>Classical:</strong></span>  "ed25519",
-                                "ed448"</p>
-                        </li></ul></div>
-                    <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+                            <p><span class="bold"><strong>Classical:</strong></span>  "ed25519", "ed448"</p>
+                        </li><li class="listitem">
                             <p><span class="bold"><strong>Hybrid post-quantum:</strong></span> "Ed25519
                                 Sphincs+", "Ed448-Sphincs+", "Ed25519-Dilithium2",
                                 "Ed448-Dilithium3" </p>
@@ -2239,13 +2232,13 @@ FZWJFK0R8iU52CEUxVpXTA==
                     <p>Required: Yes</p>
                 </li><li class="listitem">
                     <p><span class="bold"><strong>IsGatewayNode</strong></span></p>
-                    <p>If <span class="bold"><strong>true&gt;</strong></span>, the server is a gateway
+                    <p>If <span class="bold"><strong>true</strong></span>, the server is a gateway
                         node.</p>
                     <p>Type: bool</p>
                     <p>Required: No</p>
                 </li><li class="listitem">
                     <p><span class="bold"><strong>IsServiceNode</strong></span></p>
-                    <p>If <span class="bold"><strong>true&gt;</strong></span>, the server is a service
+                    <p>If <span class="bold"><strong>true</strong></span>, the server is a service
                         node.</p>
                     <p>Type: bool</p>
                     <p>Required: No</p>
@@ -2258,7 +2251,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1745"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1742"></a></h5></div></div></div>
         
         <div class="informalexample"> 
             <p>The <code class="code">Logging</code> configuration section controls logging behavior across Katzenpost.</p>
@@ -2268,7 +2261,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 Level = "INFO"</pre>
             <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
                     <p><span class="bold"><strong>Disable</strong></span></p>
-                    <p>If <span class="bold"><strong>true&gt;</strong></span>, logging is disabled.</p>
+                    <p>If <span class="bold"><strong>true</strong></span>, logging is disabled.</p>
                     <p>Type: bool</p>
                     <p>Required: No</p>
                 </li><li class="listitem">
@@ -2502,7 +2495,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1937"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1934"></a></h5></div></div></div>
              
         <div class="informalexample"> 
             <p>The <code class="code">PKI</code> section contains the directory authority configuration for a mix, gateway, or service node.</p>
@@ -2620,7 +2613,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1985"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1982"></a></h5></div></div></div>
         
            <div class="informalexample"> 
            <p>The <code class="code">Management</code> section specifies 
@@ -2631,7 +2624,7 @@ FZWJFK0R8iU52CEUxVpXTA==
    Path = "/dirauth_mixnet/mix1/management_sock"</pre>
            <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
                    <p><span class="bold"><strong>Enable</strong></span></p>
-                   <p>If <span class="bold"><strong>true&gt;</strong></span>, the management interface is
+                   <p>If <span class="bold"><strong>true</strong></span>, the management interface is
                         enabled.</p>
                    <p>Type: bool</p>
                    <p>Required: No</p>
@@ -2649,7 +2642,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e2009"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e2006"></a></h5></div></div></div>
         
         <div class="informalexample">        
             <p>The <code class="code">SphinxGeometry</code> section defines parameters for the Sphinx
@@ -2776,7 +2769,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e2127"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e2124"></a></h5></div></div></div>
              
         <div class="informalexample">    
             <p>The <code class="code">Debug</code> section is the Katzenpost server debug configuration
@@ -2822,7 +2815,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>Required: No</p>
                     </li><li class="listitem">
                         <p><span class="bold"><strong>SchedulerExternalMemoryQueue</strong></span></p>
-                        <p>If <span class="bold"><strong>true&gt;</strong></span>, the experimental disk-backed external memory 
+                        <p>If <span class="bold"><strong>true</strong></span>, the experimental disk-backed external memory 
                             queue is enabled.</p>
                         <p>Type: bool</p>
                         <p>Required: No</p>
@@ -2901,7 +2894,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>Required: No</p>
                     </li><li class="listitem">
                         <p><span class="bold"><strong>SendDecoyTraffic</strong></span></p>
-                        <p>If <span class="bold"><strong>true&gt;</strong></span>, decoy traffic is enabled. 
+                        <p>If <span class="bold"><strong>true</strong></span>, decoy traffic is enabled. 
                             This parameter is experimental and untuned, 
                             and is disabled by default.</p>
                         <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
@@ -2911,7 +2904,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>Required: No</p>
                     </li><li class="listitem">
                         <p><span class="bold"><strong>DisableRateLimit</strong></span></p>
-                        <p>If <span class="bold"><strong>true&gt;</strong></span>, the per-client rate limiter is disabled.</p>
+                        <p>If <span class="bold"><strong>true</strong></span>, the per-client rate limiter is disabled.</p>
                         <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                             <p>This option should only be used for testing.</p>
                         </td></tr></table></div>
@@ -2933,7 +2926,7 @@ FZWJFK0R8iU52CEUxVpXTA==
     </div>
 </div> 
 
-    <div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="container"></a>Chapter&nbsp;2.&nbsp;Using the Katzenpost Docker test network</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#install_kp">Preparing to run the container image</a></span></dt><dt><span class="section"><a href="#basic-ops">Operating the test mixnet</a></span></dt><dd><dl><dt><span class="section"><a href="#start-mixnet">Starting and monitoring the mixnet</a></span></dt><dt><span class="section"><a href="#test-mixnet">Testing the mixnet</a></span></dt><dt><span class="section"><a href="#shutdown-mixnet">Shutting down the mixnet</a></span></dt><dt><span class="section"><a href="#uninstall-mixnet">Uninstalling and cleaning up</a></span></dt></dl></dd><dt><span class="section"><a href="#topology">Network topology and components</a></span></dt><dd><dl><dt><span class="section"><a href="#d6e2651">The Docker file tree</a></span></dt></dl></dd><dt><span class="section"><a href="#d6e2657"></a></span></dt></dl></div>
+    <div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="container"></a>Chapter&nbsp;2.&nbsp;Using the Katzenpost Docker test network</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#install_kp">Preparing to run the container image</a></span></dt><dt><span class="section"><a href="#basic-ops">Operating the test mixnet</a></span></dt><dd><dl><dt><span class="section"><a href="#start-mixnet">Starting and monitoring the mixnet</a></span></dt><dt><span class="section"><a href="#test-mixnet">Testing the mixnet</a></span></dt><dt><span class="section"><a href="#shutdown-mixnet">Shutting down the mixnet</a></span></dt><dt><span class="section"><a href="#uninstall-mixnet">Uninstalling and cleaning up</a></span></dt></dl></dd><dt><span class="section"><a href="#topology">Network topology and components</a></span></dt><dd><dl><dt><span class="section"><a href="#d6e2648">The Docker file tree</a></span></dt></dl></dd><dt><span class="section"><a href="#d6e2654"></a></span></dt></dl></div>
         
     
     <p>Katzenpost provides a ready-to-deploy Docker
@@ -3022,7 +3015,7 @@ FZWJFK0R8iU52CEUxVpXTA==
         <pre class="programlisting"> <code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make<em class="replaceable"><code> target</code></em></strong></span></pre>
         <p>Running <span class="command"><strong>make</strong></span> with no target specified returns a list of available
             targets.</p>
-        <div class="table"><a name="d6e2356"></a><p class="title"><b>Table&nbsp;2.1.&nbsp;Table 1: Makefile targets</b></p><div class="table-contents">
+        <div class="table"><a name="d6e2353"></a><p class="title"><b>Table&nbsp;2.1.&nbsp;Table 1: Makefile targets</b></p><div class="table-contents">
             
             <table class="table" summary="Table 1: Makefile targets" border="1"><colgroup><col><col></colgroup><tbody><tr><td>
                             <p>[none]</p>
@@ -3272,7 +3265,7 @@ FZWJFK0R8iU52CEUxVpXTA==
         </td></tr></table></div>
         <p>The following diagram illustrates the components and their network interactions. The
             gray blocks represent nodes, and the arrows represent information transfer. </p>
-        <div class="figure"><a name="d6e2555"></a><p class="title"><b>Figure&nbsp;2.1.&nbsp;Test network topology</b></p><div class="figure-contents">
+        <div class="figure"><a name="d6e2552"></a><p class="title"><b>Figure&nbsp;2.1.&nbsp;Test network topology</b></p><div class="figure-contents">
             
             <div class="mediaobject"><img src="/admin_guide/pix/katzenpost-docker.png" width="405" alt="Test network topology"></div>
         </div></div><br class="figure-break">
@@ -3291,7 +3284,7 @@ FZWJFK0R8iU52CEUxVpXTA==
             the following table. Note that all nodes share the same IP address (127.0.0.1, i.e.,
             localhost), but are accessed through different ports. Each node type links to additional
             information in <a class="xref" href="#components" title="Chapter&nbsp;1.&nbsp;Components and configuration of the Katzenpost mixnet">Components and configuration of the Katzenpost mixnet</a>.</p>
-        <div class="table"><a name="d6e2577"></a><p class="title"><b>Table&nbsp;2.2.&nbsp;Table 2: Test mixnet hosts</b></p><div class="table-contents">
+        <div class="table"><a name="d6e2574"></a><p class="title"><b>Table&nbsp;2.2.&nbsp;Table 2: Test mixnet hosts</b></p><div class="table-contents">
             
             <table class="table" summary="Table 2: Test mixnet hosts" border="1"><colgroup><col class="c1"><col class="c2"><col class="newCol3"><col class="c3"><col class="c4"></colgroup><thead><tr><th>Node type</th><th>Docker ID</th><th>Diagram label</th><th>IP address</th><th>TCP port</th></tr></thead><tbody><tr><td rowspan="3">
                             <p><a class="link" href="#intro-dirauth" title="Directory authorities (dirauths)">Directory authority</a></p>
@@ -3329,7 +3322,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                             <p>30012</p>
                         </td></tr></tbody></table>
         </div></div><br class="table-break">
-        <div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="d6e2651"></a>The Docker file tree</h3></div></div></div>
+        <div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="d6e2648"></a>The Docker file tree</h3></div></div></div>
             
             <p>The following <a class="ulink" href="https://manpages.debian.org/bookworm/tree/tree.1.en.html" target="_top">tree</a>
                 output shows the location, relative to the <code class="filename">katzenpost</code>
