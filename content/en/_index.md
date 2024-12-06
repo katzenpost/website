@@ -1,6 +1,6 @@
 ---
 title: "Katzenpost"
-description: "Welcome to the Katzenpost project. We are creating traffic analysis resistant messaging. kthxbai"
+description: "Katzenpost is a free and open source software project."
 ---
 
 <!-- Hero -->
@@ -8,8 +8,7 @@ description: "Welcome to the Katzenpost project. We are creating traffic analysi
 <div>
     <img src="/images/logo-friendly-mono.svg" height="200">
 </div>
-<h1 class="display-3 mt-0 mt-md-3">Welcome to Katzenpost</h1>
-<p class="lead">We are creating traffic analysis resistant messaging</p>
+<h1 class="display-3 mt-0 mt-md-3">Katzenpost, the first post quantum mixnet.</h1>
 <a class="btn btn-lg btn-secondary me-3 mb-4" href="https://github.com/katzenpost/katzenpost">
   Codebase <i class="fab fa-github ms-2 "></i>
 </a>
@@ -17,24 +16,34 @@ description: "Welcome to the Katzenpost project. We are creating traffic analysi
 
 
 {{% blocks/lead color="primary" title="" %}}
-Katzenpost is a free software project. We write mix network protocol
-libraries. What is a mix network? It is an anonymous communications
-system… however the word anonymous is problematic because some
-government authorities equate anonymity with terrorism. We prefer to
-instead call it “network security” because you can feel more secure
-when you communicate using traffic analysis resistant communications
-protocols.
+Katzenpost is an educational, research and free software project. We make anonymous communication protocols,
+specializing in mixnet protocols. 
 {{% /blocks/lead %}}
 
 <!-- Triplet Section: Gray -->
 {{% blocks/section color="dark" type="row" %}}
 {{% blocks/feature icon="fa-users" title="Our Team" url="/team" %}}
-Our team consists of numerous experts who've worked on anonymity and privacy
-enhancing technology for the last two decades.
+Our team consists of world clas experts.
 {{% /blocks/feature %}}
 
 {{% blocks/feature icon="fa fa-file-powerpoint" title="Presentations" url="/presentations" %}}
-Browse recent and past talks and presentations about Katzenpost and mixnets designs.
+Browse recent and past video/audio presentations about Katzenpost and mixnets designs.
+{{% /blocks/feature %}}
+
+{{% blocks/feature icon="fa fa-file-powerpoint" title="Katzenpost Admin Guide" url="/admin_guide" %}}
+Read our extensive documentation for a better understanding of the Katzenpost server side.
+NOTE that this document also covers how to run a local docker mixnet which is useful for developers.
+{{% /blocks/feature %}}
+
+{{% blocks/feature icon="fa fa-file-powerpoint" title="Katzenpost Threat Model" url="/research/Threat_Model_Doc.pdf" %}}
+Here we present a draft of the Katzenpost mixnet threat model document.
+We regard the threat model document as a living document which is frequently
+edited and in need of ongoing maintenance as we continue to develop newer
+mixnet protocols.
+{{% /blocks/feature %}}
+
+{{% blocks/feature icon="fa fa-file-powerpoint" title="Katzenpost Literature Review" url="/research/Literature_overview__website_version.pdf" %}}
+This doc, in particular, does not talk about the Katzenpost design. It does introduce the reader to some of the reasons why we've been making certain design decisions, and a keen eye might be led to some of the similar conclusions. But here we focus on already published research. We also stick to theory and don't focus on any practical systems being built today.
 {{% /blocks/feature %}}
 
 {{% /blocks/section %}}

@@ -30,28 +30,9 @@ ui:
   sidebar_menu_compact: true
   sidebar_search_disable: false
   feedback:
-    enable: true
-    'yes': >-
-      Glad to hear it! Please <a
-      href="https://github.com/katzenpost/website/issues/new">tell us how we can
-      improve</a>.
-    'no': >-
-      Sorry to hear that. Please <a
-      href="https://github.com/katzenpost/website/issues/new">tell us how we can
-      improve</a>.
+    enable: false
   readingtime:
     enable: false
-links:
-  user:
-    - name: "Developer mailing list"
-      url: "https://lists.mixnetworks.org/listinfo/katzenpost"
-      icon: "fa fa-envelope"
-      desc: "Discuss development issues around the project"
-  developer:
-    - name: "GitHub"
-      url: "https://github.com/katzenpost/katzenpost"
-      icon: "fab fa-github"
-      desc: "Katzenpost monorepo codebase is here!"
 
 decap_cms:
   media_folder: "static/images/uploads"
