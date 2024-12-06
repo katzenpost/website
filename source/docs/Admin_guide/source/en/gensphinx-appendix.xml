@@ -31,7 +31,7 @@
 <chapter id="gensphinx">
     <title id="gensphinx.title">Appendix: Using <emphasis>gensphinx</emphasis></title>
     <para>To Do</para>
-<!--    <programlisting>./gensphinx -h
+<!--<programlisting>./gensphinx -h
 Usage of ./gensphinx:
   -L int
         Number of mix layers. (default 3)
@@ -41,6 +41,12 @@ Usage of ./gensphinx:
         Name of the KEM Scheme to be used with Sphinx
   -nike string
         Name of the NIKE Scheme to be used with Sphinx (default "x25519")</programlisting>
+    
+ <para>it might not be totally clear from the above usage that:
+
+-nike "" must be set if you want to use a KEM because you have to override the NIKE default value</para>    
+    
+    
     <para>not counting Gateway hop and service node hop, if "Number of mix layers" is set to 3 then
         that'd match what we normally deploy</para>
     <para>but the super paranoid will want to increase that number</para>
