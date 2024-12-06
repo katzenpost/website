@@ -1,6 +1,6 @@
 ---
 title: "Katzenpost"
-description: "Welcome to the Katzenpost project. We are creating traffic analysis resistant messaging."
+description: "Katzenpost is a free and open source software project."
 ---
 
 <!-- Hero -->
