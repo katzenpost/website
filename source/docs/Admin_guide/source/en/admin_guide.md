@@ -4002,7 +4002,7 @@ The following diagram illustrates the components and their network
 interactions. The gray blocks represent nodes, and the arrows represent
 information transfer.
 
-![Test network topology](/admin_guide/pix/katzenpost-docker.png)
+![Test network topology](/static/admin_guide/pix/katzenpost-docker.png)
 
 On the left, the **Client** transmits a message (shown by purple arrows)
 through the **Gateway node**, across three **mix node** layers, to the
