@@ -1,16 +1,16 @@
 <!doctype html>
 <html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js">
-  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <link rel="icon" href="/iconx/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/iconx/apple-touch-icon.png"/>
 <link rel="manifest" href="/iconx/manifest.json" />
 
 <title>Audio Engineering Considerations for a Modern Mixnet | Katzenpost</title>
 <meta name="description" content="Original research into audio engineering considerations for apps on low latency mixnetworks">
-<meta property="og:url" content="//localhost:1313/blog/2023-11-25-audio-engineering-considerations/">
+<meta property="og:url" content="/blog/2023-11-25-audio-engineering-considerations/">
   <meta property="og:site_name" content="Katzenpost">
   <meta property="og:title" content="Audio Engineering Considerations for a Modern Mixnet">
   <meta property="og:description" content="Original research into audio engineering considerations for apps on low latency mixnetworks">
@@ -32,7 +32,8 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Audio Engineering Considerations for a Modern Mixnet">
   <meta name="twitter:description" content="Original research into audio engineering considerations for apps on low latency mixnetworks">
-<link href="/scss/main.css" rel="stylesheet">
+<link rel="preload" href="/scss/main.min.cf73d921612b1236e936a01516d54ab1264d8d071ce4a2e0102823e60c1f8fb9.css" as="style" integrity="sha256-z3PZIWErEjbpNqAVFtVKsSZNjQcc5KLgECgj5gwfj7k=" crossorigin="anonymous">
+<link href="/scss/main.min.cf73d921612b1236e936a01516d54ab1264d8d071ce4a2e0102823e60c1f8fb9.css" rel="stylesheet" integrity="sha256-z3PZIWErEjbpNqAVFtVKsSZNjQcc5KLgECgj5gwfj7k=" crossorigin="anonymous">
 <script
   src="https://code.jquery.com/jquery-3.7.1.min.js"
   integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
@@ -72,7 +73,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/offline-search-index.json"
+    data-offline-search-index-json-src="/offline-search-index.83211f2533a799263ba75cce0d34135e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -96,7 +97,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/offline-search-index.json"
+    data-offline-search-index-json-src="/offline-search-index.83211f2533a799263ba75cce0d34135e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -153,23 +154,23 @@
             <div class="taxonomy taxonomy-terms-cloud taxo-tags">
       <h5 class="taxonomy-title">Browse by Tag</h5>
       <ul class="taxonomy-terms">
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/apps/" data-taxonomy-term="apps"><span class="taxonomy-label">Apps</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/audio/" data-taxonomy-term="audio"><span class="taxonomy-label">Audio</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">5</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/cryptography/" data-taxonomy-term="cryptography"><span class="taxonomy-label">Cryptography</span><span class="taxonomy-count">4</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/design/" data-taxonomy-term="design"><span class="taxonomy-label">Design</span><span class="taxonomy-count">3</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/hpqc/" data-taxonomy-term="hpqc"><span class="taxonomy-label">Hpqc</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/katzenpost/" data-taxonomy-term="katzenpost"><span class="taxonomy-label">Katzenpost</span><span class="taxonomy-count">5</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/launches/" data-taxonomy-term="launches"><span class="taxonomy-label">Launches</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/mathematics/" data-taxonomy-term="mathematics"><span class="taxonomy-label">Mathematics</span><span class="taxonomy-count">2</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/outreach/" data-taxonomy-term="outreach"><span class="taxonomy-label">Outreach</span><span class="taxonomy-count">2</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/privacy/" data-taxonomy-term="privacy"><span class="taxonomy-label">Privacy</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/research/" data-taxonomy-term="research"><span class="taxonomy-label">Research</span><span class="taxonomy-count">4</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/talk/" data-taxonomy-term="talk"><span class="taxonomy-label">Talk</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/threat-model/" data-taxonomy-term="threat-model"><span class="taxonomy-label">Threat Model</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="//localhost:1313/tags/website/" data-taxonomy-term="website"><span class="taxonomy-label">Website</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/apps/" data-taxonomy-term="apps"><span class="taxonomy-label">Apps</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/audio/" data-taxonomy-term="audio"><span class="taxonomy-label">Audio</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/cryptography/" data-taxonomy-term="cryptography"><span class="taxonomy-label">Cryptography</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/design/" data-taxonomy-term="design"><span class="taxonomy-label">Design</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/hpqc/" data-taxonomy-term="hpqc"><span class="taxonomy-label">Hpqc</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/katzenpost/" data-taxonomy-term="katzenpost"><span class="taxonomy-label">Katzenpost</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/launches/" data-taxonomy-term="launches"><span class="taxonomy-label">Launches</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/mathematics/" data-taxonomy-term="mathematics"><span class="taxonomy-label">Mathematics</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/outreach/" data-taxonomy-term="outreach"><span class="taxonomy-label">Outreach</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/privacy/" data-taxonomy-term="privacy"><span class="taxonomy-label">Privacy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/research/" data-taxonomy-term="research"><span class="taxonomy-label">Research</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/talk/" data-taxonomy-term="talk"><span class="taxonomy-label">Talk</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/threat-model/" data-taxonomy-term="threat-model"><span class="taxonomy-label">Threat Model</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="/tags/website/" data-taxonomy-term="website"><span class="taxonomy-label">Website</span><span class="taxonomy-count">1</span></a></li>
         </ul>
     </div>
   
@@ -191,9 +192,9 @@
 		<div class="taxonomy taxonomy-terms-article taxo-tags">
   <h5 class="taxonomy-title">Tags:</h5>
   <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="//localhost:1313/tags/research/" data-taxonomy-term="research"><span class="taxonomy-label">Research</span></a></li>
-    <li><a class="taxonomy-term" href="//localhost:1313/tags/audio/" data-taxonomy-term="audio"><span class="taxonomy-label">Audio</span></a></li>
-    <li><a class="taxonomy-term" href="//localhost:1313/tags/apps/" data-taxonomy-term="apps"><span class="taxonomy-label">Apps</span></a></li>
+    <li><a class="taxonomy-term" href="/tags/research/" data-taxonomy-term="research"><span class="taxonomy-label">Research</span></a></li>
+    <li><a class="taxonomy-term" href="/tags/audio/" data-taxonomy-term="audio"><span class="taxonomy-label">Audio</span></a></li>
+    <li><a class="taxonomy-term" href="/tags/apps/" data-taxonomy-term="apps"><span class="taxonomy-label">Apps</span></a></li>
     </ul>
 </div>
 
@@ -228,7 +229,7 @@ quality at low bandwidth or good quality at impressively low bandwidth.</p>
 </ul>
 
 	<div class="td-page-meta__lastmod">
-  Last modified December 6, 2024: <a href="https://github.com/katzenpost/website/commit/21f1acfc2509f1ed1efd319c6e940872cb933a19">add content (21f1acf)</a>
+  Last modified December 6, 2024: <a href="https://github.com/katzenpost/website/commit/21f1acfc2509f1ed1efd319c6e940872cb933a19">add content (21f1acfc)</a>
 </div>
 </div>
 
@@ -253,8 +254,8 @@ quality at low bandwidth or good quality at impressively low bandwidth.</p>
 </footer>
 
     </div>
-    <script src="/js/main.js"></script>
-<script defer src="/js/click-to-copy.js" crossorigin="anonymous"></script>
+    <script src="/js/main.min.69e2c1ae9320465ab10236d9ef752c6a4442c54b48b883b17c497b7c7d96a796.js" integrity="sha256-aeLBrpMgRlqxAjbZ73UsakRCxUtIuIOxfEl7fH2Wp5Y=" crossorigin="anonymous"></script>
+<script defer src="/js/click-to-copy.min.73478a7d4807698aed7e355eb23f9890ca18fea3158604c8471746d046702bad.js" integrity="sha256-c0eKfUgHaYrtfjVesj&#43;YkMoY/qMVhgTIRxdG0EZwK60=" crossorigin="anonymous"></script>
 <script src='/js/tabpane-persist.js'></script>
 
   </body>

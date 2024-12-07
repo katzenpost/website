@@ -38,15 +38,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: npm
-          cache-dependency-path: package.json
 
       - name: Install PostCSS
-        run: npm install -D autoprefixer postcss postcss-cli
-
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v5
+        run: npm ci
 
       - name: Build with Hugo
         env:
@@ -57,8 +51,12 @@ jobs:
             --gc \
             --baseURL "https://katzenpost.network/"          
 
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
 
@@ -71,4 +69,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
