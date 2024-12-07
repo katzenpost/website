@@ -449,7 +449,7 @@
                 <para>interfacing with external clients</para>
             </listitem>
         </itemizedlist>
-        <warning>
+        <warning >
             <para>While suited for client development and testing, the test mixnet omits performance
                 and security redundancies. <emphasis>Do not use it in production.</emphasis></para>
         </warning>

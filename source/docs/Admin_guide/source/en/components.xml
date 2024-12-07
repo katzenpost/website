@@ -606,7 +606,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">GenerateOnly</emphasis></para>
-                        <para>If <emphasis role="bold">true></emphasis>, the server halts and cleans
+                        <para>If <emphasis role="bold">true</emphasis>, the server halts and cleans
                             up the data directory immediately after long-term key generation.</para>
                         <para>Type: bool</para>
                         <para>Required: No</para>
