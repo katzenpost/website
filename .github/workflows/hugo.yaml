@@ -41,26 +41,24 @@ jobs:
           cache: npm
           cache-dependency-path: package.json
 
-      - run: npm install --omit=optional
-      - run: npm install -D autoprefixer postcss postcss-cli
+      - name: Install PostCSS
+        run: npm install -D autoprefixer postcss postcss-cli
 
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v3.0.6
 
-      - name: Install Node.js dependencies
-        run: "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
       - name: Build with Hugo
         env:
-          HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
           HUGO_ENVIRONMENT: production
+          HUGO_ENV: production
         run: |
           hugo \
-	    --gc \
-            --minify \
-            --baseURL "https://katzenpost.network/"
+            --gc \
+            --baseURL "https://katzenpost.network/"          
+
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v1
         with:
           path: ./public
 
