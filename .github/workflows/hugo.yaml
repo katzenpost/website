@@ -38,11 +38,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: npm
-          cache-dependency-path: package.json
 
       - name: Install PostCSS
-        run: npm install -g autoprefixer postcss postcss-cli
+        run: npm ci
 
       - name: Build with Hugo
         env:
