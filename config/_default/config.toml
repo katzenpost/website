@@ -36,6 +36,19 @@ enableGitInfo = true
       title = "Katzenpost"
       description = "A next generation privacy preserving mixnet with post-quantum cryptography"
 
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.parser]
+      [markup.goldmark.parser.attribute]
+        block = true
+    [markup.goldmark.parser.renderer]
+      unsafe = true
+  [markup.highlight]
+    style = "tango"
+  [markup.goldmark.renderer]
+    unsafe = true
+
 [module]
 proxy = "direct"
 [[module.imports]]
