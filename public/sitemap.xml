@@ -92,10 +92,11 @@
     <loc>//localhost:1313/blog/2018-02-27/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/pages/admin_guide/</loc>
-    <lastmod>2024-12-06T20:36:49-08:00</lastmod>
+    <loc>//localhost:1313/documentation/admin_guide/</loc>
   </url><url>
     <loc>//localhost:1313/categories/</loc>
+  </url><url>
+    <loc>//localhost:1313/documentation/</loc>
   </url><url>
     <loc>//localhost:1313/false/</loc>
   </url><url>
