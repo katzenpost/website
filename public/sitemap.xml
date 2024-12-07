@@ -2,126 +2,126 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>//localhost:1313/blog/</loc>
+    <loc>/blog/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/cryptography/</loc>
+    <loc>/tags/cryptography/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/design/</loc>
+    <loc>/tags/design/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/blog/2024-04-25-threat-model/</loc>
+    <loc>/blog/2024-04-25-threat-model/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/privacy/</loc>
+    <loc>/tags/privacy/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/research/</loc>
+    <loc>/tags/research/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/security/</loc>
+    <loc>/tags/security/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/</loc>
+    <loc>/tags/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/threat-model/</loc>
+    <loc>/tags/threat-model/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/mathematics/</loc>
+    <loc>/tags/mathematics/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/blog/2024-04-15-lit-review/</loc>
+    <loc>/blog/2024-04-15-lit-review/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/outreach/</loc>
+    <loc>/tags/outreach/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/hpqc/</loc>
+    <loc>/tags/hpqc/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/blog/2024-04-12-hpqc/</loc>
+    <loc>/blog/2024-04-12-hpqc/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/blog/2024-01-28-katzenpost-at-37c3/</loc>
+    <loc>/blog/2024-01-28-katzenpost-at-37c3/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/talk/</loc>
+    <loc>/tags/talk/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/apps/</loc>
+    <loc>/tags/apps/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/audio/</loc>
+    <loc>/tags/audio/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/blog/2023-11-25-audio-engineering-considerations/</loc>
+    <loc>/blog/2023-11-25-audio-engineering-considerations/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/hugo/</loc>
+    <loc>/tags/hugo/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/launches/</loc>
+    <loc>/tags/launches/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/website/</loc>
+    <loc>/tags/website/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/blog/2023-11-24-website-relaunch/</loc>
+    <loc>/blog/2023-11-24-website-relaunch/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/blog/</loc>
+    <loc>/tags/blog/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/katzenpost/</loc>
+    <loc>/tags/katzenpost/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/blog/2019-05-04/</loc>
+    <loc>/blog/2019-05-04/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/blog/2019-04-10/</loc>
+    <loc>/blog/2019-04-10/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/blog/2019-01-19/</loc>
+    <loc>/blog/2019-01-19/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/blog/2018-11-22/</loc>
+    <loc>/blog/2018-11-22/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/blog/2018-02-27/</loc>
+    <loc>/blog/2018-02-27/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/pages/admin_guide/</loc>
+    <loc>/pages/admin_guide/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/categories/</loc>
+    <loc>/categories/</loc>
   </url><url>
-    <loc>//localhost:1313/false/</loc>
+    <loc>/false/</loc>
   </url><url>
-    <loc>//localhost:1313/</loc>
+    <loc>/</loc>
     <lastmod>2024-12-06T22:30:41-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/admin/</loc>
+    <loc>/admin/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/pages/</loc>
+    <loc>/pages/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/pages/presentations/</loc>
+    <loc>/pages/presentations/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/pages/privacy/</loc>
+    <loc>/pages/privacy/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tango/</loc>
+    <loc>/tango/</loc>
   </url><url>
-    <loc>//localhost:1313/pages/pages/team/</loc>
+    <loc>/pages/pages/team/</loc>
     <lastmod>2024-12-06T22:30:41-08:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/true/</loc>
+    <loc>/true/</loc>
   </url><url>
-    <loc>//localhost:1313/pages/moral-character/</loc>
+    <loc>/pages/moral-character/</loc>
     <lastmod>2024-12-06T20:36:49-08:00</lastmod>
   </url>
 </urlset>
