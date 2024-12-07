@@ -42,7 +42,7 @@ jobs:
           cache-dependency-path: package.json
 
       - name: Install PostCSS
-        run: npm install -D autoprefixer postcss postcss-cli
+        run: npm install -g autoprefixer postcss postcss-cli
 
       - name: Setup Pages
         id: pages
