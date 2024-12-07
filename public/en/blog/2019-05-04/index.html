@@ -8,20 +8,33 @@
 <link rel="apple-touch-icon" href="/iconx/apple-touch-icon.png"/>
 <link rel="manifest" href="/iconx/manifest.json" />
 
-<title>404 Page not found | My New Hugo Site</title>
-<meta name="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
-<meta property="og:url" content="http://localhost:1313/404.html">
+<title>Monthly News Update (May 2019) | My New Hugo Site</title>
+<meta name="description" content="Greetings,
+The last few weeks have been very busy. I now have the basic working prototype implementation of a new Katzenpost messaging system. This new system has mutual location hiding properties for communication partners because recipients retreive their messages from a remote spool using a Sphinx SURB based protocol. SPHINX SPHINXSPEC">
+<meta property="og:url" content="http://localhost:1313/en/blog/2019-05-04/">
   <meta property="og:site_name" content="My New Hugo Site">
-  <meta property="og:title" content="404 Page not found">
-  <meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta property="og:title" content="Monthly News Update (May 2019)">
+  <meta property="og:description" content="Greetings,
+The last few weeks have been very busy. I now have the basic working prototype implementation of a new Katzenpost messaging system. This new system has mutual location hiding properties for communication partners because recipients retreive their messages from a remote spool using a Sphinx SURB based protocol. SPHINX SPHINXSPEC">
   <meta property="og:locale" content="en_us">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="en">
+    <meta property="article:published_time" content="2019-05-04T00:00:00+00:00">
+    <meta property="article:modified_time" content="2019-05-04T00:00:00+00:00">
+    <meta property="article:tag" content="Katzenpost">
+    <meta property="article:tag" content="Blog">
 
-  <meta itemprop="name" content="404 Page not found">
-  <meta itemprop="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta itemprop="name" content="Monthly News Update (May 2019)">
+  <meta itemprop="description" content="Greetings,
+The last few weeks have been very busy. I now have the basic working prototype implementation of a new Katzenpost messaging system. This new system has mutual location hiding properties for communication partners because recipients retreive their messages from a remote spool using a Sphinx SURB based protocol. SPHINX SPHINXSPEC">
+  <meta itemprop="datePublished" content="2019-05-04T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2019-05-04T00:00:00+00:00">
+  <meta itemprop="wordCount" content="480">
+  <meta itemprop="keywords" content="Katzenpost,Blog">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="404 Page not found">
-  <meta name="twitter:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta name="twitter:title" content="Monthly News Update (May 2019)">
+  <meta name="twitter:description" content="Greetings,
+The last few weeks have been very busy. I now have the basic working prototype implementation of a new Katzenpost messaging system. This new system has mutual location hiding properties for communication partners because recipients retreive their messages from a remote spool using a Sphinx SURB based protocol. SPHINX SPHINXSPEC">
 <link href="/scss/main.css" rel="stylesheet">
 <script
   src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -30,7 +43,7 @@
 
 
   </head>
-  <body class="td-404">
+  <body class="td-page">
     <header>
       <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
 <div class="container-fluid flex-column flex-md-row">
@@ -41,7 +54,7 @@
         <a class="nav-link" href="/en/pages/moral-character/"><span>Values</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/en/blog/"><span>Blog</span></a>
+        <a class="nav-link active" href="/en/blog/"><span>Blog</span></a>
       </li>
       </ul>
   </div>
@@ -53,11 +66,67 @@
     </header>
     <div class="container-fluid td-default td-outer">
       <main role="main" class="td-main">
-        <div class="td-content">
-  <h1>404</h1>
-  <p>The page you are looking for does not seem to exist.</p>
-  <p>Go back to the <a href="/">home page</a></p>
-</div>
+        <p>Greetings,</p>
+<p>The last few weeks have been very busy. I now have the basic working
+prototype implementation of a new Katzenpost messaging system. This
+new system has mutual location hiding properties for communication
+partners because recipients retreive their messages from a remote
+spool using a Sphinx SURB based protocol. <a href="https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf" title="Danezis, G., Goldberg, I., Sphinx: A Compact and Provably Secure Mix Format, DOI 10.1109/SP.2009.15, May 2009">SPHINX</a>  <a href="https://github.com/katzenpost/docs/blob/master/specs/sphinx.rst" title="Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., Sphinx Mix Network Cryptographic Packet Format Specification July 2017">SPHINXSPEC</a></p>
+<p>Naming things is tricky. I had to call it something:</p>
+<ul>
+<li><a href="https://github.com/katzenpost/katzenpost/tree/main/catshadow">https://github.com/katzenpost/katzenpost/tree/main/catshadow</a></li>
+</ul>
+<p>This messaging system is inspired by agl&rsquo;s pond, obviously.
+See agl&rsquo;s <a href="https://github.com/agl/pond">pond</a>.</p>
+<p>I forked agl&rsquo;s Double Ratchet from pond:</p>
+<ul>
+<li><a href="https://github.com/katzenpost/katzenpost/tree/main/doubleratchet">doubleratchet</a></li>
+</ul>
+<p>Also forked agl&rsquo;s PANDA:</p>
+<ul>
+<li><a href="https://github.com/katzenpost/katzenpost/tree/main/panda">panda</a></li>
+</ul>
+<p>Communication partners use a remote spool service which is now, memspool
+but later it will be a replicating CRDT:</p>
+<ul>
+<li><a href="https://github.com/katzenpost/katzenpost/tree/main/memspool">memspool</a></li>
+</ul>
+<p>In order to exchange double ratchet keys and spool identities to form
+a bidirectional cryptographic channel, clients make use of the PANDA
+service. That is to say, PANDA (Phrase Automated Nym Discovery
+Authentication) is just another mixnet service like the memspool
+service mentioned above.</p>
+<p>The user interface I wrote is a CLI terminal interface and it really
+kind of sucks. I&rsquo;m feeling rather inspired by Special&rsquo;s golang
+Ricochet. The UI and the backend are two separate processes and
+communicate by unix domain socket. Cool. Maybe I should do a similar construction
+that way someone else can later write a crazy C++ Gtk UI for this
+thing. Although I suspect this strategy doesn&rsquo;t work well with
+Android. Unclear. At any rate, catshadow is crash fault tolerant, I
+hope. It is also internally way more simple than mailproxy and doesn&rsquo;t
+use database transactions or anything like that. State is persisted to
+disk in an encrypted statefile&hellip; passphrase, argon2, nacl secretbox of course.</p>
+<p>Anyway describing this whole thing is basically a paper worth of words
+which I shall attempt to articulate later. The overall strategy for
+Katzenpost should be for this client to merely serve as a
+demonstration. Whereas it would be far better to help another software
+project integrate with Katzenpost.  Projects such as Briar and Wire
+come to mind. That having been said, I&rsquo;d like to soon start a
+volunteer operated Katzenpost mix network so that we have some real
+infrastructure that allows us to start using catshadow to send each
+other encrypted messages. The amount of metadata we leak onto the
+network will depend on how many people use the system, number of mixes
+and of course how it is tuned. Since tuning is currently an unsolved
+problem, it&rsquo;s all just a fun game anyway.</p>
+<p>OK folks that&rsquo;s all for now. I am not sure exactly what the next steps
+should be and I&rsquo;m planning on deliberating while I discuss it with my
+colleagues and advisors.  Either I will start a demo mixnet all on one
+machine that we can use to try out catshadow or I will attempt to
+instigate a volunteer operated mixnet. Things will get very cool once
+we have multiple applications that can use the mixnet. :)</p>
+<p>Cheers,</p>
+<p>David</p>
+
       </main>
       <footer class="td-footer row d-print-none">
   <div class="container-fluid">

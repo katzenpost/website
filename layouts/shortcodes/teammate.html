@@ -1,0 +1,17 @@
+{{ $name := .Get "name" }}
+{{ $img := .Get "img" }}
+{{ $role := .Get "role" }}
+{{ $github := .Get "github" }}
+<div class="row mt-5 mb-5">
+    <div class="col-lg-3">
+        <img class="mt-0 h-100 rounded" src="{{ .Get "img" }}" title="{{ .Get "name" }} Avatar">
+    </div>
+    <div class="col-lg-9">
+        <h3>{{ $name }}</h3>
+        {{ if $role }}<p class="boxed">{{ $role }}</p>{{ end }}
+        {{ if $github }}
+        <a href="https://github.com/{{ $github }}" class="btn btn-primary">
+            @{{ $github }} on <i class="fab fa-github ms-2"></i>
+        </a>{{ end }}
+    </div>
+</div>

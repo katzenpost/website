@@ -8,20 +8,37 @@
 <link rel="apple-touch-icon" href="/iconx/apple-touch-icon.png"/>
 <link rel="manifest" href="/iconx/manifest.json" />
 
-<title>404 Page not found | My New Hugo Site</title>
-<meta name="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
-<meta property="og:url" content="http://localhost:1313/404.html">
+<title>Rustification | My New Hugo Site</title>
+<meta name="description" content="Hi,
+I wrote some notes about making mixnet components in Rust that are binary compatible with existing Katzenpost components
+Rustification The goal should be binary compatibility with the golang implementation of Katzenpost such that the existing golang components can interoperate with the new Rust components. Perhaps the biggest advantage of using Rust would be for writing mixnet clients as opposed to mix servers. A Rust mixnet client could easily present a FFI that could be used by user interfaces written in Java for Android and Swift for iOS.">
+<meta property="og:url" content="http://localhost:1313/en/blog/2019-01-19/">
   <meta property="og:site_name" content="My New Hugo Site">
-  <meta property="og:title" content="404 Page not found">
-  <meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta property="og:title" content="Rustification">
+  <meta property="og:description" content="Hi,
+I wrote some notes about making mixnet components in Rust that are binary compatible with existing Katzenpost components
+Rustification The goal should be binary compatibility with the golang implementation of Katzenpost such that the existing golang components can interoperate with the new Rust components. Perhaps the biggest advantage of using Rust would be for writing mixnet clients as opposed to mix servers. A Rust mixnet client could easily present a FFI that could be used by user interfaces written in Java for Android and Swift for iOS.">
   <meta property="og:locale" content="en_us">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="en">
+    <meta property="article:published_time" content="2019-01-13T00:00:00+00:00">
+    <meta property="article:modified_time" content="2019-01-13T00:00:00+00:00">
+    <meta property="article:tag" content="Katzenpost">
+    <meta property="article:tag" content="Blog">
 
-  <meta itemprop="name" content="404 Page not found">
-  <meta itemprop="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta itemprop="name" content="Rustification">
+  <meta itemprop="description" content="Hi,
+I wrote some notes about making mixnet components in Rust that are binary compatible with existing Katzenpost components
+Rustification The goal should be binary compatibility with the golang implementation of Katzenpost such that the existing golang components can interoperate with the new Rust components. Perhaps the biggest advantage of using Rust would be for writing mixnet clients as opposed to mix servers. A Rust mixnet client could easily present a FFI that could be used by user interfaces written in Java for Android and Swift for iOS.">
+  <meta itemprop="datePublished" content="2019-01-13T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2019-01-13T00:00:00+00:00">
+  <meta itemprop="wordCount" content="238">
+  <meta itemprop="keywords" content="Katzenpost,Blog">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="404 Page not found">
-  <meta name="twitter:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta name="twitter:title" content="Rustification">
+  <meta name="twitter:description" content="Hi,
+I wrote some notes about making mixnet components in Rust that are binary compatible with existing Katzenpost components
+Rustification The goal should be binary compatibility with the golang implementation of Katzenpost such that the existing golang components can interoperate with the new Rust components. Perhaps the biggest advantage of using Rust would be for writing mixnet clients as opposed to mix servers. A Rust mixnet client could easily present a FFI that could be used by user interfaces written in Java for Android and Swift for iOS.">
 <link href="/scss/main.css" rel="stylesheet">
 <script
   src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -30,7 +47,7 @@
 
 
   </head>
-  <body class="td-404">
+  <body class="td-page">
     <header>
       <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
 <div class="container-fluid flex-column flex-md-row">
@@ -41,7 +58,7 @@
         <a class="nav-link" href="/en/pages/moral-character/"><span>Values</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/en/blog/"><span>Blog</span></a>
+        <a class="nav-link active" href="/en/blog/"><span>Blog</span></a>
       </li>
       </ul>
   </div>
@@ -53,11 +70,62 @@
     </header>
     <div class="container-fluid td-default td-outer">
       <main role="main" class="td-main">
-        <div class="td-content">
-  <h1>404</h1>
-  <p>The page you are looking for does not seem to exist.</p>
-  <p>Go back to the <a href="/">home page</a></p>
-</div>
+        <p>Hi,</p>
+<p>I wrote some notes about making mixnet components in Rust that are binary
+compatible with <a href="https://github.com/katzenpost/docs/blob/master/drafts/priority_tasks.rst#rustification">existing Katzenpost components</a></p>
+<h1 id="rustification">Rustification</h1>
+<p>The goal should be binary compatibility with the golang implementation
+of Katzenpost such that the existing golang components can
+interoperate with the new Rust components. Perhaps the biggest advantage
+of using Rust would be for writing mixnet clients as opposed to mix servers.
+A Rust mixnet client could easily present a FFI that could be used by
+user interfaces written in Java for Android and Swift for iOS.</p>
+<p>I wrote several relavant rust crates:</p>
+<ul>
+<li><a href="https://crates.io/crates/aez">https://crates.io/crates/aez</a></li>
+<li><a href="https://crates.io/crates/ecdh_wrapper">https://crates.io/crates/ecdh_wrapper</a></li>
+<li><a href="https://crates.io/crates/mix_link">https://crates.io/crates/mix_link</a></li>
+<li><a href="https://crates.io/crates/rust-lioness">https://crates.io/crates/rust-lioness</a></li>
+<li><a href="https://crates.io/crates/epoch">https://crates.io/crates/epoch</a></li>
+<li><a href="https://crates.io/crates/sphinx_replay_cache">https://crates.io/crates/sphinx_replay_cache</a></li>
+<li><a href="https://crates.io/crates/sphinxcrypto">https://crates.io/crates/sphinxcrypto</a></li>
+</ul>
+<h2 id="sphinx-binary-compatibility">Sphinx binary compatibility</h2>
+<ul>
+<li><a href="https://crates.io/crates/sphinxcrypto">https://crates.io/crates/sphinxcrypto</a></li>
+</ul>
+<p>The rust Sphinx uses the exact same cryptographic primitives
+as the golang implementation. Therefore it should be fairly
+easy to make them binary compatible. They should share test vectors.</p>
+<h2 id="mix-link-layer-binary-compatibility">Mix link layer binary compatibility</h2>
+<ul>
+<li><a href="https://crates.io/crates/mix_link">https://crates.io/crates/mix_link</a></li>
+</ul>
+<p>Currently this mix link layer crate uses <code>Noise_XX_25519_ChaChaPoly_BLAKE2b</code>
+however if the Katzenpost link layer were to upgrade to
+Kyber then the task of making this crate binary compatibility
+would be greatly simplified.</p>
+<p>Here&rsquo;s an implementation of Kyber:</p>
+<ul>
+<li><a href="https://crates.io/crates/kyber">https://crates.io/crates/kyber</a></li>
+</ul>
+<p>This <code>mix_link</code> crate uses the snow Noise protocol library implementation:</p>
+<ul>
+<li><a href="https://crates.io/crates/snow">https://crates.io/crates/snow</a></li>
+</ul>
+<p>However we SHOULD patch snow with Kyber PQ KEM hybrid forward secrecy.
+Here&rsquo;s the snow github ticket for this task:</p>
+<ul>
+<li><a href="https://github.com/mcginty/snow/issues/39">https://github.com/mcginty/snow/issues/39</a></li>
+</ul>
+<h2 id="mix-server">Mix server</h2>
+<p>Current work in progress rust mix server:</p>
+<ul>
+<li><a href="https://github.com/david415/mix_server">https://github.com/david415/mix_server</a></li>
+</ul>
+<p>Development progress has halted due to not being able to interoperate
+with the existing Katzenpost Directory Authority system.</p>
+
       </main>
       <footer class="td-footer row d-print-none">
   <div class="container-fluid">

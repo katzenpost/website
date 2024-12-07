@@ -8,20 +8,32 @@
 <link rel="apple-touch-icon" href="/iconx/apple-touch-icon.png"/>
 <link rel="manifest" href="/iconx/manifest.json" />
 
-<title>404 Page not found | My New Hugo Site</title>
-<meta name="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
-<meta property="og:url" content="http://localhost:1313/404.html">
+<title>Mixnet Literature Overview | My New Hugo Site</title>
+<meta name="description" content="Foundational work">
+<meta property="og:url" content="http://localhost:1313/en/blog/2024-04-15-lit-review/">
   <meta property="og:site_name" content="My New Hugo Site">
-  <meta property="og:title" content="404 Page not found">
-  <meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta property="og:title" content="Mixnet Literature Overview">
+  <meta property="og:description" content="Foundational work">
   <meta property="og:locale" content="en_us">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="en">
+    <meta property="article:published_time" content="2024-04-15T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-04-15T00:00:00+00:00">
+    <meta property="article:tag" content="Research">
+    <meta property="article:tag" content="Cryptography">
+    <meta property="article:tag" content="Design">
+    <meta property="article:tag" content="Outreach">
+    <meta property="article:tag" content="Mathematics">
 
-  <meta itemprop="name" content="404 Page not found">
-  <meta itemprop="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta itemprop="name" content="Mixnet Literature Overview">
+  <meta itemprop="description" content="Foundational work">
+  <meta itemprop="datePublished" content="2024-04-15T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-04-15T00:00:00+00:00">
+  <meta itemprop="wordCount" content="254">
+  <meta itemprop="keywords" content="Research,Cryptography,Design,Outreach,Mathematics">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="404 Page not found">
-  <meta name="twitter:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta name="twitter:title" content="Mixnet Literature Overview">
+  <meta name="twitter:description" content="Foundational work">
 <link href="/scss/main.css" rel="stylesheet">
 <script
   src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -30,7 +42,7 @@
 
 
   </head>
-  <body class="td-404">
+  <body class="td-page">
     <header>
       <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
 <div class="container-fluid flex-column flex-md-row">
@@ -41,7 +53,7 @@
         <a class="nav-link" href="/en/pages/moral-character/"><span>Values</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/en/blog/"><span>Blog</span></a>
+        <a class="nav-link active" href="/en/blog/"><span>Blog</span></a>
       </li>
       </ul>
   </div>
@@ -53,11 +65,14 @@
     </header>
     <div class="container-fluid td-default td-outer">
       <main role="main" class="td-main">
-        <div class="td-content">
-  <h1>404</h1>
-  <p>The page you are looking for does not seem to exist.</p>
-  <p>Go back to the <a href="/">home page</a></p>
-</div>
+        <p>We are presenting our overview of existing Mixnet literature. It takes some liberties with what is included or not. It proposes new ways to talk about some issues, and provides a critical analysis of some of the existing papers. It also endeavors to introduce the reader to the language of anonymity systems, while maintaining mathematical rigor.</p>
+<p>This doc, in particular, does not talk about the Katzenpost design. It does introduce the reader to some of the reasons why we&rsquo;ve been making certain design decisions, and a keen eye might be led to some of the similar conclusions. But here we focus on already published research. We also stick to theory and don&rsquo;t focus on any practical systems being built today.</p>
+<p>The specific networking decisions implemented in Katzenpost so far, and the threats they mitigate and don&rsquo;t, will be addressed in an upcoming, detailed threat model document.</p>
+<p>We thank Wau Holland Stiftung for funding this work.</p>
+<p><a href="https://katzenpost.network/research/Literature_overview__website_version.pdf">Lit Review Doc</a></p>
+<p>Note form Eva: I understand that the tone of some of this analysis may come across as harsh. I personally take full responsibility for this tone and critique in particular.</p>
+<p>At the same time, the point of this doc is not to present original research. Some exploitable mistakes in existing research were withheld from this version, and original contributions are included if I, personally, feel like they are merely reinventing the wheel in bridging some of the gaps between Mixnets and Mathematics. Some of the other original research is mentioned, but will be expanded on elsewhere.</p>
+
       </main>
       <footer class="td-footer row d-print-none">
   <div class="container-fluid">

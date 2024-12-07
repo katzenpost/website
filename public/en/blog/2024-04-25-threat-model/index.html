@@ -8,20 +8,33 @@
 <link rel="apple-touch-icon" href="/iconx/apple-touch-icon.png"/>
 <link rel="manifest" href="/iconx/manifest.json" />
 
-<title>404 Page not found | My New Hugo Site</title>
-<meta name="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
-<meta property="og:url" content="http://localhost:1313/404.html">
+<title>Katzenpost threat model document | My New Hugo Site</title>
+<meta name="description" content="Here we present a draft of the Katzenpost mixnet threat model document. We regard the threat model document as a living document which is frequently edited and in need of ongoing maintenance as we continue to develop newer mixnet protocols. Currently it is being organized by mixnet attack category and we have arranged attacks in a table with corresponding attacker capabilities. Later sections of the document present a deep dive into the core cryptographic protocols that comprise Katzenpost, namely these three:">
+<meta property="og:url" content="http://localhost:1313/en/blog/2024-04-25-threat-model/">
   <meta property="og:site_name" content="My New Hugo Site">
-  <meta property="og:title" content="404 Page not found">
-  <meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta property="og:title" content="Katzenpost threat model document">
+  <meta property="og:description" content="Here we present a draft of the Katzenpost mixnet threat model document. We regard the threat model document as a living document which is frequently edited and in need of ongoing maintenance as we continue to develop newer mixnet protocols. Currently it is being organized by mixnet attack category and we have arranged attacks in a table with corresponding attacker capabilities. Later sections of the document present a deep dive into the core cryptographic protocols that comprise Katzenpost, namely these three:">
   <meta property="og:locale" content="en_us">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="en">
+    <meta property="article:published_time" content="2024-04-25T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-04-25T00:00:00+00:00">
+    <meta property="article:tag" content="Research">
+    <meta property="article:tag" content="Design">
+    <meta property="article:tag" content="Threat Model">
+    <meta property="article:tag" content="Security">
+    <meta property="article:tag" content="Privacy">
+    <meta property="article:tag" content="Cryptography">
 
-  <meta itemprop="name" content="404 Page not found">
-  <meta itemprop="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta itemprop="name" content="Katzenpost threat model document">
+  <meta itemprop="description" content="Here we present a draft of the Katzenpost mixnet threat model document. We regard the threat model document as a living document which is frequently edited and in need of ongoing maintenance as we continue to develop newer mixnet protocols. Currently it is being organized by mixnet attack category and we have arranged attacks in a table with corresponding attacker capabilities. Later sections of the document present a deep dive into the core cryptographic protocols that comprise Katzenpost, namely these three:">
+  <meta itemprop="datePublished" content="2024-04-25T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-04-25T00:00:00+00:00">
+  <meta itemprop="wordCount" content="156">
+  <meta itemprop="keywords" content="Research,Design,Threat Model,Security,Privacy,Cryptography">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="404 Page not found">
-  <meta name="twitter:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins.">
+  <meta name="twitter:title" content="Katzenpost threat model document">
+  <meta name="twitter:description" content="Here we present a draft of the Katzenpost mixnet threat model document. We regard the threat model document as a living document which is frequently edited and in need of ongoing maintenance as we continue to develop newer mixnet protocols. Currently it is being organized by mixnet attack category and we have arranged attacks in a table with corresponding attacker capabilities. Later sections of the document present a deep dive into the core cryptographic protocols that comprise Katzenpost, namely these three:">
 <link href="/scss/main.css" rel="stylesheet">
 <script
   src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -30,7 +43,7 @@
 
 
   </head>
-  <body class="td-404">
+  <body class="td-page">
     <header>
       <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
 <div class="container-fluid flex-column flex-md-row">
@@ -41,7 +54,7 @@
         <a class="nav-link" href="/en/pages/moral-character/"><span>Values</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/en/blog/"><span>Blog</span></a>
+        <a class="nav-link active" href="/en/blog/"><span>Blog</span></a>
       </li>
       </ul>
   </div>
@@ -53,11 +66,24 @@
     </header>
     <div class="container-fluid td-default td-outer">
       <main role="main" class="td-main">
-        <div class="td-content">
-  <h1>404</h1>
-  <p>The page you are looking for does not seem to exist.</p>
-  <p>Go back to the <a href="/">home page</a></p>
-</div>
+        <p>Here we present a draft of the Katzenpost mixnet threat model document.
+We regard the threat model document as a living document which is frequently
+edited and in need of ongoing maintenance as we continue to develop newer
+mixnet protocols. Currently it is being organized by mixnet attack category
+and we have arranged attacks in a table with corresponding attacker
+capabilities. Later sections of the document present a deep dive into the core cryptographic
+protocols that comprise Katzenpost, namely these three:</p>
+<ol>
+<li>Katzenpost Directory Authority PKI protocol</li>
+<li>PQ Noise based wire protocol (on top of TCP or QUIC)</li>
+<li>Sphinx nested encrypted packet routing protocol</li>
+</ol>
+<p>Those are the basics necessary for point to point communications through the mix network.
+However mixnet protocols will then add their own cryptographic protocols which simply
+make use of the above three protocols in service to their goals of message transportation.</p>
+<p>We thank Wau Holland Stiftung for funding this work.</p>
+<p><a href="https://katzenpost.network/research/Threat_Model_Doc.pdf">Threat Model Doc</a></p>
+
       </main>
       <footer class="td-footer row d-print-none">
   <div class="container-fluid">
