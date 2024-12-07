@@ -1,7 +1,7 @@
 ---
 title: "Privacy Policy"
 linkTitle: "Privacy"
-draft: true
+draft: false
 slug: "/privacy/"
 type: "pages"
 ---
