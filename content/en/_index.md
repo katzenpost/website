@@ -41,7 +41,7 @@ This doc, in particular, does not talk about the Katzenpost design. It does intr
 {{% /blocks/feature %}}
 
 {{% blocks/feature icon="fa-users" title="Our Team" url="/team" %}}
-Our team consists of world clas experts.
+Our team consists of world class experts.
 {{% /blocks/feature %}}
 
 {{% blocks/feature icon="fa-users" title="source code" url="https://github.com/katzenpost/" %}}
