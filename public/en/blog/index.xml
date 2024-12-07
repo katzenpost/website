@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blog on Katzenpost</title>
+    <link>//localhost:1313/en/blog/</link>
+    <description>Recent content in Blog on Katzenpost</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 25 Apr 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="//localhost:1313/en/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Katzenpost threat model document</title>
+      <link>//localhost:1313/en/blog/2024-04-25-threat-model/</link>
+      <pubDate>Thu, 25 Apr 2024 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/en/blog/2024-04-25-threat-model/</guid>
+      <description>&lt;p&gt;Here we present a draft of the Katzenpost mixnet threat model document.&#xA;We regard the threat model document as a living document which is frequently&#xA;edited and in need of ongoing maintenance as we continue to develop newer&#xA;mixnet protocols. Currently it is being organized by mixnet attack category&#xA;and we have arranged attacks in a table with corresponding attacker&#xA;capabilities. Later sections of the document present a deep dive into the core cryptographic&#xA;protocols that comprise Katzenpost, namely these three:&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Mixnet Literature Overview</title>
+      <link>//localhost:1313/en/blog/2024-04-15-lit-review/</link>
+      <pubDate>Mon, 15 Apr 2024 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/en/blog/2024-04-15-lit-review/</guid>
+      <description>&lt;p&gt;We are presenting our overview of existing Mixnet literature. It takes some liberties with what is included or not. It proposes new ways to talk about some issues, and provides a critical analysis of some of the existing papers. It also endeavors to introduce the reader to the language of anonymity systems, while maintaining mathematical rigor.&lt;/p&gt;&#xA;&lt;p&gt;This doc, in particular, does not talk about the Katzenpost design. It does introduce the reader to some of the reasons why we&amp;rsquo;ve been making certain design decisions, and a keen eye might be led to some of the similar conclusions. But here we focus on already published research. We also stick to theory and don&amp;rsquo;t focus on any practical systems being built today.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>hpqc - hybrid post quantum cryptography library</title>
+      <link>//localhost:1313/en/blog/2024-04-12-hpqc/</link>
+      <pubDate>Fri, 12 Apr 2024 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/en/blog/2024-04-12-hpqc/</guid>
+      <description>&lt;p&gt;The Katzenpost developement team has recently released a new golang&#xA;cryptography library known as &lt;a href=&#34;https://github.com/katzenpost/hpqc&#34;&gt;&lt;strong&gt;hpqc&lt;/strong&gt;&lt;/a&gt;.&#xA;The theme of the library is hybrid post quantum cryptographic constructions, namely:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;hybrid KEMs (key encapsulation mechanism)&lt;/li&gt;&#xA;&lt;li&gt;hybrid NIKEs (non-interactive key exchange)&lt;/li&gt;&#xA;&lt;li&gt;hybrid signature schemes&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;In each of the three main subdirectories, &amp;ldquo;kem&amp;rdquo;, &amp;ldquo;nike&amp;rdquo; and &amp;ldquo;sign&amp;rdquo; there exists&#xA;interface definitions for &lt;code&gt;Scheme&lt;/code&gt;, &lt;code&gt;PrivateKey&lt;/code&gt; and &lt;code&gt;PublicKey&lt;/code&gt;. For signature schemes and&#xA;KEMs we&amp;rsquo;re borrowing the interface sets from cloudflare&amp;rsquo;s circl library.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Katzenpost at 37C3</title>
+      <link>//localhost:1313/en/blog/2024-01-28-katzenpost-at-37c3/</link>
+      <pubDate>Sun, 28 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/en/blog/2024-01-28-katzenpost-at-37c3/</guid>
+      <description>&lt;p&gt;Dr. Eva Infeld and surveillance expert and developer Leif Ryge held a session at the Chaos Communication Congress about the current state of the project, some of the things we’re working on, and some of the pitfalls many anonymity systems fall into. Building an anonymity system fit for our dystopian age is a hard problem, but we’re doing it.&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=1ev4r-aZmFM&#34;&gt;&lt;img src=&#34;https://github.com/katzenpost/website/tree/main/content/en/media/thumbnail.png&#34; alt=&#34;Katzenpost talk on YouTube&#34;&gt;&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Audio Engineering Considerations for a Modern Mixnet</title>
+      <link>//localhost:1313/en/blog/2023-11-25-audio-engineering-considerations/</link>
+      <pubDate>Sat, 25 Nov 2023 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/en/blog/2023-11-25-audio-engineering-considerations/</guid>
+      <description>&lt;p&gt;Modern Mixnets have a unique set of requirements when it comes to processing&#xA;audio. The bandwidth is scarce, but we expect to use modern devices and have&#xA;ample processing power. We aim to secure the communication against even&#xA;sophisticated attacks that come from capturing the metadata, and prioritize&#xA;tools that are free, open source and written with security in mind. In this&#xA;unique setting, we present a set of recommendations for implementing codecs,&#xA;DSPs, and sophisticated noise reduction tools, to deliver either impressive&#xA;quality at low bandwidth or good quality at impressively low bandwidth.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Website Relaunch and migration to Hugo</title>
+      <link>//localhost:1313/en/blog/2023-11-24-website-relaunch/</link>
+      <pubDate>Fri, 24 Nov 2023 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/en/blog/2023-11-24-website-relaunch/</guid>
+      <description>&lt;p&gt;To match all the code development in Katzenpost in the last year, it was time&#xA;for a website relaunch. Our site was a migration from Sphinx, which is primarily&#xA;for documentation, to Hugo which is wildly configurable for all sorts of&#xA;websites. Given the technical nature and need for nice documentation interface,&#xA;we used the well crafted and maintained Docsy theme.&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;Website Dependencies&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://gohugo.io&#34;&gt;Hugo&lt;/a&gt; static site generator&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://docsy.dev&#34;&gt;Docsy&lt;/a&gt; theme for Hugo&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://getbootstrap.com&#34;&gt;Bootstrap 5&lt;/a&gt; is bundled in Docsy&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://decapcms.org&#34;&gt;Decap CMS&lt;/a&gt; for a user-friendly GUI&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
+    </item>
+    <item>
+      <title>Monthly News Update (May 2019)</title>
+      <link>//localhost:1313/en/blog/2019-05-04/</link>
+      <pubDate>Sat, 04 May 2019 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/en/blog/2019-05-04/</guid>
+      <description>&lt;p&gt;Greetings,&lt;/p&gt;&#xA;&lt;p&gt;The last few weeks have been very busy. I now have the basic working&#xA;prototype implementation of a new Katzenpost messaging system. This&#xA;new system has mutual location hiding properties for communication&#xA;partners because recipients retreive their messages from a remote&#xA;spool using a Sphinx SURB based protocol. &lt;a href=&#34;https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf&#34; title=&#34;Danezis, G., Goldberg, I., Sphinx: A Compact and Provably Secure Mix Format, DOI 10.1109/SP.2009.15, May 2009&#34;&gt;SPHINX&lt;/a&gt;  &lt;a href=&#34;https://github.com/katzenpost/docs/blob/master/specs/sphinx.rst&#34; title=&#34;Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., Sphinx Mix Network Cryptographic Packet Format Specification July 2017&#34;&gt;SPHINXSPEC&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Monthly News Update (April 2019)</title>
+      <link>//localhost:1313/en/blog/2019-04-10/</link>
+      <pubDate>Wed, 10 Apr 2019 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/en/blog/2019-04-10/</guid>
+      <description>&lt;p&gt;Greetings,&lt;/p&gt;&#xA;&lt;p&gt;The Panoramix grant project funded by the European Commission has&#xA;officially ended but the Katzenpost free software project lives on.&#xA;Masala and I continue to work on Katzenpost for grant money given to&#xA;us by Samsung.&lt;/p&gt;&#xA;&lt;p&gt;We recently learned a few things about mixnet design in a series of&#xA;design meetings. The conclusions from our learnings is too much&#xA;information and detail for this here post. However I will summarize&#xA;some of our conclusions below. Our discussions usually revolved around&#xA;mixnet CRDT applications, client reliability, message spool server&#xA;design, client decoy traffic and, preventing attacks: statistical&#xA;disclosure and active confirmation attacks.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Rustification</title>
+      <link>//localhost:1313/en/blog/2019-01-19/</link>
+      <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/en/blog/2019-01-19/</guid>
+      <description>&lt;p&gt;Hi,&lt;/p&gt;&#xA;&lt;p&gt;I wrote some notes about making mixnet components in Rust that are binary&#xA;compatible with &lt;a href=&#34;https://github.com/katzenpost/docs/blob/master/drafts/priority_tasks.rst#rustification&#34;&gt;existing Katzenpost components&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;rustification&#34;&gt;Rustification&lt;/h1&gt;&#xA;&lt;p&gt;The goal should be binary compatibility with the golang implementation&#xA;of Katzenpost such that the existing golang components can&#xA;interoperate with the new Rust components. Perhaps the biggest advantage&#xA;of using Rust would be for writing mixnet clients as opposed to mix servers.&#xA;A Rust mixnet client could easily present a FFI that could be used by&#xA;user interfaces written in Java for Android and Swift for iOS.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Monthly News Update (Nov 2018)</title>
+      <link>//localhost:1313/en/blog/2018-11-22/</link>
+      <pubDate>Thu, 22 Nov 2018 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/en/blog/2018-11-22/</guid>
+      <description>&lt;p&gt;Greetings!&lt;/p&gt;&#xA;&lt;p&gt;This is our second edition of katzenpost news.&#xA;There&amp;rsquo;s been a lot of progress since the last report I posted many months ago.&lt;/p&gt;&#xA;&lt;p&gt;Firstly I&amp;rsquo;d like to mention our future development plans:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;mix and directory authority key agility&lt;/li&gt;&#xA;&lt;li&gt;generative testing for the voting Directory Authority system&lt;/li&gt;&#xA;&lt;li&gt;generative testing for all of the things where appropriate&lt;/li&gt;&#xA;&lt;li&gt;load and performance testing the mix server&lt;/li&gt;&#xA;&lt;li&gt;design and development of an application agnostic mixnet client message oriented protocol library&lt;/li&gt;&#xA;&lt;li&gt;design and development of one or more applications that use our new mixnet protocol client library&lt;/li&gt;&#xA;&lt;li&gt;potentially assist in integration with other software projects that want to use a mixnet transport protocol&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Our recent accomplishments include:&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Monthly News Update (Feb 2018)</title>
+      <link>//localhost:1313/en/blog/2018-02-27/</link>
+      <pubDate>Tue, 27 Feb 2018 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/en/blog/2018-02-27/</guid>
+      <description>&lt;h2 id=&#34;katzenpost-monthly-news&#34;&gt;katzenpost monthly news&lt;/h2&gt;&#xA;&lt;p&gt;Greetings!&lt;/p&gt;&#xA;&lt;p&gt;This is our first edition of katzenpost monthly news. I&amp;rsquo;ll be&#xA;summarizing recent events from our first hackfest in Athens in early&#xA;December 2017 to the present.&lt;/p&gt;&#xA;&lt;p&gt;What we did in Athens:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;setup a test mix network&lt;/li&gt;&#xA;&lt;li&gt;remote collaboration with Yawning Angel to fix bugs&#xA;and add features to the server side&lt;/li&gt;&#xA;&lt;li&gt;wrote some basic installation documentation&lt;/li&gt;&#xA;&lt;li&gt;Moritz created and deployed the &lt;a href=&#34;https://katzenpost.mixnetworks.org&#34;&gt;katzenpost website&lt;/a&gt;&#xA;with glossary and FAQ&lt;/li&gt;&#xA;&lt;li&gt;explored technical issues related to python and java language&#xA;bindings to golang libraries&lt;/li&gt;&#xA;&lt;li&gt;discussed at length the possibilies for various kinds of mixnet&#xA;clients&lt;/li&gt;&#xA;&lt;li&gt;Vincent wrote a prototype android instant messenger client&lt;/li&gt;&#xA;&lt;li&gt;met with the GrNet people and told them how to install a&#xA;katzenpost mix network and answered their questions&lt;/li&gt;&#xA;&lt;li&gt;meskio and kaliy added an external user db interface for Provider authentication&lt;/li&gt;&#xA;&lt;li&gt;meskio wrote prototype python clients for testing purposes&lt;/li&gt;&#xA;&lt;li&gt;we had many group discussion about mix network design&lt;/li&gt;&#xA;&lt;li&gt;special guest visitor: George Kadianakis from Tor Project&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Since that time we have been working on our PKI specification. Nick&#xA;Mathewson sent us a six page review of our spec and Yawning sent a two&#xA;page reply; both of these e-mails contain lots of design details and&#xA;have been useful in our editing of the spec thus far:&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -20,11 +20,11 @@ specializing in mixnet protocols.
 <!-- Triplet Section: Gray -->
 {{% blocks/section color="dark" type="row" %}}
 
-{{% blocks/feature icon="fa fa-file-powerpoint" title="Presentations" url="/presentations" %}}
+{{% blocks/feature icon="fa fa-file-powerpoint" title="Presentations" url="/pages/presentations" %}}
 Browse recent and past video/audio presentations about Katzenpost and mixnets designs.
 {{% /blocks/feature %}}
 
-{{% blocks/feature icon="fa fa-file-powerpoint" title="Katzenpost Admin Guide" url="/admin_guide" %}}
+{{% blocks/feature icon="fa fa-file-powerpoint" title="Katzenpost Admin Guide" url="/pages/admin_guide" %}}
 Read our extensive documentation for a better understanding of the Katzenpost server side.
 NOTE that this document also covers how to run a local docker mixnet which is useful for developers.
 {{% /blocks/feature %}}
@@ -40,7 +40,7 @@ mixnet protocols.
 This doc, in particular, does not talk about the Katzenpost design. It does introduce the reader to some of the reasons why we've been making certain design decisions, and a keen eye might be led to some of the similar conclusions. But here we focus on already published research. We also stick to theory and don't focus on any practical systems being built today.
 {{% /blocks/feature %}}
 
-{{% blocks/feature icon="fa-users" title="Our Team" url="/team" %}}
+{{% blocks/feature icon="fa-users" title="Our Team" url="/pages/team" %}}
 Our team consists of world class experts.
 {{% /blocks/feature %}}
 

@@ -1,0 +1,221 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/iconx/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/iconx/apple-touch-icon.png"/>
+<link rel="manifest" href="/iconx/manifest.json" />
+
+<title>hpqc - hybrid post quantum cryptography library | Katzenpost</title>
+<meta name="description" content="The Katzenpost developement team has recently released a new golang cryptography library known as hpqc. The theme of the library is hybrid post quantum cryptographic constructions, namely:
+hybrid KEMs (key encapsulation mechanism) hybrid NIKEs (non-interactive key exchange) hybrid signature schemes In each of the three main subdirectories, “kem”, “nike” and “sign” there exists interface definitions for Scheme, PrivateKey and PublicKey. For signature schemes and KEMs we’re borrowing the interface sets from cloudflare’s circl library.">
+<meta property="og:url" content="//localhost:1313/en/blog/2024-04-12-hpqc/">
+  <meta property="og:site_name" content="Katzenpost">
+  <meta property="og:title" content="hpqc - hybrid post quantum cryptography library">
+  <meta property="og:description" content="The Katzenpost developement team has recently released a new golang cryptography library known as hpqc. The theme of the library is hybrid post quantum cryptographic constructions, namely:
+hybrid KEMs (key encapsulation mechanism) hybrid NIKEs (non-interactive key exchange) hybrid signature schemes In each of the three main subdirectories, “kem”, “nike” and “sign” there exists interface definitions for Scheme, PrivateKey and PublicKey. For signature schemes and KEMs we’re borrowing the interface sets from cloudflare’s circl library.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="en">
+    <meta property="article:published_time" content="2024-04-12T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-04-12T00:00:00+00:00">
+    <meta property="article:tag" content="Hpqc">
+    <meta property="article:tag" content="Cryptography">
+
+  <meta itemprop="name" content="hpqc - hybrid post quantum cryptography library">
+  <meta itemprop="description" content="The Katzenpost developement team has recently released a new golang cryptography library known as hpqc. The theme of the library is hybrid post quantum cryptographic constructions, namely:
+hybrid KEMs (key encapsulation mechanism) hybrid NIKEs (non-interactive key exchange) hybrid signature schemes In each of the three main subdirectories, “kem”, “nike” and “sign” there exists interface definitions for Scheme, PrivateKey and PublicKey. For signature schemes and KEMs we’re borrowing the interface sets from cloudflare’s circl library.">
+  <meta itemprop="datePublished" content="2024-04-12T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-04-12T00:00:00+00:00">
+  <meta itemprop="wordCount" content="656">
+  <meta itemprop="keywords" content="Hpqc,Cryptography">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="hpqc - hybrid post quantum cryptography library">
+  <meta name="twitter:description" content="The Katzenpost developement team has recently released a new golang cryptography library known as hpqc. The theme of the library is hybrid post quantum cryptographic constructions, namely:
+hybrid KEMs (key encapsulation mechanism) hybrid NIKEs (non-interactive key exchange) hybrid signature schemes In each of the three main subdirectories, “kem”, “nike” and “sign” there exists interface definitions for Scheme, PrivateKey and PublicKey. For signature schemes and KEMs we’re borrowing the interface sets from cloudflare’s circl library.">
+<link href="/scss/main.css" rel="stylesheet">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+
+
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/"><span class="navbar-brand__logo navbar-logo"><svg viewBox="0 0 52.916665 52.916666" id="svg378" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs id="defs375"/><g id="layer1"><path id="path668-6-0-2" style="display:inline;fill:#fff;stroke-width:.259796" d="M7.0958238.39494076C5.9693164 1.595474 5.3662335 3.1945076 5.4185681 4.8399842c.052392 1.6454494.7563068 3.2026664 1.9567874 4.329176.396336.3719228.46567 1.0094308.116531 1.4259988-1.5140595 1.806234-2.5523992 4.024813-2.9213634 6.46312 2.6090367.0 4.5689775 1.999645 4.5689775 4.467958.0 1.420535-1.9978708 3.964085-1.9978708 3.964085-1.7234653 1.824301-3.4261911 6.00593 1.9978708 12.156344 1.9146704 2.171055 2.2712124 3.794957 2.2780944 5.699267.004 1.144145-.269038 2.732086-.487684 3.817247 1.943752.513625 3.984796.787434 6.08996.787434 7.860022.0 14.829415-3.814249 19.158331-9.692328l-.212858 7.427032c0 3.80888 3.088053 6.89692 6.896919 6.89692 3.642099.0 6.624804-2.822404 6.879401-6.39981-.589475.605844-1.414018.98143-2.325908.98143-1.792079.0-3.244693-1.452209-3.244693-3.244028v-8.834167c0-3.041181-1.355308-5.880385-3.566692-7.867575-1.111596-.999172-2.439884-1.782682-3.920978-2.267994-1.152122-.377422-2.39653-.574627-3.704079-.552337h-1.009052c-1.227541.05187-2.697634.322038-3.834766.798877-1.271703.533307-2.806331 1.574255-3.779524 2.559662-.04471.04497-.0932.09385-.14483.145486-.902545.90566-2.846831 2.856725-3.993048 6.195033-.07195.209626-.210943.122527-.177156-.0404.197177-.953133.455162-2.014219.740938-2.71256.632346-1.545526 1.558821-2.949636 2.727393-4.132499 1.004032-1.016847 2.170349-1.853382 3.447437-2.474778.18422-.08968.159989-.381581-.03441-.447264-1.335105-.451422-2.379143-1.337516-2.379143-2.763069.0-2.332177 1.786684-4.246967 4.065808-4.451118C28.275647 14.852726 27.386424 12.812451 26.0877 11.099689 25.649169 10.52136 25.778762 9.6658324 26.307963 9.1691655c1.200518-1.1265096 1.904556-2.6837267 1.956786-4.3291762C28.317013 3.1945128 27.713311 1.5954792 26.586842.394946L21.266123 5.3876047H12.416469zM12.082423 9.5726539c1.827495-.024237 2.925419 1.5236681 2.925419 1.5236681s-.284395.410257-.805604.691105a1.0110635.89956302.0 00.06596-.320643 1.0110635.89956302.0 00-1.010382-.899247 1.0110635.89956302.0 00-1.011738.899247 1.0110635.89956302.0 00.117836.418977c-1.055691-.361181-1.691479-1.134876-1.65906-2.0066323C11.199746 9.6677693 11.660618 9.5782455 12.082347 9.5726539zm9.160872.0c.421717.00651.881962.095154 1.37683.3064748.01799.4829013-.16931.9356923-.518669 1.3054253a1.0476442.93210967.0 00-1.033974-.784072 1.0476442.93210967.0 00-1.048104.932252 1.0476442.93210967.0 00.354977.695159c-1.306323.155753-2.056478-.931571-2.056478-.931571s1.097989-1.5479391 2.925418-1.5236681zM10.385654 13.795403l4.081294.439182-.06934.645302-4.081307-.438518zm12.938364.06127.06948.64598-4.081306.438503-.06934-.645302zm-6.505549.27347a1.6895096 1.1114297.0 011.689365 1.11144 1.6895096 1.1114297.0 01-1.689365 1.111414 1.6895096 1.1114297.0 01-1.689378-1.111414 1.6895096 1.1114297.0 011.689378-1.11144zm-2.322558 1.360666.155597.631145-3.984967.983452-.155609-.630481zm4.715152.13538 3.984979.984129-.155596.629802-3.98498-.983437z"/></g></svg></span><span class="navbar-brand__name">Katzenpost</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="/moral-character"><span>Values</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="/en/blog/"><span>Blog</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/katzenpost" target="_blank" rel="noopener"><span>Code</span></a>
+      </li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="Search this site…"
+    aria-label="Search this site…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/offline-search-index.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-default td-outer">
+      <main role="main" class="td-main">
+        <p>The Katzenpost developement team has recently released a new golang
+cryptography library known as <a href="https://github.com/katzenpost/hpqc"><strong>hpqc</strong></a>.
+The theme of the library is hybrid post quantum cryptographic constructions, namely:</p>
+<ul>
+<li>hybrid KEMs (key encapsulation mechanism)</li>
+<li>hybrid NIKEs (non-interactive key exchange)</li>
+<li>hybrid signature schemes</li>
+</ul>
+<p>In each of the three main subdirectories, &ldquo;kem&rdquo;, &ldquo;nike&rdquo; and &ldquo;sign&rdquo; there exists
+interface definitions for <code>Scheme</code>, <code>PrivateKey</code> and <code>PublicKey</code>. For signature schemes and
+KEMs we&rsquo;re borrowing the interface sets from cloudflare&rsquo;s circl library.</p>
+<p>And each of these subdirectories has a <code>schemes</code> package where all the imeplementations are
+registered and can be referenced by unique string name, take for examples the
+<a href="https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/kem/schemes">KEM schemes documentation</a>.
+However the implementations that are registered don&rsquo;t show up in the API docs but we can see
+them in the <a href="https://github.com/katzenpost/hpqc/blob/main/kem/schemes/schemes.go">source code</a>.</p>
+<p><strong>hpqc</strong> gives you the power to compose an arbitrary number of KEMs and NIKEs, for example the
+above source file defines many KEMs in composition like this one:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span>	<span style="color:#a6e22e">combiner</span>.<span style="color:#a6e22e">New</span>(
+</span></span><span style="display:flex;"><span>		<span style="color:#e6db74">&#34;X25519-mlkem768-ctidh512&#34;</span>,
+</span></span><span style="display:flex;"><span>		[]<span style="color:#a6e22e">kem</span>.<span style="color:#a6e22e">Scheme</span>{
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">adapter</span>.<span style="color:#a6e22e">FromNIKE</span>(<span style="color:#a6e22e">x25519</span>.<span style="color:#a6e22e">Scheme</span>(<span style="color:#a6e22e">rand</span>.<span style="color:#a6e22e">Reader</span>)),
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">mlkem768</span>.<span style="color:#a6e22e">Scheme</span>(),
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">adapter</span>.<span style="color:#a6e22e">FromNIKE</span>(<span style="color:#a6e22e">ctidh512</span>.<span style="color:#a6e22e">Scheme</span>()),
+</span></span><span style="display:flex;"><span>		},
+</span></span><span style="display:flex;"><span>	),
+</span></span></code></pre></div><p>This library makes seven unique contributions in golang:</p>
+<ol>
+<li>a set of generic NIKE interfaces for NIKE scheme, public key and private key types</li>
+</ol>
+<p><a href="https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/nike">NIKE interfaces documentation</a>
+<a href="https://github.com/katzenpost/hpqc/blob/main/nike/nike.go">source code</a></p>
+<p>These are useful for making your cryptographic protocol not rely on a specific NIKE such
+as an elliptic curve diffiehellman function like x25519 or x448.</p>
+<ol start="2">
+<li>generic hybrid NIKE, combines any two NIKEs into one</li>
+</ol>
+<p><a href="https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/nike/hybrid">NIKE hybrid scheme documentation</a>
+<a href="https://github.com/katzenpost/hpqc/blob/main/nike/hybrid/hybrid.go">source code</a></p>
+<p>Many cryptographic protocols can use a hybrid post quantum NIKE in place of a NIKE.
+Here the NIKE interfaces are satisfied by this hybrid scheme type.</p>
+<ol start="3">
+<li>security preserving KEM combiner</li>
+</ol>
+<p><a href="https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/kem/combiner">security preserving KEM combiner documentation</a>
+<a href="https://github.com/katzenpost/hpqc/blob/main/kem/combiner/combiner.go">source code</a></p>
+<p>Our security preserving KEM combiner can combine an arbitrary number of KEMs althought it&rsquo;s
+usually useful enough to combine just two KEMs. We get our design from the <a href="https://eprint.iacr.org/2018/024.pdf">KEM Combiners paper</a>
+which makes the observation that if a KEM combiner is not security preserving then the
+resulting hybrid KEM will not have IND-CCA2 security if one of the
+composing KEMs does not have IND-CCA2 security. Likewise the paper
+points out that when using a security preserving KEM combiner, if only
+one of the composing KEMs has IND-CCA2 security then the resulting
+hybrid KEM will have IND-CCA2 security.</p>
+<p>Our KEM combiner uses the split PRF design for an arbitrary number
+of KEMs, here shown with only three, in pseudo code:</p>
+<pre tabindex="0"><code>func SplitPRF(ss1, ss2, ss3, cct1, cct2, cct3 []byte) []byte {
+    cct := cct1 || cct2 || cct3
+    return PRF(ss1 || cct) XOR PRF(ss2 || cct) XOR PRF(ss3 || cct)
+}
+</code></pre><ol start="4">
+<li>a &ldquo;NIKE to KEM adapter&rdquo; which uses an ad hoc hashed elgamal construction</li>
+</ol>
+<p><a href="https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/kem/adapter">NIKE to KEM adapter documentation</a>
+<a href="https://github.com/katzenpost/hpqc/blob/main/kem/adapter/kem.go">source code</a></p>
+<p>It is very common in modern hybrid post quantum cryptographic protocol constructions to see
+a NIKE adapted into a KEM and then combined with a post quantum KEM.</p>
+<p>Our ad hoc hashed elgamal construction for adapting any NIKE to a KEM is, in pseudo code:</p>
+<pre tabindex="0"><code>func ENCAPSULATE(their_pubkey publickey) ([]byte, []byte) {
+    my_privkey, my_pubkey = GEN_KEYPAIR(RNG)
+    ss = DH(my_privkey, their_pubkey)
+    ss2 = PRF(ss || their_pubkey || my_pubkey)
+    return my_pubkey, ss2
+}
+
+func DECAPSULATE(my_privkey, their_pubkey) []byte {
+    s = DH(my_privkey, their_pubkey)
+    shared_key = PRF(ss || my_pubkey || their_pubkey)
+    return shared_key
+}
+</code></pre><ol start="5">
+<li>cgo bindings for the Sphincs+ C reference source</li>
+</ol>
+<p>Our Sphincs+ wrapper conforms to the signature scheme interfaces:</p>
+<p><a href="https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/sign/sphincsplus">Sphincs+ signature scheme documentation</a>
+<a href="https://github.com/katzenpost/hpqc/blob/main/sign/sphincsplus/sphincs.go">source code</a></p>
+<p>We maintain our Sphincs+ C reference fork and golang bindings in this git repo:
+<a href="https://github.com/katzenpost/sphincsplus/">https://github.com/katzenpost/sphincsplus/</a></p>
+<p>Here&rsquo;s the cgo bindings source code:
+<a href="https://github.com/katzenpost/sphincsplus/blob/main/ref/binding.go">https://github.com/katzenpost/sphincsplus/blob/main/ref/binding.go</a></p>
+<ol start="6">
+<li>cgo bindings for the CTIDH C source</li>
+</ol>
+<p>Our CTIDH golang bindings have been much improved through
+collaboration and are now maintained by the <a href="https://vula.link/">Vula project</a> in this git repo:</p>
+<p><a href="https://codeberg.org/vula/highctidh">https://codeberg.org/vula/highctidh</a></p>
+<p>hpqc currently has a wrapper type for each CTIDH key size, as documented here:</p>
+<p><a href="https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/nike/ctidh/ctidh511">https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/nike/ctidh/ctidh511</a>
+<a href="https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/nike/ctidh/ctidh512">https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/nike/ctidh/ctidh512</a>
+<a href="https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/nike/ctidh/ctidh1024">https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/nike/ctidh/ctidh1024</a>
+<a href="https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/nike/ctidh/ctidh2048">https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/nike/ctidh/ctidh2048</a></p>
+<ol start="7">
+<li>generic hybrid signature scheme, combines any two signature schemes into one</li>
+</ol>
+<p>It is useful to combine a classical signature scheme such as ed25519
+with a post quantum signature scheme such as Sphincs+.</p>
+<p><a href="https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.17/sign/hybrid">hybrid signature scheme documentation</a>
+<a href="https://github.com/katzenpost/hpqc/blob/main/sign/hybrid/hybrid.go">source code</a></p>
+
+      </main>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2024
+    <span class="td-footer__authors">Katzenpost</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span><span class="ms-2"><a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/js/main.js"></script>
+<script defer src="/js/click-to-copy.js" crossorigin="anonymous"></script>
+<script src='/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
