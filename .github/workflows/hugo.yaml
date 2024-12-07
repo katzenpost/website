@@ -35,10 +35,10 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install node v18
+      - name: Install node
         uses: actions/setup-node@v4
         with:
-          node-version: 18.19
+          node-version: 20
 
       - name: Install PostCSS
         run: npm install -D autoprefixer postcss postcss-cli
