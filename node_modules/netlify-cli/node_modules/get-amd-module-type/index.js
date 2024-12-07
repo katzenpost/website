@@ -8,7 +8,7 @@ const types = require('ast-module-types');
  * Asynchronously identifies the AMD module type of the given file
  *
  * @param {Object|String} file - filename
- * @param {Function} cb - Executed with (error, type)
+ * @param {Function} callback - Executed with (error, type)
  *
  * @example
  * define('name', [deps], func)    'named'
@@ -18,22 +18,23 @@ const types = require('ast-module-types');
  *
  * @returns {String|null} the supported type of module syntax used, or null
  */
-module.exports = function(file, cb) {
+module.exports = function(file, callback) {
   if (!file) throw new Error('filename missing');
-  if (!cb) throw new Error('callback missing');
+  if (!callback) throw new Error('callback missing');
 
+  // eslint-disable-next-line n/prefer-promises/fs
   fs.readFile(file, 'utf8', (error, data) => {
-    if (error) return cb(error);
+    if (error) return callback(error);
 
     let type;
 
     try {
       type = fromSource(data);
     } catch (error) {
-      return cb(error);
+      return callback(error);
     }
 
-    if (cb) cb(null, type);
+    if (callback) callback(null, type);
   });
 };
 
@@ -61,12 +62,12 @@ function fromAST(node) {
  * @return {String|null}
  */
 function fromSource(source) {
-  if (typeof source === 'undefined') throw new Error('source missing');
+  if (source === undefined) throw new Error('source missing');
 
-  let type;
   const walker = new Walker();
+  let type;
 
-  walker.walk(source, (node) => {
+  walker.walk(source, node => {
     type = fromAST(node);
 
     if (type) {
