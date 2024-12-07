@@ -50,7 +50,7 @@ outputs:
 module:
   hugoVersion:
     extended: true
-    min: "0.139.3"
+    min: "0.110.0"
   imports:
     - path: "github.com/google/docsy"
       disable: false

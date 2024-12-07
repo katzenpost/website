@@ -22,7 +22,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.139.3
+      HUGO_VERSION: 0.119.0
     steps:
       - name: Install Hugo CLI
         run: |
@@ -38,14 +38,14 @@ jobs:
       - name: Install node v18
         uses: actions/setup-node@v4
         with:
-          node-version: 22.12.0
+          node-version: 18.19
 
       - name: Install PostCSS
         run: npm install -D autoprefixer postcss postcss-cli
 
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v5.0.0
+        uses: actions/configure-pages@v3.0.6
 
       - name: Build with Hugo
         env:
