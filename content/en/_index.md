@@ -9,9 +9,6 @@ description: "Katzenpost is a free and open source software project."
     <img src="/images/logo-friendly-mono.svg" height="200">
 </div>
 <h1 class="display-3 mt-0 mt-md-3">Katzenpost, the first post quantum mixnet.</h1>
-<a class="btn btn-lg btn-secondary me-3 mb-4" href="https://github.com/katzenpost/katzenpost">
-  Codebase <i class="fab fa-github ms-2 "></i>
-</a>
 {{< /blocks/cover >}}
 
 
@@ -19,12 +16,6 @@ description: "Katzenpost is a free and open source software project."
 Katzenpost is an educational, research and free software project. We make anonymous communication protocols,
 specializing in mixnet protocols. 
 {{% /blocks/lead %}}
-
-<!-- Triplet Section: Gray -->
-{{% blocks/section color="dark" type="row" %}}
-{{% blocks/feature icon="fa-users" title="Our Team" url="/team" %}}
-Our team consists of world clas experts.
-{{% /blocks/feature %}}
 
 {{% blocks/feature icon="fa fa-file-powerpoint" title="Presentations" url="/presentations" %}}
 Browse recent and past video/audio presentations about Katzenpost and mixnets designs.
@@ -44,6 +35,17 @@ mixnet protocols.
 
 {{% blocks/feature icon="fa fa-file-powerpoint" title="Katzenpost Literature Review" url="/research/Literature_overview__website_version.pdf" %}}
 This doc, in particular, does not talk about the Katzenpost design. It does introduce the reader to some of the reasons why we've been making certain design decisions, and a keen eye might be led to some of the similar conclusions. But here we focus on already published research. We also stick to theory and don't focus on any practical systems being built today.
+{{% /blocks/feature %}}
+
+{{% blocks/section color="dark" type="row" %}}
+{{% blocks/feature icon="fa-users" title="Our Team" url="/team" %}}
+Our team consists of world class experts.
+{{% /blocks/feature %}}
+
+{{% blocks/section color="dark" type="row" %}}
+<a class="btn btn-lg btn-secondary me-3 mb-4" href="https://github.com/katzenpost/katzenpost">
+  Codebase <i class="fab fa-github ms-2 "></i>
+</a>
 {{% /blocks/feature %}}
 
 {{% /blocks/section %}}
