@@ -46,7 +46,7 @@ jobs:
 
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v3.0.6
+        uses: actions/configure-pages@v5
 
       - name: Build with Hugo
         env:
