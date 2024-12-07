@@ -37,9 +37,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: package.json
+
+      - run: npm install --omit=optional
 
       - name: Install PostCSS
         run: npm install -g autoprefixer postcss postcss-cli
