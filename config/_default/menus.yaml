@@ -1,8 +1,0 @@
-main:
-  - name: "Values"
-    weight: 10
-    url: "/moral-character"
-  - name: "Code"
-    weight: 50
-    url: "https://github.com/katzenpost"
-
