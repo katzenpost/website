@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Launches on My New Hugo Site</title>
-    <link>http://localhost:1313/tags/launches/</link>
-    <description>Recent content in Launches on My New Hugo Site</description>
+    <title>Launches on Katzenpost</title>
+    <link>//localhost:1313/tags/launches/</link>
+    <description>Recent content in Launches on Katzenpost</description>
     <generator>Hugo</generator>
-    <language>en-us</language>
-    <lastBuildDate>Fri, 24 Nov 2023 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/launches/index.xml" rel="self" type="application/rss+xml" />
+    <language>en</language>
+    <lastBuildDate>Fri, 06 Dec 2024 20:36:49 -0800</lastBuildDate>
+    <atom:link href="//localhost:1313/tags/launches/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Website Relaunch and migration to Hugo</title>
-      <link>http://localhost:1313/en/blog/2023-11-24-website-relaunch/</link>
+      <link>//localhost:1313/blog/2023-11-24-website-relaunch/</link>
       <pubDate>Fri, 24 Nov 2023 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/en/blog/2023-11-24-website-relaunch/</guid>
+      <guid>//localhost:1313/blog/2023-11-24-website-relaunch/</guid>
       <description>&lt;p&gt;To match all the code development in Katzenpost in the last year, it was time&#xA;for a website relaunch. Our site was a migration from Sphinx, which is primarily&#xA;for documentation, to Hugo which is wildly configurable for all sorts of&#xA;websites. Given the technical nature and need for nice documentation interface,&#xA;we used the well crafted and maintained Docsy theme.&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;Website Dependencies&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://gohugo.io&#34;&gt;Hugo&lt;/a&gt; static site generator&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://docsy.dev&#34;&gt;Docsy&lt;/a&gt; theme for Hugo&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://getbootstrap.com&#34;&gt;Bootstrap 5&lt;/a&gt; is bundled in Docsy&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://decapcms.org&#34;&gt;Decap CMS&lt;/a&gt; for a user-friendly GUI&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
     </item>
   </channel>

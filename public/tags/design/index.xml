@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Design on My New Hugo Site</title>
-    <link>http://localhost:1313/tags/design/</link>
-    <description>Recent content in Design on My New Hugo Site</description>
+    <title>Design on Katzenpost</title>
+    <link>//localhost:1313/tags/design/</link>
+    <description>Recent content in Design on Katzenpost</description>
     <generator>Hugo</generator>
-    <language>en-us</language>
-    <lastBuildDate>Thu, 25 Apr 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/design/index.xml" rel="self" type="application/rss+xml" />
+    <language>en</language>
+    <lastBuildDate>Fri, 06 Dec 2024 20:36:49 -0800</lastBuildDate>
+    <atom:link href="//localhost:1313/tags/design/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Katzenpost threat model document</title>
-      <link>http://localhost:1313/en/blog/2024-04-25-threat-model/</link>
+      <link>//localhost:1313/blog/2024-04-25-threat-model/</link>
       <pubDate>Thu, 25 Apr 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/en/blog/2024-04-25-threat-model/</guid>
+      <guid>//localhost:1313/blog/2024-04-25-threat-model/</guid>
       <description>&lt;p&gt;Here we present a draft of the Katzenpost mixnet threat model document.&#xA;We regard the threat model document as a living document which is frequently&#xA;edited and in need of ongoing maintenance as we continue to develop newer&#xA;mixnet protocols. Currently it is being organized by mixnet attack category&#xA;and we have arranged attacks in a table with corresponding attacker&#xA;capabilities. Later sections of the document present a deep dive into the core cryptographic&#xA;protocols that comprise Katzenpost, namely these three:&lt;/p&gt;</description>
     </item>
     <item>
       <title>Mixnet Literature Overview</title>
-      <link>http://localhost:1313/en/blog/2024-04-15-lit-review/</link>
+      <link>//localhost:1313/blog/2024-04-15-lit-review/</link>
       <pubDate>Mon, 15 Apr 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/en/blog/2024-04-15-lit-review/</guid>
+      <guid>//localhost:1313/blog/2024-04-15-lit-review/</guid>
       <description>&lt;p&gt;We are presenting our overview of existing Mixnet literature. It takes some liberties with what is included or not. It proposes new ways to talk about some issues, and provides a critical analysis of some of the existing papers. It also endeavors to introduce the reader to the language of anonymity systems, while maintaining mathematical rigor.&lt;/p&gt;&#xA;&lt;p&gt;This doc, in particular, does not talk about the Katzenpost design. It does introduce the reader to some of the reasons why we&amp;rsquo;ve been making certain design decisions, and a keen eye might be led to some of the similar conclusions. But here we focus on already published research. We also stick to theory and don&amp;rsquo;t focus on any practical systems being built today.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Katzenpost at 37C3</title>
-      <link>http://localhost:1313/en/blog/2024-01-28-katzenpost-at-37c3/</link>
+      <link>//localhost:1313/blog/2024-01-28-katzenpost-at-37c3/</link>
       <pubDate>Sun, 28 Jan 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/en/blog/2024-01-28-katzenpost-at-37c3/</guid>
-      <description>&lt;p&gt;Dr. Eva Infeld and surveillance expert and developer Leif Ryge held a session at the Chaos Communication Congress about the current state of the project, some of the things we’re working on, and some of the pitfalls many anonymity systems fall into. Building an anonymity system fit for our dystopian age is a hard problem, but we’re doing it.&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=1ev4r-aZmFM&#34;&gt;&lt;img src=&#34;https://github.com/katzenpost/website/tree/main/content/en/media/thumbnail.png&#34; alt=&#34;Katzenpost talk on YouTube&#34;&gt;&lt;/a&gt;&lt;/p&gt;</description>
+      <guid>//localhost:1313/blog/2024-01-28-katzenpost-at-37c3/</guid>
+      <description>&lt;p&gt;Dr. Eva Infeld and surveillance expert and developer Leif Ryge held a session at the Chaos Communication Congress about the current state of the project, some of the things we’re working on, and some of the pitfalls many anonymity systems fall into. Building an anonymity system fit for our dystopian age is a hard problem, but we’re doing it.&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=1ev4r-aZmFM&#34;&gt;&lt;img alt=&#34;Katzenpost talk on YouTube&#34; src=&#34;https://github.com/katzenpost/website/tree/main/content/en/media/thumbnail.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

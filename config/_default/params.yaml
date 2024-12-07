@@ -1,0 +1,44 @@
+copyright: "Katzenpost"
+privacy_policy: "/privacy"
+version_menu: "Releases"
+archived_version: false
+version: '0.0'
+url_latest_version: "https://katzenpost.network"
+github_repo: "https://github.com/katzenpost/website"
+github_project_repo: "https://github.com/katzenpost/katzenpost"
+github_branch: "main"
+algolia: false
+offlineSearch: true
+prism_syntax_highlighting: false
+
+taxonomy:
+  taxonomyCloud:
+    - "tags"
+    - "categories"
+  taxonomyCloudTitle:
+    - "Browse by Tag"
+    - "Categories"
+  taxonomyPageHeader:
+    - "tags"
+    - "categories"
+
+ui:
+  breadcrumb_disable: false
+  footer_about_disable: true
+  navbar_logo: true
+  navbar_translucent_over_cover_disable: true
+  sidebar_menu_compact: true
+  sidebar_search_disable: false
+  feedback:
+    enable: false
+  readingtime:
+    enable: false
+
+decap_cms:
+  media_folder: "static/images/uploads"
+  public_folder: "/images/uploads"
+  publish_mode: "editorial_workflow"
+  search: true
+  preview_styles:
+    - "/scss/main.css"
+

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Talk on My New Hugo Site</title>
-    <link>http://localhost:1313/tags/talk/</link>
-    <description>Recent content in Talk on My New Hugo Site</description>
+    <title>Talk on Katzenpost</title>
+    <link>//localhost:1313/tags/talk/</link>
+    <description>Recent content in Talk on Katzenpost</description>
     <generator>Hugo</generator>
-    <language>en-us</language>
-    <lastBuildDate>Sun, 28 Jan 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/talk/index.xml" rel="self" type="application/rss+xml" />
+    <language>en</language>
+    <lastBuildDate>Fri, 06 Dec 2024 20:36:49 -0800</lastBuildDate>
+    <atom:link href="//localhost:1313/tags/talk/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Katzenpost at 37C3</title>
-      <link>http://localhost:1313/en/blog/2024-01-28-katzenpost-at-37c3/</link>
+      <link>//localhost:1313/blog/2024-01-28-katzenpost-at-37c3/</link>
       <pubDate>Sun, 28 Jan 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/en/blog/2024-01-28-katzenpost-at-37c3/</guid>
-      <description>&lt;p&gt;Dr. Eva Infeld and surveillance expert and developer Leif Ryge held a session at the Chaos Communication Congress about the current state of the project, some of the things we’re working on, and some of the pitfalls many anonymity systems fall into. Building an anonymity system fit for our dystopian age is a hard problem, but we’re doing it.&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=1ev4r-aZmFM&#34;&gt;&lt;img src=&#34;https://github.com/katzenpost/website/tree/main/content/en/media/thumbnail.png&#34; alt=&#34;Katzenpost talk on YouTube&#34;&gt;&lt;/a&gt;&lt;/p&gt;</description>
+      <guid>//localhost:1313/blog/2024-01-28-katzenpost-at-37c3/</guid>
+      <description>&lt;p&gt;Dr. Eva Infeld and surveillance expert and developer Leif Ryge held a session at the Chaos Communication Congress about the current state of the project, some of the things we’re working on, and some of the pitfalls many anonymity systems fall into. Building an anonymity system fit for our dystopian age is a hard problem, but we’re doing it.&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=1ev4r-aZmFM&#34;&gt;&lt;img alt=&#34;Katzenpost talk on YouTube&#34; src=&#34;https://github.com/katzenpost/website/tree/main/content/en/media/thumbnail.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

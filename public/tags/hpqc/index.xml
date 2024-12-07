@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Hpqc on My New Hugo Site</title>
-    <link>http://localhost:1313/tags/hpqc/</link>
-    <description>Recent content in Hpqc on My New Hugo Site</description>
+    <title>Hpqc on Katzenpost</title>
+    <link>//localhost:1313/tags/hpqc/</link>
+    <description>Recent content in Hpqc on Katzenpost</description>
     <generator>Hugo</generator>
-    <language>en-us</language>
-    <lastBuildDate>Fri, 12 Apr 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/hpqc/index.xml" rel="self" type="application/rss+xml" />
+    <language>en</language>
+    <lastBuildDate>Fri, 06 Dec 2024 20:36:49 -0800</lastBuildDate>
+    <atom:link href="//localhost:1313/tags/hpqc/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>hpqc - hybrid post quantum cryptography library</title>
-      <link>http://localhost:1313/en/blog/2024-04-12-hpqc/</link>
+      <link>//localhost:1313/blog/2024-04-12-hpqc/</link>
       <pubDate>Fri, 12 Apr 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/en/blog/2024-04-12-hpqc/</guid>
+      <guid>//localhost:1313/blog/2024-04-12-hpqc/</guid>
       <description>&lt;p&gt;The Katzenpost developement team has recently released a new golang&#xA;cryptography library known as &lt;a href=&#34;https://github.com/katzenpost/hpqc&#34;&gt;&lt;strong&gt;hpqc&lt;/strong&gt;&lt;/a&gt;.&#xA;The theme of the library is hybrid post quantum cryptographic constructions, namely:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;hybrid KEMs (key encapsulation mechanism)&lt;/li&gt;&#xA;&lt;li&gt;hybrid NIKEs (non-interactive key exchange)&lt;/li&gt;&#xA;&lt;li&gt;hybrid signature schemes&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;In each of the three main subdirectories, &amp;ldquo;kem&amp;rdquo;, &amp;ldquo;nike&amp;rdquo; and &amp;ldquo;sign&amp;rdquo; there exists&#xA;interface definitions for &lt;code&gt;Scheme&lt;/code&gt;, &lt;code&gt;PrivateKey&lt;/code&gt; and &lt;code&gt;PublicKey&lt;/code&gt;. For signature schemes and&#xA;KEMs we&amp;rsquo;re borrowing the interface sets from cloudflare&amp;rsquo;s circl library.&lt;/p&gt;</description>
     </item>
   </channel>
