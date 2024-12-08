@@ -42,4 +42,3 @@ Meet the team of world-class experts behind Katzenpost.
 Access Katzenpost source code on GitHub to explore, contribute, or integrate with our project.
 {{% /blocks/section %}}
 {{% /blocks/section %}}
-
