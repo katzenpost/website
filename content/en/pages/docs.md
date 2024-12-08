@@ -11,7 +11,7 @@ type: "pages"
 
 * <A HREF="/pages/admin_guide">Admin Guide</A>
 
-* <A HREF="pages/threat_model/">Threat Model</A> <A HREF="/research/Threat_Model_Doc.pdf">PDF</A>
+* <A HREF="/pages/threat_model">Threat Model</A> <A HREF="/research/Threat_Model_Doc.pdf">PDF</A>
 
 * <A HREF="/research/Literature_overview__website_version.pdf">Literature Review</A>
 
