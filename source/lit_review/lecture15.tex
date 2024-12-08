@@ -1,0 +1,123 @@
+\documentclass[english]{svjour3modified}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=3cm,bmargin=3cm,lmargin=2cm,rmargin=2cm}
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{babel}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{wrapfig}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{tikz, hyperref}
+\usepackage{epsdice, pgfplots}
+\clubpenalty=10000
+\widowpenalty=10000
+\usetikzlibrary{calc}
+\usepackage{framed}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Ewa}[1]{\textcolor{blue}{(Ewa: #1)}}
+
+
+
+
+%commands to make math expressions easier
+\newcommand{\ee}[1]{\begin{align} #1 \end{align}} 						%align environment
+\newcommand{\vc}[1]{\vec{\mathbf{#1}}} 								%arrowed bold vector
+\newcommand{\intg}[2]{\int \! \mathrm{d}^{#1}\vc{#2} \ }					%integral with measure
+\newcommand{\nn}[1][]{\ifthenelse{\isempty{#1}}{\nonumber \\}{\nonumber}}	%nonumber shortcut
+\newcommand{\dv}{\partial }											%partial derivative shortcut
+
+
+\pgfmathdeclarefunction{gauss}{2}{%
+  \pgfmathparse{1/(#2*sqrt(2*pi))*exp(-((x-#1)^2)/(2*#2^2))}%
+  }
+
+
+\begin{document}
+\noindent\textbf{Lecture 15 \hfill Math 20 Fall 2014, Dartmouth College}\bigskip
+
+\section{Independent trials}
+
+\noindent Let $S_n$ be the sum of $n$ Bernoulli trials $X_1,\dots,X_n,$ each with $p=1/6.$ \medskip
+
+\begin{enumerate}
+\item Find $\mu=E(X_i)$ and $\sigma^2=V(X_i)$. 
+
+\textcolor{black!50}{$$\mu=p,\ \sigma^2=pq$$}
+
+\item For any $n,$ find $E(S_n)$ and $V(S_n)$. \textcolor{black!50}{$$E(S_n)=nE(X_i)=\mu,\ V(S_n)=nV(S_n)=n\sigma^2.$$}
+
+\item Find $E(\frac{S_n}{n})$ and $V(\frac{S_n}{n})$. What does $\frac{S_n}{n}$ describe? \textcolor{black!50}{$$E(\frac{S_n}{n})=\frac{1}{n}E(S_n)=\mu,\ V(\frac{S_n}{n})=\frac{1}{n^2}V(S_n)=\frac{\mu}{n}.$$ $\frac{S_n}{n}$ is the proportion of trials, out of $n$, that turned out to be successful.}\end{enumerate}
+
+
+
+\begin{theorem}[Chebyshev inequality]
+
+\noindent Let $X$ be a random variable with expected value $\mu=E(X)$ and let $\epsilon>0$ be any positive real number. Then: $$P(|X-\mu|\geq \epsilon)\leq \frac{V(X)}{\epsilon^2}$$ The probability that $X$ differs from $\mu$ by $\epsilon$ or more is bounded by $V(X)/\epsilon^2$
+\end{theorem}\bigskip
+
+\noindent Using Chebyshev inequality, find the bounds on the following:\bigskip\large
+
+
+$P(|S_{360}-60|\geq 10)\leq\textcolor{black!50}{\frac{1}{2}}$ \bigskip
+
+$P(|S_{360}-60|\geq 20)\leq \textcolor{black!50}{\frac{1}{8}}$ \bigskip
+
+$P(S_{3600}-600|\geq 100)\leq\textcolor{black!50}{\frac{1}{20}}$ \bigskip
+
+$P(|S_{3600}-600|\geq 200)\leq\textcolor{black!50}{\frac{1}{80}}$\bigskip
+
+$P(|\frac{S_{360}}{360}-\frac{1}{6}|\geq \frac{1}{36})\leq \textcolor{black!50}{\frac{1}{2}}$ \bigskip
+
+$P(|\frac{S_{360}}{360}-\frac{1}{6}|\geq \frac{2}{36})\leq \textcolor{black!50}{\frac{1}{8}}$ \bigskip
+
+$P(\frac{S_{3600}}{3600}-\frac{1}{6}|\geq \frac{1}{36})\leq \textcolor{black!50}{\frac{1}{20}}$ \bigskip
+
+$P(|\frac{S_{3600}}{3600}-\frac{1}{6}|\geq \frac{2}{36})\leq \textcolor{black!50}{\frac{1}{80}}$
+
+\vskip 1 in
+
+
+\normalsize
+\noindent In other words, as the number of trials increases, the probability that the average differs from the mean by any specific amount gets smaller. This property is called the \emph{Law of Large Numbers.}
+
+\pagebreak
+\section{Law of Large Numbers}
+
+Let $X_1,X_2,\dots,X_n$ be an independent trials process where each trial has finite expected value $\mu=E(X_i)$ and finite variance $\sigma^2=V(X_i).$ Let $S_n=X_1+X_2+\dots+X_n.$ Then for any $\epsilon>0,$ Chebyshev inequality on $S_n/n$ implies: $$\lim_{n\rightarrow\infty}P(|\frac{S_n}{n}-\mu|\geq \epsilon)=0.$$ Equivalently, $$\lim_{n\rightarrow\infty}P(|\frac{S_n}{n}-\mu|< \epsilon)=1.$$
+
+\noindent Notice that as $n$ grows, $E(S_n/n)$ stays the same, it's always $\mu.$ But $V(S_n/n)$ is: $$V(S_n)/n^2=n\sigma^2/n^2=\sigma^2/n,$$ which gets smaller and smaller. So for the case of Bernoulli trials with $p=1/6,$ we get: $$E(\frac{S_n}{n})=\mu=\frac{1}{6}$$ $$V(\frac{S_n}{n})=\frac{npq}{n^2}\frac{5}{36n}.$$\medskip
+
+\noindent \textbf{LAW OF LARGE NUMBERS: AS WE PERFORM MORE AND MORE TRIALS, THEN WITH PROBABILITY APPROACHING 1 THE PROPORTION OF SUCCESSFUL TRIALS APPROACHES $p$.}
+
+\section{Uniform density}
+
+This works exactly the same way in the continuous case. For instance, let $X_1,\dots,X_i$ each be chosen uniformly at random from [0,1]. We have: $\mu=E(X_i)=1/2$, $\sigma^2=V(X_i)=1/12.$ Then if $S_n=X_1+\dots+X_n.$ Find:\vfill\large
+
+\begin{enumerate}
+\item $E(\frac{S_n}{n})=\textcolor{black!50}{\frac{1}{2}}$ \vfill
+
+\item $V(\frac{S_n}{n})=\textcolor{black!50}{\frac{1}{12n}}$ \vfill
+
+\end{enumerate}\normalsize
+\noindent Then, fill in the appropriate form of Chebyshev inequality for $S_n$ being the sum of $n$ uniformly distributed random variables on [0,1]:\bigskip
+
+\noindent For any \large $\epsilon>0,$ $$P(|\frac{S_n}{n}-\textcolor{black!50}{\frac{1}{2}} |\geq \epsilon)\leq \textcolor{black!50}{\frac{1}{12n\epsilon^2}},$$\vfill
+
+\normalsize \noindent Which clearly satisfies: \large $$\lim_{n\rightarrow\infty}P(|\frac{S_n}{n}-\textcolor{black!50}{\frac{1}{2}}|\geq \epsilon)=0.$$\vfill
+
+\pagebreak
+\section{Normal density} 
+
+Suppose we choose $n$ numbers at random, independently, using a standard normal distribution. Then for each number, $\mu=0,\ \sigma^2=1.$ Let $S_n$ be the sum of those numbers. $$E(S_n)=0$$ $$V(S_n)=n$$ $$E(\frac{S_n}{n})=0$$ $$V(\frac{S_n}{n})=\frac{1}{n}$$ And therefore by Chebyshev inequality, $$P(|\frac{S_n}{n}|\geq \epsilon)\frac{1}{n\epsilon^2}.$$
+
+\section{Case when LLN fails}
+
+If variance is infinite, the Law of Large Numbers fails. Consider the density $f(x)=\frac{1}{x^2}$ for $x\in(1,\infty)$. Then neither $E(X)$ nor $V(X)$ exist, and we cannot find the bounds necessary for the LLN.
+
+
+\end{document}

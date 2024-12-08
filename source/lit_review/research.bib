@@ -1,0 +1,118 @@
+@misc{loopix,
+      title={The Loopix Anonymity System}, 
+      author={Ania Piotrowska and Jamie Hayes and Tariq Elahi and Sebastian Meiser and George Danezis},
+      year={2017},
+      eprint={1703.00536},
+      archivePrefix={arXiv},
+      primaryClass={cs.CR}
+}
+
+@inproceedings{minx,
+author = {Danezis, George and Laurie, Ben},
+title = {Minx: a simple and efficient anonymous packet format},
+year = {2004},
+isbn = {1581139683},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1029179.1029198},
+doi = {10.1145/1029179.1029198},
+abstract = {<i>Minx</i> is a cryptographic message format for encoding anonymous messages, relayed through a network of Chaumian mixes. It provides security against a passive adversary by completely hiding correspondences between input and output messages. Possibly corrupt mixes on the message path gain no information about the route length or the position of the mix on the route. Most importantly Minx resists active attackers that are prepared to modify messages in order to embed tags which they will try to detect elsewhere in the network. The proposed scheme imposes a low communication and computational overhead, and only combines well understood cryptographic primitives.},
+booktitle = {Proceedings of the 2004 ACM Workshop on Privacy in the Electronic Society},
+pages = {59–65},
+numpages = {7},
+keywords = {anonymity, mix networks, tagging attacks},
+location = {Washington DC, USA},
+series = {WPES '04}
+}
+
+
+
+@article{forward,
+author = {Danezis, George},
+year = {2002},
+month = {10},
+pages = {},
+title = {Forward Secure Mixes}
+}
+
+@InProceedings{lioness,
+author="Anderson, Ross
+and Biham, Eli",
+editor="Gollmann, Dieter",
+title="Two practical and provably secure block ciphers: BEAR and LION",
+booktitle="Fast Software Encryption",
+year="1996",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="113--120",
+abstract="In this paper we suggest two new provably secure block ciphers, called BEAR and LION. They both have large block sizes, and are based on the Luby-Rackoff construction. Their underlying components are a hash function and a stream cipher, and they are provably secure in the sense that attacks which find their keys would yield attacks on one or both of the underlying components. They also have the potential to be much faster than existing block ciphers in many applications.",
+isbn="978-3-540-49652-6"
+}
+
+@INPROCEEDINGS{sphinx,
+  author={Danezis, George and Goldberg, Ian},
+  booktitle={2009 30th IEEE Symposium on Security and Privacy}, 
+  title={Sphinx: A Compact and Provably Secure Mix Format}, 
+  year={2009},
+  volume={},
+  number={},
+  pages={269-282},
+  doi={10.1109/SP.2009.15}}
+
+@inproceedings{stopandgo,
+author = {Kesdogan, Dogan and Egner, Jan and Büschkes, Roland},
+year = {1998},
+month = {04},
+pages = {83-98},
+title = {Stop- and- Go-MIXes Providing Probabilistic Anonymity in an Open System},
+volume = {1525},
+isbn = {978-3-540-65386-8},
+doi = {10.1007/3-540-49380-8_7}
+}
+
+@inproceedings{topology,
+author="Diaz, Claudia
+and Murdoch, Steven J.
+and Troncoso, Carmela",
+editor="Atallah, Mikhail J.
+and Hopper, Nicholas J.",
+title="Impact of Network Topology on Anonymity and Overhead in Low-Latency Anonymity Networks",
+booktitle="Privacy Enhancing Technologies",
+year="2010",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="184--201",
+abstract="Low-latency anonymous communication networks require padding to resist timing analysis attacks, and dependent link padding has been proven to prevent these attacks with minimal overhead. In this paper we consider low-latency anonymity networks that implement dependent link padding, and examine various network topologies. We find that the choice of the topology has an important influence on the padding overhead and the level of anonymity provided, and that Stratified networks offer the best trade-off between them. We show that fully connected network topologies (Free Routes) are impractical when dependent link padding is used, as they suffer from feedback effects that induce disproportionate amounts of padding; and that Cascade topologies have the lowest padding overhead at the cost of poor scalability with respect to anonymity. Furthermore, we propose an variant of dependent link padding that considerably reduces the overhead at no loss in anonymity with respect to external adversaries. Finally, we discuss how Tor, a deployed large-scale anonymity network, would need to be adapted to support dependent link padding.",
+isbn="978-3-642-14527-8"
+}
+
+@InProceedings{expanders,
+author="Danezis, George",
+editor="Dingledine, Roger",
+title="Mix-Networks with Restricted Routes",
+booktitle="Privacy Enhancing Technologies",
+year="2003",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="1--17",
+abstract="We present a mix network topology that is based on sparse expander graphs, with each mix only communicating with a few neighbouring others. We analyse the anonymity such networks provide, and compare it with fully connected mix networks and mix cascades. We prove that such a topology is efficient since it only requires the route length of messages to be relatively small in comparison with the number of mixes to achieve maximal anonymity. Additionally mixes can resist intersection attacks while their batch size, that is directly linked to the latency of the network, remains constant. A worked example of a network is also presented to illustrate how these results can be applied to create secure mix networks in practise.",
+isbn="978-3-540-40956-4"
+}
+
+@inproceedings{heartbeat,
+author = {Danezis, George and Sassaman, Len},
+title = {Heartbeat Traffic to Counter (n-1) Attacks: Red-Green-Black Mixes},
+year = {2003},
+isbn = {1581137761},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1005140.1005154},
+doi = {10.1145/1005140.1005154},
+abstract = {A dummy traffic strategy is described that can be implemented by mix nodes in an anonymous communication network to detect and counter active (n - 1) attacks and their variants. Heartbeat messages are sent anonymously from the mix node back to itself in order to establish its state of connectivity with the rest of the network. In case the mix is under attack, the flow of heartbeat messages is interrupted and the mix takes measures to preserve the quality of the anonymity it provides by introducing decoy messages.},
+booktitle = {Proceedings of the 2003 ACM Workshop on Privacy in the Electronic Society},
+pages = {89–93},
+numpages = {5},
+keywords = {mix networks, flooding attacks, anonymity},
+location = {Washington, DC},
+series = {WPES '03}
+}
