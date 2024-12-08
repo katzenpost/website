@@ -5,16 +5,12 @@ description: "Katzenpost is a free and open source software project."
 
 <!-- Hero -->
 {{< blocks/cover image_anchor="top" height="auto" color="white">}}
-<div>
-    <img src="/images/logo-friendly-mono.svg" height="200">
-</div>
-<h1 class="display-3 mt-0 mt-md-3">Katzenpost, the first post quantum mixnet.</h1>
+<h1 class="display-3 mt-0 mt-md-3">Katzenpost, the only post quantum mixnet.</h1>
 {{< /blocks/cover >}}
 
 
 {{% blocks/lead color="primary" title="" %}}
-Katzenpost is an educational, research and free software project. We make anonymous communication protocols,
-specializing in mixnet protocols. 
+Katzenpost is an educational, research and free software project. We make anonymous communication protocols, specializing in mixnet protocols. 
 {{% /blocks/lead %}}
 
 <!-- Triplet Section: Gray -->
