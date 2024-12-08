@@ -113,3 +113,14 @@ header.article-meta {
 .td-overlay--dark::after {
     background-color: transparent !important;
 }
+
+.narrow-paragraph {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 1.25rem; /* Slightly larger font size (20px) */
+    line-height: 1.6; /* Increase line height for better readability */
+    font-weight: 400; /* Optional: Adjust weight for optimal readability */
+}
