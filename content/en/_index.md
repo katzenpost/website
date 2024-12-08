@@ -11,8 +11,13 @@ description: "Katzenpost is a free and open source software project."
 
 <!-- Lead Section -->
 {{% blocks/lead color="primary" title="" %}}
-Katzenpost is a free and open-source software project focused on anonymous communication.  
-We specialize in mixnet protocols, prioritizing post-quantum cryptography and a well-defined threat model.
+Katzenpost is a free and open-source software project advancing
+anonymous communication through innovative mixnet protocols. As the
+world's first post-quantum mixnet, Katzenpost integrates cutting-edge
+cryptography to ensure future-proof privacy. Our rigorous security
+design includes the first-ever comprehensive threat model for a
+mixnet, setting a new standard for secure, resilient online
+communication.
 {{% /blocks/lead %}}
 
 <!-- Triplet Section: Gray -->
