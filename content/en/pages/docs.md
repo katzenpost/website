@@ -8,7 +8,7 @@ type: "pages"
 ---
 
 
-### Fine Katzenpost Literature
+### Fine Literature
 
 ---
 
@@ -21,7 +21,7 @@ type: "pages"
 
 ---
 
-### Design Specification Documents
+### Design Specifications
 
 These documents are mostly for internal use. They go into excruciating detail which is not so good for most people but great for experts.
 
