@@ -10,10 +10,7 @@ type: "pages"
 
 ### Ready to Dive Deeper?
 
-*Whether you're looking to deploy a Katzenpost mix network, understand our rigorous security model, or explore the theory behind modern mixnets, our documentation is your gateway.*
-
-
-
+---
 
 |      | Title                                                                                                    | Description                                                                                                                                                        | Link(s)                                                                                                                     |
 |------|----------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
