@@ -37,7 +37,7 @@
     <para>For information about the theory and design of this software, see <xref
             linkend="introduction" endterm="introduction.title"/>. For a quickly deployable,
         non-production test network (primarily for use by developers), see <xref linkend="container"
-            endterm="container.title"/>.</para>    
+            endterm="configuration.title"/>.</para>    
     <section id="overview">
         <title id="overview.title">Understanding the &program_name; components</title>
         <para>The core of &program_name; consists of two program executables, <link
