@@ -1,0 +1,293 @@
+---
+title: "Katzenpost Wire Protocol Specification"
+linkTitle: "Wire Protocol"
+draft: false
+slug: "/wire_protocol/"
+type: "pages"
+---
+
+<p><strong>Abstract</strong></p>
+<p>This document defines the Katzenpost Mix Network Wire Protocol for
+use in all network communications to, from, and within the Katzenpost
+Mix Network.</p>
+<h1 id="introduction">1. Introduction</h1>
+<p>The Katzenpost Mix Network Wire Protocol (KMNWP) is the custom wire
+protocol for all network communications to, from, and within the
+Katzenpost Mix Network. This protocol provides mutual authentication,
+and an additional layer of cryptographic security and forward
+secrecy.</p>
+<h2 id="conventions-used-in-this-document">1.1 Conventions Used in This
+Document</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
+“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this
+document are to be interpreted as described in <a
+href="#RFC2119">RFC2119</a>.</p>
+<p>The “C” style Presentation Language as described in <a
+href="#RFC5246">RFC5246</a> Section 4 is used to represent data
+structures, except for cryptographic attributes, which are specified as
+opaque byte vectors.</p>
+<p><code>x | y</code> denotes the concatenation of x and y.</p>
+<h2 id="key-encapsulation-mechanism">1.2 Key Encapsulation
+Mechanism</h2>
+<p>This protocol uses ANY Key Encapsulation Mechanism. However it’s
+recommended that most users select a hybrid post quantum KEM such as
+Xwing. <a href="#XWING">XWING</a></p>
+<h1 id="core-protocol">2. Core Protocol</h1>
+<p>The protocol is based on Kyber and Trevor Perrin’s Noise Protocol
+Framework <a href="#NOISE">NOISE</a> along with “Post Quantum Noise”
+paper <a href="#PQNOISE">PQNOISE</a>. Older previous versions of our
+transport were based on <a href="#NOISEHFS">NOISEHFS</a>.</p>
+<p>Our transport protocol begins with a prologue, Noise handshake,
+followed by a stream of Noise Transport messages in a minimal framing
+layer, over a TCP/IP connection.</p>
+<p>Our Noise protocol is configurable via the KEM selection in the TOML
+configuration files, here’s an example PQ Noise protocol string:</p>
+<pre><code>Noise_pqXX_Xwing_ChaChaPoly_BLAKE2b</code></pre>
+<p>The protocol string is a very condensed description of our protocol.
+We use the pqXX two way Noise pattern which is described as follows:</p>
+<pre><code>pqXX: -&gt; e &lt;- ekem, s -&gt; skem, s &lt;- skem</code></pre>
+<p>The next part of the protocol string specifies the KEM,
+<code>Xwing</code> which is a hybrid KEM where the share secret outputs
+of both X25519 and MLKEM768 are combined.</p>
+<p>Finally the <code>ChaChaPoly_BLAKE2b</code> parts of the protocol
+string indicate which stream cipher and hash function we are using.</p>
+<p>As a non-standard modification to the Noise protocol, the 65535 byte
+message length limit is increased to 1300000 bytes. We send very large
+messages over our Noise protocol because of our using the Sphincs+
+signature scheme which has signatures that are about 49k bytes.</p>
+<p>It is assumed that all parties using the KMNWP protocol have a fixed
+long or short lived <code>Xwing</code> keypair <a
+href="#XWING">XWING</a>, the public component of which is known to the
+other party in advance. How such keys are distributed is beyond the
+scope of this document.</p>
+<h2 id="handshake-phase">2.1 Handshake Phase</h2>
+<p>All sessions start in the Handshake Phase, in which an anonymous
+authenticated handshake is conducted.</p>
+<p>The handshake is a unmodified Noise handshake, with a fixed prologue
+prefacing the initiator's first Noise handshake message. This prologue
+is also used as the <code>prologue</code> input to the Noise
+HandshakeState <code>Initialize()</code> operation for both the
+initiator and responder.</p>
+<p>The prologue is defined to be the following structure:</p>
+<pre><code>struct {
+    uint8_t protocol_version; /* 0x03 */
+} Prologue;</code></pre>
+<p>As all Noise handshake messages are fixed sizes, no additional
+framing is required for the handshake.</p>
+<p>Implementations MUST preserve the Noise handshake hash
+<code>[h]</code> for the purpose of implementing authentication (Section
+2.3).</p>
+<p>Implementations MUST reject handshake attempts by terminating the
+session immediately upon any Noise protocol handshake failure and when,
+as a responder, they receive a Prologue containing an unknown
+protocol_version value.</p>
+<p>Implementations SHOULD impose reasonable timeouts for the handshake
+process, and SHOULD terminate sessions that are taking too long to
+handshake.</p>
+<h2 id="handshake-authentication">2.1.1 Handshake Authentication</h2>
+<p>Mutual authentication is done via exchanging fixed sized payloads as
+part of the <code>pqXX</code> handshake consisting of the following
+structure:</p>
+<pre><code>struct {
+    uint8_t ad_len;
+    opaque additional_data[ad_len];
+    opaque padding[255 - ad_len];
+    uint32_t unix_time;
+} AuthenticateMessage;</code></pre>
+<p>Where:</p>
+<ul>
+<li><code>ad_len</code> - The length of the optional additional
+data.</li>
+<li><code>additional_data</code> - Optional additional data, such as a
+username, if any.</li>
+<li><code>unix_time</code> - 0 for the initiator, the approximate number
+of seconds since 1970-01-01 00:00:00 UTC for the responder.</li>
+</ul>
+<p>The initiator MUST send the <code>AuthenticateMessage</code> after it
+has received the peer's response (so after <code>-&gt; s, se</code> in
+Noise parlance).</p>
+<p>The contents of the optional <code>additional_data</code> field is
+deliberately left up to the implementation, however it is RECOMMENDED
+that implementations pad the field to be a consistent length regardless
+of contents to avoid leaking information about the authenticating
+identity.</p>
+<p>To authenticate the remote peer given an AuthenticateMessage, the
+receiving peer must validate the <code>s</code> component of the Noise
+handshake (the remote peer's long term public key) with the known value,
+along with any of the information in the <code>additional_data</code>
+field such as the user name, if any.</p>
+<p>If the validation procedure succeeds, the peer is considered
+authenticated. If the validation procedure fails for any reason, the
+session MUST be terminated immediately.</p>
+<p>Responders MAY add a slight amount (+- 10 seconds) of random noise to
+the unix_time value to avoid leaking precise load information via packet
+queueing delay.</p>
+<h2 id="data-transfer-phase">2.2 Data Transfer Phase</h2>
+<p>Upon successfully concluding the handshake the session enters the
+Data Transfer Phase, where the initiator and responder can exchange
+KMNWP messages.</p>
+<p>A KMNWP message is defined to be the following structure:</p>
+<pre><code>enum {
+    no_op(0),
+    disconnect(1),
+    send_packet(2),
+
+    (255),
+} Command;
+
+struct {
+    Command command;
+    uint8_t reserved;    /* MUST be &#39;0x00&#39; */
+    uint32_t msg_length; /* 0 &lt;= msg_length &lt;= 1048554) */
+    opaque message[msg_length];
+    opaque padding[];    /* length is implicit */
+} Message;</code></pre>
+<p>Notes:</p>
+<ul>
+<li>The padding field, if any MUST be padded with <code>'0x00'</code>
+bytes.</li>
+</ul>
+<p>All outgoing Message(s) are encrypted and authenticated into a pair
+of Noise Transport messages, each containing one of the following
+structures:</p>
+<pre><code>struct {
+    uint32_t message_length;
+} CiphertextHeader;
+
+struct {
+    uint32_t message[ciphertext_length-16];
+} Ciphertext;</code></pre>
+<p>Notes:</p>
+<ul>
+<li>The <code>ciphertext_length</code> field includes the Noise protocol
+overhead of 16 bytes, for the Noise Transport message containing the
+Ciphertext.</li>
+</ul>
+<p>All outgoing Message(s) are preceded by a Noise Transport Message
+containing a <code>CiphertextHeader</code>, indicating the size of the
+Noise Transport Message transporting the Message Ciphertext. After
+generating both Noise Transport Messages, the sender MUST call the Noise
+CipherState <code>Rekey()</code> operation.</p>
+<p>To receive incoming Ciphertext messages, first the Noise Transport
+Message containing the CiphertextHeader is consumed off the network,
+authenticated and decrypted, giving the receiver the length of the Noise
+Transport Message containing the actual message itself. The second Noise
+Transport Message is consumed off the network, authenticated and
+decrypted, with the resulting message being returned to the caller for
+processing. After receiving both Noise Transport Messages, the receiver
+MUST call the Noise CipherState <code>Rekey()</code> operation.</p>
+<p>Implementations MUST immediately terminate the session any of the
+<code>DecryptWithAd()</code> operations fails.</p>
+<p>Implementations MUST immediately terminate the session if an unknown
+command is received in a Message, or if the Message is otherwise
+malformed in any way.</p>
+<p>Implementations MAY impose a reasonable idle timeout, and terminate
+the session if it expires.</p>
+<h1 id="predefined-commands">3. Predefined Commands</h1>
+<h2 id="the-no_op-command">3.1 The no_op Command</h2>
+<p>The <code>no_op</code> command is a command that explicitly is a No
+Operation, to be used to implement functionality such as keep-alives and
+or application layer padding.</p>
+<p>Implementations MUST NOT send any message payload accompanying this
+command, and all received command data MUST be discarded without
+interpretation.</p>
+<h2 id="the-disconnect-command">3.2 The disconnect Command</h2>
+<p>The <code>disconnect</code> command is a command that is used to
+signal explicit session termination. Upon receiving a disconnect
+command, implementations MUST interpret the command as a signal from the
+peer that no additional commands will be sent, and destroy the
+cryptographic material in the receive CipherState.</p>
+<p>While most implementations will likely wish to terminate the session
+upon receiving this command, any additional behavior is explicitly left
+up to the implementation and application.</p>
+<p>Implementations MUST NOT send any message payload accompanying this
+command, and MUST not send any further traffic after sending a
+disconnect command.</p>
+<h2 id="the-send_packet-command">3.3 The send_packet Command</h2>
+<p>The <code>send_packet</code> command is the command that is used by
+the initiator to transmit a Sphinx Packet over the network. The
+command’s message is the Sphinx Packet destined for the responder.</p>
+<p>Initiators MUST terminate the session immediately upon reception of a
+<code>send_packet</code> command.</p>
+<h1 id="command-padding">4. Command Padding</h1>
+<p>We use traffic padding to hide from a passive network observer which
+command has been sent or received.</p>
+<p>Among the set of padded commands we exclude the
+<code>Consensus</code> command because it’s contents are a very large
+payload which is usually many times larger than our Sphinx packets.
+Therefore we only pad these commands:</p>
+<p>GetConsensus NoOp Disconnect SendPacket RetrieveMessage MessageACK
+Message MessageEmpty</p>
+<p>However we split them up into two directions, client to server and
+server to client because they differ in size due to the difference in
+size between <code>SendPacket</code> and <code>Message</code>:</p>
+<p>Client to Server commands:</p>
+<p>NoOp SendPacket Disconnect RetrieveMessage GetConsensus</p>
+<p>Server to client commands:</p>
+<p>Message MessageACK MessageEmpty</p>
+<p>The <code>GetConsensus</code> command is a special case because we
+only want to pad it when it’s sent over the mixnet. We don’t want to pad
+it when sending to the dirauths. Although it would not be so terrible if
+it’s padded when sent to the dirauths… it would just needlessly take up
+bandwidth without providing any privacy benefits.</p>
+<h1 id="anonymity-considerations">5. Anonymity Considerations</h1>
+<p>Adversaries being able to determine that two parties are
+communicating via KMNWP is beyond the threat model of this protocol. At
+a minimum, it is trivial to determine that a KMNWP handshake is being
+performed, due to the length of each handshake message, and the fixed
+positions of the various public keys.</p>
+<h1 id="security-considerations">6. Security Considerations</h1>
+<p>It is imperative that implementations use ephemeral keys for every
+handshake as the security properties of the Kyber KEM are totally lost
+if keys are ever reused.</p>
+<p>Kyber was chosen as the KEM algorithm due to it’s conservative
+parameterization, simplicty of implementation, and high performance in
+software. It is hoped that the addition of a quantum resistant algorithm
+will provide forward secrecy even in the event that large scale quantum
+computers are applied to historical intercepts.</p>
+<h1 id="acknowledgments">7. Acknowledgments</h1>
+<p>I would like to thank Trevor Perrin for providing feedback during the
+design of this protocol, and answering questions regarding Noise.</p>
+<h1 id="appendix-a.-references">Appendix A. References</h1>
+<h2 id="appendix-a.1-normative-references">Appendix A.1 Normative
+References</h2>
+<h2 id="appendix-a.2-informative-references">Appendix A.2 Informative
+References</h2>
+<h1 id="appendix-b.-citing-this-document">Appendix B. Citing This
+Document</h1>
+<h2 id="appendix-b.1-bibtex-entry">Appendix B.1 Bibtex Entry</h2>
+<p>Note that the following bibtex entry is in the IEEEtran bibtex style
+as described in a document called “How to Use the IEEEtran BIBTEX
+Style”.</p>
+<pre><code>@online{KatzMixWire,
+title = {Katzenpost Mix Network Wire Protocol Specification},
+author = {Yawning Angel},
+url = {https://github.com/katzenpost/katzenpost/blob/master/docs/specs/wire-protocol.rst},
+year = {2017}
+}</code></pre>
+<p><strong>XWING</strong></p>
+<p>Manuel Barbosa, Deirdre Connolly, João Diogo Duarte, Aaron Kaiser,
+Peter Schwabe, Karoline Varner, Bas Westerbaan “X-Wing: The Hybrid KEM
+You’ve Been Looking For”, https://eprint.iacr.org/2024/039.pdf</p>
+<p><strong>NOISE</strong></p>
+<p>Perrin, T., “The Noise Protocol Framework”, May 2017,
+https://noiseprotocol.org/noise.pdf</p>
+<p><strong>NOISEHFS</strong></p>
+<p>Weatherley, R., “Noise Extension: Hybrid Forward Secrecy”,
+https://github.com/noiseprotocol/noise_hfs_spec/blob/master/output/noise_hfs.pdf</p>
+<p><strong>PQNOISE</strong></p>
+<p>Yawning Angel, Benjamin Dowling, Andreas Hülsing, Peter Schwabe and
+Florian Weber, “Post Quantum Noise”, 2022,
+https://eprint.iacr.org/2022/539.pdf</p>
+<p><strong>RFC2119</strong></p>
+<p>Bradner, S., “Key words for use in RFCs to Indicate Requirement
+Levels”, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997,
+https://www.rfc-editor.org/info/rfc2119</p>
+<p><strong>RFC5246</strong></p>
+<p>Dierks, T. and E. Rescorla, “The Transport Layer Security (TLS)
+Protocol Version 1.2”, RFC 5246, DOI 10.17487/RFC5246, August 2008,
+https://www.rfc-editor.org/info/rfc5246</p>
+<p><strong>RFC7748</strong></p>
+<p>Langley, A., Hamburg, M., and S. Turner, “Elliptic Curves for
+Security”, RFC 7748, DOI 10.17487/RFC7748, January 2016,
+http://www.rfc-editor.org/info/rfc7748</p>
