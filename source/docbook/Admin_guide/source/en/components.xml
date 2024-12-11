@@ -5,8 +5,7 @@
 [
    <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
     %shared-content;
-<!-- 
-    <!ELEMENT xi:include (xi:fallback?) > 
+<!--    <!ELEMENT xi:include (xi:fallback?) > 
     <!ATTLIST xi:include 
         xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
     href CDATA #REQUIRED 
@@ -25,7 +24,7 @@
     <!ENTITY % local.divcomponent.mix "| xi:include"> 
     <!ENTITY % local.para.char.mix "| xi:include"> 
     <!ENTITY % local.info.class "| xi:include"> 
-    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >-->
 ]> 
     
 <chapter id="components">
