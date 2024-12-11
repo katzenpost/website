@@ -48,8 +48,8 @@
     not introduce any new crypto, but is meant to serve as an
     implementation guide.
   </para>
-  <section xml:id="introduction">
-    <title>1. Introduction</title>
+  <section xml:id="sphinx_introduction">
+    <title xml:id="sphinx_introduction.title">1. Introduction</title>
     <para>
       The Sphinx cryptographic packet format is a compact and provably
       secure design introduced by George Danezis and Ian Goldberg

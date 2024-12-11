@@ -23,8 +23,8 @@
     properties of bitwise unlinkability, constant packet size and route
     length hiding.
   </para>
-  <section xml:id="introduction">
-    <title>1. Introduction</title>
+  <section xml:id="kemsphinx_introduction">
+    <title xml:id="kemsphinx_introduction.title">1. Introduction</title>
     <para>
       We’ll express our KEM Sphinx header in pseudo code. The Sphinx
       body will be exactly the same as

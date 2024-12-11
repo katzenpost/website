@@ -46,8 +46,8 @@
     protocols and behavior required of mix nodes participating in the
     Katzenpost Mix Network.
   </para>
-  <section xml:id="introduction">
-    <title>1. Introduction</title>
+  <section xml:id="mixnet_introduction">
+    <title xml:id="mixnet_introduction.title">1. Introduction</title>
     <para>
       This specification provides the design of a mix network meant
       provide an anonymous messaging protocol between clients and public

@@ -29,8 +29,8 @@
   <para>
     <emphasis role="strong">Abstract</emphasis>
   </para>
-  <section xml:id="introduction">
-    <title>1. Introduction</title>
+  <section xml:id="kaetzchen_introduction">
+    <title xml:id="kaetzchen_introduction.title">1. Introduction</title>
     <para>
       This interface is meant to provide support for various
       autoresponder agents <quote>Kaetzchen</quote> that run on

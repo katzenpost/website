@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
 [
    <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
     %shared-content;
-<!-- 
-    <!ELEMENT xi:include (xi:fallback?) > 
+<!--    <!ELEMENT xi:include (xi:fallback?) > 
     <!ATTLIST xi:include 
         xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
     href CDATA #REQUIRED 
@@ -25,10 +24,10 @@
     <!ENTITY % local.divcomponent.mix "| xi:include"> 
     <!ENTITY % local.para.char.mix "| xi:include"> 
     <!ENTITY % local.info.class "| xi:include"> 
-    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >-->
 ]> 
     
-<chapter id="components">
+<article id="components">
     <title id="components.title">Components and configuration of the &program_name; mixnet</title>
     <para>This section of the &program_name; technical documentation provides an introduction to the
         software components that make up &program_name; and guidance on how to configure each
@@ -37,7 +36,7 @@
     <para>For information about the theory and design of this software, see <xref
             linkend="introduction" endterm="introduction.title"/>. For a quickly deployable,
         non-production test network (primarily for use by developers), see <xref linkend="container"
-            endterm="container.title"/>.</para>    
+            endterm="configuration.title"/>.</para>    
     <section id="overview">
         <title id="overview.title">Understanding the &program_name; components</title>
         <para>The core of &program_name; consists of two program executables, <link
@@ -1367,4 +1366,4 @@ ldMtDsvvc9KUfE4I0+c+XQ==
 
         </section>
     </section>
-</chapter>
+</article>

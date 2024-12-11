@@ -27,7 +27,7 @@ communication.
 Watch recent and past presentations about Katzenpost and mixnet designs.
 {{% /blocks/feature %}}
 
-{{% blocks/feature icon="fa-file-alt" title="Admin Guide" url="/pages/admin_guide" %}}
+{{% blocks/feature icon="fa-file-alt" title="Admin Guide" url="/docs/admin_guide" %}}
 Comprehensive documentation on running Katzenpost servers, including a guide for local Docker mixnet setups.
 {{% /blocks/feature %}}
 

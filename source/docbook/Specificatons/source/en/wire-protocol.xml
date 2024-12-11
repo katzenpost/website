@@ -28,8 +28,8 @@
     use in all network communications to, from, and within the
     Katzenpost Mix Network.
   </para>
-  <section xml:id="introduction">
-    <title>1. Introduction</title>
+  <section xml:id="wire_protocol_introduction">
+    <title xml:id="wire_protocol_introduction.title"> xml:id="wire_protocol_introduction.title">1. Introduction</title>
     <para>
       The Katzenpost Mix Network Wire Protocol (KMNWP) is the custom
       wire protocol for all network communications to, from, and within
