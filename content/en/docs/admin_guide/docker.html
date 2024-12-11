@@ -3,10 +3,9 @@ title: "Docker"
 draft: false
 weight: 20
 ---
-
 <html xmlns:ng="http://docbook.org/docbook-ng"><head>
       <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-   <title>Chapter&nbsp;1.&nbsp;Using the Katzenpost Docker test network</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="chapter"><div class="titlepage"><div><div><h2 class="title"><a name="container"></a>Chapter&nbsp;1.&nbsp;Using the Katzenpost Docker test network</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#install_kp">Preparing to run the container image</a></span></dt><dt><span class="section"><a href="#basic-ops">Operating the test mixnet</a></span></dt><dd><dl><dt><span class="section"><a href="#start-mixnet">Starting and monitoring the mixnet</a></span></dt><dt><span class="section"><a href="#test-mixnet">Testing the mixnet</a></span></dt><dt><span class="section"><a href="#shutdown-mixnet">Shutting down the mixnet</a></span></dt><dt><span class="section"><a href="#uninstall-mixnet">Uninstalling and cleaning up</a></span></dt></dl></dd><dt><span class="section"><a href="#topology">Network topology and components</a></span></dt><dd><dl><dt><span class="section"><a href="#d6e396">The Docker file tree</a></span></dt></dl></dd><dt><span class="section"><a href="#d6e402"></a></span></dt></dl></div>
+   <title>Using the Katzenpost Docker test network</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article"><div class="titlepage"><div><div><h2 class="title"><a name="container"></a>Using the Katzenpost Docker test network</h2></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#install_kp">Preparing to run the container image</a></span></dt><dt><span class="section"><a href="#basic-ops">Operating the test mixnet</a></span></dt><dd><dl><dt><span class="section"><a href="#start-mixnet">Starting and monitoring the mixnet</a></span></dt><dt><span class="section"><a href="#test-mixnet">Testing the mixnet</a></span></dt><dt><span class="section"><a href="#shutdown-mixnet">Shutting down the mixnet</a></span></dt><dt><span class="section"><a href="#uninstall-mixnet">Uninstalling and cleaning up</a></span></dt></dl></dd><dt><span class="section"><a href="#topology">Network topology and components</a></span></dt><dd><dl><dt><span class="section"><a href="#d6e396">The Docker file tree</a></span></dt></dl></dd><dt><span class="section"><a href="#d6e402"></a></span></dt></dl></div>
         
     
     <p>Katzenpost provides a ready-to-deploy Docker
@@ -41,7 +40,7 @@ weight: 20
             </li><li class="listitem">
                 <p><a class="ulink" href="https://www.docker.com" target="_top">Docker</a>, <a class="ulink" href="https://docs.docker.com/compose/" target="_top">Docker Compose</a>, and
                     (optionally) <a class="ulink" href="https://podman.io" target="_top">Podman</a></p>
-                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                     <p>If both Docker and Podman are present on your system, Katzenpost uses
                         Podman. Podman is a drop-in daemonless equivalent to Docker that does not
                         require superuser privileges to run.</p>
@@ -95,7 +94,7 @@ weight: 20
         <pre class="programlisting"> <code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make<em class="replaceable"><code> target</code></em></strong></span></pre>
         <p>Running <span class="command"><strong>make</strong></span> with no target specified returns a list of available
             targets.</p>
-        <div class="table"><a name="d6e101"></a><p class="title"><b>Table&nbsp;1.1.&nbsp;Table 1: Makefile targets</b></p><div class="table-contents">
+        <div class="table"><a name="d6e101"></a><p class="title"><b>Table&nbsp;1.&nbsp;Table 1: Makefile targets</b></p><div class="table-contents">
             
             <table class="table" summary="Table 1: Makefile targets" border="1"><colgroup><col><col></colgroup><tbody><tr><td>
                             <p>[none]</p>
@@ -158,7 +157,7 @@ weight: 20
                 dependent on the deleted binary. For more information about the files created during
                 the Docker build, see <a class="xref" href="#topology" title="Network topology and components">the section called &#8220;Network topology and components&#8221;</a>.</p>
             <p></p>
-            <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+            <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                 <p>When running <span class="command"><strong>make start</strong></span> , be aware of the following
                     considerations:</p>
                 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
@@ -220,7 +219,7 @@ weight: 20
     !Success rate is 100.000000 percent 10/10)</pre>
             <p>lf <span class="command"><strong>run-ping</strong></span> fails to receive a reply, it eventually times out
                 with an error message. If this happens, try the command again. </p>
-            <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+            <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                 <p>If you attempt use <span class="bold"><strong>run-ping</strong></span> too quickly after
                     starting the mixnet, and consensus has not been reached, the utility may crash
                     with an error message or hang indefinitely. If this happens, issue (if
@@ -339,15 +338,15 @@ weight: 20
             </li><li class="listitem">
                 <p>interfacing with external clients</p>
             </li></ul></div>
-        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
+        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
             <p>While suited for client development and testing, the test mixnet omits performance
                 and security redundancies. <span class="emphasis"><em>Do not use it in production.</em></span></p>
         </td></tr></table></div>
         <p>The following diagram illustrates the components and their network interactions. The
             gray blocks represent nodes, and the arrows represent information transfer. </p>
-        <div class="figure"><a name="d6e300"></a><p class="title"><b>Figure&nbsp;1.1.&nbsp;Test network topology</b></p><div class="figure-contents">
+        <div class="figure"><a name="d6e300"></a><p class="title"><b>Figure&nbsp;1.&nbsp;Test network topology</b></p><div class="figure-contents">
             
-            <div class="mediaobject"><img src="pix/katzenpost-docker.png" width="405" alt="Test network topology"></div>
+            <div class="mediaobject"><img src="../../pix/katzenpost-docker.png" width="405" alt="Test network topology"></div>
         </div></div><br class="figure-break">
         <p>On the left, the <span class="bold"><strong>Client</strong></span> transmits a message (shown by
             purple arrows) through the <span class="bold"><strong>Gateway node</strong></span>, across three
@@ -364,7 +363,7 @@ weight: 20
             the following table. Note that all nodes share the same IP address (127.0.0.1, i.e.,
             localhost), but are accessed through different ports. Each node type links to additional
             information in <a class="xref" href="#">???</a>.</p>
-        <div class="table"><a name="d6e322"></a><p class="title"><b>Table&nbsp;1.2.&nbsp;Table 2: Test mixnet hosts</b></p><div class="table-contents">
+        <div class="table"><a name="d6e322"></a><p class="title"><b>Table&nbsp;2.&nbsp;Table 2: Test mixnet hosts</b></p><div class="table-contents">
             
             <table class="table" summary="Table 2: Test mixnet hosts" border="1"><colgroup><col class="c1"><col class="c2"><col class="newCol3"><col class="c3"><col class="c4"></colgroup><thead><tr><th>Node type</th><th>Docker ID</th><th>Diagram label</th><th>IP address</th><th>TCP port</th></tr></thead><tbody><tr><td rowspan="3">
                             <p><a class="link" href="#">Directory authority</a></p>

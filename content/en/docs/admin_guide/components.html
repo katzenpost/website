@@ -5,14 +5,14 @@ weight: 10
 ---
 <html xmlns:ng="http://docbook.org/docbook-ng"><head>
       <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-   <title>Chapter&nbsp;1.&nbsp;Components and configuration of the Katzenpost mixnet</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="chapter"><div class="titlepage"><div><div><h2 class="title"><a name="components"></a>Chapter&nbsp;1.&nbsp;Components and configuration of the Katzenpost mixnet</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#overview">Understanding the Katzenpost components</a></span></dt><dd><dl><dt><span class="section"><a href="#intro-dirauth">Directory authorities (dirauths)</a></span></dt><dt><span class="section"><a href="#intro-mix">Mix nodes</a></span></dt><dt><span class="section"><a href="#intro-gateway">Gateway nodes</a></span></dt><dt><span class="section"><a href="#intro-service">Service nodes</a></span></dt><dt><span class="section"><a href="#intro-client">Clients</a></span></dt></dl></dd><dt><span class="section"><a href="#configuration">Configuring Katzenpost</a></span></dt><dd><dl><dt><span class="section"><a href="#auth-config">Configuring directory authorities</a></span></dt><dt><span class="section"><a href="#mix-config">Configuring mix nodes</a></span></dt><dt><span class="section"><a href="#gateway-config">Configuring gateway nodes</a></span></dt><dt><span class="section"><a href="#service-config">Configuring service nodes</a></span></dt></dl></dd></dl></div>
+   <title>Components and configuration of the Katzenpost mixnet</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article"><div class="titlepage"><div><div><h2 class="title"><a name="components"></a>Components and configuration of the Katzenpost mixnet</h2></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#overview">Understanding the Katzenpost components</a></span></dt><dd><dl><dt><span class="section"><a href="#intro-dirauth">Directory authorities (dirauths)</a></span></dt><dt><span class="section"><a href="#intro-mix">Mix nodes</a></span></dt><dt><span class="section"><a href="#intro-gateway">Gateway nodes</a></span></dt><dt><span class="section"><a href="#intro-service">Service nodes</a></span></dt><dt><span class="section"><a href="#intro-client">Clients</a></span></dt></dl></dd><dt><span class="section"><a href="#configuration">Configuring Katzenpost</a></span></dt><dd><dl><dt><span class="section"><a href="#auth-config">Configuring directory authorities</a></span></dt><dt><span class="section"><a href="#mix-config">Configuring mix nodes</a></span></dt><dt><span class="section"><a href="#gateway-config">Configuring gateway nodes</a></span></dt><dt><span class="section"><a href="#service-config">Configuring service nodes</a></span></dt></dl></dd></dl></div>
     
     <p>This section of the Katzenpost technical documentation provides an introduction to the
         software components that make up Katzenpost and guidance on how to configure each
         component.  The intended reader is a system administrator who wants to implement a working,
         production Katzenpost network. </p>
     <p>For information about the theory and design of this software, see <a class="xref" href="#">???</a>. For a quickly deployable,
-        non-production test network (primarily for use by developers), see <a class="xref" href="#">???</a>.</p>    
+        non-production test network (primarily for use by developers), see <a class="xref" href="#">Configuring Katzenpost</a>.</p>    
     <div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="overview"></a>Understanding the Katzenpost components</h2></div></div></div>
         
         <p>The core of Katzenpost consists of two program executables, <a class="link" href="#">dirauth</a> and <a class="link" href="#">server</a>.
@@ -27,10 +27,10 @@ weight: 10
             client applications hosted externally to the mix network and communicating with it
             through gateway nodes. </p>
         <p>A model mix network is shown in Figure 1.</p>
-        <div class="figure"><a name="d6e23"></a><p class="title"><b>Figure&nbsp;1.1.&nbsp;The pictured element types correspond to discrete client and server programs that
+        <div class="figure"><a name="d6e23"></a><p class="title"><b>Figure&nbsp;1.&nbsp;The pictured element types correspond to discrete client and server programs that
                 Katzenpost requires to function. </b></p><div class="figure-contents">
             
-            <div class="mediaobject"><img src="pix/components-production.png" width="405" alt="The pictured element types correspond to discrete client and server programs that Katzenpost requires to function."></div>
+            <div class="mediaobject"><img src="../../pix/components-production.png" width="405" alt="The pictured element types correspond to discrete client and server programs that Katzenpost requires to function."></div>
         </div></div><br class="figure-break">
         <p>The mix network contains an <span class="emphasis"><em>n</em></span>-layer topology of mix-nodes, with
             three nodes per layer in this example. Sphinx packets traverse the network in one
@@ -118,7 +118,7 @@ weight: 10
                 provides multiplexing and privilege separation with a consequent reduction in
                 processing overhead. These clients also implement the Pigeonhole storage and BACAP
                 protocols detailed in <span class="bold"><strong>Place-holder for research paper link</strong></span>. </p>
-            <p>The following client applications are available.</p><div class="table"><a name="d6e67"></a><p class="title"><b>Table&nbsp;1.1.&nbsp;Katzenpost clients</b></p><div class="table-contents">
+            <p>The following client applications are available.</p><div class="table"><a name="d6e67"></a><p class="title"><b>Table&nbsp;1.&nbsp;Katzenpost clients</b></p><div class="table-contents">
                     
                     <table class="table" summary="Katzenpost clients" border="1"><colgroup><col class="c1"><col class="newCol2"><col class="c2"><col class="c3"></colgroup><thead><tr><th>
                                     <p>Name</p>
@@ -178,7 +178,7 @@ weight: 10
                     <code class="filename">katzenpost/docker/dirauth_mixnet/auth1/authority.toml</code>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
                 more information about the test mixnet, see <span class="bold"><strong><a class="xref" href="#">???</a></strong></span>.</p>
-            <div class="table"><a name="d6e138"></a><p class="title"><b>Table&nbsp;1.2.&nbsp;<span class="bold">Directory authority (dirauth) configuration
+            <div class="table"><a name="d6e138"></a><p class="title"><b>Table&nbsp;2.&nbsp;<span class="bold">Directory authority (dirauth) configuration
                         sections</span></b></p><div class="table-contents">
                 
                 <table class="table" summary="Directory authority (dirauth) configuration&#xA;                        sections" border="1"><colgroup><col class="c1"></colgroup><tbody><tr><td>            
@@ -235,33 +235,40 @@ weight: 10
                         <p><span class="bold"><strong>WireKEMScheme</strong></span></p>
                         <p>Specifies the key encapsulation mechanism (KEM) scheme
                             for the <a class="ulink" href="https://eprint.iacr.org/2022/539" target="_top">PQ
-                                Noise</a>-based wire protocol (link layer) that nodes use
+                            Noise</a>-based wire protocol (link layer) that nodes use
                             to communicate with each other. PQ Noise is a post-quantum variation of
                             the <a class="ulink" href="https://noiseprotocol.org/" target="_top">Noise protocol
-                                framework</a>, which algebraically transforms ECDH handshake
+                            framework</a>, which algebraically transforms ECDH handshake
                             patterns into KEM encapsulate/decapsulate operations.</p>
                             
-                            <p>This configuration option supports the optional use of
+                        <p>This configuration option supports the optional use of
                             hybrid post-quantum cryptography to strengthen security. The following KEM
-                            schemes are supported: </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
-                                    <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
-                                    <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
-                                        <p>X25519 and X448 are actually non-interactive key-exchanges
-                                            (NIKEs), not KEMs. Katzenpost uses
-                                            a hashed ElGamal cryptographic construction
-                                            to convert them from NIKEs to KEMs.</p>
-                                    </td></tr></table></div>
-                                </li><li class="listitem">
-                                    <p><span class="bold"><strong>Hybrid post-quantum:</strong></span>
-                                        "mlkem768", "sntrup4591761", "frodo640shake",
-                                        "mceliece348864", "mceliece348864f", "mceliece460896",
-                                        "mceliece460896f", "mceliece6688128", "mceliece6688128f",
-                                        "mceliece6960119", "mceliece6960119f", "mceliece8192128",
-                                        "mceliece8192128f", "xwing", "Kyber768-X25519",
-                                        "MLKEM768-X25519", "MLKEM768-X448", "CTIDH511", "CTIDH512",
-                                        "CTIDH1024", "CTIDH2048", "CTIDH512-X25519",
-                                        "CTIDH512-X25519"</p>
-                                </li></ul></div>						
+                            schemes are supported:</p>                           
+                        <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+                                <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
+                                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                                    <p>X25519 and X448 are actually non-interactive key-exchanges
+                                        (NIKEs), not KEMs. Katzenpost uses
+                                        a hashed ElGamal cryptographic construction
+                                        to convert them from NIKEs to KEMs.</p>
+                                </td></tr></table></div>
+                            </li><li class="listitem">
+                                <p><span class="bold"><strong>Post-quantum:</strong></span>
+                                    "mlkem768","sntrup4591761", "frodo640shake", "mceliece348864", 
+                                    "mceliece348864f", "mceliece460896", "mceliece460896f", "mceliece6688128",
+                                    "mceliece6688128f", "mceliece6960119", "mceliece6960119f",
+                                    "mceliece8192128", "mceliece8192128f", "CTIDH511", "CTIDH512", "CTIDH1024",
+                                    "CTIDH2048",</p>
+                            </li><li class="listitem">
+                                <p><span class="bold"><strong>Hybrid post-quantum:</strong></span>
+                                    "xwing", "Kyber768-X25519",
+                                    "MLKEM768-X25519", "MLKEM768-X448", "FrodoKEM-640-SHAKE-X448",
+                                    "sntrup4591761-X448", "mceliece348864-X25519", "mceliece348864f-X25519",
+                                    "mceliece460896-X25519", "mceliece460896f-X25519", "mceliece6688128-X25519",
+                                    "mceliece6688128f-X25519", "mceliece6960119-X25519", "mceliece6960119f-X25519",
+                                    "mceliece8192128-X25519", "mceliece8192128f-X25519",
+                                     "CTIDH512-X25519", "CTIDH512-X25519"</p>
+                            </li></ul></div>					
                         <p>Type: string</p>
                         <p>Required: Yes</p>                    
                     </li><li class="listitem">
@@ -355,33 +362,40 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <p><span class="bold"><strong>WireKEMScheme</strong></span></p>
                         <p>Specifies the key encapsulation mechanism (KEM) scheme
                             for the <a class="ulink" href="https://eprint.iacr.org/2022/539" target="_top">PQ
-                                Noise</a>-based wire protocol (link layer) that nodes use
+                            Noise</a>-based wire protocol (link layer) that nodes use
                             to communicate with each other. PQ Noise is a post-quantum variation of
                             the <a class="ulink" href="https://noiseprotocol.org/" target="_top">Noise protocol
-                                framework</a>, which algebraically transforms ECDH handshake
+                            framework</a>, which algebraically transforms ECDH handshake
                             patterns into KEM encapsulate/decapsulate operations.</p>
                             
-                            <p>This configuration option supports the optional use of
+                        <p>This configuration option supports the optional use of
                             hybrid post-quantum cryptography to strengthen security. The following KEM
-                            schemes are supported: </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
-                                    <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
-                                    <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
-                                        <p>X25519 and X448 are actually non-interactive key-exchanges
-                                            (NIKEs), not KEMs. Katzenpost uses
-                                            a hashed ElGamal cryptographic construction
-                                            to convert them from NIKEs to KEMs.</p>
-                                    </td></tr></table></div>
-                                </li><li class="listitem">
-                                    <p><span class="bold"><strong>Hybrid post-quantum:</strong></span>
-                                        "mlkem768", "sntrup4591761", "frodo640shake",
-                                        "mceliece348864", "mceliece348864f", "mceliece460896",
-                                        "mceliece460896f", "mceliece6688128", "mceliece6688128f",
-                                        "mceliece6960119", "mceliece6960119f", "mceliece8192128",
-                                        "mceliece8192128f", "xwing", "Kyber768-X25519",
-                                        "MLKEM768-X25519", "MLKEM768-X448", "CTIDH511", "CTIDH512",
-                                        "CTIDH1024", "CTIDH2048", "CTIDH512-X25519",
-                                        "CTIDH512-X25519"</p>
-                                </li></ul></div>						
+                            schemes are supported:</p>                           
+                        <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+                                <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
+                                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                                    <p>X25519 and X448 are actually non-interactive key-exchanges
+                                        (NIKEs), not KEMs. Katzenpost uses
+                                        a hashed ElGamal cryptographic construction
+                                        to convert them from NIKEs to KEMs.</p>
+                                </td></tr></table></div>
+                            </li><li class="listitem">
+                                <p><span class="bold"><strong>Post-quantum:</strong></span>
+                                    "mlkem768","sntrup4591761", "frodo640shake", "mceliece348864", 
+                                    "mceliece348864f", "mceliece460896", "mceliece460896f", "mceliece6688128",
+                                    "mceliece6688128f", "mceliece6960119", "mceliece6960119f",
+                                    "mceliece8192128", "mceliece8192128f", "CTIDH511", "CTIDH512", "CTIDH1024",
+                                    "CTIDH2048",</p>
+                            </li><li class="listitem">
+                                <p><span class="bold"><strong>Hybrid post-quantum:</strong></span>
+                                    "xwing", "Kyber768-X25519",
+                                    "MLKEM768-X25519", "MLKEM768-X448", "FrodoKEM-640-SHAKE-X448",
+                                    "sntrup4591761-X448", "mceliece348864-X25519", "mceliece348864f-X25519",
+                                    "mceliece460896-X25519", "mceliece460896f-X25519", "mceliece6688128-X25519",
+                                    "mceliece6688128f-X25519", "mceliece6960119-X25519", "mceliece6960119f-X25519",
+                                    "mceliece8192128-X25519", "mceliece8192128f-X25519",
+                                     "CTIDH512-X25519", "CTIDH512-X25519"</p>
+                            </li></ul></div>					
                         <p>Type: string</p>
                         <p>Required: Yes</p>                    
                     </li><li class="listitem">
@@ -399,7 +413,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e298"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e304"></a></h5></div></div></div>
         
         <div class="informalexample"> 
             <p>The <code class="code">Logging</code> configuration section controls logging behavior across Katzenpost.</p>
@@ -425,7 +439,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     <p>Supported logging level values are ERROR | WARNING | NOTICE |INFO | DEBUG.</p>
                     <p>Type: string</p>
                     <p>Required: No</p>
-                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
+                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
                         <p>The DEBUG log level is unsafe for
                             production use.</p>
                     </td></tr></table></div>                               
@@ -519,7 +533,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <p>LambdaG is the inverse of the mean of the exponential distribution
                             that gateway nodes to select the delay between gateway node
                             decoys.</p>
-                        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
+                        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
                             <p>Do not set this value manually in the TOML configuration file. The
                                 field is used internally by the dirauth server state machine.</p>
                         </td></tr></table></div>
@@ -688,7 +702,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     post-quantum cryptography. Hybrid constructions offset the newness of
                     post-quantum algorithms by offering heavily tested classical algorithms as a
                     fallback.</p>
-                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                     <p>Sphinx, the nested-packet format, should not be confused with <a class="ulink" href="http://sphincs.org/index.html" target="_top">Sphincs or Sphincs+</a>, which
                         are post-quantum signature schemes.</p>
                 </td></tr></table></div>
@@ -709,12 +723,12 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     PKI document for validation by its peer dirauths. </p>
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e529"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e535"></a></h5></div></div></div>
         
         <div class="informalexample">        
             <p>The <code class="code">SphinxGeometry</code> section defines parameters for the Sphinx
                 encrypted nested-packet format used internally by Katzenpost. 
-                </p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top"><p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                </p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top"><p>The values in the <code class="code">SphinxGeometry</code> configuration section must
                         be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
                         parameters are interdependent and cannot be individually modified. Do not
                         modify the these values by hand.</p></td></tr></table></div>
@@ -840,7 +854,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
                 more information about the test mixnet, see <span class="bold"><strong><a class="xref" href="#">???</a></strong></span>.</p>
             <p>
-                </p><div class="table"><a name="d6e652"></a><p class="title"><b>Table&nbsp;1.3.&nbsp;Mix node configuration sections</b></p><div class="table-contents">
+                </p><div class="table"><a name="d6e658"></a><p class="title"><b>Table&nbsp;3.&nbsp;Mix node configuration sections</b></p><div class="table-contents">
                     
                     <table class="table" summary="Mix node configuration sections" border="1"><colgroup><col class="c1"></colgroup><tbody><tr><td>
                                     <p><a class="xref" href="#mix-server-section-config" title="Mix node: Server section">Mix node: Server section</a></p>
@@ -876,7 +890,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 </p>
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e687"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e693"></a></h5></div></div></div>
         
                
         <div class="informalexample"> 
@@ -894,28 +908,35 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             to communicate with each other. PQ Noise is a post-quantum variation of
                             the <a class="ulink" href="https://noiseprotocol.org/" target="_top">Noise protocol
                                 framework</a>, which algebraically transforms ECDH handshake
-                            patterns into KEM encapsulate/decapsulate operations.</p>
-                            
-                            <p>This configuration option supports the optional use of
+                            patterns into KEM encapsulate/decapsulate operations.</p>                           
+                        <p>This configuration option supports the optional use of
                             hybrid post-quantum cryptography to strengthen security. The following KEM
-                            schemes are supported: </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
-                                    <p><span class="bold"><strong>Classical:</strong></span> "x25519",
-                                        "x448"</p>
-                                     <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>X25519 and X448 are actually non-interactive key-exchanges
-                                            (NIKEs), not KEMs. Katzenpost uses
-                                            a Hashed ElGamal cryptographic construction
-                                            to convert them from NIKEs to KEMs.</p></td></tr></table></div>
-                                </li><li class="listitem">
-                                    <p><span class="bold"><strong>Hybrid post-quantum:</strong></span>
-                                        "mlkem768", "sntrup4591761", "frodo640shake",
-                                        "mceliece348864", "mceliece348864f", "mceliece460896",
-                                        "mceliece460896f", "mceliece6688128", "mceliece6688128f",
-                                        "mceliece6960119", "mceliece6960119f", "mceliece8192128",
-                                        "mceliece8192128f", "xwing", "Kyber768-X25519",
-                                        "MLKEM768-X25519", "MLKEM768-X448", "CTIDH511", "CTIDH512",
-                                        "CTIDH1024", "CTIDH2048", "CTIDH512-X25519",
-                                        "CTIDH512-X25519"</p>
-                                </li></ul></div>						
+                            schemes are supported:</p>
+                        <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+                                <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
+                                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                                    <p>X25519 and X448 are actually non-interactive key-exchanges
+                                        (NIKEs), not KEMs. Katzenpost uses
+                                        a hashed ElGamal cryptographic construction
+                                        to convert them from NIKEs to KEMs.</p>
+                                </td></tr></table></div>
+                            </li><li class="listitem">
+                                <p><span class="bold"><strong>Post-quantum:</strong></span>
+                                    "mlkem768","sntrup4591761", "frodo640shake", "mceliece348864", 
+                                    "mceliece348864f", "mceliece460896", "mceliece460896f", "mceliece6688128",
+                                    "mceliece6688128f", "mceliece6960119", "mceliece6960119f",
+                                    "mceliece8192128", "mceliece8192128f", "CTIDH511", "CTIDH512", "CTIDH1024",
+                                    "CTIDH2048",</p>
+                            </li><li class="listitem">
+                                <p><span class="bold"><strong>Hybrid post-quantum:</strong></span>
+                                    "xwing", "Kyber768-X25519",
+                                    "MLKEM768-X25519", "MLKEM768-X448", "FrodoKEM-640-SHAKE-X448",
+                                    "sntrup4591761-X448", "mceliece348864-X25519", "mceliece348864f-X25519",
+                                    "mceliece460896-X25519", "mceliece460896f-X25519", "mceliece6688128-X25519",
+                                    "mceliece6688128f-X25519", "mceliece6960119-X25519", "mceliece6960119f-X25519",
+                                    "mceliece8192128-X25519", "mceliece8192128f-X25519",
+                                     "CTIDH512-X25519", "CTIDH512-X25519"</p>
+                            </li></ul></div>											
                         <p>Type: string</p>
                         <p>Required: Yes</p>                    
                     </li><li class="listitem">
@@ -958,10 +979,9 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     <p>Required: No</p>
                 </li><li class="listitem">
                     <p><span class="bold"><strong>DataDir</strong></span></p>
-                    <p>Specifies the absolute path to a node's state directory. This is 
-                        where persistence.db is written to disk and where a node stores its 
-                        cryptographic key materials when started with the "-g" commmand-line 
-                        option.</p>
+                    <p>Specifies the absolute path to a node's state directory. This is where
+                        persistence.db is written to disk and where a node stores its cryptographic
+                        key materials when started with the "-g" commmand-line option.</p>
                     <p>Type: string</p>
                     <p>Required: Yes</p>
                 </li><li class="listitem">
@@ -985,7 +1005,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e770"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e779"></a></h5></div></div></div>
         
         <div class="informalexample"> 
             <p>The <code class="code">Logging</code> configuration section controls logging behavior across Katzenpost.</p>
@@ -1011,7 +1031,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     <p>Supported logging level values are ERROR | WARNING | NOTICE |INFO | DEBUG.</p>
                     <p>Type: string</p>
                     <p>Required: No</p>
-                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
+                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
                         <p>The DEBUG log level is unsafe for
                             production use.</p>
                     </td></tr></table></div>                               
@@ -1023,7 +1043,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e803"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e812"></a></h5></div></div></div>
              
         <div class="informalexample"> 
             <p>The <code class="code">PKI</code> section contains the directory authority configuration for a mix, gateway, or service node.</p>
@@ -1141,7 +1161,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e851"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e860"></a></h5></div></div></div>
         
            <div class="informalexample"> 
            <p>The <code class="code">Management</code> section specifies 
@@ -1170,12 +1190,12 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e875"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e884"></a></h5></div></div></div>
         
         <div class="informalexample">        
             <p>The <code class="code">SphinxGeometry</code> section defines parameters for the Sphinx
                 encrypted nested-packet format used internally by Katzenpost. 
-                </p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top"><p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                </p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top"><p>The values in the <code class="code">SphinxGeometry</code> configuration section must
                         be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
                         parameters are interdependent and cannot be individually modified. Do not
                         modify the these values by hand.</p></td></tr></table></div>
@@ -1297,7 +1317,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e993"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1002"></a></h5></div></div></div>
              
         <div class="informalexample">    
             <p>The <code class="code">Debug</code> section is the Katzenpost server debug configuration
@@ -1425,7 +1445,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>If <span class="bold"><strong>true</strong></span>, decoy traffic is enabled. 
                             This parameter is experimental and untuned, 
                             and is disabled by default.</p>
-                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                             <p>This option will be removed once decoy traffic is fully implemented.</p>
                         </td></tr></table></div>
                         <p>Type: bool</p>
@@ -1433,7 +1453,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </li><li class="listitem">
                         <p><span class="bold"><strong>DisableRateLimit</strong></span></p>
                         <p>If <span class="bold"><strong>true</strong></span>, the per-client rate limiter is disabled.</p>
-                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                             <p>This option should only be used for testing.</p>
                         </td></tr></table></div>
                         <p>Type: bool</p>
@@ -1455,7 +1475,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     <code class="filename">katzenpost/docker/dirauth_mixnet/gateway1/katzenpost.toml</code>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
                 address. For more information about the test mixnet, see <span class="bold"><strong><a class="xref" href="#">???</a></strong></span>.</p>
-            <div class="table"><a name="d6e1128"></a><p class="title"><b>Table&nbsp;1.4.&nbsp;Gateway node configuration sections</b></p><div class="table-contents">
+            <div class="table"><a name="d6e1137"></a><p class="title"><b>Table&nbsp;4.&nbsp;Gateway node configuration sections</b></p><div class="table-contents">
                 
                 <table class="table" summary="Gateway node configuration sections" border="1"><colgroup><col class="c1"></colgroup><tbody><tr><td>
                                 <p><a class="xref" href="#gateway-server-section-config" title="Gateway node: Server section">Gateway node: Server section</a></p>
@@ -1492,7 +1512,7 @@ FZWJFK0R8iU52CEUxVpXTA==
         TCP = ["localhost:30004"]</pre>
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1166"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1175"></a></h5></div></div></div>
         
                
         <div class="informalexample"> 
@@ -1510,28 +1530,35 @@ FZWJFK0R8iU52CEUxVpXTA==
                             to communicate with each other. PQ Noise is a post-quantum variation of
                             the <a class="ulink" href="https://noiseprotocol.org/" target="_top">Noise protocol
                                 framework</a>, which algebraically transforms ECDH handshake
-                            patterns into KEM encapsulate/decapsulate operations.</p>
-                            
-                            <p>This configuration option supports the optional use of
+                            patterns into KEM encapsulate/decapsulate operations.</p>                           
+                        <p>This configuration option supports the optional use of
                             hybrid post-quantum cryptography to strengthen security. The following KEM
-                            schemes are supported: </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
-                                    <p><span class="bold"><strong>Classical:</strong></span> "x25519",
-                                        "x448"</p>
-                                     <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>X25519 and X448 are actually non-interactive key-exchanges
-                                            (NIKEs), not KEMs. Katzenpost uses
-                                            a Hashed ElGamal cryptographic construction
-                                            to convert them from NIKEs to KEMs.</p></td></tr></table></div>
-                                </li><li class="listitem">
-                                    <p><span class="bold"><strong>Hybrid post-quantum:</strong></span>
-                                        "mlkem768", "sntrup4591761", "frodo640shake",
-                                        "mceliece348864", "mceliece348864f", "mceliece460896",
-                                        "mceliece460896f", "mceliece6688128", "mceliece6688128f",
-                                        "mceliece6960119", "mceliece6960119f", "mceliece8192128",
-                                        "mceliece8192128f", "xwing", "Kyber768-X25519",
-                                        "MLKEM768-X25519", "MLKEM768-X448", "CTIDH511", "CTIDH512",
-                                        "CTIDH1024", "CTIDH2048", "CTIDH512-X25519",
-                                        "CTIDH512-X25519"</p>
-                                </li></ul></div>						
+                            schemes are supported:</p>
+                        <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+                                <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
+                                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                                    <p>X25519 and X448 are actually non-interactive key-exchanges
+                                        (NIKEs), not KEMs. Katzenpost uses
+                                        a hashed ElGamal cryptographic construction
+                                        to convert them from NIKEs to KEMs.</p>
+                                </td></tr></table></div>
+                            </li><li class="listitem">
+                                <p><span class="bold"><strong>Post-quantum:</strong></span>
+                                    "mlkem768","sntrup4591761", "frodo640shake", "mceliece348864", 
+                                    "mceliece348864f", "mceliece460896", "mceliece460896f", "mceliece6688128",
+                                    "mceliece6688128f", "mceliece6960119", "mceliece6960119f",
+                                    "mceliece8192128", "mceliece8192128f", "CTIDH511", "CTIDH512", "CTIDH1024",
+                                    "CTIDH2048",</p>
+                            </li><li class="listitem">
+                                <p><span class="bold"><strong>Hybrid post-quantum:</strong></span>
+                                    "xwing", "Kyber768-X25519",
+                                    "MLKEM768-X25519", "MLKEM768-X448", "FrodoKEM-640-SHAKE-X448",
+                                    "sntrup4591761-X448", "mceliece348864-X25519", "mceliece348864f-X25519",
+                                    "mceliece460896-X25519", "mceliece460896f-X25519", "mceliece6688128-X25519",
+                                    "mceliece6688128f-X25519", "mceliece6960119-X25519", "mceliece6960119f-X25519",
+                                    "mceliece8192128-X25519", "mceliece8192128f-X25519",
+                                     "CTIDH512-X25519", "CTIDH512-X25519"</p>
+                            </li></ul></div>											
                         <p>Type: string</p>
                         <p>Required: Yes</p>                    
                     </li><li class="listitem">
@@ -1574,10 +1601,9 @@ FZWJFK0R8iU52CEUxVpXTA==
                     <p>Required: No</p>
                 </li><li class="listitem">
                     <p><span class="bold"><strong>DataDir</strong></span></p>
-                    <p>Specifies the absolute path to a node's state directory. This is 
-                        where persistence.db is written to disk and where a node stores its 
-                        cryptographic key materials when started with the "-g" commmand-line 
-                        option.</p>
+                    <p>Specifies the absolute path to a node's state directory. This is where
+                        persistence.db is written to disk and where a node stores its cryptographic
+                        key materials when started with the "-g" commmand-line option.</p>
                     <p>Type: string</p>
                     <p>Required: Yes</p>
                 </li><li class="listitem">
@@ -1601,7 +1627,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1249"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1261"></a></h5></div></div></div>
         
         <div class="informalexample"> 
             <p>The <code class="code">Logging</code> configuration section controls logging behavior across Katzenpost.</p>
@@ -1627,7 +1653,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     <p>Supported logging level values are ERROR | WARNING | NOTICE |INFO | DEBUG.</p>
                     <p>Type: string</p>
                     <p>Required: No</p>
-                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
+                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
                         <p>The DEBUG log level is unsafe for
                             production use.</p>
                     </td></tr></table></div>                               
@@ -1662,7 +1688,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1291"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1303"></a></h5></div></div></div>
              
         <div class="informalexample"> 
             <p>The <code class="code">PKI</code> section contains the directory authority configuration for a mix, gateway, or service node.</p>
@@ -1780,7 +1806,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1339"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1351"></a></h5></div></div></div>
         
            <div class="informalexample"> 
            <p>The <code class="code">Management</code> section specifies 
@@ -1809,12 +1835,12 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1363"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1375"></a></h5></div></div></div>
         
         <div class="informalexample">        
             <p>The <code class="code">SphinxGeometry</code> section defines parameters for the Sphinx
                 encrypted nested-packet format used internally by Katzenpost. 
-                </p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top"><p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                </p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top"><p>The values in the <code class="code">SphinxGeometry</code> configuration section must
                         be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
                         parameters are interdependent and cannot be individually modified. Do not
                         modify the these values by hand.</p></td></tr></table></div>
@@ -1936,7 +1962,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1481"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1493"></a></h5></div></div></div>
              
         <div class="informalexample">    
             <p>The <code class="code">Debug</code> section is the Katzenpost server debug configuration
@@ -2064,7 +2090,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>If <span class="bold"><strong>true</strong></span>, decoy traffic is enabled. 
                             This parameter is experimental and untuned, 
                             and is disabled by default.</p>
-                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                             <p>This option will be removed once decoy traffic is fully implemented.</p>
                         </td></tr></table></div>
                         <p>Type: bool</p>
@@ -2072,7 +2098,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </li><li class="listitem">
                         <p><span class="bold"><strong>DisableRateLimit</strong></span></p>
                         <p>If <span class="bold"><strong>true</strong></span>, the per-client rate limiter is disabled.</p>
-                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                             <p>This option should only be used for testing.</p>
                         </td></tr></table></div>
                         <p>Type: bool</p>
@@ -2094,7 +2120,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     <code class="filename">katzenpost/docker/dirauth_mixnet/servicenode1/authority.toml</code>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
                 address. For more information about the test mixnet, see <span class="bold"><strong><a class="xref" href="#">???</a></strong></span>.</p>
-            <div class="table"><a name="d6e1616"></a><p class="title"><b>Table&nbsp;1.5.&nbsp;Mix node configuration sections</b></p><div class="table-contents">
+            <div class="table"><a name="d6e1628"></a><p class="title"><b>Table&nbsp;5.&nbsp;Mix node configuration sections</b></p><div class="table-contents">
                 
                 <table class="table" summary="Mix node configuration sections" border="1"><colgroup><col class="c1"></colgroup><tbody><tr><td>
                                 <p><a class="xref" href="#service-server-section-config" title="Service node: Server section">Service node: Server section</a></p>
@@ -2130,7 +2156,7 @@ FZWJFK0R8iU52CEUxVpXTA==
     [Server.AltAddresses]</pre>
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1654"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1666"></a></h5></div></div></div>
         
                
         <div class="informalexample"> 
@@ -2148,28 +2174,35 @@ FZWJFK0R8iU52CEUxVpXTA==
                             to communicate with each other. PQ Noise is a post-quantum variation of
                             the <a class="ulink" href="https://noiseprotocol.org/" target="_top">Noise protocol
                                 framework</a>, which algebraically transforms ECDH handshake
-                            patterns into KEM encapsulate/decapsulate operations.</p>
-                            
-                            <p>This configuration option supports the optional use of
+                            patterns into KEM encapsulate/decapsulate operations.</p>                           
+                        <p>This configuration option supports the optional use of
                             hybrid post-quantum cryptography to strengthen security. The following KEM
-                            schemes are supported: </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
-                                    <p><span class="bold"><strong>Classical:</strong></span> "x25519",
-                                        "x448"</p>
-                                     <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>X25519 and X448 are actually non-interactive key-exchanges
-                                            (NIKEs), not KEMs. Katzenpost uses
-                                            a Hashed ElGamal cryptographic construction
-                                            to convert them from NIKEs to KEMs.</p></td></tr></table></div>
-                                </li><li class="listitem">
-                                    <p><span class="bold"><strong>Hybrid post-quantum:</strong></span>
-                                        "mlkem768", "sntrup4591761", "frodo640shake",
-                                        "mceliece348864", "mceliece348864f", "mceliece460896",
-                                        "mceliece460896f", "mceliece6688128", "mceliece6688128f",
-                                        "mceliece6960119", "mceliece6960119f", "mceliece8192128",
-                                        "mceliece8192128f", "xwing", "Kyber768-X25519",
-                                        "MLKEM768-X25519", "MLKEM768-X448", "CTIDH511", "CTIDH512",
-                                        "CTIDH1024", "CTIDH2048", "CTIDH512-X25519",
-                                        "CTIDH512-X25519"</p>
-                                </li></ul></div>						
+                            schemes are supported:</p>
+                        <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+                                <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
+                                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                                    <p>X25519 and X448 are actually non-interactive key-exchanges
+                                        (NIKEs), not KEMs. Katzenpost uses
+                                        a hashed ElGamal cryptographic construction
+                                        to convert them from NIKEs to KEMs.</p>
+                                </td></tr></table></div>
+                            </li><li class="listitem">
+                                <p><span class="bold"><strong>Post-quantum:</strong></span>
+                                    "mlkem768","sntrup4591761", "frodo640shake", "mceliece348864", 
+                                    "mceliece348864f", "mceliece460896", "mceliece460896f", "mceliece6688128",
+                                    "mceliece6688128f", "mceliece6960119", "mceliece6960119f",
+                                    "mceliece8192128", "mceliece8192128f", "CTIDH511", "CTIDH512", "CTIDH1024",
+                                    "CTIDH2048",</p>
+                            </li><li class="listitem">
+                                <p><span class="bold"><strong>Hybrid post-quantum:</strong></span>
+                                    "xwing", "Kyber768-X25519",
+                                    "MLKEM768-X25519", "MLKEM768-X448", "FrodoKEM-640-SHAKE-X448",
+                                    "sntrup4591761-X448", "mceliece348864-X25519", "mceliece348864f-X25519",
+                                    "mceliece460896-X25519", "mceliece460896f-X25519", "mceliece6688128-X25519",
+                                    "mceliece6688128f-X25519", "mceliece6960119-X25519", "mceliece6960119f-X25519",
+                                    "mceliece8192128-X25519", "mceliece8192128f-X25519",
+                                     "CTIDH512-X25519", "CTIDH512-X25519"</p>
+                            </li></ul></div>											
                         <p>Type: string</p>
                         <p>Required: Yes</p>                    
                     </li><li class="listitem">
@@ -2212,10 +2245,9 @@ FZWJFK0R8iU52CEUxVpXTA==
                     <p>Required: No</p>
                 </li><li class="listitem">
                     <p><span class="bold"><strong>DataDir</strong></span></p>
-                    <p>Specifies the absolute path to a node's state directory. This is 
-                        where persistence.db is written to disk and where a node stores its 
-                        cryptographic key materials when started with the "-g" commmand-line 
-                        option.</p>
+                    <p>Specifies the absolute path to a node's state directory. This is where
+                        persistence.db is written to disk and where a node stores its cryptographic
+                        key materials when started with the "-g" commmand-line option.</p>
                     <p>Type: string</p>
                     <p>Required: Yes</p>
                 </li><li class="listitem">
@@ -2239,7 +2271,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1737"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1752"></a></h5></div></div></div>
         
         <div class="informalexample"> 
             <p>The <code class="code">Logging</code> configuration section controls logging behavior across Katzenpost.</p>
@@ -2265,7 +2297,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     <p>Supported logging level values are ERROR | WARNING | NOTICE |INFO | DEBUG.</p>
                     <p>Type: string</p>
                     <p>Required: No</p>
-                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
+                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
                         <p>The DEBUG log level is unsafe for
                             production use.</p>
                     </td></tr></table></div>                               
@@ -2385,7 +2417,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                 storage protocol,
                                 which
                                 is required by the Katzen chat client. The
-                                example configuration above shows spool enabled with the setting:</p><pre class="programlisting">Disable = false</pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                                example configuration above shows spool enabled with the setting:</p><pre class="programlisting">Disable = false</pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                                     <p><code class="code">Spool</code>, properly <code class="code">memspool</code>, should
                                         not be confused with the spool database on gateway
                                         nodes.</p>
@@ -2439,7 +2471,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                     <p><span class="bold"><strong>log_level</strong></span></p>
                                     <p>Supported values are ERROR | WARNING | NOTICE |INFO |
                                         DEBUG.</p>
-                                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
+                                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
                                         <p>The DEBUG log level is unsafe for production
                                             use.</p>
                                     </td></tr></table></div>
@@ -2469,7 +2501,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                     <p>Type: string</p>
                                     <p>Required: Yes</p>
                                     <p>Required: Yes</p>
-                                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
+                                    <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
                                         <p>The DEBUG log level is unsafe for production
                                             use.</p>
                                     </td></tr></table></div>
@@ -2483,7 +2515,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1929"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1944"></a></h5></div></div></div>
              
         <div class="informalexample"> 
             <p>The <code class="code">PKI</code> section contains the directory authority configuration for a mix, gateway, or service node.</p>
@@ -2601,7 +2633,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1977"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e1992"></a></h5></div></div></div>
         
            <div class="informalexample"> 
            <p>The <code class="code">Management</code> section specifies 
@@ -2630,12 +2662,12 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e2001"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e2016"></a></h5></div></div></div>
         
         <div class="informalexample">        
             <p>The <code class="code">SphinxGeometry</code> section defines parameters for the Sphinx
                 encrypted nested-packet format used internally by Katzenpost. 
-                </p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top"><p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                </p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top"><p>The values in the <code class="code">SphinxGeometry</code> configuration section must
                         be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
                         parameters are interdependent and cannot be individually modified. Do not
                         modify the these values by hand.</p></td></tr></table></div>
@@ -2757,7 +2789,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                 
                 
                 
-                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e2119"></a></h5></div></div></div>
+                <div class="simplesect"><div class="titlepage"><div><div><h5 class="title"><a name="d6e2134"></a></h5></div></div></div>
              
         <div class="informalexample">    
             <p>The <code class="code">Debug</code> section is the Katzenpost server debug configuration
@@ -2885,7 +2917,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                         <p>If <span class="bold"><strong>true</strong></span>, decoy traffic is enabled. 
                             This parameter is experimental and untuned, 
                             and is disabled by default.</p>
-                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                             <p>This option will be removed once decoy traffic is fully implemented.</p>
                         </td></tr></table></div>
                         <p>Type: bool</p>
@@ -2893,7 +2925,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                     </li><li class="listitem">
                         <p><span class="bold"><strong>DisableRateLimit</strong></span></p>
                         <p>If <span class="bold"><strong>true</strong></span>, the per-client rate limiter is disabled.</p>
-                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2026/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+                        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
                             <p>This option should only be used for testing.</p>
                         </td></tr></table></div>
                         <p>Type: bool</p>
