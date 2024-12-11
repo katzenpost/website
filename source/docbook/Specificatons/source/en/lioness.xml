@@ -26,8 +26,8 @@
     This document does not introduce any new crypto, but is meant to
     serve as a stable reference and implementation guide.
   </para>
-  <section xml:id="introduction">
-    <title>1. Introduction</title>
+  <section xml:id="lioness_introduction">
+    <title xml:id="lioness_introduction.title">1. Introduction</title>
     <para>
       LIONESS is a provably secure wide-block-cipher proposed by
       Anderson and Biham in

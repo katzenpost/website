@@ -23,8 +23,8 @@
     serve as an implementation guide and document the existing replay
     protect for deployed mix networks.
   </para>
-  <section xml:id="introduction">
-    <title>1. Introduction</title>
+  <section xml:id="sphinx_replay_detection_introduction">
+    <title xml:id="sphinx_replay_detection_introduction.title">1. Introduction</title>
     <para>
       The Sphinx cryptographic packet format is a compact and provably
       secure design introduced by George Danezis and Ian Goldberg

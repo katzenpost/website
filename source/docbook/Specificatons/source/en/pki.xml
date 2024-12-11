@@ -41,8 +41,8 @@
   <para>
     <emphasis role="strong">Abstract</emphasis>
   </para>
-  <section xml:id="introduction">
-    <title>1. Introduction</title>
+  <section xml:id="pki_introduction">
+    <title xml:id="pki_introduction.title">1. Introduction</title>
     <para>
       Mixnets are designed with the assumption that a Public Key
       Infrastructure (PKI) exists and it gives each client the same view

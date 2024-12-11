@@ -21,8 +21,8 @@
     This document proposes a certificate format that Katzenpost mix
     server, directory authority server and clients will use.
   </para>
-  <section xml:id="introduction">
-    <title>1. Introduction</title>
+  <section xml:id="certificate_introduction">
+    <title xml:id="certificate_introduction.title">1. Introduction</title>
     <para>
       Mixes and Directory Authority servers need to have key agility in
       the sense of operational abilities such as key rotation and key

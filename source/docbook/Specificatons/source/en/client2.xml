@@ -23,8 +23,8 @@
     and privilege separation design elements as well as the protocol
     used by the thin client library.
   </para>
-  <section xml:id="introduction">
-    <title>1. Introduction</title>
+  <section xml:id="client2_introduction">
+    <title xml:id="client2_introduction.title">1. Introduction</title>
     <para>
       A Katzenpost mixnet client has several responsibilities at
       minimum:
