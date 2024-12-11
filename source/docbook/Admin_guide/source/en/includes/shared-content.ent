@@ -74,7 +74,7 @@
                             patterns into KEM encapsulate/decapsulate operations.</para>                           
                         <para>This configuration option supports the optional use of
                             hybrid post-quantum cryptography to strengthen security. The following KEM
-                            schemes are supported: 
+                            schemes are supported:</para>
                         <itemizedlist>
                             <listitem>
                                 <para><emphasis role="bold">Classical:</emphasis> "x25519", "x448"</para>
