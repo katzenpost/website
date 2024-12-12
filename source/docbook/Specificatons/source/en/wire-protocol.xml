@@ -29,7 +29,7 @@
     Katzenpost Mix Network.
   </para>
   <section xml:id="wire_protocol_introduction">
-    <title xml:id="wire_protocol_introduction.title"> xml:id="wire_protocol_introduction.title">1. Introduction</title>
+    <title xml:id="wire_protocol_introduction.title">1. Introduction</title>
     <para>
       The Katzenpost Mix Network Wire Protocol (KMNWP) is the custom
       wire protocol for all network communications to, from, and within
@@ -45,11 +45,11 @@
         NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD NOT</quote>,
         <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
         <quote>OPTIONAL</quote> in this document are to be interpreted
-        as described in <link linkend="RFC2119">RFC2119</link>.
+        as described in <xref linkend="RFC2119" endterm="RFC2119.title" />.
       </para>
       <para>
         The <quote>C</quote> style Presentation Language as described in
-        <link linkend="RFC5246">RFC5246</link> Section 4 is used to
+        <xref linkend="RFC5246" endterm="RFC5246.title" /> Section 4 is used to
         represent data structures, except for cryptographic attributes,
         which are specified as opaque byte vectors.
       </para>
@@ -62,7 +62,7 @@
       <para>
         This protocol uses ANY Key Encapsulation Mechanism. However it’s
         recommended that most users select a hybrid post quantum KEM
-        such as Xwing. <link linkend="XWING">XWING</link>
+        such as Xwing. <xref linkend="XWING" endterm="XWING.title" />
       </para>
     </section>
   </section>
@@ -70,7 +70,7 @@
     <title>2. Core Protocol</title>
     <para>
       The protocol is based on Kyber and Trevor Perrin’s Noise Protocol
-      Framework <link linkend="NOISE">NOISE</link> along with
+      Framework <xref linkend="NOISE" endterm="NOISE.title"/> along with
       <quote>Post Quantum Noise</quote> paper
       <link linkend="PQNOISE">PQNOISE</link>. Older previous versions of
       our transport were based on
@@ -491,64 +491,62 @@ url = {https://github.com/katzenpost/katzenpost/blob/master/docs/specs/wire-prot
 year = {2017}
 }
 </programlisting>
-      <para>
-        <emphasis role="strong">XWING</emphasis>
-      </para>
-      <para>
-        Manuel Barbosa, Deirdre Connolly, João Diogo Duarte, Aaron
-        Kaiser, Peter Schwabe, Karoline Varner, Bas Westerbaan
-        <quote>X-Wing: The Hybrid KEM You’ve Been Looking For</quote>,
-        https://eprint.iacr.org/2024/039.pdf
-      </para>
-      <para>
-        <emphasis role="strong">NOISE</emphasis>
-      </para>
-      <para>
-        Perrin, T., <quote>The Noise Protocol Framework</quote>, May
-        2017, https://noiseprotocol.org/noise.pdf
-      </para>
-      <para>
-        <emphasis role="strong">NOISEHFS</emphasis>
-      </para>
-      <para>
-        Weatherley, R., <quote>Noise Extension: Hybrid Forward
-        Secrecy</quote>,
-        https://github.com/noiseprotocol/noise_hfs_spec/blob/master/output/noise_hfs.pdf
-      </para>
-      <para>
-        <emphasis role="strong">PQNOISE</emphasis>
-      </para>
-      <para>
-        Yawning Angel, Benjamin Dowling, Andreas Hülsing, Peter Schwabe
-        and Florian Weber, <quote>Post Quantum Noise</quote>, 2022,
-        https://eprint.iacr.org/2022/539.pdf
-      </para>
-      <para>
-        <emphasis role="strong">RFC2119</emphasis>
-      </para>
-      <para>
-        Bradner, S., <quote>Key words for use in RFCs to Indicate
-        Requirement Levels</quote>, BCP 14, RFC 2119, DOI
-        10.17487/RFC2119, March 1997,
-        https://www.rfc-editor.org/info/rfc2119
-      </para>
-      <para>
-        <emphasis role="strong">RFC5246</emphasis>
-      </para>
-      <para>
-        Dierks, T. and E. Rescorla, <quote>The Transport Layer Security
-        (TLS) Protocol Version 1.2</quote>, RFC 5246, DOI
-        10.17487/RFC5246, August 2008,
-        https://www.rfc-editor.org/info/rfc5246
-      </para>
-      <para>
-        <emphasis role="strong">RFC7748</emphasis>
-      </para>
-      <para>
-        Langley, A., Hamburg, M., and S. Turner, <quote>Elliptic Curves
-        for Security</quote>, RFC 7748, DOI 10.17487/RFC7748, January
-        2016, http://www.rfc-editor.org/info/rfc7748
-      </para>
+      
+      <formalpara xml:id="XWING">
+        <title xml:id="XWING.title">XWING</title>
+        <para>Manuel Barbosa, Deirdre Connolly, João Diogo Duarte, Aaron Kaiser, Peter Schwabe,
+          Karoline Varner, Bas Westerbaan, <quote>X-Wing: The Hybrid KEM You’ve Been Looking
+            For</quote>. <link xlink:href="https://eprint.iacr.org/2024/039.pdf"
+            >https://eprint.iacr.org/2024/039.pdf</link></para>
+      </formalpara>
+
+      <formalpara xml:id="NOISE">
+        <title xml:id="NOISE.title">NOISE</title>
+        <para>Perrin, T., <quote>The Noise Protocol Framework</quote>, May 2017. <link
+            xlink:href="https://noiseprotocol.org/noise.pdf"
+            >https://noiseprotocol.org/noise.pdf</link></para>
+      </formalpara>
+      
+      <formalpara xml:id="NOISEHFS">
+        <title xml:id="NOISEHFS.title">NOISEHFS</title>
+        <para>Weatherley, R., <quote>Noise Extension: Hybrid Forward Secrecy</quote>. <link
+            xlink:href="https://github.com/noiseprotocol/noise_hfs_spec/blob/master/output/noise_hfs.pdf"
+            >https://github.com/noiseprotocol/noise_hfs_spec/blob/master/output/noise_hfs.pdf</link></para>
+      </formalpara>
+      
+      <formalpara xml:id="PQNOISE">
+        <title xml:id="PQNOISE.title">PQNOISE</title>
+        <para>Yawning Angel, Benjamin Dowling, Andreas Hülsing, Peter Schwabe and Florian Weber,
+            <quote>Post Quantum Noise</quote>, September 2023. <link
+            xlink:href="https://eprint.iacr.org/2022/539.pdf"
+            >https://eprint.iacr.org/2022/539.pdf</link></para>
+      </formalpara>
+      
+      <formalpara xml:id="RFC2119">
+        <title xml:id="RFC2119.title">RFC2119</title>
+        <para>Bradner, S., <quote>Key words for use in RFCs to Indicate Requirement Levels</quote>,
+          BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997. <link
+            xlink:href="https://www.rfc-editor.org/info/rfc2119"
+            >https://www.rfc-editor.org/info/rfc2119</link></para>
+      </formalpara>
+      
+      <formalpara xml:id="RFC5246">
+        <title xml:id="RFC5246.title">RFC5246</title>     
+        <para>Dierks, T. and E. Rescorla, <quote>The Transport Layer Security (TLS) Protocol Version
+            1.2</quote>, RFC 5246, DOI 10.17487/RFC5246, August 2008. <link
+            xlink:href="https://www.rfc-editor.org/info/rfc5246"
+            >https://www.rfc-editor.org/info/rfc5246</link>
+        </para>
+      </formalpara>
+      
+      <formalpara xml:id="RFC7748">
+        <title xml:id="RFC7748.title">RFC7748</title>
+        <para> Langley, A., Hamburg, M., and S. Turner, <quote>Elliptic Curves for Security</quote>,
+          RFC 7748, DOI 10.17487/RFC7748, January 2016. <link
+            xlink:href="http://www.rfc-editor.org/info/rfc7748"
+            >http://www.rfc-editor.org/info/rfc7748</link></para>
+      </formalpara>
+      
     </section>
   </section>
 </article>
