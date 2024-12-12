@@ -34,11 +34,11 @@ ui:
   readingtime:
     enable: false
 
-decap_cms:
-  media_folder: "static/images/uploads"
-  public_folder: "/images/uploads"
-  publish_mode: "editorial_workflow"
-  search: true
-  preview_styles:
-    - "/scss/main.css"
+#decap_cms:
+#  media_folder: "static/images/uploads"
+#  public_folder: "/images/uploads"
+#  publish_mode: "editorial_workflow"
+#  search: true
+#  preview_styles:
+#    - "/scss/main.css"
 
