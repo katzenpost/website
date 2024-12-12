@@ -1,6 +1,8 @@
 ---
 title: Specifications
 weight: 6
+draft: false
+type: page
 ---
 
 {{% pageinfo %}}
