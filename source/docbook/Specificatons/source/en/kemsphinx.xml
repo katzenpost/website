@@ -28,7 +28,7 @@
     <para>
       We’ll express our KEM Sphinx header in pseudo code. The Sphinx
       body will be exactly the same as
-      <link linkend="SPHINXSPEC">SPHINXSPEC</link>. Our basic KEM API
+      <xref linkend="SPHINXSPEC" endterm="SPHINXSPEC.title" /> Our basic KEM API
       has three functions:
     </para>
     <itemizedlist spacing="compact">
@@ -117,7 +117,7 @@ func DECAPSULATE(my_privkey, their_pubkey) []byte {
     <section xml:id="kem-combiner">
       <title>2.2 KEM Combiner</title>
       <para>
-        The KEM Combiners paper <link linkend="KEMCOMB">KEMCOMB</link>
+        The KEM Combiners paper <link linkend="KEMCOMB" endterm="KEMCOMB.title" />
         makes the observation that if a KEM combiner is not security
         preserving then the resulting hybrid KEM will not have IND-CCA2
         security if one of the composing KEMs does not have IND-CCA2
@@ -258,7 +258,7 @@ for i := 0; i &lt; num_hops; i++ {
       </listitem>
     </orderedlist>
     <para>
-      Same as in <link linkend="SPHINXSPEC">SPHINXSPEC</link> except for
+      Same as in <xref linkend="SPHINXSPEC" endterm="SPHINXSPEC.title"/> except for
       the fact that each routing info slot is now increased by the size
       of the KEM ciphertext.
     </para>
@@ -326,34 +326,30 @@ sphinx_header.mac = mac
     </section>
     <section xml:id="appendix-a.-references">
       <title>Appendix A. References</title>
-      <para>
-        <emphasis role="strong">KEMCOMB</emphasis>
-      </para>
-      <programlisting>
-Federico Giacon, Felix Heuer, Bertram Poettering,
-&quot;KEM Combiners&quot;,
-2018
-https://link.springer.com/chapter/10.1007/978-3-319-76578-5_7&gt;PKC
-</programlisting>
-      <para>
-        <emphasis role="strong">SPHINX09</emphasis>
-      </para>
-      <programlisting>
-Danezis, G., Goldberg, I.,
-&quot;Sphinx: A Compact and Provably Secure Mix Format\&quot;,
-DOI 10.1109/SP.2009.15,
-May 2009,
-https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf
-</programlisting>
-      <para>
-        <emphasis role="strong">SPHINXSPEC</emphasis>
-      </para>
-      <programlisting>
-Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D.,
-&quot;Sphinx Mix Network Cryptographic Packet Format Specification&quot;
-July 2017,
-https://github.com/katzenpost/katzenpost/blob/master/docs/specs/sphinx.md
-</programlisting>
+     
+      <formalpara xml:id="KEMCOMB">
+        <title xml:id="KEMCOMB.title">KEMCOMB</title>
+        <para>Federico Giacon, Felix Heuer, Bertram Poettering, &quot;KEM Combiners&quot;, 2018.
+            <link xlink:href="https://link.springer.com/chapter/10.1007/978-3-319-76578-5_7"
+            >https://link.springer.com/chapter/10.1007/978-3-319-76578-5_7</link></para>
+      </formalpara>
+      
+      <formalpara xml:id="SPHINX09">
+        <title xml:id="SPHINX09.title">SPHINX09</title>
+        <para>Danezis, G., Goldberg, I., &quot;Sphinx: A Compact and Provably Secure Mix
+          Format\&quot;, DOI 10.1109/SP.2009.15, May 2009. <link
+            xlink:href="https://cypherpunks.ca/%7Eiang/pubs/Sphinx_Oakland09.pdf"
+            >https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</link></para>
+      </formalpara>
+      
+      <formalpara xml:id="SPHINXSPEC">
+        <title xml:id="SPHINXSPEC.title">SPHINXSPEC</title>
+        <para>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., &quot;Sphinx Mix
+          Network Cryptographic Packet Format Specification&quot; July 2017. <link
+            xlink:href="https://katzenpost.network/docs/specs/sphinx/"
+            >https://katzenpost.network/docs/specs/sphinx/</link></para>
+      </formalpara>
+ 
     </section>
   </section>
 </article>

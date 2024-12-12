@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 
-<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
 [
    <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
@@ -28,7 +28,7 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
 ]> 
 
-<article id="docker-config">
+<section id="docker-config">
     <title id="docker-config.title">Appendix: Configuration files from the Docker test mixnet </title>
     <para>As an aid to adminstrators implementing a &program_name; mixnet, this appendix provides
         lightly edited examples of configuration files for each &program_name; node type. These
@@ -484,4 +484,4 @@
     </section>
 
     
-</article>
+</section>

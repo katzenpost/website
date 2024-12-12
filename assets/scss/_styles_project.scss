@@ -124,3 +124,11 @@ header.article-meta {
     line-height: 1.6; /* Increase line height for better readability */
     font-weight: 400; /* Optional: Adjust weight for optimal readability */
 }
+
+/* Customizations */
+
+.td-page-meta__view  { display: none !important; }
+.td-page-meta__edit  { display: none !important; }
+.td-page-meta__child  { display: none !important; }
+.td-page-meta__issue  { display: none !important; }
+.td-page-meta__project-issue  { display: none !important; }

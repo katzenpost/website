@@ -1,5 +1,5 @@
 ---
-title: Katzenpost administration guide
+title: Administration guide
 weight: 6
 ---
 
@@ -9,7 +9,7 @@ Use the documentation in this section to explore how the mixnet works and to imp
 
 |      | Title                                                                                                    | Description                                                                                                                                                        | Link(s)                                                                                                                     |
 |------|----------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| 📖   | **[Admin Guide](/docs/admin_guide)**                                                                    | Detailed guide for deploying and managing Katzenpost servers, including setting up a local Docker-based mixnet.                                                   | [HTML](/docs/admin_guide)    / [PDF](/research/)                                                                                       |
+| 📖   | **[Admin Guide](/docs/admin_guide)**                                                                    | Detailed guide for deploying and managing Katzenpost servers, including setting up a local Docker-based mixnet.                                                   | [PDF](/admin_guide/admin_guide.pdf)                                                                                       |
 
 
 

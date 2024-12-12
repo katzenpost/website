@@ -43,7 +43,7 @@
     <xi:include href="kaetzchen.xml"></xi:include>
     <xi:include href="kemsphinx.xml"></xi:include>
     <xi:include href="lioness.xml"></xi:include>
-    <xi:include href="mix_decoy_stats_propagation.xml"></xi:include>     
+    <xi:include href="mix_decoy_stats_propagation.xml"></xi:include>git add     
     <xi:include href="mixnet.xml"></xi:include>
     <xi:include href="sphinx_replay_detection.xml"></xi:include>
     <xi:include href="pki.xml"></xi:include>

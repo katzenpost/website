@@ -1,5 +1,14 @@
 <?xml version='1.0'?> 
 
+<!--
+    
+Favorite PDF recipe for this document:
+
+xmllint -\-noent -\-xinclude book.xml -\-output out.xml
+pandoc -f docbook out.xml -\-toc -\-toc-depth=5 -\-pdf-engine lualatex -o admin_guide.pdf
+
+-->
+
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
 [
@@ -31,15 +40,12 @@
 ]> 
 
 <book> 
-    <title>&program_name; administrator's guide</title>
+    <title>&program_name; administration guide</title>
    <preface id="introduction">
        <title id="introduction.title">Introduction</title>
        <para>To Do</para>
    </preface>
-      
     <xi:include href="components.xml"></xi:include> 
-<!--    <xi:include href="operations.xml"></xi:include>-->
     <xi:include href="docker.xml"></xi:include>
     <xi:include href="docker-config-appendix.xml"></xi:include>
-    <xi:include href="gensphinx-appendix.xml"></xi:include>
 </book> 

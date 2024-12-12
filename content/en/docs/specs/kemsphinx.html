@@ -1,51 +1,57 @@
----
-title: "KEM Sphinx Specification"
-linkTitle: "KEM Sphinx"
-draft: false
-slug: "/kem_sphinx/"
----
-
-<p><strong>Abstract</strong></p>
-<p>Here I present a modification of the Sphinx cryptographic packet
-format that uses a KEM instead of a NIKE whilst preserving the
-properties of bitwise unlinkability, constant packet size and route
-length hiding.</p>
-<h1 id="introduction">1. Introduction</h1>
-<p>We’ll express our KEM Sphinx header in pseudo code. The Sphinx body
-will be exactly the same as <a href="#SPHINXSPEC">SPHINXSPEC</a>. Our
-basic KEM API has three functions:</p>
-<ul>
-<li><code>PRIV_KEY, PUB_KEY = GEN_KEYPAIR(RNG)</code></li>
-<li><code>ct, ss = ENCAP(PUB_KEY)</code> - Encapsulate generates a
-shared secret, ss, for the public key and encapsulates it into a
-ciphertext.</li>
-<li><code>ss = DECAP(PRIV_KEY, ct)</code> - Decapsulate computes the
-shared key, ss, encapsulated in the ciphertext, ct, for the private
-key.</li>
-</ul>
-<p>Additional notation includes:</p>
-<ul>
-<li><code>||</code> = concatenate two binary blobs together</li>
-<li><code>PRF</code> = pseudo random function, a cryptographic hash
-function, e.g. <code>Blake2b</code>.</li>
-</ul>
-<p>Therefore we must embed these KEM ciphertexts in the KEMSphinx
-header, one KEM ciphertext per mix hop.</p>
-<h1 id="post-quantum-hybrid-kem">2. Post Quantum Hybrid KEM</h1>
-<p>Special care must be taken in order correctly compose a hybrid post
-quantum KEM that is IND-CCA2 robust.</p>
-<p>The hybrid post quantum KEMs found in Cloudflare’s circl library are
-suitable to be used with Noise or TLS but not with KEM Sphinx because
-they are not IND-CCA2 robust. Noise and TLS achieve IND-CCA2 security by
-mixing in the public keys and ciphertexts into the hash object and
-therefore do not require an IND-CCA2 KEM.</p>
-<p>Firstly, our post quantum KEM is IND-CCA2 however we must
-specifically take care to make our NIKE to KEM adapter have semantic
-security. Secondly, we must make a security preserving KEM combiner.</p>
-<h2 id="nike-to-kem-adapter">2.1 NIKE to KEM adapter</h2>
-<p>We easily achieve our IND-CCA2 security by means of hashing together
-the DH shared secret along with both of the public keys:</p>
-<pre><code>func ENCAPSULATE(their_pubkey publickey) ([]byte, []byte) {
+<html xmlns:ng="http://docbook.org/docbook-ng"><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>KEMSphinx</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article"><div class="titlepage"><div><div><h1 class="title"><a name="d5e1"></a>KEMSphinx</h1></div><div><div class="authorgroup"><div class="author"><h3 class="author"><span class="firstname">David</span> <span class="surname">Stainton</span></h3></div></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#kemsphinx_introduction">1. Introduction</a></span></dt><dt><span class="section"><a href="#post-quantum-hybrid-kem">2. Post Quantum Hybrid KEM</a></span></dt><dd><dl><dt><span class="section"><a href="#nike-to-kem-adapter">2.1 NIKE to KEM adapter</a></span></dt><dt><span class="section"><a href="#kem-combiner">2.2 KEM Combiner</a></span></dt></dl></dd><dt><span class="section"><a href="#kemsphinx-header-design">3. KEMSphinx Header Design</a></span></dt><dt><span class="section"><a href="#kemsphinx-unwrap-operation">2. KEMSphinx Unwrap Operation</a></span></dt><dd><dl><dt><span class="section"><a href="#acknowledgments">3. Acknowledgments</a></span></dt><dt><span class="section"><a href="#appendix-a.-references">Appendix A. References</a></span></dt></dl></dd></dl></div><p>
+    <span class="strong"><strong>Abstract</strong></span>
+  </p><p>
+    Here I present a modification of the Sphinx cryptographic packet
+    format that uses a KEM instead of a NIKE whilst preserving the
+    properties of bitwise unlinkability, constant packet size and route
+    length hiding.
+  </p><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="kemsphinx_introduction"></a>1. Introduction</h2></div></div></div><p>
+      We&#8217;ll express our KEM Sphinx header in pseudo code. The Sphinx
+      body will be exactly the same as
+      <a class="xref" href="#SPHINXSPEC" title="SPHINXSPEC">SPHINXSPEC</a> Our basic KEM API
+      has three functions:
+    </p><div class="itemizedlist"><ul class="itemizedlist compact" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">PRIV_KEY, PUB_KEY = GEN_KEYPAIR(RNG)</code>
+        </p></li><li class="listitem"><p>
+          <code class="literal">ct, ss = ENCAP(PUB_KEY)</code> - Encapsulate
+          generates a shared secret, ss, for the public key and
+          encapsulates it into a ciphertext.
+        </p></li><li class="listitem"><p>
+          <code class="literal">ss = DECAP(PRIV_KEY, ct)</code> - Decapsulate
+          computes the shared key, ss, encapsulated in the ciphertext,
+          ct, for the private key.
+        </p></li></ul></div><p>
+      Additional notation includes:
+    </p><div class="itemizedlist"><ul class="itemizedlist compact" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">||</code> = concatenate two binary blobs together
+        </p></li><li class="listitem"><p>
+          <code class="literal">PRF</code> = pseudo random function, a
+          cryptographic hash function, e.g.&nbsp;<code class="literal">Blake2b</code>.
+        </p></li></ul></div><p>
+      Therefore we must embed these KEM ciphertexts in the KEMSphinx
+      header, one KEM ciphertext per mix hop.
+    </p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="post-quantum-hybrid-kem"></a>2. Post Quantum Hybrid KEM</h2></div></div></div><p>
+      Special care must be taken in order correctly compose a hybrid
+      post quantum KEM that is IND-CCA2 robust.
+    </p><p>
+      The hybrid post quantum KEMs found in Cloudflare&#8217;s circl library
+      are suitable to be used with Noise or TLS but not with KEM Sphinx
+      because they are not IND-CCA2 robust. Noise and TLS achieve
+      IND-CCA2 security by mixing in the public keys and ciphertexts
+      into the hash object and therefore do not require an IND-CCA2 KEM.
+    </p><p>
+      Firstly, our post quantum KEM is IND-CCA2 however we must
+      specifically take care to make our NIKE to KEM adapter have
+      semantic security. Secondly, we must make a security preserving
+      KEM combiner.
+    </p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="nike-to-kem-adapter"></a>2.1 NIKE to KEM adapter</h3></div></div></div><p>
+        We easily achieve our IND-CCA2 security by means of hashing
+        together the DH shared secret along with both of the public
+        keys:
+      </p><pre class="programlisting">
+func ENCAPSULATE(their_pubkey publickey) ([]byte, []byte) {
     my_privkey, my_pubkey = GEN_KEYPAIR(RNG)
     ss = DH(my_privkey, their_pubkey)
     ss2 = PRF(ss || their_pubkey || my_pubkey)
@@ -56,124 +62,131 @@ func DECAPSULATE(my_privkey, their_pubkey) []byte {
     s = DH(my_privkey, their_pubkey)
     shared_key = PRF(ss || my_pubkey || their_pubkey)
     return shared_key
-}</code></pre>
-<h2 id="kem-combiner">2.2 KEM Combiner</h2>
-<p>The KEM Combiners paper <a href="#KEMCOMB">KEMCOMB</a> makes the
-observation that if a KEM combiner is not security preserving then the
-resulting hybrid KEM will not have IND-CCA2 security if one of the
-composing KEMs does not have IND-CCA2 security. Likewise the paper
-points out that when using a security preserving KEM combiner, if only
-one of the composing KEMs has IND-CCA2 security then the resulting
-hybrid KEM will have IND-CCA2 security.</p>
-<p>Our KEM combiner uses the split PRF design from the paper when
-combining two KEM shared secrets together we use a hash function to also
-mix in the values of both KEM ciphertexts. In this pseudo code example
-we are hashing together the two shared secrets from the two underlying
-KEMs, ss1 and ss2. Additionally the two ciphertexts from the underlying
-KEMs, cct1 and cct2, are also hashed together:</p>
-<pre><code>func SplitPRF(ss1, ss2, cct1, cct2 []byte) []byte {
+}
+</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="kem-combiner"></a>2.2 KEM Combiner</h3></div></div></div><p>
+        The KEM Combiners paper <a class="link" href="#KEMCOMB" title="KEMCOMB">KEMCOMB</a>
+        makes the observation that if a KEM combiner is not security
+        preserving then the resulting hybrid KEM will not have IND-CCA2
+        security if one of the composing KEMs does not have IND-CCA2
+        security. Likewise the paper points out that when using a
+        security preserving KEM combiner, if only one of the composing
+        KEMs has IND-CCA2 security then the resulting hybrid KEM will
+        have IND-CCA2 security.
+      </p><p>
+        Our KEM combiner uses the split PRF design from the paper when
+        combining two KEM shared secrets together we use a hash function
+        to also mix in the values of both KEM ciphertexts. In this
+        pseudo code example we are hashing together the two shared
+        secrets from the two underlying KEMs, ss1 and ss2. Additionally
+        the two ciphertexts from the underlying KEMs, cct1 and cct2, are
+        also hashed together:
+      </p><pre class="programlisting">
+func SplitPRF(ss1, ss2, cct1, cct2 []byte) []byte {
     cct := cct1 || cct2
     return PRF(ss1 || cct) XOR PRF(ss2 || cct)
-}</code></pre>
-<p>Which simplifies to:</p>
-<pre><code>SplitPRF := PRF(ss1 || cct2) XOR PRF(ss2 || cct1)</code></pre>
-<p>The Split PRF can be used to combine an arbitrary number of KEMs.
-Here’s what it looks like with three KEMs:</p>
-<pre><code>func SplitPRF(ss1, ss2, ss3, cct1, cct2, cct3 []byte) []byte {
+}
+</pre><p>
+        Which simplifies to:
+      </p><pre class="programlisting">
+SplitPRF := PRF(ss1 || cct2) XOR PRF(ss2 || cct1)
+</pre><p>
+        The Split PRF can be used to combine an arbitrary number of
+        KEMs. Here&#8217;s what it looks like with three KEMs:
+      </p><pre class="programlisting">
+func SplitPRF(ss1, ss2, ss3, cct1, cct2, cct3 []byte) []byte {
     cct := cct1 || cct2 || cct3
     return PRF(ss1 || cct) XOR PRF(ss2 || cct) XOR PRF(ss3 || cct)
-}</code></pre>
-<h1 id="kemsphinx-header-design">3. KEMSphinx Header Design</h1>
-<p>NIKE Sphinx header elements:</p>
-<ol type="1">
-<li>Version number (MACed but not encrypted)</li>
-<li>Group element</li>
-<li>Encrypted per routing commands</li>
-<li>MAC for this hop (authenticates header fields 1 thru 4)</li>
-</ol>
-<p>KEM Sphinx header elements:</p>
-<ol type="1">
-<li>Version number (MACed but not encrypted)</li>
-<li>One KEM ciphertext for use with the next hop</li>
-<li>Encrypted per routing commands AND KEM ciphtertexts, one for each
-additional hop</li>
-<li>MAC for this hop (authenticates header fields 1 thru 4)</li>
-</ol>
-<p>We can say that KEMSphinx differs from NIKE Sphinx by replacing the
-header’s group element (e.g. an X25519 public key) field with the KEM
-ciphertext. Subsequent KEM ciphertexts for each hop are stored inside
-the Sphinx header “routing information” section.</p>
-<p>First we must have a data type to express a mix hop, and we can use
-lists of these hops to express a route:</p>
-<pre><code>type PathHop struct {
+}
+</pre></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="kemsphinx-header-design"></a>3. KEMSphinx Header Design</h2></div></div></div><p>
+      NIKE Sphinx header elements:
+    </p><div class="orderedlist"><ol class="orderedlist compact" type="1"><li class="listitem"><p>
+          Version number (MACed but not encrypted)
+        </p></li><li class="listitem"><p>
+          Group element
+        </p></li><li class="listitem"><p>
+          Encrypted per routing commands
+        </p></li><li class="listitem"><p>
+          MAC for this hop (authenticates header fields 1 thru 4)
+        </p></li></ol></div><p>
+      KEM Sphinx header elements:
+    </p><div class="orderedlist"><ol class="orderedlist compact" type="1"><li class="listitem"><p>
+          Version number (MACed but not encrypted)
+        </p></li><li class="listitem"><p>
+          One KEM ciphertext for use with the next hop
+        </p></li><li class="listitem"><p>
+          Encrypted per routing commands AND KEM ciphtertexts, one for
+          each additional hop
+        </p></li><li class="listitem"><p>
+          MAC for this hop (authenticates header fields 1 thru 4)
+        </p></li></ol></div><p>
+      We can say that KEMSphinx differs from NIKE Sphinx by replacing
+      the header&#8217;s group element (e.g.&nbsp;an X25519 public key) field with
+      the KEM ciphertext. Subsequent KEM ciphertexts for each hop are
+      stored inside the Sphinx header <span class="quote">&#8220;<span class="quote">routing information</span>&#8221;</span>
+      section.
+    </p><p>
+      First we must have a data type to express a mix hop, and we can
+      use lists of these hops to express a route:
+    </p><pre class="programlisting">
+type PathHop struct {
     public_key kem.PublicKey
     routing_commands Commands
-}</code></pre>
-<p>Here’s how we construct a KEMSphinx packet header where path is a
-list of PathHop, and indicates the route through the network:</p>
-<ol type="1">
-<li>Derive the KEM ciphertexts for each hop.</li>
-</ol>
-<pre><code>route_keys = []
+}
+</pre><p>
+      Here&#8217;s how we construct a KEMSphinx packet header where path is a
+      list of PathHop, and indicates the route through the network:
+    </p><div class="orderedlist"><ol class="orderedlist compact" type="1"><li class="listitem"><p>
+          Derive the KEM ciphertexts for each hop.
+        </p></li></ol></div><pre class="programlisting">
+route_keys = []
 route_kems = []
 for i := 0; i &lt; num_hops; i++ {
     kem_ct, ss := ENCAP(path[i].public_key)
     route_kems += kem_ct
     route_keys += ss
-}</code></pre>
-<ol start="2" type="1">
-<li>Derive the routing_information keystream and encrypted padding for
-each hop.</li>
-</ol>
-<p>Same as in <a href="#SPHINXSPEC">SPHINXSPEC</a> except for the fact
-that each routing info slot is now increased by the size of the KEM
-ciphertext.</p>
-<ol start="3" type="1">
-<li>Create the routing_information block.</li>
-</ol>
-<p>Here we modify the Sphinx implementation to pack the next KEM
-ciphertext into each routing information block. Each of these blocks is
-decrypted for each mix mix hop which will decrypt the KEM ciphertext for
-the next hop in the route.</p>
-<ol start="4" type="1">
-<li>Assemble the completed Sphinx Packet Header and Sphinx Packet
-Payload SPRP key vector. Same as in <a href="#SPHINXSPEC">SPHINXSPEC</a>
-except the <code>kem_element</code> field is set to the first KEM
-ciphertext, <code>route_kems[0]</code>:</li>
-</ol>
-<pre><code>var sphinx_header SphinxHeader
+}
+</pre><div class="orderedlist"><ol class="orderedlist compact" type="1"><li class="listitem" value="2"><p>
+          Derive the routing_information keystream and encrypted padding
+          for each hop.
+        </p></li></ol></div><p>
+      Same as in <a class="xref" href="#SPHINXSPEC" title="SPHINXSPEC">SPHINXSPEC</a> except for
+      the fact that each routing info slot is now increased by the size
+      of the KEM ciphertext.
+    </p><div class="orderedlist"><ol class="orderedlist compact" type="1"><li class="listitem" value="3"><p>
+          Create the routing_information block.
+        </p></li></ol></div><p>
+      Here we modify the Sphinx implementation to pack the next KEM
+      ciphertext into each routing information block. Each of these
+      blocks is decrypted for each mix mix hop which will decrypt the
+      KEM ciphertext for the next hop in the route.
+    </p><div class="orderedlist"><ol class="orderedlist compact" type="1"><li class="listitem" value="4"><p>
+          Assemble the completed Sphinx Packet Header and Sphinx Packet
+          Payload SPRP key vector. Same as in
+          <a class="link" href="#SPHINXSPEC" title="SPHINXSPEC">SPHINXSPEC</a> except the
+          <code class="literal">kem_element</code> field is set to the first KEM
+          ciphertext, <code class="literal">route_kems[0]</code>:
+        </p></li></ol></div><pre class="programlisting">
+var sphinx_header SphinxHeader
 sphinx_header.additional_data = version
 sphinx_header.kem_element = route_kems[0]
 sphinx_header.routing_info = routing_info
-sphinx_header.mac = mac</code></pre>
-<h1 id="kemsphinx-unwrap-operation">2. KEMSphinx Unwrap Operation</h1>
-<p>Most of the design here will be exactly the same as in <a
-href="#SPHINXSPEC">SPHINXSPEC</a>. However there are a few notable
-differences:</p>
-<ol type="1">
-<li>The shared secret is derived from the KEM ciphertext instead of a
-DH.</li>
-<li>Next hop’s KEM ciphertext stored in the encrypted routing
-information.</li>
-</ol>
-<h2 id="acknowledgments">3. Acknowledgments</h2>
-<p>I would like to thank Peter Schwabe for the original idea of simply
-replacing the Sphinx NIKE with a KEM and for answering all my questions.
-I’d also like to thank Bas Westerbaan for answering questions.</p>
-<h2 id="appendix-a.-references">Appendix A. References</h2>
-<p><strong>KEMCOMB</strong></p>
-<pre><code>Federico Giacon, Felix Heuer, Bertram Poettering,
-&quot;KEM Combiners&quot;,
-2018
-https://link.springer.com/chapter/10.1007/978-3-319-76578-5_7&gt;PKC</code></pre>
-<p><strong>SPHINX09</strong></p>
-<pre><code>Danezis, G., Goldberg, I.,
-&quot;Sphinx: A Compact and Provably Secure Mix Format\&quot;,
-DOI 10.1109/SP.2009.15,
-May 2009,
-https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</code></pre>
-<p><strong>SPHINXSPEC</strong></p>
-<pre><code>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D.,
-&quot;Sphinx Mix Network Cryptographic Packet Format Specification&quot;
-July 2017,
-https://github.com/katzenpost/katzenpost/blob/master/docs/specs/sphinx.md</code></pre>
+sphinx_header.mac = mac
+</pre></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="kemsphinx-unwrap-operation"></a>2. KEMSphinx Unwrap Operation</h2></div></div></div><p>
+      Most of the design here will be exactly the same as in
+      <a class="link" href="#SPHINXSPEC" title="SPHINXSPEC">SPHINXSPEC</a>. However there are a
+      few notable differences:
+    </p><div class="orderedlist"><ol class="orderedlist compact" type="1"><li class="listitem"><p>
+          The shared secret is derived from the KEM ciphertext instead
+          of a DH.
+        </p></li><li class="listitem"><p>
+          Next hop&#8217;s KEM ciphertext stored in the encrypted routing
+          information.
+        </p></li></ol></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="acknowledgments"></a>3. Acknowledgments</h3></div></div></div><p>
+        I would like to thank Peter Schwabe for the original idea of
+        simply replacing the Sphinx NIKE with a KEM and for answering
+        all my questions. I&#8217;d also like to thank Bas Westerbaan for
+        answering questions.
+      </p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="appendix-a.-references"></a>Appendix A. References</h3></div></div></div><p><a name="KEMCOMB"></a><b>KEMCOMB.&nbsp;</b>Federico Giacon, Felix Heuer, Bertram Poettering, "KEM Combiners", 2018.
+            <a class="link" href="https://link.springer.com/chapter/10.1007/978-3-319-76578-5_7" target="_top">https://link.springer.com/chapter/10.1007/978-3-319-76578-5_7</a></p><p><a name="SPHINX09"></a><b>SPHINX09.&nbsp;</b>Danezis, G., Goldberg, I., "Sphinx: A Compact and Provably Secure Mix
+          Format\", DOI 10.1109/SP.2009.15, May 2009. <a class="link" href="https://cypherpunks.ca/%7Eiang/pubs/Sphinx_Oakland09.pdf" target="_top">https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</a></p><p><a name="SPHINXSPEC"></a><b>SPHINXSPEC.&nbsp;</b>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., "Sphinx Mix
+          Network Cryptographic Packet Format Specification" July 2017. <a class="link" href="https://katzenpost.network/docs/specs/sphinx/" target="_top">https://katzenpost.network/docs/specs/sphinx/</a></p></div></div></div></body></html>

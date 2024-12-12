@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 
-<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
 [
    <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
@@ -28,7 +28,7 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
 ]> 
 
-<article id="container">
+<section id="container">
     <title id="container.title">Using the &program_name; Docker test network</title>    
     
     <para>&program_name; provides a ready-to-deploy Docker
@@ -458,9 +458,14 @@
         <figure>
             <title>Test network topology</title>
             <mediaobject>
+                <!--local path-->
                 <imageobject>
-                    <imagedata fileref="pix/katzenpost-docker.png" scale="75"/>
+                    <imagedata fileref="pix/katzenpost-docker.png" scale="100"/>
                 </imageobject>
+                <!--target path-->
+                 <imageobject>
+                    <imagedata fileref="../pix/katzenpost-docker.png" scale="100"/>
+                </imageobject>               
             </mediaobject>
         </figure>
         <para>On the left, the <emphasis role="bold">Client</emphasis> transmits a message (shown by
@@ -688,4 +693,4 @@
     </section>
     
     
-</article>
+</section>
