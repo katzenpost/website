@@ -56,9 +56,14 @@
             <title>The pictured element types correspond to discrete client and server programs that
                 &program_name; requires to function. </title>
             <mediaobject>
+                <!--local path-->                              
                 <imageobject>
-                    <imagedata fileref="pix/components-production.png" scale="75"/>
+                    <imagedata fileref="pix/components-production.png" scale="100"/>
                 </imageobject>
+                <!--target path-->
+                <imageobject>
+                    <imagedata fileref="../pix/components-production.png" scale="100"/>
+                </imageobject>                
             </mediaobject>
         </figure>
         <para>The mix network contains an <emphasis>n</emphasis>-layer topology of mix-nodes, with

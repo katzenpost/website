@@ -5,7 +5,7 @@ weight: 20
 ---
 <html xmlns:ng="http://docbook.org/docbook-ng"><head>
       <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-   <title>Using the Katzenpost Docker test network</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article"><div class="titlepage"><div><div><h2 class="title"><a name="container"></a>Using the Katzenpost Docker test network</h2></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#install_kp">Preparing to run the container image</a></span></dt><dt><span class="section"><a href="#basic-ops">Operating the test mixnet</a></span></dt><dd><dl><dt><span class="section"><a href="#start-mixnet">Starting and monitoring the mixnet</a></span></dt><dt><span class="section"><a href="#test-mixnet">Testing the mixnet</a></span></dt><dt><span class="section"><a href="#shutdown-mixnet">Shutting down the mixnet</a></span></dt><dt><span class="section"><a href="#uninstall-mixnet">Uninstalling and cleaning up</a></span></dt></dl></dd><dt><span class="section"><a href="#topology">Network topology and components</a></span></dt><dd><dl><dt><span class="section"><a href="#d6e396">The Docker file tree</a></span></dt></dl></dd><dt><span class="section"><a href="#d6e402"></a></span></dt></dl></div>
+   <title>Using the Katzenpost Docker test network</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article"><div class="titlepage"><div><div><h2 class="title"><a name="container"></a>Using the Katzenpost Docker test network</h2></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#install_kp">Preparing to run the container image</a></span></dt><dt><span class="section"><a href="#basic-ops">Operating the test mixnet</a></span></dt><dd><dl><dt><span class="section"><a href="#start-mixnet">Starting and monitoring the mixnet</a></span></dt><dt><span class="section"><a href="#test-mixnet">Testing the mixnet</a></span></dt><dt><span class="section"><a href="#shutdown-mixnet">Shutting down the mixnet</a></span></dt><dt><span class="section"><a href="#uninstall-mixnet">Uninstalling and cleaning up</a></span></dt></dl></dd><dt><span class="section"><a href="#topology">Network topology and components</a></span></dt><dd><dl><dt><span class="section"><a href="#d6e398">The Docker file tree</a></span></dt></dl></dd><dt><span class="section"><a href="#d6e404"></a></span></dt></dl></div>
         
     
     <p>Katzenpost provides a ready-to-deploy Docker
@@ -346,7 +346,7 @@ weight: 20
             gray blocks represent nodes, and the arrows represent information transfer. </p>
         <div class="figure"><a name="d6e300"></a><p class="title"><b>Figure&nbsp;1.&nbsp;Test network topology</b></p><div class="figure-contents">
             
-            <div class="mediaobject"><img src="../../pix/katzenpost-docker.png" width="405" alt="Test network topology"></div>
+            <div class="mediaobject"><img src="../pix/katzenpost-docker.png" alt="Test network topology"></div>
         </div></div><br class="figure-break">
         <p>On the left, the <span class="bold"><strong>Client</strong></span> transmits a message (shown by
             purple arrows) through the <span class="bold"><strong>Gateway node</strong></span>, across three
@@ -363,7 +363,7 @@ weight: 20
             the following table. Note that all nodes share the same IP address (127.0.0.1, i.e.,
             localhost), but are accessed through different ports. Each node type links to additional
             information in <a class="xref" href="#">???</a>.</p>
-        <div class="table"><a name="d6e322"></a><p class="title"><b>Table&nbsp;2.&nbsp;Table 2: Test mixnet hosts</b></p><div class="table-contents">
+        <div class="table"><a name="d6e324"></a><p class="title"><b>Table&nbsp;2.&nbsp;Table 2: Test mixnet hosts</b></p><div class="table-contents">
             
             <table class="table" summary="Table 2: Test mixnet hosts" border="1"><colgroup><col class="c1"><col class="c2"><col class="newCol3"><col class="c3"><col class="c4"></colgroup><thead><tr><th>Node type</th><th>Docker ID</th><th>Diagram label</th><th>IP address</th><th>TCP port</th></tr></thead><tbody><tr><td rowspan="3">
                             <p><a class="link" href="#">Directory authority</a></p>
@@ -401,7 +401,7 @@ weight: 20
                             <p>30012</p>
                         </td></tr></tbody></table>
         </div></div><br class="table-break">
-        <div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="d6e396"></a>The Docker file tree</h3></div></div></div>
+        <div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="d6e398"></a>The Docker file tree</h3></div></div></div>
             
             <p>The following <a class="ulink" href="https://manpages.debian.org/bookworm/tree/tree.1.en.html" target="_top">tree</a>
                 output shows the location, relative to the <code class="filename">katzenpost</code>

@@ -458,9 +458,14 @@
         <figure>
             <title>Test network topology</title>
             <mediaobject>
+                <!--local path-->
                 <imageobject>
-                    <imagedata fileref="pix/katzenpost-docker.png" scale="75"/>
+                    <imagedata fileref="pix/katzenpost-docker.png" scale="100"/>
                 </imageobject>
+                <!--target path-->
+                 <imageobject>
+                    <imagedata fileref="../pix/katzenpost-docker.png" scale="100"/>
+                </imageobject>               
             </mediaobject>
         </figure>
         <para>On the left, the <emphasis role="bold">Client</emphasis> transmits a message (shown by

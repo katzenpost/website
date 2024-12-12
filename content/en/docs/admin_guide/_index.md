@@ -1,5 +1,5 @@
 ---
-title: Katzenpost administration guide
+title: Administration guide
 weight: 6
 ---
 
