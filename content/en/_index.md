@@ -33,7 +33,7 @@ Comprehensive documentation on running Katzenpost servers, including a guide for
 
 {{% blocks/feature icon="fa-shield-alt" title="Threat Model" %}}
 Check out our threat model document—it lays out the security assumptions and attack scenarios we consider while designing and improving the mixnet.
-Available as [HTML](/pages/threat_model) or [PDF](/research/Threat_Model_Doc.pdf).
+Available as [HTML](/docs/threat_model) or [PDF](/research/Threat_Model_Doc.pdf).
 {{% /blocks/feature %}}
 
 {{% blocks/feature icon="fa-book" title="Literature Review" url="/research/Literature_overview__website_version.pdf" %}}
