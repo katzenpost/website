@@ -1,46 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
-   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
-[
-   <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title  ?>
+<?linkTitle "Components and configuration" ?>  <!-- Section menu link text -->
+<?url "docs/admin_guide/components.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 25 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
     %shared-content;
-<!--    <!ELEMENT xi:include (xi:fallback?) > 
-    <!ATTLIST xi:include 
-        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
-    href CDATA #REQUIRED 
-    parse (xml|text) "xml" 
-    xpointer CDATA #IMPLIED 
-    encoding CDATA #IMPLIED 
-    accept CDATA #IMPLIED 
-    accept-charset CDATA #IMPLIED 
-    accept-language CDATA #IMPLIED > 
-    <!ELEMENT xi:fallback ANY > 
-    <!ATTLIST xi:fallback 
-        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
-    <!ENTITY % local.preface.class "| xi:include"> 
-    <!ENTITY % local.part.class "| xi:include"> 
-    <!ENTITY % local.chapter.class "| xi:include"> 
-    <!ENTITY % local.divcomponent.mix "| xi:include"> 
-    <!ENTITY % local.para.char.mix "| xi:include"> 
-    <!ENTITY % local.info.class "| xi:include"> 
-    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >-->
-]> 
+]>
+
+<article xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" xml:id="components">
+    <info>
+        <title xml:id="components.title">Components and configuration of the &program_name; mixnet</title>
+    </info>
     
-<section id="components">
-    <title id="components.title">Components and configuration of the &program_name; mixnet</title>
     <para>This section of the &program_name; technical documentation provides an introduction to the
         software components that make up &program_name; and guidance on how to configure each
         component.  The intended reader is a system administrator who wants to implement a working,
         production &program_name; network. </para>
-    <para>For information about the theory and design of this software, see <xref
-            linkend="introduction" endterm="introduction.title"/>. For a quickly deployable,
-        non-production test network (primarily for use by developers), see <xref linkend="container"
-            endterm="configuration.title"/>.</para>    
-    <section id="overview">
-        <title id="overview.title">Understanding the &program_name; components</title>
-        <para>The core of &program_name; consists of two program executables, <link
-                linkend="voter-usage">dirauth</link> and <link linkend="server-usage">server</link>.
+    <para>For information about the theory and design of this software, see <link xlink:href="&baseURL;docs/admin_guide/introduction.html"
+        >Introducing &program_name;, a modern mixnet</link><!--<xref
+            linkend="introduction" endterm="introduction.title"/>-->. For a quickly deployable,
+        non-production test network (primarily for use by developers), <link xlink:href="&baseURL;docs/admin_guide/docker.html"
+        >Using the &program_name; Docker test network</link><!--<xref linkend="container" endterm="container.title"/>-->.</para>    
+ 
+    <section xml:id="overview"><info><title xml:id="overview.title">Understanding the &program_name; components</title></info>
+        
+        <para>The core of &program_name; consists of two program executables, <link linkend="voter-usage">dirauth</link> and <link linkend="server-usage">server</link>.
             Running the <command>dirauth </command>commmand runs a <emphasis>directory
                 authority</emphasis> node, or <emphasis>dirauth</emphasis>, that functions as part
             of the mixnet's public-key infrastructure (PKI). Running the <command>server</command>
@@ -52,19 +49,15 @@
             client applications hosted externally to the mix network and communicating with it
             through gateway nodes. </para>
         <para>A model mix network is shown in Figure 1.</para>
-        <figure>
-            <title>The pictured element types correspond to discrete client and server programs that
-                &program_name; requires to function. </title>
-            <mediaobject>
-                <!--local path-->                              
+        <figure><info><title>The pictured element types correspond to discrete client and server programs that
+            &program_name; requires to function. </title></info>
+            
+            <mediaobject>                                           
                 <imageobject>
                     <imagedata fileref="pix/components-production.png"/>
                 </imageobject>
-                <!--target path-->
-                <imageobject>
-                    <imagedata fileref="../pix/components-production.png"/>
-                </imageobject>                
             </mediaobject>
+            
         </figure>
         <para>The mix network contains an <emphasis>n</emphasis>-layer topology of mix-nodes, with
             three nodes per layer in this example. Sphinx packets traverse the network in one
@@ -80,8 +73,8 @@
         <para>In addition to the server components, &program_name; supports connections to client
             applications hosted externally to the mix network and communicating with it through
             gateway nodes and, in some cases, a client connector.</para>
-        <section id="intro-dirauth">
-            <title id="intro-dirauth.title">Directory authorities (dirauths)</title>
+        <section xml:id="intro-dirauth"><info><title xml:id="intro-dirauth.title">Directory authorities (dirauths)</title></info>
+            
             <para>Dirauths compose the decentralized public key infrastructure (PKI) that serves as
                 the root of security for the entire mix network. Clients, mix nodes, gateways nodes,
                 and service nodes rely on the PKI/dirauth system to maintain and sign an up-to-date
@@ -100,15 +93,15 @@
                 parameters: "sphincs-shake-256f"), which is designated in &program_name;
                 configurations as "Ed25519 Sphincs+". Examples are provided below.</para>
         </section>
-        <section id="intro-mix">
-            <title id="intro-mix.title">Mix nodes</title>
+        <section xml:id="intro-mix"><info><title xml:id="intro-mix.title">Mix nodes</title></info>
+            
             <para>The mix node is the fundamental building block of the mix network. </para>
             <para>&program_name; mix nodes are arranged in a layered topology to achieve the best
                 levels of anonymity and ease of analysis while being flexible enough to scale with
                 traffic demands. </para>
         </section>
-        <section id="intro-gateway">
-            <title id="intro-gateway.title">Gateway nodes</title>
+        <section xml:id="intro-gateway"><info><title xml:id="intro-gateway.title">Gateway nodes</title></info>
+            
             <para>Gateway nodes provide external client access to the mix network. Because gateways
                 are uniquely positioned to identify clients, they are designed to have as little
                 information about client behavior as possible. Gateways are randomly selected and
@@ -116,8 +109,8 @@
                 packets are decoys or not. When client traffic through a gateway is slow, the node
                 additionally generates decoy traffic. </para>
         </section>
-        <section id="intro-service">
-            <title id="intro-service.title">Service nodes</title>
+        <section xml:id="intro-service"><info><title xml:id="intro-service.title">Service nodes</title></info>
+            
             <para><?oxy_comment_start author="dwrob" timestamp="20241114T125846-0800" comment="Division of service nodes into replicas and couriers is not addressed here."?>Service
                 nodes <?oxy_comment_end?>provide functionality requested by clients. They are
                 logically positioned at the deepest point of the mix network, with incoming queries
@@ -126,9 +119,8 @@
                 information outside of the mixnet, interfacing with a blockchain node, and so on.
                 Service nodes also process decoy packets. </para>
         </section>
-        <section id="intro-client">
-            <title id="intro-client.title"
-                ><?oxy_comment_start author="dwrob" timestamp="20241114T164534-0800" comment="This will be removed or reworked when we have a client user guide."?>Clients<?oxy_comment_end?></title>
+        <section xml:id="intro-client"><info><title xml:id="intro-client.title"><?oxy_comment_start author="dwrob" timestamp="20241114T164534-0800" comment="This will be removed or reworked when we have a client user guide."?>Clients<?oxy_comment_end?></title></info>
+            
             <para>Client applications should be designed so that the following conditions are
                 met:</para>
             <itemizedlist>
@@ -157,9 +149,9 @@
                 require a connection through the client <emphasis>connector</emphasis>, which
                 provides multiplexing and privilege separation with a consequent reduction in
                 processing overhead. These clients also implement the Pigeonhole storage and BACAP
-                protocols detailed in <emphasis role="bold">&research_paper_link;</emphasis>. </para>
-            <para>The following client applications are available.<table frame="all">
-                    <title>&program_name; clients</title>
+                protocols detailed in <emphasis role="bold">Place-holder for research paper link</emphasis>. </para>
+            <para>The following client applications are available.<table frame="all"><info><title>&program_name; clients</title></info>
+                    
                     <tgroup cols="4">
                         <colspec colname="c1" colnum="1" colwidth="1*"/>
                         <colspec colname="newCol2" colnum="2" colwidth="1*"/>
@@ -194,9 +186,7 @@
                                         for network testing.</para>
                                 </entry>
                                 <entry>
-                                    <para>GitHub: <ulink
-                                            url="https://github.com/katzenpost/katzenpost/tree/main/ping"
-                                            >ping</ulink></para>
+                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/katzenpost/katzenpost/tree/main/ping">ping</link></para>
                                 </entry>
                             </row>
                             <row>
@@ -210,8 +200,7 @@
                                     <para>A text chat client with file-transfer support.</para>
                                 </entry>
                                 <entry>
-                                    <para>GitHub: <ulink url="https://github.com/katzenpost/katzen"
-                                            >katzen</ulink></para>
+                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/katzenpost/katzen">katzen</link></para>
                                 </entry>
                             </row>
                             <row>
@@ -226,8 +215,7 @@
                                         network.</para>
                                 </entry>
                                 <entry>
-                                    <para>GitHub: <ulink url="https://github.com/katzenpost/status"
-                                            >status</ulink></para>
+                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/katzenpost/status">status</link></para>
                                 </entry>
                             </row>
                             <row>
@@ -240,9 +228,7 @@
                                         of mix network nodes. </para>
                                 </entry>
                                 <entry>
-                                    <para>GitHub: <ulink
-                                            url="https://github.com/katzenpost/worldmap"
-                                            >worldmap</ulink></para>
+                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/katzenpost/worldmap">worldmap</link></para>
                                 </entry>
                             </row>
                         </tbody>
@@ -250,24 +236,23 @@
                 </table></para>
         </section>
     </section>
-    <section id="configuration">
-        <title id="configuration.title">Configuring &program_name;</title>
+    <section xml:id="configuration"><info><title xml:id="configuration.title">Configuring &program_name;</title></info>
+        
  
         
         <para>This section documents the configuration parameters for each type of &program_name;
-            server node. Each node has its own configuration file in <ulink
-                url="https://toml.io/en/v1.0.0">TOML</ulink> format. </para>
+            server node. Each node has its own configuration file in <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://toml.io/en/v1.0.0">TOML</link> format. </para>
 
-        <section id="auth-config">
-            <title id="auth-config.title">Configuring directory authorities</title>
+        <section xml:id="auth-config"><info><title xml:id="auth-config.title">Configuring directory authorities</title></info>
+            
             <para>The following configuration is drawn from the reference implementation in
                     <filename>katzenpost/docker/dirauth_mixnet/auth1/authority.toml</filename>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
-                more information about the test mixnet, see <emphasis role="bold"><xref
-                        endterm="container.title" linkend="container"/></emphasis>.</para>
-            <table frame="all">
-                <title><emphasis role="bold">Directory authority (dirauth) configuration
-                        sections</emphasis></title>
+                more information about the test mixnet, see <emphasis role="bold"><link xlink:href="&baseURL;docs/admin_guide/docker.html"
+                        >Using the &program_name; Docker test network</link><!--<xref linkend="container" endterm="container.title"/>--></emphasis>.</para>
+            <table frame="all"><info><title><emphasis role="bold">Directory authority (dirauth) configuration
+                        sections</emphasis></title></info>
+                
                 <tgroup cols="1">
                     <colspec colname="c1" colnum="1" colwidth="1*"/>
                     <tbody>
@@ -334,8 +319,8 @@
     https://toml.io/en/v1.0.0
     \-->
 
-            <section id="auth-server-section-config">
-                <title id="auth-server-section-config.title">Dirauth: Server section</title>
+            <section xml:id="auth-server-section-config"><info><title xml:id="auth-server-section-config.title">Dirauth: Server section</title></info>
+                
                 <para>The <code>Server</code> section configures mandatory basic parameters for each
                     directory authority.</para>
                 <programlisting>[Server]
@@ -353,7 +338,55 @@
                         <para>Type: string</para>
                         <para>Required: Yes</para>
                     </listitem>
-                    &WireKEMScheme;
+                                    
+                    <!-- WireKEMScheme ... the link layer -->
+                    <!-- This is the API term just for the dirauths. This is a flaw. -->
+                    
+                    <listitem>
+                        <para><emphasis role="bold">WireKEMScheme</emphasis></para>
+                        <para>Specifies the key encapsulation mechanism (KEM) scheme
+                            for the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://eprint.iacr.org/2022/539">PQ
+                            Noise</link>-based wire protocol (link layer) that nodes use
+                            to communicate with each other. PQ Noise is a post-quantum variation of
+                            the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://noiseprotocol.org/">Noise protocol
+                            framework</link>, which algebraically transforms ECDH handshake
+                            patterns into KEM encapsulate/decapsulate operations.</para>
+                            
+                        <para>This configuration option supports the optional use of
+                            hybrid post-quantum cryptography to strengthen security. The following KEM
+                            schemes are supported:</para>                           
+                        <itemizedlist>
+                            <listitem>
+                                <para><emphasis role="bold">Classical:</emphasis> "x25519", "x448"</para>
+                                <note>
+                                    <para>X25519 and X448 are actually non-interactive key-exchanges
+                                        (NIKEs), not KEMs. &program_name; uses
+                                        a hashed ElGamal cryptographic construction
+                                        to convert them from NIKEs to KEMs.</para>
+                                </note>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">Post-quantum:</emphasis>
+                                    "mlkem768","sntrup4591761", "frodo640shake", "mceliece348864", 
+                                    "mceliece348864f", "mceliece460896", "mceliece460896f", "mceliece6688128",
+                                    "mceliece6688128f", "mceliece6960119", "mceliece6960119f",
+                                    "mceliece8192128", "mceliece8192128f", "CTIDH511", "CTIDH512", "CTIDH1024",
+                                    "CTIDH2048",</para>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">Hybrid post-quantum:</emphasis>
+                                    "xwing", "Kyber768-X25519",
+                                    "MLKEM768-X25519", "MLKEM768-X448", "FrodoKEM-640-SHAKE-X448",
+                                    "sntrup4591761-X448", "mceliece348864-X25519", "mceliece348864f-X25519",
+                                    "mceliece460896-X25519", "mceliece460896f-X25519", "mceliece6688128-X25519",
+                                    "mceliece6688128f-X25519", "mceliece6960119-X25519", "mceliece6960119f-X25519",
+                                    "mceliece8192128-X25519", "mceliece8192128f-X25519",
+                                     "CTIDH512-X25519", "CTIDH512-X25519"</para>
+                            </listitem>
+                        </itemizedlist>					
+                        <para>Type: string</para>
+                        <para>Required: Yes</para>                    
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
                         <para>Specifies the cryptographic signature scheme which will be used by all
@@ -388,11 +421,11 @@
                 </itemizedlist>
                 <para/>
             </section>
-            <section id="auth-authorities-section-config">
-                <title id="auth-authorities-section-config.title">Dirauth: <code>Authorities</code>
-                    section</title>
+            <section xml:id="auth-authorities-section-config"><info><title xml:id="auth-authorities-section-config.title">Dirauth: <code>Authorities</code>
+                    section</title></info>
+                
                 <para>An <code>Authorities</code> section is configured for each peer authority. We
-                    recommend using <ulink url="https://quickref.me/toml.html">TOML's style</ulink>
+                    recommend using <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://quickref.me/toml.html">TOML's style</link>
                     for multi-line quotations for key materials.</para>
                 <programlisting>[[Authorities]]
     Identifier = "auth1"
@@ -449,7 +482,55 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                         <para>Type: string</para>
                         <para>Required: Yes</para>
                     </listitem>
-                    &WireKEMScheme;
+                                    
+                    <!-- WireKEMScheme ... the link layer -->
+                    <!-- This is the API term just for the dirauths. This is a flaw. -->
+                    
+                    <listitem>
+                        <para><emphasis role="bold">WireKEMScheme</emphasis></para>
+                        <para>Specifies the key encapsulation mechanism (KEM) scheme
+                            for the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://eprint.iacr.org/2022/539">PQ
+                            Noise</link>-based wire protocol (link layer) that nodes use
+                            to communicate with each other. PQ Noise is a post-quantum variation of
+                            the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://noiseprotocol.org/">Noise protocol
+                            framework</link>, which algebraically transforms ECDH handshake
+                            patterns into KEM encapsulate/decapsulate operations.</para>
+                            
+                        <para>This configuration option supports the optional use of
+                            hybrid post-quantum cryptography to strengthen security. The following KEM
+                            schemes are supported:</para>                           
+                        <itemizedlist>
+                            <listitem>
+                                <para><emphasis role="bold">Classical:</emphasis> "x25519", "x448"</para>
+                                <note>
+                                    <para>X25519 and X448 are actually non-interactive key-exchanges
+                                        (NIKEs), not KEMs. &program_name; uses
+                                        a hashed ElGamal cryptographic construction
+                                        to convert them from NIKEs to KEMs.</para>
+                                </note>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">Post-quantum:</emphasis>
+                                    "mlkem768","sntrup4591761", "frodo640shake", "mceliece348864", 
+                                    "mceliece348864f", "mceliece460896", "mceliece460896f", "mceliece6688128",
+                                    "mceliece6688128f", "mceliece6960119", "mceliece6960119f",
+                                    "mceliece8192128", "mceliece8192128f", "CTIDH511", "CTIDH512", "CTIDH1024",
+                                    "CTIDH2048",</para>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">Hybrid post-quantum:</emphasis>
+                                    "xwing", "Kyber768-X25519",
+                                    "MLKEM768-X25519", "MLKEM768-X448", "FrodoKEM-640-SHAKE-X448",
+                                    "sntrup4591761-X448", "mceliece348864-X25519", "mceliece348864f-X25519",
+                                    "mceliece460896-X25519", "mceliece460896f-X25519", "mceliece6688128-X25519",
+                                    "mceliece6688128f-X25519", "mceliece6960119-X25519", "mceliece6960119f-X25519",
+                                    "mceliece8192128-X25519", "mceliece8192128f-X25519",
+                                     "CTIDH512-X25519", "CTIDH512-X25519"</para>
+                            </listitem>
+                        </itemizedlist>					
+                        <para>Type: string</para>
+                        <para>Required: Yes</para>                    
+                    </listitem>
                     <listitem>
                         <para><emphasis role="bold">Addresses</emphasis></para>
                         <para>Specifies a list of one or more address URLs in a format that contains
@@ -462,15 +543,50 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </listitem>
                 </itemizedlist>
             </section>
-            <section id="auth-logging">
-                <title id="auth-logging.title">Dirauth: Logging section</title>
+            <section xml:id="auth-logging"><info><title xml:id="auth-logging.title">Dirauth: Logging section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: logging (/1/3)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+        <informalexample> 
+            <para>The <code>Logging</code> configuration section controls logging behavior across &program_name;.</para>
+            <programlisting>[Logging]
+                Disable = false
+                File = "katzenpost.log"
+                Level = "INFO"</programlisting>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">Disable</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, logging is disabled.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">File</emphasis></para>
+                    <para>Specifies the log file. If omitted, <code>stdout</code> is used.</para>
+                    <para>An absolute or relative file path can be specified. A relative path is 
+                    relative to the DataDir specified in the <code>Server</code> section of the 
+                    configuration.</para>
+                    <para>Type: string</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">Level</emphasis></para>
+                    <para>Supported logging level values are ERROR | WARNING | NOTICE |INFO | DEBUG.</para>
+                    <para>Type: string</para>
+                    <para>Required: No</para>
+                    <warning>
+                        <para>The DEBUG log level is unsafe for
+                            production use.</para>
+                    </warning>                               
+                </listitem>
+            </itemizedlist>   
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="auth-parameters">
-                <title id="auth-parameters.title">Dirauth: Parameters section</title>
+            <section xml:id="auth-parameters"><info><title xml:id="auth-parameters.title">Dirauth: Parameters section</title></info>
+                
                 <para>The <code>Parameters</code> section contains the network parameters.</para>
                 <programlisting>[Parameters]
     SendRatePerMinute = 0
@@ -587,8 +703,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </listitem>
                 </itemizedlist>
             </section>
-            <section id="auth-debug">
-                <title id="auth-debug.title">Dirauth: Debug section</title>
+            <section xml:id="auth-debug"><info><title xml:id="auth-debug.title">Dirauth: Debug section</title></info>
+                
                 <programlisting>[Debug]
     Layers = 3
     MinNodesPerLayer = 1
@@ -617,9 +733,9 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </listitem>
                 </itemizedlist>
             </section>
-            <section id="auth-mixes-section-config">
-                <title id="auth-mixes-section-config.title">Dirauth: Mixes
-                    sections</title>
+            <section xml:id="auth-mixes-section-config"><info><title xml:id="auth-mixes-section-config.title">Dirauth: Mixes
+                    sections</title></info>
+                
                 <para>The <code>Mixes</code> configuration sections list mix nodes that are known to
                     the authority.</para>
                 <programlisting>[[Mixes]]
@@ -651,9 +767,9 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </listitem>
                 </itemizedlist>
             </section>
-            <section id="auth-gatewaynodes-section-config">
-                <title id="auth-gatewaynodes-section-config.title">Dirauth:
-                        GatewayNodes section</title>
+            <section xml:id="auth-gatewaynodes-section-config"><info><title xml:id="auth-gatewaynodes-section-config.title">Dirauth:
+                        GatewayNodes section</title></info>
+                
                 <para>The <code>GatewayNodes</code> sections list gateway nodes that are known to
                     the authority.</para>
                 <programlisting>[[GatewayNodes]]
@@ -677,9 +793,9 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </listitem>
                 </itemizedlist>
             </section>
-            <section id="auth-servicenodes-section-config">
-                <title id="auth-servicenodes-section-config.title">Dirauth:
-                        ServiceNodes sections</title>
+            <section xml:id="auth-servicenodes-section-config"><info><title xml:id="auth-servicenodes-section-config.title">Dirauth:
+                        ServiceNodes sections</title></info>
+                
                 <para>The <code>ServiceNodes</code> sections list service nodes that are known to
                     the authority.</para>
                 <programlisting>[[ServiceNodes]]
@@ -703,8 +819,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </listitem>
                 </itemizedlist>
             </section>
-            <section id="auth-topology">
-                <title id="auth-topology.title">Dirauth: Topology section</title>
+            <section xml:id="auth-topology"><info><title xml:id="auth-topology.title">Dirauth: Topology section</title></info>
+                
                 <para>The <code>Topology</code> section defines the layers of the mix network and
                     the mix nodes in each layer.</para>
                 <programlisting>[Topology]
@@ -743,13 +859,11 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </listitem>
                 </itemizedlist>
             </section>
-            <section id="auth-sphinx-config">
-                <title id="auth-sphinx-config.title">Dirauth: SphinxGeometry
-                    section</title>
+            <section xml:id="auth-sphinx-config"><info><title xml:id="auth-sphinx-config.title">Dirauth: SphinxGeometry
+                    section</title></info>
+                
                 <para>Sphinx is an encrypted nested-packet format designed primarily for mixnets.
-                    The <ulink
-                        url="https://www.freehaven.net/anonbib/cache/DBLP:conf/sp/DanezisG09.pdf"
-                        >original Sphinx paper</ulink> described a non-interactive key exchange
+                    The <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://www.freehaven.net/anonbib/cache/DBLP:conf/sp/DanezisG09.pdf">original Sphinx paper</link> described a non-interactive key exchange
                     (NIKE) employing classical encryption. The &program_name; implementation
                     strongly emphasizes configurability, supporting key encapsulation mechanisms
                     (KEMs) as well as NIKEs, and enabling the use of either classical or hybrid
@@ -757,8 +871,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     post-quantum algorithms by offering heavily tested classical algorithms as a
                     fallback.</para>
                 <note>
-                    <para>Sphinx, the nested-packet format, should not be confused with <ulink
-                            url="http://sphincs.org/index.html">Sphincs or Sphincs+</ulink>, which
+                    <para>Sphinx, the nested-packet format, should not be confused with <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://sphincs.org/index.html">Sphincs or Sphincs+</link>, which
                         are post-quantum signature schemes.</para>
                 </note>
                 <para>&program_name; Sphinx also relies on the following classical cryptographic
@@ -783,20 +896,160 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     PKI document for validation by its peer dirauths. </para>
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+        <informalexample>        
+            <para>The <code>SphinxGeometry</code> section defines parameters for the Sphinx
+                encrypted nested-packet format used internally by &program_name;. 
+                <warning><para>The values in the <code>SphinxGeometry</code> configuration section must
+                        be programmatically generated by <command>gensphinx</command>. Many of the
+                        parameters are interdependent and cannot be individually modified. Do not
+                        modify the these values by hand.</para></warning></para>
+            <para>The settings in this section are generated by the <command>gensphinx</command>
+                utility, which computes the Sphinx geometry based on the following user-supplied
+                directives:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>The number of  mix node layers (not counting gateway and service
+                        nodes)</para>
+                </listitem>
+                <listitem>
+                    <para>The length of the application-usable packet payload</para>
+                </listitem>
+                <listitem>
+                    <para>The selected NIKE or KEM scheme</para>
+                </listitem>
+            </itemizedlist>
+            <para>The output in TOML should then be pasted unchanged into the node's configuration
+                file, as shown below. For more information, see <link xlink:href="&baseURL;docs/admin_guide/gensphinx.html"
+                    >Appendix: Using <emphasis>gensphinx</emphasis></link><!--<xref linkend="gensphinx"/>-->.</para>
+            <programlisting>[SphinxGeometry]
+                PacketLength = 3082
+                NrHops = 5
+                HeaderLength = 476
+                RoutingInfoLength = 410
+                PerHopRoutingInfoLength = 82
+                SURBLength = 572
+                SphinxPlaintextHeaderLength = 2
+                PayloadTagLength = 32
+                ForwardPayloadLength = 2574
+                UserForwardPayloadLength = 2000
+                NextNodeHopLength = 65
+                SPRPKeyMaterialLength = 64
+                NIKEName = "x25519"
+                KEMName = ""</programlisting>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">PacketLength</emphasis></para>
+                    <para>The length of a Sphinx packet in bytes.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">NrHops</emphasis></para>
+                    <para>The number of hops a Sphinx packet takes through the mixnet. Because
+                        packet headers hold destination information for each hop, the size of the
+                        header increases linearly with the number of hops.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">HeaderLength</emphasis></para>
+                    <para>The total length of the Sphinx packet header in bytes.</para>                   
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">RoutingInfoLength</emphasis></para>
+                    <para>The total length of the routing information portion of the Sphinx packet
+                        header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">PerHopRoutingInfoLength</emphasis></para>
+                    <para>The length of the per-hop routing information in the Sphinx packet
+                        header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">SURBLength</emphasis></para>
+                    <para>The length of a single-use reply block (SURB).</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">SphinxPlaintextHeaderLength</emphasis></para>
+                    <para>The length of the plaintext Sphinx packet header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">PayloadTagLength</emphasis></para>
+                    <para>The length of the payload tag.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">ForwardPayloadLength</emphasis></para>
+                    <para>The total size of the payload.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">UserForwardPayloadLength</emphasis></para>
+                    <para>The size of the usable payload.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>       
+                <listitem>
+                    <para><emphasis role="bold">NextNodeHopLength</emphasis></para>
+                    <para>The <code>NextNodeHopLength</code> is derived from the largest routing-information 
+                        block that we expect to encounter. Other packets have 
+                        <code>NextNodeHop</code> + <code>NodeDelay</code> sections, or a <code>Recipient</code> section, both of which
+                        are shorter.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>  
+                <listitem>
+                    <para><emphasis role="bold">SPRPKeyMaterialLength</emphasis></para>
+                    <para>The length of the strong pseudo-random permutation (SPRP) key.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">NIKEName</emphasis></para>
+                    <para>The name of the non-interactive key exchange (NIKE) scheme used by Sphinx
+                        packets.</para>
+                    <para><code>NIKEName</code> and <code>KEMName</code> are mutually
+                        exclusive.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">KEMName</emphasis></para>
+                    <para>The name of the key encapsulation mechanism (KEM) used by Sphinx
+                        packets.</para>
+                    <para><code>NIKEName</code> and <code>KEMName</code> are mutually exclusive.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+            </itemizedlist>            
+        </informalexample>
+    </simplesect>
             </section>
         </section>
-        <section id="mix-config">
-            <title id="mix-config.title">Configuring mix nodes</title>
+        <section xml:id="mix-config"><info><title xml:id="mix-config.title">Configuring mix nodes</title></info>
+            
             <para>The following configuration is drawn from the reference implementation in
                     <filename>katzenpost/docker/dirauth_mixnet/mix1/katzenpost.toml</filename>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
-                more information about the test mixnet, see <emphasis role="bold"><xref
-                        endterm="container.title" linkend="container"/></emphasis>.</para>
+                more information about the test mixnet, see <link xlink:href="&baseURL;docs/admin_guide/docker.html"
+                    >Using the &program_name; Docker test network</link><!--<xref linkend="container" endterm="container.title"/>-->.</para>
             <para>
-                <table frame="all">
-                    <title>Mix node configuration sections</title>
+                <table frame="all"><info><title>Mix node configuration sections</title></info>
+                    
                     <tgroup cols="1">
                         <colspec colname="c1" colnum="1" colwidth="1*"/>
                         <tbody>
@@ -834,8 +1087,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </tgroup>
                 </table>
             </para>
-            <section id="mix-server-section-config">
-                <title id="mix-server-section-config.title">Mix node: Server section</title>
+            <section xml:id="mix-server-section-config"><info><title xml:id="mix-server-section-config.title">Mix node: Server section</title></info>
+                
                 <para>The <code>Server</code> section configures mandatory basic parameters for each
                     server node.</para>
                 <para>
@@ -853,54 +1106,672 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 </para>
                 <!--See comment in includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--serverconfig (/1/2)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+        <!--The config code varies by role so it is not included in this entity.-->       
+        <informalexample> 
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">Identifier</emphasis></para>
+                    <para>Specifies the human-readable identifier for a node, and must be unique per mixnet. 
+                        The identifier can be an FQDN but does not have to be.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                
+                                
+                    <!-- WireKEM ... the  link layer -->
+                    <!-- This is the API term just for the Server options (mix, gateway, service). This is a flaw. -->
+                    
+                    <listitem>
+                        <para><emphasis role="bold">WireKEM</emphasis></para>
+                        <para>WireKEM specifies the key encapsulation mechanism (KEM) scheme
+                            for the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://eprint.iacr.org/2022/539">PQ
+                                Noise</link>-based wire protocol (link layer) that nodes use
+                            to communicate with each other. PQ Noise is a post-quantum variation of
+                            the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://noiseprotocol.org/">Noise protocol
+                                framework</link>, which algebraically transforms ECDH handshake
+                            patterns into KEM encapsulate/decapsulate operations.</para>                           
+                        <para>This configuration option supports the optional use of
+                            hybrid post-quantum cryptography to strengthen security. The following KEM
+                            schemes are supported:</para>
+                        <itemizedlist>
+                            <listitem>
+                                <para><emphasis role="bold">Classical:</emphasis> "x25519", "x448"</para>
+                                <note>
+                                    <para>X25519 and X448 are actually non-interactive key-exchanges
+                                        (NIKEs), not KEMs. &program_name; uses
+                                        a hashed ElGamal cryptographic construction
+                                        to convert them from NIKEs to KEMs.</para>
+                                </note>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">Post-quantum:</emphasis>
+                                    "mlkem768","sntrup4591761", "frodo640shake", "mceliece348864", 
+                                    "mceliece348864f", "mceliece460896", "mceliece460896f", "mceliece6688128",
+                                    "mceliece6688128f", "mceliece6960119", "mceliece6960119f",
+                                    "mceliece8192128", "mceliece8192128f", "CTIDH511", "CTIDH512", "CTIDH1024",
+                                    "CTIDH2048",</para>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">Hybrid post-quantum:</emphasis>
+                                    "xwing", "Kyber768-X25519",
+                                    "MLKEM768-X25519", "MLKEM768-X448", "FrodoKEM-640-SHAKE-X448",
+                                    "sntrup4591761-X448", "mceliece348864-X25519", "mceliece348864f-X25519",
+                                    "mceliece460896-X25519", "mceliece460896f-X25519", "mceliece6688128-X25519",
+                                    "mceliece6688128f-X25519", "mceliece6960119-X25519", "mceliece6960119f-X25519",
+                                    "mceliece8192128-X25519", "mceliece8192128f-X25519",
+                                     "CTIDH512-X25519", "CTIDH512-X25519"</para>
+                            </listitem>
+                        </itemizedlist>											
+                        <para>Type: string</para>
+                        <para>Required: Yes</para>                    
+                    </listitem>
+                
+                <listitem>
+                    <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
+                    <para>Specifies the cryptographic signature scheme that will be used by all
+                        components of the mix network when interacting with the PKI system. Mix
+                        nodes sign their descriptors using this signature scheme, and dirauth nodes
+                        similarly sign PKI documents using the same scheme.</para>
+                    <para>The following signature schemes are supported:</para>
+                    <itemizedlist>
+                        <listitem>
+                            <para><emphasis role="bold">Classical:</emphasis>  "ed25519", "ed448"</para>
+                        </listitem>
+                        <listitem>
+                            <para><emphasis role="bold">Hybrid post-quantum:</emphasis> "Ed25519
+                                Sphincs+", "Ed448-Sphincs+", "Ed25519-Dilithium2",
+                                "Ed448-Dilithium3" </para>
+                        </listitem>
+                    </itemizedlist>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                
+                <listitem>
+                    <para><emphasis role="bold">Addresses</emphasis></para>
+                    <para>Specifies a list of one or more address URLs in a format that contains the
+                        transport protocol, IP address, and port number that the server will bind to
+                        for incoming connections. &program_name; supports URLs with that start with
+                        either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
+                        ["quic://192.168.1.1:40001"].</para>
+                    <para>Type: []string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">BindAddresses</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, allows setting of listener
+                        addresses that the server will bind to and accept connections on. These
+                        addresses are not advertised in the PKI.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">MetricsAddress</emphasis></para>
+                    <para>Specifies the address/port to bind the Prometheus metrics endpoint
+                        to.</para>
+                    <para>Type: string</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">DataDir</emphasis></para>
+                    <para>Specifies the absolute path to a node's state directory. This is where
+                        persistence.db is written to disk and where a node stores its cryptographic
+                        key materials when started with the "-g" commmand-line option.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">IsGatewayNode</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, the server is a gateway
+                        node.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">IsServiceNode</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, the server is a service
+                        node.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+            </itemizedlist>
+            
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="mix-logging-config">
-                <title id="mix-logging-config.title">Mix node: Logging section</title>
+            <section xml:id="mix-logging-config"><info><title xml:id="mix-logging-config.title">Mix node: Logging section</title></info>
+                
                 <!--See comment in includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--logging (/1/3)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+        <informalexample> 
+            <para>The <code>Logging</code> configuration section controls logging behavior across &program_name;.</para>
+            <programlisting>[Logging]
+                Disable = false
+                File = "katzenpost.log"
+                Level = "INFO"</programlisting>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">Disable</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, logging is disabled.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">File</emphasis></para>
+                    <para>Specifies the log file. If omitted, <code>stdout</code> is used.</para>
+                    <para>An absolute or relative file path can be specified. A relative path is 
+                    relative to the DataDir specified in the <code>Server</code> section of the 
+                    configuration.</para>
+                    <para>Type: string</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">Level</emphasis></para>
+                    <para>Supported logging level values are ERROR | WARNING | NOTICE |INFO | DEBUG.</para>
+                    <para>Type: string</para>
+                    <para>Required: No</para>
+                    <warning>
+                        <para>The DEBUG log level is unsafe for
+                            production use.</para>
+                    </warning>                               
+                </listitem>
+            </itemizedlist>   
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="mix-pki-config">
-                <title id="mix-pki-config.title">Mix node: PKI section</title>
+            <section xml:id="mix-pki-config"><info><title xml:id="mix-pki-config.title">Mix node: PKI section</title></info>
+                
                 <!--See comment in includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--pki (/1/6)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+             
+        <informalexample> 
+            <para>The <code>PKI</code> section contains the directory authority configuration for a mix, gateway, or service node.</para>
+            <programlisting>[PKI]
+[PKI.dirauth]
+
+    [[PKI.dirauth.Authorities]]
+        Identifier = "auth1"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+tqN6tpOVotHWXKCszVn2kS7vAZjQpvJjQF3Qz/Qwhyg=
+-----END ED25519 PUBLIC KEY-----
+"""
+        PKISignatureScheme = "Ed25519"
+        LinkPublicKey = """-----BEGIN XWING PUBLIC KEY-----
+JnJ8ztQEIjAkKJcpuZvJAdkWjBim/5G5d8yoosEQHeGJeeBqNPdm2AitUbpiQPcd
+tNCo9DxuC9Ieqmsfw0YpV6AtOOsaInA6QnHDYcuBfZcQL5MU4+t2TzpBZQYlrSED
+hPCKrAG+8GEUl6akseG371WQzEtPpEWWCJCJOiS/VDFZT7eKrldlumN6gfiB84sR
+...
+arFh/WKwYJUj+aGBsFYSqGdzC6MdY4x/YyFe2ze0MJEjThQE91y1d/LCQ3Sb7Ri+
+u6PBi3JU2qzlPEejDKwK0t5tMNEAkq8iNrpRTdD/hS0gR+ZIN8Z9QKh7Xf94FWG2
+H+r8OaqImQhgHabrWRDyLg==
+-----END XWING PUBLIC KEY-----
+"""
+        WireKEMScheme = "xwing"
+        Addresses = ["127.0.0.1:30001"]
+
+    [[PKI.dirauth.Authorities]]
+        Identifier = "auth2"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+O51Ty2WLu4C1ETMa29s03bMXV72gnjJfTfwLV++LVBI=
+-----END ED25519 PUBLIC KEY-----	
+"""
+        PKISignatureScheme = "Ed25519"
+        LinkPublicKey = """-----BEGIN XWING PUBLIC KEY-----
+TtQkg2XKUnY602FFBaPJ+zpN0Twy20cwyyFxh7FNUjaXA9MAJXs0vUwFbJc6BjYv
+f+olKnlIKFSmDvcF74U6w1F0ObugwTNKNxeYKPKhX4FiencUbRwkHoYHdtZdSctz
+TKy08qKQyCAccqCRpdo6ZtYXPAU+2rthjYTOL7Zn+7SHUKCuJClcPnvEYjVcJxtZ
+...
+ubJIe5U4nMJbBkOqr7Kq6niaEkiLODa0tkpB8tKMYTMBdcYyHSXCzpo7U9sb6LAR
+HktiTBDtRXviu2vbw7VRXhkMW2kjYZDtReQ5sAse04DvmD49zgTp1YxYW+wWFaL3
+37X7/SNuLdHX4PHZXIWHBQ==
+-----END XWING PUBLIC KEY-----	
+"""
+        WireKEMScheme = "xwing"
+        Addresses = ["127.0.0.1:30002"]
+
+    [[PKI.dirauth.Authorities]]
+        Identifier = "auth3"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+zQvydRYJq3npeLcg1NqIf+SswEKE5wFmiwNsI9Z1whQ=
+-----END ED25519 PUBLIC KEY-----
+"""
+        PKISignatureScheme = "Ed25519"
+        LinkPublicKey = """
+-----BEGIN XWING PUBLIC KEY-----
+OYK9FiC53xwZ1VST3jDOO4tR+cUMSVRSekmigZMChSjDCPZbKut8TblxtlUfc/yi
+Ugorz4NIvYPMWUt3QPwS2UWq8/HMWXNGPUiAevg12+oV+jOJXaJeCfY24UekJnSw
+TNcdGaFZFSR0FocFcPBBnrK1M2B8w8eEUKQIsXRDM3x/8aRIuDif+ve8rSwpgKeh
+...
+OdVD3yw7OOS8uPZLORGQFyJbHtVmFPVvwja4G/o2gntAoHUZ2LiJJakpVhhlSyrI
+yuzvwwFtZVfWtNb5gAKZCyg0aduR3qgd7MPerRF+YopZk3OCRpC02YxfUZrHv398
+FZWJFK0R8iU52CEUxVpXTA==
+-----END XWING PUBLIC KEY-----	
+"""
+        WireKEMScheme = "xwing"
+        Addresses = ["127.0.0.1:30003"]</programlisting>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">Identifier</emphasis></para>
+                    <para>Specifies the human-readable identifier for a node, which must be unique per mixnet. 
+                    The identifier can be an FQDN but does not have to be.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">IdentityPublicKey</emphasis></para>
+                    <para>String containing the node's public identity key in PEM format.
+                            <code>IdentityPublicKey</code> is the node's permanent identifier
+                        and is used to verify cryptographic signatures produced by its private
+                        identity key.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
+                    <para>Specifies the cryptographic signature scheme that will be used by all
+                        components of the mix network when interacting with the PKI system. Mix
+                        nodes sign their descriptors using this signature scheme, and dirauth nodes
+                        similarly sign PKI documents using the same scheme.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">LinkPublicKey</emphasis></para>
+                    <para>String containing the peer's public link-layer key in PEM format.
+                            <code>LinkPublicKey</code> must match the specified
+                            <code>WireKEMScheme</code>.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">WireKEMScheme</emphasis></para>
+                    <para>The name of the wire protocol key-encapsulation mechanism (KEM) to use.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">Addresses</emphasis></para>
+                    <para>Specifies a list of one or more address URLs in a format that contains the
+                        transport protocol, IP address, and port number that the server will bind to
+                        for incoming connections. &program_name; supports URLs that start with
+                        either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
+                        ["quic://192.168.1.1:40001"].</para>
+                    <para>Type: []string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+            </itemizedlist>                            
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="mix-management-config">
-                <title id="mix-management-config.title">Mix node: Management section</title>
+            <section xml:id="mix-management-config"><info><title xml:id="mix-management-config.title">Mix node: Management section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: management (/1/5)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+           <informalexample> 
+           <para>The <code>Management</code> section specifies 
+               connectivity information for the &program_name; control protocol which can be used to make run-time 
+               configuration changes. A configuration resembles the following:</para>
+           <programlisting>[Management]
+   Enable = false
+   Path = "/dirauth_mixnet/mix1/management_sock"</programlisting>
+           <itemizedlist>
+               <listitem>
+                   <para><emphasis role="bold">Enable</emphasis></para>
+                   <para>If <emphasis role="bold">true</emphasis>, the management interface is
+                        enabled.</para>
+                   <para>Type: bool</para>
+                   <para>Required: No</para>
+               </listitem>
+               <listitem>
+                   <para><emphasis role="bold">Path</emphasis></para>
+                   <para>Specifies the path to the management interface socket. If left empty, then <code>management_sock</code> 
+                       is located in the configuration's defined <code>DataDir</code>&gt;.</para>
+                   <para>Type: string</para>
+                   <para>Required: No</para>
+               </listitem>
+           </itemizedlist>
+       </informalexample>
+    </simplesect>
             </section>
-            <section id="mix-sphinx-config">
-                <title id="mix-sphinx-config.title">Mix node: SphinxGeometry section</title>
+            <section xml:id="mix-sphinx-config"><info><title xml:id="mix-sphinx-config.title">Mix node: SphinxGeometry section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+        <informalexample>        
+            <para>The <code>SphinxGeometry</code> section defines parameters for the Sphinx
+                encrypted nested-packet format used internally by &program_name;. 
+                <warning><para>The values in the <code>SphinxGeometry</code> configuration section must
+                        be programmatically generated by <command>gensphinx</command>. Many of the
+                        parameters are interdependent and cannot be individually modified. Do not
+                        modify the these values by hand.</para></warning></para>
+            <para>The settings in this section are generated by the <command>gensphinx</command>
+                utility, which computes the Sphinx geometry based on the following user-supplied
+                directives:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>The number of  mix node layers (not counting gateway and service
+                        nodes)</para>
+                </listitem>
+                <listitem>
+                    <para>The length of the application-usable packet payload</para>
+                </listitem>
+                <listitem>
+                    <para>The selected NIKE or KEM scheme</para>
+                </listitem>
+            </itemizedlist>
+            <para>The output in TOML should then be pasted unchanged into the node's configuration
+                file, as shown below. For more information, see <link xlink:href="&baseURL;docs/admin_guide/gensphinx.html"
+                    >Appendix: Using <emphasis>gensphinx</emphasis></link><!--<xref linkend="gensphinx"/>--><!--<xref linkend="gensphinx"/>-->.</para>
+            <programlisting>[SphinxGeometry]
+                PacketLength = 3082
+                NrHops = 5
+                HeaderLength = 476
+                RoutingInfoLength = 410
+                PerHopRoutingInfoLength = 82
+                SURBLength = 572
+                SphinxPlaintextHeaderLength = 2
+                PayloadTagLength = 32
+                ForwardPayloadLength = 2574
+                UserForwardPayloadLength = 2000
+                NextNodeHopLength = 65
+                SPRPKeyMaterialLength = 64
+                NIKEName = "x25519"
+                KEMName = ""</programlisting>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">PacketLength</emphasis></para>
+                    <para>The length of a Sphinx packet in bytes.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">NrHops</emphasis></para>
+                    <para>The number of hops a Sphinx packet takes through the mixnet. Because
+                        packet headers hold destination information for each hop, the size of the
+                        header increases linearly with the number of hops.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">HeaderLength</emphasis></para>
+                    <para>The total length of the Sphinx packet header in bytes.</para>                   
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">RoutingInfoLength</emphasis></para>
+                    <para>The total length of the routing information portion of the Sphinx packet
+                        header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">PerHopRoutingInfoLength</emphasis></para>
+                    <para>The length of the per-hop routing information in the Sphinx packet
+                        header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">SURBLength</emphasis></para>
+                    <para>The length of a single-use reply block (SURB).</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">SphinxPlaintextHeaderLength</emphasis></para>
+                    <para>The length of the plaintext Sphinx packet header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">PayloadTagLength</emphasis></para>
+                    <para>The length of the payload tag.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">ForwardPayloadLength</emphasis></para>
+                    <para>The total size of the payload.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">UserForwardPayloadLength</emphasis></para>
+                    <para>The size of the usable payload.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>       
+                <listitem>
+                    <para><emphasis role="bold">NextNodeHopLength</emphasis></para>
+                    <para>The <code>NextNodeHopLength</code> is derived from the largest routing-information 
+                        block that we expect to encounter. Other packets have 
+                        <code>NextNodeHop</code> + <code>NodeDelay</code> sections, or a <code>Recipient</code> section, both of which
+                        are shorter.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>  
+                <listitem>
+                    <para><emphasis role="bold">SPRPKeyMaterialLength</emphasis></para>
+                    <para>The length of the strong pseudo-random permutation (SPRP) key.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">NIKEName</emphasis></para>
+                    <para>The name of the non-interactive key exchange (NIKE) scheme used by Sphinx
+                        packets.</para>
+                    <para><code>NIKEName</code> and <code>KEMName</code> are mutually
+                        exclusive.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">KEMName</emphasis></para>
+                    <para>The name of the key encapsulation mechanism (KEM) used by Sphinx
+                        packets.</para>
+                    <para><code>NIKEName</code> and <code>KEMName</code> are mutually exclusive.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+            </itemizedlist>            
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="mix-debug-config">
-                <title id="mix-debug-config.title">Mix node: Debug section</title>
+            <section xml:id="mix-debug-config"><info><title xml:id="mix-debug-config.title">Mix node: Debug section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: serverdebug (/1/7)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+             
+        <informalexample>    
+            <para>The <code>Debug</code> section is the &program_name; server debug configuration
+                for advanced tuning.</para>   
+            <programlisting>[Debug]
+                NumSphinxWorkers = 16
+                NumServiceWorkers = 3
+                NumGatewayWorkers = 3
+                NumKaetzchenWorkers = 3
+                SchedulerExternalMemoryQueue = false
+                SchedulerQueueSize = 0
+                SchedulerMaxBurst = 16
+                UnwrapDelay = 250
+                GatewayDelay = 500
+                ServiceDelay = 500
+                KaetzchenDelay = 750
+                SchedulerSlack = 150
+                SendSlack = 50
+                DecoySlack = 15000
+                ConnectTimeout = 60000
+                HandshakeTimeout = 30000
+                ReauthInterval = 30000
+                SendDecoyTraffic = false
+                DisableRateLimit = false
+                GenerateOnly = false</programlisting>
+                <itemizedlist>
+                    <listitem>
+                        <para><emphasis role="bold">NumSphinxWorkers</emphasis></para>
+                        <para>Specifies the number of worker instances to use for inbound Sphinx
+                            packet processing.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">NumProviderWorkers</emphasis></para>
+                        <para>Specifies the number of worker instances to use for provider specific
+                            packet processing.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">NumKaetzchenWorkers</emphasis></para>
+                        <para>Specifies the number of worker instances to use for Kaetzchen-specific
+                        packet processing.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerExternalMemoryQueue</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, the experimental disk-backed external memory 
+                            queue is enabled.</para>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerQueueSize</emphasis></para>
+                        <para>Specifies the maximum scheduler queue size before random entries will
+                        start getting dropped. A value less than or equal to zero is treated as
+                        unlimited.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerMaxBurst</emphasis></para>
+                        <para>Specifies the maximum number of packets that will be dispatched per
+                            scheduler wakeup event.</para>
+                        <para>Type: </para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">UnwrapDelay</emphasis></para>
+                        <para>Specifies the maximum unwrap delay due to queueing in
+                            milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">GatewayDelay</emphasis></para>
+                        <para>Specifies the maximum gateway node worker delay due to queueing in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">ServiceDelay</emphasis></para>
+                        <para>Specifies the maximum provider delay due to queueing in
+                            milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para> 
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">KaetzchenDelay</emphasis></para>
+                        <para>Specifies the maximum kaetzchen delay due to queueing in
+                            milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerSlack</emphasis></para>
+                        <para>Specifies the maximum scheduler slack due to queueing and/or
+                            processing in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SendSlack</emphasis></para>
+                        <para>Specifies the maximum send-queue slack due to queueing and/or
+                            congestion in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">DecoySlack</emphasis></para>
+                        <para>Specifies the maximum decoy sweep slack due to external
+                            delays such as latency before a loop decoy packet will be considered
+                            lost.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">ConnectTimeout</emphasis></para>
+                        <para>Specifies the maximum time a connection can take to establish a
+                            TCP/IP connection in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">HandshakeTimeout</emphasis></para>
+                        <para>Specifies the maximum time a connection can take for a link-protocol
+                            handshake in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">ReauthInterval</emphasis></para>
+                        <para>Specifies the interval at which a connection will be reauthenticated
+                            in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SendDecoyTraffic</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, decoy traffic is enabled. 
+                            This parameter is experimental and untuned, 
+                            and is disabled by default.</para>
+                        <note>
+                            <para>This option will be removed once decoy traffic is fully implemented.</para>
+                        </note>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">DisableRateLimit</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, the per-client rate limiter is disabled.</para>
+                        <note>
+                            <para>This option should only be used for testing.</para>
+                        </note>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">GenerateOnly</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, the server immediately halts
+                        and cleans up after long-term key generation.</para>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                </itemizedlist>
+        </informalexample> 
+    </simplesect>
             </section>
         </section>
-        <section id="gateway-config">
-            <title id="gateway-config.title">Configuring gateway nodes</title>
+        <section xml:id="gateway-config"><info><title xml:id="gateway-config.title">Configuring gateway nodes</title></info>
+            
             <para>The following configuration is drawn from the reference implementation in
                     <filename>katzenpost/docker/dirauth_mixnet/gateway1/katzenpost.toml</filename>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
-                address. For more information about the test mixnet, see <emphasis role="bold"><xref
-                        endterm="container.title" linkend="container"/></emphasis>.</para>
-            <table frame="all">
-                <title>Gateway node configuration sections</title>
+                address. For more information about the test mixnet, see <link xlink:href="&baseURL;docs/admin_guide/docker.html"
+                    >Using the &program_name; Docker test network</link><!--<xref linkend="container" endterm="container.title"/>-->.</para>
+            <table frame="all"><info><title>Gateway node configuration sections</title></info>
+                
                 <tgroup cols="1">
                     <colspec colname="c1" colnum="1" colwidth="1*"/>
                     <tbody>
@@ -942,8 +1813,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </tbody>
                 </tgroup>
             </table>
-            <section id="gateway-server-section-config">
-                <title id="gateway-server-section-config.title">Gateway node: Server section</title>
+            <section xml:id="gateway-server-section-config"><info><title xml:id="gateway-server-section-config.title">Gateway node: Server section</title></info>
+                
                 <para>The <code>Server</code> section configures mandatory basic parameters for each
                     server node.</para>
                 <programlisting>[Server]
@@ -960,23 +1831,190 @@ ldMtDsvvc9KUfE4I0+c+XQ==
         TCP = ["localhost:30004"]</programlisting>
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: serverconfig (/1/2)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+        <!--The config code varies by role so it is not included in this entity.-->       
+        <informalexample> 
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">Identifier</emphasis></para>
+                    <para>Specifies the human-readable identifier for a node, and must be unique per mixnet. 
+                        The identifier can be an FQDN but does not have to be.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                
+                                
+                    <!-- WireKEM ... the  link layer -->
+                    <!-- This is the API term just for the Server options (mix, gateway, service). This is a flaw. -->
+                    
+                    <listitem>
+                        <para><emphasis role="bold">WireKEM</emphasis></para>
+                        <para>WireKEM specifies the key encapsulation mechanism (KEM) scheme
+                            for the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://eprint.iacr.org/2022/539">PQ
+                                Noise</link>-based wire protocol (link layer) that nodes use
+                            to communicate with each other. PQ Noise is a post-quantum variation of
+                            the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://noiseprotocol.org/">Noise protocol
+                                framework</link>, which algebraically transforms ECDH handshake
+                            patterns into KEM encapsulate/decapsulate operations.</para>                           
+                        <para>This configuration option supports the optional use of
+                            hybrid post-quantum cryptography to strengthen security. The following KEM
+                            schemes are supported:</para>
+                        <itemizedlist>
+                            <listitem>
+                                <para><emphasis role="bold">Classical:</emphasis> "x25519", "x448"</para>
+                                <note>
+                                    <para>X25519 and X448 are actually non-interactive key-exchanges
+                                        (NIKEs), not KEMs. &program_name; uses
+                                        a hashed ElGamal cryptographic construction
+                                        to convert them from NIKEs to KEMs.</para>
+                                </note>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">Post-quantum:</emphasis>
+                                    "mlkem768","sntrup4591761", "frodo640shake", "mceliece348864", 
+                                    "mceliece348864f", "mceliece460896", "mceliece460896f", "mceliece6688128",
+                                    "mceliece6688128f", "mceliece6960119", "mceliece6960119f",
+                                    "mceliece8192128", "mceliece8192128f", "CTIDH511", "CTIDH512", "CTIDH1024",
+                                    "CTIDH2048",</para>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">Hybrid post-quantum:</emphasis>
+                                    "xwing", "Kyber768-X25519",
+                                    "MLKEM768-X25519", "MLKEM768-X448", "FrodoKEM-640-SHAKE-X448",
+                                    "sntrup4591761-X448", "mceliece348864-X25519", "mceliece348864f-X25519",
+                                    "mceliece460896-X25519", "mceliece460896f-X25519", "mceliece6688128-X25519",
+                                    "mceliece6688128f-X25519", "mceliece6960119-X25519", "mceliece6960119f-X25519",
+                                    "mceliece8192128-X25519", "mceliece8192128f-X25519",
+                                     "CTIDH512-X25519", "CTIDH512-X25519"</para>
+                            </listitem>
+                        </itemizedlist>											
+                        <para>Type: string</para>
+                        <para>Required: Yes</para>                    
+                    </listitem>
+                
+                <listitem>
+                    <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
+                    <para>Specifies the cryptographic signature scheme that will be used by all
+                        components of the mix network when interacting with the PKI system. Mix
+                        nodes sign their descriptors using this signature scheme, and dirauth nodes
+                        similarly sign PKI documents using the same scheme.</para>
+                    <para>The following signature schemes are supported:</para>
+                    <itemizedlist>
+                        <listitem>
+                            <para><emphasis role="bold">Classical:</emphasis>  "ed25519", "ed448"</para>
+                        </listitem>
+                        <listitem>
+                            <para><emphasis role="bold">Hybrid post-quantum:</emphasis> "Ed25519
+                                Sphincs+", "Ed448-Sphincs+", "Ed25519-Dilithium2",
+                                "Ed448-Dilithium3" </para>
+                        </listitem>
+                    </itemizedlist>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                
+                <listitem>
+                    <para><emphasis role="bold">Addresses</emphasis></para>
+                    <para>Specifies a list of one or more address URLs in a format that contains the
+                        transport protocol, IP address, and port number that the server will bind to
+                        for incoming connections. &program_name; supports URLs with that start with
+                        either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
+                        ["quic://192.168.1.1:40001"].</para>
+                    <para>Type: []string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">BindAddresses</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, allows setting of listener
+                        addresses that the server will bind to and accept connections on. These
+                        addresses are not advertised in the PKI.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">MetricsAddress</emphasis></para>
+                    <para>Specifies the address/port to bind the Prometheus metrics endpoint
+                        to.</para>
+                    <para>Type: string</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">DataDir</emphasis></para>
+                    <para>Specifies the absolute path to a node's state directory. This is where
+                        persistence.db is written to disk and where a node stores its cryptographic
+                        key materials when started with the "-g" commmand-line option.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">IsGatewayNode</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, the server is a gateway
+                        node.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">IsServiceNode</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, the server is a service
+                        node.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+            </itemizedlist>
+            
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="gateway-logging-config">
-                <title id="gateway-logging-config.title">Gateway node: Logging section</title>
+            <section xml:id="gateway-logging-config"><info><title xml:id="gateway-logging-config.title">Gateway node: Logging section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: logging (/1/3)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+        <informalexample> 
+            <para>The <code>Logging</code> configuration section controls logging behavior across &program_name;.</para>
+            <programlisting>[Logging]
+                Disable = false
+                File = "katzenpost.log"
+                Level = "INFO"</programlisting>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">Disable</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, logging is disabled.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">File</emphasis></para>
+                    <para>Specifies the log file. If omitted, <code>stdout</code> is used.</para>
+                    <para>An absolute or relative file path can be specified. A relative path is 
+                    relative to the DataDir specified in the <code>Server</code> section of the 
+                    configuration.</para>
+                    <para>Type: string</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">Level</emphasis></para>
+                    <para>Supported logging level values are ERROR | WARNING | NOTICE |INFO | DEBUG.</para>
+                    <para>Type: string</para>
+                    <para>Required: No</para>
+                    <warning>
+                        <para>The DEBUG log level is unsafe for
+                            production use.</para>
+                    </warning>                               
+                </listitem>
+            </itemizedlist>   
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="gateway-gateway-section-config">
-                <title id="gateway-gateway-section-config.title">Gateway node: Gateway
-                    section</title>
+            <section xml:id="gateway-gateway-section-config"><info><title xml:id="gateway-gateway-section-config.title">Gateway node: Gateway
+                    section</title></info>
+                
                 <para/>
                 <para>The <code>Gateway</code> section of the configuration is required for configuring a Gateway
                     node. The section must contain <code>UserDB </code>and <code>SpoolDB</code>
-                    definitions. <ulink url="https://github.com/boltdb/bolt">Bolt</ulink> is an
+                    definitions. <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/boltdb/bolt">Bolt</link> is an
                     embedded database library for the Go programming language that &program_name;
                     has used in the past for its user and spool databases. Because &program_name;
                     currently persists data on Service nodes instead of Gateways, these databases
@@ -993,44 +2031,495 @@ ldMtDsvvc9KUfE4I0+c+XQ==
             [Gateway.SpoolDB.Bolt]
                 SpoolDB = "/dirauth_mixnet/gateway1/spool.db"</programlisting>
             </section>
-            <section id="gateway-pki-config">
-                <title id="gateway-pki-config.title">Gateway node: PKI section</title>
+            <section xml:id="gateway-pki-config"><info><title xml:id="gateway-pki-config.title">Gateway node: PKI section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: pki (/1/6)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+             
+        <informalexample> 
+            <para>The <code>PKI</code> section contains the directory authority configuration for a mix, gateway, or service node.</para>
+            <programlisting>[PKI]
+[PKI.dirauth]
+
+    [[PKI.dirauth.Authorities]]
+        Identifier = "auth1"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+tqN6tpOVotHWXKCszVn2kS7vAZjQpvJjQF3Qz/Qwhyg=
+-----END ED25519 PUBLIC KEY-----
+"""
+        PKISignatureScheme = "Ed25519"
+        LinkPublicKey = """-----BEGIN XWING PUBLIC KEY-----
+JnJ8ztQEIjAkKJcpuZvJAdkWjBim/5G5d8yoosEQHeGJeeBqNPdm2AitUbpiQPcd
+tNCo9DxuC9Ieqmsfw0YpV6AtOOsaInA6QnHDYcuBfZcQL5MU4+t2TzpBZQYlrSED
+hPCKrAG+8GEUl6akseG371WQzEtPpEWWCJCJOiS/VDFZT7eKrldlumN6gfiB84sR
+...
+arFh/WKwYJUj+aGBsFYSqGdzC6MdY4x/YyFe2ze0MJEjThQE91y1d/LCQ3Sb7Ri+
+u6PBi3JU2qzlPEejDKwK0t5tMNEAkq8iNrpRTdD/hS0gR+ZIN8Z9QKh7Xf94FWG2
+H+r8OaqImQhgHabrWRDyLg==
+-----END XWING PUBLIC KEY-----
+"""
+        WireKEMScheme = "xwing"
+        Addresses = ["127.0.0.1:30001"]
+
+    [[PKI.dirauth.Authorities]]
+        Identifier = "auth2"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+O51Ty2WLu4C1ETMa29s03bMXV72gnjJfTfwLV++LVBI=
+-----END ED25519 PUBLIC KEY-----	
+"""
+        PKISignatureScheme = "Ed25519"
+        LinkPublicKey = """-----BEGIN XWING PUBLIC KEY-----
+TtQkg2XKUnY602FFBaPJ+zpN0Twy20cwyyFxh7FNUjaXA9MAJXs0vUwFbJc6BjYv
+f+olKnlIKFSmDvcF74U6w1F0ObugwTNKNxeYKPKhX4FiencUbRwkHoYHdtZdSctz
+TKy08qKQyCAccqCRpdo6ZtYXPAU+2rthjYTOL7Zn+7SHUKCuJClcPnvEYjVcJxtZ
+...
+ubJIe5U4nMJbBkOqr7Kq6niaEkiLODa0tkpB8tKMYTMBdcYyHSXCzpo7U9sb6LAR
+HktiTBDtRXviu2vbw7VRXhkMW2kjYZDtReQ5sAse04DvmD49zgTp1YxYW+wWFaL3
+37X7/SNuLdHX4PHZXIWHBQ==
+-----END XWING PUBLIC KEY-----	
+"""
+        WireKEMScheme = "xwing"
+        Addresses = ["127.0.0.1:30002"]
+
+    [[PKI.dirauth.Authorities]]
+        Identifier = "auth3"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+zQvydRYJq3npeLcg1NqIf+SswEKE5wFmiwNsI9Z1whQ=
+-----END ED25519 PUBLIC KEY-----
+"""
+        PKISignatureScheme = "Ed25519"
+        LinkPublicKey = """
+-----BEGIN XWING PUBLIC KEY-----
+OYK9FiC53xwZ1VST3jDOO4tR+cUMSVRSekmigZMChSjDCPZbKut8TblxtlUfc/yi
+Ugorz4NIvYPMWUt3QPwS2UWq8/HMWXNGPUiAevg12+oV+jOJXaJeCfY24UekJnSw
+TNcdGaFZFSR0FocFcPBBnrK1M2B8w8eEUKQIsXRDM3x/8aRIuDif+ve8rSwpgKeh
+...
+OdVD3yw7OOS8uPZLORGQFyJbHtVmFPVvwja4G/o2gntAoHUZ2LiJJakpVhhlSyrI
+yuzvwwFtZVfWtNb5gAKZCyg0aduR3qgd7MPerRF+YopZk3OCRpC02YxfUZrHv398
+FZWJFK0R8iU52CEUxVpXTA==
+-----END XWING PUBLIC KEY-----	
+"""
+        WireKEMScheme = "xwing"
+        Addresses = ["127.0.0.1:30003"]</programlisting>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">Identifier</emphasis></para>
+                    <para>Specifies the human-readable identifier for a node, which must be unique per mixnet. 
+                    The identifier can be an FQDN but does not have to be.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">IdentityPublicKey</emphasis></para>
+                    <para>String containing the node's public identity key in PEM format.
+                            <code>IdentityPublicKey</code> is the node's permanent identifier
+                        and is used to verify cryptographic signatures produced by its private
+                        identity key.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
+                    <para>Specifies the cryptographic signature scheme that will be used by all
+                        components of the mix network when interacting with the PKI system. Mix
+                        nodes sign their descriptors using this signature scheme, and dirauth nodes
+                        similarly sign PKI documents using the same scheme.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">LinkPublicKey</emphasis></para>
+                    <para>String containing the peer's public link-layer key in PEM format.
+                            <code>LinkPublicKey</code> must match the specified
+                            <code>WireKEMScheme</code>.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">WireKEMScheme</emphasis></para>
+                    <para>The name of the wire protocol key-encapsulation mechanism (KEM) to use.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">Addresses</emphasis></para>
+                    <para>Specifies a list of one or more address URLs in a format that contains the
+                        transport protocol, IP address, and port number that the server will bind to
+                        for incoming connections. &program_name; supports URLs that start with
+                        either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
+                        ["quic://192.168.1.1:40001"].</para>
+                    <para>Type: []string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+            </itemizedlist>                            
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="gateway-management-config">
-                <title id="gateway-management-config.title">Gateway node: Management section</title>
+            <section xml:id="gateway-management-config"><info><title xml:id="gateway-management-config.title">Gateway node: Management section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: management (/1/5)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+           <informalexample> 
+           <para>The <code>Management</code> section specifies 
+               connectivity information for the &program_name; control protocol which can be used to make run-time 
+               configuration changes. A configuration resembles the following:</para>
+           <programlisting>[Management]
+   Enable = false
+   Path = "/dirauth_mixnet/mix1/management_sock"</programlisting>
+           <itemizedlist>
+               <listitem>
+                   <para><emphasis role="bold">Enable</emphasis></para>
+                   <para>If <emphasis role="bold">true</emphasis>, the management interface is
+                        enabled.</para>
+                   <para>Type: bool</para>
+                   <para>Required: No</para>
+               </listitem>
+               <listitem>
+                   <para><emphasis role="bold">Path</emphasis></para>
+                   <para>Specifies the path to the management interface socket. If left empty, then <code>management_sock</code> 
+                       is located in the configuration's defined <code>DataDir</code>&gt;.</para>
+                   <para>Type: string</para>
+                   <para>Required: No</para>
+               </listitem>
+           </itemizedlist>
+       </informalexample>
+    </simplesect>
             </section>
-            <section id="gateway-sphinx-config">
-                <title id="gateway-sphinx-config.title">Gateway node: SphinxGeometry section</title>
+            <section xml:id="gateway-sphinx-config"><info><title xml:id="gateway-sphinx-config.title">Gateway node: SphinxGeometry section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+        <informalexample>        
+            <para>The <code>SphinxGeometry</code> section defines parameters for the Sphinx
+                encrypted nested-packet format used internally by &program_name;. 
+                <warning><para>The values in the <code>SphinxGeometry</code> configuration section must
+                        be programmatically generated by <command>gensphinx</command>. Many of the
+                        parameters are interdependent and cannot be individually modified. Do not
+                        modify the these values by hand.</para></warning></para>
+            <para>The settings in this section are generated by the <command>gensphinx</command>
+                utility, which computes the Sphinx geometry based on the following user-supplied
+                directives:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>The number of  mix node layers (not counting gateway and service
+                        nodes)</para>
+                </listitem>
+                <listitem>
+                    <para>The length of the application-usable packet payload</para>
+                </listitem>
+                <listitem>
+                    <para>The selected NIKE or KEM scheme</para>
+                </listitem>
+            </itemizedlist>
+            <para>The output in TOML should then be pasted unchanged into the node's configuration
+                file, as shown below. For more information, see <link xlink:href="&baseURL;docs/admin_guide/gensphinx.html"
+                    >Appendix: Using <emphasis>gensphinx</emphasis></link><!--<xref linkend="gensphinx"/>--><!--<xref linkend="gensphinx"/>-->.</para>
+            <programlisting>[SphinxGeometry]
+                PacketLength = 3082
+                NrHops = 5
+                HeaderLength = 476
+                RoutingInfoLength = 410
+                PerHopRoutingInfoLength = 82
+                SURBLength = 572
+                SphinxPlaintextHeaderLength = 2
+                PayloadTagLength = 32
+                ForwardPayloadLength = 2574
+                UserForwardPayloadLength = 2000
+                NextNodeHopLength = 65
+                SPRPKeyMaterialLength = 64
+                NIKEName = "x25519"
+                KEMName = ""</programlisting>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">PacketLength</emphasis></para>
+                    <para>The length of a Sphinx packet in bytes.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">NrHops</emphasis></para>
+                    <para>The number of hops a Sphinx packet takes through the mixnet. Because
+                        packet headers hold destination information for each hop, the size of the
+                        header increases linearly with the number of hops.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">HeaderLength</emphasis></para>
+                    <para>The total length of the Sphinx packet header in bytes.</para>                   
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">RoutingInfoLength</emphasis></para>
+                    <para>The total length of the routing information portion of the Sphinx packet
+                        header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">PerHopRoutingInfoLength</emphasis></para>
+                    <para>The length of the per-hop routing information in the Sphinx packet
+                        header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">SURBLength</emphasis></para>
+                    <para>The length of a single-use reply block (SURB).</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">SphinxPlaintextHeaderLength</emphasis></para>
+                    <para>The length of the plaintext Sphinx packet header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">PayloadTagLength</emphasis></para>
+                    <para>The length of the payload tag.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">ForwardPayloadLength</emphasis></para>
+                    <para>The total size of the payload.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">UserForwardPayloadLength</emphasis></para>
+                    <para>The size of the usable payload.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>       
+                <listitem>
+                    <para><emphasis role="bold">NextNodeHopLength</emphasis></para>
+                    <para>The <code>NextNodeHopLength</code> is derived from the largest routing-information 
+                        block that we expect to encounter. Other packets have 
+                        <code>NextNodeHop</code> + <code>NodeDelay</code> sections, or a <code>Recipient</code> section, both of which
+                        are shorter.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>  
+                <listitem>
+                    <para><emphasis role="bold">SPRPKeyMaterialLength</emphasis></para>
+                    <para>The length of the strong pseudo-random permutation (SPRP) key.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">NIKEName</emphasis></para>
+                    <para>The name of the non-interactive key exchange (NIKE) scheme used by Sphinx
+                        packets.</para>
+                    <para><code>NIKEName</code> and <code>KEMName</code> are mutually
+                        exclusive.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">KEMName</emphasis></para>
+                    <para>The name of the key encapsulation mechanism (KEM) used by Sphinx
+                        packets.</para>
+                    <para><code>NIKEName</code> and <code>KEMName</code> are mutually exclusive.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+            </itemizedlist>            
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="gateway-debug-config">
-                <title id="gateway-debug-config.title">Gateway node: Debug section</title>
+            <section xml:id="gateway-debug-config"><info><title xml:id="gateway-debug-config.title">Gateway node: Debug section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: serverdebug (/1/7)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+             
+        <informalexample>    
+            <para>The <code>Debug</code> section is the &program_name; server debug configuration
+                for advanced tuning.</para>   
+            <programlisting>[Debug]
+                NumSphinxWorkers = 16
+                NumServiceWorkers = 3
+                NumGatewayWorkers = 3
+                NumKaetzchenWorkers = 3
+                SchedulerExternalMemoryQueue = false
+                SchedulerQueueSize = 0
+                SchedulerMaxBurst = 16
+                UnwrapDelay = 250
+                GatewayDelay = 500
+                ServiceDelay = 500
+                KaetzchenDelay = 750
+                SchedulerSlack = 150
+                SendSlack = 50
+                DecoySlack = 15000
+                ConnectTimeout = 60000
+                HandshakeTimeout = 30000
+                ReauthInterval = 30000
+                SendDecoyTraffic = false
+                DisableRateLimit = false
+                GenerateOnly = false</programlisting>
+                <itemizedlist>
+                    <listitem>
+                        <para><emphasis role="bold">NumSphinxWorkers</emphasis></para>
+                        <para>Specifies the number of worker instances to use for inbound Sphinx
+                            packet processing.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">NumProviderWorkers</emphasis></para>
+                        <para>Specifies the number of worker instances to use for provider specific
+                            packet processing.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">NumKaetzchenWorkers</emphasis></para>
+                        <para>Specifies the number of worker instances to use for Kaetzchen-specific
+                        packet processing.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerExternalMemoryQueue</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, the experimental disk-backed external memory 
+                            queue is enabled.</para>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerQueueSize</emphasis></para>
+                        <para>Specifies the maximum scheduler queue size before random entries will
+                        start getting dropped. A value less than or equal to zero is treated as
+                        unlimited.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerMaxBurst</emphasis></para>
+                        <para>Specifies the maximum number of packets that will be dispatched per
+                            scheduler wakeup event.</para>
+                        <para>Type: </para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">UnwrapDelay</emphasis></para>
+                        <para>Specifies the maximum unwrap delay due to queueing in
+                            milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">GatewayDelay</emphasis></para>
+                        <para>Specifies the maximum gateway node worker delay due to queueing in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">ServiceDelay</emphasis></para>
+                        <para>Specifies the maximum provider delay due to queueing in
+                            milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para> 
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">KaetzchenDelay</emphasis></para>
+                        <para>Specifies the maximum kaetzchen delay due to queueing in
+                            milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerSlack</emphasis></para>
+                        <para>Specifies the maximum scheduler slack due to queueing and/or
+                            processing in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SendSlack</emphasis></para>
+                        <para>Specifies the maximum send-queue slack due to queueing and/or
+                            congestion in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">DecoySlack</emphasis></para>
+                        <para>Specifies the maximum decoy sweep slack due to external
+                            delays such as latency before a loop decoy packet will be considered
+                            lost.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">ConnectTimeout</emphasis></para>
+                        <para>Specifies the maximum time a connection can take to establish a
+                            TCP/IP connection in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">HandshakeTimeout</emphasis></para>
+                        <para>Specifies the maximum time a connection can take for a link-protocol
+                            handshake in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">ReauthInterval</emphasis></para>
+                        <para>Specifies the interval at which a connection will be reauthenticated
+                            in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SendDecoyTraffic</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, decoy traffic is enabled. 
+                            This parameter is experimental and untuned, 
+                            and is disabled by default.</para>
+                        <note>
+                            <para>This option will be removed once decoy traffic is fully implemented.</para>
+                        </note>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">DisableRateLimit</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, the per-client rate limiter is disabled.</para>
+                        <note>
+                            <para>This option should only be used for testing.</para>
+                        </note>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">GenerateOnly</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, the server immediately halts
+                        and cleans up after long-term key generation.</para>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                </itemizedlist>
+        </informalexample> 
+    </simplesect>
             </section>
         </section>
-        <section id="service-config">
-            <title id="service-config.title">Configuring service nodes</title>
+        <section xml:id="service-config"><info><title xml:id="service-config.title">Configuring service nodes</title></info>
+            
             <para>The following configuration is drawn from the reference implementation in
                     <filename>katzenpost/docker/dirauth_mixnet/servicenode1/authority.toml</filename>.
                 In a real-world mixnet, the component hosts would not be sharing a single IP
-                address. For more information about the test mixnet, see <emphasis role="bold"><xref
-                        endterm="container.title" linkend="container"/></emphasis>.</para>
-            <table frame="all">
-                <title>Mix node configuration sections</title>
+                address. For more information about the test mixnet, see <link xlink:href="&baseURL;docs/admin_guide/docker.html"
+                    >Using the &program_name; Docker test network</link><!--<xref linkend="container" endterm="container.title"/>-->.</para>
+            <table frame="all"><info><title>Mix node configuration sections</title></info>
+                
                 <tgroup cols="1">
                     <colspec colname="c1" colnum="1" colwidth="1*"/>
                     <tbody>
@@ -1072,8 +2561,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </tbody>
                 </tgroup>
             </table>
-            <section id="service-server-section-config">
-                <title id="service-server-section-config.title">Service node: Server section</title>
+            <section xml:id="service-server-section-config"><info><title xml:id="service-server-section-config.title">Service node: Server section</title></info>
+                
                 <para>The <code>Server</code> section configures mandatory basic parameters for each
                     server node.</para>
                 <programlisting>[Server]
@@ -1089,29 +2578,191 @@ ldMtDsvvc9KUfE4I0+c+XQ==
     [Server.AltAddresses]</programlisting>
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: serverconfig (/1/2)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+        <!--The config code varies by role so it is not included in this entity.-->       
+        <informalexample> 
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">Identifier</emphasis></para>
+                    <para>Specifies the human-readable identifier for a node, and must be unique per mixnet. 
+                        The identifier can be an FQDN but does not have to be.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                
+                                
+                    <!-- WireKEM ... the  link layer -->
+                    <!-- This is the API term just for the Server options (mix, gateway, service). This is a flaw. -->
+                    
+                    <listitem>
+                        <para><emphasis role="bold">WireKEM</emphasis></para>
+                        <para>WireKEM specifies the key encapsulation mechanism (KEM) scheme
+                            for the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://eprint.iacr.org/2022/539">PQ
+                                Noise</link>-based wire protocol (link layer) that nodes use
+                            to communicate with each other. PQ Noise is a post-quantum variation of
+                            the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://noiseprotocol.org/">Noise protocol
+                                framework</link>, which algebraically transforms ECDH handshake
+                            patterns into KEM encapsulate/decapsulate operations.</para>                           
+                        <para>This configuration option supports the optional use of
+                            hybrid post-quantum cryptography to strengthen security. The following KEM
+                            schemes are supported:</para>
+                        <itemizedlist>
+                            <listitem>
+                                <para><emphasis role="bold">Classical:</emphasis> "x25519", "x448"</para>
+                                <note>
+                                    <para>X25519 and X448 are actually non-interactive key-exchanges
+                                        (NIKEs), not KEMs. &program_name; uses
+                                        a hashed ElGamal cryptographic construction
+                                        to convert them from NIKEs to KEMs.</para>
+                                </note>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">Post-quantum:</emphasis>
+                                    "mlkem768","sntrup4591761", "frodo640shake", "mceliece348864", 
+                                    "mceliece348864f", "mceliece460896", "mceliece460896f", "mceliece6688128",
+                                    "mceliece6688128f", "mceliece6960119", "mceliece6960119f",
+                                    "mceliece8192128", "mceliece8192128f", "CTIDH511", "CTIDH512", "CTIDH1024",
+                                    "CTIDH2048",</para>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">Hybrid post-quantum:</emphasis>
+                                    "xwing", "Kyber768-X25519",
+                                    "MLKEM768-X25519", "MLKEM768-X448", "FrodoKEM-640-SHAKE-X448",
+                                    "sntrup4591761-X448", "mceliece348864-X25519", "mceliece348864f-X25519",
+                                    "mceliece460896-X25519", "mceliece460896f-X25519", "mceliece6688128-X25519",
+                                    "mceliece6688128f-X25519", "mceliece6960119-X25519", "mceliece6960119f-X25519",
+                                    "mceliece8192128-X25519", "mceliece8192128f-X25519",
+                                     "CTIDH512-X25519", "CTIDH512-X25519"</para>
+                            </listitem>
+                        </itemizedlist>											
+                        <para>Type: string</para>
+                        <para>Required: Yes</para>                    
+                    </listitem>
+                
+                <listitem>
+                    <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
+                    <para>Specifies the cryptographic signature scheme that will be used by all
+                        components of the mix network when interacting with the PKI system. Mix
+                        nodes sign their descriptors using this signature scheme, and dirauth nodes
+                        similarly sign PKI documents using the same scheme.</para>
+                    <para>The following signature schemes are supported:</para>
+                    <itemizedlist>
+                        <listitem>
+                            <para><emphasis role="bold">Classical:</emphasis>  "ed25519", "ed448"</para>
+                        </listitem>
+                        <listitem>
+                            <para><emphasis role="bold">Hybrid post-quantum:</emphasis> "Ed25519
+                                Sphincs+", "Ed448-Sphincs+", "Ed25519-Dilithium2",
+                                "Ed448-Dilithium3" </para>
+                        </listitem>
+                    </itemizedlist>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                
+                <listitem>
+                    <para><emphasis role="bold">Addresses</emphasis></para>
+                    <para>Specifies a list of one or more address URLs in a format that contains the
+                        transport protocol, IP address, and port number that the server will bind to
+                        for incoming connections. &program_name; supports URLs with that start with
+                        either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
+                        ["quic://192.168.1.1:40001"].</para>
+                    <para>Type: []string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">BindAddresses</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, allows setting of listener
+                        addresses that the server will bind to and accept connections on. These
+                        addresses are not advertised in the PKI.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">MetricsAddress</emphasis></para>
+                    <para>Specifies the address/port to bind the Prometheus metrics endpoint
+                        to.</para>
+                    <para>Type: string</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">DataDir</emphasis></para>
+                    <para>Specifies the absolute path to a node's state directory. This is where
+                        persistence.db is written to disk and where a node stores its cryptographic
+                        key materials when started with the "-g" commmand-line option.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">IsGatewayNode</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, the server is a gateway
+                        node.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">IsServiceNode</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, the server is a service
+                        node.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+            </itemizedlist>
+            
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="service-logging-config">
-                <title id="service-logging-config.title">Service node: Logging section</title>
+            <section xml:id="service-logging-config"><info><title xml:id="service-logging-config.title">Service node: Logging section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: logging (/1/3)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+        <informalexample> 
+            <para>The <code>Logging</code> configuration section controls logging behavior across &program_name;.</para>
+            <programlisting>[Logging]
+                Disable = false
+                File = "katzenpost.log"
+                Level = "INFO"</programlisting>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">Disable</emphasis></para>
+                    <para>If <emphasis role="bold">true</emphasis>, logging is disabled.</para>
+                    <para>Type: bool</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">File</emphasis></para>
+                    <para>Specifies the log file. If omitted, <code>stdout</code> is used.</para>
+                    <para>An absolute or relative file path can be specified. A relative path is 
+                    relative to the DataDir specified in the <code>Server</code> section of the 
+                    configuration.</para>
+                    <para>Type: string</para>
+                    <para>Required: No</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">Level</emphasis></para>
+                    <para>Supported logging level values are ERROR | WARNING | NOTICE |INFO | DEBUG.</para>
+                    <para>Type: string</para>
+                    <para>Required: No</para>
+                    <warning>
+                        <para>The DEBUG log level is unsafe for
+                            production use.</para>
+                    </warning>                               
+                </listitem>
+            </itemizedlist>   
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="service-servicenode-section-config">
-                <title id="service-servicenode-section-config.title">Service node: ServiceNode
-                    section</title>
+            <section xml:id="service-servicenode-section-config"><info><title xml:id="service-servicenode-section-config.title">Service node: ServiceNode
+                    section</title></info>
+                
                 <para>The <code>ServiceNode</code> section contains configurations for each network
                     service that &program_name; supports. </para>
-                <para>Services, termed <ulink
-                        url="https://github.com/katzenpost/katzenpost/blob/main/docs/Specificatons/pdf/kaetzchen.pdf"
-                        >Kaetzchen</ulink>, can be divided into built-in and external services.
-                    External services are provided through the <ulink
-                        url="https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.35/server/cborplugin#ResponseFactory"
-                        >CBORPlugin</ulink>, a Go programming language implementation of the <ulink
-                        url="https://datatracker.ietf.org/doc/html/rfc8949">Concise Binary Object
-                        Representation (CBOR)</ulink>, a binary data serialization format. While
+                <para>Services, termed <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/katzenpost/katzenpost/blob/main/docs/Specificatons/pdf/kaetzchen.pdf">Kaetzchen</link>, can be divided into built-in and external services.
+                    External services are provided through the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.35/server/cborplugin#ResponseFactory">CBORPlugin</link>, a Go programming language implementation of the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://datatracker.ietf.org/doc/html/rfc8949">Concise Binary Object
+                        Representation (CBOR)</link>, a binary data serialization format. While
                     native services need simply to be activated, external services are invoked by a
                     separate command and connected to the mixnet over a Unix socket. The plugin
                     allows mixnet services to be added in any programming language.</para>
@@ -1224,7 +2875,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             <para>The <code>spool</code> service supports the <code>catshadow</code>
                                 storage protocol,
                                 <?oxy_comment_start author="dwrob" timestamp="20241113T174007-0800" comment="Wasn&apos;t there also something about Panda and Reunion being don&apos;t-say-deprecated and needing this spool? They both appear to be configured as enabled in the example. What should be the messaging on this?  See highlighted text below."?>which
-                                is required by the &chat_client; chat client<?oxy_comment_end?>. The
+                                is required by the Katzen chat client<?oxy_comment_end?>. The
                                 example configuration above shows spool enabled with the setting:<programlisting>Disable = false</programlisting><note>
                                     <para><code>Spool</code>, properly <code>memspool</code>, should
                                         not be confused with the spool database on gateway
@@ -1250,8 +2901,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             <para><emphasis role="bold">pigeonhole</emphasis></para>
                             <para>The <code>pigeonhole</code> courier service supports the
                                 Blinding-and-Capability scheme (BACAP)-based unlinkable messaging
-                                protocols detailed in <emphasis role="bold"
-                                    >&research_paper_link;</emphasis>. Most of our future protocols
+                                protocols detailed in <emphasis role="bold">Place-holder for research paper link</emphasis>. Most of our future protocols
                                 will use the <code>pigeonhole</code> courier service.</para>
                             <itemizedlist>
                                 <listitem>
@@ -1270,8 +2920,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                             </itemizedlist>
                         </listitem>
                         <listitem>
-                            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><emphasis
-                                    role="bold">panda</emphasis></para>
+                            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><emphasis role="bold">panda</emphasis></para>
                             <para>The <code>panda</code> storage and authentication service
                                 currently does not work properly.</para>
                             <itemizedlist>
@@ -1339,36 +2988,487 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </itemizedlist>
                 </para>
             </section>
-            <section id="service-pki-config">
-                <title id="service-pki-config.title">Service node: PKI section</title>
+            <section xml:id="service-pki-config"><info><title xml:id="service-pki-config.title">Service node: PKI section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: pki (/1/6)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+             
+        <informalexample> 
+            <para>The <code>PKI</code> section contains the directory authority configuration for a mix, gateway, or service node.</para>
+            <programlisting>[PKI]
+[PKI.dirauth]
+
+    [[PKI.dirauth.Authorities]]
+        Identifier = "auth1"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+tqN6tpOVotHWXKCszVn2kS7vAZjQpvJjQF3Qz/Qwhyg=
+-----END ED25519 PUBLIC KEY-----
+"""
+        PKISignatureScheme = "Ed25519"
+        LinkPublicKey = """-----BEGIN XWING PUBLIC KEY-----
+JnJ8ztQEIjAkKJcpuZvJAdkWjBim/5G5d8yoosEQHeGJeeBqNPdm2AitUbpiQPcd
+tNCo9DxuC9Ieqmsfw0YpV6AtOOsaInA6QnHDYcuBfZcQL5MU4+t2TzpBZQYlrSED
+hPCKrAG+8GEUl6akseG371WQzEtPpEWWCJCJOiS/VDFZT7eKrldlumN6gfiB84sR
+...
+arFh/WKwYJUj+aGBsFYSqGdzC6MdY4x/YyFe2ze0MJEjThQE91y1d/LCQ3Sb7Ri+
+u6PBi3JU2qzlPEejDKwK0t5tMNEAkq8iNrpRTdD/hS0gR+ZIN8Z9QKh7Xf94FWG2
+H+r8OaqImQhgHabrWRDyLg==
+-----END XWING PUBLIC KEY-----
+"""
+        WireKEMScheme = "xwing"
+        Addresses = ["127.0.0.1:30001"]
+
+    [[PKI.dirauth.Authorities]]
+        Identifier = "auth2"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+O51Ty2WLu4C1ETMa29s03bMXV72gnjJfTfwLV++LVBI=
+-----END ED25519 PUBLIC KEY-----	
+"""
+        PKISignatureScheme = "Ed25519"
+        LinkPublicKey = """-----BEGIN XWING PUBLIC KEY-----
+TtQkg2XKUnY602FFBaPJ+zpN0Twy20cwyyFxh7FNUjaXA9MAJXs0vUwFbJc6BjYv
+f+olKnlIKFSmDvcF74U6w1F0ObugwTNKNxeYKPKhX4FiencUbRwkHoYHdtZdSctz
+TKy08qKQyCAccqCRpdo6ZtYXPAU+2rthjYTOL7Zn+7SHUKCuJClcPnvEYjVcJxtZ
+...
+ubJIe5U4nMJbBkOqr7Kq6niaEkiLODa0tkpB8tKMYTMBdcYyHSXCzpo7U9sb6LAR
+HktiTBDtRXviu2vbw7VRXhkMW2kjYZDtReQ5sAse04DvmD49zgTp1YxYW+wWFaL3
+37X7/SNuLdHX4PHZXIWHBQ==
+-----END XWING PUBLIC KEY-----	
+"""
+        WireKEMScheme = "xwing"
+        Addresses = ["127.0.0.1:30002"]
+
+    [[PKI.dirauth.Authorities]]
+        Identifier = "auth3"
+        IdentityPublicKey = """-----BEGIN ED25519 PUBLIC KEY-----
+zQvydRYJq3npeLcg1NqIf+SswEKE5wFmiwNsI9Z1whQ=
+-----END ED25519 PUBLIC KEY-----
+"""
+        PKISignatureScheme = "Ed25519"
+        LinkPublicKey = """
+-----BEGIN XWING PUBLIC KEY-----
+OYK9FiC53xwZ1VST3jDOO4tR+cUMSVRSekmigZMChSjDCPZbKut8TblxtlUfc/yi
+Ugorz4NIvYPMWUt3QPwS2UWq8/HMWXNGPUiAevg12+oV+jOJXaJeCfY24UekJnSw
+TNcdGaFZFSR0FocFcPBBnrK1M2B8w8eEUKQIsXRDM3x/8aRIuDif+ve8rSwpgKeh
+...
+OdVD3yw7OOS8uPZLORGQFyJbHtVmFPVvwja4G/o2gntAoHUZ2LiJJakpVhhlSyrI
+yuzvwwFtZVfWtNb5gAKZCyg0aduR3qgd7MPerRF+YopZk3OCRpC02YxfUZrHv398
+FZWJFK0R8iU52CEUxVpXTA==
+-----END XWING PUBLIC KEY-----	
+"""
+        WireKEMScheme = "xwing"
+        Addresses = ["127.0.0.1:30003"]</programlisting>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">Identifier</emphasis></para>
+                    <para>Specifies the human-readable identifier for a node, which must be unique per mixnet. 
+                    The identifier can be an FQDN but does not have to be.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">IdentityPublicKey</emphasis></para>
+                    <para>String containing the node's public identity key in PEM format.
+                            <code>IdentityPublicKey</code> is the node's permanent identifier
+                        and is used to verify cryptographic signatures produced by its private
+                        identity key.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
+                    <para>Specifies the cryptographic signature scheme that will be used by all
+                        components of the mix network when interacting with the PKI system. Mix
+                        nodes sign their descriptors using this signature scheme, and dirauth nodes
+                        similarly sign PKI documents using the same scheme.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">LinkPublicKey</emphasis></para>
+                    <para>String containing the peer's public link-layer key in PEM format.
+                            <code>LinkPublicKey</code> must match the specified
+                            <code>WireKEMScheme</code>.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">WireKEMScheme</emphasis></para>
+                    <para>The name of the wire protocol key-encapsulation mechanism (KEM) to use.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">Addresses</emphasis></para>
+                    <para>Specifies a list of one or more address URLs in a format that contains the
+                        transport protocol, IP address, and port number that the server will bind to
+                        for incoming connections. &program_name; supports URLs that start with
+                        either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
+                        ["quic://192.168.1.1:40001"].</para>
+                    <para>Type: []string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+            </itemizedlist>                            
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="service-management-config">
-                <title id="service-management-config.title">Service node: Management section</title>
+            <section xml:id="service-management-config"><info><title xml:id="service-management-config.title">Service node: Management section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: management (/1/5)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+           <informalexample> 
+           <para>The <code>Management</code> section specifies 
+               connectivity information for the &program_name; control protocol which can be used to make run-time 
+               configuration changes. A configuration resembles the following:</para>
+           <programlisting>[Management]
+   Enable = false
+   Path = "/dirauth_mixnet/mix1/management_sock"</programlisting>
+           <itemizedlist>
+               <listitem>
+                   <para><emphasis role="bold">Enable</emphasis></para>
+                   <para>If <emphasis role="bold">true</emphasis>, the management interface is
+                        enabled.</para>
+                   <para>Type: bool</para>
+                   <para>Required: No</para>
+               </listitem>
+               <listitem>
+                   <para><emphasis role="bold">Path</emphasis></para>
+                   <para>Specifies the path to the management interface socket. If left empty, then <code>management_sock</code> 
+                       is located in the configuration's defined <code>DataDir</code>&gt;.</para>
+                   <para>Type: string</para>
+                   <para>Required: No</para>
+               </listitem>
+           </itemizedlist>
+       </informalexample>
+    </simplesect>
             </section>
-            <section id="service-sphinx-config">
-                <title id="service-sphinx-config.title">Service node: SphinxGeometry section</title>
+            <section xml:id="service-sphinx-config"><info><title xml:id="service-sphinx-config.title">Service node: SphinxGeometry section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+        
+        <informalexample>        
+            <para>The <code>SphinxGeometry</code> section defines parameters for the Sphinx
+                encrypted nested-packet format used internally by &program_name;. 
+                <warning><para>The values in the <code>SphinxGeometry</code> configuration section must
+                        be programmatically generated by <command>gensphinx</command>. Many of the
+                        parameters are interdependent and cannot be individually modified. Do not
+                        modify the these values by hand.</para></warning></para>
+            <para>The settings in this section are generated by the <command>gensphinx</command>
+                utility, which computes the Sphinx geometry based on the following user-supplied
+                directives:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>The number of  mix node layers (not counting gateway and service
+                        nodes)</para>
+                </listitem>
+                <listitem>
+                    <para>The length of the application-usable packet payload</para>
+                </listitem>
+                <listitem>
+                    <para>The selected NIKE or KEM scheme</para>
+                </listitem>
+            </itemizedlist>
+            <para>The output in TOML should then be pasted unchanged into the node's configuration
+                file, as shown below. For more information, see <link xlink:href="&baseURL;docs/admin_guide/gensphinx.html"
+                    >Appendix: Using <emphasis>gensphinx</emphasis></link><!--<xref linkend="gensphinx"/>--><!--<xref linkend="gensphinx"/>-->.</para>
+            <programlisting>[SphinxGeometry]
+                PacketLength = 3082
+                NrHops = 5
+                HeaderLength = 476
+                RoutingInfoLength = 410
+                PerHopRoutingInfoLength = 82
+                SURBLength = 572
+                SphinxPlaintextHeaderLength = 2
+                PayloadTagLength = 32
+                ForwardPayloadLength = 2574
+                UserForwardPayloadLength = 2000
+                NextNodeHopLength = 65
+                SPRPKeyMaterialLength = 64
+                NIKEName = "x25519"
+                KEMName = ""</programlisting>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">PacketLength</emphasis></para>
+                    <para>The length of a Sphinx packet in bytes.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">NrHops</emphasis></para>
+                    <para>The number of hops a Sphinx packet takes through the mixnet. Because
+                        packet headers hold destination information for each hop, the size of the
+                        header increases linearly with the number of hops.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">HeaderLength</emphasis></para>
+                    <para>The total length of the Sphinx packet header in bytes.</para>                   
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">RoutingInfoLength</emphasis></para>
+                    <para>The total length of the routing information portion of the Sphinx packet
+                        header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">PerHopRoutingInfoLength</emphasis></para>
+                    <para>The length of the per-hop routing information in the Sphinx packet
+                        header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">SURBLength</emphasis></para>
+                    <para>The length of a single-use reply block (SURB).</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">SphinxPlaintextHeaderLength</emphasis></para>
+                    <para>The length of the plaintext Sphinx packet header.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">PayloadTagLength</emphasis></para>
+                    <para>The length of the payload tag.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">ForwardPayloadLength</emphasis></para>
+                    <para>The total size of the payload.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>                    
+                <listitem>
+                    <para><emphasis role="bold">UserForwardPayloadLength</emphasis></para>
+                    <para>The size of the usable payload.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>       
+                <listitem>
+                    <para><emphasis role="bold">NextNodeHopLength</emphasis></para>
+                    <para>The <code>NextNodeHopLength</code> is derived from the largest routing-information 
+                        block that we expect to encounter. Other packets have 
+                        <code>NextNodeHop</code> + <code>NodeDelay</code> sections, or a <code>Recipient</code> section, both of which
+                        are shorter.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>  
+                <listitem>
+                    <para><emphasis role="bold">SPRPKeyMaterialLength</emphasis></para>
+                    <para>The length of the strong pseudo-random permutation (SPRP) key.</para>
+                    <para>Type: int</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">NIKEName</emphasis></para>
+                    <para>The name of the non-interactive key exchange (NIKE) scheme used by Sphinx
+                        packets.</para>
+                    <para><code>NIKEName</code> and <code>KEMName</code> are mutually
+                        exclusive.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">KEMName</emphasis></para>
+                    <para>The name of the key encapsulation mechanism (KEM) used by Sphinx
+                        packets.</para>
+                    <para><code>NIKEName</code> and <code>KEMName</code> are mutually exclusive.</para>
+                    <para>Type: string</para>
+                    <para>Required: Yes</para>
+                </listitem>
+            </itemizedlist>            
+        </informalexample>
+    </simplesect>
             </section>
-            <section id="service-debug-config">
-                <title id="service-debug-config.title">Service node: Debug section</title>
+            <section xml:id="service-debug-config"><info><title xml:id="service-debug-config.title">Service node: Debug section</title></info>
+                
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: serverdebug (/1/7)-->
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <simplesect xml:base="includes/xincludes.xml"><info><title/></info>
+             
+        <informalexample>    
+            <para>The <code>Debug</code> section is the &program_name; server debug configuration
+                for advanced tuning.</para>   
+            <programlisting>[Debug]
+                NumSphinxWorkers = 16
+                NumServiceWorkers = 3
+                NumGatewayWorkers = 3
+                NumKaetzchenWorkers = 3
+                SchedulerExternalMemoryQueue = false
+                SchedulerQueueSize = 0
+                SchedulerMaxBurst = 16
+                UnwrapDelay = 250
+                GatewayDelay = 500
+                ServiceDelay = 500
+                KaetzchenDelay = 750
+                SchedulerSlack = 150
+                SendSlack = 50
+                DecoySlack = 15000
+                ConnectTimeout = 60000
+                HandshakeTimeout = 30000
+                ReauthInterval = 30000
+                SendDecoyTraffic = false
+                DisableRateLimit = false
+                GenerateOnly = false</programlisting>
+                <itemizedlist>
+                    <listitem>
+                        <para><emphasis role="bold">NumSphinxWorkers</emphasis></para>
+                        <para>Specifies the number of worker instances to use for inbound Sphinx
+                            packet processing.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">NumProviderWorkers</emphasis></para>
+                        <para>Specifies the number of worker instances to use for provider specific
+                            packet processing.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">NumKaetzchenWorkers</emphasis></para>
+                        <para>Specifies the number of worker instances to use for Kaetzchen-specific
+                        packet processing.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerExternalMemoryQueue</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, the experimental disk-backed external memory 
+                            queue is enabled.</para>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerQueueSize</emphasis></para>
+                        <para>Specifies the maximum scheduler queue size before random entries will
+                        start getting dropped. A value less than or equal to zero is treated as
+                        unlimited.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerMaxBurst</emphasis></para>
+                        <para>Specifies the maximum number of packets that will be dispatched per
+                            scheduler wakeup event.</para>
+                        <para>Type: </para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">UnwrapDelay</emphasis></para>
+                        <para>Specifies the maximum unwrap delay due to queueing in
+                            milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">GatewayDelay</emphasis></para>
+                        <para>Specifies the maximum gateway node worker delay due to queueing in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">ServiceDelay</emphasis></para>
+                        <para>Specifies the maximum provider delay due to queueing in
+                            milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para> 
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">KaetzchenDelay</emphasis></para>
+                        <para>Specifies the maximum kaetzchen delay due to queueing in
+                            milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SchedulerSlack</emphasis></para>
+                        <para>Specifies the maximum scheduler slack due to queueing and/or
+                            processing in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SendSlack</emphasis></para>
+                        <para>Specifies the maximum send-queue slack due to queueing and/or
+                            congestion in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">DecoySlack</emphasis></para>
+                        <para>Specifies the maximum decoy sweep slack due to external
+                            delays such as latency before a loop decoy packet will be considered
+                            lost.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">ConnectTimeout</emphasis></para>
+                        <para>Specifies the maximum time a connection can take to establish a
+                            TCP/IP connection in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">HandshakeTimeout</emphasis></para>
+                        <para>Specifies the maximum time a connection can take for a link-protocol
+                            handshake in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">ReauthInterval</emphasis></para>
+                        <para>Specifies the interval at which a connection will be reauthenticated
+                            in milliseconds.</para>
+                        <para>Type: int</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">SendDecoyTraffic</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, decoy traffic is enabled. 
+                            This parameter is experimental and untuned, 
+                            and is disabled by default.</para>
+                        <note>
+                            <para>This option will be removed once decoy traffic is fully implemented.</para>
+                        </note>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">DisableRateLimit</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, the per-client rate limiter is disabled.</para>
+                        <note>
+                            <para>This option should only be used for testing.</para>
+                        </note>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">GenerateOnly</emphasis></para>
+                        <para>If <emphasis role="bold">true</emphasis>, the server immediately halts
+                        and cleans up after long-term key generation.</para>
+                        <para>Type: bool</para>
+                        <para>Required: No</para>
+                    </listitem>
+                </itemizedlist>
+        </informalexample> 
+    </simplesect>
             </section>
 
 
         </section>
     </section>
-</section>
+</article>

@@ -4,15 +4,15 @@
 
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
-<?title ?> 
-<?linkTitle "Using with NAT" ?>  <!-- Section menu link text -->
-<?url "docs/admin_guide/nat.html" ?> <!-- Required to make image links work -->
+<?title ?>
+<?linkTitle "Introduction" ?>  <!-- Section menu link text -->
+<?url "docs/admin_guide/introduction.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
 <?draft false ?> <!-- Optional -->
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
-<?weight 40 ?> <!-- Optional -->
+<?weight 1 ?> <!-- Optional -->
 
 <!DOCTYPE article [
     <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
@@ -21,13 +21,20 @@
 
 <article    xmlns="http://docbook.org/ns/docbook"
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
-    xml:id="nat">
+    xml:id="introduction">
     
     <info>
-        <title xml:id="nat.title">Using &program_name; from behind a NAT device</title>    
+        <title xml:id="introduction.title">Introducing &program_name;, a modern mixnet</title>  
     </info>
 
     <para>To do</para>   
+    
+    <mediaobject>               
+        <imageobject>
+            <imagedata fileref="pix/mixnet-traversal.png"/>
+        </imageobject>                                                
+    </mediaobject>
+    
    
 <!--    <para>&program_name; can be used from behind NAT devices. Both mix and dirauth nodes.</para>
     <para>Some networking scenearios do not require any manual port forwarding, such as operating an ec2 node on AWS,

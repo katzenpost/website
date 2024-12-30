@@ -1,252 +1,459 @@
 ---
-title: "Docker"
-draft: false
-weight: 20
+title: 
+linkTitle: "Docker test network" 
+description: "" 
+url: "docs/admin_guide/docker.html" 
+date: "2024-12-30T00:06:22.682627456-08:00"
+draft: false 
+slug: "" 
+layout: "" 
+type: "" 
+weight: 20 
 ---
-<html xmlns:ng="http://docbook.org/docbook-ng"><head>
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
       <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-   <title>Using the Katzenpost Docker test network</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article"><div class="titlepage"><div><div><h2 class="title"><a name="container"></a>Using the Katzenpost Docker test network</h2></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#install_kp">Preparing to run the container image</a></span></dt><dt><span class="section"><a href="#basic-ops">Operating the test mixnet</a></span></dt><dd><dl><dt><span class="section"><a href="#start-mixnet">Starting and monitoring the mixnet</a></span></dt><dt><span class="section"><a href="#test-mixnet">Testing the mixnet</a></span></dt><dt><span class="section"><a href="#shutdown-mixnet">Shutting down the mixnet</a></span></dt><dt><span class="section"><a href="#uninstall-mixnet">Uninstalling and cleaning up</a></span></dt></dl></dd><dt><span class="section"><a href="#topology">Network topology and components</a></span></dt><dd><dl><dt><span class="section"><a href="#d6e398">The Docker file tree</a></span></dt></dl></dd><dt><span class="section"><a href="#d6e404"></a></span></dt></dl></div>
-        
-    
-    <p>Katzenpost provides a ready-to-deploy Docker
+      <title>Using the Katzenpost Docker test network</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+   </head>
+   <body>
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h1 class="title"><a name="container"></a>Using the Katzenpost Docker test network</h1>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="toc">
+            <p><b>Table of Contents</b></p>
+            <dl class="toc">
+               <dt><span class="section"><a href="#requirements">Requirements</a></span></dt>
+               <dt><span class="section"><a href="#install_kp">Preparing to run the container image</a></span></dt>
+               <dt><span class="section"><a href="#basic-ops">Operating the test mixnet</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#start-mixnet">Starting and monitoring the mixnet</a></span></dt>
+                     <dt><span class="section"><a href="#test-mixnet">Testing the mixnet</a></span></dt>
+                     <dt><span class="section"><a href="#shutdown-mixnet">Shutting down the mixnet</a></span></dt>
+                     <dt><span class="section"><a href="#uninstall-mixnet">Uninstalling and cleaning up</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#topology">Network topology and components</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#d58e584">The Docker file tree</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#d58e596"></a></span></dt>
+            </dl>
+         </div>
+         <p>Katzenpost provides a ready-to-deploy Docker
             image for developers who need a non-production test environment for developing
-        and testing client applications and server side plugins. By running this image on a single computer, you avoid the
-        need to build and manage a complex multi-node mix net. The image can also be run using <a class="ulink" href="https://podman.io/" target="_top">Podman</a></p>
-    <p>The test mix network includes the following components:</p>
-    <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
-            <p>Three directory authority (<a class="ulink" href="https://katzenpost.network/docs/specs/pki/" target="_top">PKI</a>) nodes</p>
-        </li><li class="listitem">
-            <p>Six <a class="ulink" href="https://katzenpost.network/docs/specs/mixnet/" target="_top">mix</a> nodes,
-                including one node serving also as both gateway and service provider</p>
-        </li><li class="listitem">
-            <p>A ping utility, <span class="command"><strong>run-ping</strong></span></p>
-        </li></ul></div>
-    
-    <div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="requirements"></a>Requirements</h2></div></div></div>         
-        
-        <p>Before running the Katzenpost docker image, make sure that the
-            following
-            software is installed. </p>
-        <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
-                <p>A <a class="ulink" href="https://debian.org" target="_top">Debian GNU Linux</a> or <a class="ulink" href="https://ubuntu.com" target="_top">Ubuntu</a> system</p>
-            </li><li class="listitem">
-                <p><a class="ulink" href="https://git-scm.com/" target="_top">Git</a></p>
-            </li><li class="listitem">
-                <p><a class="ulink" href="https://go.dev/" target="_top">Go</a></p>
-            </li><li class="listitem">
-                <p><a class="ulink" href="https://www.gnu.org/software/make/" target="_top">GNU Make</a></p>
-            </li><li class="listitem">
-                <p><a class="ulink" href="https://prometheus.io/docs/introduction/overview/" target="_top">Prometheus</a></p>
-            </li><li class="listitem">
-                <p><a class="ulink" href="https://www.docker.com" target="_top">Docker</a>, <a class="ulink" href="https://docs.docker.com/compose/" target="_top">Docker Compose</a>, and
-                    (optionally) <a class="ulink" href="https://podman.io" target="_top">Podman</a></p>
-                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
-                    <p>If both Docker and Podman are present on your system, Katzenpost uses
-                        Podman. Podman is a drop-in daemonless equivalent to Docker that does not
-                        require superuser privileges to run.</p>
-                </td></tr></table></div>
-            </li></ul></div>
-        <p>On Debian, these software requirements can be installed with the following commands
-            (running as superuser). <span class="command"><strong>Apt</strong></span> will pull in the needed
-            dependencies.</p>
-        <pre class="programlisting"><code class="prompt"># </code><span class="command"><strong>apt update</strong></span>
-<code class="prompt"># </code><span class="command"><strong>apt install git golang make docker docker-compose podman</strong></span></pre>       
-    </div>   
-    <div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="install_kp"></a>Preparing to run the container image</h2></div></div></div>
-        
-        <p>Complete the following procedure to obtain, build, and deploy the Katzenpost test
-            network. </p>
-        <div class="procedure"><ol class="procedure" type="1"><li class="step">
-                <p>Install the Katzenpost code repository, hosted at <a class="ulink" href="https://github.com/katzenpost" target="_top">https://github.com/katzenpost</a>. The main Katzenpost
-                    repository contains code for the server components as well as the docker image.
-                    Clone the repository with the following command (your directory location may
-                    vary):</p>
-                <pre class="programlisting"><code class="prompt">~$ </code><span class="command"><strong>git clone https://github.com/katzenpost/katzenpost.git</strong></span></pre>
-            </li><li class="step">
-                <p>Navigate to the new <code class="filename">katzenpost</code> subdirectory and ensure
-                    that the code is up to date.
-                    </p><pre class="programlisting"><code class="prompt">~$ </code><span class="command"><strong>cd katzenpost</strong></span>
-<code class="prompt">~/katzenpost$ </code><span class="command"><strong>git checkout main</strong></span>
-<code class="prompt">~/katzenpost$ </code><span class="command"><strong>git pull</strong></span></pre>
-            </li><li class="step">
-                <p>(Optional) Create a development branch and check it
-                    out.</p><pre class="programlisting"><code class="prompt">~/katzenpost$ </code><span class="command"><strong>git checkout -b devel</strong></span></pre>
-            </li><li class="step">
-                <p>(Optional) If you are using Podman, complete the following steps:</p>
-                <div class="procedure"><ol class="procedure" type="1"><li class="step">
-                        <p>Point the DOCKER_HOST environment variable at the Podman
-                            process.</p>
-                        <pre class="programlisting"><code class="prompt">$ </code><span class="command"><strong>export DOCKER_HOST=unix:///var/run/user/$(id -u)/podman/podman.sock</strong></span></pre>
-                    </li><li class="step">
-                        <p> Set up and start the Podman server (as superuser).</p>
-                        <pre class="programlisting"><code class="prompt">$ </code><span class="command"><strong>podman system service -t 0 $DOCKER_HOST &amp;</strong></span>
-<code class="prompt">$ </code><span class="command"><strong>systemctl --user enable --now podman.socket</strong></span>
-                        </pre>
-                    </li></ol></div>
-            </li></ol></div>        
-    </div>           
-    <div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="basic-ops"></a>Operating the test mixnet</h2></div></div></div>
-        
-        <p>Navigate to <code class="filename">katzenpost/docker</code>. The <code class="filename">Makefile</code>
-            contains target operations to create, manage, and test the self-contained Katzenpost
-            container network. To invoke a target, run a command with the using the following
-            pattern:</p>
-        <pre class="programlisting"> <code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make<em class="replaceable"><code> target</code></em></strong></span></pre>
-        <p>Running <span class="command"><strong>make</strong></span> with no target specified returns a list of available
-            targets.</p>
-        <div class="table"><a name="d6e101"></a><p class="title"><b>Table&nbsp;1.&nbsp;Table 1: Makefile targets</b></p><div class="table-contents">
-            
-            <table class="table" summary="Table 1: Makefile targets" border="1"><colgroup><col><col></colgroup><tbody><tr><td>
-                            <p>[none]</p>
-                        </td><td>
-                            <p>Display this list of targets.</p>
-                        </td></tr><tr><td>
-                            <p><span class="bold"><strong>start</strong></span></p>
-                        </td><td>
-                            <p>Run the test network in the background.</p>
-                        </td></tr><tr><td>
-                            <p><span class="bold"><strong>stop</strong></span></p>
-                        </td><td>
-                            <p>Stop the test network.</p>
-                        </td></tr><tr><td>
-                            <p><span class="bold"><strong>wait</strong></span></p>
-                        </td><td>
-                            <p>Wait for the test network to have consensus.</p>
-                        </td></tr><tr><td><span class="bold"><strong>watch</strong></span></td><td>
-                            <p>Display live log entries until <span class="command"><strong>Ctrl-C</strong></span>.</p>
-                        </td></tr><tr><td>
-                            <p><span class="bold"><strong>status</strong></span></p>
-                        </td><td>
-                            <p>Show test network consensus status.</p>
-                        </td></tr><tr><td>
-                            <p><span class="bold"><strong>show-latest-vote</strong></span></p>
-                        </td><td>
-                            <p>Show latest consensus vote.</p>
-                        </td></tr><tr><td>
-                            <p><span class="bold"><strong>run-ping</strong></span></p>
-                        </td><td>Send a ping over the test network.</td></tr><tr><td>
-                            <p><span class="bold"><strong>clean-bin</strong></span></p>
-                        </td><td>
-                            <p>Stop all components and delete binaries.</p>
-                        </td></tr><tr><td>
-                            <p><span class="bold"><strong>clean-local</strong></span></p>
-                        </td><td>
-                            <p>Stop all components, delete binaries, and delete data.</p>
-                        </td></tr><tr><td>
-                            <p><span class="bold"><strong>clean-local-dryrun</strong></span></p>
-                        </td><td>
-                            <p>Show what clean-local would delete.</p>
-                        </td></tr><tr><td>
-                            <p><span class="bold"><strong>clean</strong></span></p>
-                        </td><td>
-                            <p>Same as <span class="bold"><strong>clean-local</strong></span>, but also
-                                deletes <code class="code">go_deps</code> image.</p>
-                        </td></tr></tbody></table>
-        </div></div><br class="table-break">
-        <div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="start-mixnet"></a>Starting and monitoring the mixnet</h3></div></div></div>
-            
-            <p>The first time that you run <span class="command"><strong>make start</strong></span>, the Docker image is
-                downloaded, built, installed, and started. This takes several minutes. When the
-                build is complete, the command exits while the network remains running in the
-                background.</p>
-            <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make start</strong></span></pre>
-            <p>Subsequent runs of <span class="command"><strong>make start</strong></span> either start or restart the
-                network without building the components from scratch. The exception to this is when
-                you delete any of the Katzenpost binaries (dirauth.alpine, server.alpine, etc.).
-                In that case, <span class="command"><strong>make start</strong></span> rebuilds just the parts of the network
-                dependent on the deleted binary. For more information about the files created during
-                the Docker build, see <a class="xref" href="#topology" title="Network topology and components">the section called &#8220;Network topology and components&#8221;</a>.</p>
-            <p></p>
-            <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
-                <p>When running <span class="command"><strong>make start</strong></span> , be aware of the following
-                    considerations:</p>
-                <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
-                        <p>If you intend to use Docker, you need to run <span class="command"><strong>make</strong></span>
-                            as superuser. If you are using <span class="command"><strong>sudo</strong></span> to elevate your
-                            privileges, you need to edit
-                                <code class="filename">katzenpost/docker/Makefile</code> to prepend
-                                <span class="command"><strong>sudo</strong></span> to each command contained in it.</p>
-                    </li><li class="listitem">
-                        <p>If you have Podman installed on your system and you nonetheless want
-                            to run Docker, you can override the default behavior by adding the
-                            argument <span class="command"><strong>docker=docker</strong></span> to the command as in the
-                            following:</p><pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make run docker=docker</strong></span> </pre>
-                    </li></ul></div>
-            </td></tr></table></div>
-            <p>After the <span class="command"><strong>make start</strong></span> command exits, the mixnet runs in the
-                background, and you can run <span class="command"><strong>make watch</strong></span> to display a live log of
-                the network activity.</p>
-            <p>
-                </p><pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make watch</strong></span>
+            and testing client applications and server side plugins. By running this image on
+            a single computer, you avoid the
+            need to build and manage a complex multi-node mix net. The image can also be run using
+            <a class="link" href="https://podman.io/" target="_top">Podman</a></p>
+         <p>The test mix network includes the following components:</p>
+         <div class="itemizedlist">
+            <ul class="itemizedlist" style="list-style-type: disc; ">
+               <li class="listitem">
+                  <p>Three directory authority (<a class="link" href="https://katzenpost.network/docs/specs/pki/" target="_top">PKI</a>) nodes</p>
+               </li>
+               <li class="listitem">
+                  <p>Six <a class="link" href="https://katzenpost.network/docs/specs/mixnet/" target="_top">mix</a> nodes,
+                     including one node serving also as both gateway and service provider</p>
+               </li>
+               <li class="listitem">
+                  <p>A ping utility, <span class="command"><strong>run-ping</strong></span></p>
+               </li>
+            </ul>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="requirements"></a>Requirements</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Before running the Katzenpost docker image, make sure that the
+               following
+               software is installed. </p>
+            <div class="itemizedlist">
+               <ul class="itemizedlist" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p>A <a class="link" href="https://debian.org" target="_top">Debian GNU Linux</a> or <a class="link" href="https://ubuntu.com" target="_top">Ubuntu</a> system</p>
+                  </li>
+                  <li class="listitem">
+                     <p><a class="link" href="https://git-scm.com/" target="_top">Git</a></p>
+                  </li>
+                  <li class="listitem">
+                     <p><a class="link" href="https://go.dev/" target="_top">Go</a></p>
+                  </li>
+                  <li class="listitem">
+                     <p><a class="link" href="https://www.gnu.org/software/make/" target="_top">GNU Make</a></p>
+                  </li>
+                  <li class="listitem">
+                     <p><a class="link" href="https://prometheus.io/docs/introduction/overview/" target="_top">Prometheus</a></p>
+                  </li>
+                  <li class="listitem">
+                     <p><a class="link" href="https://www.docker.com" target="_top">Docker</a>, <a class="link" href="https://docs.docker.com/compose/" target="_top">Docker Compose</a>, and
+                        (optionally) <a class="link" href="https://podman.io" target="_top">Podman</a></p>
+                     <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                        <table border="0" summary="Note">
+                           <tr>
+                              <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                              <th align="left">Note</th>
+                           </tr>
+                           <tr>
+                              <td align="left" valign="top">
+                                 <p>If both Docker and Podman are present on your system, Katzenpost uses
+                                    Podman. Podman is a drop-in daemonless equivalent to Docker that does not
+                                    require superuser privileges to run.</p>
+                              </td>
+                           </tr>
+                        </table>
+                     </div>
+                  </li>
+               </ul>
+            </div>
+            <p>On Debian, these software requirements can be installed with the following commands
+               (running as superuser). <span class="command"><strong>Apt</strong></span> will pull in the needed
+               dependencies.</p>
+            <pre class="programlisting"><code class="prompt"># </code><span class="command"><strong>apt update</strong></span><code class="prompt"># </code><span class="command"><strong>apt install git golang make docker docker-compose podman</strong></span></pre>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="install_kp"></a>Preparing to run the container image</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Complete the following procedure to obtain, build, and deploy the Katzenpost test
+               network. </p>
+            <div class="procedure">
+               <ol class="procedure" type="1">
+                  <li class="step">
+                     <p>Install the Katzenpost code repository, hosted at <code class="uri"><a class="uri" href="https://github.com/katzenpost" target="_top">https://github.com/katzenpost</a></code>. The main Katzenpost
+                        repository contains code for the server components as well as the docker image.
+                        Clone the repository with the following command (your directory location may
+                        vary):</p>
+                     <pre class="programlisting"><code class="prompt">~$ </code><span class="command"><strong>git clone https://github.com/katzenpost/katzenpost.git</strong></span></pre>
+                  </li>
+                  <li class="step">
+                     <p>Navigate to the new <code class="filename">katzenpost</code> subdirectory and ensure
+                        that the code is up to date.
+                        
+                        <pre class="programlisting"><code class="prompt">~$ </code><span class="command"><strong>cd katzenpost</strong></span><code class="prompt">~/katzenpost$ </code><span class="command"><strong>git checkout main</strong></span><code class="prompt">~/katzenpost$ </code><span class="command"><strong>git pull</strong></span></pre>
+                     </p>
+                  </li>
+                  <li class="step">
+                     <p>(Optional) Create a development branch and check it
+                        out.
+                        <pre class="programlisting"><code class="prompt">~/katzenpost$ </code><span class="command"><strong>git checkout -b devel</strong></span></pre>
+                     </p>
+                  </li>
+                  <li class="step">
+                     <p>(Optional) If you are using Podman, complete the following steps:</p>
+                     <div class="procedure">
+                        <ol class="procedure" type="1">
+                           <li class="step">
+                              <p>Point the DOCKER_HOST environment variable at the Podman
+                                 process.</p>
+                              <pre class="programlisting"><code class="prompt">$ </code><span class="command"><strong>export DOCKER_HOST=unix:///var/run/user/$(id -u)/podman/podman.sock</strong></span></pre>
+                           </li>
+                           <li class="step">
+                              <p> Set up and start the Podman server (as superuser).</p>
+                              <pre class="programlisting"><code class="prompt">$ </code><span class="command"><strong>podman system service -t 0 $DOCKER_HOST &amp;</strong></span><code class="prompt">$ </code><span class="command"><strong>systemctl --user enable --now podman.socket</strong></span></pre>
+                           </li>
+                        </ol>
+                     </div>
+                  </li>
+               </ol>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="basic-ops"></a>Operating the test mixnet</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Navigate to <code class="filename">katzenpost/docker</code>. The <code class="filename">Makefile</code>
+               contains target operations to create, manage, and test the self-contained Katzenpost
+               container network. To invoke a target, run a command with the using the following
+               pattern:</p>
+            <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make<em class="replaceable"><code> target</code></em></strong></span></pre>
+            <p>Running <span class="command"><strong>make</strong></span> with no target specified returns a list of available
+               targets.</p>
+            <div class="table"><a name="d58e173"></a><p class="title"><b>Table&nbsp;1.&nbsp;Table 1: Makefile targets</b></p>
+               <div class="table-contents">
+                  <table class="table" border="1">
+                     <colgroup>
+                        <col>
+                        <col>
+                     </colgroup>
+                     <tbody>
+                        <tr>
+                           <td>
+                              <p>[none]</p>
+                           </td>
+                           <td>
+                              <p>Display this list of targets.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p><span class="bold"><strong>start</strong></span></p>
+                           </td>
+                           <td>
+                              <p>Run the test network in the background.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p><span class="bold"><strong>stop</strong></span></p>
+                           </td>
+                           <td>
+                              <p>Stop the test network.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p><span class="bold"><strong>wait</strong></span></p>
+                           </td>
+                           <td>
+                              <p>Wait for the test network to have consensus.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td><span class="bold"><strong>watch</strong></span></td>
+                           <td>
+                              <p>Display live log entries until <span class="command"><strong>Ctrl-C</strong></span>.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p><span class="bold"><strong>status</strong></span></p>
+                           </td>
+                           <td>
+                              <p>Show test network consensus status.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p><span class="bold"><strong>show-latest-vote</strong></span></p>
+                           </td>
+                           <td>
+                              <p>Show latest consensus vote.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p><span class="bold"><strong>run-ping</strong></span></p>
+                           </td>
+                           <td>Send a ping over the test network.</td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p><span class="bold"><strong>clean-bin</strong></span></p>
+                           </td>
+                           <td>
+                              <p>Stop all components and delete binaries.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p><span class="bold"><strong>clean-local</strong></span></p>
+                           </td>
+                           <td>
+                              <p>Stop all components, delete binaries, and delete data.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p><span class="bold"><strong>clean-local-dryrun</strong></span></p>
+                           </td>
+                           <td>
+                              <p>Show what clean-local would delete.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p><span class="bold"><strong>clean</strong></span></p>
+                           </td>
+                           <td>
+                              <p>Same as <span class="bold"><strong>clean-local</strong></span>, but also
+                                 deletes <code class="code">go_deps</code> image.</p>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div><br class="table-break"><div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="start-mixnet"></a>Starting and monitoring the mixnet</h3>
+                     </div>
+                  </div>
+               </div>
+               <p>The first time that you run <span class="command"><strong>make start</strong></span>, the Docker image is
+                  downloaded, built, installed, and started. This takes several minutes. When the
+                  build is complete, the command exits while the network remains running in the
+                  background.</p>
+               <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make start</strong></span></pre>
+               <p>Subsequent runs of <span class="command"><strong>make start</strong></span> either start or restart the
+                  network without building the components from scratch. The exception to this is when
+                  you delete any of the Katzenpost binaries (dirauth.alpine, server.alpine, etc.).
+                  In that case, <span class="command"><strong>make start</strong></span> rebuilds just the parts of the network
+                  dependent on the deleted binary. For more information about the files created during
+                  the Docker build, see <a class="xref" href="#topology" title="Network topology and components">the section called &#x201c;Network topology and components&#x201d;</a>.</p>
+               <p></p>
+               <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                  <table border="0" summary="Note">
+                     <tr>
+                        <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                        <th align="left">Note</th>
+                     </tr>
+                     <tr>
+                        <td align="left" valign="top">
+                           <p>When running <span class="command"><strong>make start</strong></span> , be aware of the following
+                              considerations:</p>
+                           <div class="itemizedlist">
+                              <ul class="itemizedlist" style="list-style-type: disc; ">
+                                 <li class="listitem">
+                                    <p>If you intend to use Docker, you need to run <span class="command"><strong>make</strong></span>
+                                       as superuser. If you are using <span class="command"><strong>sudo</strong></span> to elevate your
+                                       privileges, you need to edit
+                                       <code class="filename">katzenpost/docker/Makefile</code> to prepend
+                                       <span class="command"><strong>sudo</strong></span> to each command contained in it.</p>
+                                 </li>
+                                 <li class="listitem">
+                                    <p>If you have Podman installed on your system and you nonetheless want
+                                       to run Docker, you can override the default behavior by adding the
+                                       argument <span class="command"><strong>docker=docker</strong></span> to the command as in the
+                                       following:
+                                       <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make run docker=docker</strong></span></pre>
+                                    </p>
+                                 </li>
+                              </ul>
+                           </div>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+               <p>After the <span class="command"><strong>make start</strong></span> command exits, the mixnet runs in the
+                  background, and you can run <span class="command"><strong>make watch</strong></span> to display a live log of
+                  the network activity.</p>
+               <p>
+                  <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make watch</strong></span>
     ...
     &lt;output&gt;
-    ...</pre><p>
-            </p>
-            <p>When installation is complete, the mix servers vote and reach a consensus. You can
-                use the <span class="command"><strong>wait</strong></span> target to wait for the mixnet to get consensus and
-                be ready to use. This can also take several minutes:</p>
-            <p>
-                </p><pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make wait</strong></span>
+    ...</pre>
+               </p>
+               <p>When installation is complete, the mix servers vote and reach a consensus. You can
+                  use the <span class="command"><strong>wait</strong></span> target to wait for the mixnet to get consensus and
+                  be ready to use. This can also take several minutes:</p>
+               <p>
+                  <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make wait</strong></span>
     ...
     &lt;output&gt;
-    ...</pre><p>
-            </p>
-            <p>You can confirm that installation and configuration are complete by issuing the
-                    <span class="command"><strong>status</strong></span> command from the same or another terminal. When the
-                network is ready for use, <span class="command"><strong>status</strong></span> begins returning consensus
-                information similar to the following:</p>
-            <p>
-                </p><pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make status</strong></span>
+    ...</pre>
+               </p>
+               <p>You can confirm that installation and configuration are complete by issuing the
+                  <span class="command"><strong>status</strong></span> command from the same or another terminal. When the
+                  network is ready for use, <span class="command"><strong>status</strong></span> begins returning consensus
+                  information similar to the following:</p>
+               <p>
+                  <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make status</strong></span>
     ...
     00:15:15.003 NOTI state: Consensus made for epoch 1851128 with 3/3 signatures: &amp;{Epoch: 1851128 GenesisEpoch: 1851118
-    ...</pre><p>
-            </p>
-        </div>
-        <div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="test-mixnet"></a>Testing the mixnet</h3></div></div></div>
-            
-            <p>At this point, you should have a locally running mix network. You can test whether
-                it is working correctly by using <span class="command"><strong>run-ping</strong></span>, which launches a
-                packet into the network and watches for a successful reply. Run the following
-                command:</p><pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make run-ping</strong></span></pre>
-            <p>If the network is functioning properly, the resulting output contains lines
-                similar to the following:</p>
-            <pre class="programlisting">19:29:53.541 INFO gateway1_client: sending loop decoy
+    ...</pre>
+               </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="test-mixnet"></a>Testing the mixnet</h3>
+                     </div>
+                  </div>
+               </div>
+               <p>At this point, you should have a locally running mix network. You can test whether
+                  it is working correctly by using <span class="command"><strong>run-ping</strong></span>, which launches a
+                  packet into the network and watches for a successful reply. Run the following
+                  command:
+                  <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make run-ping</strong></span></pre>
+               </p>
+               <p>If the network is functioning properly, the resulting output contains lines
+                  similar to the following:</p>
+               <pre class="programlisting">19:29:53.541 INFO gateway1_client: sending loop decoy
     !19:29:54.108 INFO gateway1_client: sending loop decoy
     19:29:54.632 INFO gateway1_client: sending loop decoy
     19:29:55.160 INFO gateway1_client: sending loop decoy
     !19:29:56.071 INFO gateway1_client: sending loop decoy
     !19:29:59.173 INFO gateway1_client: sending loop decoy
     !Success rate is 100.000000 percent 10/10)</pre>
-            <p>lf <span class="command"><strong>run-ping</strong></span> fails to receive a reply, it eventually times out
-                with an error message. If this happens, try the command again. </p>
-            <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
-                <p>If you attempt use <span class="bold"><strong>run-ping</strong></span> too quickly after
-                    starting the mixnet, and consensus has not been reached, the utility may crash
-                    with an error message or hang indefinitely. If this happens, issue (if
-                    necessary) a <span class="command"><strong>Ctrl-C</strong></span> key sequence to abort, check the
-                    consensus status with the <span class="command"><strong>status</strong></span> command, and then retry
-                        <span class="command"><strong>run-ping</strong></span>.</p>
-            </td></tr></table></div>
-        </div>
-        <div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="shutdown-mixnet"></a>Shutting down the mixnet</h3></div></div></div>
-            
-            <p>The mix network continues to run in the terminal where you started it until you
-                issue a <span class="command"><strong>Ctrl-C</strong></span> key sequence, or until you issue the following
-                command in another terminal:</p>
-            <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make stop</strong></span></pre>
-            <p>When you stop the network, the binaries and data are left in place. This allows
-                for a quick restart.</p>
-        </div>
-        <div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="uninstall-mixnet"></a>Uninstalling and cleaning up</h3></div></div></div>
-            
-            <p>Several command targets can be used to uninstall the Docker image and restore your
-                system to a clean state. The following examples demonstrate the commands and their
-                output.</p>
-            <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
-                    <p><span class="command"><strong>clean-bin</strong></span></p>
-                    <p>To stop the network and delete the compiled binaries, run the following
-                        command:</p>
-                    <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make clean-bin</strong></span>
+               <p>lf <span class="command"><strong>run-ping</strong></span> fails to receive a reply, it eventually times out
+                  with an error message. If this happens, try the command again. </p>
+               <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                  <table border="0" summary="Note">
+                     <tr>
+                        <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                        <th align="left">Note</th>
+                     </tr>
+                     <tr>
+                        <td align="left" valign="top">
+                           <p>If you attempt use <span class="bold"><strong>run-ping</strong></span> too quickly after
+                              starting the mixnet, and consensus has not been reached, the utility may crash
+                              with an error message or hang indefinitely. If this happens, issue (if
+                              necessary) a <span class="command"><strong>Ctrl-C</strong></span> key sequence to abort, check the
+                              consensus status with the <span class="command"><strong>status</strong></span> command, and then retry
+                              <span class="command"><strong>run-ping</strong></span>.</p>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="shutdown-mixnet"></a>Shutting down the mixnet</h3>
+                     </div>
+                  </div>
+               </div>
+               <p>The mix network continues to run in the terminal where you started it until you
+                  issue a <span class="command"><strong>Ctrl-C</strong></span> key sequence, or until you issue the following
+                  command in another terminal:</p>
+               <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make stop</strong></span></pre>
+               <p>When you stop the network, the binaries and data are left in place. This allows
+                  for a quick restart.</p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="uninstall-mixnet"></a>Uninstalling and cleaning up</h3>
+                     </div>
+                  </div>
+               </div>
+               <p>Several command targets can be used to uninstall the Docker image and restore your
+                  system to a clean state. The following examples demonstrate the commands and their
+                  output.</p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><span class="command"><strong>clean-bin</strong></span></p>
+                        <p>To stop the network and delete the compiled binaries, run the following
+                           command:</p>
+                        <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make clean-bin</strong></span>
     
     [ -e voting_mixnet ] &amp;&amp; cd voting_mixnet &amp;&amp; DOCKER_HOST=unix:///run/user/1000/podman/podman.sock docker-compose down --remove-orphans; rm -fv running.stamp
     Stopping voting_mixnet_auth3_1        ... done
@@ -278,18 +485,20 @@ weight: 20
     removed './voting_mixnet/reunion_katzenpost_server.alpine'
     removed './voting_mixnet/server.alpine'
     removed './voting_mixnet/voting.alpine'</pre>
-                    <p>This command leaves in place the cryptographic keys, the state data, and
-                        the logs.</p>
-                </li><li class="listitem">
-                    <p><span class="command"><strong>clean-local-dryrun</strong></span></p>
-                    <p>To diplay a preview of what <span class="command"><strong>clean-local</strong></span> would remove,
-                        without actually deleting anything, run the following command:</p>
-                    <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make clean-local-dryrun</strong></span></pre>
-                </li><li class="listitem">
-                    <p><span class="command"><strong>clean-local</strong></span></p>
-                    <p>To delete both compiled binaries and data, run the following
-                        command:</p>
-                    <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make clean-local</strong></span>
+                        <p>This command leaves in place the cryptographic keys, the state data, and
+                           the logs.</p>
+                     </li>
+                     <li class="listitem">
+                        <p><span class="command"><strong>clean-local-dryrun</strong></span></p>
+                        <p>To diplay a preview of what <span class="command"><strong>clean-local</strong></span> would remove,
+                           without actually deleting anything, run the following command:</p>
+                        <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make clean-local-dryrun</strong></span></pre>
+                     </li>
+                     <li class="listitem">
+                        <p><span class="command"><strong>clean-local</strong></span></p>
+                        <p>To delete both compiled binaries and data, run the following
+                           command:</p>
+                        <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make clean-local</strong></span>
                         
     [ -e voting_mixnet ] &amp;&amp; cd voting_mixnet &amp;&amp; DOCKER_HOST=unix:///run/user/1000/podman/podman.sock docker-compose down --remove-orphans; rm -fv running.stamp
     Removing voting_mixnet_mix2_1         ... done
@@ -316,104 +525,209 @@ weight: 20
     git status .
     On branch main
     Your branch is up to date with 'origin/main'.</pre>
-                </li><li class="listitem">
-                    <p><span class="command"><strong>clean</strong></span></p>
-                    <p>To stop the the network and delete the binaries, the data, and the go_deps
-                        image, run the following command as superuser: </p>
-                    <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>sudo make clean</strong></span></pre>
-                </li></ul></div>
-        </div>
-    </div>
-    <div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="topology"></a>Network topology and components</h2></div></div></div>
-        
-        <p>The Docker image deploys a working mixnet with all components and component groups
-            needed to perform essential mixnet functions: </p>
-        <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
-                <p>message mixing (including packet reordering, timing randomization, injection
-                    of decoy traffic, obfuscation of senders and receivers, and so on)</p>
-            </li><li class="listitem">
-                <p>service provisioning</p>
-            </li><li class="listitem">
-                <p>internal authentication and integrity monitoring</p>
-            </li><li class="listitem">
-                <p>interfacing with external clients</p>
-            </li></ul></div>
-        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top">
-            <p>While suited for client development and testing, the test mixnet omits performance
-                and security redundancies. <span class="emphasis"><em>Do not use it in production.</em></span></p>
-        </td></tr></table></div>
-        <p>The following diagram illustrates the components and their network interactions. The
-            gray blocks represent nodes, and the arrows represent information transfer. </p>
-        <div class="figure"><a name="d6e300"></a><p class="title"><b>Figure&nbsp;1.&nbsp;Test network topology</b></p><div class="figure-contents">
-            
-            <div class="mediaobject"><img src="../pix/katzenpost-docker.png" alt="Test network topology"></div>
-        </div></div><br class="figure-break">
-        <p>On the left, the <span class="bold"><strong>Client</strong></span> transmits a message (shown by
-            purple arrows) through the <span class="bold"><strong>Gateway node</strong></span>, across three
-                <span class="bold"><strong>mix node</strong></span> layers, to the <span class="bold"><strong>Service node</strong></span>. The <span class="bold"><strong>Service node</strong></span>
-            processes the request and responds with a reply (shown by the green arrows) that
-            traverses the <span class="bold"><strong>mix node</strong></span> layers before exiting the mixnet
-            via the <span class="bold"><strong>Gateway node</strong></span> and arriving at the <span class="bold"><strong>Client</strong></span>.</p>
-        <p>On the right, directory authorities <span class="bold"><strong>Dirauth 1</strong></span>,
-                <span class="bold"><strong>Dirauth 2</strong></span>, and <span class="bold"><strong>Dirauth
-                3</strong></span> provide PKI services. The directory authorities receive <span class="bold"><strong>mix descriptors</strong></span> from the other nodes, collate these into a
-                <span class="bold"><strong>consensus document</strong></span> containing validated network
-            status and authentication materials , and make that available to the other nodes. </p>
-        <p>The elements in the topology diagram map to the mixnet's component nodes as shown in
-            the following table. Note that all nodes share the same IP address (127.0.0.1, i.e.,
-            localhost), but are accessed through different ports. Each node type links to additional
-            information in <a class="xref" href="#">???</a>.</p>
-        <div class="table"><a name="d6e324"></a><p class="title"><b>Table&nbsp;2.&nbsp;Table 2: Test mixnet hosts</b></p><div class="table-contents">
-            
-            <table class="table" summary="Table 2: Test mixnet hosts" border="1"><colgroup><col class="c1"><col class="c2"><col class="newCol3"><col class="c3"><col class="c4"></colgroup><thead><tr><th>Node type</th><th>Docker ID</th><th>Diagram label</th><th>IP address</th><th>TCP port</th></tr></thead><tbody><tr><td rowspan="3">
-                            <p><a class="link" href="#">Directory authority</a></p>
-                        </td><td>auth1</td><td>Dirauth1</td><td rowspan="8">
-                            <p>127.0.0.1 (localhost)</p>
-                        </td><td>
-                            <p>30001</p>
-                        </td></tr><tr><td>
-                            <p>auth2</p>
-                        </td><td>Dirauth 2</td><td>
-                            <p>30002</p>
-                        </td></tr><tr><td>
-                            <p>auth3</p>
-                        </td><td>Dirauth 3</td><td>
-                            <p>30003</p>
-                        </td></tr><tr><td><a class="link" href="#">Gateway node</a></td><td>gateway1</td><td>Gateway node</td><td>30004</td></tr><tr><td>
-                            <p><a class="link" href="#">Service node</a></p>
-                        </td><td>
-                            <p>servicenode1</p>
-                        </td><td>Service node</td><td>
-                            <p>30006 </p>
-                        </td></tr><tr><td rowspan="3">
-                            <p><a class="link" href="#">Mix node</a></p>
-                        </td><td>
-                            <p>mix1</p>
-                        </td><td>Layer 1 mix node</td><td>
-                            <p>30008</p>
-                        </td></tr><tr><td>
-                            <p>mix2</p>
-                        </td><td>Layer 2 mix node</td><td>
-                            <p>30010</p>
-                        </td></tr><tr><td>
-                            <p>mix3</p>
-                        </td><td>Layer 3 mix node</td><td>
-                            <p>30012</p>
-                        </td></tr></tbody></table>
-        </div></div><br class="table-break">
-        <div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="d6e398"></a>The Docker file tree</h3></div></div></div>
-            
-            <p>The following <a class="ulink" href="https://manpages.debian.org/bookworm/tree/tree.1.en.html" target="_top">tree</a>
-                output shows the location, relative to the <code class="filename">katzenpost</code>
-                repository root, of the files created by the Docker build. During testing and use,
-                you would normally touch only the TOML configuration file associated with each node,
-                as highlighted in the listing. For help in understanding these files and a complete
-                list of configuration options, follow the links in <span class="guilabel">Table 2: Test mixnet
-                    hosts</span>.</p>
-        </div>
-    </div>
-    <div class="section"><div class="titlepage"></div>
-        <pre class="programlisting">katzenpost/docker/voting_mixnet/
+                     </li>
+                     <li class="listitem">
+                        <p><span class="command"><strong>clean</strong></span></p>
+                        <p>To stop the the network and delete the binaries, the data, and the go_deps
+                           image, run the following command as superuser: </p>
+                        <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>sudo make clean</strong></span></pre>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="topology"></a>Network topology and components</h2>
+                  </div>
+               </div>
+            </div>
+            <p>The Docker image deploys a working mixnet with all components and component groups
+               needed to perform essential mixnet functions: </p>
+            <div class="itemizedlist">
+               <ul class="itemizedlist" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p>message mixing (including packet reordering, timing randomization, injection
+                        of decoy traffic, obfuscation of senders and receivers, and so on)</p>
+                  </li>
+                  <li class="listitem">
+                     <p>service provisioning</p>
+                  </li>
+                  <li class="listitem">
+                     <p>internal authentication and integrity monitoring</p>
+                  </li>
+                  <li class="listitem">
+                     <p>interfacing with external clients</p>
+                  </li>
+               </ul>
+            </div>
+            <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
+               <table border="0" summary="Warning">
+                  <tr>
+                     <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                     <th align="left">Warning</th>
+                  </tr>
+                  <tr>
+                     <td align="left" valign="top">
+                        <p>While suited for client development and testing, the test mixnet omits performance
+                           and security redundancies. <span class="emphasis"><em>Do not use it in production.</em></span></p>
+                     </td>
+                  </tr>
+               </table>
+            </div>
+            <p>The following diagram illustrates the components and their network interactions. The
+               gray blocks represent nodes, and the arrows represent information transfer. </p>
+            <div class="figure"><a name="d58e445"></a><p class="title"><b>Figure&nbsp;1.&nbsp;Test network topology</b></p>
+               <div class="figure-contents">
+                  <div class="mediaobject"><img src="pix/katzenpost-docker.png"></div>
+               </div>
+            </div><br class="figure-break"><p>On the left, the <span class="bold"><strong>Client</strong></span> transmits a message (shown by
+               purple arrows) through the <span class="bold"><strong>Gateway node</strong></span>, across three
+               <span class="bold"><strong>mix node</strong></span> layers, to the <span class="bold"><strong>Service node</strong></span>. The <span class="bold"><strong>Service node</strong></span>
+               processes the request and responds with a reply (shown by the green arrows) that
+               traverses the <span class="bold"><strong>mix node</strong></span> layers before exiting the mixnet
+               via the <span class="bold"><strong>Gateway node</strong></span> and arriving at the <span class="bold"><strong>Client</strong></span>.</p>
+            <p>On the right, directory authorities <span class="bold"><strong>Dirauth 1</strong></span>,
+               <span class="bold"><strong>Dirauth 2</strong></span>, and <span class="bold"><strong>Dirauth
+                     3</strong></span> provide PKI services. The directory authorities receive <span class="bold"><strong>mix descriptors</strong></span> from the other nodes, collate these into a
+               <span class="bold"><strong>consensus document</strong></span> containing validated network
+               status and authentication materials , and make that available to the other nodes.
+               </p>
+            <p>The elements in the topology diagram map to the mixnet's component nodes as shown
+               in
+               the following table. Note that all nodes share the same IP address (127.0.0.1, i.e.,
+               localhost), but are accessed through different ports. Each node type links to additional
+               information in <a class="link" href="http://localhost:1313/docs/admin_guide/components.html" target="_top">Components and configuration of the Katzenpost mixnet</a>.</p>
+            <div class="table"><a name="d58e501"></a><p class="title"><b>Table&nbsp;2.&nbsp;Table 2: Test mixnet hosts</b></p>
+               <div class="table-contents">
+                  <table class="table" border="1">
+                     <colgroup>
+                        <col class="c1">
+                        <col class="c2">
+                        <col class="newCol3">
+                        <col class="c3">
+                        <col class="c4">
+                     </colgroup>
+                     <thead>
+                        <tr>
+                           <th>Node type</th>
+                           <th>Docker ID</th>
+                           <th>Diagram label</th>
+                           <th>IP address</th>
+                           <th>TCP port</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr>
+                           <td rowspan="3">
+                              <p><a class="link" href="http://localhost:1313/docs/admin_guide/intro-dirauth.html" target="_top">Directory authority</a></p>
+                           </td>
+                           <td>auth1</td>
+                           <td>Dirauth1</td>
+                           <td rowspan="8">
+                              <p>127.0.0.1 (localhost)</p>
+                           </td>
+                           <td>
+                              <p>30001</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>auth2</p>
+                           </td>
+                           <td>Dirauth 2</td>
+                           <td>
+                              <p>30002</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>auth3</p>
+                           </td>
+                           <td>Dirauth 3</td>
+                           <td>
+                              <p>30003</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td><a class="link" href="http://localhost:1313/docs/admin_guide/intro-gateway.html" target="_top">Gateway node</a></td>
+                           <td>gateway1</td>
+                           <td>Gateway node</td>
+                           <td>30004</td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p><a class="link" href="http://localhost:1313/docs/admin_guide/intro-service.html" target="_top">Service node</a></p>
+                           </td>
+                           <td>
+                              <p>servicenode1</p>
+                           </td>
+                           <td>Service node</td>
+                           <td>
+                              <p>30006 </p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td rowspan="3">
+                              <p><a class="link" href="http://localhost:1313/docs/admin_guide/intro-mix.html" target="_top">Mix node</a></p>
+                           </td>
+                           <td>
+                              <p>mix1</p>
+                           </td>
+                           <td>Layer 1 mix node</td>
+                           <td>
+                              <p>30008</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>mix2</p>
+                           </td>
+                           <td>Layer 2 mix node</td>
+                           <td>
+                              <p>30010</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>mix3</p>
+                           </td>
+                           <td>Layer 3 mix node</td>
+                           <td>
+                              <p>30012</p>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div><br class="table-break"><div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="d58e584"></a>The Docker file tree</h3>
+                     </div>
+                  </div>
+               </div>
+               <p>The following <a class="link" href="https://manpages.debian.org/bookworm/tree/tree.1.en.html" target="_top">tree</a>
+                  output shows the location, relative to the <code class="filename">katzenpost</code>
+                  repository root, of the files created by the Docker build. During testing and use,
+                  you would normally touch only the TOML configuration file associated with each node,
+                  as highlighted in the listing. For help in understanding these files and a complete
+                  list of configuration options, follow the links in <span class="guilabel">Table 2: Test mixnet
+                     hosts</span>.</p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="d58e596"></a></h2>
+                  </div>
+               </div>
+            </div>
+            <pre class="programlisting">katzenpost/docker/voting_mixnet/
 |---<span class="bold"><strong>auth1</strong></span>
 |&nbsp;&nbsp; |---<span class="bold"><strong>authority.toml</strong></span>
 |&nbsp;&nbsp; |---identity.private.pem
@@ -502,8 +816,8 @@ weight: 20
 |&nbsp;&nbsp; |---pigeonHole.19.log
 |&nbsp;&nbsp; |---proxy.31.log
 |---voting_mixnet</pre>
-        <p>Examples of complete TOML configuration files are provided in <a class="xref" href="#">???</a>.</p>
-    </div>
-    
-    
-</div></body></html>
+            <p>Examples of complete TOML configuration files are provided in <a class="link" href="http://localhost:1313/docs/admin_guide/docker-config.html" target="_top">Appendix: Configuration files from the Docker test mixnet</a>.</p>
+         </div>
+      </div>
+   </body>
+</html>

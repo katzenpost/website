@@ -1,48 +1,43 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
-   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
-[
-   <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?> 
+<?linkTitle "Docker test network" ?>  <!-- Section menu link text -->
+<?url "docs/admin_guide/docker.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 20 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
     %shared-content;
-<!-- 
-    <!ELEMENT xi:include (xi:fallback?) > 
-    <!ATTLIST xi:include 
-        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
-    href CDATA #REQUIRED 
-    parse (xml|text) "xml" 
-    xpointer CDATA #IMPLIED 
-    encoding CDATA #IMPLIED 
-    accept CDATA #IMPLIED 
-    accept-charset CDATA #IMPLIED 
-    accept-language CDATA #IMPLIED > 
-    <!ELEMENT xi:fallback ANY > 
-    <!ATTLIST xi:fallback 
-        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
-    <!ENTITY % local.preface.class "| xi:include"> 
-    <!ENTITY % local.part.class "| xi:include"> 
-    <!ENTITY % local.chapter.class "| xi:include"> 
-    <!ENTITY % local.divcomponent.mix "| xi:include"> 
-    <!ENTITY % local.para.char.mix "| xi:include"> 
-    <!ENTITY % local.info.class "| xi:include"> 
-    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
-]> 
+]>
 
-<section id="container">
-    <title id="container.title">Using the &program_name; Docker test network</title>    
+<article   xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
+    xml:id="container">
     
-    <para>&program_name; provides a ready-to-deploy Docker
+    <info>
+        <title xml:id="container.title">Using the &program_name; Docker test network</title>
+    </info>
+           
+    <para>Katzenpost provides a ready-to-deploy Docker
             image for developers who need a non-production test environment for developing
         and testing client applications and server side plugins. By running this image on a single computer, you avoid the
-        need to build and manage a complex multi-node mix net. The image can also be run using <ulink url="https://podman.io/">Podman</ulink></para>
+        need to build and manage a complex multi-node mix net. The image can also be run using <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://podman.io/">Podman</link></para>
     <para>The test mix network includes the following components:</para>
     <itemizedlist>
         <listitem>
-            <para>Three directory authority (<ulink
-                url="https://katzenpost.network/docs/specs/pki/">PKI</ulink>) nodes</para>
+            <para>Three directory authority (<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://katzenpost.network/docs/specs/pki/">PKI</link>) nodes</para>
         </listitem>
         <listitem>
-            <para>Six <ulink url="https://katzenpost.network/docs/specs/mixnet/">mix</ulink> nodes,
+            <para>Six <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://katzenpost.network/docs/specs/mixnet/">mix</link> nodes,
                 including one node serving also as both gateway and service provider</para>
         </listitem>
         <listitem>
@@ -50,35 +45,35 @@
         </listitem>
     </itemizedlist>
     
-    <section id="requirements">         
-        <title id="requirements.title">Requirements</title>
-        <para>Before running the &program_name; docker image, make sure that the
+    <section xml:id="requirements">
+        <info>
+            <title xml:id="requirements.title">Requirements</title>
+        </info>         
+        
+        <para>Before running the Katzenpost docker image, make sure that the
             following<?oxy_comment_start author="dwrob" timestamp="20240607T121424-0700" comment="Add minimum hardware specs?"?>
             software<?oxy_comment_end?> is installed. </para>
         <itemizedlist>
             <listitem>
-                <para>A <ulink url="https://debian.org">Debian GNU Linux</ulink> or <ulink
-                    url="https://ubuntu.com">Ubuntu</ulink> system</para>
+                <para>A <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://debian.org">Debian GNU Linux</link> or <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://ubuntu.com">Ubuntu</link> system</para>
             </listitem>
             <listitem>
-                <para><ulink url="https://git-scm.com/">Git</ulink></para>
+                <para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://git-scm.com/">Git</link></para>
             </listitem>
             <listitem>
-                <para><ulink url="https://go.dev/">Go</ulink></para>
+                <para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://go.dev/">Go</link></para>
             </listitem>
             <listitem>
-                <para><ulink url="https://www.gnu.org/software/make/">GNU Make</ulink></para>
+                <para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://www.gnu.org/software/make/">GNU Make</link></para>
             </listitem>
             <listitem>
-                <para><ulink url="https://prometheus.io/docs/introduction/overview/"
-                        >Prometheus</ulink></para>
+                <para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://prometheus.io/docs/introduction/overview/">Prometheus</link></para>
             </listitem>
             <listitem>
-                <para><ulink url="https://www.docker.com">Docker</ulink>, <ulink
-                    url="https://docs.docker.com/compose/">Docker Compose</ulink>, and
-                    (optionally) <ulink url="https://podman.io">Podman</ulink></para>
+                <para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://www.docker.com">Docker</link>, <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://docs.docker.com/compose/">Docker Compose</link>, and
+                    (optionally) <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://podman.io">Podman</link></para>
                 <note>
-                    <para>If both Docker and Podman are present on your system, &program_name; uses
+                    <para>If both Docker and Podman are present on your system, Katzenpost uses
                         Podman. Podman is a drop-in daemonless equivalent to Docker that does not
                         require superuser privileges to run.</para>
                 </note>
@@ -90,39 +85,41 @@
         <programlisting><prompt># </prompt><command>apt update</command>
 <prompt># </prompt><command>apt install git golang make docker docker-compose podman</command></programlisting>       
     </section>   
-    <section id="install_kp">
-        <title id="install_kp.title">Preparing to run the container image</title>
-        <para>Complete the following procedure to obtain, build, and deploy the &program_name; test
+    <section xml:id="install_kp">
+        <info>
+            <title xml:id="install_kp.title">Preparing to run the container image</title>
+        </info>
+        
+        <para>Complete the following procedure to obtain, build, and deploy the Katzenpost test
             network. </para>
         <procedure>
-            <step>
-                <para>Install the &program_name; code repository, hosted at <ulink
-                    url="https://github.com/katzenpost"/>. The main &program_name;
+            <step performance="required">
+                <para>Install the Katzenpost code repository, hosted at <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/katzenpost">https://github.com/katzenpost</uri>. The main Katzenpost
                     repository contains code for the server components as well as the docker image.
                     Clone the repository with the following command (your directory location may
                     vary):</para>
                 <programlisting><prompt>~$ </prompt><command>git clone https://github.com/katzenpost/katzenpost.git</command></programlisting>
             </step>
-            <step>
+            <step performance="required">
                 <para>Navigate to the new <filename>katzenpost</filename> subdirectory and ensure
                     that the code is up to date.
                     <programlisting><prompt>~$ </prompt><command>cd katzenpost</command>
 <prompt>~/katzenpost$ </prompt><command>git checkout main</command>
 <prompt>~/katzenpost$ </prompt><command>git pull</command></programlisting></para>
             </step>
-            <step>
+            <step performance="required">
                 <para>(Optional) Create a development branch and check it
                     out.<programlisting><prompt>~/katzenpost$ </prompt><command>git checkout -b devel</command></programlisting></para>
             </step>
-            <step>
+            <step performance="required">
                 <para>(Optional) If you are using Podman, complete the following steps:</para>
                 <procedure>
-                    <step>
+                    <step performance="required">
                         <para>Point the DOCKER_HOST environment variable at the Podman
                             process.</para>
                         <programlisting><prompt>$ </prompt><command>export DOCKER_HOST=unix:///var/run/user/$(id -u)/podman/podman.sock</command></programlisting>
                     </step>
-                    <step>
+                    <step performance="required">
                         <para> Set up and start the Podman server (as superuser).</para>
                         <programlisting><prompt>$ </prompt><command>podman system service -t 0 $DOCKER_HOST &amp;</command>
 <prompt>$ </prompt><command>systemctl --user enable --now podman.socket</command>
@@ -132,17 +129,20 @@
             </step>
         </procedure>        
     </section>           
-    <section id="basic-ops">
-        <title id="basic-ops.title">Operating the test mixnet</title>
+    <section xml:id="basic-ops">
+        <info>
+            <title xml:id="basic-ops.title">Operating the test mixnet</title>
+        </info>
+        
         <para>Navigate to <filename>katzenpost/docker</filename>. The <filename>Makefile</filename>
-            contains target operations to create, manage, and test the self-contained &program_name;
+            contains target operations to create, manage, and test the self-contained Katzenpost
             container network. To invoke a target, run a command with the using the following
             pattern:</para>
         <programlisting> <prompt>~/katzenpost/docker$ </prompt><command>make<replaceable> target</replaceable></command></programlisting>
         <para>Running <command>make</command> with no target specified returns a list of available
             targets.</para>
-        <table>
-            <title>Table 1: Makefile targets</title>
+        <table><info><title>Table 1: Makefile targets</title></info>
+            
             <tgroup cols="2">
                 <tbody>
                     <row>
@@ -241,8 +241,11 @@
                 </tbody>
             </tgroup>
         </table>
-        <section id="start-mixnet">
-            <title id="start-mixnet.title">Starting and monitoring the mixnet</title>
+        <section xml:id="start-mixnet">
+            <info>
+                <title xml:id="start-mixnet.title">Starting and monitoring the mixnet</title>
+            </info>
+            
             <para>The first time that you run <command>make start</command>, the Docker image is
                 downloaded, built, installed, and started. This takes several minutes. When the
                 build is complete, the command exits while the network remains running in the
@@ -250,7 +253,7 @@
             <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make start</command></programlisting>
             <para>Subsequent runs of <command>make start</command> either start or restart the
                 network without building the components from scratch. The exception to this is when
-                you delete any of the &program_name; binaries (dirauth.alpine, server.alpine, etc.).
+                you delete any of the Katzenpost binaries (dirauth.alpine, server.alpine, etc.).
                 In that case, <command>make start</command> rebuilds just the parts of the network
                 dependent on the deleted binary. For more information about the files created during
                 the Docker build, see <xref linkend="topology"/>.</para>
@@ -303,8 +306,11 @@
     ...</programlisting>
             </para>
         </section>
-        <section id="test-mixnet">
-            <title id="test-mixnet.title">Testing the mixnet</title>
+        <section xml:id="test-mixnet">
+            <info>
+                <title xml:id="test-mixnet.title">Testing the mixnet</title>
+            </info>
+            
             <para>At this point, you should have a locally running mix network. You can test whether
                 it is working correctly by using <command>run-ping</command>, which launches a
                 packet into the network and watches for a successful reply. Run the following
@@ -329,8 +335,11 @@
                         <command>run-ping</command>.</para>
             </note>
         </section>
-        <section id="shutdown-mixnet">
-            <title id="shutdown-mixnet.title">Shutting down the mixnet</title>
+        <section xml:id="shutdown-mixnet">
+            <info>
+                <title xml:id="shutdown-mixnet.title">Shutting down the mixnet</title>
+            </info>
+            
             <para>The mix network continues to run in the terminal where you started it until you
                 issue a <command>Ctrl-C</command> key sequence, or until you issue the following
                 command in another terminal:</para>
@@ -338,8 +347,11 @@
             <para>When you stop the network, the binaries and data are left in place. This allows
                 for a quick restart.</para>
         </section>
-        <section id="uninstall-mixnet">
-            <title id="uninstall-mixnet.title">Uninstalling and cleaning up</title>
+        <section xml:id="uninstall-mixnet">
+            <info>
+                <title xml:id="uninstall-mixnet.title">Uninstalling and cleaning up</title>
+            </info>
+            
             <para>Several command targets can be used to uninstall the Docker image and restore your
                 system to a clean state. The following examples demonstrate the commands and their
                 output.</para>
@@ -430,8 +442,11 @@
             </itemizedlist>
         </section>
     </section>
-    <section id="topology">
-        <title id="topology.title">Network topology and components</title>
+    <section xml:id="topology">
+        <info>
+            <title xml:id="topology.title">Network topology and components</title>
+        </info>
+        
         <para>The Docker image deploys a working mixnet with all components and component groups
             needed to perform essential mixnet functions: </para>
         <itemizedlist>
@@ -449,45 +464,38 @@
                 <para>interfacing with external clients</para>
             </listitem>
         </itemizedlist>
-        <warning >
+        <warning>
             <para>While suited for client development and testing, the test mixnet omits performance
                 and security redundancies. <emphasis>Do not use it in production.</emphasis></para>
         </warning>
         <para>The following diagram illustrates the components and their network interactions. The
             gray blocks represent nodes, and the arrows represent information transfer. </para>
-        <figure>
-            <title>Test network topology</title>
+        <figure><info><title>Test network topology</title></info>
+
             <mediaobject>
-                <!--local path-->
                 <imageobject>
                     <imagedata fileref="pix/katzenpost-docker.png" scale="100"/>
-                </imageobject>
-                <!--target path-->
-                 <imageobject>
-                    <imagedata fileref="../pix/katzenpost-docker.png" scale="100"/>
                 </imageobject>               
-            </mediaobject>
+             </mediaobject>
+            
         </figure>
         <para>On the left, the <emphasis role="bold">Client</emphasis> transmits a message (shown by
             purple arrows) through the <emphasis role="bold">Gateway node</emphasis>, across three
-                <emphasis role="bold">mix node</emphasis> layers, to the <emphasis role="bold"
-                >Service node</emphasis>. The <emphasis role="bold">Service node</emphasis>
+                <emphasis role="bold">mix node</emphasis> layers, to the <emphasis role="bold">Service node</emphasis>. The <emphasis role="bold">Service node</emphasis>
             processes the request and responds with a reply (shown by the green arrows) that
             traverses the <emphasis role="bold">mix node</emphasis> layers before exiting the mixnet
-            via the <emphasis role="bold">Gateway node</emphasis> and arriving at the <emphasis
-                role="bold">Client</emphasis>.</para>
+            via the <emphasis role="bold">Gateway node</emphasis> and arriving at the <emphasis role="bold">Client</emphasis>.</para>
         <para>On the right, directory authorities <emphasis role="bold">Dirauth 1</emphasis>,
                 <emphasis role="bold">Dirauth 2</emphasis>, and <emphasis role="bold">Dirauth
-                3</emphasis> provide PKI services. The directory authorities receive <emphasis
-                role="bold">mix descriptors</emphasis> from the other nodes, collate these into a
+                3</emphasis> provide PKI services. The directory authorities receive <emphasis role="bold">mix descriptors</emphasis> from the other nodes, collate these into a
                 <emphasis role="bold">consensus document</emphasis> containing validated network
             status and authentication materials , and make that available to the other nodes. </para>
         <para>The elements in the topology diagram map to the mixnet's component nodes as shown in
             the following table. Note that all nodes share the same IP address (127.0.0.1, i.e.,
             localhost), but are accessed through different ports. Each node type links to additional
-            information in <xref linkend="components" endterm="components.title"/>.</para>
-        <table frame="all">
-            <title>Table 2: Test mixnet hosts</title>
+            information in <link xlink:href="&baseURL;docs/admin_guide/components.html"
+                >Components and configuration of the &program_name; mixnet</link><!--<xref linkend="components" endterm="components.title"/>-->.</para>
+        <table frame="all"><info><title>Table 2: Test mixnet hosts</title></info>            
             <tgroup cols="5">
                 <colspec colname="c1" colnum="1" colwidth="1*"/>
                 <colspec colname="c2" colnum="2" colwidth="1*"/>
@@ -506,90 +514,68 @@
                 <tbody>
                     <row>
                         <entry morerows="2">
-                            <para><link linkend="intro-dirauth">Directory authority</link></para>
+                            <para><link xlink:href="&baseURL;docs/admin_guide/intro-dirauth.html"
+                                    >Directory authority</link><!--<link linkend="intro-dirauth">Directory authority</link>--></para>
                         </entry>
                         <entry>auth1</entry>
                         <entry>Dirauth1</entry>
-                        <entry morerows="7">
-                            <para>127.0.0.1 (localhost)</para>
-                        </entry>
-                        <entry>
-                            <para>30001</para>
-                        </entry>
+                        <entry morerows="7"><para>127.0.0.1 (localhost)</para></entry>
+                        <entry><para>30001</para></entry>
                     </row>
                     <row>
-                        <entry>
-                            <para>auth2</para>
-                        </entry>
+                        <entry><para>auth2</para></entry>
                         <entry>Dirauth 2</entry>
-                        <entry>
-                            <para>30002</para>
-                        </entry>
+                        <entry><para>30002</para></entry>
                     </row>
                     <row>
-                        <entry>
-                            <para>auth3</para>
-                        </entry>
+                        <entry><para>auth3</para></entry>
                         <entry>Dirauth 3</entry>
-                        <entry>
-                            <para>30003</para>
-                        </entry>
+                        <entry><para>30003</para></entry>
                     </row>
                     <row>
-                        <entry><link linkend="intro-gateway">Gateway node</link></entry>
+                        <entry><link xlink:href="&baseURL;docs/admin_guide/intro-gateway.html"
+                                >Gateway node</link><!--<link linkend="intro-gateway">Gateway node</link>--></entry>
                         <entry>gateway1</entry>
                         <entry>Gateway node</entry>
                         <entry>30004</entry>
                     </row>
                     <row>
                         <entry>
-                            <para><link linkend="intro-service">Service node</link></para>
+                            <para><link xlink:href="&baseURL;docs/admin_guide/intro-service.html"
+                                    >Service node</link><!--<link linkend="intro-service">Service node</link>--></para>
                         </entry>
-                        <entry>
-                            <para>servicenode1</para>
-                        </entry>
+                        <entry><para>servicenode1</para></entry>
                         <entry>Service node</entry>
-                        <entry>
-                            <para>30006 </para>
-                        </entry>
+                        <entry><para>30006 </para></entry>
                     </row>
                     <row>
                         <entry morerows="2">
-                            <para><link linkend="intro-mix">Mix node</link></para>
+                            <para><link xlink:href="&baseURL;docs/admin_guide/intro-mix.html"
+                                    >Mix node</link><!--<link linkend="intro-mix">Mix node</link>--></para>
                         </entry>
-                        <entry>
-                            <para>mix1</para>
-                        </entry>
+                        <entry><para>mix1</para></entry>
                         <entry>Layer 1 mix node</entry>
-                        <entry>
-                            <para>30008</para>
-                        </entry>
+                        <entry><para>30008</para></entry>
                     </row>
                     <row>
-                        <entry>
-                            <para>mix2</para>
-                        </entry>
+                        <entry><para>mix2</para></entry>
                         <entry>Layer 2 mix node</entry>
-                        <entry>
-                            <para>30010</para>
-                        </entry>
+                        <entry><para>30010</para></entry>
                     </row>
                     <row>
-                        <entry>
-                            <para>mix3</para>
-                        </entry>
+                        <entry><para>mix3</para></entry>
                         <entry>Layer 3 mix node</entry>
-                        <entry>
-                            <para>30012</para>
-                        </entry>
+                        <entry><para>30012</para></entry>
                     </row>
                 </tbody>
             </tgroup>
         </table>
         <section>
-            <title>The Docker file tree</title>
-            <para>The following <ulink
-                    url="https://manpages.debian.org/bookworm/tree/tree.1.en.html">tree</ulink>
+            <info>
+                <title>The Docker file tree</title>
+            </info>
+            
+            <para>The following <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://manpages.debian.org/bookworm/tree/tree.1.en.html">tree</link>
                 output shows the location, relative to the <filename>katzenpost</filename>
                 repository root, of the files created by the Docker build. During testing and use,
                 you would normally touch only the TOML configuration file associated with each node,
@@ -599,6 +585,9 @@
         </section>
     </section>
     <section>
+        <info>
+            <title></title>
+        </info>
         <programlisting>katzenpost/docker/voting_mixnet/
 |---<emphasis role="bold">auth1</emphasis>
 |   |---<emphasis role="bold">authority.toml</emphasis>
@@ -688,9 +677,7 @@
 |   |---pigeonHole.19.log
 |   |---proxy.31.log
 |---voting_mixnet</programlisting>
-        <para>Examples of complete TOML configuration files are provided in <xref
-                linkend="docker-config" endterm="docker-config.title"/>.</para>
+        <para>Examples of complete TOML configuration files are provided in <link xlink:href="&baseURL;docs/admin_guide/docker-config.html"
+                >Appendix: Configuration files from the Docker test mixnet</link><!--<xref linkend="docker-config" endterm="docker-config.title"/>-->.</para>
     </section>
-    
-    
-</section>
+</article>

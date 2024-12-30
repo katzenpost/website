@@ -1,23 +1,58 @@
 ---
-title: "Docker configuration"
-draft: false
-weight: 30
+title: 
+linkTitle: "Appendix: Configuration files from the Docker test mixnet" 
+description: "" 
+url: "docs/admin_guide/docker-config-appendix.html" 
+date: "2024-12-30T07:33:47.575378203-08:00"
+draft: false 
+slug: "" 
+layout: "" 
+type: "" 
+weight: 70 
 ---
-<html xmlns:ng="http://docbook.org/docbook-ng"><head>
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
       <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-   <title>Appendix: Configuration files from the Docker test mixnet</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article"><div class="titlepage"><div><div><h2 class="title"><a name="docker-config"></a>Appendix: Configuration files from the Docker test mixnet </h2></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#dirauth-config">Directory authority</a></span></dt><dt><span class="section"><a href="#mix-node-config">Mix node</a></span></dt><dt><span class="section"><a href="#gateway-node-config">Gateway node</a></span></dt><dt><span class="section"><a href="#service-node-config">Service node</a></span></dt></dl></div>
-    
-    <p>As an aid to adminstrators implementing a Katzenpost mixnet, this appendix provides
-        lightly edited examples of configuration files for each Katzenpost node type. These
-        files are drawn from a built instance of the <a class="link" href="#">Docker test
-            mixnet</a>. These code listings are meant to be used as a reference alongside the
-        detailed configuration documentation in <a class="xref" href="#">???</a>. You cannot use these
-        listings as a drop-in solution in your own mixnets for reasons explained in the <a class="xref" href="#">???</a> section of the Docker test mixnet documentation.</p>
-    <div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="dirauth-config"></a>Directory authority</h2></div></div></div>
-        
-        <p>Source:
-            <code class="filename">../katzenpost/docker/voting_mixnet/auth1/authority.toml</code></p>
-        <pre class="programlisting">[Server]
+      <title>Appendix: Configuration files from the Docker test mixnet</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+   </head>
+   <body>
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h1 class="title"><a name="docker-config"></a>Appendix: Configuration files from the Docker test
+                     mixnet</h1>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="toc">
+            <p><b>Table of Contents</b></p>
+            <dl class="toc">
+               <dt><span class="section"><a href="#dirauth-config">Directory authority</a></span></dt>
+               <dt><span class="section"><a href="#mix-node-config">Mix node</a></span></dt>
+               <dt><span class="section"><a href="#gateway-node-config">Gateway node</a></span></dt>
+               <dt><span class="section"><a href="#service-node-config">Service node</a></span></dt>
+            </dl>
+         </div>
+         <p>As an aid to adminstrators implementing a Katzenpost mixnet, this appendix provides
+            lightly edited examples of configuration files for each Katzenpost node type. These
+            files are drawn from a built instance of the <a class="link" href="#">Docker test
+               mixnet</a>. These code listings are meant to be used as a reference alongside the
+            detailed configuration documentation in <a class="link" href="http://localhost:1313/docs/admin_guide/components.html" target="_top">Components and configuration of the Katzenpost mixnet</a>. You cannot use these
+            listings as a drop-in solution in your own mixnets for reasons explained in the <a class="link" href="http://localhost:1313/docs/admin_guide/topology.html" target="_top">Network topology and components</a> section of the Docker test mixnet documentation.</p>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="dirauth-config"></a>Directory authority</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Source: <code class="filename">../katzenpost/docker/voting_mixnet/auth1/authority.toml</code></p>
+            <pre class="programlisting">[Server]
   Identifier = "auth1"
   WireKEMScheme = "xwing"
   PKISignatureScheme = "Ed448-Dilithium3"
@@ -128,12 +163,17 @@ weight: 30
   SPRPKeyMaterialLength = 64
   NIKEName = "x25519"
   KEMName = ""</pre>
-    </div>
-    <div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="mix-node-config"></a>Mix node</h2></div></div></div>
-        
-        <p>Source:<code class="filename">
-            ../katzenpost/docker/voting_mixnet/mix1/katzenpost.toml</code></p>
-        <pre class="programlisting">[Server]
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="mix-node-config"></a>Mix node</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Source: <code class="filename">../katzenpost/docker/voting_mixnet/mix1/katzenpost.toml</code></p>
+            <pre class="programlisting">[Server]
   Identifier = "mix1"
   WireKEM = "xwing"
   PKISignatureScheme = "Ed448-Dilithium3"
@@ -216,12 +256,17 @@ weight: 30
   SendDecoyTraffic = false
   DisableRateLimit = false
   GenerateOnly = false</pre>
-    </div>
-    <div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="gateway-node-config"></a>Gateway node</h2></div></div></div>
-        
-        <p>Source:
-                <code class="filename">../katzenpost/docker/voting_mixnet/gateway1/katzenpost.toml</code></p>
-        <pre class="programlisting">[Server]
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="gateway-node-config"></a>Gateway node</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Source: <code class="filename">../katzenpost/docker/voting_mixnet/gateway1/katzenpost.toml</code></p>
+            <pre class="programlisting">[Server]
   Identifier = "gateway1"
   WireKEM = "xwing"
   PKISignatureScheme = "Ed448-Dilithium3"
@@ -315,12 +360,18 @@ weight: 30
   SendDecoyTraffic = false
   DisableRateLimit = false
   GenerateOnly = false</pre>
-    </div>
-    <div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="service-node-config"></a>Service node</h2></div></div></div>
-        
-        <p>Source:
-                <code class="filename">../katzenpost/docker/voting_mixnet/servicenode1/katzenpost.toml</code></p>
-        <pre class="programlisting">[Server]
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="service-node-config"></a>Service node</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Source:
+               <code class="filename">../katzenpost/docker/voting_mixnet/servicenode1/katzenpost.toml</code></p>
+            <pre class="programlisting">[Server]
   Identifier = "servicenode1"
   WireKEM = "xwing"
   PKISignatureScheme = "Ed448-Dilithium3"
@@ -457,7 +508,7 @@ weight: 30
   SendDecoyTraffic = false
   DisableRateLimit = false
   GenerateOnly = false</pre>
-    </div>
-
-    
-</div></body></html>
+         </div>
+      </div>
+   </body>
+</html>
