@@ -11,14 +11,16 @@
 <?weight 1 ?>
 
 <!DOCTYPE article [
-    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
-    %shared-content;
+<!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+%shared-content;
+<!ENTITY % terms SYSTEM "../../../terms.ent">
+%terms;
+<!ENTITY % references SYSTEM "../../../references.ent">
+%references;
 ]>
 
-<article xmlns="http://docbook.org/ns/docbook"
-    xmlns:xlink="http://www.w3.org/1999/xlink" 
-    version="5.1" 
-    xml:id="sphinx">
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.1" xml:id="sphinx">
     <info>
         <title xml:id="sphinx.title">Sphinx cryptographic packet format</title>
         <authorgroup>
@@ -59,74 +61,24 @@
                 primitives types. This document does not introduce any new crypto, but is meant to
                 serve as an implementation guide. </para>
         </abstract>
-    </info>        
-    
-    
-    
-    
+    </info>
+
+
+
+
     <section xml:id="terminology">
         <title xml:id="terminology.title">Terminology</title>
-        <para>The following terms are used in this specification.</para>    
-        <variablelist>
-            <varlistentry>
-                <term></term>
-                <listitem>
-                    <para></para>
-                </listitem>
-            </varlistentry>
-        </variablelist>    
+        <para>The following terms are used in this specification.</para>
+        <variablelist>            
+        &message;
+        &packet;
+        &header;
+        &payload;
+        &groupelement;
+        &groupgenerator;
+        </variablelist>
     </section>
-    
-    
-    
-    
-    
-    
-    <section xml:id="terminology">
-            <title>1.1 Terminology</title>
-            <itemizedlist spacing="compact">
-                <listitem>
-                    <para>
-                        <literal>Message</literal> - A variable-length sequence of octets sent
-                        anonymously through the network. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>Packet</literal> - A fixed-length sequence of octets transmitted
-                        anonymously through the network, containing the encrypted message and
-                        metadata for routing. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>Header</literal> - The packet header consisting of several
-                        components, which convey the information necessary to verify packet
-                        integrity and correctly process the packet. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>Payload</literal> - The fixed-length portion of a packet containing
-                        an encrypted message or part of a message, to be delivered anonymously.
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>Group</literal> - A finite set of elements and a binary operation
-                        that satisfy the properties of closure, associativity, invertability, and
-                        the presence of an identity element. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>Group element</literal> - An individual element of the group.
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>Group generator</literal> - A group element capable of generating
-                        any other element of the group, via repeated applications of the generator
-                        and the group operation. </para>
-                </listitem>
-            </itemizedlist>
-        </section>
+
     <section xml:id="sphinx_introduction">
         <title xml:id="sphinx_introduction.title">1. Introduction</title>
         <para> The Sphinx cryptographic packet format is a compact and provably secure design
@@ -270,11 +222,11 @@
             <para> The output of the KDF is partitioned according to the following structure: </para>
             <programlisting>
 struct {
-    opaque header_mac[M_KEY_LENGTH];
-    opaque header_encryption[S_KEY_LENGTH];
-    opaque header_encryption_iv[S_IV_LENGTH];
-    opaque payload_encryption[SPRP_KEY_LENGTH]
-    opaque blinding_factor[GROUP_ELEMENT_LENGTH];
+opaque header_mac[M_KEY_LENGTH];
+opaque header_encryption[S_KEY_LENGTH];
+opaque header_encryption_iv[S_IV_LENGTH];
+opaque payload_encryption[SPRP_KEY_LENGTH]
+opaque blinding_factor[GROUP_ELEMENT_LENGTH];
 } SphinxPacketKeys;
 
 Sphinx_KDF( info, shared_secret ) -&gt; packet_keys
@@ -408,8 +360,8 @@ PACKET_LENGTH = HEADER_LENGTH + PAYLOAD_LENGTH
             Packet Payload: </para>
         <programlisting>
 struct {
-    opaque header[HEADER_LENGTH];
-    opaque payload[PAYLOAD_LENGTH];
+opaque header[HEADER_LENGTH];
+opaque payload[PAYLOAD_LENGTH];
 } SphinxPacket;
 </programlisting>
         <itemizedlist spacing="compact">
@@ -431,10 +383,10 @@ struct {
             <para> The structure of the Sphinx Packet Header is defined as follows: </para>
             <programlisting>
 struct {
-    opaque additional_data[AD_LENGTH]; /* Unencrypted. */
-    opaque group_element[GROUP_ELEMENT_LENGTH];
-    opaque routing_information[ROUTING_INFO_LENGTH];
-    opaque MAC[MAC_LENGTH];
+opaque additional_data[AD_LENGTH]; /* Unencrypted. */
+opaque group_element[GROUP_ELEMENT_LENGTH];
+opaque routing_information[ROUTING_INFO_LENGTH];
+opaque MAC[MAC_LENGTH];
 } SphinxHeader;
 </programlisting>
             <itemizedlist>
@@ -479,58 +431,58 @@ struct {
             <para> The structure of the routing information is as follows: </para>
             <programlisting>
 struct {
-    RoutingCommand routing_commands&lt;1..2^8-1&gt;; /* PER_HOP_RI_LENGTH bytes */
-    opaque encrypted_routing_commands[ROUTING_INFO_LENGTH - PER_HOP_RI_LENGTH];
+RoutingCommand routing_commands&lt;1..2^8-1&gt;; /* PER_HOP_RI_LENGTH bytes */
+opaque encrypted_routing_commands[ROUTING_INFO_LENGTH - PER_HOP_RI_LENGTH];
 } RoutingInformation;
 </programlisting>
             <para> The structure of a single routing command is as follows: </para>
             <programlisting>
 struct {
-    RoutingCommandType command;
-    select (RoutingCommandType) {
-        case null:               NullCommand;
-        case next_node_hop:      NextNodeHopCommand;
-        case recipient:          RecipientCommand;
-        case surb_reply:         SURBReplyCommand;
-    };
+RoutingCommandType command;
+select (RoutingCommandType) {
+case null:               NullCommand;
+case next_node_hop:      NextNodeHopCommand;
+case recipient:          RecipientCommand;
+case surb_reply:         SURBReplyCommand;
+};
 } RoutingCommand;
 </programlisting>
             <para> The following routing commands are currently defined: </para>
             <programlisting>
 enum {
-    null(0),
-    next_node_hop(1),
-    recipient(2),
-    surb_reply(3),
+null(0),
+next_node_hop(1),
+recipient(2),
+surb_reply(3),
 
-    /* Routing commands between 0 and 0x7f are reserved. */
+/* Routing commands between 0 and 0x7f are reserved. */
 
-    (255)
+(255)
 } RoutingCommandType;
 </programlisting>
             <para> The null routing command structure is as follows: </para>
             <programlisting>
 struct {
-    opaque padding&lt;0..PER_HOP_RI_LENGTH-1&gt;;
+opaque padding&lt;0..PER_HOP_RI_LENGTH-1&gt;;
 } NullCommand;
 </programlisting>
             <para> The next_node_hop command structure is as follows: </para>
             <programlisting>
 struct {
-    opaque next_hop[NODE_ID_LENGTH];
-    opaque MAC[MAC_LENGTH];
+opaque next_hop[NODE_ID_LENGTH];
+opaque MAC[MAC_LENGTH];
 } NextNodeHopCommand;
 </programlisting>
             <para> The recipient command structure is as follows: </para>
             <programlisting>
 struct {
-    opaque recipient[RECIPEINT_ID_LENGTH];
+opaque recipient[RECIPEINT_ID_LENGTH];
 } RecipientCommand;
 </programlisting>
             <para> The surb_reply command structure is as follows: </para>
             <programlisting>
 struct {
-    opaque id[SURB_ID_LENGTH];
+opaque id[SURB_ID_LENGTH];
 } SURBReplyCommand;
 </programlisting>
             <para> While the <literal>NullCommand</literal> padding field is specified as opaque,
@@ -568,11 +520,11 @@ struct {
             packet will traverse, along with the per-hop routing commands and per-hop public keys. </para>
         <programlisting>
 struct {
-    /* There is no need for a node_id here, as
-       routing_commands[0].next_hop specifies that
-       information for all non-terminal hops. */
-    opaque public_key[GROUP_ELEMENT_LENGTH];
-    RoutingCommand routing_commands&lt;1...2^8-1&gt;;
+/* There is no need for a node_id here, as
+routing_commands[0].next_hop specifies that
+information for all non-terminal hops. */
+opaque public_key[GROUP_ELEMENT_LENGTH];
+RoutingCommand routing_commands&lt;1...2^8-1&gt;;
 } PathHop;
 </programlisting>
         <para> It is assumed that each routing_commands vector except for the terminal entry
@@ -585,7 +537,7 @@ struct {
                 generation of a Sphinx Packet Header, so it is specified as a distinct operation. </para>
             <programlisting>
 Sphinx_Create_Header( additional_data, path[] ) -&gt; sphinx_header,
-                                                   payload_keys
+               payload_keys
 </programlisting>
             <para> Inputs: </para>
             <itemizedlist spacing="compact">
@@ -631,12 +583,12 @@ blinding_factor = keys[0].blinding_factor
 
 /* Calculate the key material for rest of the hops. */
 for i = 1; i &lt; num_hops; ++i:
-    shared_secret = EXP( path[i].public_key, priv_key )
-    for j = 0; j &lt; i; ++j:
-        shared_secret = EXP( shared_secret, keys[j].blinding_factor )
-    route_keys += Sphinx_KDF( KDF_INFO, shared_secret )
-    group_element = EXP( group_element, keys[i-1].blinding_factor )
-    route_group_elements += group_element
+shared_secret = EXP( path[i].public_key, priv_key )
+for j = 0; j &lt; i; ++j:
+shared_secret = EXP( shared_secret, keys[j].blinding_factor )
+route_keys += Sphinx_KDF( KDF_INFO, shared_secret )
+group_element = EXP( group_element, keys[i-1].blinding_factor )
+route_group_elements += group_element
 </programlisting>
             <para> At the conclusion of the derivation process: </para>
             <itemizedlist spacing="compact">
@@ -661,25 +613,25 @@ ri_keystream = [ ]
 ri_padding = [ ]
 
 for i = 0; i &lt; num_hops; ++i:
-    keystream = ZEROBYTES( ROUTING_INFO_LENGTH + PER_HOP_RI_LENGTH ) ^
-                  S( route_keys[i].header_encryption,
-                     route_keys[i].header_encryption_iv )
-    ks_len = LEN( keystream ) - (i + 1) * PER_HOP_RI_LENGTH
+keystream = ZEROBYTES( ROUTING_INFO_LENGTH + PER_HOP_RI_LENGTH ) ^
+S( route_keys[i].header_encryption,
+route_keys[i].header_encryption_iv )
+ks_len = LEN( keystream ) - (i + 1) * PER_HOP_RI_LENGTH
 
-    padding = keystream[ks_len:]
-    if i &gt; 0:
-        prev_pad_len = LEN( ri_padding[i-1] )
-        padding = padding[:prev_pad_len] ^ ri_padding[i-1] |
-            padding[prev_pad_len]
+padding = keystream[ks_len:]
+if i &gt; 0:
+prev_pad_len = LEN( ri_padding[i-1] )
+padding = padding[:prev_pad_len] ^ ri_padding[i-1] |
+padding[prev_pad_len]
 
-    ri_keystream += keystream[:ks_len]
-    ri_padding += padding
+ri_keystream += keystream[:ks_len]
+ri_padding += padding
 
 At the conclusion of the derivation process:
-   ri_keystream - A vector of per-hop routing_information
-                  encryption keystreams.
-   ri_padding   - The per-hop encrypted routing_information
-                  padding.
+ri_keystream - A vector of per-hop routing_information
+encryption keystreams.
+ri_padding   - The per-hop encrypted routing_information
+padding.
 </programlisting>
             <orderedlist numeration="arabic" spacing="compact">
                 <listitem override="3">
@@ -691,51 +643,51 @@ At the conclusion of the derivation process:
 i = num_hops - 1
 
 /* Encode the terminal hop's routing commands. As the
-   terminal hop can never have a NextNodeHopCommand, there
-   are no per-hop alterations to be made. */
+terminal hop can never have a NextNodeHopCommand, there
+are no per-hop alterations to be made. */
 ri_fragment = path[i].routing_commands |
-   ZEROBYTES( PER_HOP_RI_LENGTH - LEN( path[i].routing_commands ) )
+ZEROBYTES( PER_HOP_RI_LENGTH - LEN( path[i].routing_commands ) )
 
 /* Encrypt and MAC. */
 ri_fragment ^= ri_keystream[i]
 mac = MAC( route_keys[i].header_mac, additional_data |
-               route_group_elements[i] | ri_fragment |
-               ri_padding[i-1] )
+route_group_elements[i] | ri_fragment |
+ri_padding[i-1] )
 routing_info = ri_fragment
 if num_hops &lt; MAX_HOPS:
-    pad_len = (MAX_HOPS - num_hops) * PER_HOP_RI_LENGTH
-    routing_info = routing_info | RNG( pad_len )
+pad_len = (MAX_HOPS - num_hops) * PER_HOP_RI_LENGTH
+routing_info = routing_info | RNG( pad_len )
 
 /* Calculate the routing info for the rest of the hops. */
 for i = num_hops - 2; i &gt;= 0; --i:
-    cmds_to_encode = [ ]
+cmds_to_encode = [ ]
 
-    /* Find and finalize the NextNodeHopCommand. */
-    for j = 0; j &lt; LEN( path[i].routing_commands; j++:
-        cmd = path[i].routing_commands[j]
-        if cmd.command == next_node_hop:
-          /* Finalize the NextNodeHopCommand. */
-          cmd.MAC = mac
-        cmds_to_encode = cmds_to_encode + cmd /* Append */
+/* Find and finalize the NextNodeHopCommand. */
+for j = 0; j &lt; LEN( path[i].routing_commands; j++:
+cmd = path[i].routing_commands[j]
+if cmd.command == next_node_hop:
+/* Finalize the NextNodeHopCommand. */
+cmd.MAC = mac
+cmds_to_encode = cmds_to_encode + cmd /* Append */
 
-    /* Append a terminal NullCommand. */
-    ri_fragment = cmds_to_encode |
-        ZEROBYTES( PER_HOP_RI_LENGTH - LEN( cmds_to_encode ) )
+/* Append a terminal NullCommand. */
+ri_fragment = cmds_to_encode |
+ZEROBYTES( PER_HOP_RI_LENGTH - LEN( cmds_to_encode ) )
 
-    /* Encrypt and MAC */
-    routing_info = ri_fragment | routing_info /* Prepend. */
-    routing_info ^= ri_keystream[i]
-    if i &gt; 0:
-        mac = MAC( route_keys[i].header_mac, additional_data |
-                   route_group_elements[i] | routing_info |
-                   ri_padding[i-1] )
-    else:
-        mac = MAC( route_keys[i].header_mac, additional_data |
-                   route_group_elements[i] | routing_info )
+/* Encrypt and MAC */
+routing_info = ri_fragment | routing_info /* Prepend. */
+routing_info ^= ri_keystream[i]
+if i &gt; 0:
+mac = MAC( route_keys[i].header_mac, additional_data |
+route_group_elements[i] | routing_info |
+ri_padding[i-1] )
+else:
+mac = MAC( route_keys[i].header_mac, additional_data |
+route_group_elements[i] | routing_info )
 
 At the conclusion of the derivation process:
-   routing_info - The completed routing_info block.
-   mac          - The MAC for the 0th hop.
+routing_info - The completed routing_info block.
+mac          - The MAC for the 0th hop.
 </programlisting>
             <orderedlist numeration="arabic" spacing="compact">
                 <listitem override="4">
@@ -752,14 +704,14 @@ sphinx_header.routing_info = routing_info   /* From step 3. */
 sphinx_header.mac = mac                     /* From step 3. */
 
 /* Preserve the Sphinx Payload SPRP keys, to return to the
-   caller. */
+caller. */
 payload_keys = [ ]
 for i = 0; i &lt; nr_hops; ++i:
-    payload_keys += route_keys[i].payload_encryption
+payload_keys += route_keys[i].payload_encryption
 
 At the conclusion of the assembly process:
-   sphinx_header - The completed sphinx_header, to be returned.
-   payload_keys  - The vector of SPRP keys, to be returned.
+sphinx_header - The completed sphinx_header, to be returned.
+payload_keys  - The vector of SPRP keys, to be returned.
 </programlisting>
         </section>
         <section xml:id="create-a-sphinx-packet">
@@ -801,7 +753,7 @@ Sphinx_Create_Packet( additional_data, path[], payload ) -&gt; sphinx_packet
             </orderedlist>
             <programlisting>
 sphinx_header, payload_keys =
-    Sphinx_Create_Header( additional_data, path )
+Sphinx_Create_Header( additional_data, path )
 </programlisting>
             <orderedlist numeration="arabic" spacing="compact">
                 <listitem override="2">
@@ -820,7 +772,7 @@ payload = payload | ZERO_BYTES( PAYLOAD_LENGTH - LEN( payload ) )
             </orderedlist>
             <programlisting>
 for i = nr_hops - 1; i &gt;= 0; --i:
-    payload = SPRP_Encrypt( payload_keys[i], payload )
+payload = SPRP_Encrypt( payload_keys[i], payload )
 </programlisting>
             <orderedlist numeration="arabic" spacing="compact">
                 <listitem override="4">
@@ -854,8 +806,8 @@ sphinx_packet.payload = payload
                 prior to forwarding it to the next node. </para>
             <programlisting>
 Sphinx_Unwrap( routing_private_key, sphinx_packet ) -&gt; sphinx_packet,
-                                                      routing_commands,
-                                                      replay_tag
+                  routing_commands,
+                  replay_tag
 </programlisting>
             <para> Inputs: </para>
             <itemizedlist spacing="compact">
@@ -928,11 +880,11 @@ keys = Sphinx_KDF( KDF_INFO, shared_secret )
             </orderedlist>
             <programlisting>
 derived_mac = MAC( keys.header_mac, hdr.additional_data |
-                  hdr.group_element |
-                  hdr.routing_information )
+hdr.group_element |
+hdr.routing_information )
 if !CONSTANT_TIME_CMP( derived_mac, hdr.MAC):
-    /* MUST abort processing if the header is invalid. */
-    return ErrorInvalidHeader
+/* MUST abort processing if the header is invalid. */
+return ErrorInvalidHeader
 </programlisting>
             <orderedlist numeration="arabic" spacing="compact">
                 <listitem override="4">
@@ -941,7 +893,7 @@ if !CONSTANT_TIME_CMP( derived_mac, hdr.MAC):
             </orderedlist>
             <programlisting>
 /* Append padding to preserve length-invariance, as the routing
-    commands for the current hop will be removed. */
+commands for the current hop will be removed. */
 padding = ZEROBYTES( PER_HOP_RI_LENGTH )
 B = hdr.routing_information | padding
 
@@ -960,33 +912,33 @@ new_routing_information = B[PER_HOP_RI_LENGTH:]
 next_mix_command_idx = -1
 routing_commands = [ ]
 for idx = 0; idx &lt; PER_HOP_RI_LENGTH {
-     /* WARNING: Bounds checking omitted for brevity. */
-     cmd_type = b[idx]
-     cmd = NULL
-     switch cmd_type {
-        case null: goto done  /* No further commands. */
+/* WARNING: Bounds checking omitted for brevity. */
+cmd_type = b[idx]
+cmd = NULL
+switch cmd_type {
+case null: goto done  /* No further commands. */
 
-        case next_node_hop:
-            cmd = RoutingCommand( B[idx:idx+1+LEN( NextNodeHopCommand )] )
-            next_mix_command_idx = i /* Save for step 7. */
-            idx += 1 + LEN( NextNodeHopCommand )
-            break
+case next_node_hop:
+cmd = RoutingCommand( B[idx:idx+1+LEN( NextNodeHopCommand )] )
+next_mix_command_idx = i /* Save for step 7. */
+idx += 1 + LEN( NextNodeHopCommand )
+break
 
-        case recipient:
-            cmd = RoutingCommand( B[idx:idx+1+LEN( FinalDestinationCommand )] )
-            idx += 1 + LEN( RecipientCommand )
-            break
+case recipient:
+cmd = RoutingCommand( B[idx:idx+1+LEN( FinalDestinationCommand )] )
+idx += 1 + LEN( RecipientCommand )
+break
 
-        case surb_reply:
-            cmd = RoutingCommand( B[idx:idx+1+LEN( SURBReplyCommand )] )
-            idx += 1 + LEN( SURBReplyCommand )
-            break
+case surb_reply:
+cmd = RoutingCommand( B[idx:idx+1+LEN( SURBReplyCommand )] )
+idx += 1 + LEN( SURBReplyCommand )
+break
 
-      default:
-            /* MUST abort processing on unrecognized commands. */
-            return ErrorInvalidCommand
-    }
-    routing_commands += cmd /* Append cmd to the tail of the list. */
+default:
+/* MUST abort processing on unrecognized commands. */
+return ErrorInvalidCommand
+}
+routing_commands += cmd /* Append cmd to the tail of the list. */
 }
 done:
 </programlisting>
@@ -1021,11 +973,11 @@ sphinx_packet.payload = payload
             </orderedlist>
             <programlisting>
 if next_mix_command_idx != -1:
-    cmd = routing_commands[next_mix_command_idx]
-    hdr.group_element = EXP( hdr.group_element, keys.blinding_factor )
-    hdr.routing_information = new_routing_information
-    hdr.mac = cmd.MAC
-    sphinx_packet.hdr = hdr
+cmd = routing_commands[next_mix_command_idx]
+hdr.group_element = EXP( hdr.group_element, keys.blinding_factor )
+hdr.routing_information = new_routing_information
+hdr.mac = cmd.MAC
+sphinx_packet.hdr = hdr
 </programlisting>
             <section xml:id="post-sphinx_unwrap-processing">
                 <title>6.2 Post Sphinx_Unwrap Processing</title>
@@ -1088,8 +1040,8 @@ if next_mix_command_idx != -1:
 derived_tag = sphinx_packet.payload[:PAYLOAD_TAG_LENGTH]
 expected_tag = ZEROBYTES( PAYLOAD_TAG_LENGTH )
 if !CONSTANT_TIME_CMP( derived_tag, expected_tag ):
-    /* Discard the packet with no further processing. */
-    return ErrorInvalidPayload
+/* Discard the packet with no further processing. */
+return ErrorInvalidPayload
 </programlisting>
                 <para> Remove the authentication tag before presenting the payload to the
                     application. </para>
@@ -1112,9 +1064,9 @@ sphinx_packet.payload = sphinx_packet.payload[PAYLOAD_TAG_LENGTH:]
                 illustrating creation and use, the following will be used: </para>
             <programlisting>
 struct {
-    SphinxHeader sphinx_header;
-    opaque first_hop[NODE_ID_LENGTH];
-    opaque payload_key[SPRP_KEY_LENGTH];
+SphinxHeader sphinx_header;
+opaque first_hop[NODE_ID_LENGTH];
+opaque payload_key[SPRP_KEY_LENGTH];
 } SphinxSURB;
 </programlisting>
             <section xml:id="create-a-sphinx-surb-and-decryption-token">
@@ -1133,8 +1085,8 @@ struct {
                     problem. </para>
                 <programlisting>
 Sphinx_Create_SURB( additional_data, first_hop, path[] ) -&gt;
-                                                 sphinx_surb,
-                                                 decryption_token
+             sphinx_surb,
+             decryption_token
 </programlisting>
                 <para> Inputs: </para>
                 <itemizedlist spacing="compact">
@@ -1175,7 +1127,7 @@ Sphinx_Create_SURB( additional_data, first_hop, path[] ) -&gt;
                 </orderedlist>
                 <programlisting>
 sphinx_header, payload_keys =
-      Sphinx_Create_Header( additional_data, path )
+Sphinx_Create_Header( additional_data, path )
 </programlisting>
                 <orderedlist numeration="arabic" spacing="compact">
                     <listitem override="2">
@@ -1246,7 +1198,7 @@ Sphinx_Decrypt_SURB_Reply( decryption_token, payload ) -&gt; message
                 </orderedlist>
                 <programlisting>
 for i = LEN( decryption_token ) - 1; i &gt; 0; --i:
-    payload = SPRP_Encrypt( decryption_token[i], payload )
+payload = SPRP_Encrypt( decryption_token[i], payload )
 </programlisting>
                 <orderedlist numeration="arabic" spacing="compact">
                     <listitem override="2">
@@ -1259,7 +1211,7 @@ message = SPRP_Decrypt( decryption_token[0], payload )
 derived_tag = message[:PAYLOAD_TAG_LENGTH]
 expected_tag = ZEROBYTES( PAYLOAD_TAG_LENGTH )
 if !CONSTANT_TIME_CMP( derived_tag, expected_tag ):
-    return ErrorInvalidPayload
+return ErrorInvalidPayload
 
 message = message[PAYLOAD_TAG_LENGTH:]
 </programlisting>
@@ -1422,7 +1374,6 @@ sphinx_packet.payload = payload
 
         <section xml:id="appendix-a.-references">
             <title>Appendix A. References</title>
-
             &COMPULS05;
             &MIXMINION;
             &MIXTOPO10;
@@ -1430,7 +1381,6 @@ sphinx_packet.payload = payload
             &RFC5246;
             &SFMIX03;
             &SPHINX09;
-            
         </section>
     </section>
 </article>
