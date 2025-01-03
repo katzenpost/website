@@ -41,20 +41,27 @@
                 protect for deployed mix networks.</para>    
         </abstract>        
     </info>
-
-  <section xml:id="sphinx_replay_detection_introduction">
-    <title xml:id="sphinx_replay_detection_introduction.title">1. Introduction</title>
-    <para>
-      The Sphinx cryptographic packet format is a compact and provably
-      secure design introduced by George Danezis and Ian Goldberg
-      <link linkend="SPHINX09">SPHINX09</link>. Although it supports
-      replay detection, the exact mechanism of replay detection is
-      neither described in <link linkend="SPHINX09">SPHINX09</link> nor
-      is it described in our
-      <link linkend="SPHINXSPEC">SPHINXSPEC</link>. Therefore we shall
-      describe in detail how to efficiently detect Sphinx packet replay
-      attacks.
-    </para>
+    
+    
+    
+    <section xml:id="terminology">
+        <title xml:id="terminology.title">Terminology</title>
+        <para>The following terms are used in this specification.</para>    
+        <variablelist>
+            <varlistentry>
+                <term></term>
+                <listitem>
+                    <para></para>
+                </listitem>
+            </varlistentry>
+        </variablelist>    
+    </section>
+    
+    
+    
+    
+    
+    
     <section xml:id="terminology">
       <title>1.1 Terminology</title>
       <itemizedlist spacing="compact">
@@ -120,6 +127,22 @@
         software based router on general purpose computing hardware.
       </para>
     </section>
+  <section xml:id="sphinx_replay_detection_introduction">
+    <title xml:id="sphinx_replay_detection_introduction.title">1. Introduction</title>
+    <para>
+      The Sphinx cryptographic packet format is a compact and provably
+      secure design introduced by George Danezis and Ian Goldberg
+      <link linkend="SPHINX09">SPHINX09</link>. Although it supports
+      replay detection, the exact mechanism of replay detection is
+      neither described in <link linkend="SPHINX09">SPHINX09</link> nor
+      is it described in our
+      <link linkend="SPHINXSPEC">SPHINXSPEC</link>. Therefore we shall
+      describe in detail how to efficiently detect Sphinx packet replay
+      attacks.
+    </para>
+      
+      
+
     <section xml:id="conventions-used-in-this-document">
       <title>1.2 Conventions Used in This Document</title>
       <para>

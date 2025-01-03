@@ -61,14 +61,26 @@
         </abstract>
 
     </info>
-
-    <section xml:id="mixnet_introduction">
-        <title xml:id="mixnet_introduction.title">1. Introduction</title>
-        <para> This specification provides the design of a mix network meant provide an anonymous
-            messaging protocol between clients and public mixnet services. </para>
-        <para> Various system components such as client software, end to end messaging protocols,
-            Sphinx cryptographic packet format and wire protocol are described in their own
-            specification documents. </para>
+    
+    
+    <section xml:id="terminology">
+        <title xml:id="terminology.title">Terminology</title>
+        <para>The following terms are used in this specification.</para>    
+        <variablelist>
+            <varlistentry>
+                <term></term>
+                <listitem>
+                    <para></para>
+                </listitem>
+            </varlistentry>
+        </variablelist>    
+    </section>
+    
+    
+    
+    
+    
+    
 
         <variablelist xml:id="terminology">
             <title xml:id="terminology.title">Terminology</title>
@@ -214,6 +226,14 @@
                 </listitem>
             </varlistentry>
         </variablelist>
+
+    <section xml:id="mixnet_introduction">
+        <title xml:id="mixnet_introduction.title">1. Introduction</title>
+        <para> This specification provides the design of a mix network meant provide an anonymous
+            messaging protocol between clients and public mixnet services. </para>
+        <para> Various system components such as client software, end to end messaging protocols,
+            Sphinx cryptographic packet format and wire protocol are described in their own
+            specification documents. </para>
 
         <section xml:id="conventions-used-in-this-document">
             <title xml:id="conventions-used-in-this-document.title">1.2 Conventions Used in This

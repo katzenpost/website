@@ -61,31 +61,28 @@
   </para>
         </abstract>
     </info>
-
-  <section xml:id="design-overview">
-    <title>1. Design Overview</title>
-    <para>
-      Nodes (mixes, gateways, and providers) need upload packet-loss
-      statistics to the directory authorities, so that authorities can
-      label malfunctioning nodes as such in the consensus in the next
-      epoch.
-    </para>
-    <para>
-      Nodes currently sign and upload a Descriptor in each epoch.
-    </para>
-    <para>
-      In the future, they would instead upload a
-      <quote>UploadDescStats</quote> containing: * Descriptor * Stats *
-      Signature
-    </para>
-    <para>
-      Stats contains: * a map from pairs-of-mixes to the ratio of
-      count-of-loops-sent vs count-of-loops-received
-    </para>
-    <para>
-      <emphasis role="strong">refer to our non-existent document on
-      Provider orignated deocy loop traffic design discussion</emphasis>
-    </para>
+    
+    
+    
+    <section xml:id="terminology">
+        <title xml:id="terminology.title">Terminology</title>
+        <para>The following terms are used in this specification.</para>    
+        <variablelist>
+            <varlistentry>
+                <term></term>
+                <listitem>
+                    <para></para>
+                </listitem>
+            </varlistentry>
+        </variablelist>    
+    </section>
+    
+    
+    
+    
+    
+    
+    
     <section xml:id="terminology">
       <title>1.3 Terminology</title>
       <itemizedlist>
@@ -122,6 +119,31 @@
         </listitem>
       </itemizedlist>
     </section>
+  <section xml:id="design-overview">
+    <title>1. Design Overview</title>
+    <para>
+      Nodes (mixes, gateways, and providers) need upload packet-loss
+      statistics to the directory authorities, so that authorities can
+      label malfunctioning nodes as such in the consensus in the next
+      epoch.
+    </para>
+    <para>
+      Nodes currently sign and upload a Descriptor in each epoch.
+    </para>
+    <para>
+      In the future, they would instead upload a
+      <quote>UploadDescStats</quote> containing: * Descriptor * Stats *
+      Signature
+    </para>
+    <para>
+      Stats contains: * a map from pairs-of-mixes to the ratio of
+      count-of-loops-sent vs count-of-loops-received
+    </para>
+    <para>
+      <emphasis role="strong">refer to our non-existent document on
+      Provider orignated deocy loop traffic design discussion</emphasis>
+    </para>
+
   </section>
   <section xml:id="tracking-packet-loss-and-detecting-faulty-mixes">
     <title>2. Tracking Packet Loss and Detecting Faulty Mixes</title>

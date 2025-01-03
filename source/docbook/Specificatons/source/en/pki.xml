@@ -56,29 +56,62 @@
                 </personname>
             </author>
         </authorgroup>
-
         <abstract>
             <para/>
         </abstract>
-
-
     </info>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    
+    
+    
+    <section xml:id="terminology">
+        <title xml:id="terminology.title">Terminology</title>
+        <para>The following terms are used in this specification.</para>    
+        <variablelist>
+            <varlistentry>
+                <term></term>
+                <listitem>
+                    <para></para>
+                </listitem>
+            </varlistentry>
+        </variablelist>    
+    </section>
+    
+    
+    
+    
+    
+    
+        <section xml:id="terminology">
+            <title>1.2 Terminology</title>
+            <para>
+                <literal>PKI</literal> - Public Key Infrastructure </para>
+            <para>
+                <literal>Directory Authority system</literal> - refers to specific PKI schemes used
+                by </para>
+            <para> Mixminion and Tor </para>
+            <para>
+                <literal>MSL</literal> - maximum segment lifetime </para>
+            <para>
+                <literal>mix descriptor</literal> - A database record which describes a component
+                mix </para>
+            <para>
+                <literal>family</literal> - Identifier of security domains or entities operating one
+                or more mixes in the network. This is used to inform the path selection algorithm. </para>
+            <para>
+                <literal>nickname</literal> - simply a nickname string that is unique in the
+                consensus document, see <quote>Katzenpost Mix Network Specification</quote> section
+                    <quote>2.2. Network Topology</quote>. </para>
+            <para>
+                <literal>layer</literal> - The layer indicates which network topology layer a
+                particular mix resides in. </para>
+            <para>
+                <literal>Provider</literal> - A service operated by a third party that Clients
+                communicate directly with to communicate with the Mixnet. It is responsible for
+                Client authentication, forwarding outgoing messages to the Mixnet, and storing
+                incoming messages for the Client. The Provider MUST have the ability to perform
+                cryptographic operations on the relayed messages. </para>
+        </section>
 
     <section xml:id="pki_introduction">
         <title xml:id="pki_introduction.title">1. Introduction</title>
@@ -118,36 +151,7 @@
                     >KATZMIXWIRE</link>
             </para>
         </section>
-        <section xml:id="terminology">
-            <title>1.2 Terminology</title>
-            <para>
-                <literal>PKI</literal> - Public Key Infrastructure </para>
-            <para>
-                <literal>Directory Authority system</literal> - refers to specific PKI schemes used
-                by </para>
-            <para> Mixminion and Tor </para>
-            <para>
-                <literal>MSL</literal> - maximum segment lifetime </para>
-            <para>
-                <literal>mix descriptor</literal> - A database record which describes a component
-                mix </para>
-            <para>
-                <literal>family</literal> - Identifier of security domains or entities operating one
-                or more mixes in the network. This is used to inform the path selection algorithm. </para>
-            <para>
-                <literal>nickname</literal> - simply a nickname string that is unique in the
-                consensus document, see <quote>Katzenpost Mix Network Specification</quote> section
-                    <quote>2.2. Network Topology</quote>. </para>
-            <para>
-                <literal>layer</literal> - The layer indicates which network topology layer a
-                particular mix resides in. </para>
-            <para>
-                <literal>Provider</literal> - A service operated by a third party that Clients
-                communicate directly with to communicate with the Mixnet. It is responsible for
-                Client authentication, forwarding outgoing messages to the Mixnet, and storing
-                incoming messages for the Client. The Provider MUST have the ability to perform
-                cryptographic operations on the relayed messages. </para>
-        </section>
+
         <section xml:id="security-properties-overview">
             <title>1.3 Security Properties Overview</title>
             <para> This Directory Authority system has the following feature goals and security
