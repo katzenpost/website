@@ -8,7 +8,7 @@
 <?slug "" ?>
 <?layout "" ?>
 <?type "" ?>
-<?weight 1 ?>
+<?weight 10 ?>
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
@@ -39,7 +39,7 @@
         </abstract>
     </info>
     <section xml:id="client2_introduction">
-        <title xml:id="client2_introduction.title">1. Introduction</title>
+        <title xml:id="client2_introduction.title">1. Overview</title>
         <para> A Katzenpost mixnet client has several responsibilities at a minimum:</para>
         <itemizedlist spacing="compact">
             <listitem>
@@ -55,9 +55,6 @@
                 <para> keep up to date with the latest PKI document </para>
             </listitem>
         </itemizedlist>
-    </section>
-    <section xml:id="overview">
-        <title xml:id="overview.title">2. Overview</title>
         <para>Client2 is essentially a long running daemon process that listens on an abstract unix
             domain socket for incoming thin client library connections. Many client applications can
             use the same client2 daemon. Those connections are in a sense being multiplexed into the
@@ -72,7 +69,7 @@
             the daemon.</para>
     </section>
     <section xml:id="thin-client-and-daemon-protocol">
-        <title xml:id="thin-client-and-daemon-protocol.title">3. Thin client and daemon
+        <title xml:id="thin-client-and-daemon-protocol.title">2. Thin client and daemon
             protocol</title>
         <para>Note that the thin client daemon protocol uses abstract unix domain sockets in
             datagram packet mode. The socket is of type SOCK_SEQPACKET which is defined as:</para>
@@ -86,7 +83,7 @@
         </itemizedlist>
         <para> In golang this is referred to by the <quote>unixpacket</quote> network string. </para>
         <section xml:id="client-socket-naming-convention">
-            <title xml:id="client-socket-naming-convention.title">3.1 Client socket naming
+            <title xml:id="client-socket-naming-convention.title">2.1 Client socket naming
                 convention</title>
             <para> Thin clients MUST randomize their abstract unix domain socket name otherwise the
                 static name will prevent multiplexing because the kernel requires that the
@@ -98,7 +95,7 @@
 </programlisting>
         </section>
         <section xml:id="daemon-socket-naming-convention">
-            <title xml:id="daemon-socket-naming-convention.title">3.2 Daemon socket naming
+            <title xml:id="daemon-socket-naming-convention.title">2.2 Daemon socket naming
                 convention</title>
             <para> The client2 daemon listens on an abstract unix domain socket with the following
                 name: </para>
@@ -107,7 +104,7 @@
 </programlisting>
         </section>
         <section xml:id="protocol-messages">
-            <title xml:id="protocol-messages.title">3.3 Protocol messages</title>
+            <title xml:id="protocol-messages.title">2.3 Protocol messages</title>
             <para> Note that there are two protocol message types and they are always CBOR encoded.
                 We do not make use of any prefix length encoding because the socket type preserves
                 message boundaries for us. Therefore we simply send over pure CBOR encoded messages. </para>
@@ -207,179 +204,179 @@ IsDropDecoy bool `cbor:is_drop_decoy`
 }
 </programlisting>
         </section>
-    </section>
-    <section xml:id="protocol-description">
-        <title xml:id="protocol-description.title">3.4 Protocol description</title>
-        <para> Upon connecting to the daemon socket the client must wait for two messages. The first
-            message received must have it’s <literal>is_status</literal> field set to true. If so
-            then it’s <literal>is_connected</literal> field indicates whether or not the daemon has
-            a mixnet PQ Noise protocol connection to an entry node. </para>
-        <para> Next the client awaits the second message which contains the PKI document in it’s
-                <literal>payload</literal> field. This marks the end of the initial connection
-            sequence. Note that this PKI document is stripped of all cryptographic signatures. </para>
-        <para> In the next protocol phase, the client may send <literal>Request</literal> messages
-            to the daemon in order to cause the daemon to encapsulate the given payload in a Sphinx
-            packet and send it to the entry node. Likewise the daemon my send the client
-                <literal>Response</literal> messages at any time during this protocol phase. These
-                <literal>Response</literal> messages may indicated a connection status change, a new
-            PKI document or a message sent or reply event. </para>
-    </section>
-    <section xml:id="request-message-fields">
-        <title xml:id="request-message-fields.title">3.5 Request message fields</title>
-        <para> There are several <literal>Request</literal> fields that we need to discuss. </para>
-        <para> Firstly, each <literal>Request</literal> message sent by a thin client needs to have
-            the <literal>app_id</literal> field set to an ID that is unique among the applications
-            using thin clients. The <literal>app_id</literal> is used by the daemon to route
-                <literal>Response</literal> messages to the correct thin client socket. </para>
-        <para> The rest of the fields we are concerned with are the following: </para>
-        <itemizedlist>
-            <listitem>
-                <para>
-                    <literal>with_surb</literal> is set to true if a Sphinx packet with a SURB in
-                    it’s payload should be sent. </para>
-            </listitem>
-            <listitem>
-                <para>
-                    <literal>surbid</literal> is used to uniquely identify the reponse to a message
-                    sent with the <literal>with_surb</literal> field set to true. It should NOT be
-                    set if using the built-in ARQ for reliability and optional retransmissions.
-                </para>
-            </listitem>
-            <listitem>
-                <para>
-                    <literal>is_send_op</literal> must be set to true. </para>
-            </listitem>
-            <listitem>
-                <para>
-                    <literal>payload</literal> must be set to the message payload being sent.
-                </para>
-            </listitem>
-            <listitem>
-                <para>
-                    <literal>destination_id_hash</literal> is 32 byte hash of the destination entry
-                    node’s identity public key. </para>
-            </listitem>
-            <listitem>
-                <para>
-                    <literal>recipient_queue_id</literal> is the destination queue identity. This is
-                    the destination the message will be delivered to. </para>
-            </listitem>
-        </itemizedlist>
-        <para> If a one way message should be sent with no SURB then <literal>with_surb</literal>
-            should be set to false and <literal>surbid</literal> may be nil. If however the thin
-            client wishes to send a reliable message using the daemon’s ARQ, then the following
-            fields must be set: </para>
-        <itemizedlist>
-            <listitem>
-                <para>
-                    <literal>id</literal> the message id which uniquely identifies this message and
-                    it’s eventual reply. </para>
-            </listitem>
-            <listitem>
-                <para>
-                    <literal>with_surb</literal> set to true </para>
-            </listitem>
-            <listitem>
-                <para>
-                    <literal>is_arq_send_op</literal> set to true </para>
-            </listitem>
-            <listitem>
-                <para>
-                    <literal>payload</literal> set to the message payload, as usual. </para>
-            </listitem>
-            <listitem>
-                <para>
-                    <literal>destination_id_hash</literal> set to the destination service node’s
-                    identity public key 32 byte hash. </para>
-            </listitem>
-            <listitem>
-                <para>
-                    <literal>recipient_queue_id</literal> is the destination queue identity. This is
-                    the destination the message will be delivered to. </para>
-            </listitem>
-        </itemizedlist>
-    </section>
-    <section xml:id="response-message-fields">
-        <title xml:id="response-message-fields.title">3.6 Response message fields</title>
-        <para> A thin client connection always begins with the daemon sendings the client two
-            messages, a connection status followed by a PKI document. </para>
-        <para> After this connection sequence phase, the daemon may send the thin client a
-            connection status or PKI document update at any time. </para>
-        <para> Thin clients recieve four possible events inside of <literal>Response</literal>
-            messages: </para>
-        <orderedlist numeration="arabic" spacing="compact">
-            <listitem>
-                <para> connection status event </para>
-                <itemizedlist spacing="compact">
-                    <listitem>
-                        <para>
-                            <literal>is_connected</literal> indicated whether the client is
-                            connected or not. </para>
-                    </listitem>
-                    <listitem>
-                        <para>
-                            <literal>err</literal> may contain an error indicating why connection
-                            status changed. </para>
-                    </listitem>
-                </itemizedlist>
-            </listitem>
-            <listitem>
-                <para> new PKI document event </para>
-                <itemizedlist spacing="compact">
-                    <listitem>
-                        <para>
-                            <literal>payload</literal> is the CBOR serialied PKI document, stripped
-                            of all the cryptographic signatures. </para>
-                    </listitem>
-                </itemizedlist>
-            </listitem>
-            <listitem>
-                <para> message sent event </para>
-                <itemizedlist spacing="compact">
-                    <listitem>
-                        <para>
-                            <literal>message_id</literal> is a unique message ID </para>
-                    </listitem>
-                    <listitem>
-                        <para>
-                            <literal>surb_id</literal> is the SURB ID </para>
-                    </listitem>
-                    <listitem>
-                        <para>
-                            <literal>sent_at</literal> is the time the message was sent </para>
-                    </listitem>
-                    <listitem>
-                        <para>
-                            <literal>replay_eta</literal> is the time we expect a reply </para>
-                    </listitem>
-                    <listitem>
-                        <para>
-                            <literal>err</literal> is the optional error we received when attempting
-                            to send </para>
-                    </listitem>
-                </itemizedlist>
-            </listitem>
-            <listitem>
-                <para> message reply event </para>
-                <itemizedlist spacing="compact">
-                    <listitem>
-                        <para>
-                            <literal>message_id</literal> is a unique message ID </para>
-                    </listitem>
-                    <listitem>
-                        <para>
-                            <literal>surb_id</literal> is a the SURB ID </para>
-                    </listitem>
-                    <listitem>
-                        <para>
-                            <literal>payload</literal> is the replay payload </para>
-                    </listitem>
-                    <listitem>
-                        <para>
-                            <literal>err</literal> is the error, if any. </para>
-                    </listitem>
-                </itemizedlist>
-            </listitem>
-        </orderedlist>
+        <section xml:id="protocol-description">
+            <title xml:id="protocol-description.title">2.4 Protocol description</title>
+            <para> Upon connecting to the daemon socket the client must wait for two messages. The
+                first message received must have it’s <literal>is_status</literal> field set to
+                true. If so then it’s <literal>is_connected</literal> field indicates whether or not
+                the daemon has a mixnet PQ Noise protocol connection to an entry node. </para>
+            <para> Next the client awaits the second message which contains the PKI document in it’s
+                    <literal>payload</literal> field. This marks the end of the initial connection
+                sequence. Note that this PKI document is stripped of all cryptographic signatures. </para>
+            <para> In the next protocol phase, the client may send <literal>Request</literal>
+                messages to the daemon in order to cause the daemon to encapsulate the given payload
+                in a Sphinx packet and send it to the entry node. Likewise the daemon my send the
+                client <literal>Response</literal> messages at any time during this protocol phase.
+                These <literal>Response</literal> messages may indicated a connection status change,
+                a new PKI document or a message sent or reply event. </para>
+        </section>
+        <section xml:id="request-message-fields">
+            <title xml:id="request-message-fields.title">2.5 Request message fields</title>
+            <para> There are several <literal>Request</literal> fields that we need to discuss. </para>
+            <para> Firstly, each <literal>Request</literal> message sent by a thin client needs to
+                have the <literal>app_id</literal> field set to an ID that is unique among the
+                applications using thin clients. The <literal>app_id</literal> is used by the daemon
+                to route <literal>Response</literal> messages to the correct thin client socket. </para>
+            <para> The rest of the fields we are concerned with are the following: </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <literal>with_surb</literal> is set to true if a Sphinx packet with a SURB
+                        in it’s payload should be sent. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <literal>surbid</literal> is used to uniquely identify the reponse to a
+                        message sent with the <literal>with_surb</literal> field set to true. It
+                        should NOT be set if using the built-in ARQ for reliability and optional
+                        retransmissions. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <literal>is_send_op</literal> must be set to true. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <literal>payload</literal> must be set to the message payload being sent.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <literal>destination_id_hash</literal> is 32 byte hash of the destination
+                        entry node’s identity public key. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <literal>recipient_queue_id</literal> is the destination queue identity.
+                        This is the destination the message will be delivered to. </para>
+                </listitem>
+            </itemizedlist>
+            <para> If a one way message should be sent with no SURB then
+                    <literal>with_surb</literal> should be set to false and
+                    <literal>surbid</literal> may be nil. If however the thin client wishes to send
+                a reliable message using the daemon’s ARQ, then the following fields must be set: </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <literal>id</literal> the message id which uniquely identifies this message
+                        and it’s eventual reply. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <literal>with_surb</literal> set to true </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <literal>is_arq_send_op</literal> set to true </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <literal>payload</literal> set to the message payload, as usual. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <literal>destination_id_hash</literal> set to the destination service node’s
+                        identity public key 32 byte hash. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <literal>recipient_queue_id</literal> is the destination queue identity.
+                        This is the destination the message will be delivered to. </para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section xml:id="response-message-fields">
+            <title xml:id="response-message-fields.title">2.6 Response message fields</title>
+            <para> A thin client connection always begins with the daemon sendings the client two
+                messages, a connection status followed by a PKI document. </para>
+            <para> After this connection sequence phase, the daemon may send the thin client a
+                connection status or PKI document update at any time. </para>
+            <para> Thin clients recieve four possible events inside of <literal>Response</literal>
+                messages: </para>
+            <orderedlist numeration="arabic" spacing="compact">
+                <listitem>
+                    <para> connection status event </para>
+                    <itemizedlist spacing="compact">
+                        <listitem>
+                            <para>
+                                <literal>is_connected</literal> indicated whether the client is
+                                connected or not. </para>
+                        </listitem>
+                        <listitem>
+                            <para>
+                                <literal>err</literal> may contain an error indicating why
+                                connection status changed. </para>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem>
+                    <para> new PKI document event </para>
+                    <itemizedlist spacing="compact">
+                        <listitem>
+                            <para>
+                                <literal>payload</literal> is the CBOR serialied PKI document,
+                                stripped of all the cryptographic signatures. </para>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem>
+                    <para> message sent event </para>
+                    <itemizedlist spacing="compact">
+                        <listitem>
+                            <para>
+                                <literal>message_id</literal> is a unique message ID </para>
+                        </listitem>
+                        <listitem>
+                            <para>
+                                <literal>surb_id</literal> is the SURB ID </para>
+                        </listitem>
+                        <listitem>
+                            <para>
+                                <literal>sent_at</literal> is the time the message was sent </para>
+                        </listitem>
+                        <listitem>
+                            <para>
+                                <literal>replay_eta</literal> is the time we expect a reply </para>
+                        </listitem>
+                        <listitem>
+                            <para>
+                                <literal>err</literal> is the optional error we received when
+                                attempting to send </para>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+                <listitem>
+                    <para> message reply event </para>
+                    <itemizedlist spacing="compact">
+                        <listitem>
+                            <para>
+                                <literal>message_id</literal> is a unique message ID </para>
+                        </listitem>
+                        <listitem>
+                            <para>
+                                <literal>surb_id</literal> is a the SURB ID </para>
+                        </listitem>
+                        <listitem>
+                            <para>
+                                <literal>payload</literal> is the replay payload </para>
+                        </listitem>
+                        <listitem>
+                            <para>
+                                <literal>err</literal> is the error, if any. </para>
+                        </listitem>
+                    </itemizedlist>
+                </listitem>
+            </orderedlist>
+        </section>
     </section>
 </article>

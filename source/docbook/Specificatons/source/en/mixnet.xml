@@ -8,7 +8,7 @@
 <?slug "" ?>
 <?layout "" ?>
 <?type "" ?>
-<?weight 1 ?>
+<?weight 30 ?>
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
@@ -83,6 +83,16 @@
         &msl;            
         </variablelist>
     </section>
+    <section/>
+    <section>
+        <title>Conventions Used in This Document</title>
+        <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
+                <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
+                NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
+                <quote>OPTIONAL</quote> in this document are to be interpreted as described in <link
+                linkend="RFC2119">RFC2119</link>
+        </para>
+    </section>
 
     <section xml:id="mixnet_introduction">
         <title xml:id="mixnet_introduction.title">1. Introduction</title>
@@ -91,17 +101,6 @@
         <para> Various system components such as client software, end to end messaging protocols,
             Sphinx cryptographic packet format and wire protocol are described in their own
             specification documents. </para>
-
-        <section xml:id="conventions-used-in-this-document">
-            <title xml:id="conventions-used-in-this-document.title">1.2 Conventions Used in This
-                Document</title>
-            <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>,
-                    <quote>REQUIRED</quote>, <quote>SHALL</quote>, <quote>SHALL NOT</quote>,
-                    <quote>SHOULD</quote>, <quote>SHOULD NOT</quote>, <quote>RECOMMENDED</quote>,
-                    <quote>MAY</quote>, and <quote>OPTIONAL</quote> in this document are to be
-                interpreted as described in <link linkend="RFC2119">RFC2119</link>
-            </para>
-        </section>
     </section>
     <section xml:id="system-overview">
         <title xml:id="system-overview.title">2. System Overview</title>
@@ -522,7 +521,7 @@ uint32_t delay_ms;
             Authority system. </para>
     </section>
     <section xml:id="appendix-a.-references">
-        <title>Appendix A. References</title>
+        <title>References</title>
         &AEZV5;
         &KATZMIXE2E;
         &KATZMIXPKI;

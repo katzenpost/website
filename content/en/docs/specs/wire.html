@@ -3,12 +3,12 @@ title:
 linkTitle: "Wire Protocol" 
 description: "" 
 url: "docs/specs/wire_protocol.html" 
-date: "2025-01-03T12:31:03.28938145-08:00"
+date: "2025-01-03T14:26:55.606547526-08:00"
 draft: false 
 slug: "" 
 layout: "" 
 type: "" 
-weight: 1 
+weight: 50 
 ---
 <!DOCTYPE HTML>
 <html xmlns:ng="http://docbook.org/docbook-ng">
@@ -48,10 +48,10 @@ weight: 1
          <div class="toc">
             <p><b>Table of Contents</b></p>
             <dl class="toc">
+               <dt><span class="section"><a href="#conventions-used-in-this-document">1.1 Conventions Used in This Document</a></span></dt>
                <dt><span class="section"><a href="#wire_protocol_introduction">1. Introduction</a></span></dt>
                <dd>
                   <dl>
-                     <dt><span class="section"><a href="#conventions-used-in-this-document">1.1 Conventions Used in This Document</a></span></dt>
                      <dt><span class="section"><a href="#key-encapsulation-mechanism">1.2 Key Encapsulation Mechanism</a></span></dt>
                   </dl>
                </dd>
@@ -74,9 +74,25 @@ weight: 1
                <dt><span class="section"><a href="#command-padding">4. Command Padding</a></span></dt>
                <dt><span class="section"><a href="#anonymity-considerations">5. Anonymity Considerations</a></span></dt>
                <dt><span class="section"><a href="#security-considerations">6. Security Considerations</a></span></dt>
-               <dt><span class="section"><a href="#acknowledgments">7. Acknowledgments</a></span></dt>
-               <dt><span class="section"><a href="#appendix-a.-references">Appendix A. References</a></span></dt>
+               <dt><span class="section"><a href="#acknowledgments">Acknowledgments</a></span></dt>
+               <dt><span class="section"><a href="#appendix-a.-references">References</a></span></dt>
             </dl>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="conventions-used-in-this-document"></a>1.1 Conventions Used in This Document</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>,
+               <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD
+                     NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and
+               <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be interpreted as described in <a class="xref" href="#RFC2119">the section called &#x201c;References&#x201d;</a>. </p>
+            <p> The <span class="quote">&#x201c;<span class="quote">C</span>&#x201d;</span> style Presentation Language as described in <a class="xref" href="#RFC5246">the section called &#x201c;References&#x201d;</a> Section 4 is used to represent data structures, except for
+               cryptographic attributes, which are specified as opaque byte vectors. </p>
+            <p><code class="literal">x | y</code> denotes the concatenation of x and y. </p>
          </div>
          <div class="section">
             <div class="titlepage">
@@ -96,29 +112,12 @@ weight: 1
                <div class="titlepage">
                   <div>
                      <div>
-                        <h3 class="title"><a name="conventions-used-in-this-document"></a>1.1 Conventions Used in This Document</h3>
-                     </div>
-                  </div>
-               </div>
-               <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>,
-                  <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>,
-                  <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>,
-                  <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be
-                  interpreted as described in <a class="xref" href="#RFC2119">the section called &#x201c;Appendix A. References&#x201d;</a>. </p>
-               <p> The <span class="quote">&#x201c;<span class="quote">C</span>&#x201d;</span> style Presentation Language as described in <a class="xref" href="#RFC5246">the section called &#x201c;Appendix A. References&#x201d;</a> Section 4 is used to represent data structures, except for
-                  cryptographic attributes, which are specified as opaque byte vectors. </p>
-               <p><code class="literal">x | y</code> denotes the concatenation of x and y. </p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
                         <h3 class="title"><a name="key-encapsulation-mechanism"></a>1.2 Key Encapsulation Mechanism</h3>
                      </div>
                   </div>
                </div>
                <p> This protocol uses ANY Key Encapsulation Mechanism. However it&#x2019;s recommended that
-                  most users select a hybrid post quantum KEM such as Xwing. <a class="xref" href="#XWING">the section called &#x201c;Appendix A. References&#x201d;</a></p>
+                  most users select a hybrid post quantum KEM such as Xwing. <a class="xref" href="#XWING">the section called &#x201c;References&#x201d;</a></p>
             </div>
          </div>
          <div class="section">
@@ -129,7 +128,7 @@ weight: 1
                   </div>
                </div>
             </div>
-            <p> The protocol is based on Kyber and Trevor Perrin&#x2019;s Noise Protocol Framework <a class="xref" href="#NOISE">the section called &#x201c;Appendix A. References&#x201d;</a> along with <span class="quote">&#x201c;<span class="quote">Post Quantum Noise</span>&#x201d;</span> paper <a class="link" href="#PQNOISE">PQNOISE</a>. Older previous versions of our transport were
+            <p> The protocol is based on Kyber and Trevor Perrin&#x2019;s Noise Protocol Framework <a class="xref" href="#NOISE">the section called &#x201c;References&#x201d;</a> along with <span class="quote">&#x201c;<span class="quote">Post Quantum Noise</span>&#x201d;</span> paper <a class="link" href="#PQNOISE">PQNOISE</a>. Older previous versions of our transport were
                based on <a class="link" href="#NOISEHFS">NOISEHFS</a>. </p>
             <p> Our transport protocol begins with a prologue, Noise handshake, followed by a stream
                of Noise Transport messages in a minimal framing layer, over a TCP/IP connection.
@@ -435,7 +434,7 @@ uint32_t message[ciphertext_length-16];
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="acknowledgments"></a>7. Acknowledgments</h2>
+                     <h2 class="title" style="clear: both"><a name="acknowledgments"></a>Acknowledgments</h2>
                   </div>
                </div>
             </div>
@@ -446,7 +445,7 @@ uint32_t message[ciphertext_length-16];
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="appendix-a.-references"></a>Appendix A. References</h2>
+                     <h2 class="title" style="clear: both"><a name="appendix-a.-references"></a>References</h2>
                   </div>
                </div>
             </div>

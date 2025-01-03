@@ -12,7 +12,7 @@
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
-<?weight 1 ?> <!-- Optional -->
+<?weight 40 ?> <!-- Optional -->
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
@@ -57,6 +57,14 @@
             &seda;            
         </variablelist>
     </section>
+    <section>
+        <title>Conventions Used in This Document</title>
+        <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
+                <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
+                NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
+                <quote>OPTIONAL</quote> in this document are to be interpreted as described in <link
+                linkend="RFC2119">RFC2119</link>. </para>
+    </section>
     <section xml:id="sphinx_replay_detection_introduction">
         <title xml:id="sphinx_replay_detection_introduction.title">1. Introduction</title>
         <para> The Sphinx cryptographic packet format is a compact and provably secure design
@@ -65,17 +73,6 @@
             neither described in <link linkend="SPHINX09">SPHINX09</link> nor is it described in our
                 <link linkend="SPHINXSPEC">SPHINXSPEC</link>. Therefore we shall describe in detail
             how to efficiently detect Sphinx packet replay attacks. </para>
-
-
-
-        <section xml:id="conventions-used-in-this-document">
-            <title>1.2 Conventions Used in This Document</title>
-            <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>,
-                    <quote>REQUIRED</quote>, <quote>SHALL</quote>, <quote>SHALL NOT</quote>,
-                    <quote>SHOULD</quote>, <quote>SHOULD NOT</quote>, <quote>RECOMMENDED</quote>,
-                    <quote>MAY</quote>, and <quote>OPTIONAL</quote> in this document are to be
-                interpreted as described in <link linkend="RFC2119">RFC2119</link>. </para>
-        </section>
     </section>
     <section xml:id="sphinx-cryptographic-primitives">
         <title>2. Sphinx Cryptographic Primitives</title>
@@ -299,7 +296,7 @@ replay_tag = H( shared_secret )
         </section>
     </section>
     <section xml:id="appendix-a.-references">
-        <title>Appendix A. References</title>
+        <title>References</title>
         <!--    <section xml:id="appendix-a.1-normative-references">
 <title>Appendix A.1 Normative References</title>
 <para>

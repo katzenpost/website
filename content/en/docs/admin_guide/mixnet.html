@@ -3,12 +3,12 @@ title:
 linkTitle: "Mix network specification" 
 description: "" 
 url: "docs/specs/mixspec.html" 
-date: "2025-01-03T12:30:18.572960441-08:00"
+date: "2025-01-03T14:26:41.109171916-08:00"
 draft: false 
 slug: "" 
 layout: "" 
 type: "" 
-weight: 1 
+weight: 30 
 ---
 <!DOCTYPE HTML>
 <html xmlns:ng="http://docbook.org/docbook-ng">
@@ -58,13 +58,9 @@ weight: 1
             <p><b>Table of Contents</b></p>
             <dl class="toc">
                <dt><span class="section"><a href="#terminology">Terminology</a></span></dt>
+               <dt><span class="section"><a href="#d58e119"></a></span></dt>
+               <dt><span class="section"><a href="#d58e120">Conventions Used in This Document</a></span></dt>
                <dt><span class="section"><a href="#mixnet_introduction">1. Introduction</a></span></dt>
-               <dd>
-                  <dl>
-                     <dt><span class="section"><a href="#conventions-used-in-this-document">1.2 Conventions Used in This
-                              Document</a></span></dt>
-                  </dl>
-               </dd>
                <dt><span class="section"><a href="#system-overview">2. System Overview</a></span></dt>
                <dd>
                   <dl>
@@ -100,7 +96,7 @@ weight: 1
                   </dl>
                </dd>
                <dt><span class="section"><a href="#security-considerations">6. Security Considerations</a></span></dt>
-               <dt><span class="section"><a href="#appendix-a.-references">Appendix A. References</a></span></dt>
+               <dt><span class="section"><a href="#appendix-a.-references">References</a></span></dt>
             </dl>
          </div>
          <div class="section">
@@ -233,6 +229,22 @@ weight: 1
             </div>
          </div>
          <div class="section">
+            <div class="titlepage"></div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="d58e120"></a>Conventions Used in This Document</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>,
+               <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD
+                     NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and
+               <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be interpreted as described in <a class="link" href="#RFC2119">RFC2119</a></p>
+         </div>
+         <div class="section">
             <div class="titlepage">
                <div>
                   <div>
@@ -245,21 +257,6 @@ weight: 1
             <p> Various system components such as client software, end to end messaging protocols,
                Sphinx cryptographic packet format and wire protocol are described in their own
                specification documents. </p>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h3 class="title"><a name="conventions-used-in-this-document"></a>1.2 Conventions Used in This
-                           Document</h3>
-                     </div>
-                  </div>
-               </div>
-               <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>,
-                  <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>,
-                  <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>,
-                  <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be
-                  interpreted as described in <a class="link" href="#RFC2119">RFC2119</a></p>
-            </div>
          </div>
          <div class="section">
             <div class="titlepage">
@@ -771,7 +768,7 @@ uint32_t delay_ms;
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="appendix-a.-references"></a>Appendix A. References</h2>
+                     <h2 class="title" style="clear: both"><a name="appendix-a.-references"></a>References</h2>
                   </div>
                </div>
             </div>

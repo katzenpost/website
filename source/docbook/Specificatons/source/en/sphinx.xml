@@ -8,7 +8,7 @@
 <?slug "" ?>
 <?layout "" ?>
 <?type "" ?>
-<?weight 1 ?>
+<?weight 45 ?>
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
@@ -78,6 +78,63 @@
         &groupgenerator;
         </variablelist>
     </section>
+    <section xml:id="conventions-used-in-this-document">
+        <title xml:id="conventions-used-in-this-document.title">Conventions Used in This
+            Document</title>
+        <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
+                <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
+                NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
+                <quote>OPTIONAL</quote> in this document are to be interpreted as described in <link
+                linkend="RFC2119">RFC2119</link>. </para>
+        <para>The <emphasis>C</emphasis> style Presentation Language as described in <link
+                linkend="RFC5246">RFC5246</link> Section 4 is used to represent data structures,
+            except for cryptographic attributes, which are specified as opaque byte vectors. </para>
+        <itemizedlist spacing="compact">
+            <listitem>
+                <para>
+                    <literal>x | y</literal> denotes the concatenation of x and y. </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <literal>x ^ y</literal> denotes the bitwise XOR of x and y. </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <literal>byte</literal> an 8-bit octet. </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <literal>x[a:b]</literal> denotes the sub-vector of x where a/b denote the
+                    start/end byte indexes (inclusive-exclusive); a/b may be omitted to signify the
+                    start/end of the vector x respectively. </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <literal>x[y]</literal> denotes the y'th element of list x. </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <literal>x.len</literal> denotes the length of list x. </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <literal>ZEROBYTES(N)</literal> denotes N bytes of 0x00. </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <literal>RNG(N)</literal> denotes N bytes of cryptographic random data. </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <literal>LEN(N)</literal> denotes the length in bytes of N. </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <literal>CONSTANT_TIME_CMP(x, y)</literal> denotes a constant time comparison
+                    between the byte vectors x and y, returning true iff x and y are equal. </para>
+            </listitem>
+        </itemizedlist>
+    </section>
 
     <section xml:id="sphinx_introduction">
         <title xml:id="sphinx_introduction.title">1. Introduction</title>
@@ -86,66 +143,6 @@
             It supports a full set of security features: indistinguishable replies, hiding the path
             length and relay position, detection of tagging attacks and replay attacks, as well as
             providing unlinkability for each leg of the packet’s journey over the network. </para>
-
-        <section xml:id="conventions-used-in-this-document">
-            <title xml:id="conventions-used-in-this-document.title">1.2 Conventions Used in This
-                Document</title>
-            <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>,
-                    <quote>REQUIRED</quote>, <quote>SHALL</quote>, <quote>SHALL NOT</quote>,
-                    <quote>SHOULD</quote>, <quote>SHOULD NOT</quote>, <quote>RECOMMENDED</quote>,
-                    <quote>MAY</quote>, and <quote>OPTIONAL</quote> in this document are to be
-                interpreted as described in <link linkend="RFC2119">RFC2119</link>. </para>
-            <para>The <emphasis>C</emphasis> style Presentation Language as described in <link
-                    linkend="RFC5246">RFC5246</link> Section 4 is used to represent data structures,
-                except for cryptographic attributes, which are specified as opaque byte vectors. </para>
-            <itemizedlist spacing="compact">
-                <listitem>
-                    <para>
-                        <literal>x | y</literal> denotes the concatenation of x and y. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>x ^ y</literal> denotes the bitwise XOR of x and y. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>byte</literal> an 8-bit octet. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>x[a:b]</literal> denotes the sub-vector of x where a/b denote the
-                        start/end byte indexes (inclusive-exclusive); a/b may be omitted to signify
-                        the start/end of the vector x respectively. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>x[y]</literal> denotes the y'th element of list x. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>x.len</literal> denotes the length of list x. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>ZEROBYTES(N)</literal> denotes N bytes of 0x00. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>RNG(N)</literal> denotes N bytes of cryptographic random data.
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>LEN(N)</literal> denotes the length in bytes of N. </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <literal>CONSTANT_TIME_CMP(x, y)</literal> denotes a constant time
-                        comparison between the byte vectors x and y, returning true iff x and y are
-                        equal. </para>
-                </listitem>
-            </itemizedlist>
-        </section>
     </section>
     <section xml:id="cryptographic-primitives">
         <title>2. Cryptographic Primitives</title>
@@ -1371,16 +1368,15 @@ sphinx_packet.payload = payload
                     to transmit payload that is known to the creator of the SURB. </para>
             </section>
         </section>
-
-        <section xml:id="appendix-a.-references">
-            <title>Appendix A. References</title>
-            &COMPULS05;
-            &MIXMINION;
-            &MIXTOPO10;
-            &RFC2119;
-            &RFC5246;
-            &SFMIX03;
-            &SPHINX09;
-        </section>
+    </section>
+    <section xml:id="appendix-a.-references">
+        <title>References</title>
+        &COMPULS05;
+        &MIXMINION;
+        &MIXTOPO10;
+        &RFC2119;
+        &RFC5246;
+        &SFMIX03;
+        &SPHINX09;
     </section>
 </article>

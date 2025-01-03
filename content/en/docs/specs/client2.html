@@ -3,12 +3,12 @@ title:
 linkTitle: "Client2 design specification" 
 description: "" 
 url: "docs/specs/client2.html" 
-date: "2025-01-03T12:29:12.585285517-08:00"
+date: "2025-01-03T14:26:24.977864158-08:00"
 draft: false 
 slug: "" 
 layout: "" 
 type: "" 
-weight: 1 
+weight: 10 
 ---
 <!DOCTYPE HTML>
 <html xmlns:ng="http://docbook.org/docbook-ng">
@@ -46,29 +46,28 @@ weight: 1
          <div class="toc">
             <p><b>Table of Contents</b></p>
             <dl class="toc">
-               <dt><span class="section"><a href="#client2_introduction">1. Introduction</a></span></dt>
-               <dt><span class="section"><a href="#overview">2. Overview</a></span></dt>
-               <dt><span class="section"><a href="#thin-client-and-daemon-protocol">3. Thin client and daemon
+               <dt><span class="section"><a href="#client2_introduction">1. Overview</a></span></dt>
+               <dt><span class="section"><a href="#thin-client-and-daemon-protocol">2. Thin client and daemon
                         protocol</a></span></dt>
                <dd>
                   <dl>
-                     <dt><span class="section"><a href="#client-socket-naming-convention">3.1 Client socket naming
+                     <dt><span class="section"><a href="#client-socket-naming-convention">2.1 Client socket naming
                               convention</a></span></dt>
-                     <dt><span class="section"><a href="#daemon-socket-naming-convention">3.2 Daemon socket naming
+                     <dt><span class="section"><a href="#daemon-socket-naming-convention">2.2 Daemon socket naming
                               convention</a></span></dt>
-                     <dt><span class="section"><a href="#protocol-messages">3.3 Protocol messages</a></span></dt>
+                     <dt><span class="section"><a href="#protocol-messages">2.3 Protocol messages</a></span></dt>
+                     <dt><span class="section"><a href="#protocol-description">2.4 Protocol description</a></span></dt>
+                     <dt><span class="section"><a href="#request-message-fields">2.5 Request message fields</a></span></dt>
+                     <dt><span class="section"><a href="#response-message-fields">2.6 Response message fields</a></span></dt>
                   </dl>
                </dd>
-               <dt><span class="section"><a href="#protocol-description">3.4 Protocol description</a></span></dt>
-               <dt><span class="section"><a href="#request-message-fields">3.5 Request message fields</a></span></dt>
-               <dt><span class="section"><a href="#response-message-fields">3.6 Response message fields</a></span></dt>
             </dl>
          </div>
          <div class="section">
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="client2_introduction"></a>1. Introduction</h2>
+                     <h2 class="title" style="clear: both"><a name="client2_introduction"></a>1. Overview</h2>
                   </div>
                </div>
             </div>
@@ -88,15 +87,6 @@ weight: 1
                      <p> keep up to date with the latest PKI document </p>
                   </li>
                </ul>
-            </div>
-         </div>
-         <div class="section">
-            <div class="titlepage">
-               <div>
-                  <div>
-                     <h2 class="title" style="clear: both"><a name="overview"></a>2. Overview</h2>
-                  </div>
-               </div>
             </div>
             <p>Client2 is essentially a long running daemon process that listens on an abstract unix
                domain socket for incoming thin client library connections. Many client applications
@@ -122,7 +112,7 @@ weight: 1
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="thin-client-and-daemon-protocol"></a>3. Thin client and daemon
+                     <h2 class="title" style="clear: both"><a name="thin-client-and-daemon-protocol"></a>2. Thin client and daemon
                         protocol</h2>
                   </div>
                </div>
@@ -143,7 +133,7 @@ weight: 1
                <div class="titlepage">
                   <div>
                      <div>
-                        <h3 class="title"><a name="client-socket-naming-convention"></a>3.1 Client socket naming
+                        <h3 class="title"><a name="client-socket-naming-convention"></a>2.1 Client socket naming
                            convention</h3>
                      </div>
                   </div>
@@ -161,7 +151,7 @@ weight: 1
                <div class="titlepage">
                   <div>
                      <div>
-                        <h3 class="title"><a name="daemon-socket-naming-convention"></a>3.2 Daemon socket naming
+                        <h3 class="title"><a name="daemon-socket-naming-convention"></a>2.2 Daemon socket naming
                            convention</h3>
                      </div>
                   </div>
@@ -176,7 +166,7 @@ weight: 1
                <div class="titlepage">
                   <div>
                      <div>
-                        <h3 class="title"><a name="protocol-messages"></a>3.3 Protocol messages</h3>
+                        <h3 class="title"><a name="protocol-messages"></a>2.3 Protocol messages</h3>
                      </div>
                   </div>
                </div>
@@ -280,188 +270,189 @@ IsDropDecoy bool `cbor:is_drop_decoy`
 }
 </pre>
             </div>
-         </div>
-         <div class="section">
-            <div class="titlepage">
-               <div>
+            <div class="section">
+               <div class="titlepage">
                   <div>
-                     <h2 class="title" style="clear: both"><a name="protocol-description"></a>3.4 Protocol description</h2>
+                     <div>
+                        <h3 class="title"><a name="protocol-description"></a>2.4 Protocol description</h3>
+                     </div>
                   </div>
                </div>
+               <p> Upon connecting to the daemon socket the client must wait for two messages. The
+                  first message received must have it&#x2019;s <code class="literal">is_status</code> field set to
+                  true. If so then it&#x2019;s <code class="literal">is_connected</code> field indicates whether or not
+                  the daemon has a mixnet PQ Noise protocol connection to an entry node. </p>
+               <p> Next the client awaits the second message which contains the PKI document in it&#x2019;s
+                  <code class="literal">payload</code> field. This marks the end of the initial connection
+                  sequence. Note that this PKI document is stripped of all cryptographic signatures.
+                  </p>
+               <p> In the next protocol phase, the client may send <code class="literal">Request</code>
+                  messages to the daemon in order to cause the daemon to encapsulate the given payload
+                  in a Sphinx packet and send it to the entry node. Likewise the daemon my send the
+                  client <code class="literal">Response</code> messages at any time during this protocol phase.
+                  These <code class="literal">Response</code> messages may indicated a connection status change,
+                  a new PKI document or a message sent or reply event. </p>
             </div>
-            <p> Upon connecting to the daemon socket the client must wait for two messages. The first
-               message received must have it&#x2019;s <code class="literal">is_status</code> field set to true. If so
-               then it&#x2019;s <code class="literal">is_connected</code> field indicates whether or not the daemon has
-               a mixnet PQ Noise protocol connection to an entry node. </p>
-            <p> Next the client awaits the second message which contains the PKI document in it&#x2019;s
-               <code class="literal">payload</code> field. This marks the end of the initial connection
-               sequence. Note that this PKI document is stripped of all cryptographic signatures.
-               </p>
-            <p> In the next protocol phase, the client may send <code class="literal">Request</code> messages
-               to the daemon in order to cause the daemon to encapsulate the given payload in a Sphinx
-               packet and send it to the entry node. Likewise the daemon my send the client
-               <code class="literal">Response</code> messages at any time during this protocol phase. These
-               <code class="literal">Response</code> messages may indicated a connection status change, a new
-               PKI document or a message sent or reply event. </p>
-         </div>
-         <div class="section">
-            <div class="titlepage">
-               <div>
+            <div class="section">
+               <div class="titlepage">
                   <div>
-                     <h2 class="title" style="clear: both"><a name="request-message-fields"></a>3.5 Request message fields</h2>
+                     <div>
+                        <h3 class="title"><a name="request-message-fields"></a>2.5 Request message fields</h3>
+                     </div>
                   </div>
                </div>
-            </div>
-            <p> There are several <code class="literal">Request</code> fields that we need to discuss. </p>
-            <p> Firstly, each <code class="literal">Request</code> message sent by a thin client needs to have
-               the <code class="literal">app_id</code> field set to an ID that is unique among the applications
-               using thin clients. The <code class="literal">app_id</code> is used by the daemon to route
-               <code class="literal">Response</code> messages to the correct thin client socket. </p>
-            <p> The rest of the fields we are concerned with are the following: </p>
-            <div class="itemizedlist">
-               <ul class="itemizedlist" style="list-style-type: disc; ">
-                  <li class="listitem">
-                     <p><code class="literal">with_surb</code> is set to true if a Sphinx packet with a SURB in
-                        it&#x2019;s payload should be sent. </p>
-                  </li>
-                  <li class="listitem">
-                     <p><code class="literal">surbid</code> is used to uniquely identify the reponse to a message
-                        sent with the <code class="literal">with_surb</code> field set to true. It should NOT be
-                        set if using the built-in ARQ for reliability and optional retransmissions.
-                        </p>
-                  </li>
-                  <li class="listitem">
-                     <p><code class="literal">is_send_op</code> must be set to true. </p>
-                  </li>
-                  <li class="listitem">
-                     <p><code class="literal">payload</code> must be set to the message payload being sent.
-                        </p>
-                  </li>
-                  <li class="listitem">
-                     <p><code class="literal">destination_id_hash</code> is 32 byte hash of the destination entry
-                        node&#x2019;s identity public key. </p>
-                  </li>
-                  <li class="listitem">
-                     <p><code class="literal">recipient_queue_id</code> is the destination queue identity. This is
-                        the destination the message will be delivered to. </p>
-                  </li>
-               </ul>
-            </div>
-            <p> If a one way message should be sent with no SURB then <code class="literal">with_surb</code>
-               should be set to false and <code class="literal">surbid</code> may be nil. If however the thin
-               client wishes to send a reliable message using the daemon&#x2019;s ARQ, then the following
-               fields must be set: </p>
-            <div class="itemizedlist">
-               <ul class="itemizedlist" style="list-style-type: disc; ">
-                  <li class="listitem">
-                     <p><code class="literal">id</code> the message id which uniquely identifies this message and
-                        it&#x2019;s eventual reply. </p>
-                  </li>
-                  <li class="listitem">
-                     <p><code class="literal">with_surb</code> set to true </p>
-                  </li>
-                  <li class="listitem">
-                     <p><code class="literal">is_arq_send_op</code> set to true </p>
-                  </li>
-                  <li class="listitem">
-                     <p><code class="literal">payload</code> set to the message payload, as usual. </p>
-                  </li>
-                  <li class="listitem">
-                     <p><code class="literal">destination_id_hash</code> set to the destination service node&#x2019;s
-                        identity public key 32 byte hash. </p>
-                  </li>
-                  <li class="listitem">
-                     <p><code class="literal">recipient_queue_id</code> is the destination queue identity. This is
-                        the destination the message will be delivered to. </p>
-                  </li>
-               </ul>
-            </div>
-         </div>
-         <div class="section">
-            <div class="titlepage">
-               <div>
-                  <div>
-                     <h2 class="title" style="clear: both"><a name="response-message-fields"></a>3.6 Response message fields</h2>
-                  </div>
+               <p> There are several <code class="literal">Request</code> fields that we need to discuss. </p>
+               <p> Firstly, each <code class="literal">Request</code> message sent by a thin client needs to
+                  have the <code class="literal">app_id</code> field set to an ID that is unique among the
+                  applications using thin clients. The <code class="literal">app_id</code> is used by the daemon
+                  to route <code class="literal">Response</code> messages to the correct thin client socket. </p>
+               <p> The rest of the fields we are concerned with are the following: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">with_surb</code> is set to true if a Sphinx packet with a SURB
+                           in it&#x2019;s payload should be sent. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">surbid</code> is used to uniquely identify the reponse to a
+                           message sent with the <code class="literal">with_surb</code> field set to true. It
+                           should NOT be set if using the built-in ARQ for reliability and optional
+                           retransmissions. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">is_send_op</code> must be set to true. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">payload</code> must be set to the message payload being sent.
+                           </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">destination_id_hash</code> is 32 byte hash of the destination
+                           entry node&#x2019;s identity public key. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">recipient_queue_id</code> is the destination queue identity.
+                           This is the destination the message will be delivered to. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> If a one way message should be sent with no SURB then
+                  <code class="literal">with_surb</code> should be set to false and
+                  <code class="literal">surbid</code> may be nil. If however the thin client wishes to send
+                  a reliable message using the daemon&#x2019;s ARQ, then the following fields must be set:
+                  </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">id</code> the message id which uniquely identifies this message
+                           and it&#x2019;s eventual reply. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">with_surb</code> set to true </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">is_arq_send_op</code> set to true </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">payload</code> set to the message payload, as usual. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">destination_id_hash</code> set to the destination service node&#x2019;s
+                           identity public key 32 byte hash. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">recipient_queue_id</code> is the destination queue identity.
+                           This is the destination the message will be delivered to. </p>
+                     </li>
+                  </ul>
                </div>
             </div>
-            <p> A thin client connection always begins with the daemon sendings the client two
-               messages, a connection status followed by a PKI document. </p>
-            <p> After this connection sequence phase, the daemon may send the thin client a
-               connection status or PKI document update at any time. </p>
-            <p> Thin clients recieve four possible events inside of <code class="literal">Response</code>
-               messages: </p>
-            <div class="orderedlist">
-               <ol class="orderedlist compact" type="1">
-                  <li class="listitem">
-                     <p> connection status event </p>
-                     <div class="itemizedlist">
-                        <ul class="itemizedlist compact" style="list-style-type: disc; ">
-                           <li class="listitem">
-                              <p><code class="literal">is_connected</code> indicated whether the client is
-                                 connected or not. </p>
-                           </li>
-                           <li class="listitem">
-                              <p><code class="literal">err</code> may contain an error indicating why connection
-                                 status changed. </p>
-                           </li>
-                        </ul>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="response-message-fields"></a>2.6 Response message fields</h3>
                      </div>
-                  </li>
-                  <li class="listitem">
-                     <p> new PKI document event </p>
-                     <div class="itemizedlist">
-                        <ul class="itemizedlist compact" style="list-style-type: disc; ">
-                           <li class="listitem">
-                              <p><code class="literal">payload</code> is the CBOR serialied PKI document, stripped
-                                 of all the cryptographic signatures. </p>
-                           </li>
-                        </ul>
-                     </div>
-                  </li>
-                  <li class="listitem">
-                     <p> message sent event </p>
-                     <div class="itemizedlist">
-                        <ul class="itemizedlist compact" style="list-style-type: disc; ">
-                           <li class="listitem">
-                              <p><code class="literal">message_id</code> is a unique message ID </p>
-                           </li>
-                           <li class="listitem">
-                              <p><code class="literal">surb_id</code> is the SURB ID </p>
-                           </li>
-                           <li class="listitem">
-                              <p><code class="literal">sent_at</code> is the time the message was sent </p>
-                           </li>
-                           <li class="listitem">
-                              <p><code class="literal">replay_eta</code> is the time we expect a reply </p>
-                           </li>
-                           <li class="listitem">
-                              <p><code class="literal">err</code> is the optional error we received when attempting
-                                 to send </p>
-                           </li>
-                        </ul>
-                     </div>
-                  </li>
-                  <li class="listitem">
-                     <p> message reply event </p>
-                     <div class="itemizedlist">
-                        <ul class="itemizedlist compact" style="list-style-type: disc; ">
-                           <li class="listitem">
-                              <p><code class="literal">message_id</code> is a unique message ID </p>
-                           </li>
-                           <li class="listitem">
-                              <p><code class="literal">surb_id</code> is a the SURB ID </p>
-                           </li>
-                           <li class="listitem">
-                              <p><code class="literal">payload</code> is the replay payload </p>
-                           </li>
-                           <li class="listitem">
-                              <p><code class="literal">err</code> is the error, if any. </p>
-                           </li>
-                        </ul>
-                     </div>
-                  </li>
-               </ol>
+                  </div>
+               </div>
+               <p> A thin client connection always begins with the daemon sendings the client two
+                  messages, a connection status followed by a PKI document. </p>
+               <p> After this connection sequence phase, the daemon may send the thin client a
+                  connection status or PKI document update at any time. </p>
+               <p> Thin clients recieve four possible events inside of <code class="literal">Response</code>
+                  messages: </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem">
+                        <p> connection status event </p>
+                        <div class="itemizedlist">
+                           <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                              <li class="listitem">
+                                 <p><code class="literal">is_connected</code> indicated whether the client is
+                                    connected or not. </p>
+                              </li>
+                              <li class="listitem">
+                                 <p><code class="literal">err</code> may contain an error indicating why
+                                    connection status changed. </p>
+                              </li>
+                           </ul>
+                        </div>
+                     </li>
+                     <li class="listitem">
+                        <p> new PKI document event </p>
+                        <div class="itemizedlist">
+                           <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                              <li class="listitem">
+                                 <p><code class="literal">payload</code> is the CBOR serialied PKI document,
+                                    stripped of all the cryptographic signatures. </p>
+                              </li>
+                           </ul>
+                        </div>
+                     </li>
+                     <li class="listitem">
+                        <p> message sent event </p>
+                        <div class="itemizedlist">
+                           <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                              <li class="listitem">
+                                 <p><code class="literal">message_id</code> is a unique message ID </p>
+                              </li>
+                              <li class="listitem">
+                                 <p><code class="literal">surb_id</code> is the SURB ID </p>
+                              </li>
+                              <li class="listitem">
+                                 <p><code class="literal">sent_at</code> is the time the message was sent </p>
+                              </li>
+                              <li class="listitem">
+                                 <p><code class="literal">replay_eta</code> is the time we expect a reply </p>
+                              </li>
+                              <li class="listitem">
+                                 <p><code class="literal">err</code> is the optional error we received when
+                                    attempting to send </p>
+                              </li>
+                           </ul>
+                        </div>
+                     </li>
+                     <li class="listitem">
+                        <p> message reply event </p>
+                        <div class="itemizedlist">
+                           <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                              <li class="listitem">
+                                 <p><code class="literal">message_id</code> is a unique message ID </p>
+                              </li>
+                              <li class="listitem">
+                                 <p><code class="literal">surb_id</code> is a the SURB ID </p>
+                              </li>
+                              <li class="listitem">
+                                 <p><code class="literal">payload</code> is the replay payload </p>
+                              </li>
+                              <li class="listitem">
+                                 <p><code class="literal">err</code> is the error, if any. </p>
+                              </li>
+                           </ul>
+                        </div>
+                     </li>
+                  </ol>
+               </div>
             </div>
          </div>
       </div>

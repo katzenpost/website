@@ -12,7 +12,7 @@
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
-<?weight 1 ?> <!-- Optional -->
+<?weight 5 ?> <!-- Optional -->
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
@@ -41,8 +41,26 @@
                 authority server and clients will use.</para>
         </abstract>
     </info>
-
-
+    <section xml:id="terminology">
+        <title xml:id="terminology.title">Terminology</title>
+        <para>The following terms are used in this specification.</para>
+        <variablelist>
+            <varlistentry>
+                <term/>
+                <listitem>
+                    <para/>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </section>
+    <section xml:id="conventions-used-in-this-document">
+        <title>Conventions Used in This Document</title>
+        <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>,
+                <quote>REQUIRED</quote>, <quote>SHALL</quote>, <quote>SHALL NOT</quote>,
+                <quote>SHOULD</quote>, <quote>SHOULD NOT</quote>, <quote>RECOMMENDED</quote>,
+                <quote>MAY</quote>, and <quote>OPTIONAL</quote> in this document are to be
+            interpreted as described in <link linkend="RFC2119">RFC2119</link>. </para>
+    </section>
     <section xml:id="certificate_introduction">
         <title xml:id="certificate_introduction.title">1. Introduction</title>
         <para> Mixes and Directory Authority servers need to have key agility in the sense of
@@ -53,30 +71,8 @@
                 linkend="RFC7515">RFC7515</link> in the voting Directory Authority system <link
                 linkend="KATZMIXPKI">KATZMIXPKI</link> for the multi-signature documents exchanged
             for voting and consensus. </para>
-        <section xml:id="conventions-used-in-this-document">
-            <title>1.1 Conventions Used in This Document</title>
-            <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>,
-                    <quote>REQUIRED</quote>, <quote>SHALL</quote>, <quote>SHALL NOT</quote>,
-                    <quote>SHOULD</quote>, <quote>SHOULD NOT</quote>, <quote>RECOMMENDED</quote>,
-                    <quote>MAY</quote>, and <quote>OPTIONAL</quote> in this document are to be
-                interpreted as described in <link linkend="RFC2119">RFC2119</link>. </para>
-        </section>
-
-        <section xml:id="terminology">
-            <title xml:id="terminology.title">Terminology</title>
-            <para>The following terms are used in this specification.</para>
-            <variablelist>
-                <varlistentry>
-                    <term/>
-                    <listitem>
-                        <para/>
-                    </listitem>
-                </varlistentry>
-            </variablelist>
-        </section>
-
         <section xml:id="document-format">
-            <title>2. Document Format</title>
+            <title>1.1. Document Format</title>
             <para> The CBOR <link linkend="RFC7049">RFC7049</link> serialization format is used to
                 serialize certificates: </para>
             <para> Signature is a cryptographic signature which has an associated signer ID. </para>
@@ -116,7 +112,7 @@ Signatures []Signature
                 by their identity so that the output is binary deterministic. </para>
         </section>
         <section xml:id="certificate-types">
-            <title>2.1 Certificate Types</title>
+            <title>1.2 Certificate Types</title>
             <para> The certificate <literal>type</literal> field indicates the type of certificate.
                 So far we have only two types: </para>
             <itemizedlist spacing="compact">
@@ -136,40 +132,38 @@ Signatures []Signature
             </para>
         </section>
         <section xml:id="certificate-key-types">
-            <title>2.2. Certificate Key Types</title>
+            <title>1.3. Certificate Key Types</title>
             <para> It’s more practical to continue using Ed25519 <link linkend="ED25519"
                     >ED25519</link> keys but it’s also possible that in the future we could upgrade
                 to a stateless hash based post quantum cryptographic signature scheme such as
                 SPHINCS-256 or SPHINCS+. <link linkend="SPHINCS256">SPHINCS256</link>
             </para>
         </section>
-        <section xml:id="golang-api">
-            <title>3. Golang API</title>
-            <itemizedlist spacing="compact">
-                <listitem>
-                    <para> https://godoc.org/github.com/katzenpost/katzenpost/core/crypto/cert
-                    </para>
-                </listitem>
-            </itemizedlist>
-            <para> Our golang implementation is agnostic to the specific cryptographic signature
-                scheme which is used. Cert can handle single and multiple signatures per document
-                and has a variety of helper functions that ease use for multi signature use cases.
-            </para>
-        </section>
-        <section xml:id="acknowledgments">
-            <title>4. Acknowledgments</title>
-            <para> This specification was inspired by Tor Project’s certificate format specification
-                document: </para>
-            <itemizedlist spacing="compact">
-                <listitem>
-                    <para> https://gitweb.torproject.org/torspec.git/tree/cert-spec.txt </para>
-                </listitem>
-            </itemizedlist>
-        </section>
-        <section xml:id="appendix-a.-references">
-            <title>Appendix A. References</title>
-
-            <!--    <section xml:id="appendix-a.1-normative-references">
+    </section>
+    <section xml:id="golang-api">
+        <title>2. Golang API</title>
+        <itemizedlist spacing="compact">
+            <listitem>
+                <para> https://godoc.org/github.com/katzenpost/katzenpost/core/crypto/cert </para>
+            </listitem>
+        </itemizedlist>
+        <para>Our golang implementation is agnostic to the specific cryptographic signature scheme
+            which is used. Cert can handle single and multiple signatures per document and has a
+            variety of helper functions that ease use for multi signature use cases. </para>
+    </section>
+    <section xml:id="acknowledgments">
+        <title>Acknowledgments</title>
+        <para> This specification was inspired by Tor Project’s certificate format specification
+            document: </para>
+        <itemizedlist spacing="compact">
+            <listitem>
+                <para> https://gitweb.torproject.org/torspec.git/tree/cert-spec.txt </para>
+            </listitem>
+        </itemizedlist>
+    </section>
+    <section xml:id="appendix-a.-references">
+        <title>References</title>
+        <!--    <section xml:id="appendix-a.1-normative-references">
 <title>Appendix A.1 Normative References</title>
 <para>
 </para>
@@ -197,13 +191,12 @@ url = {https://github.com/katzenpost/katzenpost/blob/master/docs/specs/certifica
 year = {2018}
 }
 </programlisting>-->
-            &RFC7049;
-            &RFC7515;
-            &KATZMIXPKI;
-            &RFC2119;
-            &RFC7693;
-            &ED25519;
-            &SPHINCS256;
-        </section>
+        &RFC7049;
+        &RFC7515;
+        &KATZMIXPKI;
+        &RFC2119;
+        &RFC7693;
+        &ED25519;
+        &SPHINCS256;
     </section>
 </article>

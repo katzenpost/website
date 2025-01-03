@@ -1,20 +1,20 @@
 ---
 title: 
-linkTitle: "Introduction" 
+linkTitle: "Mix decoy loop" 
 description: "" 
-url: "docs/admin_guide/introduction.html" 
-date: "2025-01-03T12:30:06.906830704-08:00"
+url: "docs/specs/decoy.html" 
+date: "2025-01-03T14:26:38.024771436-08:00"
 draft: false 
 slug: "" 
 layout: "" 
 type: "" 
-weight: 1 
+weight: 25 
 ---
 <!DOCTYPE HTML>
 <html xmlns:ng="http://docbook.org/docbook-ng">
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-      <title>Introducing Katzenpost, a modern mixnet</title>
+      <title>Propagation of mix decoy loop statistics</title>
       <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
       <meta name="description" content="In the context of continuous time mixing stategies such as the memoryless mix used by Katzenpost, n-1 attacks may use strategic packetloss. Nodes can also fail for benign reasons. Determining whether or not it&#x2019;s an n-1 attack is outside the scope of this work. This document describes how we will communicate statistics from mix nodes to mix network directory authorities which tells them about the packetloss they are observing.">
    </head>
@@ -23,7 +23,7 @@ weight: 1
          <div class="titlepage">
             <div>
                <div>
-                  <h1 class="title"><a name="introduction"></a>Introducing Katzenpost, a modern mixnet</h1>
+                  <h1 class="title"><a name="decoy"></a>Propagation of mix decoy loop statistics</h1>
                </div>
                <div>
                   <div class="authorgroup">
@@ -45,9 +45,9 @@ weight: 1
                         used by Katzenpost, n-1 attacks may use strategic packetloss. Nodes can also fail
                         for benign reasons. Determining whether or not it&#x2019;s an n-1 attack is outside the
                         scope of this work. </p>
-                     <p> This document describes how we will communicate statistics from mix nodes to mix
+                     <p>This document describes how we will communicate statistics from mix nodes to mix
                         network directory authorities which tells them about the packetloss they are
-                        observing. </p>
+                        observing.</p>
                   </div>
                </div>
             </div>
@@ -58,7 +58,7 @@ weight: 1
             <dl class="toc">
                <dt><span class="section"><a href="#terminology">Terminology</a></span></dt>
                <dt><span class="section"><a href="#design-overview">1. Design Overview</a></span></dt>
-               <dt><span class="section"><a href="#tracking-packet-loss-and-detecting-faulty-mixes">2. Tracking Packet Loss and Detecting Faulty Mixes</a></span></dt>
+               <dt><span class="section"><a href="#tracking-packet-loss-and-detecting-faulty-mixes">2. Tracking packet loss and detecting faulty mixes</a></span></dt>
                <dt><span class="section"><a href="#uploading-stats-to-dirauths">3. Uploading Stats to Dirauths</a></span></dt>
             </dl>
          </div>
@@ -73,7 +73,7 @@ weight: 1
             <p>The following terms are used in this specification.</p>
             <div class="variablelist">
                <dl class="variablelist">
-                  <dt><span class="term">wire protocol</span></dt>
+                  <dt><span class="term">Wire protocol</span></dt>
                   <dd>
                      <p>Refers to our PQ Noise based protocol which currently uses TCP but in the
                         near future will optionally use QUIC. This protocol has messages known as
@@ -81,20 +81,19 @@ weight: 1
                         functions such as sending or retrieving a message, dirauth voting etc. For
                         more information, please see our design doc: <a class="link" href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/wire-protocol.md" target="_top">wire protocol specification</a></p>
                   </dd>
-                  <dt><span class="term">providers</span></dt>
+                  <dt><span class="term">Providers</span></dt>
                   <dd>
-                     <p>A node on the edge of the network that has two roles,
-                        handling incoming client connections and running mixnet services. Soon we should
+                     <p>Refers to a set of node on the edge of the network which have two roles,
+                        handle incoming client connections and run mixnet services. Soon we should
                         get rid of <code class="literal">Providers</code> and replace it with two different
                         sets, <code class="literal">gateway nodes</code> and <code class="literal">service
                            nodes</code>.</p>
                   </dd>
-                  <dt><span class="term">epoch</span></dt>
+                  <dt><span class="term">Epoch</span></dt>
                   <dd>
-                     <p>A fixed time interval defined in section 4.2 Sphinx Mix and Provider Key
-                        Rotation. The epoch is currently set to 20 minutes. 
-                        A new PKI document containing public key material
-                        is published for each epoch and is valid only for that epoch.</p>
+                     <p>The Katzenpost epoch is currently set to a 20 minute duration. Each new
+                        epoch there is a new PKI document published containing public key material
+                        that will only be valid for that epoch.</p>
                   </dd>
                </dl>
             </div>
@@ -107,27 +106,38 @@ weight: 1
                   </div>
                </div>
             </div>
-            <p> Nodes (mixes, gateways, and providers) need upload packet-loss statistics to the
+            <p>Nodes (mixes, gateways, and providers) need to upload packet-loss statistics to the
                directory authorities, so that authorities can label malfunctioning nodes as such
                in the
                consensus in the next epoch. </p>
-            <p> Nodes currently sign and upload a Descriptor in each epoch. </p>
-            <p> In the future, they would instead upload a <span class="quote">&#x201c;<span class="quote">UploadDescStats</span>&#x201d;</span> containing:
-               * Descriptor * Stats * Signature </p>
-            <p> Stats contains: * a map from pairs-of-mixes to the ratio of count-of-loops-sent vs
-               count-of-loops-received </p>
-            <p><span class="strong"><strong>refer to our non-existent document on Provider orignated deocy
-                     loop traffic design discussion</strong></span></p>
+            <p>Nodes currently sign and upload a Descriptor in each epoch.</p>
+            <p>In the future, they would instead upload an UploadDescStats containing: 
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p>Descriptor </p>
+                     </li>
+                     <li class="listitem">
+                        <p>Stats </p>
+                     </li>
+                     <li class="listitem">
+                        <p>Signature </p>
+                     </li>
+                  </ul>
+               </div>
+            </p>
+            <p>Contains a map from pairs-of-mixes to the ratio of count-of-loops-sent vs.
+               count-of-loops-received.</p>
          </div>
          <div class="section">
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="tracking-packet-loss-and-detecting-faulty-mixes"></a>2. Tracking Packet Loss and Detecting Faulty Mixes</h2>
+                     <h2 class="title" style="clear: both"><a name="tracking-packet-loss-and-detecting-faulty-mixes"></a>2. Tracking packet loss and detecting faulty mixes</h2>
                   </div>
                </div>
             </div>
-            <p> Katzenpost lets different elements in the network track whether other elements are
+            <p>Katzenpost lets different elements in the network track whether other elements are
                functioning correctly. A node A will do this by sending packets in randomly generated
                loops through the network, and tracking whether the loop comes back or not. When it
                comes back, it will mark that as evidence, that the nodes on the path of that loop
@@ -154,14 +164,12 @@ weight: 1
                         mixnode ID&#x2019;s as the key. The ordering of the ID&#x2019;s will be from lesser topology
                         layer to greater, e.g. the two-tuple (n, n+1) which is represented here as a 64
                         byte array: </p>
+                     <pre class="programlisting">var sent_loops_A map[[64]byte]int
+var completed_loops_A map[[64]byte]int
+var ratios_A map[[64]byte]float64</pre>
                   </li>
                </ul>
             </div>
-            <pre class="programlisting">
-var sent_loops_A map[[64]byte]int
-var completed_loops_A map[[64]byte]int
-var ratios_A map[[64]byte]float64
-</pre>
             <div class="itemizedlist">
                <ul class="itemizedlist compact" style="list-style-type: disc; ">
                   <li class="listitem">
@@ -189,21 +197,19 @@ var ratios_A map[[64]byte]float64
                   </li>
                </ul>
             </div>
-            <p> You would expect the distribution of values in <code class="literal">completed_loops</code> to
+            <p>You would expect the distribution of values in <code class="literal">completed_loops</code> to
                approximate a binomial distribution. In an absence of faulty nodes,
                <code class="literal">ratios</code> should be 1, and when there are some faulty nodes values
                at faulty nodes should approach 0 (if the node doesn&#x2019;t work at all), and be binomially
                distributed at nodes that can share a loop with faulty nodes. </p>
-            <p> Therefore each mix node generates a statistics report to upload to the dirauth nodes,
-               of the struct type: </p>
-            <pre class="programlisting">
-type LoopStats struct {
+            <p>Therefore each mix node generates a statistics report to upload to the dirauth nodes,
+               of the struct type:</p>
+            <pre class="programlisting">type LoopStats struct {
 Epoch           uint64
 MixIdentityHash *[32]byte
 Ratios          map[[64]byte]float64
-}
-</pre>
-            <p> The report is subsequently uploaded to the directory authorities, which combine the
+}</pre>
+            <p>The report is subsequently uploaded to the directory authorities, which combine the
                reports of individual nodes into a health status of the network and arrive at a
                consensus decision about the topology of the network. </p>
          </div>
@@ -215,26 +221,20 @@ Ratios          map[[64]byte]float64
                   </div>
                </div>
             </div>
-            <p> Stats reports are uploaded along with the mix descriptor every Epoch. A cryptographic
-               signature covers both of these fields: </p>
-            <pre class="programlisting">
-type UploadDescStats struct {
+            <p> Stats reports are uploaded along with the mix descriptor every Epoch. A
+               cryptographic signature covers both of these fields: </p>
+            <pre class="programlisting">type UploadDescStats struct {
 Descriptor []byte
 StatsReport []byte
 Signature []byte
-}
-</pre>
-            <p> Statistics reports collected during the XXX period of time, that is, the time between
-               descriptor N+1 upload and descriptor N+2 upload, are what will affect the topology
-               choices in epoch N+2 if the dirauths collectively decide to act on the very latest
-               statistics reports in order to determine for example if a mix node should be removed
-               from the network: </p>
-            <pre class="programlisting">
-
-| ---------------- epoch N ---------------- | ---------------- epoch N+1 ---------------- | ---------------- epoch N+2 ---------------- |
-| ----------- UD_N+1 ---------------------- | ------------ UD N+2 ----------------------- | ----------- UD N+3 ------------------------ |
-| ------------------ XXX ---------------- |
-</pre>
+}    </pre>
+            <p>Statistics reports collected during the XXX period of time, that is, the time
+               between descriptor N+1 upload and descriptor N+2 upload, are what will affect the
+               topology choices in epoch N+2 if the dirauths collectively decide to act on the very
+               latest statistics reports in order to determine for example if a mix node should be
+               removed from the network: </p>
+            <pre class="programlisting">| ---------------- epoch N ---------------- | ---------------- epoch N+1 ---------------- | ---------------- epoch N+2 ---------------- |
+| ----------- UD_N+1 ---------------------- | ------------ UD N+2 ----------------------- | ----------- UD N+3 ------------------------ |             | ------------------ XXX ---------------- |  </pre>
          </div>
       </div>
    </body>

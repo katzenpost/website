@@ -3,12 +3,12 @@ title:
 linkTitle: "Provider-side autoresponder extension" 
 description: "" 
 url: "docs/admin_guide/kaetzchen.html" 
-date: "2025-01-03T12:29:36.419531696-08:00"
+date: "2025-01-03T14:26:31.913011769-08:00"
 draft: false 
 slug: "" 
 layout: "" 
 type: "" 
-weight: 1 
+weight: 15 
 ---
 <!DOCTYPE HTML>
 <html xmlns:ng="http://docbook.org/docbook-ng">
@@ -55,21 +55,34 @@ weight: 1
          <div class="toc">
             <p><b>Table of Contents</b></p>
             <dl class="toc">
+               <dt><span class="section"><a href="#d58e35">Conventions Used in This Document</a></span></dt>
                <dt><span class="section"><a href="#terminology">Terminology</a></span></dt>
-               <dt><span class="section"><a href="#conventions">1.1 Conventions Used in This Document</a></span></dt>
+               <dt><span class="section"><a href="#extension-overview">1. Extension Overview</a></span></dt>
                <dd>
                   <dl>
-                     <dt><span class="section"><a href="#extension-overview">2. Extension Overview</a></span></dt>
-                     <dt><span class="section"><a href="#agent-requirements">3. Agent Requirements</a></span></dt>
-                     <dt><span class="section"><a href="#mix-message-formats">3.1 Mix Message Formats</a></span></dt>
-                     <dt><span class="section"><a href="#pki-extensions">4. PKI Extensions</a></span></dt>
-                     <dt><span class="section"><a href="#anonymity-considerations">5. Anonymity Considerations</a></span></dt>
-                     <dt><span class="section"><a href="#security-considerations">6. Security Considerations</a></span></dt>
-                     <dt><span class="section"><a href="#acknowledgments">7. Acknowledgments</a></span></dt>
-                     <dt><span class="section"><a href="#appendix-a.-references">Appendix A. References</a></span></dt>
+                     <dt><span class="section"><a href="#agent-requirements">1.1 Agent Requirements</a></span></dt>
+                     <dt><span class="section"><a href="#mix-message-formats">1.2 Mix Message Formats</a></span></dt>
                   </dl>
                </dd>
+               <dt><span class="section"><a href="#pki-extensions">2. PKI Extensions</a></span></dt>
+               <dt><span class="section"><a href="#anonymity-considerations">3. Anonymity Considerations</a></span></dt>
+               <dt><span class="section"><a href="#security-considerations">4. Security Considerations</a></span></dt>
+               <dt><span class="section"><a href="#acknowledgments">Acknowledgments</a></span></dt>
+               <dt><span class="section"><a href="#appendix-a.-references">References</a></span></dt>
             </dl>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="d58e35"></a>Conventions Used in This Document</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>,
+               <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD
+                     NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and
+               <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be interpreted as described in <a class="link" href="#RFC2119">RFC2119</a>. </p>
          </div>
          <div class="section">
             <div class="titlepage">
@@ -103,33 +116,19 @@ weight: 1
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="conventions"></a>1.1 Conventions Used in This Document</h2>
+                     <h2 class="title" style="clear: both"><a name="extension-overview"></a>1. Extension Overview</h2>
                   </div>
                </div>
             </div>
-            <p>The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>,
-               <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD
-                     NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and
-               <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be interpreted as described in
-               <code class="literal">RFC2119</code>.</p>
+            <p>Each Kaetzchen agent will register as a potential recipient on its Provider. When
+               the Provider receives a forward packet destined for a Kaetzchen instance, it will
+               hand off the fully unwrapped packet along with its corresponding SURB to the agent,
+               which will then act on the packet and optionally reply utilizing the SURB.</p>
             <div class="section">
                <div class="titlepage">
                   <div>
                      <div>
-                        <h3 class="title"><a name="extension-overview"></a>2. Extension Overview</h3>
-                     </div>
-                  </div>
-               </div>
-               <p> Each Kaetzchen agent will register as a potential recipient on its Provider. When
-                  the Provider receives a forward packet destined for a Kaetzchen instance, it will
-                  hand off the fully unwrapped packet along with its corresponding SURB to the agent,
-                  which will then act on the packet and optionally reply utilizing the SURB.</p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h3 class="title"><a name="agent-requirements"></a>3. Agent Requirements</h3>
+                        <h3 class="title"><a name="agent-requirements"></a>1.1 Agent Requirements</h3>
                      </div>
                   </div>
                </div>
@@ -164,7 +163,7 @@ weight: 1
                <div class="titlepage">
                   <div>
                      <div>
-                        <h3 class="title"><a name="mix-message-formats"></a>3.1 Mix Message Formats</h3>
+                        <h3 class="title"><a name="mix-message-formats"></a>1.2 Mix Message Formats</h3>
                      </div>
                   </div>
                </div>
@@ -195,28 +194,29 @@ opaque plaintext[];
                   <code class="literal">KaetzchenReply</code> equal to that of a
                   <code class="literal">BlockSphinxPlaintext</code></p>
             </div>
-            <div class="section">
-               <div class="titlepage">
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
                   <div>
-                     <div>
-                        <h3 class="title"><a name="pki-extensions"></a>4. PKI Extensions</h3>
-                     </div>
+                     <h2 class="title" style="clear: both"><a name="pki-extensions"></a>2. PKI Extensions</h2>
                   </div>
                </div>
-               <p>Each provider SHOULD publish the list of publicly accessible Kaetzchen agent
-                  endpoints in its MixDescriptor, along with any other information required to utilize
-                  the agent.</p>
-               <p>Provider should make this information available in the form of a map in which the
-                  keys are the label used to identify a given service, and the value is a map with
-                  arbitrary keys.</p>
-               <p>Valid service names refer to the services defined in extensions to this
-                  specification. Every service MUST be implemented by one and only one Kaetzchen
-                  agent.</p>
-               <p>For each service, the provider MUST advertise a field for the endpoint at which
-                  the Kaetzchen agent can be reached, as a key value pair where the key is
-                  <code class="literal">endpoint</code>, and the value is the provider side endpoint
-                  identifier.</p>
-               <pre class="programlisting">{ "kaetzchen":
+            </div>
+            <p>Each provider SHOULD publish the list of publicly accessible Kaetzchen agent
+               endpoints in its MixDescriptor, along with any other information required to utilize
+               the agent.</p>
+            <p>Provider should make this information available in the form of a map in which the
+               keys are the label used to identify a given service, and the value is a map with
+               arbitrary keys.</p>
+            <p>Valid service names refer to the services defined in extensions to this
+               specification. Every service MUST be implemented by one and only one Kaetzchen
+               agent.</p>
+            <p>For each service, the provider MUST advertise a field for the endpoint at which
+               the Kaetzchen agent can be reached, as a key value pair where the key is
+               <code class="literal">endpoint</code>, and the value is the provider side endpoint
+               identifier.</p>
+            <pre class="programlisting">{ "kaetzchen":
 { "keyserver" : {
 "endpoint": "+keyserver",
 "version" : 1 } },
@@ -226,76 +226,75 @@ opaque plaintext[];
 "endpoint": "+loopback",
 "restrictedToUsers": true } },
 }</pre>
-            </div>
-            <div class="section">
-               <div class="titlepage">
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
                   <div>
-                     <div>
-                        <h3 class="title"><a name="anonymity-considerations"></a>5. Anonymity Considerations</h3>
-                     </div>
+                     <h2 class="title" style="clear: both"><a name="anonymity-considerations"></a>3. Anonymity Considerations</h2>
                   </div>
                </div>
-               <p>In the event that the mix keys for the entire return path are compromised, it is
-                  possible for adversaries to unwrap the SURB and determine the final recipient of the
-                  reply.</p>
-               <p>Depending on what sort of operations a given agent implements, there may be
-                  additional anonymity impact that requires separate consideration.</p>
-               <p>Clients MUST NOT have predictable retranmission otherwise this makes active
-                  confirmations attacks possible which could be used to discover the ingress Provider
-                  of the client.</p>
             </div>
-            <div class="section">
-               <div class="titlepage">
+            <p>In the event that the mix keys for the entire return path are compromised, it is
+               possible for adversaries to unwrap the SURB and determine the final recipient of the
+               reply.</p>
+            <p>Depending on what sort of operations a given agent implements, there may be
+               additional anonymity impact that requires separate consideration.</p>
+            <p>Clients MUST NOT have predictable retranmission otherwise this makes active
+               confirmations attacks possible which could be used to discover the ingress Provider
+               of the client.</p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
                   <div>
-                     <div>
-                        <h3 class="title"><a name="security-considerations"></a>6. Security Considerations</h3>
-                     </div>
+                     <h2 class="title" style="clear: both"><a name="security-considerations"></a>4. Security Considerations</h2>
                   </div>
                </div>
-               <p>It is possible to use this mechanism to flood a victim with unwanted traffic by
-                  constructing a request with a SURB destined for the target.</p>
-               <p>Depending on the operations implemented by each agent, the added functionality may
-                  end up being a vector for Denial of Service attacks in the form of CPU or network
-                  overload.</p>
-               <p>Unless the agent implements additional encryption, message integrity and privacy
-                  is limited to that which is provided by the base Sphinx packet format and
-                  parameterization.</p>
             </div>
-            <div class="section">
-               <div class="titlepage">
+            <p>It is possible to use this mechanism to flood a victim with unwanted traffic by
+               constructing a request with a SURB destined for the target.</p>
+            <p>Depending on the operations implemented by each agent, the added functionality may
+               end up being a vector for Denial of Service attacks in the form of CPU or network
+               overload.</p>
+            <p>Unless the agent implements additional encryption, message integrity and privacy
+               is limited to that which is provided by the base Sphinx packet format and
+               parameterization.</p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
                   <div>
-                     <div>
-                        <h3 class="title"><a name="acknowledgments"></a>7. Acknowledgments</h3>
-                     </div>
+                     <h2 class="title" style="clear: both"><a name="acknowledgments"></a>Acknowledgments</h2>
                   </div>
                </div>
-               <p>The inspiration for this extension comes primarily from a design by Vincent
-                  Breitmoser.</p>
             </div>
-            <div class="section">
-               <div class="titlepage">
+            <p>The inspiration for this extension comes primarily from a design by Vincent
+               Breitmoser.</p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
                   <div>
-                     <div>
-                        <h3 class="title"><a name="appendix-a.-references"></a>Appendix A. References</h3>
-                     </div>
+                     <h2 class="title" style="clear: both"><a name="appendix-a.-references"></a>References</h2>
                   </div>
                </div>
-               <p><a name="KATZMIXE2E"></a><span class="bold"><strong>KATZMIXE2E</strong></span></p>
-               <p>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Katzenpost Mix Network End-to-end Protocol Specification</span>&#x201d;</span>, July 2017, <a class="link" href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/old/end_to_end.md" target="_top">https://github.com/katzenpost/katzenpost/blob/main/docs/specs/old/end_to_end.md</a></p>
-               <p><a name="KATZMIXPKI"></a><span class="bold"><strong>KATZMIXPKI</strong></span></p>
-               <p>Angel, Y., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Katzenpost Mix Network Public Key Infrastructure Specification</span>&#x201d;</span>, December 2017, <a class="link" href="ttps://github.com/katzenpost/katzenpost/blob/main/docs/specs/pki.md" target="_top">ttps://github.com/katzenpost/katzenpost/blob/main/docs/specs/pki.md</a></p>
-               <p><a name="RFC2119"></a><span class="bold"><strong>RFC2119</strong></span></p>
-               <p>Bradner, S., <span class="quote">&#x201c;<span class="quote">Key words for use in RFCs to Indicate Requirement
-                        Levels</span>&#x201d;</span>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a class="link" href="http://www.rfc-editor.org/info/rfc2119" target="_top">http://www.rfc-editor.org/info/rfc2119</a></p>
-               <p><a name="RFC5322"></a><span class="bold"><strong>RFC5322</strong></span></p>
-               <p>Resnick, P., Ed., <span class="quote">&#x201c;<span class="quote">Internet Message Format</span>&#x201d;</span>, RFC 5322, DOI 10.17487/RFC5322, October 2008, <a class="link" href="https://www.rfc-editor.org/info/rfc5322" target="_top">https://www.rfc-editor.org/info/rfc5322</a></p>
-               <p><a name="SPHINX09"></a><span class="bold"><strong>SPHINX09</strong></span></p>
-               <p>Danezis, G., Goldberg, I., <span class="quote">&#x201c;<span class="quote">Sphinx: A Compact and Provably Secure Mix
-                        Format</span>&#x201d;</span>, DOI 10.1109/SP.2009.15, May 2009, <a class="link" href="https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf" target="_top">https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</a></p>
-               <p><a name="SPHINXSPEC"></a><span class="bold"><strong>SPHINXSPEC</strong></span></p>
-               <p>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Sphinx Mix Network Cryptographic Packet Format Specification</span>&#x201d;</span>, July 2017, 
-                  <a class="link" href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/sphinx.md" target="_top">https://github.com/katzenpost/katzenpost/blob/main/docs/specs/sphinx.md</a></p>
             </div>
+            <p><a name="KATZMIXE2E"></a><span class="bold"><strong>KATZMIXE2E</strong></span></p>
+            <p>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Katzenpost Mix Network End-to-end Protocol Specification</span>&#x201d;</span>, July 2017, <a class="link" href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/old/end_to_end.md" target="_top">https://github.com/katzenpost/katzenpost/blob/main/docs/specs/old/end_to_end.md</a></p>
+            <p><a name="KATZMIXPKI"></a><span class="bold"><strong>KATZMIXPKI</strong></span></p>
+            <p>Angel, Y., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Katzenpost Mix Network Public Key Infrastructure Specification</span>&#x201d;</span>, December 2017, <a class="link" href="ttps://github.com/katzenpost/katzenpost/blob/main/docs/specs/pki.md" target="_top">ttps://github.com/katzenpost/katzenpost/blob/main/docs/specs/pki.md</a></p>
+            <p><a name="RFC2119"></a><span class="bold"><strong>RFC2119</strong></span></p>
+            <p>Bradner, S., <span class="quote">&#x201c;<span class="quote">Key words for use in RFCs to Indicate Requirement
+                     Levels</span>&#x201d;</span>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a class="link" href="http://www.rfc-editor.org/info/rfc2119" target="_top">http://www.rfc-editor.org/info/rfc2119</a></p>
+            <p><a name="RFC5322"></a><span class="bold"><strong>RFC5322</strong></span></p>
+            <p>Resnick, P., Ed., <span class="quote">&#x201c;<span class="quote">Internet Message Format</span>&#x201d;</span>, RFC 5322, DOI 10.17487/RFC5322, October 2008, <a class="link" href="https://www.rfc-editor.org/info/rfc5322" target="_top">https://www.rfc-editor.org/info/rfc5322</a></p>
+            <p><a name="SPHINX09"></a><span class="bold"><strong>SPHINX09</strong></span></p>
+            <p>Danezis, G., Goldberg, I., <span class="quote">&#x201c;<span class="quote">Sphinx: A Compact and Provably Secure Mix
+                     Format</span>&#x201d;</span>, DOI 10.1109/SP.2009.15, May 2009, <a class="link" href="https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf" target="_top">https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</a></p>
+            <p><a name="SPHINXSPEC"></a><span class="bold"><strong>SPHINXSPEC</strong></span></p>
+            <p>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Sphinx Mix Network Cryptographic Packet Format Specification</span>&#x201d;</span>, July 2017, 
+               <a class="link" href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/sphinx.md" target="_top">https://github.com/katzenpost/katzenpost/blob/main/docs/specs/sphinx.md</a></p>
          </div>
       </div>
    </body>

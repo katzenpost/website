@@ -12,7 +12,7 @@
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
-<?weight 1 ?> <!-- Optional -->
+<?weight 50 ?> <!-- Optional -->
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
@@ -47,6 +47,19 @@
                 network communications to, from, and within the Katzenpost Mix Network.</para>
         </abstract>
     </info>
+    <section xml:id="conventions-used-in-this-document">
+        <title>1.1 Conventions Used in This Document</title>
+        <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
+                <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
+                NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
+                <quote>OPTIONAL</quote> in this document are to be interpreted as described in <xref
+                linkend="RFC2119"/>. </para>
+        <para> The <quote>C</quote> style Presentation Language as described in <xref
+                linkend="RFC5246"/> Section 4 is used to represent data structures, except for
+            cryptographic attributes, which are specified as opaque byte vectors. </para>
+        <para>
+            <literal>x | y</literal> denotes the concatenation of x and y. </para>
+    </section>
 
     <section xml:id="wire_protocol_introduction">
         <title xml:id="wire_protocol_introduction.title">1. Introduction</title>
@@ -54,19 +67,6 @@
             network communications to, from, and within the Katzenpost Mix Network. This protocol
             provides mutual authentication, and an additional layer of cryptographic security and
             forward secrecy. </para>
-        <section xml:id="conventions-used-in-this-document">
-            <title>1.1 Conventions Used in This Document</title>
-            <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>,
-                    <quote>REQUIRED</quote>, <quote>SHALL</quote>, <quote>SHALL NOT</quote>,
-                    <quote>SHOULD</quote>, <quote>SHOULD NOT</quote>, <quote>RECOMMENDED</quote>,
-                    <quote>MAY</quote>, and <quote>OPTIONAL</quote> in this document are to be
-                interpreted as described in <xref linkend="RFC2119"/>. </para>
-            <para> The <quote>C</quote> style Presentation Language as described in <xref
-                    linkend="RFC5246"/> Section 4 is used to represent data structures, except for
-                cryptographic attributes, which are specified as opaque byte vectors. </para>
-            <para>
-                <literal>x | y</literal> denotes the concatenation of x and y. </para>
-        </section>
         <section xml:id="key-encapsulation-mechanism">
             <title>1.2 Key Encapsulation Mechanism</title>
             <para> This protocol uses ANY Key Encapsulation Mechanism. However it’s recommended that
@@ -311,12 +311,12 @@ uint32_t message[ciphertext_length-16];
             that large scale quantum computers are applied to historical intercepts. </para>
     </section>
     <section xml:id="acknowledgments">
-        <title>7. Acknowledgments</title>
+        <title>Acknowledgments</title>
         <para> I would like to thank Trevor Perrin for providing feedback during the design of this
             protocol, and answering questions regarding Noise. </para>
     </section>
     <section xml:id="appendix-a.-references">
-        <title>Appendix A. References</title>
+        <title>References</title>
         <!--    <section xml:id="appendix-a.1-normative-references">
 <title>Appendix A.1 Normative References</title>
 <para>

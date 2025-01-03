@@ -8,7 +8,7 @@
 <?slug "" ?>
 <?layout "" ?>
 <?type "" ?>
-<?weight 1 ?>
+<?weight 15 ?>
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
@@ -52,6 +52,14 @@
                 traffic.</para>
         </abstract>
     </info>
+    <section>
+        <title>Conventions Used in This Document</title>
+        <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
+                <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
+                NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
+                <quote>OPTIONAL</quote> in this document are to be interpreted as described in <link
+                linkend="RFC2119">RFC2119</link>. </para>
+    </section>
     
     <section xml:id="terminology">
         <title xml:id="terminology.title">Terminology</title>
@@ -62,25 +70,14 @@
         </variablelist>
     </section>
     
-    <section xml:id="conventions">
-        <title xml:id="conventions.title">1.1 Conventions Used in This Document</title>
-        <para>The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
-                <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
-                NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
-                <quote>OPTIONAL</quote> in this document are to be interpreted as described in
-                <literal>RFC2119</literal>.</para>
-
-
-
-        <section xml:id="extension-overview">
-            <title xml:id="extension-overview.title">2. Extension Overview</title>
-            <para> Each Kaetzchen agent will register as a potential recipient on its Provider. When
+    <section xml:id="extension-overview">
+            <title xml:id="extension-overview.title">1. Extension Overview</title>
+            <para>Each Kaetzchen agent will register as a potential recipient on its Provider. When
                 the Provider receives a forward packet destined for a Kaetzchen instance, it will
                 hand off the fully unwrapped packet along with its corresponding SURB to the agent,
                 which will then act on the packet and optionally reply utilizing the SURB.</para>
-        </section>
         <section xml:id="agent-requirements">
-            <title xml:id="agent-requirements.title">3. Agent Requirements</title>
+            <title xml:id="agent-requirements.title">1.1 Agent Requirements</title>
             <itemizedlist spacing="compact">
                 <listitem>
                     <para>Each agent operation MUST be idempotent.</para>
@@ -107,7 +104,7 @@
             </itemizedlist>
         </section>
         <section xml:id="mix-message-formats">
-            <title xml:id="mix-message-formats.title">3.1 Mix Message Formats</title>
+            <title xml:id="mix-message-formats.title">1.2 Mix Message Formats</title>
             <para>Messages from clients to Kaetzchen use the following payload format in the forward
                 Sphinx packet:</para>
             <programlisting>struct {
@@ -135,8 +132,9 @@ opaque plaintext[];
                     <literal>KaetzchenReply</literal> equal to that of a
                     <literal>BlockSphinxPlaintext</literal></para>
         </section>
+        </section>
         <section xml:id="pki-extensions">
-            <title xml:id="pki-extensions.title">4. PKI Extensions</title>
+            <title xml:id="pki-extensions.title">2. PKI Extensions</title>
             <para>Each provider SHOULD publish the list of publicly accessible Kaetzchen agent
                 endpoints in its MixDescriptor, along with any other information required to utilize
                 the agent.</para>
@@ -162,7 +160,7 @@ opaque plaintext[];
 }</programlisting>
         </section>
         <section xml:id="anonymity-considerations">
-            <title xml:id="anonymity-considerations.title">5. Anonymity Considerations</title>
+            <title xml:id="anonymity-considerations.title">3. Anonymity Considerations</title>
             <para>In the event that the mix keys for the entire return path are compromised, it is
                 possible for adversaries to unwrap the SURB and determine the final recipient of the
                 reply.</para>
@@ -173,7 +171,7 @@ opaque plaintext[];
                 of the client.</para>
         </section>
         <section xml:id="security-considerations">
-            <title xml:id="security-considerations.title">6. Security Considerations</title>
+            <title xml:id="security-considerations.title">4. Security Considerations</title>
             <para>It is possible to use this mechanism to flood a victim with unwanted traffic by
                 constructing a request with a SURB destined for the target.</para>
             <para>Depending on the operations implemented by each agent, the added functionality may
@@ -184,12 +182,12 @@ opaque plaintext[];
                 parameterization.</para>
         </section>
         <section xml:id="acknowledgments">
-            <title xml:id="acknowledgments.title">7. Acknowledgments</title>
+            <title xml:id="acknowledgments.title">Acknowledgments</title>
             <para>The inspiration for this extension comes primarily from a design by Vincent
                 Breitmoser.</para>
         </section>
         <section xml:id="appendix-a.-references">
-            <title xml:id="appendix-a.-references.title">Appendix A. References</title>
+            <title xml:id="appendix-a.-references.title">References</title>
             &KATZMIXE2E;
             &KATZMIXPKI;
             &RFC2119;
@@ -197,5 +195,5 @@ opaque plaintext[];
             &SPHINX09;
             &SPHINXSPEC;
         </section>
-    </section>
+
 </article>
