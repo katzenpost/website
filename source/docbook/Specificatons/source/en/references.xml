@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?>
+<?linkTitle "References" ?>  <!-- Section menu link text -->
+<?url "docs/specs/references.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 1 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+<!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+%shared-content;
+<!ENTITY % terms SYSTEM "../../../terms.ent">
+%terms;
+<!ENTITY % references SYSTEM "../../../references.ent">
+%references;
+]>
+
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+version="5.1" xml:id="references">
+
+<info>
+<title xml:id="references.title">References</title>
+</info>    
+&AB96;
+&AEZV5;    
+&BRIDGING;
+&COMPULS05;
+&ED25519;
+&FINGERPRINTING;
+&KATZMIXE2E;
+&KATZMIXNET;
+&KATZMIXPKI; 
+&KATZMIXWIRE; 
+&KEMCOMB;
+&LOOPIX;
+&LOCALVIEW;
+&MIRANDA;
+&MIXMINION;
+&MIXMINIONDIRAUTH;
+&MIXRELIABLE; 
+&MIXTOPO10;
+&MPRA11;
+&NOISE;
+&NOISEHFS;
+&PEERFLOW;
+&PQNOISE;
+&RFC2119;
+&RFC5246;
+&RFC5322;
+&RFC6234;
+&RFC7049;
+&RFC7515;
+&RFC7539;
+&RFC7693;
+&RFC7748;                    
+&SECNOTSEP;
+&SEDA;
+&SFMIX03;
+&SP80038A;
+&SPHINCS256;
+&SPHINX09;
+&SPHINXSPEC;
+&TORDIRAUTH;
+&TORSRV;
+&XWING;
+</article>

@@ -1,0 +1,1704 @@
+---
+title: 
+linkTitle: "Sphinx cryptographic packet format" 
+description: "" 
+url: "docs/specs/sphinx.html" 
+date: "2025-01-03T12:30:34.368243447-08:00"
+draft: false 
+slug: "" 
+layout: "" 
+type: "" 
+weight: 1 
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>Sphinx cryptographic packet format</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+      <meta name="description" content="This document defines the Sphinx cryptographic packet format for decryption mix networks, and provides a parameterization based around generic cryptographic primitives types. This document does not introduce any new crypto, but is meant to serve as an implementation guide.">
+   </head>
+   <body>
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h1 class="title"><a name="sphinx"></a>Sphinx cryptographic packet format</h1>
+               </div>
+               <div>
+                  <div class="authorgroup">
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Yawning</span> <span class="surname">Angel</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">George</span> <span class="surname">Danezis</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Claudia</span> <span class="surname">Diaz</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Ania</span> <span class="surname">Piotrowska</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">David</span> <span class="surname">Stainton</span></h3>
+                     </div>
+                  </div>
+               </div>
+               <div>
+                  <div class="abstract">
+                     <p class="title"><b>Abstract</b></p>
+                     <p> This document defines the Sphinx cryptographic packet format for decryption mix
+                        networks, and provides a parameterization based around generic cryptographic
+                        primitives types. This document does not introduce any new crypto, but is meant to
+                        serve as an implementation guide. </p>
+                  </div>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="toc">
+            <p><b>Table of Contents</b></p>
+            <dl class="toc">
+               <dt><span class="section"><a href="#terminology">Terminology</a></span></dt>
+               <dt><span class="section"><a href="#sphinx_introduction">1. Introduction</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#conventions-used-in-this-document">1.2 Conventions Used in This
+                              Document</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#cryptographic-primitives">2. Cryptographic Primitives</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#sphinx-key-derivation-function">2.1 Sphinx Key Derivation Function</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#sphinx-packet-parameters">3. Sphinx Packet Parameters</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#sphinx-parameter-constants">3.1 Sphinx Parameter Constants</a></span></dt>
+                     <dt><span class="section"><a href="#sphinx-packet-geometry">3.2 Sphinx Packet Geometry</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#the-sphinx-cryptographic-packet-structure">4. The Sphinx Cryptographic Packet Structure</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#sphinx-packet-header">4.1 Sphinx Packet Header</a></span></dt>
+                     <dt><span class="section"><a href="#per-hop-routing-information">4.1.1 Per-hop routing information</a></span></dt>
+                     <dt><span class="section"><a href="#sphinx-packet-payload">4.2 Sphinx Packet Payload</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#sphinx-packet-creation">5. Sphinx Packet Creation</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#create-a-sphinx-packet-header">5.1 Create a Sphinx Packet Header</a></span></dt>
+                     <dt><span class="section"><a href="#create-a-sphinx-packet">5.2 Create a Sphinx Packet</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#sphinx-packet-processing">6. Sphinx Packet Processing</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#sphinx_unwrap-operation">6.1 Sphinx_Unwrap Operation</a></span></dt>
+                     <dt><span class="section"><a href="#single-use-reply-block-surb-creation">7. Single Use Reply Block (SURB) Creation</a></span></dt>
+                     <dt><span class="section"><a href="#single-use-reply-block-replies">8. Single Use Reply Block Replies</a></span></dt>
+                     <dt><span class="section"><a href="#anonymity-considerations">9. Anonymity Considerations</a></span></dt>
+                     <dt><span class="section"><a href="#security-considerations">10. Security Considerations</a></span></dt>
+                     <dt><span class="section"><a href="#appendix-a.-references">Appendix A. References</a></span></dt>
+                  </dl>
+               </dd>
+            </dl>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="terminology"></a>Terminology</h2>
+                  </div>
+               </div>
+            </div>
+            <p>The following terms are used in this specification.</p>
+            <div class="variablelist">
+               <dl class="variablelist">
+                  <dt><span class="term">message</span></dt>
+                  <dd>
+                     <p>A variable-length sequence of octets sent anonymously through the network.
+                        Short messages are sent in a single packet; long messages are fragmented
+                        across multiple packets.</p>
+                  </dd>
+                  <dt><span class="term">packet</span></dt>
+                  <dd>
+                     <p>A Sphinx packet, of fixed
+                        length for each class of traffic, carrying a message payload and metadata for routing.
+                        
+                        Packets are routed anonymously through the mixnet and cryptographically transformed
+                        at 
+                        each hop.</p>
+                  </dd>
+                  <dt><span class="term">header</span></dt>
+                  <dd>
+                     <p>The packet header consisting of several components, which convey the
+                        information necessary to verify packet integrity and correctly process the
+                        packet.</p>
+                  </dd>
+                  <dt><span class="term">payload</span></dt>
+                  <dd>
+                     <p>The fixed-length portion of a packet containing an encrypted message or
+                        part of a message, to be delivered anonymously.</p>
+                  </dd>
+                  <dt><span class="term">group element</span></dt>
+                  <dd>
+                     <p>An individual element of the group.</p>
+                  </dd>
+                  <dt><span class="term">group generator</span></dt>
+                  <dd>
+                     <p>A group element capable of generating any other element of the group, via
+                        repeated applications of the generator and the group operation.</p>
+                  </dd>
+               </dl>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="sphinx_introduction"></a>1. Introduction</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The Sphinx cryptographic packet format is a compact and provably secure design
+               introduced by George Danezis and Ian Goldberg <a class="link" href="#SPHINX09">SPHINX09</a>.
+               It supports a full set of security features: indistinguishable replies, hiding the
+               path
+               length and relay position, detection of tagging attacks and replay attacks, as well
+               as
+               providing unlinkability for each leg of the packet&#x2019;s journey over the network. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="conventions-used-in-this-document"></a>1.2 Conventions Used in This
+                           Document</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>,
+                  <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>,
+                  <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>,
+                  <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be
+                  interpreted as described in <a class="link" href="#RFC2119">RFC2119</a>. </p>
+               <p>The <span class="emphasis"><em>C</em></span> style Presentation Language as described in <a class="link" href="#RFC5246">RFC5246</a> Section 4 is used to represent data structures,
+                  except for cryptographic attributes, which are specified as opaque byte vectors. </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">x | y</code> denotes the concatenation of x and y. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">x ^ y</code> denotes the bitwise XOR of x and y. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">byte</code> an 8-bit octet. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">x[a:b]</code> denotes the sub-vector of x where a/b denote the
+                           start/end byte indexes (inclusive-exclusive); a/b may be omitted to signify
+                           the start/end of the vector x respectively. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">x[y]</code> denotes the y'th element of list x. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">x.len</code> denotes the length of list x. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">ZEROBYTES(N)</code> denotes N bytes of 0x00. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">RNG(N)</code> denotes N bytes of cryptographic random data.
+                           </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">LEN(N)</code> denotes the length in bytes of N. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">CONSTANT_TIME_CMP(x, y)</code> denotes a constant time
+                           comparison between the byte vectors x and y, returning true iff x and y are
+                           equal. </p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="cryptographic-primitives"></a>2. Cryptographic Primitives</h2>
+                  </div>
+               </div>
+            </div>
+            <p> This specification uses the following cryptographic primitives as the foundational
+               building blocks for Sphinx: </p>
+            <div class="itemizedlist">
+               <ul class="itemizedlist" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p><code class="literal">H(M)</code> - A cryptographic hash function which takes an octet
+                        array M to produce a digest consisting of a <code class="literal">HASH_LENGTH</code> byte
+                        octet array. <code class="literal">H(M)</code> MUST be pre-image and collision resistant.
+                        </p>
+                  </li>
+                  <li class="listitem">
+                     <p><code class="literal">MAC(K, M)</code> - A cryptographic message authentication code
+                        function which takes a <code class="literal">M_KEY_LENGTH</code> byte octet array key
+                        <code class="literal">K</code> and arbitrary length octet array message
+                        <code class="literal">M</code> to produce an authentication tag consisting of a
+                        <code class="literal">MAC_LENGTH</code> byte octet array. </p>
+                  </li>
+                  <li class="listitem">
+                     <p><code class="literal">KDF(SALT, IKM)</code> - A key derivation function which takes an
+                        arbitrary length octet array salt <code class="literal">SALT</code> and an arbitrary
+                        length octet array initial key <code class="literal">IKM</code>, to produce an octet array
+                        of arbitrary length. </p>
+                  </li>
+                  <li class="listitem">
+                     <p><code class="literal">S(K, IV)</code> - A pseudo-random generator (stream cipher) which
+                        takes a <code class="literal">S_KEY_LENGTH</code> byte octet array key
+                        <code class="literal">K</code> and a <code class="literal">S_IV_LENGTH</code> byte octet array
+                        initialization vector <code class="literal">IV</code> to produce an octet array key stream
+                        of arbitrary length. </p>
+                  </li>
+                  <li class="listitem">
+                     <p><code class="literal">SPRP_Encrypt(K, M)/SPRP_Decrypt(K, M)</code> - A strong
+                        pseudo-random permutation (SPRP) which takes a
+                        <code class="literal">SPRP_KEY_LENGTH</code> byte octet array key <code class="literal">K</code>
+                        and arbitrary length message <code class="literal">M</code>, and produces the encrypted
+                        ciphertext or decrypted plaintext respectively. </p>
+                     <p> When used with the default payload authentication mechanism, the SPRP MUST be
+                        "fragile" in that any amount of modifications to <code class="literal">M</code> results in
+                        a large number of unpredictable changes across the whole message upon a
+                        <code class="literal">SPRP_Encrypt()</code> or <code class="literal">SPRP_Decrypt()</code>
+                        operation. </p>
+                  </li>
+                  <li class="listitem">
+                     <p><code class="literal">EXP(X, Y)</code> - An exponentiation function which takes the
+                        <code class="literal">GROUP_ELEMENT_LENGTH</code> byte octet array group elements
+                        <code class="literal">X</code> and <code class="literal">Y</code>, and returns <code class="literal">X ^^
+                           Y</code> as a <code class="literal">GROUP_ELEMENT_LENGTH</code> byte octet array. </p>
+                     <p> Let <code class="literal">G</code> denote the generator of the group, and
+                        <code class="literal">EXP_KEYGEN()</code> return a
+                        <code class="literal">GROUP_ELEMENT_LENGTH</code> byte octet array group element
+                        usable as private key. </p>
+                     <p> The group defined by <code class="literal">G</code> and <code class="literal">EXP(X, Y)</code>
+                        MUST satisfy the Decision Diffie-Hellman problem. </p>
+                  </li>
+                  <li class="listitem">
+                     <p><code class="literal">EXP_KEYGEN()</code> - Returns a new "suitable" private key for
+                        <code class="literal">EXP()</code>. </p>
+                  </li>
+               </ul>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="sphinx-key-derivation-function"></a>2.1 Sphinx Key Derivation Function</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Sphinx Packet creation and processing uses a common Key Derivation Function (KDF)
+                  to derive the required MAC and symmetric cryptographic keys from a per-hop shared
+                  secret. </p>
+               <p> The output of the KDF is partitioned according to the following structure: </p>
+               <pre class="programlisting">
+struct {
+opaque header_mac[M_KEY_LENGTH];
+opaque header_encryption[S_KEY_LENGTH];
+opaque header_encryption_iv[S_IV_LENGTH];
+opaque payload_encryption[SPRP_KEY_LENGTH]
+opaque blinding_factor[GROUP_ELEMENT_LENGTH];
+} SphinxPacketKeys;
+
+Sphinx_KDF( info, shared_secret ) -&gt; packet_keys
+</pre>
+               <p> Inputs: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">info</code> The optional context and application specific
+                           information. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">shared_secret</code> The per-hop shared secret derived from the
+                           Diffie-Hellman key exchange. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> Outputs: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">packet_keys</code> The SphinxPacketKeys required to handle
+                           packet creation or processing. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> The output packet_keys is calculated as follows: </p>
+               <pre class="programlisting">
+kdf_out = KDF( info, shared_secret )
+packet_keys = kdf_out[:LEN( SphinxPacketKeys )]
+</pre>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="sphinx-packet-parameters"></a>3. Sphinx Packet Parameters</h2>
+                  </div>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="sphinx-parameter-constants"></a>3.1 Sphinx Parameter Constants</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The Sphinx Packet Format is parameterized by the implementation based on the
+                  application and security requirements. </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">AD_LENGTH</code> - The constant amount of per-packet unencrypted
+                           additional data in bytes. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">PAYLOAD_TAG_LENGTH</code> - The length of the message payload
+                           authentication tag in bytes. This SHOULD be set to at least 16 bytes (128
+                           bits). </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">PER_HOP_RI_LENGTH</code> - The length of the per-hop Routing
+                           Information (<code class="literal">Section 4.1.1 &lt;4.1.1&gt;</code>) in bytes.
+                           </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">NODE_ID_LENGTH</code> - The node identifier length in bytes.
+                           </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">RECIPIENT_ID_LENGTH</code> - The recipient identifier length in
+                           bytes. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">SURB_ID_LENGTH</code> - The Single Use Reply Block
+                           (<code class="literal">Section 7 &lt;7.0&gt;</code>) identifier length in bytes.
+                           </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">MAX_HOPS</code> - The maximum number of hops a packet can
+                           traverse. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">PAYLOAD_LENGTH</code> - The per-packet message payload length in
+                           bytes, including a <code class="literal">PAYLOAD_TAG_LENGTH</code> byte authentication
+                           tag. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">KDF_INFO</code> - A constant opaque byte vector used as the info
+                           parameter to the KDF for the purpose of domain separation. </p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="sphinx-packet-geometry"></a>3.2 Sphinx Packet Geometry</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The Sphinx Packet Geometry is derived from the Sphinx Parameter Constants
+                  <code class="literal">Section 3.1</code>. These are all derived parameters, and are
+                  primarily of interest to implementors. </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">ROUTING_INFO_LENGTH</code> - The total length of the "routing
+                           information" Sphinx Packet Header component in bytes: </p>
+                     </li>
+                  </ul>
+               </div>
+               <pre class="programlisting">
+ROUTING_INFO_LENGTH = PER_HOP_RI_LENGTH * MAX_HOPS
+</pre>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">HEADER_LENGTH</code> - The length of the Sphinx Packet Header in
+                           bytes: </p>
+                     </li>
+                  </ul>
+               </div>
+               <pre class="programlisting">
+HEADER_LENGTH = AD_LENGTH + GROUP_ELEMENT_LENGTH + ROUTING_INFO_LENGTH + MAC_LENGTH
+</pre>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">PACKET_LENGTH</code> - The length of the Sphinx Packet in bytes:
+                           </p>
+                     </li>
+                  </ul>
+               </div>
+               <pre class="programlisting">
+PACKET_LENGTH = HEADER_LENGTH + PAYLOAD_LENGTH
+</pre>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="the-sphinx-cryptographic-packet-structure"></a>4. The Sphinx Cryptographic Packet Structure</h2>
+                  </div>
+               </div>
+            </div>
+            <p> Each Sphinx Packet consists of two parts: the Sphinx Packet Header and the Sphinx
+               Packet Payload: </p>
+            <pre class="programlisting">
+struct {
+opaque header[HEADER_LENGTH];
+opaque payload[PAYLOAD_LENGTH];
+} SphinxPacket;
+</pre>
+            <div class="itemizedlist">
+               <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p><code class="literal">header</code> - The packet header consists of several components,
+                        which convey the information necessary to verify packet integrity and correctly
+                        process the packet. </p>
+                  </li>
+                  <li class="listitem">
+                     <p><code class="literal">payload</code> - The application message data. </p>
+                  </li>
+               </ul>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="sphinx-packet-header"></a>4.1 Sphinx Packet Header</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The Sphinx Packet Header refers to the block of data immediately preceding the
+                  Sphinx Packet Payload in a Sphinx Packet. </p>
+               <p> The structure of the Sphinx Packet Header is defined as follows: </p>
+               <pre class="programlisting">
+struct {
+opaque additional_data[AD_LENGTH]; /* Unencrypted. */
+opaque group_element[GROUP_ELEMENT_LENGTH];
+opaque routing_information[ROUTING_INFO_LENGTH];
+opaque MAC[MAC_LENGTH];
+} SphinxHeader;
+</pre>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">additional_data</code> - Unencrypted per-packet Additional Data
+                           (AD) that is visible to every hop. The AD is authenticated on a per-hop
+                           basis. </p>
+                        <p> As the additional_data is sent in the clear and traverses the network
+                           unaltered, implementations MUST take care to ensure that the field cannot be
+                           used to track individual packets. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">group_element</code> - An element of the cyclic group, used to
+                           derive the per-hop key material required to authenticate and process the
+                           rest of the SphinxHeader and decrypt a single layer of the Sphinx Packet
+                           Payload encryption. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">routing_information</code> - A vector of per-hop routing
+                           information, encrypted and authenticated in a nested manner. Each element of
+                           the vector consists of a series of routing commands, specifying all of the
+                           information required to process the packet. </p>
+                        <p> The precise encoding format is specified in <code class="literal">Section 4.1.1
+                              &lt;4.1.1&gt;</code>. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">MAC</code> - A message authentication code tag covering the
+                           additional_data, group_element, and routing_information. </p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="per-hop-routing-information"></a>4.1.1 Per-hop routing information</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The routing_information component of the Sphinx Packet Header contains a vector
+                  of per-hop routing information. When processing a packet, the per hop processing is
+                  set up such that the first element in the vector contains the routing commands for
+                  the current hop. </p>
+               <p> The structure of the routing information is as follows: </p>
+               <pre class="programlisting">
+struct {
+RoutingCommand routing_commands&lt;1..2^8-1&gt;; /* PER_HOP_RI_LENGTH bytes */
+opaque encrypted_routing_commands[ROUTING_INFO_LENGTH - PER_HOP_RI_LENGTH];
+} RoutingInformation;
+</pre>
+               <p> The structure of a single routing command is as follows: </p>
+               <pre class="programlisting">
+struct {
+RoutingCommandType command;
+select (RoutingCommandType) {
+case null:               NullCommand;
+case next_node_hop:      NextNodeHopCommand;
+case recipient:          RecipientCommand;
+case surb_reply:         SURBReplyCommand;
+};
+} RoutingCommand;
+</pre>
+               <p> The following routing commands are currently defined: </p>
+               <pre class="programlisting">
+enum {
+null(0),
+next_node_hop(1),
+recipient(2),
+surb_reply(3),
+
+/* Routing commands between 0 and 0x7f are reserved. */
+
+(255)
+} RoutingCommandType;
+</pre>
+               <p> The null routing command structure is as follows: </p>
+               <pre class="programlisting">
+struct {
+opaque padding&lt;0..PER_HOP_RI_LENGTH-1&gt;;
+} NullCommand;
+</pre>
+               <p> The next_node_hop command structure is as follows: </p>
+               <pre class="programlisting">
+struct {
+opaque next_hop[NODE_ID_LENGTH];
+opaque MAC[MAC_LENGTH];
+} NextNodeHopCommand;
+</pre>
+               <p> The recipient command structure is as follows: </p>
+               <pre class="programlisting">
+struct {
+opaque recipient[RECIPEINT_ID_LENGTH];
+} RecipientCommand;
+</pre>
+               <p> The surb_reply command structure is as follows: </p>
+               <pre class="programlisting">
+struct {
+opaque id[SURB_ID_LENGTH];
+} SURBReplyCommand;
+</pre>
+               <p> While the <code class="literal">NullCommand</code> padding field is specified as opaque,
+                  implementations SHOULD zero fill the padding. The choice of <code class="literal">0x00</code>
+                  as the terminal NullCommand is deliberate to ease implementation, as
+                  <code class="literal">ZEROBYTES(N)</code> produces a valid NullCommand RoutingCommand,
+                  resulting in <span class="quote">&#x201c;<span class="quote">appending zero filled padding</span>&#x201d;</span> producing valid output. </p>
+               <p> Implementations MUST pad the routing_commands vector so that it is exactly
+                  <code class="literal">PER_HOP_RI_LENGTH</code> bytes, by appending a terminal NullCommand
+                  if necessary. </p>
+               <p> Every non-terminal hop&#x2019;s <code class="literal">routing_commands</code> MUST include a
+                  <code class="literal">NextNodeHopCommand</code>. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="sphinx-packet-payload"></a>4.2 Sphinx Packet Payload</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The Sphinx Packet Payload refers to the block of data immediately following the
+                  Sphinx Packet Header in a Sphinx Packet. </p>
+               <p> For most purposes the structure of the Sphinx Packet Payload can be treated as a
+                  single contiguous byte vector of opaque data. </p>
+               <p> Upon packet creation, the payload is repeatedly encrypted (unless it is a SURB
+                  Reply, see <code class="literal">Section 7.0</code> via keys derived from the Diffie-Hellman
+                  key exchange between the packet's <code class="literal">group_element</code> and the public
+                  key of each node in the path. </p>
+               <p> Authentication of packet integrity is done by prepending a tag set to a known
+                  value to the plaintext prior to the first encrypt operation. By virtue of the
+                  fragile nature of the SPRP function, any alteration to the encrypted payload as it
+                  traverses the network will result in an irrecoverably corrupted plaintext when the
+                  payload is decrypted by the recipient. </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="sphinx-packet-creation"></a>5. Sphinx Packet Creation</h2>
+                  </div>
+               </div>
+            </div>
+            <p> For the sake of brevity, the pseudocode for all of the operations will take a vector
+               of the following PathHop structure as a parameter named path[] to specify the path
+               a
+               packet will traverse, along with the per-hop routing commands and per-hop public keys.
+               </p>
+            <pre class="programlisting">
+struct {
+/* There is no need for a node_id here, as
+routing_commands[0].next_hop specifies that
+information for all non-terminal hops. */
+opaque public_key[GROUP_ELEMENT_LENGTH];
+RoutingCommand routing_commands&lt;1...2^8-1&gt;;
+} PathHop;
+</pre>
+            <p> It is assumed that each routing_commands vector except for the terminal entry
+               contains at least a RoutingCommand consisting of a partially assembled
+               NextNodeHopCommand with the <code class="literal">next_hop</code> element filled in with the
+               identifier of the next hop. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="create-a-sphinx-packet-header"></a>5.1 Create a Sphinx Packet Header</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Both the creation of a Sphinx Packet and the creation of a SURB requires the
+                  generation of a Sphinx Packet Header, so it is specified as a distinct operation.
+                  </p>
+               <pre class="programlisting">
+Sphinx_Create_Header( additional_data, path[] ) -&gt; sphinx_header,
+               payload_keys
+</pre>
+               <p> Inputs: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">additional_data</code> The Additional Data that is visible to
+                           every node along the path in the header. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">path</code> The vector of PathHop structures in hop order,
+                           specifying the node id, public key, and routing commands for each hop.
+                           </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> Outputs: <code class="literal">sphinx_header</code> The resulting Sphinx Packet Header. </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">payload_keys</code> The vector of SPRP keys used to encrypt the
+                           Sphinx Packet Payload, in hop order. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> The <code class="literal">Sphinx_Create_Header</code> operation consists of the following
+                  steps: </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem">
+                        <p> Derive the key material for each hop. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+num_hops = route.len
+route_keys = [ ]
+route_group_elements = [ ]
+priv_key = EXP_KEYGEN()
+
+/* Calculate the key material for the 0th hop. */
+group_element = EXP( G, priv_key )
+route_group_elements += group_element
+shared_secret = EXP( path[0].public_key, priv_key )
+route_keys += Sphinx_KDF( KDF_INFO, shared_secret )
+blinding_factor = keys[0].blinding_factor
+
+/* Calculate the key material for rest of the hops. */
+for i = 1; i &lt; num_hops; ++i:
+shared_secret = EXP( path[i].public_key, priv_key )
+for j = 0; j &lt; i; ++j:
+shared_secret = EXP( shared_secret, keys[j].blinding_factor )
+route_keys += Sphinx_KDF( KDF_INFO, shared_secret )
+group_element = EXP( group_element, keys[i-1].blinding_factor )
+route_group_elements += group_element
+</pre>
+               <p> At the conclusion of the derivation process: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">route_keys</code> - A vector of per-hop SphinxKeys. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">route_group_elements</code> - A vector of per-hop group
+                           elements. </p>
+                     </li>
+                  </ul>
+               </div>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="2">
+                        <p> Derive the routing_information keystream and encrypted padding for each
+                           hop. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+ri_keystream = [ ]
+ri_padding = [ ]
+
+for i = 0; i &lt; num_hops; ++i:
+keystream = ZEROBYTES( ROUTING_INFO_LENGTH + PER_HOP_RI_LENGTH ) ^
+S( route_keys[i].header_encryption,
+route_keys[i].header_encryption_iv )
+ks_len = LEN( keystream ) - (i + 1) * PER_HOP_RI_LENGTH
+
+padding = keystream[ks_len:]
+if i &gt; 0:
+prev_pad_len = LEN( ri_padding[i-1] )
+padding = padding[:prev_pad_len] ^ ri_padding[i-1] |
+padding[prev_pad_len]
+
+ri_keystream += keystream[:ks_len]
+ri_padding += padding
+
+At the conclusion of the derivation process:
+ri_keystream - A vector of per-hop routing_information
+encryption keystreams.
+ri_padding   - The per-hop encrypted routing_information
+padding.
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="3">
+                        <p> Create the routing_information block. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+/* Start with the terminal hop, and work backwards. */
+i = num_hops - 1
+
+/* Encode the terminal hop's routing commands. As the
+terminal hop can never have a NextNodeHopCommand, there
+are no per-hop alterations to be made. */
+ri_fragment = path[i].routing_commands |
+ZEROBYTES( PER_HOP_RI_LENGTH - LEN( path[i].routing_commands ) )
+
+/* Encrypt and MAC. */
+ri_fragment ^= ri_keystream[i]
+mac = MAC( route_keys[i].header_mac, additional_data |
+route_group_elements[i] | ri_fragment |
+ri_padding[i-1] )
+routing_info = ri_fragment
+if num_hops &lt; MAX_HOPS:
+pad_len = (MAX_HOPS - num_hops) * PER_HOP_RI_LENGTH
+routing_info = routing_info | RNG( pad_len )
+
+/* Calculate the routing info for the rest of the hops. */
+for i = num_hops - 2; i &gt;= 0; --i:
+cmds_to_encode = [ ]
+
+/* Find and finalize the NextNodeHopCommand. */
+for j = 0; j &lt; LEN( path[i].routing_commands; j++:
+cmd = path[i].routing_commands[j]
+if cmd.command == next_node_hop:
+/* Finalize the NextNodeHopCommand. */
+cmd.MAC = mac
+cmds_to_encode = cmds_to_encode + cmd /* Append */
+
+/* Append a terminal NullCommand. */
+ri_fragment = cmds_to_encode |
+ZEROBYTES( PER_HOP_RI_LENGTH - LEN( cmds_to_encode ) )
+
+/* Encrypt and MAC */
+routing_info = ri_fragment | routing_info /* Prepend. */
+routing_info ^= ri_keystream[i]
+if i &gt; 0:
+mac = MAC( route_keys[i].header_mac, additional_data |
+route_group_elements[i] | routing_info |
+ri_padding[i-1] )
+else:
+mac = MAC( route_keys[i].header_mac, additional_data |
+route_group_elements[i] | routing_info )
+
+At the conclusion of the derivation process:
+routing_info - The completed routing_info block.
+mac          - The MAC for the 0th hop.
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="4">
+                        <p> Assemble the completed Sphinx Packet Header and Sphinx Packet Payload
+                           SPRP key vector. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+/* Assemble the completed Sphinx Packet Header. */
+SphinxHeader sphinx_header
+sphinx_header.additional_data = additional_data
+sphinx_header.group_element = route_group_elements[0] /* From step 1. */
+sphinx_header.routing_info = routing_info   /* From step 3. */
+sphinx_header.mac = mac                     /* From step 3. */
+
+/* Preserve the Sphinx Payload SPRP keys, to return to the
+caller. */
+payload_keys = [ ]
+for i = 0; i &lt; nr_hops; ++i:
+payload_keys += route_keys[i].payload_encryption
+
+At the conclusion of the assembly process:
+sphinx_header - The completed sphinx_header, to be returned.
+payload_keys  - The vector of SPRP keys, to be returned.
+</pre>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="create-a-sphinx-packet"></a>5.2 Create a Sphinx Packet</h3>
+                     </div>
+                  </div>
+               </div>
+               <pre class="programlisting">
+Sphinx_Create_Packet( additional_data, path[], payload ) -&gt; sphinx_packet
+</pre>
+               <p> Inputs: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">additional_data</code> The Additional Data that is visible to
+                           every node along the path in the header. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">path</code> The vector of PathHop structures in hop order,
+                           specifying the node id, public key, and routing commands for each hop.
+                           </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">payload</code> The packet payload message plaintext. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> Outputs: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">sphinx_packet</code> The resulting Sphinx Packet. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> The <code class="literal">Sphinx_Create_Packet</code> operation consists of the following
+                  steps: </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem">
+                        <p> Create the Sphinx Packet Header and SPRP key vector. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+sphinx_header, payload_keys =
+Sphinx_Create_Header( additional_data, path )
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="2">
+                        <p> Prepend the authentication tag, and append padding to the payload.
+                           </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+payload = ZERO_BYTES( PAYLOAD_TAG_LENGTH ) | payload
+payload = payload | ZERO_BYTES( PAYLOAD_LENGTH - LEN( payload ) )
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="3">
+                        <p> Encrypt the payload. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+for i = nr_hops - 1; i &gt;= 0; --i:
+payload = SPRP_Encrypt( payload_keys[i], payload )
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="4">
+                        <p> Assemble the completed Sphinx Packet. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+SphinxPacket sphinx_packet
+sphinx_packet.header = sphinx_header
+sphinx_packet.payload = payload
+</pre>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="sphinx-packet-processing"></a>6. Sphinx Packet Processing</h2>
+                  </div>
+               </div>
+            </div>
+            <p> Mix nodes process incoming packets first by performing the
+               <code class="literal">Sphinx_Unwrap</code> operation to authenticate and decrypt the packet,
+               and if applicable prepare the packet to be forwarded to the next node. </p>
+            <p> If <code class="literal">Sphinx_Unwrap</code> returns an error for any given packet, the packet
+               MUST be discarded with no additional processing. </p>
+            <p> After a packet has been unwrapped successfully, a replay detection tag is checked
+               to
+               ensure that the packet has not been seen before. If the packet is a replay, the packet
+               MUST be discarded with no additional processing. </p>
+            <p> The routing commands for the current hop are interpreted and executed, and finally
+               the packet is forwarded to the next mix node over the network or presented to the
+               application if the current node is the final recipient. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="sphinx_unwrap-operation"></a>6.1 Sphinx_Unwrap Operation</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The <code class="literal">Sphinx_Unwrap</code> operation is the majority of the per-hop
+                  packet processing, handling authentication, decryption, and modifying the packet
+                  prior to forwarding it to the next node. </p>
+               <pre class="programlisting">
+Sphinx_Unwrap( routing_private_key, sphinx_packet ) -&gt; sphinx_packet,
+                  routing_commands,
+                  replay_tag
+</pre>
+               <p> Inputs: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">private_routing_key</code> A group element GROUP_ELEMENT_LENGTH
+                           bytes in length, that serves as the unwrapping Mix&#x2019;s private key. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">sphinx_packet</code> A Sphinx packet to unwrap. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> Outputs: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">error</code> Indicating a unsuccessful unwrap operation if
+                           applicable. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">sphinx_packet</code> The resulting Sphinx packet. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">routing_commands</code> A vector of RoutingCommand, specifying
+                           the post unwrap actions to be taken on the packet. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">replay_tag</code> A tag used to detect whether this packet was
+                           processed before. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> The <code class="literal">Sphinx_Unwrap</code> operation consists of the following steps: </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="0">
+                        <p> (Optional) Examine the Sphinx Packet Header&#x2019;s Additional Data. </p>
+                     </li>
+                  </ol>
+               </div>
+               <p> If the header&#x2019;s <code class="literal">additional_data</code> element contains information
+                  required to complete the unwrap operation, such as specifying the packet format
+                  version or the cryptographic primitives used examine it now. </p>
+               <p> Implementations MUST NOT treat the information in the
+                  <code class="literal">additional_data</code> element as trusted until after the completion
+                  of Step 3 (<span class="quote">&#x201c;<span class="quote">Validate the Sphinx Packet Header</span>&#x201d;</span>). </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem">
+                        <p> Calculate the hop's shared secret, and replay_tag. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+hdr = sphinx_packet.header
+shared_secret = EXP( hdr.group_element, private_routing_key )
+replay_tag = H( shared_secret )
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="2">
+                        <p> Derive the various keys required for packet processing. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+keys = Sphinx_KDF( KDF_INFO, shared_secret )
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="3">
+                        <p> Validate the Sphinx Packet Header. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+derived_mac = MAC( keys.header_mac, hdr.additional_data |
+hdr.group_element |
+hdr.routing_information )
+if !CONSTANT_TIME_CMP( derived_mac, hdr.MAC):
+/* MUST abort processing if the header is invalid. */
+return ErrorInvalidHeader
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="4">
+                        <p> Extract the per-hop routing commands for the current hop. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+/* Append padding to preserve length-invariance, as the routing
+commands for the current hop will be removed. */
+padding = ZEROBYTES( PER_HOP_RI_LENGTH )
+B = hdr.routing_information | padding
+
+/* Decrypt the entire routing_information block. */
+B = B ^ S( keys.header_encryption, keys.header_encryption_iv )
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="5">
+                        <p> Parse the per-hop routing commands. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+cmd_buf = B[:PER_HOP_RI_LENGTH]
+new_routing_information = B[PER_HOP_RI_LENGTH:]
+
+next_mix_command_idx = -1
+routing_commands = [ ]
+for idx = 0; idx &lt; PER_HOP_RI_LENGTH {
+/* WARNING: Bounds checking omitted for brevity. */
+cmd_type = b[idx]
+cmd = NULL
+switch cmd_type {
+case null: goto done  /* No further commands. */
+
+case next_node_hop:
+cmd = RoutingCommand( B[idx:idx+1+LEN( NextNodeHopCommand )] )
+next_mix_command_idx = i /* Save for step 7. */
+idx += 1 + LEN( NextNodeHopCommand )
+break
+
+case recipient:
+cmd = RoutingCommand( B[idx:idx+1+LEN( FinalDestinationCommand )] )
+idx += 1 + LEN( RecipientCommand )
+break
+
+case surb_reply:
+cmd = RoutingCommand( B[idx:idx+1+LEN( SURBReplyCommand )] )
+idx += 1 + LEN( SURBReplyCommand )
+break
+
+default:
+/* MUST abort processing on unrecognized commands. */
+return ErrorInvalidCommand
+}
+routing_commands += cmd /* Append cmd to the tail of the list. */
+}
+done:
+</pre>
+               <p> At the conclusion of the parsing step: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">routing_commands</code> - A vector of SphinxRoutingCommand, to
+                           be applied at this hop. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">new_routing_information</code> - The routing_information block
+                           to be sent to the next hop if any. </p>
+                     </li>
+                  </ul>
+               </div>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="6">
+                        <p> Decrypt the Sphinx Packet Payload. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+payload = sphinx_packet.payload
+payload = SPRP_Decrypt( key.payload_encryption, payload )
+sphinx_packet.payload = payload
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="7">
+                        <p> Transform the packet for forwarding to the next mix, if the routing
+                           commands vector included a NextNodeHopCommand. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+if next_mix_command_idx != -1:
+cmd = routing_commands[next_mix_command_idx]
+hdr.group_element = EXP( hdr.group_element, keys.blinding_factor )
+hdr.routing_information = new_routing_information
+hdr.mac = cmd.MAC
+sphinx_packet.hdr = hdr
+</pre>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h4 class="title"><a name="post-sphinx_unwrap-processing"></a>6.2 Post Sphinx_Unwrap Processing</h4>
+                        </div>
+                     </div>
+                  </div>
+                  <p> Upon the completion of the <code class="literal">Sphinx_Unwrap</code> operation,
+                     implementations MUST take several additional steps. As the exact behavior is
+                     mostly implementation specific, pseudocode will not be provided for most of the
+                     post processing steps. </p>
+                  <div class="orderedlist">
+                     <ol class="orderedlist compact" type="1">
+                        <li class="listitem">
+                           <p> Apply replay detection to the packet. </p>
+                        </li>
+                     </ol>
+                  </div>
+                  <p> The <code class="literal">replay_tag</code> value returned by Sphinx_Unwrap MUST be
+                     unique across all packets processed with a given
+                     <code class="literal">private_routing_key</code>. </p>
+                  <p> The exact specifics of how to detect replays is left up to the
+                     implementation, however any replays that are detected MUST be discarded
+                     immediately. </p>
+                  <div class="orderedlist">
+                     <ol class="orderedlist compact" type="1">
+                        <li class="listitem" value="2">
+                           <p> Act on the routing commands, if any. </p>
+                        </li>
+                     </ol>
+                  </div>
+                  <p> The exact specifics of how implementations chose to apply routing commands is
+                     deliberately left unspecified, however in general: </p>
+                  <div class="itemizedlist">
+                     <ul class="itemizedlist" style="list-style-type: disc; ">
+                        <li class="listitem">
+                           <p> If there is a <code class="literal">NextNodeHopCommand</code>, the packet
+                              should be forwarded to the next node based on the
+                              <code class="literal">next_hop</code> field upon completion of the post
+                              processing. </p>
+                           <p> The lack of a NextNodeHopCommand indicates that the packet is
+                              destined for the current node. </p>
+                        </li>
+                        <li class="listitem">
+                           <p> If there is a <code class="literal">SURBReplyCommand</code>, the packet should
+                              be treated as a SURBReply destined for the current node, and decrypted
+                              accordingly (See <code class="literal">Section 7.2</code>) </p>
+                        </li>
+                        <li class="listitem">
+                           <p> If the implementation supports multiple recipients on a single node,
+                              the <code class="literal">RecipientCommand</code> command should be used to
+                              determine the correct recipient for the packet, and the payload
+                              delivered as appropriate. </p>
+                           <p> It is possible for both a RecipientCommand and a NextNodeHopCommand
+                              to be present simultaneously in the routing commands for a given hop.
+                              The behavior when this situation occurs is implementation defined.
+                              </p>
+                        </li>
+                     </ul>
+                  </div>
+                  <div class="orderedlist">
+                     <ol class="orderedlist compact" type="1">
+                        <li class="listitem" value="3">
+                           <p> Authenticate the packet if required. </p>
+                        </li>
+                     </ol>
+                  </div>
+                  <p> If the packet is destined for the current node, the integrity of the payload
+                     MUST be authenticated. </p>
+                  <p> The authentication is done as follows: </p>
+                  <pre class="programlisting">
+derived_tag = sphinx_packet.payload[:PAYLOAD_TAG_LENGTH]
+expected_tag = ZEROBYTES( PAYLOAD_TAG_LENGTH )
+if !CONSTANT_TIME_CMP( derived_tag, expected_tag ):
+/* Discard the packet with no further processing. */
+return ErrorInvalidPayload
+</pre>
+                  <p> Remove the authentication tag before presenting the payload to the
+                     application. </p>
+                  <pre class="programlisting">
+sphinx_packet.payload = sphinx_packet.payload[PAYLOAD_TAG_LENGTH:]
+</pre>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="single-use-reply-block-surb-creation"></a>7. Single Use Reply Block (SURB) Creation</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> A Single Use Reply Block (SURB) is a delivery token with a short lifetime, that
+                  can be used by the recipient to reply to the initial sender. </p>
+               <p> SURBs allow for anonymous replies, when the recipient does not know the sender of
+                  the message. Usage of SURBs guarantees anonymity properties but also makes the reply
+                  messages indistinguishable from forward messages both to external adversaries as
+                  well as the mix nodes. </p>
+               <p> When a SURB is created, a matching reply block Decryption Token is created, which
+                  is used to decrypt the reply message that is produced and delivered via the SURB.
+                  </p>
+               <p> The Sphinx SURB wire encoding is implementation defined, but for the purposes of
+                  illustrating creation and use, the following will be used: </p>
+               <pre class="programlisting">
+struct {
+SphinxHeader sphinx_header;
+opaque first_hop[NODE_ID_LENGTH];
+opaque payload_key[SPRP_KEY_LENGTH];
+} SphinxSURB;
+</pre>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h4 class="title"><a name="create-a-sphinx-surb-and-decryption-token"></a>7.1 Create a Sphinx SURB and Decryption Token</h4>
+                        </div>
+                     </div>
+                  </div>
+                  <p> Structurally a SURB consists of three parts, a pre-generated Sphinx Packet
+                     Header, a node identifier for the first hop to use when using the SURB to reply,
+                     and cryptographic keying material by which to encrypt the reply&#x2019;s payload. All
+                     elements must be securely transmitted to the recipient, perhaps as part of a
+                     forward Sphinx Packet's Payload, but the exact specifics on how to accomplish
+                     this is left up to the implementation. </p>
+                  <p> When creating a SURB, the terminal routing_commands vector SHOULD include a
+                     SURBReplyCommand, containing an identifier to ensure that the payload can be
+                     decrypted with the correct set of keys (Decryption Token). The routing command
+                     is left optional, as it is conceivable that implementations may chose to use
+                     trial decryption, and or limit the number of outstanding SURBs to solve this
+                     problem. </p>
+                  <pre class="programlisting">
+Sphinx_Create_SURB( additional_data, first_hop, path[] ) -&gt;
+             sphinx_surb,
+             decryption_token
+</pre>
+                  <p> Inputs: </p>
+                  <div class="itemizedlist">
+                     <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                        <li class="listitem">
+                           <p><code class="literal">additional_data</code> The Additional Data that is visible
+                              to every node along the path in the header. </p>
+                        </li>
+                        <li class="listitem">
+                           <p><code class="literal">first_hop</code> The node id of the first hop the recipient
+                              must use when replying via the SURB. </p>
+                        </li>
+                        <li class="listitem">
+                           <p><code class="literal">path</code> The vector of PathHop structures in hop order,
+                              specifying the node id, public key, and routing commands for each hop.
+                              </p>
+                        </li>
+                     </ul>
+                  </div>
+                  <p> Outputs: </p>
+                  <div class="itemizedlist">
+                     <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                        <li class="listitem">
+                           <p><code class="literal">sphinx_surb</code> The resulting Sphinx SURB. </p>
+                        </li>
+                        <li class="listitem">
+                           <p><code class="literal">decryption_token</code> The Decryption Token associated with
+                              the SURB. </p>
+                        </li>
+                     </ul>
+                  </div>
+                  <p> The Sphinx_Create_SURB operation consists of the following steps: </p>
+                  <div class="orderedlist">
+                     <ol class="orderedlist compact" type="1">
+                        <li class="listitem">
+                           <p> Create the Sphinx Packet Header and SPRP key vector. </p>
+                        </li>
+                     </ol>
+                  </div>
+                  <pre class="programlisting">
+sphinx_header, payload_keys =
+Sphinx_Create_Header( additional_data, path )
+</pre>
+                  <div class="orderedlist">
+                     <ol class="orderedlist compact" type="1">
+                        <li class="listitem" value="2">
+                           <p> Create a key for the final layer of encryption. </p>
+                        </li>
+                     </ol>
+                  </div>
+                  <pre class="programlisting">
+final_key = RNG( SPRP_KEY_LENGTH )
+</pre>
+                  <div class="orderedlist">
+                     <ol class="orderedlist compact" type="1">
+                        <li class="listitem" value="3">
+                           <p> Build the SURB and Decryption Token. </p>
+                        </li>
+                     </ol>
+                  </div>
+                  <pre class="programlisting">
+SphinxSURB sphinx_surb;
+sphinx_surb.sphinx_header = sphinx_header
+sphinx_surb.first_hop = first_hop
+sphinx_surb.payload_key = final_key
+
+decryption_token = final_key + payload_keys /* Prepend */
+</pre>
+               </div>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h4 class="title"><a name="decrypt-a-sphinx-reply-originating-from-a-surb"></a>7.2 Decrypt a Sphinx Reply Originating from a SURB</h4>
+                        </div>
+                     </div>
+                  </div>
+                  <p> A Sphinx Reply packet that was generated using a SURB is externally
+                     indistinguishable from a forward Sphinx Packet as it traverses the network.
+                     However, the recipient of the reply has an additional decryption step, the
+                     packet starts off unencrypted, and accumulates layers of Sphinx Packet Payload
+                     decryption as it traverses the network. </p>
+                  <p> Determining which decryption token to use when decrypting the SURB reply can
+                     be done via the SURBReplyCommand&#x2019;s id field, if one is included at the time of
+                     the SURB&#x2019;s creation. </p>
+                  <pre class="programlisting">
+Sphinx_Decrypt_SURB_Reply( decryption_token, payload ) -&gt; message
+</pre>
+                  <p> Inputs: </p>
+                  <div class="itemizedlist">
+                     <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                        <li class="listitem">
+                           <p><code class="literal">decryption_token</code> The vector of keys allowing a client
+                              to decrypt the reply ciphertext payload. This decryption_token is
+                              generated when the SURB is created. </p>
+                        </li>
+                        <li class="listitem">
+                           <p><code class="literal">payload</code> The Sphinx Packet ciphertext payload. </p>
+                        </li>
+                     </ul>
+                  </div>
+                  <p> Outputs: </p>
+                  <div class="itemizedlist">
+                     <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                        <li class="listitem">
+                           <p><code class="literal">error</code> Indicating a unsuccessful unwrap operation if
+                              applicable. </p>
+                        </li>
+                        <li class="listitem">
+                           <p><code class="literal">message</code> The plaintext message. </p>
+                        </li>
+                     </ul>
+                  </div>
+                  <p> The Sphinx_Decrypt_SURB_Reply operation consists of the following steps: </p>
+                  <div class="orderedlist">
+                     <ol class="orderedlist compact" type="1">
+                        <li class="listitem">
+                           <p> Encrypt the message to reverse the decrypt operations the payload
+                              acquired as it traversed the network. </p>
+                        </li>
+                     </ol>
+                  </div>
+                  <pre class="programlisting">
+for i = LEN( decryption_token ) - 1; i &gt; 0; --i:
+payload = SPRP_Encrypt( decryption_token[i], payload )
+</pre>
+                  <div class="orderedlist">
+                     <ol class="orderedlist compact" type="1">
+                        <li class="listitem" value="2">
+                           <p> Decrypt and authenticate the message ciphertext. </p>
+                        </li>
+                     </ol>
+                  </div>
+                  <pre class="programlisting">
+message = SPRP_Decrypt( decryption_token[0], payload )
+
+derived_tag = message[:PAYLOAD_TAG_LENGTH]
+expected_tag = ZEROBYTES( PAYLOAD_TAG_LENGTH )
+if !CONSTANT_TIME_CMP( derived_tag, expected_tag ):
+return ErrorInvalidPayload
+
+message = message[PAYLOAD_TAG_LENGTH:]
+</pre>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="single-use-reply-block-replies"></a>8. Single Use Reply Block Replies</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The process for using a SURB to reply anonymously is slightly different from the
+                  standard packet creation process, as the Sphinx Packet Header is already generated
+                  (as part of the SURB), and there is an additional layer of Sphinx Packet Payload
+                  encryption that must be performed. </p>
+               <pre class="programlisting">
+Sphinx_Create_SURB_Reply( sphinx_surb, payload ) -&gt; sphinx_packet
+</pre>
+               <p> Inputs: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">sphinx_surb</code> The SphinxSURB structure, decoded from the
+                           implementation defined wire encoding. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">payload</code> The packet payload message plaintext. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> The Sphinx_Create_SURB_Reply operation consists of the following steps: </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem">
+                        <p> Prepend the authentication tag, and append padding to the payload.
+                           </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+payload = ZERO_BYTES( PAYLOAD_TAG_LENGTH ) | payload
+payload = payload | ZERO_BYTES( PAYLOAD_LENGTH - LEN( payload ) )
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="2">
+                        <p> Encrypt the payload. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+payload = SPRP_Encrypt( sphinx_surb.payload_key, payload )
+</pre>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="3">
+                        <p> Assemble the completed Sphinx Packet. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">
+SphinxPacket sphinx_packet
+sphinx_packet.header = sphinx_surb.sphinx_header
+sphinx_packet.payload = payload
+</pre>
+               <p> The completed <code class="literal">sphinx_packet</code> MUST be sent to the node specified
+                  via <code class="literal">sphinx_surb.node_id</code>, as the entire reply
+                  <code class="literal">sphinx_packet</code>&#x2019;s header is pre-generated. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="anonymity-considerations"></a>9. Anonymity Considerations</h3>
+                     </div>
+                  </div>
+               </div>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h4 class="title"><a name="optional-non-constant-length-sphinx-packet-header-padding"></a>9.1 Optional Non-constant Length Sphinx Packet Header Padding</h4>
+                        </div>
+                     </div>
+                  </div>
+                  <p> Depending on the mix topology, there is no hard requirement that the per-hop
+                     routing info is padded to one fixed constant length. </p>
+                  <p> For example, assuming a layered topology (referred to as stratified topology
+                     in the literature) <a class="link" href="#MIXTOPO10">MIXTOPO10</a>, where the layer
+                     of any given mix node is public information, as long as the following two
+                     invariants are maintained, there is no additional information available to an
+                     adversary: </p>
+                  <div class="orderedlist">
+                     <ol class="orderedlist compact" type="1">
+                        <li class="listitem">
+                           <p> All packets entering any given mix node in a certain layer are
+                              uniform in length. </p>
+                        </li>
+                        <li class="listitem">
+                           <p> All packets leaving any given mix node in a certain layer are uniform
+                              in length. </p>
+                        </li>
+                     </ol>
+                  </div>
+                  <p> The only information available to an external or internal observer is the
+                     layer of any given mix node (via the packet length), which is information they
+                     are assumed to have by default in such a design. </p>
+               </div>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h4 class="title"><a name="additional-data-field-considerations"></a>9.2 Additional Data Field Considerations</h4>
+                        </div>
+                     </div>
+                  </div>
+                  <p> The Sphinx Packet Construct is crafted such that any given packet is bitwise
+                     unlinkable after a Sphinx_Unwrap operation, provided that the optional
+                     Additional Data (AD) facility is not used. This property ensures that external
+                     passive adversaries are unable to track a packet based on content as it
+                     traverses the network. As the on-the-wire AD field is static through the
+                     lifetime of a packet (ie: left unaltered by the <code class="literal">Sphinx_Unwrap</code>
+                     operation), implementations and applications that wish to use this facility MUST
+                     NOT transmit AD that can be used to distinctly identify individual packets.
+                     </p>
+               </div>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h4 class="title"><a name="forward-secrecy-considerations"></a>9.3 Forward Secrecy Considerations</h4>
+                        </div>
+                     </div>
+                  </div>
+                  <p> Each node acting as a mix MUST regenerate their asymmetric key pair
+                     relatively frequently. Upon key rotation the old private key MUST be securely
+                     destroyed. As each layer of a Sphinx Packet is encrypted via key material
+                     derived from the output of an ephemeral/static Diffie-Hellman key exchange,
+                     without the rotation, the construct does not provide Perfect Forward Secrecy.
+                     Implementations SHOULD implement defense-in-depth mitigations, for example by
+                     using strongly forward-secure link protocols to convey Sphinx Packets between
+                     nodes. </p>
+                  <p> This frequent mix routing key rotation can limit SURB usage by directly
+                     reducing the lifetime of SURBs. In order to have a strong Forward Secrecy
+                     property while maintaining a higher SURB lifetime, designs such as forward
+                     secure mixes <a class="link" href="#SFMIX03">SFMIX03</a> could be used. </p>
+               </div>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h4 class="title"><a name="compulsion-threat-considerations"></a>9.4 Compulsion Threat Considerations</h4>
+                        </div>
+                     </div>
+                  </div>
+                  <p> Reply Blocks (SURBs), forward and reply Sphinx packets are all vulnerable to
+                     the compulsion threat, if they are captured by an adversary. The adversary can
+                     request iterative decryptions or keys from a series of honest mixes in order to
+                     perform a deanonymizing trace of the destination. </p>
+                  <p> While a general solution to this class of attacks is beyond the scope of this
+                     document, applications that seek to mitigate or resist compulsion threats could
+                     implement the defenses proposed in <a class="link" href="#COMPULS05">COMPULS05</a>
+                     via a series of routing command extensions. </p>
+               </div>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h4 class="title"><a name="surb-usage-considerations-for-volunteer-operated-mix-networks"></a>9.5 SURB Usage Considerations for Volunteer Operated Mix Networks</h4>
+                        </div>
+                     </div>
+                  </div>
+                  <p> Given a hypothetical scenario where Alice and Bob both wish to keep their
+                     location on the mix network hidden from the other, and Alice has somehow
+                     received a SURB from Bob, Alice MUST not utilize the SURB directly because in
+                     the volunteer operated mix network the first hop specified by the SURB could be
+                     operated by Bob for the purpose of deanonymizing Alice. </p>
+                  <p> This problem could be solved via the incorporation of a <span class="quote">&#x201c;<span class="quote">cross-over
+                           point</span>&#x201d;</span> such as that described in <a class="link" href="#MIXMINION">MIXMINION</a>, for example by having Alice delegating the transmission
+                     of a SURB Reply to a randomly selected crossover point in the mix network, so
+                     that if the first hop in the SURB&#x2019;s return path is a malicious mix, the only
+                     information gained is the identity of the cross-over point. </p>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="security-considerations"></a>10. Security Considerations</h3>
+                     </div>
+                  </div>
+               </div>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h4 class="title"><a name="sphinx-payload-encryption-considerations"></a>10.1 Sphinx Payload Encryption Considerations</h4>
+                        </div>
+                     </div>
+                  </div>
+                  <p> The payload encryption&#x2019;s use of a fragile (non-malleable) SPRP is deliberate
+                     and implementations SHOULD NOT substitute it with a primitive that does not
+                     provide such a property (such as a stream cipher based PRF). In particular there
+                     is a class of correlation attacks (tagging attacks) targeting anonymity systems
+                     that involve modification to the ciphertext that are mitigated if alterations to
+                     the ciphertext result in unpredictable corruption of the plaintext (avalanche
+                     effect). </p>
+                  <p> Additionally, as the PAYLOAD_TAG_LENGTH based tag-then-encrypt payload
+                     integrity authentication mechanism is predicated on the use of a non-malleable
+                     SPRP, implementations that substitute a different primitive MUST authenticate
+                     the payload using a different mechanism. </p>
+                  <p> Alternatively, extending the MAC contained in the Sphinx Packet Header to
+                     cover the Sphinx Packet Payload will both defend against tagging attacks and
+                     authenticate payload integrity. However, such an extension does not work with
+                     the SURB construct presented in this specification, unless the SURB is only used
+                     to transmit payload that is known to the creator of the SURB. </p>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="appendix-a.-references"></a>Appendix A. References</h3>
+                     </div>
+                  </div>
+               </div>
+               <p><a name="COMPULS05"></a><span class="bold"><strong>COMPULS05</strong></span></p>
+               <p>Danezis, G., Clulow, J., <span class="quote">&#x201c;<span class="quote">Compulsion Resistant Anonymous Communications</span>&#x201d;</span>,
+                  Proceedings of Information Hiding Workshop, June 2005,
+                  <a class="link" href="https://www.freehaven.net/anonbib/cache/ih05-danezisclulow.pdf" target="_top">https://www.freehaven.net/anonbib/cache/ih05-danezisclulow.pdf</a></p>
+               <p><a name="MIXMINION"></a><span class="bold"><strong>MIXMINION</strong></span></p>
+               <p>Danezis, G., Dingledine, R., Mathewson, N., <span class="quote">&#x201c;<span class="quote">Mixminion: Design of a
+                        Type III Anonymous Remailer Protocol</span>&#x201d;</span>,
+                  <a class="link" href="https://www.mixminion.net/minion-design.pdf" target="_top">https://www.mixminion.net/minion-design.pdf</a></p>
+               <p><a name="MIXTOPO10"></a><span class="bold"><strong>MIXTOPO10</strong></span></p>
+               <p>Diaz, C., Murdoch, S., Troncoso, C., <span class="quote">&#x201c;<span class="quote">Impact of Network Topology on
+                        Anonymity and Overhead in Low-Latency Anonymity Networks</span>&#x201d;</span>, PETS, July
+                  2010, <a class="link" href="https://www.esat.kuleuven.be/cosic/publications/article-1230.pdf" target="_top">https://www.esat.kuleuven.be/cosic/publications/article-1230.pdf</a></p>
+               <p><a name="RFC2119"></a><span class="bold"><strong>RFC2119</strong></span></p>
+               <p>Bradner, S., <span class="quote">&#x201c;<span class="quote">Key words for use in RFCs to Indicate Requirement
+                        Levels</span>&#x201d;</span>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a class="link" href="http://www.rfc-editor.org/info/rfc2119" target="_top">http://www.rfc-editor.org/info/rfc2119</a></p>
+               <p><a name="RFC5246"></a><span class="bold"><strong>RFC5246</strong></span></p>
+               <p>Dierks, T. and E. Rescorla, <span class="quote">&#x201c;<span class="quote">The Transport Layer Security (TLS) Protocol
+                        Version 1.2</span>&#x201d;</span>, RFC 5246, DOI 10.17487/RFC5246, August 2008, <a class="link" href="http://www.rfc-editor.org/info/rfc5246" target="_top">http://www.rfc-editor.org/info/rfc5246</a></p>
+               <p><a name="SFMIX03"></a><span class="bold"><strong>SFMIX03</strong></span></p>
+               <p>Danezis, G., <span class="quote">&#x201c;<span class="quote">Forward Secure Mixes</span>&#x201d;</span>, Proceedings of 7th Nordic
+                  Workshop on Secure IT Systems, 2002, <a class="link" href="https://www.freehaven.net/anonbib/cache/Dan:SFMix03.pdf" target="_top">https://www.freehaven.net/anonbib/cache/Dan:SFMix03.pdf</a></p>
+               <p><a name="SPHINX09"></a><span class="bold"><strong>SPHINX09</strong></span></p>
+               <p>Danezis, G., Goldberg, I., <span class="quote">&#x201c;<span class="quote">Sphinx: A Compact and Provably Secure Mix
+                        Format</span>&#x201d;</span>, DOI 10.1109/SP.2009.15, May 2009, <a class="link" href="https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf" target="_top">https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</a></p>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>

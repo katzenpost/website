@@ -1,0 +1,819 @@
+---
+title: 
+linkTitle: "Mix network specification" 
+description: "" 
+url: "docs/specs/mixspec.html" 
+date: "2025-01-03T12:30:18.572960441-08:00"
+draft: false 
+slug: "" 
+layout: "" 
+type: "" 
+weight: 1 
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>Mix network specification</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+      <meta name="description" content="This document describes the high level architecture and detailed protocols and behavior required of mix nodes participating in the Katzenpost Mix Network.">
+   </head>
+   <body>
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h1 class="title"><a name="mixspec"></a>Mix network specification</h1>
+               </div>
+               <div>
+                  <div class="authorgroup">
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Yawning</span> <span class="surname">Angel</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">George</span> <span class="surname">Danezis</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Claudia</span> <span class="surname">Diaz</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Ania</span> <span class="surname">Piotrowska</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">David</span> <span class="surname">Stainton</span></h3>
+                     </div>
+                  </div>
+               </div>
+               <div>
+                  <div class="abstract">
+                     <p class="title"><b>Abstract</b></p>
+                     <p> This document describes the high level architecture and detailed protocols and
+                        behavior required of mix nodes participating in the Katzenpost Mix Network. </p>
+                  </div>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="toc">
+            <p><b>Table of Contents</b></p>
+            <dl class="toc">
+               <dt><span class="section"><a href="#terminology">Terminology</a></span></dt>
+               <dt><span class="section"><a href="#mixnet_introduction">1. Introduction</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#conventions-used-in-this-document">1.2 Conventions Used in This
+                              Document</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#system-overview">2. System Overview</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#threat-model">2.1 Threat Model</a></span></dt>
+                     <dt><span class="section"><a href="#network-topology">2.2 Network Topology</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#packet-format-overview">3. Packet Format Overview</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#sphinx-cryptographic-primitives">3.1 Sphinx Cryptographic
+                              Primitives</a></span></dt>
+                     <dt><span class="section"><a href="#sphinx-packet-parameters">3.2 Sphinx Packet Parameters</a></span></dt>
+                     <dt><span class="section"><a href="#sphinx-per-hop-routing-information-extensions">3.3 Sphinx Per-hop
+                              Routing Information Extensions</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#mix-node-operation">4. Mix Node Operation</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#link-layer-connection-management">4.1 Link Layer Connection
+                              Management</a></span></dt>
+                     <dt><span class="section"><a href="#sphinx-mix-and-provider-key-rotation">4.2 Sphinx Mix and Provider
+                              Key Rotation</a></span></dt>
+                     <dt><span class="section"><a href="#sphinx-packet-processing">4.3 Sphinx Packet Processing</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#anonymity-considerations">5. Anonymity Considerations</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#topology">5.1 Topology</a></span></dt>
+                     <dt><span class="section"><a href="#mixing-strategy">5.2 Mixing strategy</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#security-considerations">6. Security Considerations</a></span></dt>
+               <dt><span class="section"><a href="#appendix-a.-references">Appendix A. References</a></span></dt>
+            </dl>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="terminology"></a>Terminology</h2>
+                  </div>
+               </div>
+            </div>
+            <p>The following terms are used in this specification.</p>
+            <div class="variablelist">
+               <dl class="variablelist">
+                  <dt><span class="term">KiB</span></dt>
+                  <dd>
+                     <p>Defined as 1024 8 bit octets.</p>
+                  </dd>
+                  <dt><span class="term">mixnet</span></dt>
+                  <dd>
+                     <p>A mixnet also known as a mix network is a network of mixes that can be
+                        used to build various privacy preserving protocols.</p>
+                  </dd>
+                  <dt><span class="term">mix</span></dt>
+                  <dd>
+                     <p>A cryptographic router that is used to compose a mixnet. Mixes use a
+                        cryptographic operation on messages being routed which provides bitwise
+                        unlinkability with respect to input versus output messages. Katzenpost is a
+                        decryption mixnet that uses the Sphinx cryptographic packet format.</p>
+                  </dd>
+                  <dt><span class="term">node</span></dt>
+                  <dd>
+                     <p>Clients are NOT considered nodes in the mix network. However note that
+                        network protocols are often layered; in our design documents we describe
+                        "mixnet hidden services" which can be operated by mixnet clients. Therefore
+                        if you are using node in some adherence to methematical termonology one
+                        could conceivably designate a client as a node. That having been said, it
+                        would not be appropriate to the discussion of our core mixnet protocol to
+                        refer to the clients as nodes.</p>
+                  </dd>
+                  <dt><span class="term">entry mix, entry node</span></dt>
+                  <dd>
+                     <p>A mix that has some additional features: </p>
+                     <div class="itemizedlist">
+                        <ul class="itemizedlist" style="list-style-type: disc; ">
+                           <li class="listitem">
+                              <p> An entry mix is always the first hop in routes where the message
+                                 originates from a client. </p>
+                           </li>
+                           <li class="listitem">
+                              <p> An entry mix authenticates client&#x2019;s direct connections via the
+                                 mixnet&#x2019;s wire protocol. </p>
+                           </li>
+                           <li class="listitem">
+                              <p> An entry mix queues reply messages and allows clients to retrieve
+                                 them later. </p>
+                           </li>
+                        </ul>
+                     </div>
+                  </dd>
+                  <dt><span class="term">service mix</span></dt>
+                  <dd>
+                     <p>A service mix is a mix that has some additional features:</p>
+                     <div class="itemizedlist">
+                        <ul class="itemizedlist" style="list-style-type: disc; ">
+                           <li class="listitem">
+                              <p> A service mix is always the last hop in routes where the message
+                                 originates from a client. </p>
+                           </li>
+                           <li class="listitem">
+                              <p> A service mix runs mixnet services which use a Sphinx SURB based
+                                 protocol. </p>
+                           </li>
+                        </ul>
+                     </div>
+                  </dd>
+                  <dt><span class="term">user</span></dt>
+                  <dd>
+                     <p>An agent using the Katzenpost system.</p>
+                  </dd>
+                  <dt><span class="term">client</span></dt>
+                  <dd>
+                     <p>Software run by the User on its local device to participate in the Mixnet.
+                        Again let us reiterate that a client is not considered a "node in the
+                        network" at the level of analysis where we are discussing the core mixnet
+                        protocol in this here document.</p>
+                  </dd>
+                  <dt><span class="term">Katzenpost</span></dt>
+                  <dd>
+                     <p>A project to design many improved decryption mixnet protocols.</p>
+                  </dd>
+                  <dt><span class="term">classes of traffic</span></dt>
+                  <dd>
+                     <p>We distinguish the following classes of traffic:</p>
+                     <div class="itemizedlist">
+                        <ul class="itemizedlist" style="list-style-type: disc; ">
+                           <li class="listitem">
+                              <p> SURB Replies (also sometimes referred to as ACKs) </p>
+                           </li>
+                           <li class="listitem">
+                              <p> Forward messages </p>
+                           </li>
+                        </ul>
+                     </div>
+                  </dd>
+                  <dt><span class="term">packet</span></dt>
+                  <dd>
+                     <p>A Sphinx packet, of fixed
+                        length for each class of traffic, carrying a message payload and metadata for routing.
+                        
+                        Packets are routed anonymously through the mixnet and cryptographically transformed
+                        at 
+                        each hop.</p>
+                  </dd>
+                  <dt><span class="term">payload</span></dt>
+                  <dd>
+                     <p>The fixed-length portion of a packet containing an encrypted message or
+                        part of a message, to be delivered anonymously.</p>
+                  </dd>
+                  <dt><span class="term">message</span></dt>
+                  <dd>
+                     <p>A variable-length sequence of octets sent anonymously through the network.
+                        Short messages are sent in a single packet; long messages are fragmented
+                        across multiple packets.</p>
+                  </dd>
+                  <dt><span class="term">MSL</span></dt>
+                  <dd>
+                     <p>Maximum segment lifetime, currently set to 120 seconds.</p>
+                  </dd>
+               </dl>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="mixnet_introduction"></a>1. Introduction</h2>
+                  </div>
+               </div>
+            </div>
+            <p> This specification provides the design of a mix network meant provide an anonymous
+               messaging protocol between clients and public mixnet services. </p>
+            <p> Various system components such as client software, end to end messaging protocols,
+               Sphinx cryptographic packet format and wire protocol are described in their own
+               specification documents. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="conventions-used-in-this-document"></a>1.2 Conventions Used in This
+                           Document</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>,
+                  <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>,
+                  <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>,
+                  <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be
+                  interpreted as described in <a class="link" href="#RFC2119">RFC2119</a></p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="system-overview"></a>2. System Overview</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The presented system design is based on <a class="link" href="#LOOPIX">LOOPIX</a> Below,
+               we present the system overview. </p>
+            <p> The entry mixes are responsible for authenticating clients, accepting packets from
+               the client, and forwarding them to the mix network, which then relays packets to the
+               destination service mix. Our network design uses a strict topology where forward message
+               traverse the network from entry mix to service mix. Service mixes can optionally reply
+               if the forward message contained a Single Use Reply Block (see <a class="link" href="#SPHINXSPEC">SPHINXSPEC</a>. </p>
+            <p> The PKI system that handles the distribution of various network wide parameters,
+               and
+               information required for each participant to participate in the network such as IP
+               address/port combinations that each node can be reached at, and cryptographic public
+               keys. The specification for the PKI is beyond the scope of this document and is instead
+               covered in <a class="link" href="#KATZMIXPKI">KATZMIXPKI</a>. </p>
+            <p> The mix network provides neither reliable nor in-order delivery semantics. The
+               described mix network is neither a user facing messaging system nor is it an
+               application. It is intended to be a low level protocol which can be composed to form
+               more elaborate mixnet protocols with stronger more useful privacy notions. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="threat-model"></a>2.1 Threat Model</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Here we cannot present the threat model to the higher level mixnet protocols.
+                  However this low level core mixnet protocol does have it&#x2019;s own threat model which
+                  we
+                  attempt to illucidate here. </p>
+               <p> We assume that the clients only talk to mixnet services. These services make use
+                  of a client provided delivery token known as a SURB (Single Use Reply Block) to send
+                  their replies to the client without knowing the client&#x2019;s entry mix. This system
+                  guarantees third-party anonymity, meaning that no parties other than client and the
+                  service are able to learn that the client and service are communicating. Note that
+                  this is in contrast with other designs, such as Mixminion, which provide sender
+                  anonymity towards recipients as well as anonymous replies. </p>
+               <p> Mixnet clients will randomly select an entry node to use and may reconnect if
+                  disconnected for under a duration threshold. The entry mix can determine the
+                  approximate message volume originating from and destined to a given client. We
+                  consider the entry mix follows the protocol and might be an honest-but-curious
+                  adversary. </p>
+               <p> External local network observers can not determine the number of Packets
+                  traversing their region of the network because of the use of decoy traffic sent by
+                  the clients. Global observers will not be able to de-anonymize packet paths if there
+                  are enough packets traversing the mix network. Longer term statistical disclosure
+                  attacks are likely possible in order to link senders and receivers. </p>
+               <p> A malicious mix only has the ability to remember which input packets correspond
+                  to the output packets. To discover the entire path all of the mixes in the path
+                  would have to be malicious. Moreover, the malicious mixes can drop, inject, modify
+                  or delay the packets for more or less time than specified. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="network-topology"></a>2.2 Network Topology</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The Katzenpost Mix Network uses a layered topology consisting of a fixed number
+                  of layers, each containing a set of mixes. At any given time each Mix MUST only be
+                  assigned to one specific layer. Each Mix in a given layer N is connected to every
+                  other Mix in the previous and next layer, and or every participating Provider in the
+                  case of the mixes in layer 0 or layer N (first and last layer). : </p>
+               <pre class="programlisting">
+Layer 0          Layer 1        Layer 2        Layer 3           Layer 4
++-----------+      +-------+      +-------+      +-------+      +-------------+
++-&gt; | entry mix | -+-&gt; |  Mix  | -+-&gt; |  Mix  | -+-&gt; |  Mix  | -+-&gt; | service mix |
+|   +-----------+  |   +-------+  |   +-------+  |   +-------+  |   +-------------+
+|                  |              |              |              |
+|   +-----------+  |   +-------+  |   +-------+  |   +-------+  |   +-------------+
++-&gt; | entry mix | -+-&gt; |  Mix  | -+-&gt; |  Mix  | -+-&gt; |  Mix  | -+-&gt; | service mix |
+|   +-----------+  |   +-------+  |   +-------+  |   +-------+  |   +-------------+
+|                  |              |              |              |
+|                  |   +-------+  |   +-------+  |   +-------+  |   +-------------+
+|                  +-&gt; |  Mix  | -+-&gt; |  Mix  | -+-&gt; |  Mix  | -+-&gt; | service mix |
+|                      +-------+      +-------+      +-------+  |   +-------------+
+|                                                               |
++---------------------------------------------------------------+
+</pre>
+               <p> Note: Multiple distinct connections are collapsed in the figure for sake of
+                  brevity/clarity. </p>
+               <p> The network topology MUST also maximize the number of security domains traversed
+                  by the packets. This can be achieved by not allowing mixes from the same security
+                  domain to be in different layers. </p>
+               <p> Requirements for the topology: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p> Should allow for non-uniform throughput of each mix (Get bandwidth
+                           weights from the PKI). </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Should maximize distribution among security domains, in this case the mix
+                           descriptor specified family field would indicate the security domain or
+                           entity operating the mix. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Other legal jurisdictional region awareness for increasing the cost of
+                           compulsion attacks. </p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="packet-format-overview"></a>3. Packet Format Overview</h2>
+                  </div>
+               </div>
+            </div>
+            <p> For the packet format of the transported messages we use the Sphinx cryptographic
+               packet format. The detailed description of the packet format, construction, processing
+               and security / anonymity considerations see <a class="link" href="#SPHINXSPEC">SPHINXSPEC</a>, <span class="quote">&#x201c;<span class="quote">The Sphinx Mix Network Cryptographic Packet Format
+                     Specification</span>&#x201d;</span>. </p>
+            <p> As the Sphinx packet format is generic, the Katzenpost Mix Network must provide a
+               concrete instantiation of the format, as well as additional Sphinx per-hop routing
+               information commands. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="sphinx-cryptographic-primitives"></a>3.1 Sphinx Cryptographic
+                           Primitives</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> For the current version of the Katzenpost Mix Network, let the following
+                  cryptographic primitives be used as described in the Sphinx specification. </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">H(M)</code> - As the output of this primitive is only used
+                           locally to a Mix, any suitable primitive may be used. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">MAC(K, M)</code> - HMAC-SHA256 <a class="link" href="#RFC6234">RFC6234</a>, M_KEY_LENGTH of 32 bytes (256 bits), and MAC_LENGTH of
+                           32 bytes (256 bits). </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">KDF(SALT, IKM)</code> - HKDF-SHA256, HKDF-Expand only, with SALT
+                           used as the info parameter. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">S(K, IV)</code> - CTR-AES256 <a class="link" href="#SP80038A">[SP80038A]</a>, S_KEY_LENGTH of 32 bytes (256 bits), and S_IV_LENGTH
+                           of 12 bytes (96 bits), using a 32 bit counter. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">SPRP_Encrypt(K, M)/SPRP_Decrypt(K, M)</code> - AEZv5 <a class="link" href="#AEZV5">AEZV5</a>, SPRP_KEY_LENGTH of 48 bytes (384 bits). As
+                           there is a disconnect between AEZv5 as specified and the Sphinx usage, let
+                           the following be the AEZv5 parameters: </p>
+                        <div class="itemizedlist">
+                           <ul class="itemizedlist compact" style="list-style-type: circle; ">
+                              <li class="listitem">
+                                 <p> nonce - 16 bytes, reusing the per-hop Sphinx header IV. </p>
+                              </li>
+                              <li class="listitem">
+                                 <p> additional_data - Unused. </p>
+                              </li>
+                              <li class="listitem">
+                                 <p> tau - 0 bytes. </p>
+                              </li>
+                           </ul>
+                        </div>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">EXP(X, Y)</code> - X25519 <a class="link" href="#RFC7748">RFC7748</a>
+                           scalar multiply, GROUP_ELEMENT_LENGTH of 32 bytes (256 bits), G is the
+                           X25519 base point. </p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="sphinx-packet-parameters"></a>3.2 Sphinx Packet Parameters</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The following parameters are used as for the Katzenpost Mix Network instantiation
+                  of the Sphinx Packet Format: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">AD_SIZE</code> - 2 bytes. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">SECURITY_PARAMETER</code> - 32 bytes. (except for our SPRP which
+                           we plan to upgrade) </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">PER_HOP_RI_SIZE</code> - (XXX/ya: Addition is hard, let's go
+                           shopping.) </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">NODE_ID_SIZE</code> - 32 bytes, the size of the Ed25519 public
+                           key, used as Node identifiers. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">RECIPIENT_ID_SIZE</code> - 64 bytes, the maximum size of
+                           local-part component in an e-mail address. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">SURB_ID_SIZE</code> - Single Use Reply Block ID size, 16 bytes.
+                           </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">MAX_HOPS</code> - 5, the ingress provider, a set of three mixes,
+                           and the egress provider. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">PAYLOAD_SIZE</code> - (XXX/ya: Subtraction is hard, let's go
+                           shopping.) </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">KDF_INFO</code> - The byte string
+                           <code class="literal">Katzenpost-kdf-v0-hkdf-sha256</code>. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> The Sphinx Packet Header <code class="literal">additional_data</code> field is specified as
+                  follows: </p>
+               <pre class="programlisting">
+struct {
+uint8_t version;  /* 0x00 */
+uint8_t reserved; /* 0x00 */
+} KatzenpostAdditionalData;
+</pre>
+               <p> Double check to ensure that this causes the rest of the packet header to be 4
+                  byte aligned, when wrapped in the wire protocol command and framing. This might need
+                  to have 3 bytes reserved instead. </p>
+               <p> All nodes MUST reject Sphinx Packets that have <code class="literal">additional_data</code>
+                  that is not as specified in the header. </p>
+               <p> Design decision. </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p> We can eliminate a trial decryption step per packet around the epoch
+                           transitions by having a command that rewrites the AD on a per-hop basis and
+                           including an epoch identifier. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> I am uncertain as to if the additional complexity is worth it for a situation
+                  that can happen for a few minutes out of every epoch. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="sphinx-per-hop-routing-information-extensions"></a>3.3 Sphinx Per-hop
+                           Routing Information Extensions</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The following extensions are added to the Sphinx Per-Hop Routing Information
+                  commands. </p>
+               <p> Let the following additional routing commands be defined in the extension
+                  RoutingCommandType range (<code class="literal">0x80</code> - <code class="literal">0xff</code>): </p>
+               <pre class="programlisting">
+enum {
+mix_delay(0x80),
+} KatzenpostCommandType;
+</pre>
+               <p> The mix_delay command structure is as follows: </p>
+               <pre class="programlisting">
+struct {
+uint32_t delay_ms;
+} NodeDelayCommand;
+</pre>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="mix-node-operation"></a>4. Mix Node Operation</h2>
+                  </div>
+               </div>
+            </div>
+            <p> All Mixes behave in the following manner: </p>
+            <div class="itemizedlist">
+               <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p> Accept incoming connections from peers, and open persistent connections to
+                        peers as needed <code class="literal">Section 4.1 &lt;4.1&gt;</code>. </p>
+                  </li>
+                  <li class="listitem">
+                     <p> Periodically interact with the PKI to publish Identity and Sphinx packet
+                        public keys, and to obtain information about the peers it should be
+                        communicating with, along with periodically rotating the Sphinx packet keys for
+                        forward secrecy <code class="literal">Section 4.2 &lt;4.2&gt;</code>. </p>
+                  </li>
+                  <li class="listitem">
+                     <p> Process inbound Sphinx Packets, delay them for the specified time and forward
+                        them to the appropriate Mix and or Provider <code class="literal">Section 4.3
+                           &lt;4.3&gt;</code>. </p>
+                  </li>
+               </ul>
+            </div>
+            <p> All Nodes are identified by their link protocol signing key, for the purpose of the
+               Sphinx packet source routing hop identifier. </p>
+            <p> All Nodes participating in the Mix Network MUST share a common view of time, via
+               NTP
+               or similar time synchronization mechanism. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="link-layer-connection-management"></a>4.1 Link Layer Connection
+                           Management</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> All communication to and from participants in the Katzenpost Mix Network is done
+                  via the Katzenpost Mix Network Wire Protocol <a class="link" href="#KATZMIXWIRE">KATZMIXWIRE</a>. </p>
+               <p> Nodes are responsible for establishing the connection to the next hop, for
+                  example, a mix in layer 0 will accept inbound connections from all Providers listed
+                  in the PKI, and will proactively establish connections to each mix in layer 1. </p>
+               <p> Nodes MAY accept inbound connections from unknown Nodes, but MUST not relay any
+                  traffic until they became known via listing in the PKI document, and MUST terminate
+                  the connection immediately if authentication fails for any other reason. </p>
+               <p> Nodes MUST impose an exponential backoff when reconnecting if a link layer
+                  connection gets terminated, and the minimum retry interval MUST be no shorter than
+                  5
+                  seconds. </p>
+               <p> Nodes MAY rate limit inbound connections as required to keep load and or resource
+                  use at a manageable level, but MUST be prepared to handle at least one persistent
+                  long lived connection per potentially eligible peer at all times. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="sphinx-mix-and-provider-key-rotation"></a>4.2 Sphinx Mix and Provider
+                           Key Rotation</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Each Node MUST rotate the key pair used for Sphinx packet processing periodically
+                  for forward secrecy reasons and to keep the list of seen packet tags short. The
+                  Katzenpost Mix Network uses a fixed interval (<code class="literal">epoch</code>), so that key
+                  rotations happen simultaneously throughout the network, at predictable times. </p>
+               <p> Let each epoch be exactly <code class="literal">10800 seconds (3 hours)</code> in duration,
+                  and the 0th Epoch begin at <code class="literal">2017-06-01 00:00 UTC</code>. For more details
+                  see our <span class="quote">&#x201c;<span class="quote">Katzenpost Mix Network Public Key Infrastructure
+                        Specification</span>&#x201d;</span> document. <a class="link" href="#KATZMIXPKI">KATZMIXPKI</a></p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="sphinx-packet-processing"></a>4.3 Sphinx Packet Processing</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The detailed processing of the Sphinx packet is described in the Sphinx
+                  specification: <span class="quote">&#x201c;<span class="quote">The Sphinx Mix Network Cryptographic Packet Format
+                        Specification</span>&#x201d;</span>. Below, we present an overview of the steps which the node
+                  is performing upon receiving the packet: </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem">
+                        <p> Records the time of reception. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Perform a <code class="literal">Sphinx_Unwrap</code> operation to authenticate and
+                           decrypt a packet, discarding it immediately if the operation fails. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Apply replay detection to the packet, discarding replayed packets
+                           immediately. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Act on the routing commands. </p>
+                     </li>
+                  </ol>
+               </div>
+               <p> All packets processed by Mixes MUST contain the following commands. </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">NextNodeHopCommand</code>, specifying the next Mix or Provider
+                           that the packet will be forwarded to. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">NodeDelayCommand</code>, specifying the delay in milliseconds to
+                           be applied to the packet, prior to forwarding it to the Node specified by
+                           the NextNodeHopCommand, as measured from the time of reception. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> Mixes MUST discard packets that have any commands other than a
+                  <code class="literal">NextNodeHopCommand</code> or a <code class="literal">NodeDelayCommand</code>.
+                  Note that this does not apply to Providers or Clients, which have additional
+                  commands related to recipient and <code class="literal">SURB (Single Use Reply Block)</code>
+                  processing. </p>
+               <p> Nodes MUST continue to accept the previous epoch&#x2019;s key for up to 1MSL past the
+                  epoch transition, to tolerate latency and clock skew, and MUST start accepting the
+                  next epoch&#x2019;s key 1MSL prior to the epoch transition where it becomes the current
+                  active key. </p>
+               <p> Upon the final expiration of a key (1MSL past the epoch transition), Nodes MUST
+                  securely destroy the private component of the expired Sphinx packet processing key
+                  along with the backing store used to maintain replay information associated with the
+                  expired key. </p>
+               <p> Nodes MAY discard packets at any time, for example to keep congestion and or load
+                  at a manageable level, however assuming the <code class="literal">Sphinx_Unwrap</code>
+                  operation was successful, the packet MUST be fed into the replay detection
+                  mechanism. </p>
+               <p> Nodes MUST ensure that the time a packet is forwarded to the next Node is around
+                  the time of reception plus the delay specified in
+                  <code class="literal">NodeDelayCommand</code>. Since exact millisecond processing is
+                  unpractical, implementations MAY tolerate a small window around that time for
+                  packets to be forwarded. That tolerance window SHOULD be kept minimal. </p>
+               <p> Nodes MUST discard packets that have been delayed for significantly more time
+                  than specified by the <code class="literal">NodeDelayCommand</code>. </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="anonymity-considerations"></a>5. Anonymity Considerations</h2>
+                  </div>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="topology"></a>5.1 Topology</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Layered topology is used because it offers the best level of anonymity and ease
+                  of analysis, while being flexible enough to scale up traffic. Whereas most mixnet
+                  papers discuss their security properties in the context of a cascade topology, which
+                  does not scale well, or a free-route network, which quickly becomes intractable to
+                  analyze when the network grows, while providing slightly worse anonymity than a
+                  layered topology. <a class="link" href="#MIXTOPO10">MIXTOPO10</a></p>
+               <p> Important considerations when assigning mixes to layers, in order of decreasing
+                  importance, are: </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem">
+                        <p> Security: do not allow mixes from one security domain to be in different
+                           layers to maximise the number of security domains traversed by a packet
+                           </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Performance: arrange mixes in layers to maximise the capacity of the
+                           layer with the lowest capacity (the bottleneck layer) </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Security: arrange mixes in layers to maximise the number of jurisdictions
+                           traversed by a packet (this is harder to do really well than it seems,
+                           requires understanding of legal agreements such as MLATs). </p>
+                     </li>
+                  </ol>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="mixing-strategy"></a>5.2 Mixing strategy</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> As a mixing technique the Poisson mix strategy <a class="link" href="#LOOPIX">LOOPIX</a> and <a class="link" href="#KESDOGAN98">KESDOGAN98</a> is used, which
+                  REQUIRES that a packet at each hop in the route is delayed by some amount of time,
+                  randomly selected by the sender from an exponential distribution. This strategy
+                  allows to prevent the timing correlation of the incoming and outgoing traffic from
+                  each node. Additionally, the parameters of the distribution used for generating the
+                  delay can be tuned up and down depending on the amount of traffic in the network and
+                  the application for which the system is deployed. </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="security-considerations"></a>6. Security Considerations</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The source of all authority in the mixnet system comes from the Directory Authority
+               system which is also known as the mixnet PKI. This system gives the mixes and clients
+               a
+               consistent view of the network while allowing human intervention when needed. All
+               public
+               mix key material and network connection information is distributed by this Directory
+               Authority system. </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="appendix-a.-references"></a>Appendix A. References</h2>
+                  </div>
+               </div>
+            </div>
+            <p><a name="AEZV5"></a><span class="bold"><strong>AEZV5</strong></span></p>
+            <p>Hoang, V., Krovetz, T., Rogaway, P., <span class="quote">&#x201c;<span class="quote">AEZ v5: Authenticated Encryption by Enciphering</span>&#x201d;</span>, March 2017, 
+               <a class="link" href="http://web.cs.ucdavis.edu/~rogaway/aez/aez.pdf" target="_top">http://web.cs.ucdavis.edu/~rogaway/aez/aez.pdf</a></p>
+            <p><a name="KATZMIXE2E"></a><span class="bold"><strong>KATZMIXE2E</strong></span></p>
+            <p>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Katzenpost Mix Network End-to-end Protocol Specification</span>&#x201d;</span>, July 2017, <a class="link" href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/old/end_to_end.md" target="_top">https://github.com/katzenpost/katzenpost/blob/main/docs/specs/old/end_to_end.md</a></p>
+            <p><a name="KATZMIXPKI"></a><span class="bold"><strong>KATZMIXPKI</strong></span></p>
+            <p>Angel, Y., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Katzenpost Mix Network Public Key Infrastructure Specification</span>&#x201d;</span>, December 2017, <a class="link" href="ttps://github.com/katzenpost/katzenpost/blob/main/docs/specs/pki.md" target="_top">ttps://github.com/katzenpost/katzenpost/blob/main/docs/specs/pki.md</a></p>
+            <p><a name="KATZMIXWIRE"></a><span class="bold"><strong>KATZMIXWIRE</strong></span></p>
+            <p>Angel, Y., <span class="quote">&#x201c;<span class="quote">Katzenpost Mix Network Wire Protocol Specification</span>&#x201d;</span>, June 2017, 
+               <a class="link" href="https://github.com/katzenpost/katzenpost/blob/master/docs/specs/wire-protocol.md" target="_top">https://github.com/katzenpost/katzenpost/blob/master/docs/specs/wire-protocol.md</a></p>
+            <p><a name="KESDOGAN98"></a><span class="bold"><strong>KESDOGAN98</strong></span></p>
+            <p>Kesdogan, D., Egner, J., and Büschkes, R., <span class="quote">&#x201c;<span class="quote">Stop-and-Go-MIXes Providing Probabilistic Anonymity in an Open System</span>&#x201d;</span>, Information Hiding, 1998, 
+               <a class="link" href="https://www.freehaven.net/anonbib/cache/stop-and-go.pdf" target="_top">https://www.freehaven.net/anonbib/cache/stop-and-go.pdf</a></p>
+            <p><a name="LOOPIX"></a><span class="bold"><strong>LOOPIX</strong></span></p>
+            <p>Piotrowska, A., Hayes, J., Elahi, T., Meiser, S., Danezis, G., <span class="quote">&#x201c;<span class="quote">The Loopix Anonymity System</span>&#x201d;</span>USENIX, August 2017, 
+               <a class="link" href="https://arxiv.org/pdf/1703.00536.pdf" target="_top">https://arxiv.org/pdf/1703.00536.pdf</a></p>
+            <p><a name="MIXTOPO10"></a><span class="bold"><strong>MIXTOPO10</strong></span></p>
+            <p>Diaz, C., Murdoch, S., Troncoso, C., <span class="quote">&#x201c;<span class="quote">Impact of Network Topology on
+                     Anonymity and Overhead in Low-Latency Anonymity Networks</span>&#x201d;</span>, PETS, July
+               2010, <a class="link" href="https://www.esat.kuleuven.be/cosic/publications/article-1230.pdf" target="_top">https://www.esat.kuleuven.be/cosic/publications/article-1230.pdf</a></p>
+            <p><a name="RFC2119"></a><span class="bold"><strong>RFC2119</strong></span></p>
+            <p>Bradner, S., <span class="quote">&#x201c;<span class="quote">Key words for use in RFCs to Indicate Requirement
+                     Levels</span>&#x201d;</span>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a class="link" href="http://www.rfc-editor.org/info/rfc2119" target="_top">http://www.rfc-editor.org/info/rfc2119</a></p>
+            <p><a name="RFC5246"></a><span class="bold"><strong>RFC5246</strong></span></p>
+            <p>Dierks, T. and E. Rescorla, <span class="quote">&#x201c;<span class="quote">The Transport Layer Security (TLS) Protocol
+                     Version 1.2</span>&#x201d;</span>, RFC 5246, DOI 10.17487/RFC5246, August 2008, <a class="link" href="http://www.rfc-editor.org/info/rfc5246" target="_top">http://www.rfc-editor.org/info/rfc5246</a></p>
+            <p><a name="RFC6234"></a><span class="bold"><strong>RFC6234</strong></span></p>
+            <p>Eastlake 3rd, D. and T. Hansen, <span class="quote">&#x201c;<span class="quote">US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF)</span>&#x201d;</span>, RFC 6234, DOI 10.17487/RFC6234, May 2011, 
+               <a class="link" href="https://www.rfc-editor.org/info/rfc6234" target="_top">https://www.rfc-editor.org/info/rfc6234</a></p>
+            <p><a name="RFC7748"></a><span class="bold"><strong>RFC7748</strong></span></p>
+            <p>Langley, A., Hamburg, M., and S. Turner, <span class="quote">&#x201c;<span class="quote">Elliptic Curves for Security</span>&#x201d;</span>, RFC 7748, January 2016, 
+               <a class="link" href="https://www.rfc-editor.org/info/rfc7748" target="_top">https://www.rfc-editor.org/info/rfc7748</a></p>
+            <p><a name="SP80038A"></a><span class="bold"><strong>SP80038A</strong></span></p>
+            <p>Dworkin, M., <span class="quote">&#x201c;<span class="quote">Recommendation for Block Cipher Modes of Operation</span>&#x201d;</span>, SP800-38A, 10.6028/NIST.SP.800, December 2001, 
+               <a class="link" href="https://doi.org/10.6028/NIST.SP.800-38A" target="_top">https://doi.org/10.6028/NIST.SP.800-38A</a></p>
+            <p><a name="SPHINXSPEC"></a><span class="bold"><strong>SPHINXSPEC</strong></span></p>
+            <p>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Sphinx Mix Network Cryptographic Packet Format Specification</span>&#x201d;</span>, July 2017, 
+               <a class="link" href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/sphinx.md" target="_top">https://github.com/katzenpost/katzenpost/blob/main/docs/specs/sphinx.md</a></p>
+         </div>
+      </div>
+   </body>
+</html>
