@@ -8,7 +8,7 @@
 <?slug "" ?>
 <?layout "" ?>
 <?type "" ?>
-<?weight 30 ?>
+<?weight 25?>
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
@@ -83,7 +83,6 @@
         &msl;            
         </variablelist>
     </section>
-    <section/>
     <section>
         <title>Conventions Used in This Document</title>
         <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,

@@ -3,12 +3,12 @@ title:
 linkTitle: "Sphinx packet replay detection" 
 description: "" 
 url: "docs/specs/replay.html" 
-date: "2025-01-03T12:30:50.091905533-08:00"
+date: "2025-01-03T14:41:37.088417235-08:00"
 draft: false 
 slug: "" 
 layout: "" 
 type: "" 
-weight: 1 
+weight: 40 
 ---
 <!DOCTYPE HTML>
 <html xmlns:ng="http://docbook.org/docbook-ng">
@@ -47,12 +47,8 @@ weight: 1
             <p><b>Table of Contents</b></p>
             <dl class="toc">
                <dt><span class="section"><a href="#terminology">Terminology</a></span></dt>
+               <dt><span class="section"><a href="#d58e74">Conventions Used in This Document</a></span></dt>
                <dt><span class="section"><a href="#sphinx_replay_detection_introduction">1. Introduction</a></span></dt>
-               <dd>
-                  <dl>
-                     <dt><span class="section"><a href="#conventions-used-in-this-document">1.2 Conventions Used in This Document</a></span></dt>
-                  </dl>
-               </dd>
                <dt><span class="section"><a href="#sphinx-cryptographic-primitives">2. Sphinx Cryptographic Primitives</a></span></dt>
                <dd>
                   <dl>
@@ -79,7 +75,7 @@ weight: 1
                      <dt><span class="section"><a href="#pki-updates">5.1 PKI Updates</a></span></dt>
                   </dl>
                </dd>
-               <dt><span class="section"><a href="#appendix-a.-references">Appendix A. References</a></span></dt>
+               <dt><span class="section"><a href="#appendix-a.-references">References</a></span></dt>
             </dl>
          </div>
          <div class="section">
@@ -152,6 +148,19 @@ weight: 1
             <div class="titlepage">
                <div>
                   <div>
+                     <h2 class="title" style="clear: both"><a name="d58e74"></a>Conventions Used in This Document</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>,
+               <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD
+                     NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and
+               <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be interpreted as described in <a class="link" href="#RFC2119">RFC2119</a>. </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
                      <h2 class="title" style="clear: both"><a name="sphinx_replay_detection_introduction"></a>1. Introduction</h2>
                   </div>
                </div>
@@ -162,20 +171,6 @@ weight: 1
                neither described in <a class="link" href="#SPHINX09">SPHINX09</a> nor is it described in our
                <a class="link" href="#SPHINXSPEC">SPHINXSPEC</a>. Therefore we shall describe in detail
                how to efficiently detect Sphinx packet replay attacks. </p>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h3 class="title"><a name="conventions-used-in-this-document"></a>1.2 Conventions Used in This Document</h3>
-                     </div>
-                  </div>
-               </div>
-               <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>,
-                  <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>,
-                  <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>,
-                  <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be
-                  interpreted as described in <a class="link" href="#RFC2119">RFC2119</a>. </p>
-            </div>
          </div>
          <div class="section">
             <div class="titlepage">
@@ -473,7 +468,7 @@ replay_tag = H( shared_secret )
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="appendix-a.-references"></a>Appendix A. References</h2>
+                     <h2 class="title" style="clear: both"><a name="appendix-a.-references"></a>References</h2>
                   </div>
                </div>
             </div>
