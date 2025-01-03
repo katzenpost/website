@@ -1,32 +1,48 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE article>
-<article
-  xmlns="http://docbook.org/ns/docbook" version="5.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" >
-  <info>
-    <title>LIONESS Wide-Block-Cipher</title>
-    <authorgroup>
-      <author>
-        <personname>
-          <firstname>Yawning</firstname>
-          <surname>Angel</surname>
-        </personname>
-      </author>
-    </authorgroup>
-  </info>
-  <para>
-    <emphasis role="strong">Abstract</emphasis>
-  </para>
-  <para>
-    This document defines the LIONESS Wide-Block-Cipher construct, and
-    provides a concrete parameterization based around the BLAKE2b hash
-    algorithm and ChaCha20 stream cipher.
-  </para>
-  <para>
-    This document does not introduce any new crypto, but is meant to
-    serve as a stable reference and implementation guide.
-  </para>
-  <section xml:id="lioness_introduction">
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?>
+<?linkTitle "LIONESS wide-block cipher" ?>  <!-- Section menu link text -->
+<?url "docs/specs/lioness.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 1 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+    %shared-content;
+]>
+
+<article xmlns="http://docbook.org/ns/docbook" 
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.1" 
+    xml:id="lioness">
+    <info>
+        <title xml:id="lioness.title">LIONESS wide-block cipher</title>  
+        <authorgroup>
+          <author>
+            <personname>
+              <firstname>Yawning</firstname>
+              <surname>Angel</surname>
+            </personname>
+          </author>
+        </authorgroup>
+        <abstract>
+            <para>This document defines the LIONESS Wide-Block-Cipher construct, and
+                provides a concrete parameterization based around the BLAKE2b hash
+                algorithm and ChaCha20 stream cipher.</para>
+            <para>This document does not introduce any new crypto, but is meant to
+                serve as a stable reference and implementation guide.</para> 
+        </abstract>
+    </info>
+    
+    <section xml:id="lioness_introduction">
     <title xml:id="lioness_introduction.title">1. Introduction</title>
     <para>
       LIONESS is a provably secure wide-block-cipher proposed by
@@ -325,7 +341,7 @@ plaintext = L | R
     </para>
     <section xml:id="appendix-a.-references">
       <title>Appendix A. References</title>
-      <section xml:id="appendix-a.1-normative-references">
+<!--      <section xml:id="appendix-a.1-normative-references">
         <title>Appendix A.1 Normative References</title>
         <para>
         </para>
@@ -357,56 +373,14 @@ author = {Yawning Angel},
 url = {https://github.com/katzenpost/katzenpost/blob/main/docs/specs/lioness.md},
 year = {2017}
 }
-</programlisting>
-        <para>
-          <emphasis role="strong">AB96</emphasis>
-        </para>
-        <programlisting>
-Anderson, R., Biham, E.,
-&quot;Two Practical and Provably Secure Block Ciphers: BEAR and LION&quot;,
-1996
-</programlisting>
-        <para>
-          <emphasis role="strong">MPRA11</emphasis>
-        </para>
-        <programlisting>
-Maines, L., Piva, M., Rimoldi, A., Sala, M.,
-&quot;On the provable security of BEAR and LION schemes&quot;,
-arXiv:1105.0259,
-May 2011,
-https://arxiv.org/abs/1105.0259
-</programlisting>
-        <para>
-          <emphasis role="strong">RFC2119</emphasis>
-        </para>
-        <programlisting>
-Bradner, S.,
-&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;,
-BCP 14, RFC 2119, DOI 10.17487/RFC2119,
-March 1997,
-http://www.rfc-editor.org/info/rfc2119
-</programlisting>
-        <para>
-          <emphasis role="strong">RFC7539</emphasis>
-        </para>
-        <programlisting>
-Nir, Y. and A. Langley,
-&quot;ChaCha20 and Poly1305 for IETF Protocols&quot;,
-RFC 7539, DOI 10.17487/RFC7539,
-May 2015,
-http://www.rfc-editor.org/info/rfc7539
-</programlisting>
-        <para>
-          <emphasis role="strong">RFC7693</emphasis>
-        </para>
-        <programlisting>
-Saarinen, M-J., Ed., and J-P. Aumasson,
-&quot;The BLAKE2 Cryptographic Hash and Message Authentication Code (MAC)&quot;,
-RFC 7693, DOI 10.17487/RFC7693,
-November 2015,
-http://www.rfc-editor.org/info/rfc7693
-</programlisting>
-      </section>
+</programlisting>-->
+        
+        &AB96;
+        &MPRA11;
+        &RFC2119;
+        &RFC7539;
+        &RFC7693;
+ 
     </section>
   </section>
 </article>

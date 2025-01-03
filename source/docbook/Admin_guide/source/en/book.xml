@@ -11,10 +11,8 @@ pandoc -f docbook out.xml -\-toc -\-toc-depth=5 -\-pdf-engine lualatex -o admin_
 
 -->
 
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
-   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
-[
-   <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
+<!DOCTYPE book [
+   <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
     %shared-content;
     <!ELEMENT xi:include (xi:fallback?) > 
     <!ATTLIST xi:include 

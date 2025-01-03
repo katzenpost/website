@@ -1,11 +1,32 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE article>
-<article
-  xmlns="http://docbook.org/ns/docbook" version="5.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" >
-  <info>
-    <title>KEMSphinx</title>
-    <authorgroup>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?>
+<?linkTitle "KEMSphinx" ?>  <!-- Section menu link text -->
+<?url "docs/specs/kemsphinx.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 1 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+    %shared-content;
+]>
+
+<article xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.1"
+    xml:id="kemsphinx">
+    
+    <info>
+        <title xml:id="kemsphinx.title">KEMSphinx</title>  
+            <authorgroup>
       <author>
         <personname>
           <firstname>David</firstname>
@@ -13,22 +34,23 @@
         </personname>
       </author>
     </authorgroup>
-  </info>
-  <para>
-    <emphasis role="strong">Abstract</emphasis>
-  </para>
-  <para>
+        
+        <abstract>
+             <para>
     Here I present a modification of the Sphinx cryptographic packet
     format that uses a KEM instead of a NIKE whilst preserving the
     properties of bitwise unlinkability, constant packet size and route
     length hiding.
-  </para>
+  </para> 
+        </abstract>
+    </info>
+    
   <section xml:id="kemsphinx_introduction">
     <title xml:id="kemsphinx_introduction.title">1. Introduction</title>
     <para>
       We’ll express our KEM Sphinx header in pseudo code. The Sphinx
       body will be exactly the same as
-      <xref linkend="SPHINXSPEC" endterm="SPHINXSPEC.title" /> Our basic KEM API
+      <xref linkend="SPHINXSPEC" /> Our basic KEM API
       has three functions:
     </para>
     <itemizedlist spacing="compact">
@@ -117,7 +139,7 @@ func DECAPSULATE(my_privkey, their_pubkey) []byte {
     <section xml:id="kem-combiner">
       <title>2.2 KEM Combiner</title>
       <para>
-        The KEM Combiners paper <link linkend="KEMCOMB" endterm="KEMCOMB.title" />
+        The KEM Combiners paper <link linkend="KEMCOMB" />
         makes the observation that if a KEM combiner is not security
         preserving then the resulting hybrid KEM will not have IND-CCA2
         security if one of the composing KEMs does not have IND-CCA2
@@ -258,7 +280,7 @@ for i := 0; i &lt; num_hops; i++ {
       </listitem>
     </orderedlist>
     <para>
-      Same as in <xref linkend="SPHINXSPEC" endterm="SPHINXSPEC.title"/> except for
+      Same as in <xref linkend="SPHINXSPEC" /> except for
       the fact that each routing info slot is now increased by the size
       of the KEM ciphertext.
     </para>
@@ -327,28 +349,9 @@ sphinx_header.mac = mac
     <section xml:id="appendix-a.-references">
       <title>Appendix A. References</title>
      
-      <formalpara xml:id="KEMCOMB">
-        <title xml:id="KEMCOMB.title">KEMCOMB</title>
-        <para>Federico Giacon, Felix Heuer, Bertram Poettering, &quot;KEM Combiners&quot;, 2018.
-            <link xlink:href="https://link.springer.com/chapter/10.1007/978-3-319-76578-5_7"
-            >https://link.springer.com/chapter/10.1007/978-3-319-76578-5_7</link></para>
-      </formalpara>
-      
-      <formalpara xml:id="SPHINX09">
-        <title xml:id="SPHINX09.title">SPHINX09</title>
-        <para>Danezis, G., Goldberg, I., &quot;Sphinx: A Compact and Provably Secure Mix
-          Format\&quot;, DOI 10.1109/SP.2009.15, May 2009. <link
-            xlink:href="https://cypherpunks.ca/%7Eiang/pubs/Sphinx_Oakland09.pdf"
-            >https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</link></para>
-      </formalpara>
-      
-      <formalpara xml:id="SPHINXSPEC">
-        <title xml:id="SPHINXSPEC.title">SPHINXSPEC</title>
-        <para>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., &quot;Sphinx Mix
-          Network Cryptographic Packet Format Specification&quot; July 2017. <link
-            xlink:href="https://katzenpost.network/docs/specs/sphinx/"
-            >https://katzenpost.network/docs/specs/sphinx/</link></para>
-      </formalpara>
+     &KEMCOMB;
+     &SPHINX09;
+     &SPHINXSPEC;
  
     </section>
   </section>

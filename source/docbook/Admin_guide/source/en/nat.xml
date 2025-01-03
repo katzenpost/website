@@ -15,7 +15,7 @@
 <?weight 40 ?> <!-- Optional -->
 
 <!DOCTYPE article [
-    <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
     %shared-content;
 ]>
 

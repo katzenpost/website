@@ -1,11 +1,32 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE article>
-<article
-  xmlns="http://docbook.org/ns/docbook" version="5.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" >
-  <info>
-    <title>Propagation of Mix Decoy Loop Statistics</title>
-    <authorgroup>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?>
+<?linkTitle "Introduction" ?>  <!-- Section menu link text -->
+<?url "docs/admin_guide/introduction.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 1 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+    %shared-content;
+]>
+
+<article xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" 
+    version="5.1" 
+    xml:id="introduction">
+    
+    <info>
+        <title xml:id="introduction.title">Introducing &program_name;, a modern mixnet</title>
+            <authorgroup>
       <author>
         <personname>
           <firstname>David</firstname>
@@ -25,11 +46,9 @@
         </personname>
       </author>
     </authorgroup>
-  </info>
-  <para>
-    <emphasis role="strong">Abstract</emphasis>
-  </para>
-  <para>
+        
+        <abstract>
+              <para>
     In the context of continuous time mixing stategies such as the
     memoryless mix used by Katzenpost, n-1 attacks may use strategic
     packetloss. Nodes can also fail for benign reasons. Determining
@@ -40,6 +59,9 @@
     nodes to mix network directory authorities which tells them about
     the packetloss they are observing.
   </para>
+        </abstract>
+    </info>
+
   <section xml:id="design-overview">
     <title>1. Design Overview</title>
     <para>

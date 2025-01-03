@@ -1,11 +1,32 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE article>
-<article
-  xmlns="http://docbook.org/ns/docbook" version="5.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" >
-  <info>
-    <title>Wire Protocol</title>
-    <authorgroup>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?>
+<?linkTitle "Wire Protocol" ?>  <!-- Section menu link text -->
+<?url "docs/specs/wire_protocol.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 1 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+    %shared-content;
+]>
+
+<article xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" 
+    version="5.1" 
+    xml:id="wire_protocol">
+    
+    <info>        
+        <title xml:id="wire_protocol.title">&program_name; mix network wire protocol</title>  
+        <authorgroup>
       <author>
         <personname>
           <firstname>Yawning</firstname>
@@ -18,16 +39,16 @@
           <surname>Stainton</surname>
         </personname>
       </author>
-    </authorgroup>
-  </info>
-  <para>
-    <emphasis role="strong">Abstract</emphasis>
-  </para>
-  <para>
+    </authorgroup>        
+        <abstract>
+            <para>
     This document defines the Katzenpost Mix Network Wire Protocol for
     use in all network communications to, from, and within the
     Katzenpost Mix Network.
   </para>
+        </abstract>    
+    </info>
+    
   <section xml:id="wire_protocol_introduction">
     <title xml:id="wire_protocol_introduction.title">1. Introduction</title>
     <para>
@@ -45,11 +66,11 @@
         NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD NOT</quote>,
         <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
         <quote>OPTIONAL</quote> in this document are to be interpreted
-        as described in <xref linkend="RFC2119" endterm="RFC2119.title" />.
+        as described in <xref linkend="RFC2119" />.
       </para>
       <para>
         The <quote>C</quote> style Presentation Language as described in
-        <xref linkend="RFC5246" endterm="RFC5246.title" /> Section 4 is used to
+        <xref linkend="RFC5246" /> Section 4 is used to
         represent data structures, except for cryptographic attributes,
         which are specified as opaque byte vectors.
       </para>
@@ -62,7 +83,7 @@
       <para>
         This protocol uses ANY Key Encapsulation Mechanism. However it’s
         recommended that most users select a hybrid post quantum KEM
-        such as Xwing. <xref linkend="XWING" endterm="XWING.title" />
+        such as Xwing. <xref linkend="XWING" />
       </para>
     </section>
   </section>
@@ -70,7 +91,7 @@
     <title>2. Core Protocol</title>
     <para>
       The protocol is based on Kyber and Trevor Perrin’s Noise Protocol
-      Framework <xref linkend="NOISE" endterm="NOISE.title"/> along with
+      Framework <xref linkend="NOISE"/> along with
       <quote>Post Quantum Noise</quote> paper
       <link linkend="PQNOISE">PQNOISE</link>. Older previous versions of
       our transport were based on
@@ -245,8 +266,7 @@ struct {
       <para>
         A KMNWP message is defined to be the following structure:
       </para>
-      <programlisting>
-enum {
+      <programlisting>enum {
     no_op(0),
     disconnect(1),
     send_packet(2),
@@ -260,8 +280,7 @@ struct {
     uint32_t msg_length; /* 0 &lt;= msg_length &lt;= 1048554) */
     opaque message[msg_length];
     opaque padding[];    /* length is implicit */
-} Message;
-</programlisting>
+} Message;</programlisting>
       <para>
         Notes:
       </para>
@@ -278,15 +297,13 @@ struct {
         pair of Noise Transport messages, each containing one of the
         following structures:
       </para>
-      <programlisting>
-struct {
+      <programlisting>struct {
     uint32_t message_length;
 } CiphertextHeader;
 
 struct {
     uint32_t message[ciphertext_length-16];
-} Ciphertext;
-</programlisting>
+} Ciphertext;</programlisting>
       <para>
         Notes:
       </para>
@@ -463,7 +480,7 @@ struct {
   </section>
   <section xml:id="appendix-a.-references">
     <title>Appendix A. References</title>
-    <section xml:id="appendix-a.1-normative-references">
+<!--    <section xml:id="appendix-a.1-normative-references">
       <title>Appendix A.1 Normative References</title>
       <para>
       </para>
@@ -490,63 +507,15 @@ author = {Yawning Angel},
 url = {https://github.com/katzenpost/katzenpost/blob/master/docs/specs/wire-protocol.rst},
 year = {2017}
 }
-</programlisting>
+</programlisting>-->
       
-      <formalpara xml:id="XWING">
-        <title xml:id="XWING.title">XWING</title>
-        <para>Manuel Barbosa, Deirdre Connolly, João Diogo Duarte, Aaron Kaiser, Peter Schwabe,
-          Karoline Varner, Bas Westerbaan, <quote>X-Wing: The Hybrid KEM You’ve Been Looking
-            For</quote>. <link xlink:href="https://eprint.iacr.org/2024/039.pdf"
-            >https://eprint.iacr.org/2024/039.pdf</link></para>
-      </formalpara>
-
-      <formalpara xml:id="NOISE">
-        <title xml:id="NOISE.title">NOISE</title>
-        <para>Perrin, T., <quote>The Noise Protocol Framework</quote>, May 2017. <link
-            xlink:href="https://noiseprotocol.org/noise.pdf"
-            >https://noiseprotocol.org/noise.pdf</link></para>
-      </formalpara>
+      &XWING;
+      &NOISE;
+      &NOISEHFS;
+      &PQNOISE;
+      &RFC2119;
+      &RFC5246;
+      &RFC7748;
       
-      <formalpara xml:id="NOISEHFS">
-        <title xml:id="NOISEHFS.title">NOISEHFS</title>
-        <para>Weatherley, R., <quote>Noise Extension: Hybrid Forward Secrecy</quote>. <link
-            xlink:href="https://github.com/noiseprotocol/noise_hfs_spec/blob/master/output/noise_hfs.pdf"
-            >https://github.com/noiseprotocol/noise_hfs_spec/blob/master/output/noise_hfs.pdf</link></para>
-      </formalpara>
-      
-      <formalpara xml:id="PQNOISE">
-        <title xml:id="PQNOISE.title">PQNOISE</title>
-        <para>Yawning Angel, Benjamin Dowling, Andreas Hülsing, Peter Schwabe and Florian Weber,
-            <quote>Post Quantum Noise</quote>, September 2023. <link
-            xlink:href="https://eprint.iacr.org/2022/539.pdf"
-            >https://eprint.iacr.org/2022/539.pdf</link></para>
-      </formalpara>
-      
-      <formalpara xml:id="RFC2119">
-        <title xml:id="RFC2119.title">RFC2119</title>
-        <para>Bradner, S., <quote>Key words for use in RFCs to Indicate Requirement Levels</quote>,
-          BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997. <link
-            xlink:href="https://www.rfc-editor.org/info/rfc2119"
-            >https://www.rfc-editor.org/info/rfc2119</link></para>
-      </formalpara>
-      
-      <formalpara xml:id="RFC5246">
-        <title xml:id="RFC5246.title">RFC5246</title>     
-        <para>Dierks, T. and E. Rescorla, <quote>The Transport Layer Security (TLS) Protocol Version
-            1.2</quote>, RFC 5246, DOI 10.17487/RFC5246, August 2008. <link
-            xlink:href="https://www.rfc-editor.org/info/rfc5246"
-            >https://www.rfc-editor.org/info/rfc5246</link>
-        </para>
-      </formalpara>
-      
-      <formalpara xml:id="RFC7748">
-        <title xml:id="RFC7748.title">RFC7748</title>
-        <para> Langley, A., Hamburg, M., and S. Turner, <quote>Elliptic Curves for Security</quote>,
-          RFC 7748, DOI 10.17487/RFC7748, January 2016. <link
-            xlink:href="http://www.rfc-editor.org/info/rfc7748"
-            >http://www.rfc-editor.org/info/rfc7748</link></para>
-      </formalpara>
-      
-    </section>
   </section>
 </article>

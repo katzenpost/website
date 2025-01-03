@@ -1,28 +1,47 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE article>
-<article
-  xmlns="http://docbook.org/ns/docbook" version="5.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" >
-  <info>
-    <title>Sphinx Packet Replay Detection</title>
-    <authorgroup>
-      <author>
-        <personname>
-          <firstname>David</firstname>
-          <surname>Stainton</surname>
-        </personname>
-      </author>
-    </authorgroup>
-  </info>
-  <para>
-    <emphasis role="strong">Abstract</emphasis>
-  </para>
-  <para>
-    This document defines the replay detection for any protocol that
-    uses Sphinx cryptographic packet format. This document is meant to
-    serve as an implementation guide and document the existing replay
-    protect for deployed mix networks.
-  </para>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?>
+<?linkTitle "Sphinx packet replay detection" ?>  <!-- Section menu link text -->
+<?url "docs/specs/replay.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 1 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+    %shared-content;
+]>
+
+<article xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" 
+    version="5.1" 
+    xml:id="replay">
+    
+    <info>
+        <title xml:id="replay.title">Sphinx packet replay detection</title>  
+        <authorgroup>
+            <author>
+                <personname>
+                    <firstname>David</firstname>
+                    <surname>Stainton</surname>
+                </personname>
+            </author>
+        </authorgroup>
+        <abstract>
+            <para>This document defines the replay detection for any protocol that
+                uses Sphinx cryptographic packet format. This document is meant to
+                serve as an implementation guide and document the existing replay
+                protect for deployed mix networks.</para>    
+        </abstract>        
+    </info>
+
   <section xml:id="sphinx_replay_detection_introduction">
     <title xml:id="sphinx_replay_detection_introduction.title">1. Introduction</title>
     <para>
@@ -432,7 +451,7 @@ replay_tag = H( shared_secret )
   </section>
   <section xml:id="appendix-a.-references">
     <title>Appendix A. References</title>
-    <section xml:id="appendix-a.1-normative-references">
+<!--    <section xml:id="appendix-a.1-normative-references">
       <title>Appendix A.1 Normative References</title>
       <para>
       </para>
@@ -459,84 +478,17 @@ author = {David Stainton},
 url = {https://github.com/katzenpost/katzenpost/blob/main/docs/specs/sphinx_replay_detection.rst},
 year = {2019}
 }
-</programlisting>
-      <para>
-        <emphasis role="strong">COMPULS05</emphasis>
-      </para>
-      <para>
-        Danezis, G., Clulow, J., <quote>Compulsion Resistant Anonymous
-        Communications</quote>, Proceedings of Information Hiding
-        Workshop, June 2005,
-        https://www.freehaven.net/anonbib/cache/ih05-danezisclulow.pdf
-      </para>
-      <para>
-        <emphasis role="strong">KATZMIXNET</emphasis>
-      </para>
-      <para>
-        Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D.,
-        <quote>Katzenpost Mix Network Specification</quote>, June 2017,
-        https://github.com/katzenpost/katzenpost/blob/main/docs/specs/mixnet.md
-      </para>
-      <para>
-        <emphasis role="strong">KATZMIXPKI</emphasis>
-      </para>
-      <para>
-        Angel, Y., Piotrowska, A., Stainton, D., <quote>Katzenpost Mix
-        Network Public Key Infrastructure Specification</quote>,
-        December 2017,
-        https://github.com/katzenpost/katzenpost/blob/main/docs/specs/pki.md
-      </para>
-      <para>
-        <emphasis role="strong">RFC2119</emphasis>
-      </para>
-      <para>
-        Bradner, S., <quote>Key words for use in RFCs to Indicate
-        Requirement Levels</quote>, BCP 14, RFC 2119, DOI
-        10.17487/RFC2119, March 1997,
-        http://www.rfc-editor.org/info/rfc2119
-      </para>
-      <para>
-        <emphasis role="strong">RFC6234</emphasis>
-      </para>
-      <para>
-        Eastlake 3rd, D. and T. Hansen, <quote>US Secure Hash Algorithms
-        (SHA and SHA-based HMAC and HKDF)</quote>, RFC 6234, DOI
-        10.17487/RFC6234, May 2011,
-        https://www.rfc-editor.org/info/rfc6234
-      </para>
-      <para>
-        <emphasis role="strong">RFC7748</emphasis>
-      </para>
-      <para>
-        Langley, A., Hamburg, M., and S. Turner, <quote>Elliptic Curves
-        for Security</quote>, RFC 7748, January 2016.
-      </para>
-      <para>
-        <emphasis role="strong">SEDA</emphasis>
-      </para>
-      <para>
-        Welsh, M., Culler, D., Brewer, E., <quote>SEDA: An Architecture
-        for Well-Conditioned, Scalable Internet Services</quote>, ACM
-        Symposium on Operating Systems Principles, 2001,
-        http://www.sosp.org/2001/papers/welsh.pdf
-      </para>
-      <para>
-        <emphasis role="strong">SPHINX09</emphasis>
-      </para>
-      <para>
-        Danezis, G., Goldberg, I., <quote>Sphinx: A Compact and Provably
-        Secure Mix Format</quote>, DOI 10.1109/SP.2009.15, May 2009,
-        https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf
-      </para>
-      <para>
-        <emphasis role="strong">SPHINXSPEC</emphasis>
-      </para>
-      <para>
-        Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D.,
-        <quote>Sphinx Mix Network Cryptographic Packet Format
-        Specification</quote> July 2017,
-        https://github.com/katzenpost/katzenpost/blob/main/docs/specs/sphinx.md
-      </para>
+</programlisting>-->
+      
+      &COMPULS05;
+      &KATZMIXNET;
+      &KATZMIXPKI;
+      &RFC2119;
+      &RFC6234;
+      &RFC7748;
+      &SEDA;
+      &SPHINX09;
+      &SPHINXSPEC;
+      
     </section>
-  </section>
 </article>

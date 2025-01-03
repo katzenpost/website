@@ -1,3 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?>
+<?linkTitle "Introduction" ?>  <!-- Section menu link text -->
+<?url "docs/admin_guide/introduction.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 1 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
+    %shared-content;
+]>
+
+<article    xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
+    xml:id="introduction">
+    
+    <info>
+        <title xml:id="introduction.title">Introducing &program_name;, a modern mixnet</title>  
+    </info>
+
+
+
+
+
+
+
+
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE article>
 <article

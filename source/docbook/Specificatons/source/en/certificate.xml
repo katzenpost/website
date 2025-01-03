@@ -1,26 +1,46 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE article>
-<article
-  xmlns="http://docbook.org/ns/docbook" version="5.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" >
-  <info>
-    <title>Certificate Format</title>
-    <authorgroup>
-      <author>
-        <personname>
-          <firstname>David</firstname>
-          <surname>Stainton</surname>
-        </personname>
-      </author>
-    </authorgroup>
-  </info>
-  <para>
-    <emphasis role="strong">Abstract</emphasis>
-  </para>
-  <para>
-    This document proposes a certificate format that Katzenpost mix
-    server, directory authority server and clients will use.
-  </para>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?>
+<?linkTitle "Certificate format" ?>  <!-- Section menu link text -->
+<?url "docs/specs/certificate.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 1 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+    %shared-content;
+]>
+
+<article xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" 
+    version="5.1" 
+    xml:id="certificate">
+    
+    <info>
+        <title xml:id="certificate.title">Certificate format</title>  
+        <authorgroup>
+          <author>
+            <personname>
+              <firstname>David</firstname>
+              <surname>Stainton</surname>
+            </personname>
+          </author>
+        </authorgroup>
+        <abstract>
+        <para>This document proposes a certificate format that Katzenpost mix
+            server, directory authority server and clients will use.</para>    
+        </abstract>
+    </info>
+
+
   <section xml:id="certificate_introduction">
     <title xml:id="certificate_introduction.title">1. Introduction</title>
     <para>
@@ -176,7 +196,8 @@ type certificate struct {
   </section>
   <section xml:id="appendix-a.-references">
     <title>Appendix A. References</title>
-    <section xml:id="appendix-a.1-normative-references">
+      
+<!--    <section xml:id="appendix-a.1-normative-references">
       <title>Appendix A.1 Normative References</title>
       <para>
       </para>
@@ -203,73 +224,15 @@ author = {David Stainton},
 url = {https://github.com/katzenpost/katzenpost/blob/master/docs/specs/certificate.rst},
 year = {2018}
 }
-</programlisting>
-      <para>
-        <emphasis role="strong">ED25519</emphasis>
-      </para>
-      <itemizedlist spacing="compact">
-        <listitem>
-          <para>
-            <link xlink:href="https://tools.ietf.org/html/rfc8032">RFC8032</link>
-          </para>
-        </listitem>
-      </itemizedlist>
-      <para>
-        <emphasis role="strong">KATZMIXPKI</emphasis>
-      </para>
-      <programlisting>
-Angel, Y., Piotrowska, A., Stainton, D.,
-&quot;Katzenpost Mix Network Public Key Infrastructure Specification&quot;,
-December 2017,
-https://github.com/katzenpost/katzenpost/blob/master/docs/specs/pki.md
-</programlisting>
-      <para>
-        <emphasis role="strong">RFC2119</emphasis>
-      </para>
-      <programlisting>
-Bradner, S.,
-&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;,
-BCP 14, RFC 2119, DOI 10.17487/RFC2119,
-March 1997,
-http://www.rfc-editor.org/info/rfc2119
-</programlisting>
-      <para>
-        <emphasis role="strong">RFC7049</emphasis>
-      </para>
-      <programlisting>
-C. Bormannm, P. Hoffman,
-&quot;Concise Binary Object Representation (CBOR)&quot;,
-Internet Engineering Task Force (IETF),
-October 2013,
-https://tools.ietf.org/html/rfc7049
-</programlisting>
-      <para>
-        <emphasis role="strong">RFC7515</emphasis>
-      </para>
-      <programlisting>
-Jones, M., Bradley, J., Sakimura, N.,
-&quot;JSON Web Signature (JWS)&quot;,
-May 2015,
-https://tools.ietf.org/html/rfc7515
-</programlisting>
-      <para>
-        <emphasis role="strong">RFC7693</emphasis>
-      </para>
-      <programlisting>
-Saarinen, M-J., Ed., and J-P. Aumasson,
-&quot;The BLAKE2 Cryptographic Hash and Message Authentication Code (MAC)&quot;,
-RFC 7693, DOI 10.17487/RFC7693,
-November 2015,
-http://www.rfc-editor.org/info/rfc7693
-</programlisting>
-      <para>
-        <emphasis role="strong">SPHINCS256</emphasis>
-      </para>
-      <programlisting>
-Bernstein, D., Hopwood, D., Hulsing, A., Lange, T., Niederhagen, R., Papachristodoulou, L., Schwabe, P., Wilcox O' Hearn, Z.,
-&quot;SPHINCS: practical stateless hash-based signatures&quot;,
-http://sphincs.cr.yp.to/sphincs-20141001.pdf
-</programlisting>
-    </section>
+</programlisting>-->
+
+&RFC7049;
+&RFC7515;
+&KATZMIXPKI;
+&RFC2119;
+&RFC7693;
+&ED25519;
+&SPHINCS256;
+
   </section>
 </article>
