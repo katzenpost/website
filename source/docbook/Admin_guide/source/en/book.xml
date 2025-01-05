@@ -2,14 +2,14 @@
 <?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 
-<!--
-    
+
+<!--    
 Favorite PDF recipe for this document:
 
 xmllint -\-noent -\-xinclude book.xml -\-output out.xml
 pandoc -f docbook out.xml -\-toc -\-toc-depth=5 -\-pdf-engine lualatex -o admin_guide.pdf
-
 -->
+
 
 <!DOCTYPE book [
    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">

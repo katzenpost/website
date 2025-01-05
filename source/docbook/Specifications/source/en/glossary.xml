@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?>
+<?linkTitle "Glossary" ?>  <!-- Section menu link text -->
+<?url "docs/specs/glossary.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 100 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+<!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+%shared-content;
+<!ENTITY % terms SYSTEM "../../../terms.ent">
+%terms;
+<!ENTITY % references SYSTEM "../../../references.ent">
+%references;
+]>
+
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.1" xml:id="glossary">
+
+    <info>
+        <title xml:id="glossary.title">Glossary</title>
+    </info>
+        <variablelist>           
+        &blocksphinxplaintext;
+        &classestraffic;
+        &client;
+        &dirauthsystem;   
+        &entry;  
+        &epoch;     
+        &family;
+        &group;
+        &groupelement;
+        &groupgenerator;
+        &header;
+        &kib;           
+        &katzenpost;
+        &layer;   
+        &message;
+        &mixdescriptor; 
+        &mix;
+        &mixnet;
+        &msl; 
+        &nickname;
+        &node;
+        &packet;
+        &payload;
+        &pki;       
+        &provider;  
+        &seda;
+        &servicemix;
+        &surb;
+        &user;
+        &wireprotocol;        
+        </variablelist>
+</article>
