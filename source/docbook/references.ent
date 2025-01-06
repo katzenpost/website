@@ -164,7 +164,7 @@ Symposium on Operating Systems Principles,
 
 <!ENTITY AB96 '<para xml:id="AB96"><emphasis role="bold">AB96</emphasis></para>
 <para>Anderson, R., Biham, E., <quote>Two Practical and Provably Secure Block Ciphers: BEAR and LION</quote>, 1996, 
-<link xlink:href=""/></para>'>
+<link xlink:href="xxxx"/>.</para>'>
 
 <!ENTITY MPRA11 '<para xml:id="MPRA11"><emphasis role="boldMPRA11"></emphasis></para>
 <para>Maines, L., Piva, M., Rimoldi, A., Sala, M., <quote>On the provable security of BEAR and LION schemes</quote>, May 2011, arXiv:1105.0259, 
