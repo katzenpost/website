@@ -1,37 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
-   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
-[
-   <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title  ?> 
+<?linkTitle "Operating the mixnet" ?>  <!-- Section menu link text -->
+<?url "docs/admin_guide/operations.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft true ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 30 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
     %shared-content;
-<!-- 
-    <!ELEMENT xi:include (xi:fallback?) > 
-    <!ATTLIST xi:include 
-        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
-    href CDATA #REQUIRED 
-    parse (xml|text) "xml" 
-    xpointer CDATA #IMPLIED 
-    encoding CDATA #IMPLIED 
-    accept CDATA #IMPLIED 
-    accept-charset CDATA #IMPLIED 
-    accept-language CDATA #IMPLIED > 
-    <!ELEMENT xi:fallback ANY > 
-    <!ATTLIST xi:fallback 
-        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
-    <!ENTITY % local.preface.class "| xi:include"> 
-    <!ENTITY % local.part.class "| xi:include"> 
-    <!ENTITY % local.chapter.class "| xi:include"> 
-    <!ENTITY % local.divcomponent.mix "| xi:include"> 
-    <!ENTITY % local.para.char.mix "| xi:include"> 
-    <!ENTITY % local.info.class "| xi:include"> 
-    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
-]> 
+]>
 
-<chapter id="ops">
-    <title id="ops.title">Running and managing &program_name;</title>
-    <para/>
-    <para>
+<article    xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
+    xml:id="ops">
+
+    <info>
+        <title xml:id="ops.title">Operating the &program_name; mixnet</title>
+    </info>
+    
+    <para>To do</para>
+<!--    <para>
         <itemizedlist>
             <listitem>
                 <para><emphasis role="bold">Management</emphasis></para>
@@ -54,7 +51,7 @@
                                     <para>The <code>socat</code> commandline utility can be use to
                                         connect to the management socket and issue commands. Connect
                                         with a commandline like so:</para>
-                                    <programlisting>socat unix:/&lt;path-to-data-dir>/management_sock STDOUT
+                                    <programlisting>socat unix:/&lt;path-to-data-dir&gt;/management_sock STDOUT
 </programlisting>
                                     <para>The following commands are possible:</para>
                                     <itemizedlist>
@@ -121,7 +118,7 @@
 
   
             <para> Parameters (all) in server/config. </para>
-            <para> Go autogeneted docs: go to godocs.org and search for katezenpost/katzenpost. --
+            <para> Go autogeneted docs: go to godocs.org and search for katezenpost/katzenpost. -\-
                 Baseic dev docs</para>
             <para>Prometheus logging and graphing is to be recommended (has its own
                 documents)</para>
@@ -131,10 +128,15 @@
     </para>
             </listitem>
         </itemizedlist>
-    </para>
-    <section id="voter-usage">
-        <title id="voter-usage.title">CLI usage for directory authorities</title>
-        <para>The voting authority has the following commandline usage:</para>
+    </para>-->
+    <section xml:id="voter-usage">
+        <info>
+            <title xml:id="voter-usage.title">CLI usage for directory authorities</title>
+        </info>
+        
+        <para>To do</para>
+        
+<!--        <para>The voting authority has the following commandline usage:</para>
         <?oxy_comment_start author="dwrob" timestamp="20241112T164058-0800" comment="&quot;voting&quot; is the only dirauth cersion and the name of the binary will be chyange. Tokenized as &quot;dirauth_binary&quot;, currently called &quot;dirauth&quot;"?>
         <programlisting>./voting -h
 Usage of ./voting:
@@ -144,11 +146,17 @@ Usage of ./voting:
 </programlisting><?oxy_comment_end?>
         <para>The <code>-g</code> option is used to generate the public and private signing and link
             keys.</para>
-        <para/>
+        <para/>-->
+        
     </section>
-    <section id="server-usage">
-        <title id="server-usage.title">CLI usage for servers</title>
-        <para>The <code>server</code> commandline usage is as follows:</para>
+    <section xml:id="server-usage">
+        <info>
+            <title xml:id="server-usage.title">CLI usage for servers</title>
+        </info>
+        
+        <para>To do</para>
+        
+<!--        <para>The <code>server</code> commandline usage is as follows:</para>
         <programlisting>./server -h
 <?oxy_comment_start author="dwrob" timestamp="20241112T164237-0800" comment="&quot;server&quot; may be rename &quot;mixserver&quot; so tokenized as &quot;mixserver_binary&quot; with value &quot;mixserver&quot;.  "?>Usage of ./server:
   -f string
@@ -166,7 +174,6 @@ Usage of ./voting:
         <para>Note that if you choose to configure logging to a file one disk, you can implement log
             rotation by moving the log file and then sending the <code>HUP</code> to the authority
             server process. This will cause the daemon to rewrite the log file in the location
-            specified by the config file.</para>
+            specified by the config file.</para>-->
     </section>
-</chapter>
-
+</article>

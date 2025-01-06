@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- References -->                   
+                    
+<!ENTITY COMPULS05 '<para xml:id="COMPULS05"><emphasis role="bold">COMPULS05</emphasis></para>
+<para>Danezis, G., Clulow, J., <quote>Compulsion Resistant Anonymous Communications</quote>,
+Proceedings of Information Hiding Workshop, June 2005,
+<link xlink:href="https://www.freehaven.net/anonbib/cache/ih05-danezisclulow.pdf"/>.</para>'>
+
+<!ENTITY MIXMINION '<para xml:id="MIXMINION"><emphasis role="bold">MIXMINION</emphasis></para>
+<para>Danezis, G., Dingledine, R., Mathewson, N., <quote>Mixminion: Design of a
+Type III Anonymous Remailer Protocol</quote>,
+<link xlink:href="https://www.mixminion.net/minion-design.pdf"></link>.</para>  '>
+
+<!ENTITY MIXTOPO10 '<para xml:id="MIXTOPO10"><emphasis role="bold">MIXTOPO10</emphasis></para>
+<para>Diaz, C., Murdoch, S., Troncoso, C., <quote>Impact of Network Topology on
+Anonymity and Overhead in Low-Latency Anonymity Networks</quote>, PETS, July
+2010, <link xlink:href="https://www.esat.kuleuven.be/cosic/publications/article-1230.pdf"/>.</para>'>
+
+<!ENTITY RFC2119 '<para xml:id="RFC2119"><emphasis role="bold">RFC2119</emphasis></para>
+<para>Bradner, S., <quote>Key words for use in RFCs to Indicate Requirement
+Levels</quote>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <link
+xlink:href="http://www.rfc-editor.org/info/rfc2119"/>.</para>'>
+
+<!ENTITY RFC5246 '<para xml:id="RFC5246"><emphasis role="bold">RFC5246</emphasis></para>
+<para>Dierks, T. and E. Rescorla, <quote>The Transport Layer Security (TLS) Protocol
+Version 1.2</quote>, RFC 5246, DOI 10.17487/RFC5246, August 2008, <link
+xlink:href="http://www.rfc-editor.org/info/rfc5246"/>.</para>        '>
+
+<!ENTITY SFMIX03 '<para xml:id="SFMIX03"><emphasis role="bold">SFMIX03</emphasis></para>
+<para>Danezis, G., <quote>Forward Secure Mixes</quote>, Proceedings of 7th Nordic
+Workshop on Secure IT Systems, 2002, <link
+xlink:href="https://www.freehaven.net/anonbib/cache/Dan:SFMix03.pdf"
+/>.</para>'>
+
+<!ENTITY SPHINX09 '<para xml:id="SPHINX09"><emphasis role="bold">SPHINX09</emphasis></para>
+<para>Danezis, G., Goldberg, I., <quote>Sphinx: A Compact and Provably Secure Mix
+Format</quote>, DOI 10.1109/SP.2009.15, May 2009, <link
+xlink:href="https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf"/>.</para>'>
+
+<!ENTITY KATZMIXPKI '<para xml:id="KATZMIXPKI"><emphasis role="bold">KATZMIXPKI</emphasis></para>
+<para>Angel, Y., Piotrowska, A., Stainton, D., <quote>Katzenpost Mix Network Public Key Infrastructure Specification</quote>, December 2017, <link
+xlink:href="ttps://github.com/katzenpost/katzenpost/blob/main/docs/specs/pki.md"/>.</para>'>
+
+<!ENTITY KATZMIXE2E '<para xml:id="KATZMIXE2E"><emphasis role="bold">KATZMIXE2E</emphasis></para>
+<para>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <quote>Katzenpost Mix Network End-to-end Protocol Specification</quote>, July 2017, <link
+xlink:href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/old/end_to_end.md"/>.</para>'>
+
+<!ENTITY RFC5322 '<para xml:id="RFC5322"><emphasis role="bold">RFC5322</emphasis></para>
+<para>Resnick, P., Ed., <quote>Internet Message Format</quote>, RFC 5322, DOI 10.17487/RFC5322, October 2008, <link
+xlink:href="https://www.rfc-editor.org/info/rfc5322"/>.</para>'>
+
+<!ENTITY SPHINXSPEC '<para xml:id="SPHINXSPEC"><emphasis role="bold">SPHINXSPEC</emphasis></para>
+<para>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <quote>Sphinx Mix Network Cryptographic Packet Format Specification</quote>, July 2017, 
+<link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/sphinx.md"/>.</para>'>
+
+<!ENTITY AEZV5 '<para xml:id="AEZV5"><emphasis role="bold">AEZV5</emphasis></para>
+<para>Hoang, V., Krovetz, T., Rogaway, P., <quote>AEZ v5: Authenticated Encryption by Enciphering</quote>, March 2017, 
+<link xlink:href="http://web.cs.ucdavis.edu/~rogaway/aez/aez.pdf"/>.</para>'>
+
+<!ENTITY KATZMIXWIRE '<para xml:id="KATZMIXWIRE"><emphasis role="bold">KATZMIXWIRE</emphasis></para>
+<para>Angel, Y., <quote>Katzenpost Mix Network Wire Protocol Specification</quote>, June 2017, 
+<link xlink:href="https://github.com/katzenpost/katzenpost/blob/master/docs/specs/wire-protocol.md"/>.</para>'>
+
+<!ENTITY KESDOGAN98 '<para xml:id="KESDOGAN98"><emphasis role="bold">KESDOGAN98</emphasis></para>
+<para>Kesdogan, D., Egner, J., and Büschkes, R., <quote>Stop-and-Go-MIXes Providing Probabilistic Anonymity in an Open System</quote>, Information Hiding, 1998, 
+<link xlink:href="https://www.freehaven.net/anonbib/cache/stop-and-go.pdf"/>.</para>'>
+
+<!ENTITY LOOPIX '<para xml:id="LOOPIX"><emphasis role="bold">LOOPIX</emphasis></para>
+<para>Piotrowska, A., Hayes, J., Elahi, T., Meiser, S., Danezis, G., <quote>The Loopix Anonymity System</quote>USENIX, August 2017, 
+<link xlink:href="https://arxiv.org/pdf/1703.00536.pdf"/>.</para>'>
+
+<!ENTITY RFC6234 '<para xml:id="RFC6234"><emphasis role="bold">RFC6234</emphasis></para>
+<para>Eastlake 3rd, D. and T. Hansen, <quote>US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF)</quote>, RFC 6234, DOI 10.17487/RFC6234, May 2011, 
+<link xlink:href="https://www.rfc-editor.org/info/rfc6234"/>.</para>'>
+
+<!ENTITY RFC7748 '<para xml:id="RFC7748"><emphasis role="bold">RFC7748</emphasis></para>
+<para>Langley, A., Hamburg, M., and S. Turner, <quote>Elliptic Curves for Security</quote>, RFC 7748, January 2016, 
+<link xlink:href="https://www.rfc-editor.org/info/rfc7748"/>.</para>'>
+
+<!ENTITY SP80038A '<para xml:id="SP80038A"><emphasis role="bold">SP80038A</emphasis></para>
+<para>Dworkin, M., <quote>Recommendation for Block Cipher Modes of Operation</quote>, SP800-38A, 10.6028/NIST.SP.800, December 2001, 
+<link xlink:href="https://doi.org/10.6028/NIST.SP.800-38A"/>.</para>'>
+
+<!ENTITY ED25519 '<para xml:id="ED25519"><emphasis role="bold">ED25519</emphasis></para>
+<para><link xlink:href="https://tools.ietf.org/html/rfc8032"/>.</para>'>
+
+<!ENTITY RFC7049 '<para xml:id="RFC7049"><emphasis role="bold">RFC7049</emphasis></para>
+<para>C. Bormannm, P. Hoffman, <quote>Concise Binary Object Representation (CBOR)</quote>, Internet Engineering Task Force (IETF), October 2013, 
+<link xlink:href="https://tools.ietf.org/html/rfc7049"/>.</para>'>
+
+<!ENTITY RFC7515 '<para xml:id="RFC7515"><emphasis role="bold">RFC7515</emphasis></para>
+<para>Jones, M., Bradley, J., Sakimura, N., <quote>JSON Web Signature (JWS)</quote>, May 2015, 
+<link xlink:href="https://tools.ietf.org/html/rfc7515"/>.</para>'>
+
+<!ENTITY RFC7693 '<para xml:id="RFC7693"><emphasis role="bold">RFC7693</emphasis></para>
+<para>Saarinen, M-J., Ed., and J-P. Aumasson, <quote>The BLAKE2 Cryptographic Hash and Message Authentication Code (MAC)</quote>, RFC 7693, DOI 10.17487/RFC7693, November 2015, 
+<link xlink:href="http://www.rfc-editor.org/info/rfc7693"/>.</para>'>
+
+<!ENTITY SPHINCS256 '<para xml:id="SPHINCS256"><emphasis role="bold">SPHINCS256</emphasis></para>
+<para>Bernstein, D., Hopwood, D., Hulsing, A., Lange, T., Niederhagen, R., Papachristodoulou, L., Schwabe, P., Wilcox O&apos;Hearn, Z., 
+<quote>SPHINCS: practical stateless hash-based signatures</quote>,
+<link xlink:href="http://sphincs.cr.yp.to/sphincs-20141001.pdf"/>.</para>'>
+
+<!ENTITY BRIDGING '<para xml:id="BRIDGING"><emphasis role="bold">BRIDGING</emphasis></para>
+<para>Danezis, G., Syverson, P., <quote>Bridging and Fingerprinting: Epistemic Attacks
+on Route Selection</quote>, Proceedings of PETS 2008, Leuven, Belgium,
+July 2008, <link xlink:href="https://www.freehaven.net/anonbib/cache/danezis-pet2008.pdf"/>.</para>'>
+
+<!ENTITY FINGERPRINTING '<para xml:id="FINGERPRINTING"><emphasis role="bold">FINGERPRINTING</emphasis></para>
+<para>Danezis, G., Clayton, R., <quote>Route Finger printing in Anonymous
+Communications</quote>, 
+<link xlink:href="https://www.cl.cam.ac.uk/~rnc1/anonroute.pdf"/>.</para>'>
+
+<!ENTITY KATZMIXNET '<para xml:id="KATZMIXNET"><emphasis role="bold">KATZMIXNET</emphasis></para>
+<para>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <quote>Katzenpost
+Mix Network Specification</quote>, June 2017, 
+<link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/mixnet.md"/>.</para>'>
+
+<!ENTITY LOCALVIEW '<para xml:id="LOCALVIEW"><emphasis role="bold">LOCALVIEW</emphasis></para>
+<para>Gogolewski, M., Klonowski, M., Kutylowsky, M., <quote>Local View Attack on
+Anonymous Communication</quote>,
+<link xlink:href="https://www.freehaven.net/anonbib/cache/esorics05-Klonowski.pdf"/>.</para>'>
+
+<!ENTITY MIRANDA '<para xml:id="MIRANDA"><emphasis role="bold">MIRANDA</emphasis></para>
+<para>Leibowitz, H., Piotrowska, A., Danezis, G., Herzberg, A., <quote>No right
+to ramain silent: Isolating Malicious Mixes</quote>, 2017, 
+<link xlink:href="https://eprint.iacr.org/2017/1000.pdf"/>.</para>'>
+
+<!ENTITY MIXMINIONDIRAUTH '<para xml:id="MIXMINIONDIRAUTH"><emphasis role="bold">MIXMINIONDIRAUTH</emphasis></para>
+<para>Danezis, G., Dingledine, R., Mathewson, N., <quote>Type III (Mixminion) Mix
+Directory Specification</quote>, December 2005, 
+<link xlink:href="https://www.mixminion.net/dir-spec.txt"/>.</para>'>
+
+<!ENTITY MIXRELIABLE '<para xml:id="MIXRELIABLE"><emphasis role="bold">MIXRELIABLE</emphasis></para>
+<para>Dingledine, R., Freedman, M., Hopwood, D., Molnar, D., <quote>A Reputation
+System to Increase MIX-Net Reliability</quote>, 2001, Information Hiding, 4th
+International Workshop, 
+<link xlink:href="https://www.freehaven.net/anonbib/cache/mix-acc.pdf"/>.</para>'>
+
+<!ENTITY PEERFLOW '<para xml:id="PEERFLOW"><emphasis role="bold">PEERFLOW</emphasis></para>
+<para>Johnson, A., Jansen, R., Segal, A., Syverson, P., <quote>PeerFlow: Secure Load
+Balancing in Tor</quote>, July 2017, Proceedings on Privacy Enhancing Technologies, 
+<link xlink:href="https://petsymposium.org/2017/papers/issue2/paper12-2017-2-source.pdf"/>.</para>'>
+
+<!ENTITY SECNOTSEP '<para xml:id="SECNOTSEP"><emphasis role="bold">SECNOTSEP</emphasis></para>
+<para>Miller, M., Tulloh, B., Shapiro, J., <quote>The Structure of Authority: Why
+Security Is not a Separable Concer</quote>,
+<link xlink:href="http://www.erights.org/talks/no-sep/secnotsep.pdf"/>.</para>'>
+
+<!ENTITY TORDIRAUTH '<para xml:id="TORDIRAUTH"><emphasis role="bold">TORDIRAUTH</emphasis></para>
+<para><quote>Tor directory protocol, version 3</quote>, 
+<link xlink:href="https://gitweb.torproject.org/torspec.git/tree/dir-spec.txt"/>.</para>'>
+
+<!ENTITY TORSRV '<para xml:id="TORSRV"><emphasis role="bold">TORSRV</emphasis></para>
+<para><quote>Tor Shared Random Subsystem Specification</quote>, 
+<link xlink:href="https://gitweb.torproject.org/torspec.git/tree/srv-spec.txt"/>.</para>'>
+
+<!ENTITY SEDA '<para xml:id="SEDA"><emphasis role="bold">SEDA</emphasis></para>
+<para>Welsh, M., Culler, D., Brewer, E., <quote>SEDA: An Architecture
+for Well-Conditioned, Scalable Internet Services</quote>, 2001, ACM
+Symposium on Operating Systems Principles, 
+<link xlink:href="http://www.sosp.org/2001/papers/welsh.pdf"/>.</para>'>
+
+<!ENTITY AB96 '<para xml:id="AB96"><emphasis role="bold">AB96</emphasis></para>
+<para>Anderson, R., Biham, E., <quote>Two Practical and Provably Secure Block Ciphers: BEAR and LION</quote>, 1996, 
+<link xlink:href="xxxx"/>.</para>'>
+
+<!ENTITY MPRA11 '<para xml:id="MPRA11"><emphasis role="boldMPRA11"></emphasis></para>
+<para>Maines, L., Piva, M., Rimoldi, A., Sala, M., <quote>On the provable security of BEAR and LION schemes</quote>, May 2011, arXiv:1105.0259, 
+<link xlink:href="https://arxiv.org/abs/1105.0259"/>.</para>'>
+
+<!ENTITY RFC7539 '<para xml:id="RFC7539"><emphasis role="bold">RFC7539</emphasis></para>
+<para>Nir, Y. and A. Langley, <quote>ChaCha20 and Poly1305 for IETF Protocols</quote>, May 2015, RFC 7539, DOI 10.17487/RFC7539, 
+<link xlink:href="http://www.rfc-editor.org/info/rfc7539"/>.</para>'>
+
+<!ENTITY KEMCOMB '<para xml:id="KEMCOMB"><emphasis role="bold">KEMCOMB</emphasis></para>
+<para>Federico Giacon, Felix Heuer, Bertram Poettering, <quote>KEM Combiners</quote>, 2018, 
+<link xlink:href="https://link.springer.com/chapter/10.1007/978-3-319-76578-5_7"/></para>'>
+
+<!ENTITY XWING '<para xml:id="XWING"><emphasis role="bold">XWING</emphasis></para>
+<para>Manuel Barbosa, Deirdre Connolly, João Diogo Duarte, Aaron Kaiser, Peter Schwabe,
+Karoline Varner, Bas Westerbaan, <quote>X-Wing: The Hybrid KEM You’ve Been Looking
+For</quote>,
+<link xlink:href="https://eprint.iacr.org/2024/039.pd"/>.</para>'>
+
+<!ENTITY NOISE '<para xml:id="NOISE"><emphasis role="bold">NOISE</emphasis></para>
+<para>Perrin, T., <quote>The Noise Protocol Framework</quote>, May 2017,
+<link xlink:href="https://noiseprotocol.org/noise.pdf"/>.</para>'>
+
+<!ENTITY NOISEHFS '<para xml:id="NOISEHFS"><emphasis role="bold">NOISEHFS</emphasis></para>
+<para>Weatherley, R., <quote>Noise Extension: Hybrid Forward Secrecy</quote>,
+<link xlink:href="https://github.com/noiseprotocol/noise_hfs_spec/blob/master/output/noise_hfs.pdf"/>.</para>'>
+
+<!ENTITY PQNOISE '<para xml:id="PQNOISE"><emphasis role="bold">PQNOISE</emphasis></para>
+<para>Yawning Angel, Benjamin Dowling, Andreas Hülsing, Peter Schwabe and Florian Weber,
+<quote>Post Quantum Noise</quote>, September 2023, 
+<link xlink:href="https://eprint.iacr.org/2022/539.pdf"/>.</para>'>
+
+
+
+<!--<!ENTITY  '<para xml:id=""><emphasis role="bold"></emphasis></para>
+<para>, <quote></quote>, , , 
+<link xlink:href=""/></para>'>-->
+                   

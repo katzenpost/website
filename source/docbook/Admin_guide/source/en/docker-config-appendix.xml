@@ -1,47 +1,49 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
-   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
-[
-   <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?> 
+<?linkTitle "Appendix: Configuration files from the Docker test mixnet" ?>  <!-- Section menu link text -->
+<?url "docs/admin_guide/docker-config-appendix.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 70 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
     %shared-content;
-<!-- 
-    <!ELEMENT xi:include (xi:fallback?) > 
-    <!ATTLIST xi:include 
-        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
-    href CDATA #REQUIRED 
-    parse (xml|text) "xml" 
-    xpointer CDATA #IMPLIED 
-    encoding CDATA #IMPLIED 
-    accept CDATA #IMPLIED 
-    accept-charset CDATA #IMPLIED 
-    accept-language CDATA #IMPLIED > 
-    <!ELEMENT xi:fallback ANY > 
-    <!ATTLIST xi:fallback 
-        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
-    <!ENTITY % local.preface.class "| xi:include"> 
-    <!ENTITY % local.part.class "| xi:include"> 
-    <!ENTITY % local.chapter.class "| xi:include"> 
-    <!ENTITY % local.divcomponent.mix "| xi:include"> 
-    <!ENTITY % local.para.char.mix "| xi:include"> 
-    <!ENTITY % local.info.class "| xi:include"> 
-    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
-]> 
+]>
 
-<section id="docker-config">
-    <title id="docker-config.title">Appendix: Configuration files from the Docker test mixnet </title>
-    <para>As an aid to adminstrators implementing a &program_name; mixnet, this appendix provides
-        lightly edited examples of configuration files for each &program_name; node type. These
+<article    xmlns="http://docbook.org/ns/docbook"
+            xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
+            xml:id="docker-config">
+    <info>  
+        <title xml:id="docker-config.title">Appendix: Configuration files from the Docker test
+            mixnet</title> <!-- Match to title PI above. -->          
+    </info>
+        
+    <para>As an aid to adminstrators implementing a Katzenpost mixnet, this appendix provides
+        lightly edited examples of configuration files for each Katzenpost node type. These
         files are drawn from a built instance of the <link linkend="container">Docker test
-            mixnet</link>. These code listings are meant to be used as a reference alongside the
-        detailed configuration documentation in <xref linkend="components"/>. You cannot use these
-        listings as a drop-in solution in your own mixnets for reasons explained in the <xref
-            linkend="topology"/> section of the Docker test mixnet documentation.</para>
-    <section id="dirauth-config">
-        <title id="dirauth-config.title">Directory authority</title>
-        <para>Source:
-            <filename>../katzenpost/docker/voting_mixnet/auth1/authority.toml</filename></para>
-        <programlisting>[Server]
+        mixnet</link>. These code listings are meant to be used as a reference alongside the
+        detailed configuration documentation in <link xlink:href="&baseURL;docs/admin_guide/components.html"
+            >Components and configuration of the &program_name; mixnet</link><!--<xref linkend="components"/>-->. You cannot use these
+        listings as a drop-in solution in your own mixnets for reasons explained in the <link xlink:href="&baseURL;docs/admin_guide/topology.html"
+            >Network topology and components</link><!--<xref linkend="topology"/>--> section of the Docker test mixnet documentation.</para>
+    
+        <section xml:id="dirauth-config">
+            <info>
+                <title xml:id="dirauth-config.title">Directory authority</title>
+            </info>
+            
+            <para>Source: <filename>../katzenpost/docker/voting_mixnet/auth1/authority.toml</filename></para>
+    
+            <programlisting>[Server]
   Identifier = "auth1"
   WireKEMScheme = "xwing"
   PKISignatureScheme = "Ed448-Dilithium3"
@@ -152,12 +154,13 @@
   SPRPKeyMaterialLength = 64
   NIKEName = "x25519"
   KEMName = ""</programlisting>
-    </section>
-    <section id="mix-node-config">
-        <title id="mix-node-config.title">Mix node</title>
-        <para>Source:<filename>
-            ../katzenpost/docker/voting_mixnet/mix1/katzenpost.toml</filename></para>
-        <programlisting>[Server]
+</section>
+<section xml:id="mix-node-config">
+    <info>
+        <title xml:id="mix-node-config.title">Mix node</title>
+    </info>      
+    <para>Source: <filename>../katzenpost/docker/voting_mixnet/mix1/katzenpost.toml</filename></para>
+    <programlisting>[Server]
   Identifier = "mix1"
   WireKEM = "xwing"
   PKISignatureScheme = "Ed448-Dilithium3"
@@ -241,10 +244,11 @@
   DisableRateLimit = false
   GenerateOnly = false</programlisting>
     </section>
-    <section id="gateway-node-config">
-        <title id="gateway-node-config.title">Gateway node</title>
-        <para>Source:
-                <filename>../katzenpost/docker/voting_mixnet/gateway1/katzenpost.toml</filename></para>
+    <section xml:id="gateway-node-config">
+        <info>
+            <title xml:id="gateway-node-config.title">Gateway node</title>
+        </info>       
+        <para>Source: <filename>../katzenpost/docker/voting_mixnet/gateway1/katzenpost.toml</filename></para>
         <programlisting>[Server]
   Identifier = "gateway1"
   WireKEM = "xwing"
@@ -340,8 +344,9 @@
   DisableRateLimit = false
   GenerateOnly = false</programlisting>
     </section>
-    <section id="service-node-config">
-        <title id="service-node-config.title">Service node</title>
+    <section xml:id="service-node-config">
+        <info>
+            <title xml:id="service-node-config.title">Service node</title></info>        
         <para>Source:
                 <filename>../katzenpost/docker/voting_mixnet/servicenode1/katzenpost.toml</filename></para>
         <programlisting>[Server]
@@ -481,7 +486,6 @@
   SendDecoyTraffic = false
   DisableRateLimit = false
   GenerateOnly = false</programlisting>
-    </section>
 
-    
-</section>
+    </section>    
+</article>

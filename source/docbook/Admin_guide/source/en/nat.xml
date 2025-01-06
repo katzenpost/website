@@ -1,37 +1,35 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
-   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"    
-[
-   <!ENTITY % shared-content SYSTEM "includes/shared-content.ent">
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?> 
+<?linkTitle "Using with NAT" ?>  <!-- Section menu link text -->
+<?url "docs/admin_guide/nat.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft true?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 40 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
     %shared-content;
-<!-- 
-    <!ELEMENT xi:include (xi:fallback?) > 
-    <!ATTLIST xi:include 
-        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
-    href CDATA #REQUIRED 
-    parse (xml|text) "xml" 
-    xpointer CDATA #IMPLIED 
-    encoding CDATA #IMPLIED 
-    accept CDATA #IMPLIED 
-    accept-charset CDATA #IMPLIED 
-    accept-language CDATA #IMPLIED > 
-    <!ELEMENT xi:fallback ANY > 
-    <!ATTLIST xi:fallback 
-        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
-    <!ENTITY % local.preface.class "| xi:include"> 
-    <!ENTITY % local.part.class "| xi:include"> 
-    <!ENTITY % local.chapter.class "| xi:include"> 
-    <!ENTITY % local.divcomponent.mix "| xi:include"> 
-    <!ENTITY % local.para.char.mix "| xi:include"> 
-    <!ENTITY % local.info.class "| xi:include"> 
-    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > -->
-]> 
+]>
 
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
-    version="5.1" xml:id="components">
-    <title xml:id="components.title">Using &program_name; from behind a NAT device</title>
-    <para>&program_name; can be used from behind NAT devices. Both mix and dirauth nodes.</para>
+<article    xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
+    xml:id="nat">
+    
+    <info>
+        <title xml:id="nat.title">Using &program_name; from behind a NAT device</title>    
+    </info>
+
+    <para>To do</para>   
+   
+<!--    <para>&program_name; can be used from behind NAT devices. Both mix and dirauth nodes.</para>
     <para>Some networking scenearios do not require any manual port forwarding, such as operating an ec2 node on AWS,
     the node listens on an internal IP address yet can receive connections that get routed to a public IP address.
     There is a NAT device involved here but it's default policy is to route all trafic to the node.
@@ -82,5 +80,5 @@
     <para>Two diagrams...Onion and IPv4/IPv6</para>
     <para>This confguration only allows for the Gateway nodes (which are also mix nodes).</para>
     <para>We need a to show an excerpt from a torrc to show where the onion listening port is
-        confuigred.</para>
-</chapter>
+        confuigred.</para>-->
+</article>

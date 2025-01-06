@@ -1,0 +1,246 @@
+---
+title: 
+linkTitle: "Glossary" 
+description: "" 
+url: "docs/specs/glossary.html" 
+date: "2025-01-03T14:42:00.778602704-08:00"
+draft: false 
+slug: "" 
+layout: "" 
+type: "" 
+weight: 100 
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>Glossary</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+   </head>
+   <body>
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h1 class="title"><a name="glossary"></a>Glossary</h1>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="variablelist">
+            <dl class="variablelist">
+               <dt><span class="term">BlockSphinxPlaintext</span></dt>
+               <dd>
+                  <p>The payload structure which is encapsulated by the Sphinx body. It is
+                     described in KATZMIXE2E, section Client and Provider processing of
+                     received packets.</p>
+               </dd>
+               <dt><span class="term">classes of traffic</span></dt>
+               <dd>
+                  <p>We distinguish the following classes of traffic:</p>
+                  <div class="itemizedlist">
+                     <ul class="itemizedlist" style="list-style-type: disc; ">
+                        <li class="listitem">
+                           <p> SURB Replies (also sometimes referred to as ACKs) </p>
+                        </li>
+                        <li class="listitem">
+                           <p> Forward messages </p>
+                        </li>
+                     </ul>
+                  </div>
+               </dd>
+               <dt><span class="term">client</span></dt>
+               <dd>
+                  <p>Software run by the User on its local device to participate in the Mixnet.
+                     Again let us reiterate that a client is not considered a "node in the
+                     network" at the level of analysis where we are discussing the core mixnet
+                     protocol in this here document.</p>
+               </dd>
+               <dt><span class="term">directory authority system</span></dt>
+               <dd>
+                  <p>Refers to specific PKI schemes used by Mixminion and Tor.</p>
+               </dd>
+               <dt><span class="term">entry mix, entry node</span></dt>
+               <dd>
+                  <p>A mix that has some additional features: </p>
+                  <div class="itemizedlist">
+                     <ul class="itemizedlist" style="list-style-type: disc; ">
+                        <li class="listitem">
+                           <p> An entry mix is always the first hop in routes where the message
+                              originates from a client. </p>
+                        </li>
+                        <li class="listitem">
+                           <p> An entry mix authenticates client&#x2019;s direct connections via the
+                              mixnet&#x2019;s wire protocol. </p>
+                        </li>
+                        <li class="listitem">
+                           <p> An entry mix queues reply messages and allows clients to retrieve
+                              them later. </p>
+                        </li>
+                     </ul>
+                  </div>
+               </dd>
+               <dt><span class="term">epoch</span></dt>
+               <dd>
+                  <p>A fixed time interval defined in section 4.2 Sphinx Mix and Provider Key
+                     Rotation. The epoch is currently set to 20 minutes. 
+                     A new PKI document containing public key material
+                     is published for each epoch and is valid only for that epoch.</p>
+               </dd>
+               <dt><span class="term">family</span></dt>
+               <dd>
+                  <p>Identifier of security domains or entities operating one or more mixes in
+                     the network. This is used to inform the path selection algorithm.</p>
+               </dd>
+               <dt><span class="term">group</span></dt>
+               <dd>
+                  <p>A finite set of elements and a binary operation that satisfy the
+                     properties of closure, associativity, invertability, and the presence of an
+                     identity element. </p>
+               </dd>
+               <dt><span class="term">group element</span></dt>
+               <dd>
+                  <p>An individual element of the group.</p>
+               </dd>
+               <dt><span class="term">group generator</span></dt>
+               <dd>
+                  <p>A group element capable of generating any other element of the group, via
+                     repeated applications of the generator and the group operation.</p>
+               </dd>
+               <dt><span class="term">header</span></dt>
+               <dd>
+                  <p>The packet header consisting of several components, which convey the
+                     information necessary to verify packet integrity and correctly process the
+                     packet.</p>
+               </dd>
+               <dt><span class="term">KiB</span></dt>
+               <dd>
+                  <p>Defined as 1024 8 bit octets.</p>
+               </dd>
+               <dt><span class="term">Katzenpost</span></dt>
+               <dd>
+                  <p>A project to design many improved decryption mixnet protocols.</p>
+               </dd>
+               <dt><span class="term">layer</span></dt>
+               <dd>
+                  <p>The layer indicates which network topology layer a particular mix resides
+                     in.</p>
+               </dd>
+               <dt><span class="term">message</span></dt>
+               <dd>
+                  <p>A variable-length sequence of octets sent anonymously through the network.
+                     Short messages are sent in a single packet; long messages are fragmented
+                     across multiple packets.</p>
+               </dd>
+               <dt><span class="term">mix descriptor</span></dt>
+               <dd>
+                  <p>A database record which describes a component mix.</p>
+               </dd>
+               <dt><span class="term">mix</span></dt>
+               <dd>
+                  <p>A cryptographic router that is used to compose a mixnet. Mixes use a
+                     cryptographic operation on messages being routed which provides bitwise
+                     unlinkability with respect to input versus output messages. Katzenpost is a
+                     decryption mixnet that uses the Sphinx cryptographic packet format.</p>
+               </dd>
+               <dt><span class="term">mixnet</span></dt>
+               <dd>
+                  <p>A mixnet also known as a mix network is a network of mixes that can be
+                     used to build various privacy preserving protocols.</p>
+               </dd>
+               <dt><span class="term">MSL</span></dt>
+               <dd>
+                  <p>Maximum segment lifetime, currently set to 120 seconds.</p>
+               </dd>
+               <dt><span class="term">nickname</span></dt>
+               <dd>
+                  <p>A nickname string that is unique in the consensus document, see Katzenpost
+                     Mix Network Specification section 2.2. Network Topology.</p>
+               </dd>
+               <dt><span class="term">node</span></dt>
+               <dd>
+                  <p>Clients are NOT considered nodes in the mix network. However note that
+                     network protocols are often layered; in our design documents we describe
+                     "mixnet hidden services" which can be operated by mixnet clients. Therefore
+                     if you are using node in some adherence to methematical termonology one
+                     could conceivably designate a client as a node. That having been said, it
+                     would not be appropriate to the discussion of our core mixnet protocol to
+                     refer to the clients as nodes.</p>
+               </dd>
+               <dt><span class="term">packet</span></dt>
+               <dd>
+                  <p>A Sphinx packet, of fixed
+                     length for each class of traffic, carrying a message payload and metadata for routing.
+                     
+                     Packets are routed anonymously through the mixnet and cryptographically transformed
+                     at 
+                     each hop.</p>
+               </dd>
+               <dt><span class="term">payload</span></dt>
+               <dd>
+                  <p>The fixed-length portion of a packet containing an encrypted message or
+                     part of a message, to be delivered anonymously.</p>
+               </dd>
+               <dt><span class="term">PKI</span></dt>
+               <dd>
+                  <p>Public key infrastructure</p>
+               </dd>
+               <dt><span class="term">provider</span></dt>
+               <dd>
+                  <p>A service operated by a third party that Clients communicate directly with
+                     to communicate with the Mixnet. It is responsible for Client authentication,
+                     forwarding outgoing messages to the Mixnet, and storing incoming messages
+                     for the Client. The Provider MUST have the ability to perform cryptographic
+                     operations on the relayed messages.</p>
+               </dd>
+               <dt><span class="term">SEDA</span></dt>
+               <dd>
+                  <p>Staged Event Driven Architecture. 1. A
+                     highly parallelizable computation model. 2. A computational pipeline
+                     composed of multiple stages connected by queues utilizing active queue
+                     management algorithms that can evict items from the queue based on dwell
+                     time or other criteria where each stage is a thread pool. 3. The only
+                     correct way to efficiently implement a software based router on general
+                     purpose computing hardware.</p>
+               </dd>
+               <dt><span class="term">service mix</span></dt>
+               <dd>
+                  <p>A service mix is a mix that has some additional features:</p>
+                  <div class="itemizedlist">
+                     <ul class="itemizedlist" style="list-style-type: disc; ">
+                        <li class="listitem">
+                           <p> A service mix is always the last hop in routes where the message
+                              originates from a client. </p>
+                        </li>
+                        <li class="listitem">
+                           <p> A service mix runs mixnet services which use a Sphinx SURB based
+                              protocol. </p>
+                        </li>
+                     </ul>
+                  </div>
+               </dd>
+               <dt><span class="term">SURB</span></dt>
+               <dd>
+                  <p>Single use reply block. SURBs are used to achieve recipient anonymity,
+                     that is to say, SURBs function as a cryptographic delivery token that
+                     you can give to another client entity so that they can send you a
+                     message without them knowing your identity or location on the network.
+                     See <code class="literal">SPHINXSPEC</code> and <code class="literal">SPHINX</code>.</p>
+               </dd>
+               <dt><span class="term">user</span></dt>
+               <dd>
+                  <p>An agent using the Katzenpost system.</p>
+               </dd>
+               <dt><span class="term">wire protocol</span></dt>
+               <dd>
+                  <p>Refers to our PQ Noise based protocol which currently uses TCP but in the
+                     near future will optionally use QUIC. This protocol has messages known as
+                     wire protocol <code class="literal">commands</code>, which are used for various mixnet
+                     functions such as sending or retrieving a message, dirauth voting etc. For
+                     more information, please see our design doc: <a class="link" href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/wire-protocol.md" target="_top">wire protocol specification</a></p>
+               </dd>
+            </dl>
+         </div>
+      </div>
+   </body>
+</html>
