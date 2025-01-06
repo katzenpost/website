@@ -8,7 +8,7 @@
 <?linkTitle "Using with NAT" ?>  <!-- Section menu link text -->
 <?url "docs/admin_guide/nat.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
-<?draft false ?> <!-- Optional -->
+<?draft true?> <!-- Optional -->
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->

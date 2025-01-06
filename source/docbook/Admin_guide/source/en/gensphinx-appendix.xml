@@ -8,7 +8,7 @@
 <?linkTitle "Appendix: Using gensphinx" ?>  <!-- Section menu link text -->
 <?url "docs/admin_guide/gensphinx-appendix.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
-<?draft false ?> <!-- Optional -->
+<?draft true?> <!-- Optional -->
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
