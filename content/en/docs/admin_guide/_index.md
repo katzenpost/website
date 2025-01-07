@@ -9,7 +9,7 @@ Use the documentation in this section to explore how the mixnet works and to imp
 
 |      | Title                                                                                                    | Description                                                                                                                                                        | Link(s)                                                                                                                     |
 |------|----------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| 📖   | **[Admin Guide](/docs/admin_guide)**                                                                    | Detailed guide for deploying and managing Katzenpost servers, including setting up a local Docker-based mixnet.                                                   | [PDF](/admin_guide/admin_guide.pdf)                                                                                       |
+| 📖   | **[Admin Guide](/docs/admin_guide)**                                                                    | Detailed guide for deploying and managing Katzenpost servers, including setting up a local Docker-based mixnet.                                                   | [PDF](/docs/admin_guide/pdf/admin_guide.pdf)                                                                                       |
 
 
 
