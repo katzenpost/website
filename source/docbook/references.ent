@@ -32,9 +32,6 @@ Communications</quote>,
 Mix Network Specification</quote>, June 2017, 
 <link xlink:href="&baseURL;docs/specs/pdf/mixnet.pdf"/>.</para>'>
 
-<!ENTITY KATZMIXE2E '<para xml:id="KATZMIXE2E"><emphasis role="bold">KATZMIXE2E</emphasis></para>
-<para>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <quote>Katzenpost Mix Network End-to-end Protocol Specification</quote>, July 2017.</para>'>
-
 <!ENTITY KATZMIXPKI '<para xml:id="KATZMIXPKI"><emphasis role="bold">KATZMIXPKI</emphasis></para>
 <para>Angel, Y., Piotrowska, A., Stainton, D., <quote>Katzenpost Mix Network Public Key Infrastructure Specification</quote>, December 2017, <link
 xlink:href="&baseURL;docs/specs/pdf/pki.pdf"/>.</para>'>

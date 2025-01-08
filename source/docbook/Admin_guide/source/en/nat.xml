@@ -28,7 +28,7 @@
     
     <para>To do</para>
     
-<!--    <para>&program_name; servers can be used from behind network address translation (NAT) devices.
+    <para>&program_name; servers can be used from behind network address translation (NAT) devices.
         This applies to mix nodes, gateway nodes, service nodes, and directory authority nodes
         (dirauths). Port forwarding and other network configuration details depend on how you are
         hosting your servers and the type of router you use.</para>
@@ -155,14 +155,21 @@ IsServiceNode = false
     </section>
     
     <section xml:id="dirauths">
-        <title xml:id="dirauths.title">Setting up dirauth coordination</title>
+        <title xml:id="dirauths.title">Using <parameter>BindAddresses</parameter> with
+                <parameter>Addresses</parameter></title>
         
-        <para/>
+        <para>In a conventional NAT configuration, a router sits between two IP networks, one with
+            public, globally unique addresses and the other (the LAN) with reusable local addresses.
+            A host with a public address can connect to a host with a local address because the
+            router is configured with a mapping between the two networks. The router rewrites the
+            destination and source headers of the packets that traverse it in both directions,
+            creating the illusion of an unmediated end-to-end connection. The public host sends
+            packs to a public address </para>
         
     </section>
     
     
-    -->
+    
     
 </article>
 

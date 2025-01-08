@@ -3,7 +3,7 @@ title:
 linkTitle: "Public key infrastructure" 
 description: "" 
 url: "docs/specs/pki.html" 
-date: "2025-01-07T14:29:41.317792424-08:00"
+date: "2025-01-08T12:42:44.850794718-08:00"
 draft: false 
 slug: "" 
 layout: "" 
@@ -350,8 +350,7 @@ weight: 35
                time of 40 minutes. SURB lifetime is limited to a single epoch because of the key
                rotation epoch, however this shouldn&#x2019;t present any useability problems since SURBs
                are
-               only used for sending ACK messages from the destination Provider to the sender as
-               described in <a class="link" href="#KATZMIXE2E">KATZMIXE2E</a>. </p>
+               only used for sending ACK messages from the destination Provider to the sender. </p>
             <div class="section">
                <div class="titlepage">
                   <div>
@@ -785,8 +784,17 @@ missed. */
                   public ed25519 key. The <code class="literal">MixKeys</code> field is a map from epoch to
                   public X25519 keys which is what the Sphinx packet format uses. </p>
                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                  <h3 class="title">Note</h3>
-                  <p> XXX David: replace the following example with a JWS example: </p>
+                  <table border="0" summary="Note: Note">
+                     <tr>
+                        <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                        <th align="left">Note</th>
+                     </tr>
+                     <tr>
+                        <td align="left" valign="top">
+                           <p> XXX David: replace the following example with a JWS example: </p>
+                        </td>
+                     </tr>
+                  </table>
                </div>
                <pre class="programlisting">{
 "Version": 0,
@@ -1314,8 +1322,6 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
             <p>Danezis, G., Clayton, R., <span class="quote">&#x201c;<span class="quote">Route Finger printing in Anonymous
                      Communications</span>&#x201d;</span>, 
                <a class="link" href="https://www.cl.cam.ac.uk/~rnc1/anonroute.pdf" target="_top">https://www.cl.cam.ac.uk/~rnc1/anonroute.pdf</a>.</p>
-            <p><a name="KATZMIXE2E"></a><span class="bold"><strong>KATZMIXE2E</strong></span></p>
-            <p>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Katzenpost Mix Network End-to-end Protocol Specification</span>&#x201d;</span>, July 2017.</p>
             <p><a name="KATZMIXNET"></a><span class="bold"><strong>KATZMIXNET</strong></span></p>
             <p>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Katzenpost
                      Mix Network Specification</span>&#x201d;</span>, June 2017, 
