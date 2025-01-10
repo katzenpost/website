@@ -216,8 +216,7 @@
             available, allowing for a maximum round trip (forward message + SURB) delay + transit
             time of 40 minutes. SURB lifetime is limited to a single epoch because of the key
             rotation epoch, however this shouldn’t present any useability problems since SURBs are
-            only used for sending ACK messages from the destination Provider to the sender as
-            described in <link linkend="KATZMIXE2E">KATZMIXE2E</link>. </para>
+            only used for sending ACK messages from the destination Provider to the sender. </para>
         <section xml:id="pki-protocol-schedule">
             <title>2.1 PKI protocol schedule</title>
             <para> There are two main constraints to Authority schedule: </para>

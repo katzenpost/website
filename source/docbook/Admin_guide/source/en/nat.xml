@@ -15,21 +15,169 @@
 <?weight 40 ?> <!-- Optional -->
 
 <!DOCTYPE article [
-    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
-    %shared-content;
+<!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+%shared-content;
 ]>
 
-<article    xmlns="http://docbook.org/ns/docbook"
-    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
-    xml:id="nat">
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.1" xml:id="nat">
     
     <info>
-        <title xml:id="nat.title">Using &program_name; from behind a NAT device</title>    
+        <title xml:id="nat.title">Using &program_name; from behind a NAT device</title>
     </info>
+    
+    <para>To do</para>
+    
+    <para>&program_name; servers can be used from behind network address translation (NAT) devices.
+        This applies to mix nodes, gateway nodes, service nodes, and directory authority nodes
+        (dirauths). Port forwarding and other network configuration details depend on how you are
+        hosting your servers and the type of router you use.</para>
+    <para>Some hosting scenarios, such as the use of an AWS EC2 instance, require no manual port
+        forwarding. A &program_name; node running on an EC2 instance with default network settings
+        listens on its internal IP address yet can receive connections from publicly routed IP
+        addresses. For home and small business routers, default policy is to block inbound
+        connections from public addresses. In this scenario, you need to configure port forwarding
+        to the appropriate internal IP address and port. </para>
+    <para>
+        <table frame="all">
+            <title>Lan hosting options</title>
+            <tgroup cols="5">
+                <colspec colnum="1" colname="c1" colwidth="1*"/>
+                <colspec colnum="2" colname="c2" colwidth="1*"/>
+                <colspec colnum="3" colname="c3" colwidth="1*"/>
+                <colspec colnum="4" colname="c4" colwidth="1*"/>
+                <colspec colnum="5" colname="c5" colwidth="1*"/>
+                <thead>
+                    <row>
+                        <entry/>
+                        <entry>Mix node</entry>
+                        <entry>Gateway  node</entry>
+                        <entry>Service node</entry>
+                        <entry>Dirauth</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>Transparent port forwarding (EC2, etc.)</entry>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                    </row>
+                    <row>
+                        <entry>Selective forwarding (home and small business routers)</entry>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                    </row>
+                    <row>
+                        <entry>Tor</entry>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                    </row>
+                    <row>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                    </row>
+                    <row>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </para>
+    
+    <section xml:id="tor">
+        <title xml:id="tor.title">Using Tor</title>
+        <para/>
+        <para>Dirauth is a cooperative crash fault tolerant voting system composed of multiple
+            dirauth nodes. However, each of these dirauth nodes must have knowledge of the other
+            dirauth node's network connection information and public cryptographic key material.
+            It's often convenient enough for dirauth operators to use a private git repo to
+            coordinate changes to the dirauth configurations and public key materials. Therefore,
+            dirauth operators wishing to operate a node behind a NAT device can configure their node
+            to listen on a RFC1918 address such as 192.168.1.22 and yet tell the other dirauth node
+            operators that their publicly routable address is some other IP address or perhaps a Tor
+            Onion address. </para>
+        <para/>
+        <para/>
+        <para>Dirauths and gateways can be hosted as Tor onion services. (Mix and service nodes
+            cannot be hosted in this manner because they communicate only inside the mix network.) </para>
+        <para/>
+        <para>Any mix node type can operate behind a NAT device by using the
+            <parameter>BindAddresses</parameter> parameter.  When
+            <parameter>BindAddresses</parameter> is set, a node listens at one address while
+            advertising a different address as configured by the <parameter>Addresses</parameter>
+            parameter, which specifies the address that the node shares with other nodes through the
+            PKI document.</para>
+        <para>If you are configuring a Gateway node to listen on a Tor onion service, then you must
+            make sure that the BindAddresses match the listening address and port in your "torrc"
+            file:</para>
+        <programlisting>
+HiddenServiceDir /var/lib/tor/my_website/
+HiddenServicePort 1234 127.0.0.1:1234
+</programlisting>
+        <para>We refer you to the Tor onion setup docs for more information:
+            https://community.torproject.org/onion-services/setup/</para>
+        <para>The corresponding Gateway config Server section might look like this:</para>
+        <programlisting>
+[Server]
+Identifier = "gnunet"
+PKISignatureScheme = "Ed25519 Sphincs+"
+WireKEM = "KYBER768-X25519"
+Addresses = [ "onion://your-onion-address.onion:1234"]
+BindAddresses = [ "tcp://127.0.0.1:1234",]
+DataDir = "/var/lib/pq-katzenpost-mixserver"
+IsGatewayNode = true
+IsServiceNode = false
+...
+</programlisting>
+        <para>DIAGRAM: ROUTER, IPs, etc.</para>
+        <para>mix node, device NAT device/router; Nat dev has an Internet route. Internall, mix node
+            binds to an internal addrexs (show configuration). This is the same for Tor, but with
+            Onion addess rahter that a static IP (see Tor and link)</para>
+        <para>NATPMP STUN TURN– these are Nat PENETRATION PROTOCLDS... <emphasis role="underline"
+                >NOT SUPPORTED</emphasis></para>
+        <para>Two diagrams...Onion and IPv4/IPv6</para>
+        <para>This confguration only allows for the Gateway nodes (which are also mix nodes).</para>
+        <para>We need a to show an excerpt from a torrc to show where the onion listening port is
+            confuigred.</para>
+    </section>
+    
+    <section xml:id="dirauths">
+        <title xml:id="dirauths.title">Using <parameter>BindAddresses</parameter> with
+                <parameter>Addresses</parameter></title>
+        
+        <para>In a conventional NAT configuration, a router sits between two IP networks, one with
+            public, globally unique addresses and the other (the LAN) with reusable local addresses.
+            A host with a public address can connect to a host with a local address because the
+            router is configured with a mapping between the two networks. The router rewrites the
+            destination and source headers of the packets that traverse it in both directions,
+            creating the illusion of an unmediated end-to-end connection. The public host sends
+            packs to a public address </para>
+        
+    </section>
+    
+    
+    
+    
+</article>
 
-    <para>To do</para>   
-   
-<!--    <para>&program_name; can be used from behind NAT devices. Both mix and dirauth nodes.</para>
+<!--
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.1" xml:id="components">
+    <title xml:id="components.title">Using &program_name; from behind a NAT device</title>
+    <para>&program_name; can be used from behind NAT devices. Both mix and dirauth nodes.</para>
     <para>Some networking scenearios do not require any manual port forwarding, such as operating an ec2 node on AWS,
     the node listens on an internal IP address yet can receive connections that get routed to a public IP address.
     There is a NAT device involved here but it's default policy is to route all trafic to the node.
@@ -80,5 +228,6 @@
     <para>Two diagrams...Onion and IPv4/IPv6</para>
     <para>This confguration only allows for the Gateway nodes (which are also mix nodes).</para>
     <para>We need a to show an excerpt from a torrc to show where the onion listening port is
-        confuigred.</para>-->
-</article>
+        confuigred.</para>
+</chapter>
+-->

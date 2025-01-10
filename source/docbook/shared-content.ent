@@ -6,8 +6,8 @@
 <!ENTITY mixserver_binary 'mixserver'>
 <!ENTITY dirauth_binary 'dirauth'> 
 <!ENTITY research_paper_link 'Place-holder for research paper link'>
-<!ENTITY baseURL 'http://localhost:1313/'>
-<!--<!ENTITY baseURL 'https://katzenpost.network/'>-->
+<!--<!ENTITY baseURL 'http://localhost:1313/'>-->
+<!ENTITY baseURL 'https://katzenpost.network/'>
 <!--<!ENTITY xxx ''>
 <!ENTITY xxx ''>
 <!ENTITY xxx ''>-->

@@ -3,7 +3,7 @@ title:
 linkTitle: "Components and configuration" 
 description: "" 
 url: "docs/admin_guide/components.html" 
-date: "2024-12-30T07:33:33.44352874-08:00"
+date: "2025-01-08T12:54:46.354826237-08:00"
 draft: false 
 slug: "" 
 layout: "" 
@@ -57,8 +57,8 @@ weight: 25
             component.  The intended reader is a system administrator who wants to implement a
             working,
             production Katzenpost network. </p>
-         <p>For information about the theory and design of this software, see <a class="link" href="http://localhost:1313/docs/admin_guide/introduction.html" target="_top">Introducing Katzenpost, a modern mixnet</a>. For a quickly deployable,
-            non-production test network (primarily for use by developers), <a class="link" href="http://localhost:1313/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
+         <p>For information about the theory and design of this software, see <a class="link" href="https://katzenpost.network/docs/admin_guide/introduction.html" target="_top">Introducing Katzenpost, a modern mixnet</a>. For a quickly deployable,
+            non-production test network (primarily for use by developers), <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
          <div class="section">
             <div class="titlepage">
                <div>
@@ -83,7 +83,7 @@ weight: 25
                      that
                      Katzenpost requires to function. </b></p>
                <div class="figure-contents">
-                  <div class="mediaobject"><img src="pix/components-production.png"></div>
+                  <div class="mediaobject"><img src="../../pix/components-production.png"></div>
                </div>
             </div><br class="figure-break"><p>The mix network contains an <span class="emphasis"><em>n</em></span>-layer topology of mix-nodes, with
                three nodes per layer in this example. Sphinx packets traverse the network in one
@@ -322,7 +322,7 @@ weight: 25
                <p>The following configuration is drawn from the reference implementation in
                   <code class="filename">katzenpost/docker/dirauth_mixnet/auth1/authority.toml</code>. In a
                   real-world mixnet, the component hosts would not be sharing a single IP address. For
-                  more information about the test mixnet, see <span class="bold"><strong><a class="link" href="http://localhost:1313/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a></strong></span>.</p>
+                  more information about the test mixnet, see <span class="bold"><strong><a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a></strong></span>.</p>
                <div class="table"><a name="d58e242"></a><p class="title"><b>Table&nbsp;2.&nbsp;<span class="bold"><strong>Directory authority (dirauth) configuration
                               sections</strong></span></b></p>
                   <div class="table-contents">
@@ -432,11 +432,20 @@ weight: 25
                                  <li class="listitem">
                                     <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
                                     <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                       <h3 class="title">Note</h3>
-                                       <p>X25519 and X448 are actually non-interactive key-exchanges
-                                          (NIKEs), not KEMs. Katzenpost uses
-                                          a hashed ElGamal cryptographic construction
-                                          to convert them from NIKEs to KEMs.</p>
+                                       <table border="0" summary="Note">
+                                          <tr>
+                                             <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                             <th align="left">Note</th>
+                                          </tr>
+                                          <tr>
+                                             <td align="left" valign="top">
+                                                <p>X25519 and X448 are actually non-interactive key-exchanges
+                                                   (NIKEs), not KEMs. Katzenpost uses
+                                                   a hashed ElGamal cryptographic construction
+                                                   to convert them from NIKEs to KEMs.</p>
+                                             </td>
+                                          </tr>
+                                       </table>
                                     </div>
                                  </li>
                                  <li class="listitem">
@@ -582,11 +591,20 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                  <li class="listitem">
                                     <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
                                     <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                       <h3 class="title">Note</h3>
-                                       <p>X25519 and X448 are actually non-interactive key-exchanges
-                                          (NIKEs), not KEMs. Katzenpost uses
-                                          a hashed ElGamal cryptographic construction
-                                          to convert them from NIKEs to KEMs.</p>
+                                       <table border="0" summary="Note">
+                                          <tr>
+                                             <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                             <th align="left">Note</th>
+                                          </tr>
+                                          <tr>
+                                             <td align="left" valign="top">
+                                                <p>X25519 and X448 are actually non-interactive key-exchanges
+                                                   (NIKEs), not KEMs. Katzenpost uses
+                                                   a hashed ElGamal cryptographic construction
+                                                   to convert them from NIKEs to KEMs.</p>
+                                             </td>
+                                          </tr>
+                                       </table>
                                     </div>
                                  </li>
                                  <li class="listitem">
@@ -670,9 +688,18 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                  <p>Type: string</p>
                                  <p>Required: No</p>
                                  <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                    <h3 class="title">Warning</h3>
-                                    <p>The DEBUG log level is unsafe for
-                                       production use.</p>
+                                    <table border="0" summary="Warning">
+                                       <tr>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                          <th align="left">Warning</th>
+                                       </tr>
+                                       <tr>
+                                          <td align="left" valign="top">
+                                             <p>The DEBUG log level is unsafe for
+                                                production use.</p>
+                                          </td>
+                                       </tr>
+                                    </table>
                                  </div>
                               </li>
                            </ul>
@@ -785,9 +812,18 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                               that gateway nodes to select the delay between gateway node
                               decoys.</p>
                            <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                              <h3 class="title">Warning</h3>
-                              <p>Do not set this value manually in the TOML configuration file. The
-                                 field is used internally by the dirauth server state machine.</p>
+                              <table border="0" summary="Warning">
+                                 <tr>
+                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                    <th align="left">Warning</th>
+                                 </tr>
+                                 <tr>
+                                    <td align="left" valign="top">
+                                       <p>Do not set this value manually in the TOML configuration file. The
+                                          field is used internally by the dirauth server state machine.</p>
+                                    </td>
+                                 </tr>
+                              </table>
                            </div>
                            <p>Type: float64</p>
                            <p>Required: Yes</p>
@@ -1021,9 +1057,18 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                      post-quantum algorithms by offering heavily tested classical algorithms as a
                      fallback.</p>
                   <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                     <h3 class="title">Note</h3>
-                     <p>Sphinx, the nested-packet format, should not be confused with <a class="link" href="http://sphincs.org/index.html" target="_top">Sphincs or Sphincs+</a>, which
-                        are post-quantum signature schemes.</p>
+                     <table border="0" summary="Note">
+                        <tr>
+                           <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                           <th align="left">Note</th>
+                        </tr>
+                        <tr>
+                           <td align="left" valign="top">
+                              <p>Sphinx, the nested-packet format, should not be confused with <a class="link" href="http://sphincs.org/index.html" target="_top">Sphincs or Sphincs+</a>, which
+                                 are post-quantum signature schemes.</p>
+                           </td>
+                        </tr>
+                     </table>
                   </div>
                   <p>Katzenpost Sphinx also relies on the following classical cryptographic
                      primitives: </p>
@@ -1060,11 +1105,20 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                            encrypted nested-packet format used internally by Katzenpost. 
                            
                            <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                              <h3 class="title">Warning</h3>
-                              <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
-                                 be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
-                                 parameters are interdependent and cannot be individually modified. Do not
-                                 modify the these values by hand.</p>
+                              <table border="0" summary="Warning">
+                                 <tr>
+                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                    <th align="left">Warning</th>
+                                 </tr>
+                                 <tr>
+                                    <td align="left" valign="top">
+                                       <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                                          be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
+                                          parameters are interdependent and cannot be individually modified. Do not
+                                          modify the these values by hand.</p>
+                                    </td>
+                                 </tr>
+                              </table>
                            </div>
                         </p>
                         <p>The settings in this section are generated by the <span class="command"><strong>gensphinx</strong></span>
@@ -1085,7 +1139,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                            </ul>
                         </div>
                         <p>The output in TOML should then be pasted unchanged into the node's configuration
-                           file, as shown below. For more information, see <a class="link" href="http://localhost:1313/docs/admin_guide/gensphinx.html" target="_top">Appendix: Using <span class="emphasis"><em>gensphinx</em></span></a>.</p>
+                           file, as shown below. For more information, see <a class="link" href="https://katzenpost.network/docs/admin_guide/gensphinx.html" target="_top">Appendix: Using <span class="emphasis"><em>gensphinx</em></span></a>.</p>
                         <pre class="programlisting">[SphinxGeometry]
                 PacketLength = 3082
                 NrHops = 5
@@ -1216,7 +1270,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                <p>The following configuration is drawn from the reference implementation in
                   <code class="filename">katzenpost/docker/dirauth_mixnet/mix1/katzenpost.toml</code>. In a
                   real-world mixnet, the component hosts would not be sharing a single IP address. For
-                  more information about the test mixnet, see <a class="link" href="http://localhost:1313/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
+                  more information about the test mixnet, see <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
                <p>
                   <div class="table"><a name="d58e947"></a><p class="title"><b>Table&nbsp;3.&nbsp;Mix node configuration sections</b></p>
                      <div class="table-contents">
@@ -1318,11 +1372,20 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                        <li class="listitem">
                                           <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
                                           <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                             <h3 class="title">Note</h3>
-                                             <p>X25519 and X448 are actually non-interactive key-exchanges
-                                                (NIKEs), not KEMs. Katzenpost uses
-                                                a hashed ElGamal cryptographic construction
-                                                to convert them from NIKEs to KEMs.</p>
+                                             <table border="0" summary="Note">
+                                                <tr>
+                                                   <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                                   <th align="left">Note</th>
+                                                </tr>
+                                                <tr>
+                                                   <td align="left" valign="top">
+                                                      <p>X25519 and X448 are actually non-interactive key-exchanges
+                                                         (NIKEs), not KEMs. Katzenpost uses
+                                                         a hashed ElGamal cryptographic construction
+                                                         to convert them from NIKEs to KEMs.</p>
+                                                   </td>
+                                                </tr>
+                                             </table>
                                           </div>
                                        </li>
                                        <li class="listitem">
@@ -1467,9 +1530,18 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                  <p>Type: string</p>
                                  <p>Required: No</p>
                                  <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                    <h3 class="title">Warning</h3>
-                                    <p>The DEBUG log level is unsafe for
-                                       production use.</p>
+                                    <table border="0" summary="Warning">
+                                       <tr>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                          <th align="left">Warning</th>
+                                       </tr>
+                                       <tr>
+                                          <td align="left" valign="top">
+                                             <p>The DEBUG log level is unsafe for
+                                                production use.</p>
+                                          </td>
+                                       </tr>
+                                    </table>
                                  </div>
                               </li>
                            </ul>
@@ -1682,11 +1754,20 @@ FZWJFK0R8iU52CEUxVpXTA==
                            encrypted nested-packet format used internally by Katzenpost. 
                            
                            <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                              <h3 class="title">Warning</h3>
-                              <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
-                                 be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
-                                 parameters are interdependent and cannot be individually modified. Do not
-                                 modify the these values by hand.</p>
+                              <table border="0" summary="Warning">
+                                 <tr>
+                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                    <th align="left">Warning</th>
+                                 </tr>
+                                 <tr>
+                                    <td align="left" valign="top">
+                                       <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                                          be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
+                                          parameters are interdependent and cannot be individually modified. Do not
+                                          modify the these values by hand.</p>
+                                    </td>
+                                 </tr>
+                              </table>
                            </div>
                         </p>
                         <p>The settings in this section are generated by the <span class="command"><strong>gensphinx</strong></span>
@@ -1707,7 +1788,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                            </ul>
                         </div>
                         <p>The output in TOML should then be pasted unchanged into the node's configuration
-                           file, as shown below. For more information, see <a class="link" href="http://localhost:1313/docs/admin_guide/gensphinx.html" target="_top">Appendix: Using <span class="emphasis"><em>gensphinx</em></span></a>.</p>
+                           file, as shown below. For more information, see <a class="link" href="https://katzenpost.network/docs/admin_guide/gensphinx.html" target="_top">Appendix: Using <span class="emphasis"><em>gensphinx</em></span></a>.</p>
                         <pre class="programlisting">[SphinxGeometry]
                 PacketLength = 3082
                 NrHops = 5
@@ -1987,8 +2068,17 @@ FZWJFK0R8iU52CEUxVpXTA==
                                     This parameter is experimental and untuned, 
                                     and is disabled by default.</p>
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                    <h3 class="title">Note</h3>
-                                    <p>This option will be removed once decoy traffic is fully implemented.</p>
+                                    <table border="0" summary="Note">
+                                       <tr>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <th align="left">Note</th>
+                                       </tr>
+                                       <tr>
+                                          <td align="left" valign="top">
+                                             <p>This option will be removed once decoy traffic is fully implemented.</p>
+                                          </td>
+                                       </tr>
+                                    </table>
                                  </div>
                                  <p>Type: bool</p>
                                  <p>Required: No</p>
@@ -1997,8 +2087,17 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p><span class="bold"><strong>DisableRateLimit</strong></span></p>
                                  <p>If <span class="bold"><strong>true</strong></span>, the per-client rate limiter is disabled.</p>
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                    <h3 class="title">Note</h3>
-                                    <p>This option should only be used for testing.</p>
+                                    <table border="0" summary="Note">
+                                       <tr>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <th align="left">Note</th>
+                                       </tr>
+                                       <tr>
+                                          <td align="left" valign="top">
+                                             <p>This option should only be used for testing.</p>
+                                          </td>
+                                       </tr>
+                                    </table>
                                  </div>
                                  <p>Type: bool</p>
                                  <p>Required: No</p>
@@ -2027,7 +2126,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                <p>The following configuration is drawn from the reference implementation in
                   <code class="filename">katzenpost/docker/dirauth_mixnet/gateway1/katzenpost.toml</code>.
                   In a real-world mixnet, the component hosts would not be sharing a single IP
-                  address. For more information about the test mixnet, see <a class="link" href="http://localhost:1313/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
+                  address. For more information about the test mixnet, see <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
                <div class="table"><a name="d58e1607"></a><p class="title"><b>Table&nbsp;4.&nbsp;Gateway node configuration sections</b></p>
                   <div class="table-contents">
                      <table class="table" border="1">
@@ -2132,11 +2231,20 @@ FZWJFK0R8iU52CEUxVpXTA==
                                        <li class="listitem">
                                           <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
                                           <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                             <h3 class="title">Note</h3>
-                                             <p>X25519 and X448 are actually non-interactive key-exchanges
-                                                (NIKEs), not KEMs. Katzenpost uses
-                                                a hashed ElGamal cryptographic construction
-                                                to convert them from NIKEs to KEMs.</p>
+                                             <table border="0" summary="Note">
+                                                <tr>
+                                                   <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                                   <th align="left">Note</th>
+                                                </tr>
+                                                <tr>
+                                                   <td align="left" valign="top">
+                                                      <p>X25519 and X448 are actually non-interactive key-exchanges
+                                                         (NIKEs), not KEMs. Katzenpost uses
+                                                         a hashed ElGamal cryptographic construction
+                                                         to convert them from NIKEs to KEMs.</p>
+                                                   </td>
+                                                </tr>
+                                             </table>
                                           </div>
                                        </li>
                                        <li class="listitem">
@@ -2281,9 +2389,18 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p>Type: string</p>
                                  <p>Required: No</p>
                                  <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                    <h3 class="title">Warning</h3>
-                                    <p>The DEBUG log level is unsafe for
-                                       production use.</p>
+                                    <table border="0" summary="Warning">
+                                       <tr>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                          <th align="left">Warning</th>
+                                       </tr>
+                                       <tr>
+                                          <td align="left" valign="top">
+                                             <p>The DEBUG log level is unsafe for
+                                                production use.</p>
+                                          </td>
+                                       </tr>
+                                    </table>
                                  </div>
                               </li>
                            </ul>
@@ -2525,11 +2642,20 @@ FZWJFK0R8iU52CEUxVpXTA==
                            encrypted nested-packet format used internally by Katzenpost. 
                            
                            <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                              <h3 class="title">Warning</h3>
-                              <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
-                                 be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
-                                 parameters are interdependent and cannot be individually modified. Do not
-                                 modify the these values by hand.</p>
+                              <table border="0" summary="Warning">
+                                 <tr>
+                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                    <th align="left">Warning</th>
+                                 </tr>
+                                 <tr>
+                                    <td align="left" valign="top">
+                                       <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                                          be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
+                                          parameters are interdependent and cannot be individually modified. Do not
+                                          modify the these values by hand.</p>
+                                    </td>
+                                 </tr>
+                              </table>
                            </div>
                         </p>
                         <p>The settings in this section are generated by the <span class="command"><strong>gensphinx</strong></span>
@@ -2550,7 +2676,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                            </ul>
                         </div>
                         <p>The output in TOML should then be pasted unchanged into the node's configuration
-                           file, as shown below. For more information, see <a class="link" href="http://localhost:1313/docs/admin_guide/gensphinx.html" target="_top">Appendix: Using <span class="emphasis"><em>gensphinx</em></span></a>.</p>
+                           file, as shown below. For more information, see <a class="link" href="https://katzenpost.network/docs/admin_guide/gensphinx.html" target="_top">Appendix: Using <span class="emphasis"><em>gensphinx</em></span></a>.</p>
                         <pre class="programlisting">[SphinxGeometry]
                 PacketLength = 3082
                 NrHops = 5
@@ -2830,8 +2956,17 @@ FZWJFK0R8iU52CEUxVpXTA==
                                     This parameter is experimental and untuned, 
                                     and is disabled by default.</p>
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                    <h3 class="title">Note</h3>
-                                    <p>This option will be removed once decoy traffic is fully implemented.</p>
+                                    <table border="0" summary="Note">
+                                       <tr>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <th align="left">Note</th>
+                                       </tr>
+                                       <tr>
+                                          <td align="left" valign="top">
+                                             <p>This option will be removed once decoy traffic is fully implemented.</p>
+                                          </td>
+                                       </tr>
+                                    </table>
                                  </div>
                                  <p>Type: bool</p>
                                  <p>Required: No</p>
@@ -2840,8 +2975,17 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p><span class="bold"><strong>DisableRateLimit</strong></span></p>
                                  <p>If <span class="bold"><strong>true</strong></span>, the per-client rate limiter is disabled.</p>
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                    <h3 class="title">Note</h3>
-                                    <p>This option should only be used for testing.</p>
+                                    <table border="0" summary="Note">
+                                       <tr>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <th align="left">Note</th>
+                                       </tr>
+                                       <tr>
+                                          <td align="left" valign="top">
+                                             <p>This option should only be used for testing.</p>
+                                          </td>
+                                       </tr>
+                                    </table>
                                  </div>
                                  <p>Type: bool</p>
                                  <p>Required: No</p>
@@ -2870,7 +3014,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                <p>The following configuration is drawn from the reference implementation in
                   <code class="filename">katzenpost/docker/dirauth_mixnet/servicenode1/authority.toml</code>.
                   In a real-world mixnet, the component hosts would not be sharing a single IP
-                  address. For more information about the test mixnet, see <a class="link" href="http://localhost:1313/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
+                  address. For more information about the test mixnet, see <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
                <div class="table"><a name="d58e2287"></a><p class="title"><b>Table&nbsp;5.&nbsp;Mix node configuration sections</b></p>
                   <div class="table-contents">
                      <table class="table" border="1">
@@ -2974,11 +3118,20 @@ FZWJFK0R8iU52CEUxVpXTA==
                                        <li class="listitem">
                                           <p><span class="bold"><strong>Classical:</strong></span> "x25519", "x448"</p>
                                           <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                             <h3 class="title">Note</h3>
-                                             <p>X25519 and X448 are actually non-interactive key-exchanges
-                                                (NIKEs), not KEMs. Katzenpost uses
-                                                a hashed ElGamal cryptographic construction
-                                                to convert them from NIKEs to KEMs.</p>
+                                             <table border="0" summary="Note">
+                                                <tr>
+                                                   <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                                   <th align="left">Note</th>
+                                                </tr>
+                                                <tr>
+                                                   <td align="left" valign="top">
+                                                      <p>X25519 and X448 are actually non-interactive key-exchanges
+                                                         (NIKEs), not KEMs. Katzenpost uses
+                                                         a hashed ElGamal cryptographic construction
+                                                         to convert them from NIKEs to KEMs.</p>
+                                                   </td>
+                                                </tr>
+                                             </table>
                                           </div>
                                        </li>
                                        <li class="listitem">
@@ -3123,9 +3276,18 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p>Type: string</p>
                                  <p>Required: No</p>
                                  <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                    <h3 class="title">Warning</h3>
-                                    <p>The DEBUG log level is unsafe for
-                                       production use.</p>
+                                    <table border="0" summary="Warning">
+                                       <tr>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                          <th align="left">Warning</th>
+                                       </tr>
+                                       <tr>
+                                          <td align="left" valign="top">
+                                             <p>The DEBUG log level is unsafe for
+                                                production use.</p>
+                                          </td>
+                                       </tr>
+                                    </table>
                                  </div>
                               </li>
                            </ul>
@@ -3266,10 +3428,19 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  example configuration above shows spool enabled with the setting:
                                  <pre class="programlisting">Disable = false</pre>
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                    <h3 class="title">Note</h3>
-                                    <p><code class="code">Spool</code>, properly <code class="code">memspool</code>, should
-                                       not be confused with the spool database on gateway
-                                       nodes.</p>
+                                    <table border="0" summary="Note">
+                                       <tr>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <th align="left">Note</th>
+                                       </tr>
+                                       <tr>
+                                          <td align="left" valign="top">
+                                             <p><code class="code">Spool</code>, properly <code class="code">memspool</code>, should
+                                                not be confused with the spool database on gateway
+                                                nodes.</p>
+                                          </td>
+                                       </tr>
+                                    </table>
                                  </div>
                               </p>
                               <div class="itemizedlist">
@@ -3338,9 +3509,18 @@ FZWJFK0R8iU52CEUxVpXTA==
                                        <p>Supported values are ERROR | WARNING | NOTICE |INFO |
                                           DEBUG.</p>
                                        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                          <h3 class="title">Warning</h3>
-                                          <p>The DEBUG log level is unsafe for production
-                                             use.</p>
+                                          <table border="0" summary="Warning">
+                                             <tr>
+                                                <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                                <th align="left">Warning</th>
+                                             </tr>
+                                             <tr>
+                                                <td align="left" valign="top">
+                                                   <p>The DEBUG log level is unsafe for production
+                                                      use.</p>
+                                                </td>
+                                             </tr>
+                                          </table>
                                        </div>
                                        <p>Type: string</p>
                                        <p>Required: Yes</p>
@@ -3376,9 +3556,18 @@ FZWJFK0R8iU52CEUxVpXTA==
                                        <p>Required: Yes</p>
                                        <p>Required: Yes</p>
                                        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                          <h3 class="title">Warning</h3>
-                                          <p>The DEBUG log level is unsafe for production
-                                             use.</p>
+                                          <table border="0" summary="Warning">
+                                             <tr>
+                                                <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                                <th align="left">Warning</th>
+                                             </tr>
+                                             <tr>
+                                                <td align="left" valign="top">
+                                                   <p>The DEBUG log level is unsafe for production
+                                                      use.</p>
+                                                </td>
+                                             </tr>
+                                          </table>
                                        </div>
                                        <p>Type: string</p>
                                        <p>Required: Yes</p>
@@ -3595,11 +3784,20 @@ FZWJFK0R8iU52CEUxVpXTA==
                            encrypted nested-packet format used internally by Katzenpost. 
                            
                            <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                              <h3 class="title">Warning</h3>
-                              <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
-                                 be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
-                                 parameters are interdependent and cannot be individually modified. Do not
-                                 modify the these values by hand.</p>
+                              <table border="0" summary="Warning">
+                                 <tr>
+                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                    <th align="left">Warning</th>
+                                 </tr>
+                                 <tr>
+                                    <td align="left" valign="top">
+                                       <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                                          be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
+                                          parameters are interdependent and cannot be individually modified. Do not
+                                          modify the these values by hand.</p>
+                                    </td>
+                                 </tr>
+                              </table>
                            </div>
                         </p>
                         <p>The settings in this section are generated by the <span class="command"><strong>gensphinx</strong></span>
@@ -3620,7 +3818,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                            </ul>
                         </div>
                         <p>The output in TOML should then be pasted unchanged into the node's configuration
-                           file, as shown below. For more information, see <a class="link" href="http://localhost:1313/docs/admin_guide/gensphinx.html" target="_top">Appendix: Using <span class="emphasis"><em>gensphinx</em></span></a>.</p>
+                           file, as shown below. For more information, see <a class="link" href="https://katzenpost.network/docs/admin_guide/gensphinx.html" target="_top">Appendix: Using <span class="emphasis"><em>gensphinx</em></span></a>.</p>
                         <pre class="programlisting">[SphinxGeometry]
                 PacketLength = 3082
                 NrHops = 5
@@ -3900,8 +4098,17 @@ FZWJFK0R8iU52CEUxVpXTA==
                                     This parameter is experimental and untuned, 
                                     and is disabled by default.</p>
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                    <h3 class="title">Note</h3>
-                                    <p>This option will be removed once decoy traffic is fully implemented.</p>
+                                    <table border="0" summary="Note">
+                                       <tr>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <th align="left">Note</th>
+                                       </tr>
+                                       <tr>
+                                          <td align="left" valign="top">
+                                             <p>This option will be removed once decoy traffic is fully implemented.</p>
+                                          </td>
+                                       </tr>
+                                    </table>
                                  </div>
                                  <p>Type: bool</p>
                                  <p>Required: No</p>
@@ -3910,8 +4117,17 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p><span class="bold"><strong>DisableRateLimit</strong></span></p>
                                  <p>If <span class="bold"><strong>true</strong></span>, the per-client rate limiter is disabled.</p>
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-                                    <h3 class="title">Note</h3>
-                                    <p>This option should only be used for testing.</p>
+                                    <table border="0" summary="Note">
+                                       <tr>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <th align="left">Note</th>
+                                       </tr>
+                                       <tr>
+                                          <td align="left" valign="top">
+                                             <p>This option should only be used for testing.</p>
+                                          </td>
+                                       </tr>
+                                    </table>
                                  </div>
                                  <p>Type: bool</p>
                                  <p>Required: No</p>

@@ -13,9 +13,7 @@
 <!ENTITY blocksphinxplaintext '<varlistentry>
                 <term>BlockSphinxPlaintext</term>
                 <listitem>
-                    <para>The payload structure which is encapsulated by the Sphinx body. It is
-                        described in KATZMIXE2E, section Client and Provider processing of
-                        received packets.</para>
+                    <para>The payload structure which is encapsulated by the Sphinx body.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY wireprotocol '<varlistentry>

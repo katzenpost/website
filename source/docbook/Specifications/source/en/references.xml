@@ -22,7 +22,7 @@
 <!ENTITY % references SYSTEM "../../../references.ent">
 %references;
 ]>
-
+ 
 <article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
 version="5.1" xml:id="references">
 
@@ -40,8 +40,8 @@ version="5.1" xml:id="references">
 &KATZMIXPKI; 
 &KATZMIXWIRE; 
 &KEMCOMB;
-&LOOPIX;
 &LOCALVIEW;
+&LOOPIX;
 &MIRANDA;
 &MIXMINION;
 &MIXMINIONDIRAUTH;
