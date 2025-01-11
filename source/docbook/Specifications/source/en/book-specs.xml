@@ -2,21 +2,16 @@
 <?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 
-
-<!--    
-Favorite PDF recipe for this document:
-
-xmllint -\-noent -\-xinclude book.xml -\-output out.xml
-pandoc -f docbook out.xml -\-toc -\-toc-depth=5 -\-pdf-engine lualatex -o admin_guide.pdf
--->
-
-
 <!DOCTYPE book [
    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
     %shared-content;
+    <!ENTITY % terms SYSTEM "../../../terms.ent">
+    %terms;
+    <!ENTITY % references SYSTEM "../../../references.ent">
+    %references;
     <!ELEMENT xi:include (xi:fallback?) > 
     <!ATTLIST xi:include 
-        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
     href CDATA #REQUIRED 
     parse (xml|text) "xml" 
     xpointer CDATA #IMPLIED 
@@ -36,17 +31,20 @@ pandoc -f docbook out.xml -\-toc -\-toc-depth=5 -\-pdf-engine lualatex -o admin_
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" > 
 ]> 
 <book xmlns="http://docbook.org/ns/docbook">
+
+    <title>&program_name; Specifications</title>
     
-    <title>&program_name; administration guide</title>
-    
-    <xi:include href="introduction.xml"></xi:include>
-    <xi:include href="quickstart.xml"></xi:include>
-    <xi:include href="components.xml"></xi:include> 
-    <xi:include href="docker.xml"></xi:include>
-    <xi:include href="tuning.xml"></xi:include>
-    <xi:include href="nat.xml"></xi:include>
-    <xi:include href="docker-config-appendix.xml"/>
-    <xi:include href="operations.xml"></xi:include>
-    <xi:include href="gensphinx-appendix.xml"></xi:include>
-    
+<!--    <xi:include href="certificate.xml">2</xi:include>
+    <xi:include href="client2.xml"/>
+    <xi:include href="kemsphinx.xml"/>
+    <xi:include href="mixnet.xml"/>
+    <xi:include href="mixdecoy.xml"/>
+    <xi:include href="pki.xml"/>
+    <xi:include href="kaetzchen.xml"/>
+    <xi:include href="sphinx.xml"/>
+    <xi:include href="replay.xml"/>
+    <xi:include href="wire.xml"/>
+    <xi:include href="glossary.xml"/>
+    <xi:include href="references.xml"/>   
+    -->
 </book>
