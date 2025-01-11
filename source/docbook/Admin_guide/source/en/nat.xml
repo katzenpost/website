@@ -109,8 +109,100 @@
             to listen on a RFC1918 address such as 192.168.1.22 and yet tell the other dirauth node
             operators that their publicly routable address is some other IP address or perhaps a Tor
             Onion address. </para>
-        <para/>
-        <para/>
+        
+        <mediaobject>                                           
+            <imageobject>
+                <imagedata fileref="pix/gateway-onion.png"/>
+            </imageobject>
+        </mediaobject>   
+        
+        <para><filename>/etc/tor/torrc</filename></para>
+        <programlisting>...
+HiddenServiceDir /var/lib/tor/my_website/
+HiddenServicePort 1234 127.0.0.1:1234
+...</programlisting>
+        <para><filename>Katzenpost.toml</filename></para>
+        <programlisting>[Server]
+...
+Addresses = [ "onion://onion-address.onion:1234"]
+BindAddresses = [ "tcp://127.0.0.1:1234",]
+...</programlisting>
+        <para><filename>client.toml</filename></para>
+        <programlisting>ListenNetwork = "tcp"
+ListenAddress = "localhost:64331"
+PKISignatureScheme = "Ed25519"
+WireKEMScheme = "xwing"
+
+[SphinxGeometry]
+  PacketLength = 3082
+  NrHops = 5
+  HeaderLength = 476
+  RoutingInfoLength = 410
+  PerHopRoutingInfoLength = 82
+  SURBLength = 572
+  SphinxPlaintextHeaderLength = 2
+  PayloadTagLength = 32
+  ForwardPayloadLength = 2574
+  UserForwardPayloadLength = 2000
+  NextNodeHopLength = 65
+  SPRPKeyMaterialLength = 64
+  NIKEName = "x25519"
+  KEMName = ""
+
+[Logging]
+  Disable = false
+  File = ""
+  Level = "DEBUG"
+
+[UpstreamProxy]
+  Type = "none"
+  Network = ""
+  Address = ""
+  User = ""
+  Password = ""
+
+[Debug]
+  DisableDecoyTraffic = true
+  SessionDialTimeout = 0
+  InitialMaxPKIRetrievalDelay = 0
+  PollingInterval = 0
+  EnableTimeSync = false
+
+[PinnedGateways]
+
+  [[PinnedGateways.Gateways]]
+    WireKEMScheme = "xwing"
+    Name = "gateway1"
+    IdentityKey = "-----BEGIN ED25519 PUBLIC KEY-----\naJaBWi498i7smuA9JrZq0uHUZ4yrIv3OTAAnhWeoqOE=\n-----END ED25519 PUBLIC KEY-----\n"
+    LinkKey = "-----BEGIN XWING PUBLIC KEY-----\nioBUTSlbNbR3raBKhHKfFzRlt9Vc1iKfzuh7b4HJiDcDqvw4VxtVpKoSE+WAYOlR\nLfaWp9Wd3qqeiyc8EQysWfeeBEtslsk/4aJWF+xQTYxjF/Sqb2ktJuuNkKRmDCVr\n20Voy+g/h+NnSXiB8PBjFIPJnZKi8JEynAfJ1iFLVwOggHfDtSehT5R2l2gjLgCZ\ncHBvm0W8rAM751N00IBXGGVPDWiNF/lNSyeQbnF2v3lKcEQ1xZIzp4MdtlWETEs/\nB6Fqi3Agk9hVUQOF+8VBbGZnJ/yP14hPFOK1C4OnzXJXTJJT3rWFRuwl/HMzlbil\nmIeYqRE2HHd2C9Gf8koLPalnYknDqHduAxWfcixPvbeVY0YFpjk48DoZZOlpCVuT\nLmkbkPPB0OolkpRQNHKpfpDKANh3BvA1Y8gywVdvKvpL6DSWZvgt2rlhdTUgL6rC\nhNEpR8TJTKqkTawiHaugAoFodxajm3I9ITEORxAm00Clu4GP8Juty9KyVdRKjxBf\nK5sSEEfKwmxTTakOrFN80wu2sHEIIFguqUzHuOS3UAejNgigIJIISdOOKZDH86Z6\nO3RdcPxc/TST85mRLhGxw+ekQigKd1SWmEKKmpccYqwL2redvmdXP4rPf6Auxviu\ne3WtgkpAN/lc87W0kDa0uCVsPZxm/TyDbnm2krLNUdRhT5lX0nsHMjlf4SE3I3E/\nh7cPckkjNCm994NcIus7eNAWUDK5ePSSOLyhXoE6uDsjWPM0piFHZxRLbIrBPGfK\ndsWTK3GPvSGK8KVcFFMaZBmy87u+vMhnXvCkNpxP9GEeucGTHKSqNxu97sG/PvoN\n95KX9qW+LPCOCTUXyAN4A1ovqCAjJcOuxAqfzvZq3Eo3T1arniyxI3Epz7RMLLqi\nbqt+S1F0C3RMFxk0EBd+6SENSgGuV7d+cPCrQKhK03NTGxxjYVihm4EPNVtk22jO\n91IGccIFbtJ2eTWnrclmRCeOFil+SHHIDrc981pCSSOWABxkT5exthc5mXy0IIHL\n4KzPydqUABVAfwR3euQSkllxjdG4ISt4CPixnWBO0npKquljJvh2g/gIpHMih/u5\nxklmUsCFWkh5eQWCcJKyOjJL6EK2ZGBu1UV8ebpcdtKx6/SO2/I7ivQe5fw6DaSo\nibdcn/S8uEHOMYgD21BDLKxJCiAQjHRzNCO9q/WaXhVNObCjTBaqAMxGWVN0Q7BW\n+IBrutzBeQfP7XgBgpRuMzm6i8tskJB59pQ/UwAHd6WfqHgD2jwJfbdcbPcUYSwA\njrNbcWVgIobHHAXBcwdHmSkVa2Gs9pA1PvjDFsQv9bdkjGZ1VJSx3hUmhKpoGoVl\nAKO/X6IjfRUXKst74hEgl7q6JpVjlJAjkGpR9cpJ17Q1cOdxFvOKxnBeSFasUQPF\nFQZEt3qmsDw/KQoxUNmBvJClWaogXElFu/K8HNR3FAaZEjSbLaiem8aXBJayTvKL\n3eaFgrwQqbctQBhMvRoJ2qRMbNIn8GJ5hKWQjLggtoPDdXSKjXM2OoAReSaeCKAf\n9uEgW8tVo7cejCOl9TiuuRj1kijUzO5pv5t1gEdakiHEMIQpIF6oaqcrDkiC48Ha\n7yIlFZf8uYpoDekvHz4NWQ==\n-----END XWING PUBLIC KEY-----\n"
+    PKISignatureScheme = "Ed25519"
+    Addresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005", "onion://thisisjustatestoniontoverifythatconfigandpkiworkproperly.onion:4242"]
+
+[VotingAuthority]
+
+  [[VotingAuthority.Peers]]
+    Identifier = "auth1"
+    IdentityPublicKey = "-----BEGIN ED25519 PUBLIC KEY-----\naXCOSAlAKN4jM54qnwwoH+bBvXSvj+enn4HKJu1Loak=\n-----END ED25519 PUBLIC KEY-----\n"
+    PKISignatureScheme = "Ed25519"
+    LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nCTwARqRQCTyQYpwQRpyyR0GPJqIqdbJrUspd2YETSUuaSxXOY4hh5MfNZNlhJ/Gt\nUsQ3/eTCU0QTDeqn+MAkidxWQkV972Yaz2xa3wST2oWe5QwmmGCLmosKvsAgTbvG\nCniRx/q7hUp7lnAadWp2zew5b2OiXSGuK5ypjpkB/+mp7vCqqbZGwvARclt4KTOt\npiaGZxtkb9zPJohOotPDLipHHiKvWucELZGz/xQXptsR3vUmLrh+axmi/EiRn7Q0\nBMmG3YpuN2eMtYOG8Vw3EJkLGwzGb7nPR7PAZwa6BgI3g/MBhKp6qeQD8Cl70Dt/\nnuRMWpV+J8qHWdXDGyt7jmtbFcjC7xyIpcMkfYRHGGZFBacA1Ka/uzcIj5oMBGh1\n9HA8O1lDpqsQpOkw7WRuJIal1NYxeSodSVWQ9AG7jOQbDUK+E5MTWvqpZwuaUCTC\nUKZIPJkb3nAddyi3BKcs47mQf5hTpQEF6sIS2rZ1UruVX0wAynBt9RtP2MB3wVtY\ng4q32Vh2Uls1BdJVcxyVTaelIwLJFQmuMzt1c9MPXpxwUJOQXNkCrEVLWKBJsysE\n0xlHoOQU51JseaFUEOY6dkIgXCHAGgwI8PTFEUKKGQg3RqvCNWt/j+FrMXRQMpvE\nS2eooYR4CqgR09KZD5l9hLbHeVUUfdoU27hckDEzaLQJMYhF50APyDSWa0C9oZaR\n3QE4meURIEo4pyW8YRVHAVwllvxyB+JTFmUnxREccvWJpWl2rxI4AtA2NVqECBw0\n9OECFlLGH9s+c9wC9ah50ZPOLRalVEdU6/FiS0pBGSB0HKsil0ipZ6qUIxgiJrYr\ndVV/b1uU0+qDQ5hJlbdUCtEUNHteXnIPjEa9lCg1KARFfGoIF5jM20FhOfFW/nVo\n1Jka5TtJOZDI1YoSQcUoDwCC6eW1ucFHPUOdviZ2fYEZzoAGx5A50GPG+7vHXeuh\nHQPArUC1TkafejW5bHmjqSo37fQO97SyrfKW0WNCARinHDJsM1NG4wmpZ+N8FihH\n5uYkTIIjDLRmoUhNaQG+jhzGhZSvf1CI9jI3BCiB9ShgwZR9RTlhCezC4Wy1Y3sU\nYmm6XbYYh7gCGGEs9npAxRmGroWwCVpMJeWzxdUR5KMJclNId1gBYhioCFSru4ZE\nbHBFiEoOxrubnkWxZGDLlkVDQmOyNISl+tIy0GI/ubtRLbgDMyyL71dWmLVZcpsh\nRBJJL+lrhSirFeyh9kZEotVdkOp5uPIViyqjIRukcCKzIwavM6YlptuyZitIBWsg\naqU+9ooqwZUPRLFRdJE/J5umbdQTBtOMhdrOIRdKeJoEDAFIqYwQcrJjLDJj8lhA\nJ2FwGnFjJJYFVWIte2qg+7UqKxqf1+QlL+uJ4uaE6KQJcRlzKGYLE1h3jToWL8wO\nDaUPdACQGexHj7wVomPJa9ecSKGUKFWb1LZLryYh+AM8D3COLKN3CXU1WAG/Bth3\nF2QC4FewIuVMhVWk9XoXY+By5cKHpriPbwtqRgY9c6TKNnk7dVKL3rWg0mG0qoSz\n4MIJxfGsWJb0rK7KUEBu5BTati4iHqy6NOr+FtGYcyYfH2UB+Q2LWit9FB6Bgeg6\n7wbN0RSiyrNIM4ZJ9eqvKg==\n-----END XWING PUBLIC KEY-----\n"
+    WireKEMScheme = "xwing"
+    Addresses = ["tcp://127.0.0.1:30001"]
+
+  [[VotingAuthority.Peers]]
+    Identifier = "auth2"
+    IdentityPublicKey = "-----BEGIN ED25519 PUBLIC KEY-----\nnYK+ND7+nTgbh+9uEcAZeDp0Ohkq3jzJro2BrMCkZFA=\n-----END ED25519 PUBLIC KEY-----\n"
+    PKISignatureScheme = "Ed25519"
+    LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\njDJpv2C8DKNWq1OK5TNEPNmuQUihpdC5w8i87aci7UAZ0/LOfOGFbeIo6MKNnUyL\nskYa3pASRbAxMTNRDNhMsAq9JQy2o/CjXrDHZoe0AEZp9nwDozOqUtqSiCxnV+Bw\ng4tN6aRTl3FplLuOAzY2imV0kFXIITWfqSlIP1eWTMh4YvVfOrwzV0yjfqRthpa7\nr6tjBRlYc3QE1Jlz3fOOFzsLtlaUYHxJtjxdfTtpW7yr6WMJyyu+HJcge3Zoq/gG\nNytDYIAYEWgWiRZpcAm6V2m6utB3r/O7OdS3hMcv7YDAeFG7E0jExthP0pHEqkaZ\npGipM2JSvzk5Shp2UNhoSxMej6U4egoAaxZ3JZIs+ZQRZwyoPqBp4Gca9OlEO3QR\nR0Ami9deA2Ifiegu1sSxlGt6B1YDgdhGfLQow+JV0wy0MzMAYrasVCIaNeghkvRa\n3pkVyWZc12RR4St0oAxU03QrRPSoGXonYfQbdrUZfjlywrgcNTu+v4VRDjst4yUd\nqzZPw9iABHJgw+SwQgAyzTZj3ntrs7W7ECepaVbDt0c9yKy3E0Qy5Je/rkQgnjsC\ndDU+OsnD8rVnjXgyj3Cp7+dmh1IeC1ybTomwyDCKr+WwEeh2beo8MaG05wRYRCS6\n8kV5kocNB1w5SUZ+R6fC0BwU+FFho9mK4LFnoHenHSXE8PludpmOW0OTf0IVZeGd\npcHK7DkELUtQOQCDBVXBoJAD80ewoNfN8hIzbECOCsdsMOEl2VuA/wB8WkS9JNx8\nCCM4nMZbnyeaeaojvJMDgwW8U3kuBwhR0AeZO/dQPVpWdbxV61NIHeRi21cniVrG\naMJaXtaEp0MxHmRl2Ue0HcOVd7S8dNPJmwUBNOYYpIQ9H4KVWXwP+DvC3fkOXESp\nmLJZySbNmfCtLzDHzMWKXaW3k8lRZ3CUrFtAFsfIxAhlL0RBfbe2gGxhL2tKONsN\nKAIXt+YnNTOpVnsPhFRUCWGyrkO9c1yMAiclVWliaaVlBbYHhmKEPUSZTAI5meuN\nCkstBADBEKyc1fArgmIRbxYWXNKWrien5CBXlNM/g9K3MlIFjqs6FqAQDad0eVs+\naeLNPHhAFdZ3ZMNU8zgpAQs2uMqms1a4/8E6PlWH2upOWysO5vzDm1bFR3dVw3eO\nOlsbAN1xC/ChbhSk6gy7RtCHGfllmMNlRMAc59w0tJuxUpQasFYkxMWgFwO7BdFe\ni2TE39k33ubDhyQLwOkuWaTLlVWfLyIkZRFOdOhBP8o4i3R/ujVZ5bVDn5qKoKWC\nlboy71abYZRR5HiMhtFmaXSZuPey7WFh0SF2/UciTKc77pBihFte5Up+NSsJjQZk\n29U4EFtDHgK6GwUan6aI4KUOYrWjemAKSePO7qoZPHQ0wXtoxgGbshipPYQPohfB\nGQPI31gxlHtTf2YUdqoKasmRvyIXqrV2ImQ1SBJ5SCcGUtUzvkekZfZUEGaD+cKz\nr5wyHeS4iEuyzoVD8avH90q3J2mt2dTDfSNaKWKkzHUh+jZ9nIYpGbpfNrWUkkYr\nhLh+TJFFmpTZWIIw3K+XNdb0iLw6ZC6TB7uGkjhkQW+mtGKzZr6bwywCatrAOrdq\nfK02ZSDz8Ckfkrfn1BQLOA==\n-----END XWING PUBLIC KEY-----\n"
+    WireKEMScheme = "xwing"
+    Addresses = ["tcp://127.0.0.1:30002"]
+
+  [[VotingAuthority.Peers]]
+    Identifier = "auth3"
+    IdentityPublicKey = "-----BEGIN ED25519 PUBLIC KEY-----\ngnn4qJensuWMONasmiau/4HQnPFJifj2OER7tqD2t/s=\n-----END ED25519 PUBLIC KEY-----\n"
+    PKISignatureScheme = "Ed25519"
+    LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nbnkD32kD1Spj8uoyriwobTYrWNFybCIjEllrP4QUhFV0Iwm7F7CF3bQ4xgsB3BvD\n8up3cIsTJ3XB/9spnVG+ynGlUiJyoPkoORqGImt9KcWqS3yNZXB+e+OYH2yy2cwL\npplQ/foJRhKd6tvFq7EPjqfGfrLL+Lw9PkamaOSqgYCtjxep6aclE+SWP+sEv8da\naaXP0qLNl7dsP9Ene+oIiPUD8QmWOAYRfKh5BZqFLYN1UuqLroIq3FiRe7dIAHOp\nAga8pBKpXfKVJXONoytOhOmQdhRiFQKJavFpj6hSXHeQ+NxQz4q5NOyvrhx/gvaG\n6vqX6vdT53ySaVoXJyASbqOT88EqtecF1QeWNIOeL6xu3cFNoIaegmDL+BYoNBkH\nqAG5LKAAJ2m8VVqYRgRLvXCDA2grFDcembdSijct+ZmeFSBFN2daxAcjxqyU8mYK\nmBAlY8ZC6vUY78m5cXdSnqFD7LkQe1sb3yVc3PVfIJF3qdSClzRj2MZbSGWmx9pq\ntKVQODonlEOUu9YcfYcmvgSClJNACDbPHDRgmRuh1qNurTRj83E+B1etm6U7sATK\nLwWsKepcqoV8E6BlKklcsiVN+euQPdqNnwCXGYNwuEox6aa9aFO4iDgrCOCgkcLE\nVXmFsJovfVBAJEpo2FIBm/Y2oCpBHGaQaQI0KdSebrFKhuwtHIs/slY0OGaBG4qP\njNCqn4plCPJ5CWSvIUC/J0KO1pYJV4wmzSgwNDQzjwQEfycbqoWIZvs0OHQWowW6\nvtdB+WtxuHUz4oZFLnG9UgAJzLGohwcmi6wP4YmtBnUI9WNylppnp9RxI3gSrLeS\nNNGn26I1uMEfPgPGwWUMkcCNgGAPlnpxYgFxycoycvrFxwuGrZoI4RcdRIOlmwJT\nyKiqn+QSR/CJgNkSnCGB1woR4PA1m6lKERoiTMg2/1F7ADW8YINTgYRo4xUjBOCn\nvLc/Eiw4FbdFNgRzZiN87zuCV2gANTpjFalOiUl53bsoWOKgheF/izJdjkhx5kB7\nrZctURQFVWezlmeOWIg1e8ituStsC7Q9INIX2FXJ+xolhgCiOlSmWXUHq2ePm3Wq\noVqsEqHFgeujaPV5/yOmiqAYERMkcFvITzeTMhS+tUREV9kpgSauZgqAUEaONbtp\nHDs9fKzLm4J1xOiXMIazDTFi/CEaNlSnDaw/xQRVjAkqb4Qi0vCJ9HJmb6Q7yBVp\n33lITjl0FUc5TmJX5OeLToJ71EE6RoETjYEiZUk3RJs//RVvbkkryKyE+NRoACSM\nVgQTp3tv4VSHVwVSULqs1TZGi7CcVStuGeNaUNU548y2yUFdmdqJnlCfDlV2aRY2\nGvEquInLAjaSS5lfPFEMgNts1kWggkihGJiXpiZx33EPbBdFHUgvOkc+M9SldGtM\n+CXOPdI9wgNvBnIw2Di69fHIvgdl9xxoceZ+UWEjl+IOCpKQoAtW7NVSpsK9hPcB\nk0mYdPh3X6y4KWVlglycjGQOrdK+njiUqxEvZNolmaYZWVQNpkV4ylGgoidE8xgz\n0IqiDk+K0CJrhVKI/CxgeNwpMOBVZJOfnhpegJyXTIJkauu5yMLfBhbG0TKNpSE/\n6qdySmRRPC5qMDEeBfwLHA==\n-----END XWING PUBLIC KEY-----\n"
+    WireKEMScheme = "xwing"
+    Addresses = ["tcp://127.0.0.1:30003"]</programlisting>
         <para>Dirauths and gateways can be hosted as Tor onion services. (Mix and service nodes
             cannot be hosted in this manner because they communicate only inside the mix network.) </para>
         <para/>
@@ -130,8 +222,7 @@ HiddenServicePort 1234 127.0.0.1:1234
         <para>We refer you to the Tor onion setup docs for more information:
             https://community.torproject.org/onion-services/setup/</para>
         <para>The corresponding Gateway config Server section might look like this:</para>
-        <programlisting>
-[Server]
+        <programlisting>[Server]
 Identifier = "gnunet"
 PKISignatureScheme = "Ed25519 Sphincs+"
 WireKEM = "KYBER768-X25519"
@@ -140,8 +231,7 @@ BindAddresses = [ "tcp://127.0.0.1:1234",]
 DataDir = "/var/lib/pq-katzenpost-mixserver"
 IsGatewayNode = true
 IsServiceNode = false
-...
-</programlisting>
+...</programlisting>
         <para>DIAGRAM: ROUTER, IPs, etc.</para>
         <para>mix node, device NAT device/router; Nat dev has an Internet route. Internall, mix node
             binds to an internal addrexs (show configuration). This is the same for Tor, but with
@@ -230,4 +320,7 @@ IsServiceNode = false
     <para>We need a to show an excerpt from a torrc to show where the onion listening port is
         confuigred.</para>
 </chapter>
+
+<a href="https://vectorified.com/tor-icon">Tor Icon</a>
+
 -->
