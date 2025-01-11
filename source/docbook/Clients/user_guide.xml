@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title "Client user guide" ?> <!-- Required ... copy section title here -->
+<?linkTitle "Client user guide" ?>  <!-- Section menu link text -->
+<?url "docs/clients/user_guide.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft "false" ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight "1" ?> <!-- Optional -->
+
+<!DOCTYPE section [
+    <!ENTITY % shared-content SYSTEM "../shared-content.ent">
+    %shared-content;
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+
+<section    xmlns="http://docbook.org/ns/docbook"
+            xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
+            xml:id="CHANGE_ME">
+    <info>  
+        <title xml:id="CHANGE_ME.title">&program_name; client user guide</title> <!-- Match to title PI above. -->          
+    </info>
+    <example>
+        <caption>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/3r8yohzpp7dbpdkueu91f8itoe"
+                    xml:id="CENTER_time_3r8yohzpp7dbpdkueu91f8itoe">7:03 PM</link></para><para>about
+                Tor, I mean I understand this to be a mix server running on a host that is
+                advertised only as an onion service</para><para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/w3hptufo5iy1ixunfi8ha4c9fy"
+                    xml:id="CENTER_time_w3hptufo5iy1ixunfi8ha4c9fy">7:04 PM</link></para><para>The
+                oinon address is what's in the PKI doc</para><para>Wednesday</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/fz4fkb8637yd7m7rquys3qengc"
+                    xml:id="CENTER_time_fz4fkb8637yd7m7rquys3qengc">8:57 AM</link></para><para>Our
+                software only does that for gateway nodes. </para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/6ozq51ch7ig48gsbhyh5sydo3r"
+                    xml:id="CENTER_time_6ozq51ch7ig48gsbhyh5sydo3r">11:46 AM</link></para><para>So
+                all node types can be NATted, but Tor is only usable with gateway
+                    nodes.</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/r4rug3sw6ff77c6qtwyjb61e8e"
+                    xml:id="CENTER_time_r4rug3sw6ff77c6qtwyjb61e8e">1:04 PM</link></para><para>PR
+                    <link xlink:href="https://github.com/katzenpost/website/pull/130"
+                    >https://github.com/katzenpost/website/pull/130</link> now includes removal of
+                the obsolete reference and a refresh of the
+                    docs.</para><para>Yesterday</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/hj6t4e661tdafnpg7pbs3cxnho"
+                    xml:id="CENTER_time_hj6t4e661tdafnpg7pbs3cxnho">10:51 AM</link></para><para>It
+                was pointed out to me that this page has two broken links <link
+                    xlink:href="https://katzenpost.network/pages/moral-character/"
+                    >https://katzenpost.network/pages/moral-character/</link></para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/z9ohhxr86p8sbxuskh3tascmpc"
+                    xml:id="CENTER_time_z9ohhxr86p8sbxuskh3tascmpc">12:04 PM</link></para><para>I'll
+                fix that, no problem. First, I have a draft diagram. I'm not totally sure how I need
+                to be representing the network use.</para><mediaobject>
+                <imageobject>
+                    <imagedata
+                        fileref="https://bench.cr.yp.to:41867/api/v4/files/infsioqbafyxfjuzoxhyahjuxy/preview"
+                    />
+                </imageobject>
+            </mediaobject>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/yh4mfi4n1tgwp8c9hcxqbcjiae"
+                    xml:id="CENTER_time_yh4mfi4n1tgwp8c9hcxqbcjiae">12:05
+                PM</link></para><para>looks iluminating</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/okbyonkb1jnkijku3x7n1txjfh"
+                    xml:id="CENTER_time_okbyonkb1jnkijku3x7n1txjfh">12:05 PM</link></para><para>What
+                happens step by step when the gateway talks to the client or vice
+                    versa?</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/h85ob7aueigkdnn6rn7xpjeu1h"
+                    xml:id="CENTER_time_h85ob7aueigkdnn6rn7xpjeu1h">12:05 PM</link></para><para>the
+                client connects to the gateway. and that's it.</para><para>all interactions between
+                client and mixnet go through the gateway.</para><para>the client get's a cached copy
+                of the PKI doc from the gateway</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/ag3dyj9irirw9giqtm3413m7nh"
+                    xml:id="CENTER_time_ag3dyj9irirw9giqtm3413m7nh">12:06 PM</link></para><para>Does
+                the client connect to the gateway over the Tor route?</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/srbu4cwf7bgcdjns37cgu55ygr"
+                    xml:id="CENTER_time_srbu4cwf7bgcdjns37cgu55ygr">12:06 PM</link></para><para>the
+                client sends packets all around the mixnet</para><para>yeah clients can use Tor with
+                an exit node to the gateway IP or onion service</para><para>connecting to the onion
+                means not using Tor exit nodes</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/xc63mdhb47f43nee5bpxzmsuxy"
+                    xml:id="CENTER_time_xc63mdhb47f43nee5bpxzmsuxy">12:07
+                PM</link></para><para>!</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/54dbqkr44irkxdw9i5z1wy8tth"
+                    xml:id="CENTER_time_54dbqkr44irkxdw9i5z1wy8tth">12:08 PM</link></para><para>none
+                of this should be new infor</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/kc7f9bfmy7g3jcb4aor1p1ip8a"
+                    xml:id="CENTER_time_kc7f9bfmy7g3jcb4aor1p1ip8a">12:08 PM</link></para><para>How
+                does the gateway provide the PKI to the client? Not over Tor, it
+                    appears.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/erwyjsfhcirt3exufyqpsc75mc"
+                    xml:id="CENTER_time_erwyjsfhcirt3exufyqpsc75mc">12:08 PM</link></para><para>how?
+                it doesn't matter</para><para>i don't understand the motivation for the
+                question</para><para>once the client is connected they can exchange
+                information</para><para>a PKI doc is information</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/6jn7pqf75fd9t8bwan3wdcxdpw"
+                    xml:id="CENTER_time_6jn7pqf75fd9t8bwan3wdcxdpw">12:09 PM</link></para><para>The
+                motivation is knowing where to put the arrowheads.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/z99zhjcunin6zkq4uffngrhiuh"
+                    xml:id="CENTER_time_z99zhjcunin6zkq4uffngrhiuh">12:10 PM</link></para><para>How
+                does the gateway provide the PKI to the client?</para><para>what would a sensible
+                answer to that question look like to you?</para><para>for me it doesn't make sense
+                as a question in the first place</para><para>they are connected. that's
+                    it</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/kcsxmtft57rg5bjfn3btayt1zw"
+                    xml:id="CENTER_time_kcsxmtft57rg5bjfn3btayt1zw">12:10 PM</link></para><para>I am
+                dreaming of being able to look at one of those two-column network handshake
+                diagrams.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/x95ydku8spb8d8chohncngd67h"
+                    xml:id="CENTER_time_x95ydku8spb8d8chohncngd67h">12:11 PM</link></para><para>yeah
+                those are called ladder diagrams</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/ob7t6qh343bcmrzc9nf9uoq7ie"
+                    xml:id="CENTER_time_ob7t6qh343bcmrzc9nf9uoq7ie">12:11 PM</link></para><para>Ah,
+                yes.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/rpigikfbp78xbymw9jwn4bpmke"
+                    xml:id="CENTER_time_rpigikfbp78xbymw9jwn4bpmke">12:11 PM</link></para><para>we
+                can make those. no problem. they are used to show the sequence of events in a
+                network protocol.</para><para>the clients asks for the PKI doc and the gateway
+                respons with the PKI doc.</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/fku5j4y6zprw7gb1r5pamr5jwy"
+                    xml:id="CENTER_time_fku5j4y6zprw7gb1r5pamr5jwy">12:11 PM</link></para><para>If
+                you could make one that would answer everything.</para><para>I am fuzzy on how the
+                connection gets bootstrapped.</para><para>And over what routres, that's
+                    all.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/6oykuopi5igbjybtn4t3wzkc1o"
+                    xml:id="CENTER_time_6oykuopi5igbjybtn4t3wzkc1o">12:12
+                PM</link></para><para>no</para><para>there's no routes in the ladder
+                diagram</para><para>they only show the sequence of what was sent and
+                    receive</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/ep7ojyfnct8kje5emeqsqhhu9r"
+                    xml:id="CENTER_time_ep7ojyfnct8kje5emeqsqhhu9r">12:13 PM</link></para><para>Hm.
+                True; the route is assumed.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/uu4n4iy18pdgprhbsf11b5zhpr"
+                    xml:id="CENTER_time_uu4n4iy18pdgprhbsf11b5zhpr">12:13 PM</link></para><para>yes
+                it is!!!</para><para>we don't want to explain how TCP or Tor
+                    works</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/f6ojq33zxfyuxxi7hw3bt7b8ra"
+                    xml:id="CENTER_time_f6ojq33zxfyuxxi7hw3bt7b8ra">12:13 PM</link></para><para>So
+                let's back up... Where did the cclient get the Gateway's
+                    address?</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/f19f1jt8e7yhdnx6fe33519ciy"
+                    xml:id="CENTER_time_f19f1jt8e7yhdnx6fe33519ciy">12:13 PM</link></para><para>or
+                IPv4/6</para><para>from it's configuration file</para><para>in fact... we should
+                probably structure all documentation around either the binary usage
+                    </para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/gs5homxxztncxfbwuney3zd1qy"
+                    xml:id="CENTER_time_gs5homxxztncxfbwuney3zd1qy">12:13 PM</link></para><para>Is
+                that delievered out of band?</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/f3c9mnsufin8zjj6x7tthj4zth"
+                    xml:id="CENTER_time_f3c9mnsufin8zjj6x7tthj4zth">12:13 PM</link></para><para>or
+                the config files</para><para>the config file is delivered out of band</para><para>of
+                course the config file is out of band</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/c3q7ooenc3fwiypxdxf9c1kfdo"
+                    xml:id="CENTER_time_c3q7ooenc3fwiypxdxf9c1kfdo">12:14 PM</link></para><para>So
+                the client has the onion address from the start.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/eychf6u8htyn9qrspdzc1tmn1r"
+                    xml:id="CENTER_time_eychf6u8htyn9qrspdzc1tmn1r">12:14 PM</link></para><para>most
+                of the known universe of literally out of band</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/fjtds3khdpn3dyyuhh5ta4dcha"
+                    xml:id="CENTER_time_fjtds3khdpn3dyyuhh5ta4dcha">12:14
+                PM</link></para><para>hahaha</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/sqtq8e3i9ifibd8f1tc3own8pw"
+                    xml:id="CENTER_time_sqtq8e3i9ifibd8f1tc3own8pw">12:14 PM</link></para><para>yes
+                of course</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/hix4wjycypyemckx5ycwtmuf6h"
+                    xml:id="CENTER_time_hix4wjycypyemckx5ycwtmuf6h">12:14 PM</link></para><para>Yes,
+                I've been dealing with that.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/yhe9q8cbdbfkxmfszhafgkbz3o"
+                    xml:id="CENTER_time_yhe9q8cbdbfkxmfszhafgkbz3o">12:15
+                PM</link></para><para>so... we need to get clear on what's in the client
+                config</para><para>it's everything a client needs to get
+                    started</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/g9mk7wj8ppymmpo7cg8rgdyboh"
+                    xml:id="CENTER_time_g9mk7wj8ppymmpo7cg8rgdyboh">12:15
+                PM</link></para><para>OK</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/d385b4kew7nktkfd5cu686eajo"
+                    xml:id="CENTER_time_d385b4kew7nktkfd5cu686eajo">12:15 PM</link></para><para>umm
+                so WHS is now evaluating my client2 work</para><para>and it's taking them weeks and
+                weeks</para><para>i offered to help</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/66jkezyfxfdpdxngc1tdfumsjh"
+                    xml:id="CENTER_time_66jkezyfxfdpdxngc1tdfumsjh">12:15 PM</link></para><para>I
+                saw, thank God. What is their problem? </para><para>They are flakier than we
+                are.</para><address>
+dawuud
+12:15 PM
+
+umm so WHS is now evaluating my client2 work
+
+and it's taking them weeks and weeks
+
+i offered to help
+jdormansteele
+12:15 PM
+
+I saw, thank God. What is their problem? 
+
+They are flakier than we are.
+dawuud
+12:16 PM
+
+i suspect they don't trust me and need to make sure i'm not full of shit
+
+client2 actually works properly but we don't have a mixnet to test with except the docker stuff
+
+namenlos has been down for weeks
+
+also @resilient promised me a status page and flaked
+jdormansteele
+12:17 PM
+
+Once I finish these dosc I'll get my mix server working again.
+dawuud
+12:17 PM
+
+even though i did the hard part and coded up a nice python utility 
+jdormansteele
+12:18 PM
+
+Can you point me to a representative client config?
+dawuud
+12:18 PM
+
+no because we don't put them in git. but if you run genconfig it will generate it.
+
+shall we argue with Leif and try to convince him we need configs checked into git?
+
+it would make it easier to document stuff 
+
+it would probably be less confusing to new users
+jdormansteele
+12:19 PM
+
+I agree. 
+dawuud
+12:19 PM
+
+you should be able to cd katzenpost/docker; make start
+
+and it should run genconfig
+
+i think it only works on linux
+jdormansteele
+12:20 PM
+
+I'll be in Berlin in a few weeks and could try to chase Leif down.
+dawuud
+12:20 PM
+
+and it only works if stuff is installed properly
+jdormansteele
+12:20 PM
+
+But that doesn't helpo me at the moment
+dawuud
+12:20 PM
+
+sure it does. it gives you the config that you asked for
+
+otherwise i have to do the same thing
+jdormansteele
+12:20 PM
+
+I'll try the genconfig solution.
+dawuud
+12:21 PM
+client.tomlTOML9KB
+jdormansteele
+12:23 PM
+
+Aha. Non-torified. Would the addresses parameter simply contain an onion address?
+dawuud
+12:23 PM
+
+yes
+Addresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005", "onion://thisisjustatestoniontoverifythatconfigandpkiworkproperly.onion:4242"]
+jdormansteele
+12:24 PM
+
+I misread it; there's the onion address.
+dawuud
+12:24 PM
+
+look at the onion address
+
+it exists but is a fake one
+
+yes you did misread the config initially
+jdormansteele
+12:25 PM
+
+I will try to use this to continue drafting, thanks.
+
+About tor support in general, the notes you gave me last summer say that dirauths can be reached over an onion address. I think this contradicts what you were saying a few days ago. 
+dawuud
+12:27 PM
+
+no it doesn't
+
+the new client doesn't talk to the dir auths
+
+because why should it?
+
+anyway the dirauths are accessible over tor onion if the onion is setup properly
+
+does that make sense? there isn't a contradiction here
+jdormansteele
+12:29 PM
+
+That clarifies it. Thanks. The dirauths can talk to each other via onion addresses, as can the other nodes. 
+dawuud
+12:30 PM
+
+i didn't say the dirauths can talk to each other via onion
+
+they can listen
+
+okay this'll make it easy for you to understand; in all of the katzenpost code base we do not have a single "dialer" function that is able to use Tor.
+
+got it?
+
+none of our stuff actually is able to use Tor
+
+listening on a dirauth does NOT require our code to use Tor
+
+that's why we do it. because it's easy
+
+in order to make the dirauths or any other part of katzenpost use Tor we'd need a socks proxy client
+
+our client can do it if it's configured properly
+
+but none of the other katzenpost components can dial via tor
+
+if they could it would be because we are using some golang library that let's us talk to tor over socks like this https://github.com/Yawning/bulb
+jdormansteele
+12:34 PM
+
+What would be sending traffic over Tor to a dirauth?
+dawuud
+12:34 PM
+
+nothing
+
+but that's besides the point
+
+we support Tor only partially
+
+and i don't feel any motivation to fully support Tor
+
+the old client connects directly to the dirauths. maybe it can also connect over an onion but i doubt it and we are phasing out the old client anyways.
+jdormansteele
+12:36 PM
+
+What is the point then of listening over Tor?
+dawuud
+12:36 PM
+
+there is no point
+
+we have partially completed tor integration
+
+that's the point
+
+it's unfinished labor
+
+my labor and aaron's labor
+
+and currently i feel exploited for my labor because i'm not getting the help i need
+jdormansteele
+12:37 PM
+
+It sould like something we should not mention at all for the time being.
+dawuud
+12:37 PM
+
+nobody else writes code
+jdormansteele
+12:37 PM
+
+With the exception of toried client/gateway communication.
+
+torified
+dawuud
+12:40 PM
+
+that's fine
+
+what's not fine is for the others to tell me to fix it
+dawuud
+12:46 PM
+
+i think Rob Pike intentionally designed golang for stupid people
+
+that's why it's so easy to learn
+
+if we picked Rust some people would have a harder time learning that
+
+but i think there's also value in documenting some of our unfinished features
+dawuud
+12:52 PM
+
+@jdormansteele it looks like the dirauth client does optionally support Tor dialing onion addresses... if the calling party passes in a socks dialer
+
+so... if used properly it would allow someone to write code that talks to the dirauths over tor onion services
+jdormansteele
+12:54 PM
+
+OK, noted.
+dawuud
+12:54 PM
+
+// Config is a voting authority pki.Client instance.
+type Config struct {
+    // KEMScheme indicates the KEM scheme used for the LinkKey/wire protocol.
+    KEMScheme kem.Scheme
+
+    // PKISignatureScheme specifies the cryptographic signature scheme
+    PKISignatureScheme sign.Scheme
+
+    // LinkKey is the link key for the client's wire connections.
+    LinkKey kem.PrivateKey
+
+    // LogBackend is the `core/log` Backend instance to use for logging.
+    LogBackend *log.Backend
+
+    // Authorities is the set of Directory Authority servers.
+    Authorities []*config.Authority
+
+    // DialContextFn is the optional alternative Dialer.DialContext function
+    // to be used when creating outgoing network connections.
+    DialContextFn func(ctx context.Context, network, address string) (net.Conn, error)
+
+    // Geo is the geometry used for the Sphinx packet construction.
+    Geo *geo.Geometry
+}
+
+that's the config for the dirauth client
+
+and inside our mix server code we leave the DialContextFn empty
+
+but if instead of leaving it empty we gave it a proxy socks proxy AND we would also have to make the assumption that there's a local Tor daemon running and that our config tells us it's socks port etc
+jdormansteele
+4:10 PM
+
+In a normal NAT setup without Tor, what would the server configuration contain in the Addresses parameter? 
+
+Its NATted public IP address?
+</address></caption>
+    </example>
+    <example/>
+    <example/>
+    <example/>
+    <para>
+        <example>
+            <caption>dawuud<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/mqc73fxcqfnu98d7he47stxqgo"
+                    xml:id="CENTER_time_mqc73fxcqfnu98d7he47stxqgo">9:19 AM</link><code>// Addresses
+                    are the IP listener addresses that the server will advertise // in the PKI and
+                    bind to for incoming connections unless BindAddresses is specified. Addresses
+                    []string // BindAddresses are the listener addresses that the server will bind
+                    to and accept connections on // These Addresses are not advertised in the PKI.
+                    BindAddresses []string</code><para>BindAddress would have the public IP in a NAT
+                    setup</para><para>Address would have the local LAN ip</para><para>this is in the
+                    Server section of the mix server config</para><para>Hey we should document the
+                    client2 configuration in the docs</para><para>I just now added SOCKS proxy
+                    support to client2</para><para>previously it wasn't
+                    there.</para>jdormansteele<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/uc9z9nefjpy6pj3n63yrum3u1o"
+                    xml:id="CENTER_time_uc9z9nefjpy6pj3n63yrum3u1o">10:47 AM</link><para>Sounds
+                    good; what would documenting that involve? </para>dawuud<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/tjsmc8jzzbfmugd16wcogmoq8w"
+                    xml:id="CENTER_time_tjsmc8jzzbfmugd16wcogmoq8w">10:47 AM</link><para>i'm working
+                    on a rough draft in markdown. perhaps you can edit it when i'm
+                    down</para><para>*done</para>jdormansteele<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/gyk6noyyi3d7tn4gek6jg9hb7w"
+                    xml:id="CENTER_time_gyk6noyyi3d7tn4gek6jg9hb7w">10:48
+                    AM</link><para>Perfect.</para>dawuud<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/dazpyd1gm3g6xdbgoumxpfizkh"
+                    xml:id="CENTER_time_dazpyd1gm3g6xdbgoumxpfizkh">10:48 AM</link><para>that is, if
+                    we don't have another terrible earth quake or a tsunami</para>jdormansteele<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/59a9szhknfbnxp55b9x1cbmi7c"
+                    xml:id="CENTER_time_59a9szhknfbnxp55b9x1cbmi7c">10:49 AM</link><para>Are we
+                    expecting one? Everything burning down seems to be the popylar approach to
+                    ending civilization.</para>dawuud<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/6wwjb7zi83849cgua6hb5ncbyw"
+                    xml:id="CENTER_time_6wwjb7zi83849cgua6hb5ncbyw">10:49 AM</link><para>i felt a
+                    minor earth quake last night</para><para>i'm stock piling food at
+                    home</para><para>but have yet to fill my 55 gallon water
+                    container</para><para>kind of want to build a cabin in the woods just in case
+                    the city becomes uninhabitable</para>jdormansteele<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/qsdcq4mh8pdwfyd6p6p9zet1te"
+                    xml:id="CENTER_time_qsdcq4mh8pdwfyd6p6p9zet1te">10:53 AM</link><para>I see two
+                    quakes, right off the Richmond.</para><para>Actually three, including a 3.7
+                    which would be the one you felt.</para>dawuud<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/zjbq7qs3b7bwmn35ci1xuefauy"
+                    xml:id="CENTER_time_zjbq7qs3b7bwmn35ci1xuefauy">10:56 AM</link><para>ah
+                    ok</para>jdormansteele<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/4gykchppgibgtyiebo4dgaghcy"
+                    xml:id="CENTER_time_4gykchppgibgtyiebo4dgaghcy">10:57 AM</link><para>I'm ashamed
+                    to say as a native of the Bay Area that I never actually felt an earthquake
+                    until I got to Seattle. 
+                    
+                    
+                    
+                    
+                    
+                    </para>
+                
+                
+           <!--     
+                dawuud
+                11:46 AM
+                
+                https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/docs/client_guide.md
+                
+                @jdormansteele can you add the client2 configuration to the docs. we've documented the config params in the code comments here: https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/client2/config/config.go
+                
+                we support the following proxy types:
+                typeNone      = "none"
+                typeTorSocks5 = "tor+socks5"
+                typeSocks5    = "socks5"
+                
+                none does nothing.
+                
+                socks5 does normal socks5 and passes through the specified username and password from the proxy config
+                
+                // UpstreamProxy is the outgoing connection proxy configuration.
+                type UpstreamProxy struct {
+                // Type is the proxy type (Eg: "none"," socks5").
+                Type string
+                
+                // Network is the proxy address' network (`unix`, `tcp`).
+                Network string
+                
+                // Address is the proxy's address.
+                Address string
+                
+                // User is the optional proxy username.
+                User string
+                
+                // Password is the optional proxy password.
+                Password string
+                }
+                
+                if they specify the Type as "tor+socks5" then the User and Pasword are ignored and a random username is selected for Tor stream isolation
+                
+                @leif_ says that we have no use for the normal socks5 where the user/pass are passed through... so if it pleases the court we could also just remove the User/Password params from the above config
+                jdormansteele
+                12:16 PM
+                
+                Got it.
+                dawuud
+                12:17 PM
+                
+                the entire UpstreamProxy section is optional and can be ommitted from the config
+                dawuud
+                12:25 PM
+                
+                also note the default values:
+                const (
+                defaultLogLevel                    = "NOTICE"
+                defaultPollingInterval             = 10
+                defaultInitialMaxPKIRetrievalDelay = 30
+                defaultSessionDialTimeout          = 30
+                )
+                jdormansteele
+                12:27 PM
+                
+                Are the client2 daemon and thin library called by actual application clients and run on a user host?
+                dawuud
+                12:27 PM
+                
+                the app will be integrated with the thin client library so that it can talk to the client daemon
+                
+                we've got two thin clients; written in golang and python
+                
+                they both work
+                
+                first the user starts the client2 daemon. then they start a katzenpost application that is written using the thin client. if it's got a correct config it should tell it how to connect to the client2 daemon over the thin client protocol
+                
+                once @leif_ merged this PR https://github.com/katzenpost/katzenpost/pull/810 then we can say that we support socks5 and tor+socks5
+                
+                currently however it ignores the user/password from the proxy config and randomizes the username per tor isolation
+                jdormansteele
+                12:31 PM
+                
+                Wait, how is the Client2 daemon started? That doesn't involve a separate user action besides starting a client app, does it?
+                dawuud
+                12:32 PM
+                
+                it's a binary
+                
+                you run the binary
+                
+                you should document it's usage
+                
+                https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/client2/cmd/kpclientd/main.go#L22-L23
+                
+                two CLI flags
+                
+                -v and -c
+                
+                -c specifies the location of the config file
+                
+                -v prints the version number... but usually is useless and doesn't actually print the version number
+                
+                human@computer ~/code/katzenpost/client2/cmd/kpclientd (fixup_socks_proxy)$ go build
+                human@computer ~/code/katzenpost/client2/cmd/kpclientd (fixup_socks_proxy)$ ./kpclientd -h
+                Usage of ./kpclientd:
+                -c string
+                configuration file
+                -v    Get version info.
+                human@computer ~/code/katzenpost/client2/cmd/kpclientd (fixup_socks_proxy)$
+                jdormansteele
+                12:34 PM
+                
+                Ah.
+                dawuud
+                12:34 PM
+                
+                we can also integrate the client2 daemon into the application... but that's not so good because it means only running one app at a time
+                
+                we've done that for the ping command
+                12:35 PM
+                
+                but that should probably be optional... later on we can add an option to the ping command so that it doesn't start it's own daemon
+                jdormansteele
+                12:36 PM
+                
+                I wonder if all of this should be put in the client document. -->
+                
+                
+                
+                
+                ><para/><para/><para/><para/>dawuud<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/nmc644xi5pnb8pytz38k1kergw"
+                    xml:id="CENTER_time_nmc644xi5pnb8pytz38k1kergw">12:36 PM</link><para>the down
+                    side of that is of course that the new ping command needs a configuration to
+                    tell it how to connect to the client2 daemon</para><para>yes the client
+                    document</para><para>not the client spec</para><para>NOT THE
+                    SPEC</para>jdormansteele<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/5okdom8gb7bjjx6royu9yrnqmc"
+                    xml:id="CENTER_time_5okdom8gb7bjjx6royu9yrnqmc">12:36 PM</link><para>Which we
+                    aren't starting yet because there's not an up to date client.</para>dawuud<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/74ccuekww7rddq8g8sa811jtfo"
+                    xml:id="CENTER_time_74ccuekww7rddq8g8sa811jtfo">12:36 PM</link><para>SPECs are
+                    only for developers</para><para>just document client2 for now,
+                    please</para><para>it's up to date</para>jdormansteele<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/9pr6tfm9mifctm5ayki6qwtwnh"
+                    xml:id="CENTER_time_9pr6tfm9mifctm5ayki6qwtwnh">12:36 PM</link><para>Right, I
+                    mean the one I have the contract to write.</para>dawuud<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/brkgr81cypgopbkjkhfwrhxsqc"
+                    xml:id="CENTER_time_brkgr81cypgopbkjkhfwrhxsqc">12:36 PM</link><para>it
+                    works</para>jdormansteele<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/rzy8h4g1o78kfdq4rojnpto9sc"
+                    xml:id="CENTER_time_rzy8h4g1o78kfdq4rojnpto9sc">12:37 PM</link><para>OK, I will
+                    organize it that way. I'll dump this information now in the client document, and
+                    then return to that after I finish the admin guide.</para><para>Two separate
+                    deliverables.</para>dawuud<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/bqq4xsqed7yzixoxiw5kcwqena"
+                    xml:id="CENTER_time_bqq4xsqed7yzixoxiw5kcwqena">12:38 PM</link><para>oh
+                    isee</para>jdormansteele<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/6obbubxayb8cfbay353yfwesrr"
+                    xml:id="CENTER_time_6obbubxayb8cfbay353yfwesrr">12:39 PM</link><para>What does
+                    does this client2 information have to do with what we were calling the
+                    "connector"?</para><para>They sound like the same thing.</para>New
+                    Messagesdawuud<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/1y4x7frk4pbcdcuab7u1j1j9hc"
+                    xml:id="CENTER_time_1y4x7frk4pbcdcuab7u1j1j9hc">12:43 PM</link><para>same
+                    thing</para>jdormansteele<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/fs69mehf138d9mpegmuuwysd3y"
+                    xml:id="CENTER_time_fs69mehf138d9mpegmuuwysd3y">12:43 PM</link><para>THANK
+                    GOD</para><para>:slightly_smiling_face:</para><para>As the ambassador for admins
+                    and users everywhere, I suggest that we systematically purge our "client2"
+                    references and substitute "connector." That gives us "connector daemon" and
+                    "connector library" and no necessity to ever explain the difference between a
+                    client application and these other things.</para>dawuud<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/f6amsa6b3irh9jmw5q7yx7p3ec"
+                    xml:id="CENTER_time_f6amsa6b3irh9jmw5q7yx7p3ec">12:47 PM</link><para>as you
+                    wish</para>jdormansteele<link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/qadzbyeth7rydm9sto5r11f1wr"
+                    xml:id="CENTER_time_qadzbyeth7rydm9sto5r11f1wr">12:48 PM</link><para>Hurrah! I
+                    think this will spare many tears.</para><para>Starting with my
+                    own.</para><para>There's nothing magic about the term "connector" but it is at
+                    least distinct.</para></caption>
+        </example>
+    </para>
+    
+</section>

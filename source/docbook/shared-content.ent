@@ -3,8 +3,8 @@
 <!ENTITY program_name 'Katzenpost'>
 <!ENTITY chat_client 'Katzen'>
 <!ENTITY chat_client_binary 'katzen'>
-<!ENTITY mixserver_binary 'mixserver'>
-<!ENTITY dirauth_binary 'dirauth'> 
+<!ENTITY mixserver_binary 'pq-katzenpost-mixserver'>
+<!ENTITY dirauth_binary 'pq-katzenpost-authority'> 
 <!ENTITY research_paper_link 'Place-holder for research paper link'>
 <!--<!ENTITY baseURL 'http://localhost:1313/'>-->
 <!ENTITY baseURL 'https://katzenpost.network/'>
@@ -21,11 +21,11 @@
                     <listitem>
                         <para><emphasis role="bold">WireKEMScheme</emphasis></para>
                         <para>Specifies the key encapsulation mechanism (KEM) scheme
-                            for the <ulink url="https://eprint.iacr.org/2022/539">PQ
-                            Noise</ulink>-based wire protocol (link layer) that nodes use
+                            for the <link xlink:href="https://eprint.iacr.org/2022/539">PQ
+                            Noise</link>-based wire protocol (link layer) that nodes use
                             to communicate with each other. PQ Noise is a post-quantum variation of
-                            the <ulink url="https://noiseprotocol.org/">Noise protocol
-                            framework</ulink>, which algebraically transforms ECDH handshake
+                            the <link xlink:href="https://noiseprotocol.org/">Noise protocol
+                            framework</link>, which algebraically transforms ECDH handshake
                             patterns into KEM encapsulate/decapsulate operations.</para>
                             
                         <para>This configuration option supports the optional use of
@@ -71,11 +71,11 @@
                     <listitem>
                         <para><emphasis role="bold">WireKEM</emphasis></para>
                         <para>WireKEM specifies the key encapsulation mechanism (KEM) scheme
-                            for the <ulink url="https://eprint.iacr.org/2022/539">PQ
-                                Noise</ulink>-based wire protocol (link layer) that nodes use
+                            for the <link xlink:href="https://eprint.iacr.org/2022/539">PQ
+                                Noise</link>-based wire protocol (link layer) that nodes use
                             to communicate with each other. PQ Noise is a post-quantum variation of
-                            the <ulink url="https://noiseprotocol.org/">Noise protocol
-                                framework</ulink>, which algebraically transforms ECDH handshake
+                            the <link xlink:href="https://noiseprotocol.org/">Noise protocol
+                                framework</link>, which algebraically transforms ECDH handshake
                             patterns into KEM encapsulate/decapsulate operations.</para>                           
                         <para>This configuration option supports the optional use of
                             hybrid post-quantum cryptography to strengthen security. The following KEM
@@ -111,7 +111,4 @@
                         </itemizedlist>											
                         <para>Type: string</para>
                         <para>Required: Yes</para>                    
-                    </listitem>'>    
-                  
-                    
-                    
+                    </listitem>'> 
