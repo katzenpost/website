@@ -45,36 +45,437 @@
     <info>  
         <title xml:id="CHANGE_ME.title">&program_name; client user guide</title> <!-- Match to title PI above. -->          
     </info>
+    <example>
+        <caption>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/3r8yohzpp7dbpdkueu91f8itoe"
+                    xml:id="CENTER_time_3r8yohzpp7dbpdkueu91f8itoe">7:03 PM</link></para><para>about
+                Tor, I mean I understand this to be a mix server running on a host that is
+                advertised only as an onion service</para><para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/w3hptufo5iy1ixunfi8ha4c9fy"
+                    xml:id="CENTER_time_w3hptufo5iy1ixunfi8ha4c9fy">7:04 PM</link></para><para>The
+                oinon address is what's in the PKI doc</para><para>Wednesday</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/fz4fkb8637yd7m7rquys3qengc"
+                    xml:id="CENTER_time_fz4fkb8637yd7m7rquys3qengc">8:57 AM</link></para><para>Our
+                software only does that for gateway nodes. </para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/6ozq51ch7ig48gsbhyh5sydo3r"
+                    xml:id="CENTER_time_6ozq51ch7ig48gsbhyh5sydo3r">11:46 AM</link></para><para>So
+                all node types can be NATted, but Tor is only usable with gateway
+                    nodes.</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/r4rug3sw6ff77c6qtwyjb61e8e"
+                    xml:id="CENTER_time_r4rug3sw6ff77c6qtwyjb61e8e">1:04 PM</link></para><para>PR
+                    <link xlink:href="https://github.com/katzenpost/website/pull/130"
+                    >https://github.com/katzenpost/website/pull/130</link> now includes removal of
+                the obsolete reference and a refresh of the
+                    docs.</para><para>Yesterday</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/hj6t4e661tdafnpg7pbs3cxnho"
+                    xml:id="CENTER_time_hj6t4e661tdafnpg7pbs3cxnho">10:51 AM</link></para><para>It
+                was pointed out to me that this page has two broken links <link
+                    xlink:href="https://katzenpost.network/pages/moral-character/"
+                    >https://katzenpost.network/pages/moral-character/</link></para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/z9ohhxr86p8sbxuskh3tascmpc"
+                    xml:id="CENTER_time_z9ohhxr86p8sbxuskh3tascmpc">12:04 PM</link></para><para>I'll
+                fix that, no problem. First, I have a draft diagram. I'm not totally sure how I need
+                to be representing the network use.</para><mediaobject>
+                <imageobject>
+                    <imagedata
+                        fileref="https://bench.cr.yp.to:41867/api/v4/files/infsioqbafyxfjuzoxhyahjuxy/preview"
+                    />
+                </imageobject>
+            </mediaobject>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/yh4mfi4n1tgwp8c9hcxqbcjiae"
+                    xml:id="CENTER_time_yh4mfi4n1tgwp8c9hcxqbcjiae">12:05
+                PM</link></para><para>looks iluminating</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/okbyonkb1jnkijku3x7n1txjfh"
+                    xml:id="CENTER_time_okbyonkb1jnkijku3x7n1txjfh">12:05 PM</link></para><para>What
+                happens step by step when the gateway talks to the client or vice
+                    versa?</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/h85ob7aueigkdnn6rn7xpjeu1h"
+                    xml:id="CENTER_time_h85ob7aueigkdnn6rn7xpjeu1h">12:05 PM</link></para><para>the
+                client connects to the gateway. and that's it.</para><para>all interactions between
+                client and mixnet go through the gateway.</para><para>the client get's a cached copy
+                of the PKI doc from the gateway</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/ag3dyj9irirw9giqtm3413m7nh"
+                    xml:id="CENTER_time_ag3dyj9irirw9giqtm3413m7nh">12:06 PM</link></para><para>Does
+                the client connect to the gateway over the Tor route?</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/srbu4cwf7bgcdjns37cgu55ygr"
+                    xml:id="CENTER_time_srbu4cwf7bgcdjns37cgu55ygr">12:06 PM</link></para><para>the
+                client sends packets all around the mixnet</para><para>yeah clients can use Tor with
+                an exit node to the gateway IP or onion service</para><para>connecting to the onion
+                means not using Tor exit nodes</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/xc63mdhb47f43nee5bpxzmsuxy"
+                    xml:id="CENTER_time_xc63mdhb47f43nee5bpxzmsuxy">12:07
+                PM</link></para><para>!</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/54dbqkr44irkxdw9i5z1wy8tth"
+                    xml:id="CENTER_time_54dbqkr44irkxdw9i5z1wy8tth">12:08 PM</link></para><para>none
+                of this should be new infor</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/kc7f9bfmy7g3jcb4aor1p1ip8a"
+                    xml:id="CENTER_time_kc7f9bfmy7g3jcb4aor1p1ip8a">12:08 PM</link></para><para>How
+                does the gateway provide the PKI to the client? Not over Tor, it
+                    appears.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/erwyjsfhcirt3exufyqpsc75mc"
+                    xml:id="CENTER_time_erwyjsfhcirt3exufyqpsc75mc">12:08 PM</link></para><para>how?
+                it doesn't matter</para><para>i don't understand the motivation for the
+                question</para><para>once the client is connected they can exchange
+                information</para><para>a PKI doc is information</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/6jn7pqf75fd9t8bwan3wdcxdpw"
+                    xml:id="CENTER_time_6jn7pqf75fd9t8bwan3wdcxdpw">12:09 PM</link></para><para>The
+                motivation is knowing where to put the arrowheads.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/z99zhjcunin6zkq4uffngrhiuh"
+                    xml:id="CENTER_time_z99zhjcunin6zkq4uffngrhiuh">12:10 PM</link></para><para>How
+                does the gateway provide the PKI to the client?</para><para>what would a sensible
+                answer to that question look like to you?</para><para>for me it doesn't make sense
+                as a question in the first place</para><para>they are connected. that's
+                    it</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/kcsxmtft57rg5bjfn3btayt1zw"
+                    xml:id="CENTER_time_kcsxmtft57rg5bjfn3btayt1zw">12:10 PM</link></para><para>I am
+                dreaming of being able to look at one of those two-column network handshake
+                diagrams.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/x95ydku8spb8d8chohncngd67h"
+                    xml:id="CENTER_time_x95ydku8spb8d8chohncngd67h">12:11 PM</link></para><para>yeah
+                those are called ladder diagrams</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/ob7t6qh343bcmrzc9nf9uoq7ie"
+                    xml:id="CENTER_time_ob7t6qh343bcmrzc9nf9uoq7ie">12:11 PM</link></para><para>Ah,
+                yes.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/rpigikfbp78xbymw9jwn4bpmke"
+                    xml:id="CENTER_time_rpigikfbp78xbymw9jwn4bpmke">12:11 PM</link></para><para>we
+                can make those. no problem. they are used to show the sequence of events in a
+                network protocol.</para><para>the clients asks for the PKI doc and the gateway
+                respons with the PKI doc.</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/fku5j4y6zprw7gb1r5pamr5jwy"
+                    xml:id="CENTER_time_fku5j4y6zprw7gb1r5pamr5jwy">12:11 PM</link></para><para>If
+                you could make one that would answer everything.</para><para>I am fuzzy on how the
+                connection gets bootstrapped.</para><para>And over what routres, that's
+                    all.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/6oykuopi5igbjybtn4t3wzkc1o"
+                    xml:id="CENTER_time_6oykuopi5igbjybtn4t3wzkc1o">12:12
+                PM</link></para><para>no</para><para>there's no routes in the ladder
+                diagram</para><para>they only show the sequence of what was sent and
+                    receive</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/ep7ojyfnct8kje5emeqsqhhu9r"
+                    xml:id="CENTER_time_ep7ojyfnct8kje5emeqsqhhu9r">12:13 PM</link></para><para>Hm.
+                True; the route is assumed.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/uu4n4iy18pdgprhbsf11b5zhpr"
+                    xml:id="CENTER_time_uu4n4iy18pdgprhbsf11b5zhpr">12:13 PM</link></para><para>yes
+                it is!!!</para><para>we don't want to explain how TCP or Tor
+                    works</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/f6ojq33zxfyuxxi7hw3bt7b8ra"
+                    xml:id="CENTER_time_f6ojq33zxfyuxxi7hw3bt7b8ra">12:13 PM</link></para><para>So
+                let's back up... Where did the cclient get the Gateway's
+                    address?</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/f19f1jt8e7yhdnx6fe33519ciy"
+                    xml:id="CENTER_time_f19f1jt8e7yhdnx6fe33519ciy">12:13 PM</link></para><para>or
+                IPv4/6</para><para>from it's configuration file</para><para>in fact... we should
+                probably structure all documentation around either the binary usage
+                    </para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/gs5homxxztncxfbwuney3zd1qy"
+                    xml:id="CENTER_time_gs5homxxztncxfbwuney3zd1qy">12:13 PM</link></para><para>Is
+                that delievered out of band?</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/f3c9mnsufin8zjj6x7tthj4zth"
+                    xml:id="CENTER_time_f3c9mnsufin8zjj6x7tthj4zth">12:13 PM</link></para><para>or
+                the config files</para><para>the config file is delivered out of band</para><para>of
+                course the config file is out of band</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/c3q7ooenc3fwiypxdxf9c1kfdo"
+                    xml:id="CENTER_time_c3q7ooenc3fwiypxdxf9c1kfdo">12:14 PM</link></para><para>So
+                the client has the onion address from the start.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/eychf6u8htyn9qrspdzc1tmn1r"
+                    xml:id="CENTER_time_eychf6u8htyn9qrspdzc1tmn1r">12:14 PM</link></para><para>most
+                of the known universe of literally out of band</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/fjtds3khdpn3dyyuhh5ta4dcha"
+                    xml:id="CENTER_time_fjtds3khdpn3dyyuhh5ta4dcha">12:14
+                PM</link></para><para>hahaha</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/sqtq8e3i9ifibd8f1tc3own8pw"
+                    xml:id="CENTER_time_sqtq8e3i9ifibd8f1tc3own8pw">12:14 PM</link></para><para>yes
+                of course</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/hix4wjycypyemckx5ycwtmuf6h"
+                    xml:id="CENTER_time_hix4wjycypyemckx5ycwtmuf6h">12:14 PM</link></para><para>Yes,
+                I've been dealing with that.</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/yhe9q8cbdbfkxmfszhafgkbz3o"
+                    xml:id="CENTER_time_yhe9q8cbdbfkxmfszhafgkbz3o">12:15
+                PM</link></para><para>so... we need to get clear on what's in the client
+                config</para><para>it's everything a client needs to get
+                    started</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/g9mk7wj8ppymmpo7cg8rgdyboh"
+                    xml:id="CENTER_time_g9mk7wj8ppymmpo7cg8rgdyboh">12:15
+                PM</link></para><para>OK</para>dawuud<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/d385b4kew7nktkfd5cu686eajo"
+                    xml:id="CENTER_time_d385b4kew7nktkfd5cu686eajo">12:15 PM</link></para><para>umm
+                so WHS is now evaluating my client2 work</para><para>and it's taking them weeks and
+                weeks</para><para>i offered to help</para>jdormansteele<para><link
+                    xlink:href="https://bench.cr.yp.to:41867/research/pl/66jkezyfxfdpdxngc1tdfumsjh"
+                    xml:id="CENTER_time_66jkezyfxfdpdxngc1tdfumsjh">12:15 PM</link></para><para>I
+                saw, thank God. What is their problem? </para><para>They are flakier than we
+                are.</para><address>
+dawuud
+12:15 PM
+
+umm so WHS is now evaluating my client2 work
+
+and it's taking them weeks and weeks
+
+i offered to help
+jdormansteele
+12:15 PM
+
+I saw, thank God. What is their problem? 
+
+They are flakier than we are.
+dawuud
+12:16 PM
+
+i suspect they don't trust me and need to make sure i'm not full of shit
+
+client2 actually works properly but we don't have a mixnet to test with except the docker stuff
+
+namenlos has been down for weeks
+
+also @resilient promised me a status page and flaked
+jdormansteele
+12:17 PM
+
+Once I finish these dosc I'll get my mix server working again.
+dawuud
+12:17 PM
+
+even though i did the hard part and coded up a nice python utility 
+jdormansteele
+12:18 PM
+
+Can you point me to a representative client config?
+dawuud
+12:18 PM
+
+no because we don't put them in git. but if you run genconfig it will generate it.
+
+shall we argue with Leif and try to convince him we need configs checked into git?
+
+it would make it easier to document stuff 
+
+it would probably be less confusing to new users
+jdormansteele
+12:19 PM
+
+I agree. 
+dawuud
+12:19 PM
+
+you should be able to cd katzenpost/docker; make start
+
+and it should run genconfig
+
+i think it only works on linux
+jdormansteele
+12:20 PM
+
+I'll be in Berlin in a few weeks and could try to chase Leif down.
+dawuud
+12:20 PM
+
+and it only works if stuff is installed properly
+jdormansteele
+12:20 PM
+
+But that doesn't helpo me at the moment
+dawuud
+12:20 PM
+
+sure it does. it gives you the config that you asked for
+
+otherwise i have to do the same thing
+jdormansteele
+12:20 PM
+
+I'll try the genconfig solution.
+dawuud
+12:21 PM
+client.tomlTOML9KB
+jdormansteele
+12:23 PM
+
+Aha. Non-torified. Would the addresses parameter simply contain an onion address?
+dawuud
+12:23 PM
+
+yes
+Addresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005", "onion://thisisjustatestoniontoverifythatconfigandpkiworkproperly.onion:4242"]
+jdormansteele
+12:24 PM
+
+I misread it; there's the onion address.
+dawuud
+12:24 PM
+
+look at the onion address
+
+it exists but is a fake one
+
+yes you did misread the config initially
+jdormansteele
+12:25 PM
+
+I will try to use this to continue drafting, thanks.
+
+About tor support in general, the notes you gave me last summer say that dirauths can be reached over an onion address. I think this contradicts what you were saying a few days ago. 
+dawuud
+12:27 PM
+
+no it doesn't
+
+the new client doesn't talk to the dir auths
+
+because why should it?
+
+anyway the dirauths are accessible over tor onion if the onion is setup properly
+
+does that make sense? there isn't a contradiction here
+jdormansteele
+12:29 PM
+
+That clarifies it. Thanks. The dirauths can talk to each other via onion addresses, as can the other nodes. 
+dawuud
+12:30 PM
+
+i didn't say the dirauths can talk to each other via onion
+
+they can listen
+
+okay this'll make it easy for you to understand; in all of the katzenpost code base we do not have a single "dialer" function that is able to use Tor.
+
+got it?
+
+none of our stuff actually is able to use Tor
+
+listening on a dirauth does NOT require our code to use Tor
+
+that's why we do it. because it's easy
+
+in order to make the dirauths or any other part of katzenpost use Tor we'd need a socks proxy client
+
+our client can do it if it's configured properly
+
+but none of the other katzenpost components can dial via tor
+
+if they could it would be because we are using some golang library that let's us talk to tor over socks like this https://github.com/Yawning/bulb
+jdormansteele
+12:34 PM
+
+What would be sending traffic over Tor to a dirauth?
+dawuud
+12:34 PM
+
+nothing
+
+but that's besides the point
+
+we support Tor only partially
+
+and i don't feel any motivation to fully support Tor
+
+the old client connects directly to the dirauths. maybe it can also connect over an onion but i doubt it and we are phasing out the old client anyways.
+jdormansteele
+12:36 PM
+
+What is the point then of listening over Tor?
+dawuud
+12:36 PM
+
+there is no point
+
+we have partially completed tor integration
+
+that's the point
+
+it's unfinished labor
+
+my labor and aaron's labor
+
+and currently i feel exploited for my labor because i'm not getting the help i need
+jdormansteele
+12:37 PM
+
+It sould like something we should not mention at all for the time being.
+dawuud
+12:37 PM
+
+nobody else writes code
+jdormansteele
+12:37 PM
+
+With the exception of toried client/gateway communication.
+
+torified
+dawuud
+12:40 PM
+
+that's fine
+
+what's not fine is for the others to tell me to fix it
+dawuud
+12:46 PM
+
+i think Rob Pike intentionally designed golang for stupid people
+
+that's why it's so easy to learn
+
+if we picked Rust some people would have a harder time learning that
+
+but i think there's also value in documenting some of our unfinished features
+dawuud
+12:52 PM
+
+@jdormansteele it looks like the dirauth client does optionally support Tor dialing onion addresses... if the calling party passes in a socks dialer
+
+so... if used properly it would allow someone to write code that talks to the dirauths over tor onion services
+jdormansteele
+12:54 PM
+
+OK, noted.
+dawuud
+12:54 PM
+
+// Config is a voting authority pki.Client instance.
+type Config struct {
+    // KEMScheme indicates the KEM scheme used for the LinkKey/wire protocol.
+    KEMScheme kem.Scheme
+
+    // PKISignatureScheme specifies the cryptographic signature scheme
+    PKISignatureScheme sign.Scheme
+
+    // LinkKey is the link key for the client's wire connections.
+    LinkKey kem.PrivateKey
+
+    // LogBackend is the `core/log` Backend instance to use for logging.
+    LogBackend *log.Backend
+
+    // Authorities is the set of Directory Authority servers.
+    Authorities []*config.Authority
+
+    // DialContextFn is the optional alternative Dialer.DialContext function
+    // to be used when creating outgoing network connections.
+    DialContextFn func(ctx context.Context, network, address string) (net.Conn, error)
+
+    // Geo is the geometry used for the Sphinx packet construction.
+    Geo *geo.Geometry
+}
+
+that's the config for the dirauth client
+
+and inside our mix server code we leave the DialContextFn empty
+
+but if instead of leaving it empty we gave it a proxy socks proxy AND we would also have to make the assumption that there's a local Tor daemon running and that our config tells us it's socks port etc
+jdormansteele
+4:10 PM
+
+In a normal NAT setup without Tor, what would the server configuration contain in the Addresses parameter? 
+
+Its NATted public IP address?
+</address></caption>
+    </example>
+    <example/>
+    <example/>
+    <example/>
     <para>
         <example>
-            <caption><para>so... if used properly it would allow someone to write code that talks to
-                    the dirauths over tor onion services</para>jdormansteele<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/47m9e3o34tyo8php14b3r9565h"
-                    xml:id="CENTER_time_47m9e3o34tyo8php14b3r9565h">12:54 PM</link><para>OK,
-                    noted.</para>dawuud<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/z9i1tjzryiye8xp3h6gqeb3wwr"
-                    xml:id="CENTER_time_z9i1tjzryiye8xp3h6gqeb3wwr">12:54 PM</link><code>// Config
-                    is a voting authority pki.Client instance.type Config struct { // KEMScheme
-                    indicates the KEM scheme used for the LinkKey/wire protocol. KEMScheme
-                    kem.Scheme // PKISignatureScheme specifies the cryptographic signature scheme
-                    PKISignatureScheme sign.Scheme // LinkKey is the link key for the client's wire
-                    connections. LinkKey kem.PrivateKey // LogBackend is the `core/log` Backend
-                    instance to use for logging. LogBackend *log.Backend // Authorities is the set
-                    of Directory Authority servers. Authorities []*config.Authority // DialContextFn
-                    is the optional alternative Dialer.DialContext function// to be used when
-                    creating outgoing network connections. DialContextFn func(ctx context.Context,
-                    network, address string) (net.Conn, error) // Geo is the geometry used for the
-                    Sphinx packet construction. Geo *geo.Geometry }</code><para>that's the config
-                    for the dirauth client</para><para>and inside our mix server code we leave the
-                        <code>DialContextFn</code> empty</para><para>but if instead of leaving it
-                    empty we gave it a proxy socks proxy AND we would also have to make the
-                    assumption that there's a local Tor daemon running and that our config tells us
-                    it's socks port etc</para>jdormansteele<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/dzkfjox3uffmtpc9uosxhbxrsw"
-                    xml:id="CENTER_time_dzkfjox3uffmtpc9uosxhbxrsw">4:10 PM</link><para>In a normal
-                    NAT setup without Tor, what would the server configuration contain in the
-                    Addresses parameter? </para><para>Its NATted public IP
-                    address?</para>Todaydawuud<link
+            <caption>dawuud<link
                     xlink:href="https://bench.cr.yp.to:41867/research/pl/mqc73fxcqfnu98d7he47stxqgo"
                     xml:id="CENTER_time_mqc73fxcqfnu98d7he47stxqgo">9:19 AM</link><code>// Addresses
                     are the IP listener addresses that the server will advertise // in the PKI and

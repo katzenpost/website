@@ -38,68 +38,38 @@
         addresses. For home and small business routers, default policy is to block inbound
         connections from public addresses. In this scenario, you need to configure port forwarding
         to the appropriate internal IP address and port. </para>
-    <para>
-        <table frame="all">
-            <title>Lan hosting options</title>
-            <tgroup cols="5">
-                <colspec colnum="1" colname="c1" colwidth="1*"/>
-                <colspec colnum="2" colname="c2" colwidth="1*"/>
-                <colspec colnum="3" colname="c3" colwidth="1*"/>
-                <colspec colnum="4" colname="c4" colwidth="1*"/>
-                <colspec colnum="5" colname="c5" colwidth="1*"/>
-                <thead>
-                    <row>
-                        <entry/>
-                        <entry>Mix node</entry>
-                        <entry>Gateway  node</entry>
-                        <entry>Service node</entry>
-                        <entry>Dirauth</entry>
-                    </row>
-                </thead>
-                <tbody>
-                    <row>
-                        <entry>Transparent port forwarding (EC2, etc.)</entry>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                    </row>
-                    <row>
-                        <entry>Selective forwarding (home and small business routers)</entry>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                    </row>
-                    <row>
-                        <entry>Tor</entry>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                    </row>
-                    <row>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                    </row>
-                    <row>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                    </row>
-                </tbody>
-            </tgroup>
-        </table>
-    </para>
-    
-    <section xml:id="tor">
-        <title xml:id="tor.title">Using Tor</title>
+
+
+
+    <section xml:id="nat-example">
+        <title xml:id="nat-example.title">Configuring a directory authority behind NAT</title>
         <para/>
+
+        <mediaobject>                                           
+            <imageobject>
+                <imagedata fileref="pix/dirauth-nat.png"/>
+            </imageobject>
+        </mediaobject>   
+
+    </section>
+
+
+    
+    <section xml:id="tor-example">
+        <title xml:id="tor-example.title">Configuring a gateway node as a Tor onion service</title>
+        <para/>
+
+        
+        
+        
+        <mediaobject>                                           
+            <imageobject>
+                <imagedata fileref="pix/gateway-onion.png"/>
+            </imageobject>
+        </mediaobject>   
+        
+        
+        
         <para>Dirauth is a cooperative crash fault tolerant voting system composed of multiple
             dirauth nodes. However, each of these dirauth nodes must have knowledge of the other
             dirauth node's network connection information and public cryptographic key material.
@@ -110,11 +80,8 @@
             operators that their publicly routable address is some other IP address or perhaps a Tor
             Onion address. </para>
         
-        <mediaobject>                                           
-            <imageobject>
-                <imagedata fileref="pix/gateway-onion.png"/>
-            </imageobject>
-        </mediaobject>   
+        
+        
         
         <para><filename>/etc/tor/torrc</filename></para>
         <programlisting>...
