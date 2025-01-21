@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-                 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
-[ 
-<!ENTITY % shared-content SYSTEM "shared-content.ent">
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../../shared-content.ent">
     %shared-content;
 ]>
 
@@ -62,8 +63,10 @@ management (/1/5)
 pki (/1/6)
 serverdebug (/1/7)-->
 
-<chapter id="xincludes">
-    <title id="xincludes.title">XIncludes repository</title>
+<chapter xml:id="xincludes"  xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1">
+    
+    <title xml:id="xincludes.title">XIncludes repository</title>
 
     <!--##################################################-->
     <!--##################################################-->
@@ -252,7 +255,9 @@ serverdebug (/1/7)-->
                 </listitem>
             </itemizedlist>
             <para>The output in TOML should then be pasted unchanged into the node's configuration
-                file, as shown below. For more information, see <xref linkend="gensphinx"/>.</para>
+                file, as shown below. For more information, 
+                see <!-- <xref linkend="gensphinx"/> --><link xlink:href="&baseURL;docs/admin_guide/gensphinx-appendix.html">Appendix: 
+                    Using gensphinx</link>.</para>
             <programlisting>[SphinxGeometry]
                 PacketLength = 3082
                 NrHops = 5
