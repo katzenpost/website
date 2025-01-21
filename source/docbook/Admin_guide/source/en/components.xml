@@ -401,6 +401,7 @@
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Addresses</emphasis></para>
+                        <!--Note that there is no "BindAddresses" parameter in the Server section for dirauths.-->
                         <para>Specifies a list of one or more address URLs in a format that contains
                             the transport protocol, IP address, and port number that the node will
                             bind to for incoming connections. &program_name; supports URLs with that
@@ -533,6 +534,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                     </listitem>
                     <listitem>
                         <para><emphasis role="bold">Addresses</emphasis></para>
+                        <!--Since dirauths cannot identify themselves with a "BindAddresses" parameter, there is none in references to peer dirauths.-->
                         <para>Specifies a list of one or more address URLs in a format that contains
                             the transport protocol, IP address, and port number that the node will
                             bind to for incoming connections. &program_name; supports URLs with that
@@ -1171,9 +1173,10 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <listitem>
                     <para><emphasis role="bold">PKISignatureScheme</emphasis></para>
                     <para>Specifies the cryptographic signature scheme that will be used by all
-                        components of the mix network when interacting with the PKI system. Mix
-                        nodes sign their descriptors using this signature scheme, and dirauth nodes
-                        similarly sign PKI documents using the same scheme.</para>
+                                    components of the mix network when interacting with the PKI
+                                    system. Mix nodes sign their descriptors using this signature
+                                    scheme, and dirauth nodes similarly sign PKI documents using the
+                                    same scheme.</para>
                     <para>The following signature schemes are supported:</para>
                     <itemizedlist>
                         <listitem>
@@ -1192,10 +1195,11 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <listitem>
                     <para><emphasis role="bold">Addresses</emphasis></para>
                     <para>Specifies a list of one or more address URLs in a format that contains the
-                        transport protocol, IP address, and port number that the server will bind to
-                        for incoming connections. &program_name; supports URLs with that start with
-                        either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
-                        ["quic://192.168.1.1:40001"].</para>
+                                    transport protocol, IP address, and port number that the server
+                                    will bind to for incoming connections. &program_name; supports
+                                    URLs with that start with either "tcp://" or "quic://" such as:
+                                    ["tcp://192.168.1.1:30001"] and
+                                    ["quic://192.168.1.1:40001"].</para>
                     <para>Type: []string</para>
                     <para>Required: Yes</para>
                 </listitem>
@@ -1210,7 +1214,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <listitem>
                     <para><emphasis role="bold">MetricsAddress</emphasis></para>
                     <para>Specifies the address/port to bind the Prometheus metrics endpoint
-                        to.</para>
+                                    to.</para>
                     <para>Type: string</para>
                     <para>Required: No</para>
                 </listitem>
@@ -1397,10 +1401,11 @@ FZWJFK0R8iU52CEUxVpXTA==
                 <listitem>
                     <para><emphasis role="bold">Addresses</emphasis></para>
                     <para>Specifies a list of one or more address URLs in a format that contains the
-                        transport protocol, IP address, and port number that the server will bind to
-                        for incoming connections. &program_name; supports URLs that start with
-                        either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
-                        ["quic://192.168.1.1:40001"].</para>
+                                    transport protocol, IP address, and port number that the server
+                                    will bind to for incoming connections. &program_name; supports
+                                    URLs that start with either "tcp://" or "quic://" such as:
+                                    ["tcp://192.168.1.1:30001"] and
+                                    ["quic://192.168.1.1:40001"].</para>
                     <para>Type: []string</para>
                     <para>Required: Yes</para>
                 </listitem>

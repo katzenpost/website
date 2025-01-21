@@ -521,90 +521,141 @@ Its NATted public IP address?
                     xlink:href="https://bench.cr.yp.to:41867/research/pl/4gykchppgibgtyiebo4dgaghcy"
                     xml:id="CENTER_time_4gykchppgibgtyiebo4dgaghcy">10:57 AM</link><para>I'm ashamed
                     to say as a native of the Bay Area that I never actually felt an earthquake
-                    until I got to Seattle. </para>dawuud<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/q7we99y567b5dgca98k3qx1r5a"
-                    xml:id="CENTER_time_q7we99y567b5dgca98k3qx1r5a">11:46 AM</link><para><link
-                        xlink:href="https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/docs/client_guide.md"
-                        >https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/docs/client_guide.md</link></para><para>@jdormansteele
-                    can you add the client2 configuration to the docs. we've documented the config
-                    params in the code comments here: <link
-                        xlink:href="https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/client2/config/config.go"
-                        >https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/client2/config/config.go</link></para><para>we
-                    support the following proxy types:</para><code>typeNone = "none" typeTorSocks5 =
-                    "tor+socks5" typeSocks5 = "socks5"</code><para>none does
-                    nothing.</para><para>socks5 does normal socks5 and passes through the specified
-                    username and password from the proxy config</para><code>// UpstreamProxy is the
-                    outgoing connection proxy configuration.type UpstreamProxy struct { // Type is
-                    the proxy type (Eg: "none"," socks5"). Type string// Network is the proxy
-                    address' network (`unix`, `tcp`). Network string// Address is the proxy's
-                    address. Address string// User is the optional proxy username. User string//
-                    Password is the optional proxy password. Password string } </code><para>if they
-                    specify the <code>Type</code> as "tor+socks5" then the User and Pasword are
-                    ignored and a random username is selected for Tor stream
-                    isolation</para><para>@leif_ says that we have no use for the normal socks5
-                    where the user/pass are passed through... so if it pleases the court we could
-                    also just remove the User/Password params from the above
-                    config</para>jdormansteele<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/3c4hz5aqsfb58dszq53uobgujh"
-                    xml:id="CENTER_time_3c4hz5aqsfb58dszq53uobgujh">12:16 PM</link><para>Got
-                    it.</para>dawuud<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/wcudsqbc83g4bp3ty7p4njdwhh"
-                    xml:id="CENTER_time_wcudsqbc83g4bp3ty7p4njdwhh">12:17 PM</link><para>the entire
-                    UpstreamProxy section is optional and can be ommitted from the
-                    config</para>dawuud<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/1c5uaa65jjfnbg8ig68397u7fw"
-                    xml:id="CENTER_time_1c5uaa65jjfnbg8ig68397u7fw">12:25 PM</link><para>also note
-                    the default values: const ( defaultLogLevel = "NOTICE" defaultPollingInterval =
-                    10 defaultInitialMaxPKIRetrievalDelay = 30 defaultSessionDialTimeout = 30
-                    )</para>jdormansteele<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/mskpp1bkzbrr9geowt3yxcqg5e"
-                    xml:id="CENTER_time_mskpp1bkzbrr9geowt3yxcqg5e">12:27 PM</link><para>Are the
-                    client2 daemon and thin library called by actual application clients and run on
-                    a user host?</para>dawuud<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/nkct4kika3d3zpj5txkb9r4ebe"
-                    xml:id="CENTER_time_nkct4kika3d3zpj5txkb9r4ebe">12:27 PM</link><para>the app
-                    will be integrated with the thin client library so that it can talk to the
-                    client daemon</para><para>we've got two thin clients; written in golang and
-                    python</para><para>they both work</para><para>first the user starts the client2
-                    daemon. then they start a katzenpost application that is written using the thin
-                    client. if it's got a correct config it should tell it how to connect to the
-                    client2 daemon over the thin client protocol</para><para>once @leif_ merged this
-                    PR <link xlink:href="https://github.com/katzenpost/katzenpost/pull/810"
-                        >https://github.com/katzenpost/katzenpost/pull/810</link> then we can say
-                    that we support socks5 and tor+socks5</para><para>currently however it ignores
-                    the user/password from the proxy config and randomizes the username per tor
-                    isolation</para>jdormansteele<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/y8cbg3cg13rh3jixg3154id8wy"
-                    xml:id="CENTER_time_y8cbg3cg13rh3jixg3154id8wy">12:31 PM</link><para>Wait, how
-                    is the Client2 daemon started? That doesn't involve a separate user action
-                    besides starting a client app, does it?</para>dawuud<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/6srk4hsmzjbzzei485zgz7itzo"
-                    xml:id="CENTER_time_6srk4hsmzjbzzei485zgz7itzo">12:32 PM</link><para>it's a
-                    binary</para><para>you run the binary</para><para>you should document it's
-                    usage</para><para><link
-                        xlink:href="https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/client2/cmd/kpclientd/main.go#L22-L23"
-                        >https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/client2/cmd/kpclientd/main.go#L22-L23</link></para><para>two
-                    CLI flags</para><para>-v and -c</para><para>-c specifies the location of the
-                    config file</para><para>-v prints the version number... but usually is useless
-                    and doesn't actually print the version number</para><para>human@computer
-                    ~/code/katzenpost/client2/cmd/kpclientd (fixup_socks_proxy)$ go build
-                    human@computer ~/code/katzenpost/client2/cmd/kpclientd (fixup_socks_proxy)$
-                    ./kpclientd -h Usage of ./kpclientd: -c string configuration file -v Get version
-                    info. human@computer ~/code/katzenpost/client2/cmd/kpclientd
-                    (fixup_socks_proxy)$</para>jdormansteele<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/kcif3wyidib6fr5b9kmoewf9fr"
-                    xml:id="CENTER_time_kcif3wyidib6fr5b9kmoewf9fr">12:34
-                    PM</link><para>Ah.</para>dawuud<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/c47qr1e1npyzff4f4hcqs8tkoe"
-                    xml:id="CENTER_time_c47qr1e1npyzff4f4hcqs8tkoe">12:34 PM</link><para>we can also
-                    integrate the client2 daemon into the application... but that's not so good
-                    because it means only running one app at a time</para><para>we've done that for
-                    the ping command</para><para>but that should probably be optional... later on we
-                    can add an option to the ping command so that it doesn't start it's own
-                    daemon</para>jdormansteele<link
-                    xlink:href="https://bench.cr.yp.to:41867/research/pl/e9tu43enkffk9cjer996whfffe"
-                    xml:id="CENTER_time_e9tu43enkffk9cjer996whfffe">12:36 PM</link><para>I wonder if
-                    all of this should be put in the client document. </para>dawuud<link
+                    until I got to Seattle. 
+                    
+                    
+                    
+                    
+                    
+                    </para>
+                
+                
+           <!--     
+                dawuud
+                11:46 AM
+                
+                https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/docs/client_guide.md
+                
+                @jdormansteele can you add the client2 configuration to the docs. we've documented the config params in the code comments here: https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/client2/config/config.go
+                
+                we support the following proxy types:
+                typeNone      = "none"
+                typeTorSocks5 = "tor+socks5"
+                typeSocks5    = "socks5"
+                
+                none does nothing.
+                
+                socks5 does normal socks5 and passes through the specified username and password from the proxy config
+                
+                // UpstreamProxy is the outgoing connection proxy configuration.
+                type UpstreamProxy struct {
+                // Type is the proxy type (Eg: "none"," socks5").
+                Type string
+                
+                // Network is the proxy address' network (`unix`, `tcp`).
+                Network string
+                
+                // Address is the proxy's address.
+                Address string
+                
+                // User is the optional proxy username.
+                User string
+                
+                // Password is the optional proxy password.
+                Password string
+                }
+                
+                if they specify the Type as "tor+socks5" then the User and Pasword are ignored and a random username is selected for Tor stream isolation
+                
+                @leif_ says that we have no use for the normal socks5 where the user/pass are passed through... so if it pleases the court we could also just remove the User/Password params from the above config
+                jdormansteele
+                12:16 PM
+                
+                Got it.
+                dawuud
+                12:17 PM
+                
+                the entire UpstreamProxy section is optional and can be ommitted from the config
+                dawuud
+                12:25 PM
+                
+                also note the default values:
+                const (
+                defaultLogLevel                    = "NOTICE"
+                defaultPollingInterval             = 10
+                defaultInitialMaxPKIRetrievalDelay = 30
+                defaultSessionDialTimeout          = 30
+                )
+                jdormansteele
+                12:27 PM
+                
+                Are the client2 daemon and thin library called by actual application clients and run on a user host?
+                dawuud
+                12:27 PM
+                
+                the app will be integrated with the thin client library so that it can talk to the client daemon
+                
+                we've got two thin clients; written in golang and python
+                
+                they both work
+                
+                first the user starts the client2 daemon. then they start a katzenpost application that is written using the thin client. if it's got a correct config it should tell it how to connect to the client2 daemon over the thin client protocol
+                
+                once @leif_ merged this PR https://github.com/katzenpost/katzenpost/pull/810 then we can say that we support socks5 and tor+socks5
+                
+                currently however it ignores the user/password from the proxy config and randomizes the username per tor isolation
+                jdormansteele
+                12:31 PM
+                
+                Wait, how is the Client2 daemon started? That doesn't involve a separate user action besides starting a client app, does it?
+                dawuud
+                12:32 PM
+                
+                it's a binary
+                
+                you run the binary
+                
+                you should document it's usage
+                
+                https://github.com/katzenpost/katzenpost/blob/fixup_socks_proxy/client2/cmd/kpclientd/main.go#L22-L23
+                
+                two CLI flags
+                
+                -v and -c
+                
+                -c specifies the location of the config file
+                
+                -v prints the version number... but usually is useless and doesn't actually print the version number
+                
+                human@computer ~/code/katzenpost/client2/cmd/kpclientd (fixup_socks_proxy)$ go build
+                human@computer ~/code/katzenpost/client2/cmd/kpclientd (fixup_socks_proxy)$ ./kpclientd -h
+                Usage of ./kpclientd:
+                -c string
+                configuration file
+                -v    Get version info.
+                human@computer ~/code/katzenpost/client2/cmd/kpclientd (fixup_socks_proxy)$
+                jdormansteele
+                12:34 PM
+                
+                Ah.
+                dawuud
+                12:34 PM
+                
+                we can also integrate the client2 daemon into the application... but that's not so good because it means only running one app at a time
+                
+                we've done that for the ping command
+                12:35 PM
+                
+                but that should probably be optional... later on we can add an option to the ping command so that it doesn't start it's own daemon
+                jdormansteele
+                12:36 PM
+                
+                I wonder if all of this should be put in the client document. -->
+                
+                
+                
+                
+                ><para/><para/><para/><para/>dawuud<link
                     xlink:href="https://bench.cr.yp.to:41867/research/pl/nmc644xi5pnb8pytz38k1kergw"
                     xml:id="CENTER_time_nmc644xi5pnb8pytz38k1kergw">12:36 PM</link><para>the down
                     side of that is of course that the new ping command needs a configuration to
