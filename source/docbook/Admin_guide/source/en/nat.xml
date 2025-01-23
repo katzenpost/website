@@ -225,11 +225,11 @@
                 </info>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="&baseURL;docs/admin_guide/pix/client-gateway-nat.png" scale="65"/>
+                        <imagedata fileref="pix/client-gateway-nat.png" scale="65"/>
                     </imageobject>
                 </mediaobject>
             </figure>
-            <para><link xlink:href="pix/client-gateway-nat.png" xlink:show="new">Enlarge diagram</link></para>
+            <para><link xlink:href="&baseURL;docs/admin_guide/pix/client-gateway-nat.png" xlink:show="new">Enlarge diagram</link></para>
             <para><emphasis role="bold">Key observations</emphasis></para>
             <itemizedlist>
                 <listitem>
