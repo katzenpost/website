@@ -79,7 +79,130 @@ serverdebug (/1/7)-->
     <!--##################################################-->
     <!--##################################################-->
     <!--##################################################-->   
+    
+    
+    <!-- Note -->
+    <!-- To remedy confusion concerning Addresses and BindAddresses, here is the relevant csource code. -->
+    
+    <!--
+        
+    In server/config/config.go : 
+    
+    
+    type Server struct {
+    // Identifier is the human readable identifier for the node (eg: FQDN).
+    Identifier string
+    
+    // WireKEM is the KEM string representing the chosen KEM scheme with which to communicate
+    // with the mixnet and dirauth nodes.
+    WireKEM string
+    
+    // PKISignatureScheme specifies the cryptographic signature scheme
+    PKISignatureScheme string
+    
+    // Addresses are the IP listener addresses that the server will advertise
+    // in the PKI and bind to for incoming connections unless BindAddresses is specified.
+    Addresses []string
+    
+    // BindAddresses are the listener addresses that the server will bind to and accept connections on
+    // These Addresses are not advertised in the PKI.
+    BindAddresses []string
+    
+    ....  
+    
+    func (sCfg *Server) validate() error {
+    if sCfg.Identifier == "" {
+    return errors.New("config: Server: Identifier is not set")
+    }
+    
+    if sCfg.WireKEM == "" {
+    return errors.New("config: Server: WireKEM is not set")
+    }
+    
+    if sCfg.PKISignatureScheme == "" {
+    return errors.New("config: Server: PKISignatureScheme is not set")
+    }
+    
+    if sCfg.Addresses != nil {
+    for _, v := range append(sCfg.Addresses, sCfg.BindAddresses...) {
+    if u, err := url.Parse(v); err != nil {
+    return fmt.Errorf("config: Authority: Address '%v' is invalid: %v", v, err)
+    } else if u.Port() == "" {
+    return fmt.Errorf("config: Authority: Address '%v' is invalid: Must contain Port", v)
+    }
+    }
+    } else {
+    // Try to guess a "suitable" external IPv4 address.  If people want
+    // to do loopback testing, they can manually specify one.  If people
+    // want to use IPng, they can manually specify that as well.
+    addr, err := utils.GetExternalIPv4Address()
+    if err != nil {
+    return err
+    }
+    
+    sCfg.Addresses = []string{"tcp://" + addr.String() + defaultAddress}
+    }
+    
+    internalTransports := make(map[string]bool)
+    for _, v := range pki.InternalTransports {
+    internalTransports[strings.ToLower(string(v))] = true
+    }
+    
+    if !filepath.IsAbs(sCfg.DataDir) {
+    return fmt.Errorf("config: Server: DataDir '%v' is not an absolute path", sCfg.DataDir)
+    }
+    if sCfg.MetricsAddress != "" {
+    if _, err := netip.ParseAddrPort(sCfg.MetricsAddress); err != nil {
+    return fmt.Errorf("config: Server: MetricsAddress '%v' is invalid: %v", sCfg.MetricsAddress, err)
+    }
+    }
+    return nil
+    }
+    
+    
+    
+    In server/server.go :
+    
+    // Initialize the outgoing connection manager, decoy source/sink, and then
+    // start the PKI worker.
+    s.connector = outgoing.New(goo)
+    if s.decoy, err = decoy.New(goo); err != nil {
+    s.log.Errorf("Failed to initialize decoy source/sink: %v", err)
+    return nil, err
+    }
+    
+    var addresses []string
+    if len(s.cfg.Server.BindAddresses) > 0 {
+    s.log.Debugf("BindAddresses found")
+    addresses = s.cfg.Server.BindAddresses
+    } else {
+    addresses = s.cfg.Server.Addresses
+    }
+    // Bring the listener(s) online.
+    s.listeners = make([]glue.Listener, 0, len(addresses))
+    for i, addr := range addresses  {
+    l, err := incoming.New(goo, s.inboundPackets, i, addr)
+    if err != nil {
+    s.log.Errorf("Failed to spawn listener on address: %v (%v).", addr, err)
+    return nil, err
+    }
+    s.listeners = append(s.listeners, l)
+    }
+     
+In docker/voting_mixnet/gateway1/katzenpost.toml :
 
+[Server]
+  Identifier = "gateway1"
+  WireKEM = "xwing"
+  PKISignatureScheme = "Ed448-Dilithium3"
+  Addresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005", "onion://thisisjustatestoniontoverifythatconfigandpkiworkproperly.onion:4242"]
+  BindAddresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005"]
+  MetricsAddress = "127.0.0.1:30006"
+  DataDir = "/voting_mixnet/gateway1"
+  IsGatewayNode = true
+  IsServiceNode = false
+-->
+   
     <simplesect>
         <title></title>
         <!--The config code varies by role so it is not included in this entity.-->       
@@ -116,13 +239,22 @@ serverdebug (/1/7)-->
                     <para>Required: Yes</para>
                 </listitem>
                 
-                <listitem>
+                <listitem xml:id="addresses">
                     <para><emphasis role="bold">Addresses</emphasis></para>
                     <para>Specifies a list of one or more address URLs in a format that contains the
                         transport protocol, IP address, and port number that the server will bind to
                         for incoming connections. &program_name; supports URLs with that start with
                         either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
                         ["quic://192.168.1.1:40001"].</para>
+                    <para><emphasis role="bold">Addresses</emphasis> is overridden if <emphasis
+                            role="bold">BindAddresses</emphasis> is <emphasis role="bold"
+                            >true</emphasis>. In that scenario, one or more advertised, external
+                        addresses is provided as the value of <emphasis role="bold"
+                            >Addresses</emphasis>, and is advertised in the PKI document. <emphasis
+                            role="bold">BindAddresses</emphasis>, meanwhile, holds the values of
+                        non-adverstised, internal-only listening addresses. This is the
+                        configuration for hosts connecting to the Internet through network adddress
+                        translation (NAT).</para>
                     <para>Type: []string</para>
                     <para>Required: Yes</para>
                 </listitem>
@@ -130,7 +262,8 @@ serverdebug (/1/7)-->
                     <para><emphasis role="bold">BindAddresses</emphasis></para>
                     <para>If <emphasis role="bold">true</emphasis>, allows setting of listener
                         addresses that the server will bind to and accept connections on. These
-                        addresses are not advertised in the PKI.</para>
+                        addresses are not advertised in the PKI document. For more information, see
+                            <link linkend="addresses">Addresses</link>.</para>
                     <para>Type: bool</para>
                     <para>Required: No</para>
                 </listitem>
@@ -539,7 +672,8 @@ FZWJFK0R8iU52CEUxVpXTA==
                         transport protocol, IP address, and port number that the server will bind to
                         for incoming connections. &program_name; supports URLs that start with
                         either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
-                        ["quic://192.168.1.1:40001"].</para>
+                        ["quic://192.168.1.1:40001"]. The value of <emphasis role="bold"
+                            >Addresses</emphasis> is advertised in the PKI document.</para>
                     <para>Type: []string</para>
                     <para>Required: Yes</para>
                 </listitem>

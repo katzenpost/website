@@ -32,25 +32,28 @@
         This applies to mix nodes, gateway nodes, service nodes, and directory authority nodes
         (dirauths). Port forwarding and other network configuration details depend on how you are
         hosting your servers and the type of router you use.</para>
-    <para>Some hosting scenarios, such as the use of an AWS EC2 instance, require no manual port
-        forwarding. A &program_name; node running on an EC2 instance with default network settings
-        listens on its internal IP address yet can receive connections from publicly routed IP
-        addresses. For home and small business routers, default policy is to block inbound
-        connections from public addresses. In this scenario, you need to configure port forwarding
-        to the appropriate internal IP address and port. <note>
+    <para>Some hosting scenarios, such as the use of an Amazon Elastic Compute Cloud (Amazon EC2)
+        instance, require no manual port forwarding. A &program_name; node running on an EC2
+        instance with default network settings listens on its internal IP address yet can receive
+        connections from publicly routed IP addresses. For home and small business routers, typical
+        default policy is to block inbound connections from public addresses. In this scenario, you
+        need to configure port-forwarding to the appropriate internal IP address and port of the
+        destination node. <note>
             <para>Router and LAN host configuration in a NAT topology are beyond the scope of this
-                topic.</para>
+                topic. NAT was defined in 1994 in <link
+                    xlink:href="https://www.rfc-editor.org/rfc/rfc1631">RFC 1631</link>.</para>
         </note></para>
     <section>
         <title><parameter>Addresses</parameter> and <parameter>BindAddresses</parameter></title>
         <para>Any &program_name; server node can be configured to support NAT and similar network
-            topologies (such as Tor).  In a direct network connection, the address defined in the
-            server <parameter>Addresses</parameter> parameter is both the address on with the node
-            listens for incoming connections, and the address that is advertised to other mixnet
-            components in the PKI document. By supplying the optional
-                <parameter>BindAddresses</parameter> parameter, you can define two addresses:  a
-            public address that is advertised in the PKI document, and an internal address that is
-                <emphasis>not</emphasis> advertised.</para>
+            topologies (such as Tor) that traverse public and private network boundaries. In a
+            direct network connection, the address defined in the server
+                <parameter>Addresses</parameter> parameter defines the addresses on with the node
+            listens for incoming connections, and which are advertised to other mixnet components in
+            the PKI document. By supplying the optional <parameter>BindAddresses</parameter>
+            parameter, you can define a second address group: internal addresses that are
+                <emphasis>not</emphasis> advertised in the PKI document. This is useful for NAT and
+            Tor scenarios.</para>
         <para>The following table shows the details for these two parameters. For more information
             about mixnet node configuration, see <link
                 xlink:href="https://katzenpost.network/docs/admin_guide/components.html">Components
@@ -61,13 +64,13 @@
                     parameters</title>
                 <tgroup cols="3">
                     <colspec colnum="1" colname="c1" colwidth="1*"/>
-                    <colspec colnum="2" colname="c2" colwidth="1*"/>
-                    <colspec colnum="3" colname="c3" colwidth="1*"/>
+                    <colspec colnum="2" colname="c2" colwidth="1.39*"/>
+                    <colspec colnum="3" colname="c3" colwidth="3.17*"/>
                     <thead>
                         <row>
                             <entry><parameter>Parameter</parameter></entry>
                             <entry>Required</entry>
-                            <entry/>
+                            <entry>Description</entry>
                         </row>
                     </thead>
                     <tbody>
@@ -77,11 +80,16 @@
                             <entry>
                                 <para>Specifies a list of one or more address URLs in a format that
                                     contains the transport protocol, IP address, and port number
-                                    that the server will bind to for incoming connections.
-                                    &program_name; supports URLs with that start with either
-                                    "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
-                                    ["quic://192.168.1.1:40001"].</para>
-                                <para>Type: []string</para>
+                                    that the server will bind to for incoming connections. This
+                                    value is advertised in the PKI document. &program_name; supports
+                                    URLs with that start with either <code>tcp://</code> or
+                                        <code>quic://</code> such as:
+                                        <code>["tcp://192.168.1.1:30001"]</code> and
+                                        <code>["quic://192.168.1.1:40001"]</code>. Onion addresses
+                                    (prefix <code>onion://</code>) are also supported on some node
+                                    types if <code>BindAddresses</code> is also present.</para>
+                                <para>Overridden by <parameter>BindAddresses</parameter>; see
+                                    below.</para>
                             </entry>
                         </row>
                         <row>
@@ -89,21 +97,21 @@
                             <entry>No</entry>
                             <entry>
                                 <para><emphasis role="bold">BindAddresses</emphasis></para>
-                                <para>If <emphasis role="bold">true</emphasis>, allows setting of
+                                <para>If <emphasis role="bold">true</emphasis> (that is, if the
+                                    parameter is present), this parameter allows you to set internal
                                     listener addresses that the server will bind to and accept
-                                    connections on. These addresses are not advertised in the
-                                    PKI.</para>
-                                <para>Type: bool</para>
+                                    connections on, but that are not advertised in the PKI document.
+                                    This parameter is used to configure NAT and Tor support.</para>
                             </entry>
                         </row>
                     </tbody>
                 </tgroup>
             </table>
         </para>
-        <para>To illustrate, a node configuration file with a direct Internet connection contains
-            contains a <code>Server</code> section specifying only the
-                <parameter>Addresses</parameter> parameter, as in the following
-            lisiting:<programlisting>[Server]
+        <para>For example, a mix node configuration file with a direct Internet connection, or with
+            transparent NAT hosting such as that provided by Amazon EC2, contains a
+                <code>Server</code> section specifying only the <parameter>Addresses</parameter>
+            parameter, as in the following listing:<programlisting>[Server]
   Identifier = "mix1"
   WireKEM = "xwing"
   PKISignatureScheme = "Ed448-Dilithium3"
@@ -112,10 +120,17 @@
   DataDir = "/voting_mixnet/mix1"
   IsGatewayNode = false
   IsServiceNode = false</programlisting></para>
-        <para>The configuration file for a similar node behind NAT contains <code>Server</code>
-            section that specifies both the <parameter>Addresses</parameter> and
-                <parameter>BindAddresses</parameter> parameters, as in the following
-            lisiting:<programlisting>[Server]
+        <para>Importantly, the value of <code>Addresses</code>, which the node advertises to other
+            peers, is its loopback address, 127.0.0.1, and a specified port. This means that there
+            is no publicly routable address for this node, and that traffic arriving at the node is
+            delivered there by external infrastructure, presumably a configured LAN. In all of these
+            examples, nodes have necessarily been assigned a LAN addresses, but these addresses play
+            no role in &program_name; server configurations. Rather, for portability, the
+            configurations use the logically equivalent loopback address.</para>
+        <para>In contrast to the direct connection, the next example shows the configuration file
+            for a similar node behind NAT, containing a <code>Server</code> section that specifies
+            both the <parameter>Addresses</parameter> and
+            <parameter>BindAddresses</parameter>parameters:<programlisting>[Server]
   Identifier = "mix1"
   WireKEM = "xwing"
   PKISignatureScheme = "Ed448-Dilithium3"
@@ -126,28 +141,66 @@
   IsGatewayNode = false
   IsServiceNode = false</programlisting></para>
         <para>Notice that the internal listening address remains unchanged, but it is now the value
-            of the added <parameter>BindAddresses</parameter> parameter. The value of the
-                <parameter>Addresses</parameter>parameter has changed to NAT router's WAN address.
-            It is assumed that the router is configured to forward traffic to this address and port
-            to the mixnet node over its LAN subnet, and that the host on which the mixnet server
-            runs has been assigned a LAN address.</para>
+            of the new <parameter>BindAddresses</parameter> parameter. In addition, the value of the
+                <parameter>Addresses</parameter> parameter has changed to the NAT router's WAN
+            address, including a port. It is assumed that the router is configured to forward
+            traffic routed to this address and port to the mixnet node over its LAN. </para>
     </section>
     <section>
         <title>Application scenarios</title>
-        <para/>
-        <section xml:id="node-to-node">
-            <title xml:id="node-to-node.title">Node-to-node connections involving NAT</title>
-            <para/>
+        <para>The following sections  illustrate supported &program_name; topologies that make use
+            of the <parameter>BindAddresses</parameter> parameter.</para>
+        <section xml:id="peer-to-peer">
+            <title xml:id="peer-to-peer.title">Peer-to-peer connections involving NAT</title>
+            <para>In this scenario, a mix node behind NAT listens on local addresses for
+                connections, while advertising a public address and port to its peer, a directory
+                authority, which is assumed to have a publicly routable address.</para>
             <figure>
                 <info>
                     <title>Configuring a mix node behind NAT to be available to a dirauth</title>
                 </info>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="pix/node-to-node-nat.png"/>
+                        <imagedata fileref="pix/peer-to-peer-nat.png"/>
                     </imageobject>
                 </mediaobject>
             </figure>
+            <para><emphasis role="bold">Key observations</emphasis></para>
+            <itemizedlist>
+                <listitem>
+                    <para>The configuration file on the NATed mix node is
+                            <code>katzenpost.toml</code>. </para>
+                </listitem>
+                <listitem>
+                    <para>The relevant section of the configuration file is
+                        <code>[Server]</code>.</para>
+                </listitem>
+                <listitem>
+                    <para>The <code>Addresses</code> parameter specifices the publicly routable
+                        address (100.100.100.x) a port (1234) over which the mix node can be reached
+                        from the Internet. This value is periodically advertised in the PKI documen
+                        to other peers on the mix network.</para>
+                </listitem>
+                <listitem>
+                    <para>The mix node also has a LAN address, 192.168.0.2, which does not appear in
+                        the &program_name; configuration, but is logically equivalent to the node's
+                        loopback address, 127.0.0.1.</para>
+                </listitem>
+                <listitem>
+                    <para>The <parameter>BindAddresses</parameter> parameter specifies  the loopback
+                        address (127.0.0.1) and a port (1234) on which the node listend for incoming
+                        Sphinx packets from peers.</para>
+                </listitem>
+                <listitem>
+                    <para>The NAT router has two configured addresses, public address 100.100.100.x,
+                        and LAN address 192.168.0.1.</para>
+                </listitem>
+                <listitem>
+                    <para>The NAT device routes traffic for 100.100.100.x:1234 to the LAN address
+                        and port of the mix node, 192.168.0.2:1234, and therefore to the configured
+                        listener on 127.0.0.1:1234.</para>
+                </listitem>
+            </itemizedlist>
         </section>
         <section xml:id="client-to-gateway-nat">
             <title xml:id="client-to-gateway-nat.title">Client-to-gateway connections involving
