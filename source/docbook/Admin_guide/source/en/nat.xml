@@ -135,7 +135,7 @@
         <para>In contrast to the direct connection, the next example shows the configuration file
             for a similar node behind NAT, containing a <code>Server</code> section that specifies
             both the <parameter>Addresses</parameter> and
-            <parameter>BindAddresses</parameter>parameters:<programlisting>[Server]
+            <parameter>BindAddresses</parameter> parameters:<programlisting>[Server]
   Identifier = "mix1"
   WireKEM = "xwing"
   PKISignatureScheme = "Ed448-Dilithium3"
@@ -183,10 +183,10 @@
                         <code>[Server]</code>.</para>
                 </listitem>
                 <listitem>
-                    <para>The <parameter>Addresses</parameter> parameter specifices the publicly routable
-                        address (203.0.113.10) and a port (1234) over which the mix node can be
-                        reached from the Internet. This value is periodically advertised in the PKI
-                        document to other components of the mix network.</para>
+                    <para>The <parameter>Addresses</parameter> parameter specifies the publicly
+                        routable address (203.0.113.10) and a port (1234) over which the mix node
+                        can be reached from the Internet. This value is periodically advertised in
+                        the PKI document to other components of the mix network.</para>
                 </listitem>
                 <listitem>
                     <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
@@ -241,10 +241,10 @@
                         <code>[Server]</code>.</para>
                 </listitem>
                 <listitem>
-                    <para>The <parameter>Addresses</parameter> parameter specifices the publicly routable
-                        address (203.0.113.10) and a port (1234) over which the gateway node can be
-                        reached from the Internet. This value is periodically advertised in the PKI
-                        document to other components of the mix network.</para>
+                    <para>The <parameter>Addresses</parameter> parameter specifies the publicly
+                        routable address (203.0.113.10) and a port (1234) over which the gateway
+                        node can be reached from the Internet. This value is periodically advertised
+                        in the PKI document to other components of the mix network.</para>
                 </listitem>
                 <listitem>
                     <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
@@ -280,7 +280,7 @@
                 one.</para>
             <figure>
                 <info>
-                    <title>Conguring a gateway to be availabe to a client over Tor</title>
+                    <title>Configuring a gateway to be available to a client over Tor</title>
                 </info>
                 <mediaobject>
                     <imageobject>
@@ -307,7 +307,7 @@
                         shown.</para>
                 </listitem>
                 <listitem>
-                    <para>The <parameter>Addresses</parameter> parameter specifices the onion address
+                    <para>The <parameter>Addresses</parameter> parameter specifies the onion address
                             (<code>address.onion</code>) and a port (1234) over which the gateway
                         node can be reached by way of the Tor network. This value is periodically
                         advertised in the PKI document to other components of the mix
