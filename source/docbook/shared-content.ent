@@ -3,8 +3,8 @@
 <!ENTITY program_name 'Katzenpost'>
 <!ENTITY chat_client 'Katzen'>
 <!ENTITY chat_client_binary 'katzen'>
-<!ENTITY mixserver_binary 'mixserver'>
-<!ENTITY dirauth_binary 'dirauth'> 
+<!ENTITY mixserver_binary 'pq-katzenpost-mixserver'>
+<!ENTITY dirauth_binary 'pq-katzenpost-authority'> 
 <!ENTITY research_paper_link 'Place-holder for research paper link'>
 <!--<!ENTITY baseURL 'http://localhost:1313/'>-->
 <!ENTITY baseURL 'https://katzenpost.network/'>
