@@ -27,15 +27,12 @@
         <title xml:id="ops.title">Operating the &program_name; mixnet</title>
     </info>
     
-    <para>To do</para>
+    <para>The &program_name; management interface, which is accessed through a unix socket,
+        supports run-time changes on service nodes without requiring the node to be restarted. The
+        management interface is disabled by default. For information about enabling it, see </para>
     <para>
         <itemizedlist>
-            <listitem>
-                <para><emphasis role="bold">Management</emphasis></para>
-                <para>TODO: write description of new "Management" feature making it easy to
-                    install/restart service plugins without restarting whole mix net ... management
-                    socket for restarting services without restarting the service node</para>
-            </listitem>
+            <listitem/>
             <listitem>
                 <para><emphasis role="bold">Production vs. docker test mix network</emphasis></para>
                 <para>Currently our Epoch duration is hardcoded to 20 minutes. The docker test mix
@@ -53,8 +50,7 @@
                                         with a commandline like so:</para>
                                     <programlisting>socat unix:/&lt;path-to-data-dir&gt;/management_sock STDOUT
 </programlisting>
-                                    <para><?oxy_comment_start author="dwrob" timestamp="20250124T101920-0800" comment="David S queried about where this is, and need for examples."?>The
-                    following commands are possible:<?oxy_comment_end?></para>
+                                    <para>The following commands are possible:</para>
                                     <itemizedlist>
                                         <listitem>
                                             <para>QUIT - Exit this management socket session.</para>
@@ -136,15 +132,19 @@
         </info>
         <para>Directory authorities (dirauths) may be controlled individually from the command line. </para>
         <para>The the dirauth binary  <command>&dirauth_binary;</command> has the following
-            commandline usage:</para>
-        <programlisting>./voting -h
-Usage of ./voting:
+            command-pqline usage:</para>
+        <programlisting><prompt>$ </prompt>&dirauth_binary; -h
+Usage of &dirauth_binary;:
   -f string
-        Path to the authority config file. (default "katzenpost-authority.toml")
-  -g    Generate the keys and exit immediately.</programlisting>
+    	Path to the authority config file. (default "katzenpost-authority.toml")
+  -g	Generate the keys and exit immediately.
+  -v	Get version info.</programlisting>
+        <para>The <code>-f</code> parameter can be used to specify the full path and filename of the
+            server configuration file, typically
+                <filename>/etc/pq-katzenpost-authority/katzenpost-authority.toml</filename>.</para>
         <para>The <code>-g</code> option is used to generate the public and private signing and link
-            keys.</para>
-        <para/>
+            keys. By default, these must be manually copied to the directory defined by
+                <filename>DataDir</filename> in /etc/&mixserver_binary;/ </para>
     </section>
     <section xml:id="server-usage">
         <info>
@@ -155,9 +155,9 @@ Usage of ./voting:
             individually from the command line.</para>
         
         <para>The mix server binary  <command>&mixserver_binary;</command> has the following
-            commandline usage:</para>
-        <programlisting>./server -h
-Usage of ./server:
+            command-line usage:</para>
+        <programlisting><prompt>$ </prompt>&mixserver_binary; -h
+Usage of ./&mixserver_binary;:
   -f string
         Path to the server config file. (default "katzenpost.toml")
   -g    Generate the keys and exit immediately.</programlisting>
