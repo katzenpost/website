@@ -6,13 +6,11 @@
 <!ENTITY mixserver_binary 'pq-katzenpost-mixserver'>
 <!ENTITY dirauth_binary 'pq-katzenpost-authority'> 
 <!ENTITY research_paper_link 'Place-holder for research paper link'>
-<!--<!ENTITY baseURL 'http://localhost:1313/'>-->
 <!ENTITY baseURL 'https://katzenpost.network/'>
-<!--<!ENTITY xxx ''>
-<!ENTITY xxx ''>
-<!ENTITY xxx ''>-->
 
 <!-- The following two are entities, not includes, because their XML is ill-formed.-->
+
+<!--  This one is provided directly as an entity in the Components chapter -->
 
 <!ENTITY WireKEMScheme '                
                     <!-- WireKEMScheme ... the link layer -->
@@ -63,7 +61,9 @@
                         <para>Type: string</para>
                         <para>Required: Yes</para>                    
                     </listitem>'>     
-                    
+ 
+<!-- This one is called from the WireKEM XInclude. --> 
+ 
 <!ENTITY WireKEM '                
                     <!-- WireKEM ... the  link layer -->
                     <!-- This is the API term just for the Server options (mix, gateway, service). This is a flaw. -->
@@ -111,4 +111,7 @@
                         </itemizedlist>											
                         <para>Type: string</para>
                         <para>Required: Yes</para>                    
-                    </listitem>'> 
+                    </listitem>'>    
+                  
+                    
+                    

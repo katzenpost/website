@@ -80,128 +80,7 @@ serverdebug (/1/7)-->
     <!--##################################################-->
     <!--##################################################-->   
     
-    
-    <!-- Note -->
-    <!-- To remedy confusion concerning Addresses and BindAddresses, here is the relevant csource code. -->
-    
-    <!--
-        
-    In server/config/config.go : 
-    
-    
-    type Server struct {
-    // Identifier is the human readable identifier for the node (eg: FQDN).
-    Identifier string
-    
-    // WireKEM is the KEM string representing the chosen KEM scheme with which to communicate
-    // with the mixnet and dirauth nodes.
-    WireKEM string
-    
-    // PKISignatureScheme specifies the cryptographic signature scheme
-    PKISignatureScheme string
-    
-    // Addresses are the IP listener addresses that the server will advertise
-    // in the PKI and bind to for incoming connections unless BindAddresses is specified.
-    Addresses []string
-    
-    // BindAddresses are the listener addresses that the server will bind to and accept connections on
-    // These Addresses are not advertised in the PKI.
-    BindAddresses []string
-    
-    ....  
-    
-    func (sCfg *Server) validate() error {
-    if sCfg.Identifier == "" {
-    return errors.New("config: Server: Identifier is not set")
-    }
-    
-    if sCfg.WireKEM == "" {
-    return errors.New("config: Server: WireKEM is not set")
-    }
-    
-    if sCfg.PKISignatureScheme == "" {
-    return errors.New("config: Server: PKISignatureScheme is not set")
-    }
-    
-    if sCfg.Addresses != nil {
-    for _, v := range append(sCfg.Addresses, sCfg.BindAddresses...) {
-    if u, err := url.Parse(v); err != nil {
-    return fmt.Errorf("config: Authority: Address '%v' is invalid: %v", v, err)
-    } else if u.Port() == "" {
-    return fmt.Errorf("config: Authority: Address '%v' is invalid: Must contain Port", v)
-    }
-    }
-    } else {
-    // Try to guess a "suitable" external IPv4 address.  If people want
-    // to do loopback testing, they can manually specify one.  If people
-    // want to use IPng, they can manually specify that as well.
-    addr, err := utils.GetExternalIPv4Address()
-    if err != nil {
-    return err
-    }
-    
-    sCfg.Addresses = []string{"tcp://" + addr.String() + defaultAddress}
-    }
-    
-    internalTransports := make(map[string]bool)
-    for _, v := range pki.InternalTransports {
-    internalTransports[strings.ToLower(string(v))] = true
-    }
-    
-    if !filepath.IsAbs(sCfg.DataDir) {
-    return fmt.Errorf("config: Server: DataDir '%v' is not an absolute path", sCfg.DataDir)
-    }
-    if sCfg.MetricsAddress != "" {
-    if _, err := netip.ParseAddrPort(sCfg.MetricsAddress); err != nil {
-    return fmt.Errorf("config: Server: MetricsAddress '%v' is invalid: %v", sCfg.MetricsAddress, err)
-    }
-    }
-    return nil
-    }
-    
-    
-    
-    In server/server.go :
-    
-    // Initialize the outgoing connection manager, decoy source/sink, and then
-    // start the PKI worker.
-    s.connector = outgoing.New(goo)
-    if s.decoy, err = decoy.New(goo); err != nil {
-    s.log.Errorf("Failed to initialize decoy source/sink: %v", err)
-    return nil, err
-    }
-    
-    var addresses []string
-    if len(s.cfg.Server.BindAddresses) > 0 {
-    s.log.Debugf("BindAddresses found")
-    addresses = s.cfg.Server.BindAddresses
-    } else {
-    addresses = s.cfg.Server.Addresses
-    }
-    // Bring the listener(s) online.
-    s.listeners = make([]glue.Listener, 0, len(addresses))
-    for i, addr := range addresses  {
-    l, err := incoming.New(goo, s.inboundPackets, i, addr)
-    if err != nil {
-    s.log.Errorf("Failed to spawn listener on address: %v (%v).", addr, err)
-    return nil, err
-    }
-    s.listeners = append(s.listeners, l)
-    }
-     
-In docker/voting_mixnet/gateway1/katzenpost.toml :
-
-[Server]
-  Identifier = "gateway1"
-  WireKEM = "xwing"
-  PKISignatureScheme = "Ed448-Dilithium3"
-  Addresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005", "onion://thisisjustatestoniontoverifythatconfigandpkiworkproperly.onion:4242"]
-  BindAddresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005"]
-  MetricsAddress = "127.0.0.1:30006"
-  DataDir = "/voting_mixnet/gateway1"
-  IsGatewayNode = true
-  IsServiceNode = false
--->
+ 
    
     <simplesect>
         <title></title>
@@ -866,3 +745,126 @@ FZWJFK0R8iU52CEUxVpXTA==
         </informalexample> 
     </simplesect>
 </chapter>
+
+
+<!-- Note -->
+<!-- To remedy confusion concerning Addresses and BindAddresses, here is the relevant csource code. -->
+
+<!--
+        
+    In server/config/config.go : 
+    
+    
+    type Server struct {
+    // Identifier is the human readable identifier for the node (eg: FQDN).
+    Identifier string
+    
+    // WireKEM is the KEM string representing the chosen KEM scheme with which to communicate
+    // with the mixnet and dirauth nodes.
+    WireKEM string
+    
+    // PKISignatureScheme specifies the cryptographic signature scheme
+    PKISignatureScheme string
+    
+    // Addresses are the IP listener addresses that the server will advertise
+    // in the PKI and bind to for incoming connections unless BindAddresses is specified.
+    Addresses []string
+    
+    // BindAddresses are the listener addresses that the server will bind to and accept connections on
+    // These Addresses are not advertised in the PKI.
+    BindAddresses []string
+    
+    ....  
+    
+    func (sCfg *Server) validate() error {
+    if sCfg.Identifier == "" {
+    return errors.New("config: Server: Identifier is not set")
+    }
+    
+    if sCfg.WireKEM == "" {
+    return errors.New("config: Server: WireKEM is not set")
+    }
+    
+    if sCfg.PKISignatureScheme == "" {
+    return errors.New("config: Server: PKISignatureScheme is not set")
+    }
+    
+    if sCfg.Addresses != nil {
+    for _, v := range append(sCfg.Addresses, sCfg.BindAddresses...) {
+    if u, err := url.Parse(v); err != nil {
+    return fmt.Errorf("config: Authority: Address '%v' is invalid: %v", v, err)
+    } else if u.Port() == "" {
+    return fmt.Errorf("config: Authority: Address '%v' is invalid: Must contain Port", v)
+    }
+    }
+    } else {
+    // Try to guess a "suitable" external IPv4 address.  If people want
+    // to do loopback testing, they can manually specify one.  If people
+    // want to use IPng, they can manually specify that as well.
+    addr, err := utils.GetExternalIPv4Address()
+    if err != nil {
+    return err
+    }
+    
+    sCfg.Addresses = []string{"tcp://" + addr.String() + defaultAddress}
+    }
+    
+    internalTransports := make(map[string]bool)
+    for _, v := range pki.InternalTransports {
+    internalTransports[strings.ToLower(string(v))] = true
+    }
+    
+    if !filepath.IsAbs(sCfg.DataDir) {
+    return fmt.Errorf("config: Server: DataDir '%v' is not an absolute path", sCfg.DataDir)
+    }
+    if sCfg.MetricsAddress != "" {
+    if _, err := netip.ParseAddrPort(sCfg.MetricsAddress); err != nil {
+    return fmt.Errorf("config: Server: MetricsAddress '%v' is invalid: %v", sCfg.MetricsAddress, err)
+    }
+    }
+    return nil
+    }
+    
+    
+    
+    In server/server.go :
+    
+    // Initialize the outgoing connection manager, decoy source/sink, and then
+    // start the PKI worker.
+    s.connector = outgoing.New(goo)
+    if s.decoy, err = decoy.New(goo); err != nil {
+    s.log.Errorf("Failed to initialize decoy source/sink: %v", err)
+    return nil, err
+    }
+    
+    var addresses []string
+    if len(s.cfg.Server.BindAddresses) > 0 {
+    s.log.Debugf("BindAddresses found")
+    addresses = s.cfg.Server.BindAddresses
+    } else {
+    addresses = s.cfg.Server.Addresses
+    }
+    // Bring the listener(s) online.
+    s.listeners = make([]glue.Listener, 0, len(addresses))
+    for i, addr := range addresses  {
+    l, err := incoming.New(goo, s.inboundPackets, i, addr)
+    if err != nil {
+    s.log.Errorf("Failed to spawn listener on address: %v (%v).", addr, err)
+    return nil, err
+    }
+    s.listeners = append(s.listeners, l)
+    }
+     
+In docker/voting_mixnet/gateway1/katzenpost.toml :
+
+[Server]
+  Identifier = "gateway1"
+  WireKEM = "xwing"
+  PKISignatureScheme = "Ed448-Dilithium3"
+  Addresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005", "onion://thisisjustatestoniontoverifythatconfigandpkiworkproperly.onion:4242"]
+  BindAddresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005"]
+  MetricsAddress = "127.0.0.1:30006"
+  DataDir = "/voting_mixnet/gateway1"
+  IsGatewayNode = true
+  IsServiceNode = false
+-->

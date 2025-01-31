@@ -26,135 +26,100 @@
     <info>
         <title xml:id="ops.title">Operating the &program_name; mixnet</title>
     </info>
+    <para>Intro to do.</para>
     
-    <para>The &program_name; management interface, which is accessed through a unix socket,
-        supports run-time changes on service nodes without requiring the node to be restarted. The
-        management interface is disabled by default. For information about enabling it, see </para>
-    <para>
-        <itemizedlist>
-            <listitem/>
-            <listitem>
-                <para><emphasis role="bold">Production vs. docker test mix network</emphasis></para>
-                <para>Currently our Epoch duration is hardcoded to 20 minutes. The docker test mix
-                    network uses an Epoch duration of 2 minutes and this setting is known a "warped
-                    epoch". In the future we'll make the Epoch duration configuration via bash
-                    environmental variable, see github issue:
-                    https://github.com/katzenpost/katzenpost/issues/744 </para>
-            </listitem>
-            <listitem>
-                <para><emphasis role="bold">Management</emphasis> struct – a management interface,
-                    off by default</para>
-
-                                    <para>The <code>socat</code> commandline utility can be use to
-                                        connect to the management socket and issue commands. Connect
-                                        with a commandline like so:</para>
-                                    <programlisting>socat unix:/&lt;path-to-data-dir&gt;/management_sock STDOUT
+  <section xml:id="management_socket">
+      <info>
+          <title xml:id="management_socket.title">Management interface</title>
+      </info>
+        
+    <para>&program_name; provides a management interface that is accessed through a unix domain
+            socket. The interface supports run-time changes to nodes without requiring a restart. By
+            default, the management interface is disabled. To enable it, </para>
+        <para/>
+        <para>For information about about configuring mixnet components, see.... </para>
+        <para/>
+    <para>The <code>socat</code> commandline utility can be use to connect to the management socket
+            and issue commands. Connect with a commandline like so:<itemizedlist>
+                <listitem>
+                    <programlisting>socat unix:/&lt;path-to-data-dir&gt;/management_sock STDOUT</programlisting>
+                    <para>The following commands are possible:</para>
+                    <itemizedlist>
+                        <listitem>
+                            <para>QUIT - Exit this management socket session.</para>
+                        </listitem>
+                        <listitem>
+                            <para>SHUTDOWN - Cause the server to gracefully shutdown.</para>
+                        </listitem>
+                        <listitem>
+                            <para>ADD_USER - Add a user and associate it with the given link key in
+                                either hex or base64. The syntax of the command is as
+                                follows:</para>
+                            <programlisting>ADD_USER alice X25519_public_key_in_hex_or_base64
 </programlisting>
-                                    <para>The following commands are possible:</para>
-                                    <itemizedlist>
-                                        <listitem>
-                                            <para>QUIT - Exit this management socket session.</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para>SHUTDOWN - Cause the server to gracefully
-                                                shutdown.</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para>ADD_USER - Add a user and associate it with the
-                                                given link key in either hex or base64. The syntax
-                                                of the command is as follows:</para>
-                                            <programlisting>ADD_USER alice X25519_public_key_in_hex_or_base64
+                        </listitem>
+                        <listitem>
+                            <para>UPDATE_USER - Update the link key of a given user. The syntax of
+                                the command is as follows:</para>
+                            <programlisting>UPDATE_USER alice X25519_public_key_in_hex_or_base64
 </programlisting>
-                                        </listitem>
-                                        <listitem>
-                                            <para>UPDATE_USER - Update the link key of a given user.
-                                                The syntax of the command is as follows:</para>
-                                            <programlisting>UPDATE_USER alice X25519_public_key_in_hex_or_base64
+                        </listitem>
+                        <listitem>
+                            <para>REMOVE_USER - Remove a given user. The syntax of the command is as
+                                follows:</para>
+                            <programlisting>REMOVE_USER alice
 </programlisting>
-                                        </listitem>
-                                        <listitem>
-                                            <para>REMOVE_USER - Remove a given user. The syntax of
-                                                the command is as follows:</para>
-                                            <programlisting>REMOVE_USER alice
+                        </listitem>
+                        <listitem>
+                            <para>SET_USER_IDENTITY - Set a given user's identity key. The syntax of
+                                the command is as follows:</para>
+                            <programlisting>SET_USER_IDENTITY alice X25519_public_key_in_hex_or_base64
 </programlisting>
-                                        </listitem>
-                                        <listitem>
-                                            <para>SET_USER_IDENTITY - Set a given user's identity
-                                                key. The syntax of the command is as follows:</para>
-                                            <programlisting>SET_USER_IDENTITY alice X25519_public_key_in_hex_or_base64
+                        </listitem>
+                        <listitem>
+                            <para>REMOVE_USER_IDENTITY - Remove a given user's identity key. MUST be
+                                called before removing the user with the <code>REMOVE_USER</code>
+                                command. The synx of this command is as follows:</para>
+                            <programlisting>REMOVE_USER_IDENTITY alice
 </programlisting>
-                                        </listitem>
-                                        <listitem>
-                                            <para>REMOVE_USER_IDENTITY - Remove a given user's
-                                                identity key. MUST be called before removing the
-                                                user with the <code>REMOVE_USER</code> command. The
-                                                synx of this command is as follows:</para>
-                                            <programlisting>REMOVE_USER_IDENTITY alice
+                        </listitem>
+                        <listitem>
+                            <para>USER_IDENTITY - Retrieve the identity key of the given user. The
+                                syntax of the command is as follows:</para>
+                            <programlisting>USER_IDENTITY alice
 </programlisting>
-                                        </listitem>
-                                        <listitem>
-                                            <para>USER_IDENTITY - Retrieve the identity key of the
-                                                given user. The syntax of the command is as
-                                                follows:</para>
-                                            <programlisting>USER_IDENTITY alice
+                        </listitem>
+                        <listitem>
+                            <para>SEND_RATE - Sets the rate limiter to the given packets per minute
+                                rate.</para>
+                            <programlisting>SEND_RATE 30
 </programlisting>
-                                        </listitem>
-                                        <listitem>
-                                            <para>SEND_RATE - Sets the rate limiter to the given
-                                                packets per minute rate.</para>
-                                            <programlisting>SEND_RATE 30
+                        </listitem>
+                        <listitem>
+                            <para>SEND_BURST - Sets the rate limiter burst to the given
+                                maximum.</para>
+                            <programlisting>SEND_BURST 4
 </programlisting>
-                                        </listitem>
-                                        <listitem>
-                                            <para>SEND_BURST - Sets the rate limiter burst to the
-                                                given maximum.</para>
-                                            <programlisting>SEND_BURST 4
-</programlisting>
-                                        </listitem>
-                                    </itemizedlist>
-
-  
-            <para> Parameters (all) in server/config. </para>
-            <para> Go autogeneted docs: go to godocs.org and search for katezenpost/katzenpost. --
-                Baseic dev docs</para>
-            <para>Prometheus logging and graphing is to be recommended (has its own
-                documents)</para>
-            <para/>
-    <para>
- 
-    </para>
-            </listitem>
-        </itemizedlist>
-    </para>
-    <section xml:id="voter-usage">
-        <info>
-            <title xml:id="voter-usage.title">CLI usage for directory authorities</title>
-        </info>
-        <para>Directory authorities (dirauths) may be controlled individually from the command line. </para>
-        <para>The the dirauth binary  <command>&dirauth_binary;</command> has the following
-            command-pqline usage:</para>
-        <programlisting><prompt>$ </prompt>&dirauth_binary; -h
-Usage of &dirauth_binary;:
-  -f string
-    	Path to the authority config file. (default "katzenpost-authority.toml")
-  -g	Generate the keys and exit immediately.
-  -v	Get version info.</programlisting>
-        <para>The <code>-f</code> parameter can be used to specify the full path and filename of the
-            server configuration file, typically
-                <filename>/etc/pq-katzenpost-authority/katzenpost-authority.toml</filename>.</para>
-        <para>The <code>-g</code> option is used to generate the public and private signing and link
-            keys. By default, these must be manually copied to the directory defined by
-                <filename>DataDir</filename> in /etc/&mixserver_binary;/ </para>
-    </section>
+                        </listitem>
+                    </itemizedlist>
+                    <para> Parameters (all) in server/config. </para>
+                    <para> Go autogeneted docs: go to godocs.org and search for
+                        katezenpost/katzenpost. -- Baseic dev docs</para>
+                    <para>Prometheus logging and graphing is to be recommended (has its own
+                        documents)</para>
+                    <para/>
+                    <para> </para>
+                </listitem>
+            </itemizedlist></para>
+    
+  </section>
     <section xml:id="server-usage">
         <info>
             <title xml:id="server-usage.title">CLI usage for mix server components</title>
         </info>
-        
         <para>Mix server components (mix nodes, gateway nodes, service nodes) may be controlled
             individually from the command line.</para>
-        
-        <para>The mix server binary  <command>&mixserver_binary;</command> has the following
+        <para>The mix server binary <command>&mixserver_binary;</command> has the following
             command-line usage:</para>
         <programlisting><prompt>$ </prompt>&mixserver_binary; -h
 Usage of ./&mixserver_binary;:
@@ -572,7 +537,7 @@ Usage of ./&mixserver_binary;:
     </section>
     <section xml:id="gensphinx">
         <info>
-            <title xml:id="gensphinx.title">Appendix: Using <emphasis>gensphinx</emphasis></title>
+            <title xml:id="gensphinx.title">Using <emphasis>gensphinx</emphasis></title>
         </info>
         <para>We need the required Go version...seems to be 1.23.</para>
         <programlisting>./gensphinx -h
@@ -592,7 +557,6 @@ Usage of ./gensphinx:
         <para>but the super paranoid will want to increase that number</para>
         <para>whereas in your description of gensphinx you didn't mention mix hop count</para>
     </section>
-    
     <section xml:id="tuning">
         <info>
             <title xml:id="tuning.title"
@@ -602,13 +566,14 @@ There need to be some end-to-end demonstrations of how you use this tool or tool
                 the &program_name; mixnet</title>
         </info>
         <para>[introductory something]</para>
-        <para>This topic assumes that you have cloned the &program_name; repository locally. The Python
-            tuning script is located at the following location:</para>
+        <para>This topic assumes that you have cloned the &program_name; repository locally. The
+            Python tuning script is located at the following location:</para>
         <para>
             <programlisting><filename>../katzenpost/tools/mixnet-params.py</filename></programlisting>
         </para>
-        <para>Assuming uniform computational resources across all mix nodes in the network, the script
-            compares a given Sphinx packets-per-second measurement with a set of tuning parameters, and
+        <para>Assuming uniform computational resources across all mix nodes in the network, the
+            script compares a given Sphinx packets-per-second measurement with a set of tuning
+            parameters, and
             <?oxy_comment_start author="dwrob" timestamp="20250123T164817-0800" comment="What do you do if it&apos;s not?  What KP settings do you change? What is the definition of &quot;fast enough&quot;?"?>assesses
             whether your Sphinx processing rate is fast enough<?oxy_comment_end?>. </para>
         <para>Supplying the --help option displays a list of available configuration options.</para>
@@ -676,6 +641,24 @@ BenchmarkSphinxUnwrap/CTIDH1024-X448_PQ_Hybrid_KEM-8                	      1	121
 PASS
 ok  	github.com/katzenpost/katzenpost/core/sphinx	177.826s</programlisting>
     </section>
-    
-    
+    <section xml:id="voter-usage">
+        <info>
+            <title xml:id="voter-usage.title">CLI usage for directory authorities</title>
+        </info>
+        <para>Directory authorities (dirauths) may be controlled individually from the command line. </para>
+        <para>The the dirauth binary <command>&dirauth_binary;</command> has the following
+            command-pqline usage:</para>
+        <programlisting><prompt>$ </prompt>&dirauth_binary; -h
+Usage of &dirauth_binary;:
+  -f string
+    	Path to the authority config file. (default "katzenpost-authority.toml")
+  -g	Generate the keys and exit immediately.
+  -v	Get version info.</programlisting>
+        <para>The <code>-f</code> parameter can be used to specify the full path and filename of the
+            server configuration file, typically
+                <filename>/etc/pq-katzenpost-authority/katzenpost-authority.toml</filename>.</para>
+        <para>The <code>-g</code> option is used to generate the public and private signing and link
+            keys. By default, these must be manually copied to the directory defined by
+                <filename>DataDir</filename> in /etc/&mixserver_binary;/ </para>
+    </section>   
 </article>
