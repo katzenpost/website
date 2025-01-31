@@ -25,11 +25,18 @@
     <info>
         <title xml:id="nat.title">Using &program_name; with NAT and Tor</title>
     </info>
-    
-    <para>&program_name; servers can be used from behind network address translation (NAT) devices.
-        This applies to mix nodes, gateway nodes, service nodes, and directory authority nodes
-        (dirauths). Port forwarding and other network configuration details depend on how you are
-        hosting your servers and the type of router you use.</para>
+    <para>&program_name; nodes support various network topologies beyond direct connection to the
+        Internet. All &program_name; node types (mix nodes, gateway nodes, service nodes, and
+        directory authority nodes (dirauths) can be used from behind <link
+            xlink:href="https://www.rfc-editor.org/rfc/rfc1631">network address translation
+            (NAT)</link> routers. A variation of NAT topology occurs when hosting occurs in a
+        container environment, such as Docker, or when a node runs in a virtualized environment,
+        such as Qemu or KVM. Additionally, gateway nodes that listen on an <link
+            xlink:href="https://tb-manual.torproject.org/onion-services/">onion service</link> can
+        be accessed using an onion address. </para>
+    <para/>
+    <para>Port forwarding and other network configuration details depend on how you are hosting your
+        servers and the type of router you use.</para>
     <para>Some hosting scenarios, such as the use of an Amazon Elastic Compute Cloud (Amazon EC2)
         instance, require no manual port forwarding. A &program_name; node running on an EC2
         instance with default network settings listens on its internal IP address yet can receive
@@ -37,9 +44,8 @@
         default policy is to block inbound connections from public addresses. In this scenario, you
         need to configure port-forwarding to the appropriate internal IP address and port of the
         destination node. </para>
-    <para>Router and LAN host configuration in a NAT topology are beyond the scope of this topic.
-        NAT was defined in 1994 in <link xlink:href="https://www.rfc-editor.org/rfc/rfc1631">RFC
-            1631</link> and tutorials are widely available.</para>
+    <para>Router and LAN host configuration in a NAT topology are beyond the scope of this
+        topic.</para>
     <para>
         <note>
             <para>&program_name; does not support NAT penetration protocols such as <link
