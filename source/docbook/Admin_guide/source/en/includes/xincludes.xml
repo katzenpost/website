@@ -239,7 +239,7 @@ In docker/voting_mixnet/gateway1/katzenpost.toml :
                     <para>Required: Yes</para>
                 </listitem>
                 
-                <listitem xml:id="addresses">
+                <listitem>
                     <para><emphasis role="bold">Addresses</emphasis></para>
                     <para>Specifies a list of one or more address URLs in a format that contains the
                         transport protocol, IP address, and port number that the server will bind to
@@ -250,10 +250,11 @@ In docker/voting_mixnet/gateway1/katzenpost.toml :
                             role="bold">BindAddresses</emphasis> is <emphasis role="bold"
                             >true</emphasis>. In that scenario, one or more advertised, external
                         addresses is provided as the value of <emphasis role="bold"
-                            >Addresses</emphasis>, and is advertised in the PKI document. <emphasis
-                            role="bold">BindAddresses</emphasis>, meanwhile, holds the values of
-                        non-adverstised, internal-only listening addresses. This is the
-                        configuration for hosts connecting to the Internet through network adddress
+                            >Addresses</emphasis>, and is advertised in the PKI document.</para>
+                    <para>Note that <emphasis role="bold">BindAddresses</emphasis>, below, holds the
+                        address values for non-adverstised, internal-only listeners. The addition of
+                            <emphasis role="bold">BindAddresses</emphasis> to the node configuration
+                        is required for hosts connecting to the Internet through network adddress
                         translation (NAT).</para>
                     <para>Type: []string</para>
                     <para>Required: Yes</para>
@@ -263,8 +264,8 @@ In docker/voting_mixnet/gateway1/katzenpost.toml :
                     <para>If <emphasis role="bold">true</emphasis>, allows setting of listener
                         addresses that the server will bind to and accept connections on. These
                         addresses are not advertised in the PKI document. For more information, see
-                            <link linkend="addresses">Addresses</link>.</para>
-                    <para>Type: bool</para>
+                            <emphasis role="bold">Addresses</emphasis>, above.</para>
+                    <para>Type: bool, []string</para>
                     <para>Required: No</para>
                 </listitem>
                 <listitem>
@@ -522,12 +523,13 @@ In docker/voting_mixnet/gateway1/katzenpost.toml :
     <simplesect>
         <title></title>
            <informalexample> 
-           <para>The <code>Management</code> section specifies 
-               connectivity information for the &program_name; control protocol which can be used to make run-time 
-               configuration changes. A configuration resembles the following:</para>
+           <para>The <code>Management</code> section specifies connectivity information for the
+                &program_name; control protocol which can be used to make run-time configuration
+                changes. A configuration resembles the following, substituting the node's configured
+                    <code>DataDir</code> value as part of the <code>Path</code> value:</para>
            <programlisting>[Management]
    Enable = false
-   Path = "/dirauth_mixnet/mix1/management_sock"</programlisting>
+   Path = "/<replaceable>node_datadir</replaceable>/management_sock"</programlisting>
            <itemizedlist>
                <listitem>
                    <para><emphasis role="bold">Enable</emphasis></para>
@@ -539,7 +541,7 @@ In docker/voting_mixnet/gateway1/katzenpost.toml :
                <listitem>
                    <para><emphasis role="bold">Path</emphasis></para>
                    <para>Specifies the path to the management interface socket. If left empty, then <code>management_sock</code> 
-                       is located in the configuration's defined <code>DataDir</code>>.</para>
+                       is located in the configuration's defined <code>DataDir</code>.</para>
                    <para>Type: string</para>
                    <para>Required: No</para>
                </listitem>

@@ -293,6 +293,27 @@ sphinx_header.additional_data = version
 sphinx_header.kem_element = route_kems[0]
 sphinx_header.routing_info = routing_info
 sphinx_header.mac = mac
+<<<<<<< HEAD
+</pre></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="kemsphinx-unwrap-operation"></a>2. KEMSphinx Unwrap Operation</h2></div></div></div><p>
+      Most of the design here will be exactly the same as in
+      <a class="link" href="#SPHINXSPEC" title="SPHINXSPEC">SPHINXSPEC</a>. However there are a
+      few notable differences:
+    </p><div class="orderedlist"><ol class="orderedlist compact" type="1"><li class="listitem"><p>
+          The shared secret is derived from the KEM ciphertext instead
+          of a DH.
+        </p></li><li class="listitem"><p>
+          Next hop&#8217;s KEM ciphertext stored in the encrypted routing
+          information.
+        </p></li></ol></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="acknowledgments"></a>3. Acknowledgments</h3></div></div></div><p>
+        I would like to thank Peter Schwabe for the original idea of
+        simply replacing the Sphinx NIKE with a KEM and for answering
+        all my questions. I&#8217;d also like to thank Bas Westerbaan for
+        answering questions.
+      </p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="appendix-a.-references"></a>Appendix A. References</h3></div></div></div><p><a name="KEMCOMB"></a><b>KEMCOMB.&nbsp;</b>Federico Giacon, Felix Heuer, Bertram Poettering, "KEM Combiners", 2018.
+            <a class="link" href="https://link.springer.com/chapter/10.1007/978-3-319-76578-5_7" target="_top">https://link.springer.com/chapter/10.1007/978-3-319-76578-5_7</a></p><p><a name="SPHINX09"></a><b>SPHINX09.&nbsp;</b>Danezis, G., Goldberg, I., "Sphinx: A Compact and Provably Secure Mix
+          Format\", DOI 10.1109/SP.2009.15, May 2009. <a class="link" href="https://cypherpunks.ca/%7Eiang/pubs/Sphinx_Oakland09.pdf" target="_top">https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</a></p><p><a name="SPHINXSPEC"></a><b>SPHINXSPEC.&nbsp;</b>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., "Sphinx Mix
+          Network Cryptographic Packet Format Specification" July 2017. <a class="link" href="https://katzenpost.network/docs/specs/sphinx/" target="_top">https://katzenpost.network/docs/specs/sphinx/</a></p></div></div></div></body></html>
+=======
 </pre>
          </div>
          <div class="section">
@@ -350,3 +371,4 @@ sphinx_header.mac = mac
       </div>
    </body>
 </html>
+>>>>>>> alt-site

@@ -3,7 +3,7 @@ title:
 linkTitle: "Components and configuration" 
 description: "" 
 url: "docs/admin_guide/components.html" 
-date: "2025-01-21T15:10:24.06666766-08:00"
+date: "2025-01-26T15:46:29.77548007-08:00"
 draft: false 
 slug: "" 
 layout: "" 
@@ -84,7 +84,7 @@ weight: 25
                      that
                      Katzenpost requires to function. </b></p>
                <div class="figure-contents">
-                  <div class="mediaobject"><img src="../../pix/components-production.png"></div>
+                  <div class="mediaobject"><img src="pix/components-production.png"></div>
                </div>
             </div><br class="figure-break"><p>The mix network contains an <span class="emphasis"><em>n</em></span>-layer topology of mix-nodes, with
                three nodes per layer in this example. Sphinx packets traverse the network in one
@@ -1443,6 +1443,13 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                     for incoming connections. Katzenpost supports URLs with that start with
                                     either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
                                     ["quic://192.168.1.1:40001"].</p>
+                                 <p><span class="bold"><strong>Addresses</strong></span> is overridden if <span class="bold"><strong>BindAddresses</strong></span> is <span class="bold"><strong>true</strong></span>. In that scenario, one or more advertised, external
+                                    addresses is provided as the value of <span class="bold"><strong>Addresses</strong></span>, and is advertised in the PKI document.</p>
+                                 <p>Note that <span class="bold"><strong>BindAddresses</strong></span>, below, holds the
+                                    address values for non-adverstised, internal-only listeners. The addition of
+                                    <span class="bold"><strong>BindAddresses</strong></span> to the node configuration
+                                    is required for hosts connecting to the Internet through network adddress
+                                    translation (NAT).</p>
                                  <p>Type: []string</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -1450,8 +1457,9 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                  <p><span class="bold"><strong>BindAddresses</strong></span></p>
                                  <p>If <span class="bold"><strong>true</strong></span>, allows setting of listener
                                     addresses that the server will bind to and accept connections on. These
-                                    addresses are not advertised in the PKI.</p>
-                                 <p>Type: bool</p>
+                                    addresses are not advertised in the PKI document. For more information, see
+                                    <span class="bold"><strong>Addresses</strong></span>, above.</p>
+                                 <p>Type: bool, []string</p>
                                  <p>Required: No</p>
                               </li>
                               <li class="listitem">
@@ -1500,7 +1508,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1114"></a></h5>
+                              <h5 class="title"><a name="d58e1138"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -1564,7 +1572,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1163"></a></h5>
+                              <h5 class="title"><a name="d58e1187"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -1682,7 +1690,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                     transport protocol, IP address, and port number that the server will bind to
                                     for incoming connections. Katzenpost supports URLs that start with
                                     either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
-                                    ["quic://192.168.1.1:40001"].</p>
+                                    ["quic://192.168.1.1:40001"]. The value of <span class="bold"><strong>Addresses</strong></span> is advertised in the PKI document.</p>
                                  <p>Type: []string</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -1703,18 +1711,18 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1228"></a></h5>
+                              <h5 class="title"><a name="d58e1256"></a></h5>
                            </div>
                         </div>
                      </div>
                      <div class="informalexample">
-                        <p>The <code class="code">Management</code> section specifies 
-                           connectivity information for the Katzenpost control protocol which can be used to
-                           make run-time 
-                           configuration changes. A configuration resembles the following:</p>
+                        <p>The <code class="code">Management</code> section specifies connectivity information for the
+                           Katzenpost control protocol which can be used to make run-time configuration
+                           changes. A configuration resembles the following, substituting the node's configured
+                           <code class="code">DataDir</code> value as part of the <code class="code">Path</code> value:</p>
                         <pre class="programlisting">[Management]
    Enable = false
-   Path = "/dirauth_mixnet/mix1/management_sock"</pre>
+   Path = "/<em class="replaceable"><code>node_datadir</code></em>/management_sock"</pre>
                         <div class="itemizedlist">
                            <ul class="itemizedlist" style="list-style-type: disc; ">
                               <li class="listitem">
@@ -1727,7 +1735,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                               <li class="listitem">
                                  <p><span class="bold"><strong>Path</strong></span></p>
                                  <p>Specifies the path to the management interface socket. If left empty, then <code class="code">management_sock</code> 
-                                    is located in the configuration's defined <code class="code">DataDir</code>&gt;.</p>
+                                    is located in the configuration's defined <code class="code">DataDir</code>.</p>
                                  <p>Type: string</p>
                                  <p>Required: No</p>
                               </li>
@@ -1748,7 +1756,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1266"></a></h5>
+                              <h5 class="title"><a name="d58e1301"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -1924,7 +1932,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1423"></a></h5>
+                              <h5 class="title"><a name="d58e1458"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -2132,7 +2140,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                   <code class="filename">katzenpost/docker/dirauth_mixnet/gateway1/katzenpost.toml</code>.
                   In a real-world mixnet, the component hosts would not be sharing a single IP
                   address. For more information about the test mixnet, see <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
-               <div class="table"><a name="d58e1598"></a><p class="title"><b>Table&nbsp;4.&nbsp;Gateway node configuration sections</b></p>
+               <div class="table"><a name="d58e1633"></a><p class="title"><b>Table&nbsp;4.&nbsp;Gateway node configuration sections</b></p>
                   <div class="table-contents">
                      <table class="table" border="1">
                         <colgroup>
@@ -2204,7 +2212,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1643"></a></h5>
+                              <h5 class="title"><a name="d58e1678"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -2304,6 +2312,13 @@ FZWJFK0R8iU52CEUxVpXTA==
                                     for incoming connections. Katzenpost supports URLs with that start with
                                     either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
                                     ["quic://192.168.1.1:40001"].</p>
+                                 <p><span class="bold"><strong>Addresses</strong></span> is overridden if <span class="bold"><strong>BindAddresses</strong></span> is <span class="bold"><strong>true</strong></span>. In that scenario, one or more advertised, external
+                                    addresses is provided as the value of <span class="bold"><strong>Addresses</strong></span>, and is advertised in the PKI document.</p>
+                                 <p>Note that <span class="bold"><strong>BindAddresses</strong></span>, below, holds the
+                                    address values for non-adverstised, internal-only listeners. The addition of
+                                    <span class="bold"><strong>BindAddresses</strong></span> to the node configuration
+                                    is required for hosts connecting to the Internet through network adddress
+                                    translation (NAT).</p>
                                  <p>Type: []string</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -2311,8 +2326,9 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p><span class="bold"><strong>BindAddresses</strong></span></p>
                                  <p>If <span class="bold"><strong>true</strong></span>, allows setting of listener
                                     addresses that the server will bind to and accept connections on. These
-                                    addresses are not advertised in the PKI.</p>
-                                 <p>Type: bool</p>
+                                    addresses are not advertised in the PKI document. For more information, see
+                                    <span class="bold"><strong>Addresses</strong></span>, above.</p>
+                                 <p>Type: bool, []string</p>
                                  <p>Required: No</p>
                               </li>
                               <li class="listitem">
@@ -2361,7 +2377,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1769"></a></h5>
+                              <h5 class="title"><a name="d58e1828"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -2454,7 +2470,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1835"></a></h5>
+                              <h5 class="title"><a name="d58e1894"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -2572,7 +2588,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                     transport protocol, IP address, and port number that the server will bind to
                                     for incoming connections. Katzenpost supports URLs that start with
                                     either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
-                                    ["quic://192.168.1.1:40001"].</p>
+                                    ["quic://192.168.1.1:40001"]. The value of <span class="bold"><strong>Addresses</strong></span> is advertised in the PKI document.</p>
                                  <p>Type: []string</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -2593,18 +2609,18 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1900"></a></h5>
+                              <h5 class="title"><a name="d58e1963"></a></h5>
                            </div>
                         </div>
                      </div>
                      <div class="informalexample">
-                        <p>The <code class="code">Management</code> section specifies 
-                           connectivity information for the Katzenpost control protocol which can be used to
-                           make run-time 
-                           configuration changes. A configuration resembles the following:</p>
+                        <p>The <code class="code">Management</code> section specifies connectivity information for the
+                           Katzenpost control protocol which can be used to make run-time configuration
+                           changes. A configuration resembles the following, substituting the node's configured
+                           <code class="code">DataDir</code> value as part of the <code class="code">Path</code> value:</p>
                         <pre class="programlisting">[Management]
    Enable = false
-   Path = "/dirauth_mixnet/mix1/management_sock"</pre>
+   Path = "/<em class="replaceable"><code>node_datadir</code></em>/management_sock"</pre>
                         <div class="itemizedlist">
                            <ul class="itemizedlist" style="list-style-type: disc; ">
                               <li class="listitem">
@@ -2617,7 +2633,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                               <li class="listitem">
                                  <p><span class="bold"><strong>Path</strong></span></p>
                                  <p>Specifies the path to the management interface socket. If left empty, then <code class="code">management_sock</code> 
-                                    is located in the configuration's defined <code class="code">DataDir</code>&gt;.</p>
+                                    is located in the configuration's defined <code class="code">DataDir</code>.</p>
                                  <p>Type: string</p>
                                  <p>Required: No</p>
                               </li>
@@ -2638,7 +2654,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1938"></a></h5>
+                              <h5 class="title"><a name="d58e2008"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -2814,7 +2830,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2095"></a></h5>
+                              <h5 class="title"><a name="d58e2165"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -3022,7 +3038,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                   <code class="filename">katzenpost/docker/dirauth_mixnet/servicenode1/authority.toml</code>.
                   In a real-world mixnet, the component hosts would not be sharing a single IP
                   address. For more information about the test mixnet, see <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
-               <div class="table"><a name="d58e2270"></a><p class="title"><b>Table&nbsp;5.&nbsp;Mix node configuration sections</b></p>
+               <div class="table"><a name="d58e2340"></a><p class="title"><b>Table&nbsp;5.&nbsp;Mix node configuration sections</b></p>
                   <div class="table-contents">
                      <table class="table" border="1">
                         <colgroup>
@@ -3093,7 +3109,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2315"></a></h5>
+                              <h5 class="title"><a name="d58e2385"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -3193,6 +3209,13 @@ FZWJFK0R8iU52CEUxVpXTA==
                                     for incoming connections. Katzenpost supports URLs with that start with
                                     either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
                                     ["quic://192.168.1.1:40001"].</p>
+                                 <p><span class="bold"><strong>Addresses</strong></span> is overridden if <span class="bold"><strong>BindAddresses</strong></span> is <span class="bold"><strong>true</strong></span>. In that scenario, one or more advertised, external
+                                    addresses is provided as the value of <span class="bold"><strong>Addresses</strong></span>, and is advertised in the PKI document.</p>
+                                 <p>Note that <span class="bold"><strong>BindAddresses</strong></span>, below, holds the
+                                    address values for non-adverstised, internal-only listeners. The addition of
+                                    <span class="bold"><strong>BindAddresses</strong></span> to the node configuration
+                                    is required for hosts connecting to the Internet through network adddress
+                                    translation (NAT).</p>
                                  <p>Type: []string</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -3200,8 +3223,9 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p><span class="bold"><strong>BindAddresses</strong></span></p>
                                  <p>If <span class="bold"><strong>true</strong></span>, allows setting of listener
                                     addresses that the server will bind to and accept connections on. These
-                                    addresses are not advertised in the PKI.</p>
-                                 <p>Type: bool</p>
+                                    addresses are not advertised in the PKI document. For more information, see
+                                    <span class="bold"><strong>Addresses</strong></span>, above.</p>
+                                 <p>Type: bool, []string</p>
                                  <p>Required: No</p>
                               </li>
                               <li class="listitem">
@@ -3250,7 +3274,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2441"></a></h5>
+                              <h5 class="title"><a name="d58e2535"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -3598,7 +3622,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2715"></a></h5>
+                              <h5 class="title"><a name="d58e2809"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -3716,7 +3740,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                     transport protocol, IP address, and port number that the server will bind to
                                     for incoming connections. Katzenpost supports URLs that start with
                                     either "tcp://" or "quic://" such as: ["tcp://192.168.1.1:30001"] and
-                                    ["quic://192.168.1.1:40001"].</p>
+                                    ["quic://192.168.1.1:40001"]. The value of <span class="bold"><strong>Addresses</strong></span> is advertised in the PKI document.</p>
                                  <p>Type: []string</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -3737,18 +3761,18 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2780"></a></h5>
+                              <h5 class="title"><a name="d58e2878"></a></h5>
                            </div>
                         </div>
                      </div>
                      <div class="informalexample">
-                        <p>The <code class="code">Management</code> section specifies 
-                           connectivity information for the Katzenpost control protocol which can be used to
-                           make run-time 
-                           configuration changes. A configuration resembles the following:</p>
+                        <p>The <code class="code">Management</code> section specifies connectivity information for the
+                           Katzenpost control protocol which can be used to make run-time configuration
+                           changes. A configuration resembles the following, substituting the node's configured
+                           <code class="code">DataDir</code> value as part of the <code class="code">Path</code> value:</p>
                         <pre class="programlisting">[Management]
    Enable = false
-   Path = "/dirauth_mixnet/mix1/management_sock"</pre>
+   Path = "/<em class="replaceable"><code>node_datadir</code></em>/management_sock"</pre>
                         <div class="itemizedlist">
                            <ul class="itemizedlist" style="list-style-type: disc; ">
                               <li class="listitem">
@@ -3761,7 +3785,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                               <li class="listitem">
                                  <p><span class="bold"><strong>Path</strong></span></p>
                                  <p>Specifies the path to the management interface socket. If left empty, then <code class="code">management_sock</code> 
-                                    is located in the configuration's defined <code class="code">DataDir</code>&gt;.</p>
+                                    is located in the configuration's defined <code class="code">DataDir</code>.</p>
                                  <p>Type: string</p>
                                  <p>Required: No</p>
                               </li>
@@ -3782,7 +3806,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2818"></a></h5>
+                              <h5 class="title"><a name="d58e2923"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -3958,7 +3982,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2975"></a></h5>
+                              <h5 class="title"><a name="d58e3080"></a></h5>
                            </div>
                         </div>
                      </div>
