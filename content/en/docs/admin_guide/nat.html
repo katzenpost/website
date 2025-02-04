@@ -3,7 +3,7 @@ title:
 linkTitle: "Using with NAT" 
 description: "" 
 url: "docs/admin_guide/nat.html" 
-date: "2025-01-26T15:34:30.870713987-08:00"
+date: "2025-02-04T11:42:50.990048115-08:00"
 draft: "false" 
 slug: "" 
 layout: "" 
@@ -30,8 +30,8 @@ weight: 40
          <div class="toc">
             <p><b>Table of Contents</b></p>
             <dl class="toc">
-               <dt><span class="section"><a href="#d58e47"><em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em></a></span></dt>
-               <dt><span class="section"><a href="#d58e153">Application scenarios</a></span></dt>
+               <dt><span class="section"><a href="#d58e54"><em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em></a></span></dt>
+               <dt><span class="section"><a href="#d58e179">Application scenarios</a></span></dt>
                <dd>
                   <dl>
                      <dt><span class="section"><a href="#peer-to-peer">Peer-to-peer connections involving NAT</a></span></dt>
@@ -41,28 +41,30 @@ weight: 40
                               Tor</a></span></dt>
                   </dl>
                </dd>
+               <dt><span class="section"><a href="#d58e327">Dirauth node NAT traversal</a></span></dt>
             </dl>
          </div>
-         <p>Katzenpost servers can be used from behind network address translation (NAT) devices.
-            This applies to mix nodes, gateway nodes, service nodes, and directory authority nodes
-            (dirauths). Port forwarding and other network configuration details depend on how
-            you are
-            hosting your servers and the type of router you use.</p>
-         <p>Some hosting scenarios, such as the use of an Amazon Elastic Compute Cloud (Amazon
-            EC2)
-            instance, require no manual port forwarding. A Katzenpost node running on an EC2
-            instance with default network settings listens on its internal IP address yet can
-            receive
-            connections from publicly routed IP addresses. For home and small business routers,
-            typical
-            default policy is to block inbound connections from public addresses. In this scenario,
-            you
-            need to configure port-forwarding to the appropriate internal IP address and port
-            of the
-            destination node. </p>
-         <p>Router and LAN host configuration in a NAT topology are beyond the scope of this topic.
-            NAT was defined in 1994 in <a class="link" href="https://www.rfc-editor.org/rfc/rfc1631" target="_top">RFC
-               1631</a> and tutorials are widely available.</p>
+         <p>Any Katzenpost server node can be configured to support NAT and similar network
+            topologies (such as Tor) that traverse public and private network boundaries. All
+            Katzenpost node types (mix nodes, gateway nodes, service nodes, and dirauths) can
+            be
+            used from behind <a class="link" href="https://www.rfc-editor.org/rfc/rfc1631" target="_top">network address
+               translation (NAT)</a> routers. A variation of NAT topology may be used for hosting in
+            a container environment, such as Docker, or when a node runs in a virtualized environment,
+            such as Qemu or KVM. Additionally, gateway nodes running a Tor <a class="link" href="https://tb-manual.torproject.org/onion-services/" target="_top">onion service</a> can
+            be accessed from the Internet using an onion address. </p>
+         <p>Some indirect network scenarios that involve NAT, such as Amazon EC2, are effectively
+            transparent and require no special Katzenpost configuration. More typically,  the
+            router
+            connecting a LAN with the Internet blocks incoming connections by default, and must
+            be
+            configured to forward traffic from the Internet to a destination LAN host based on
+            port
+            number. (Router configuration for a NAT topology is beyond the scope of this topic.)
+            For
+            these cases, where the host listens on a LAN <code class="code">address:port</code> but is accessed
+            publicly from another <code class="code">address:port</code>,  Katzenpost provides a mechanism to
+            specify both addresses and to share access information with peers and clients.</p>
          <p>
             <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                <table border="0" summary="Note">
@@ -82,25 +84,40 @@ weight: 40
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="d58e47"></a><em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em></h2>
+                     <h2 class="title" style="clear: both"><a name="d58e54"></a><em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em></h2>
                   </div>
                </div>
             </div>
-            <p>Any Katzenpost server node can be configured to support NAT and similar network
-               topologies (such as Tor) that traverse public and private network boundaries. In a
-               direct network connection, the address defined in the server
-               <em class="parameter"><code>Addresses</code></em> parameter defines the addresses on with the node
+            <p>In a direct network connection, the address defined in the server
+               <em class="parameter"><code>Addresses</code></em> parameter defines the addresses on which the node
                listens for incoming connections, and which are advertised to other mixnet components
                in
                the PKI document. By supplying the optional <em class="parameter"><code>BindAddresses</code></em>
                parameter, you can define a second address group: internal addresses that are
                <span class="emphasis"><em>not</em></span> advertised in the PKI document. This is useful for NAT and
-               Tor scenarios.</p>
+               Tor scenarios.
+               <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                  <table border="0" summary="Note">
+                     <tr>
+                        <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                        <th align="left">Note</th>
+                     </tr>
+                     <tr>
+                        <td align="left" valign="top">
+                           <p>The <em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em>
+                              parameters are closely analogous to Tor's <em class="parameter"><code>Address</code></em> and
+                              <em class="parameter"><code>ORPort</code></em> parameters. For more information, see the
+                              <a class="link" href="https://manpages.debian.org/testing/tor/torrc.5.en.html" target="_top">torrc man page</a>.</p>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+            </p>
             <p>The following table shows the details for these two parameters. For more information
                about mixnet node configuration, see <a class="link" href="https://katzenpost.network/docs/admin_guide/components.html" target="_top">Components
                   and configuration of the Katzenpost mixnet</a>.</p>
             <p>
-               <div class="table"><a name="d58e66"></a><p class="title"><b>Table&nbsp;1.&nbsp;<em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em>
+               <div class="table"><a name="d58e87"></a><p class="title"><b>Table&nbsp;1.&nbsp;<em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em>
                         parameters</b></p>
                   <div class="table-contents">
                      <table class="table" summary="Addresses and BindAddresses&#xA;                    parameters" border="1">
@@ -128,12 +145,12 @@ weight: 40
                                     URLs with that start with either <code class="code">tcp://</code> or
                                     <code class="code">quic://</code> such as:
                                     <code class="code">["tcp://192.168.1.1:30001"]</code> and
-                                    <code class="code">["quic://192.168.1.1:40001"]</code>. Onion addresses
-                                    (transport protocol <code class="code">onion://</code>) are also supported on
+                                    <code class="code">["quic://192.168.1.1:40001"]</code>. Onion addresses,
+                                    identified by transport protocol onion://, are also supported on
                                     some node types if <em class="parameter"><code>BindAddresses</code></em> is also
                                     present.</p>
-                                 <p>Overridden by <em class="parameter"><code>BindAddresses</code></em>; see
-                                    below.</p>
+                                 <p>This parameter is overridden by
+                                    <em class="parameter"><code>BindAddresses</code></em>; see below.</p>
                               </td>
                            </tr>
                            <tr>
@@ -143,8 +160,7 @@ weight: 40
                                  <p>If <span class="bold"><strong>true</strong></span> (that is, if the
                                     parameter is present), this parameter allows you to set internal
                                     listener addresses that the server will bind to and accept
-                                    connections on, but that are not advertised in the PKI document.
-                                    This parameter is used to configure NAT and Tor support.</p>
+                                    connections on, but that are not advertised in the PKI document. </p>
                               </td>
                            </tr>
                         </tbody>
@@ -165,20 +181,18 @@ weight: 40
   IsGatewayNode = false
   IsServiceNode = false</pre>
             </p>
-            <p>Importantly, the value of <em class="parameter"><code>Addresses</code></em>, which the node advertises to other
-               peers, is its loopback address, 127.0.0.1, and a specified port. This means that there
-               is no publicly routable address for this node, and that traffic arriving at the node
-               is
-               delivered there by external infrastructure, presumably a configured LAN. In all of
-               these
-               examples, nodes have necessarily been assigned a LAN addresses, but these addresses
-               play
+            <p>Importantly, the value of <em class="parameter"><code>Addresses</code></em>, which the node advertises
+               to other peers, is its loopback address, 127.0.0.1, and a specified port. This means
+               that there is no publicly routable address for this node, and that traffic arriving
+               at
+               the node is delivered there by a configured LAN. In all of these examples, nodes have
+               necessarily been assigned a LAN addresses, but these non-routable<a class="link" href="https://www.rfc-editor.org/rfc/rfc1918" target="_top"> RFC 1918</a> addresses play
                no role in Katzenpost server configurations. Rather, for portability, the
                configurations use the logically equivalent loopback address.</p>
-            <p>In contrast to the direct connection, the next example shows the configuration file
-               for a similar node behind NAT, containing a <code class="code">Server</code> section that specifies
-               both the <em class="parameter"><code>Addresses</code></em> and
-               <em class="parameter"><code>BindAddresses</code></em> parameters:
+            <p>In contrast to the direct connection, the next example shows part of the configuration
+               file for a similar node behind NAT, containing a <code class="code">Server</code> section that
+               specifies both the <em class="parameter"><code>Addresses</code></em> and
+               <em class="parameter"><code>BindAddresses</code></em>parameters:
                <pre class="programlisting">[Server]
   Identifier = "mix1"
   WireKEM = "xwing"
@@ -190,19 +204,19 @@ weight: 40
   IsGatewayNode = false
   IsServiceNode = false</pre>
             </p>
-            <p>Notice that the internal listening address remains unchanged, but it's has been
-               shifted to the new <em class="parameter"><code>BindAddresses</code></em> parameter. In addition, the
-               value of the <em class="parameter"><code>Addresses</code></em> parameter has been changed to a public
-               address (the NAT router's WAN address), including a port. It is assumed that the router
-               is configured to forward traffic routed to this address:port to the mixnet node over
-               its
-               LAN. </p>
+            <p>Notice that the local listening address remains unchanged, <span class="emphasis"><em>but has been
+                     relocated to the new
+                     </em></span><em class="parameter"><code><span class="emphasis"><em>BindAddresses</em></span></code></em><span class="emphasis"><em>
+                     parameter</em></span>. In addition, the value of the <em class="parameter"><code>Addresses</code></em>
+               parameter has been changed to a public address (the NAT router's WAN address), including
+               a port. It is assumed that the router is configured to forward traffic routed to this
+               <code class="code">address:port</code> to the mixnet node over the LAN. </p>
          </div>
          <div class="section">
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="d58e153"></a>Application scenarios</h2>
+                     <h2 class="title" style="clear: both"><a name="d58e179"></a>Application scenarios</h2>
                   </div>
                </div>
             </div>
@@ -219,7 +233,7 @@ weight: 40
                <p>In this scenario, a mix node behind NAT listens on local addresses for
                   connections, while advertising a public address and port to its peer, a directory
                   authority, that is assumed to have a publicly routable address.</p>
-               <div class="figure"><a name="d58e163"></a><p class="title"><b>Figure&nbsp;1.&nbsp;Configuring a mix node behind NAT to be available to a dirauth</b></p>
+               <div class="figure"><a name="d58e189"></a><p class="title"><b>Figure&nbsp;1.&nbsp;Configuring a mix node behind NAT to be available to a dirauth</b></p>
                   <div class="figure-contents">
                      <div class="mediaobject"><img src="pix/peer-to-peer-nat.png" width="351"></div>
                   </div>
@@ -248,19 +262,17 @@ weight: 40
                      </li>
                      <li class="listitem">
                         <p>The mix node also has a LAN address, 192.168.0.2, which does not appear in
-                           the Katzenpost configuration, but is
-                           logically
-                           equivalent to the node's loopback address,
-                           127.0.0.1.</p>
+                           the Katzenpost configuration, but is logically equivalent to the node's
+                           loopback address, 127.0.0.1.</p>
                      </li>
                      <li class="listitem">
-                        <p>The NAT router has two configured addresses, public address 203.0.113.10,
+                        <p>The NAT router has two configured addresses, public address 203.0.113.10
                            and LAN address 192.168.0.1.</p>
                      </li>
                      <li class="listitem">
-                        <p>The NAT device routes traffic for 203.0.113.10:1234 to the LAN address and
-                           port of the mix node, 192.168.0.2:1234, and therefore to the configured
-                           listener bound to 127.0.0.1:1234.</p>
+                        <p>The NAT device routes traffic for 203.0.113.10:1234 to the LAN
+                           <code class="code">address:port</code> of the mix node, 192.168.0.2:1234, and
+                           therefore to the configured listener bound to 127.0.0.1:1234.</p>
                      </li>
                   </ul>
                </div>
@@ -276,10 +288,8 @@ weight: 40
                </div>
                <p>In this scenario, a gateway node behind NAT listens on local addresses for
                   connections from the Internet, while advertising a public address and port to a
-                  client
-                  application that is assumed to have a publicly routable
-                  address.</p>
-               <div class="figure"><a name="d58e216"></a><p class="title"><b>Figure&nbsp;2.&nbsp;Configuring a gateway behind NAT to be available to a client</b></p>
+                  client application that is assumed to have a publicly routable address.</p>
+               <div class="figure"><a name="d58e235"></a><p class="title"><b>Figure&nbsp;2.&nbsp;Configuring a gateway behind NAT to be available to a client</b></p>
                   <div class="figure-contents">
                      <div class="mediaobject"><img src="pix/client-gateway-nat.png" width="351"></div>
                   </div>
@@ -308,19 +318,17 @@ weight: 40
                      </li>
                      <li class="listitem">
                         <p>The gateway node also has a LAN address, 192.168.0.2, which does not
-                           appear in the Katzenpost configuration, but is
-                           logically
-                           equivalent to the node's loopback address,
-                           127.0.0.1.</p>
+                           appear in the Katzenpost configuration, but is logically equivalent to
+                           the node's loopback address, 127.0.0.1.</p>
                      </li>
                      <li class="listitem">
                         <p>The NAT router has two configured addresses, public address 203.0.113.10,
                            and LAN address 192.168.0.1.</p>
                      </li>
                      <li class="listitem">
-                        <p>The NAT device routes traffic for 203.0.113.10:1234 to the LAN address and
-                           port of the gateway node, 192.168.0.2:1234, and therefore to the configured
-                           listener bound to 127.0.0.1:1234.</p>
+                        <p>The NAT device routes traffic for 203.0.113.10:1234 to the LAN
+                           <code class="code">address:port</code> of the gateway node, 192.168.0.2:1234, and
+                           therefore to the configured listener bound to 127.0.0.1:1234.</p>
                      </li>
                   </ul>
                </div>
@@ -336,11 +344,9 @@ weight: 40
                </div>
                <p>In this scenario, a gateway node behind NAT listens on local addresses for
                   connections from the Internet, while advertising an onion address and port to a
-                  client
-                  application that is assumed to have a publicly routable address.
-                  Apart from the use of an onion address, this scenario is identical to the previous
-                  one.</p>
-               <div class="figure"><a name="d58e269"></a><p class="title"><b>Figure&nbsp;3.&nbsp;Configuring a gateway to be available to a client over Tor</b></p>
+                  client application that is assumed to have a publicly routable address. Apart from
+                  the use of an onion address, this scenario is identical to the previous one.</p>
+               <div class="figure"><a name="d58e281"></a><p class="title"><b>Figure&nbsp;3.&nbsp;Configuring a gateway to be available to a client over Tor</b></p>
                   <div class="figure-contents">
                      <div class="mediaobject"><img src="pix/client-gateway-onion.png" width="351"></div>
                   </div>
@@ -357,9 +363,9 @@ weight: 40
                            <code class="code">[Server]</code>.</p>
                      </li>
                      <li class="listitem">
-                        <p>The gateway node exposes itself to the network as an onion (hidden)service
-                           bound to the loopback address (127.0.0.1) and a port (1234). This requires a
-                           Tor daemon to be running on the node and for the code snippet from the Tor
+                        <p>The gateway node exposes itself to the network as an onion (hidden)
+                           service bound to the loopback address (127.0.0.1) and a port (1234). This
+                           requires a Tor daemon to be running on the node and for the Tor
                            configuration file <code class="code">/etc/tor/torrc</code> to contain the lines
                            shown.</p>
                      </li>
@@ -377,15 +383,12 @@ weight: 40
                      </li>
                      <li class="listitem">
                         <p>The gateway node also has a LAN address, 192.168.0.2, which does not
-                           appear in the Katzenpost configuration, but is
-                           logically
-                           equivalent to the node's loopback address,
-                           127.0.0.1.</p>
+                           appear in the Katzenpost configuration, but is logically equivalent to
+                           the node's loopback address, 127.0.0.1.</p>
                      </li>
                      <li class="listitem">
                         <p>The NAT router has two configured addresses, public address 203.0.113.10,
-                           and LAN address 192.168.0.1, which in this case play no role in the
-                           Katzenpost configuration.</p>
+                           and LAN address 192.168.0.1.</p>
                      </li>
                      <li class="listitem">
                         <p>The NAT device routes traffic for 203.0.113.10:1234 to the LAN address and
@@ -395,6 +398,43 @@ weight: 40
                   </ul>
                </div>
             </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="d58e327"></a>Dirauth node NAT traversal</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Directory authorities have no support for the <em class="parameter"><code>BindAddresses</code></em>
+               parameter. Unlike mix, gateway, and service nodes, dirauths have no mechanism to
+               announce their addresses automatically. Rather, their public addresses must be added
+               out-of-band to the PKI document on which peers and clients rely. Consequently,
+               conventional NAT works without special Katzenpost configuration. This is
+               demonstrated by a scenario involving three dirauths &#x2013; dirauth1, dirauth2 and dirauth3
+               &#x2013;
+               where dirauth1 is behind NAT, with a <code class="code">server</code> section like the following in
+               its configuration:</p>
+            <pre class="programlisting">[Server] 
+  Identifier = "dirauth1" 
+  PKISignatureScheme = "Ed25519 Sphincs+"
+  WireKEMScheme = "KYBER768-X25519"
+  Addresses = [ "tcp://192.168.1.123:52323" ]
+  DataDir = "/var/lib/pq-katzenpost-authority"</pre>
+            <p>The listening address on dirauth1 is LAN IP address <code class="code">192.168.1.123</code>. It
+               differs from the other examples in this topic by its use of a LAN address rather than
+               the loopback address (127.0.0.1). This configuration is not seen by the other dirauth
+               nodes; it only determines which network interface dirauth1 is listening on. Peer nodes,
+               such as dirauth2 and dirauth3, have configuration files containing a public IP address,
+               provided out-of-band, for dirauth1 in the <code class="code">Authorities</code> section:</p>
+            <pre class="programlisting">[[Authorities]]
+  Identifier = "dirauth1" 
+  PKISignatureScheme = "Ed25519 Sphincs+"
+  WireKEMScheme = "KYBER768-X25519"
+  Addresses = [ "tcp://203.0.113.10:52323" ]</pre>
+            <p>The NAT router passes incoming connections to their destination host based on
+               <code class="code">address:port</code> information in the usual manner.</p>
          </div>
       </div>
    </body>
