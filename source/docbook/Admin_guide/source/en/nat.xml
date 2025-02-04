@@ -336,7 +336,7 @@
         </section>
     </section>
     <section>
-        <title>Dirauth node NAT traversal</title>
+        <title>Using NAT with directory authorities</title>
         <para>Directory authorities have no support for the <parameter>BindAddresses</parameter>
             parameter. Unlike mix, gateway, and service nodes, dirauths have no mechanism to
             announce their addresses automatically. Rather, their public addresses must be added
