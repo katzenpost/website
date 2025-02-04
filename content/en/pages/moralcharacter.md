@@ -38,7 +38,7 @@ aliases:
 > instance of which was the problem addressed by Chaum. Secure-messaging
 > is the most fundamental privacy problem in cryptography: how can parties
 > communicate in such a way that nobody knows who said what. More than a
-> decade after the problem was introduced, [Rackoff and Simon](http://sci-hub.tw/10.1145/167088.167260)
+> decade after the problem was introduced, (C. Rackoff and D. Simon, "Cryptographic defense against traffic analysis", in Proc. of the 25th ACM Symp. on Theory of Computing, May 1993, pp. 672-681)
 > would comment on the near-absence of attention being paid to it."
 
 > "Another 20-plus years later, the situation is this: there is now a mountain of work on secure-messaging, but

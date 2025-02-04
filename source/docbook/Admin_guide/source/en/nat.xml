@@ -8,7 +8,7 @@
 <?linkTitle "Using with NAT" ?>  <!-- Section menu link text -->
 <?url "docs/admin_guide/nat.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
-<?draft true?> <!-- Optional -->
+<?draft "false" ?> <!-- Optional -->
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
@@ -23,211 +23,347 @@
     version="5.1" xml:id="nat">
     
     <info>
-        <title xml:id="nat.title">Using &program_name; from behind a NAT device</title>
+        <title xml:id="nat.title">Using &program_name; with NAT and Tor</title>
     </info>
-    
-    <para>To do</para>
-    
-    <para>&program_name; servers can be used from behind network address translation (NAT) devices.
-        This applies to mix nodes, gateway nodes, service nodes, and directory authority nodes
-        (dirauths). Port forwarding and other network configuration details depend on how you are
-        hosting your servers and the type of router you use.</para>
-    <para>Some hosting scenarios, such as the use of an AWS EC2 instance, require no manual port
-        forwarding. A &program_name; node running on an EC2 instance with default network settings
-        listens on its internal IP address yet can receive connections from publicly routed IP
-        addresses. For home and small business routers, default policy is to block inbound
-        connections from public addresses. In this scenario, you need to configure port forwarding
-        to the appropriate internal IP address and port. </para>
+    <para>Any &program_name; server node can be configured to support NAT and similar network
+        topologies (such as Tor) that traverse public and private network boundaries. All
+        &program_name; node types (mix nodes, gateway nodes, service nodes, and dirauths) can be
+        used from behind <link xlink:href="https://www.rfc-editor.org/rfc/rfc1631">network address
+            translation (NAT)</link> routers. A variation of NAT topology may be used for hosting in
+        a container environment, such as Docker, or when a node runs in a virtualized environment,
+        such as Qemu or KVM. Additionally, gateway nodes running a Tor <link
+            xlink:href="https://tb-manual.torproject.org/onion-services/">onion service</link> can
+        be accessed from the Internet using an onion address. </para>
+    <para>Some indirect network scenarios that involve NAT, such as Amazon EC2, are effectively
+        transparent and require no special &program_name; configuration. More typically,  the router
+        connecting a LAN with the Internet blocks incoming connections by default, and must be
+        configured to forward traffic from the Internet to a destination LAN host based on port
+        number. (Router configuration for a NAT topology is beyond the scope of this topic.) For
+        these cases, where the host listens on a LAN <code>address:port</code> but is accessed
+        publicly from another <code>address:port</code>,  &program_name; provides a mechanism to
+        specify both addresses and to share access information with peers and clients.</para>
     <para>
-        <table frame="all">
-            <title>Lan hosting options</title>
-            <tgroup cols="5">
-                <colspec colnum="1" colname="c1" colwidth="1*"/>
-                <colspec colnum="2" colname="c2" colwidth="1*"/>
-                <colspec colnum="3" colname="c3" colwidth="1*"/>
-                <colspec colnum="4" colname="c4" colwidth="1*"/>
-                <colspec colnum="5" colname="c5" colwidth="1*"/>
-                <thead>
-                    <row>
-                        <entry/>
-                        <entry>Mix node</entry>
-                        <entry>Gateway  node</entry>
-                        <entry>Service node</entry>
-                        <entry>Dirauth</entry>
-                    </row>
-                </thead>
-                <tbody>
-                    <row>
-                        <entry>Transparent port forwarding (EC2, etc.)</entry>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                    </row>
-                    <row>
-                        <entry>Selective forwarding (home and small business routers)</entry>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                    </row>
-                    <row>
-                        <entry>Tor</entry>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                    </row>
-                    <row>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                    </row>
-                    <row>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                        <entry/>
-                    </row>
-                </tbody>
-            </tgroup>
-        </table>
+        <note>
+            <para>&program_name; does not support NAT penetration protocols such as <link
+                    xlink:href="https://www.rfc-editor.org/rfc/rfc6886">NATPMP</link>, <link
+                    xlink:href="https://www.rfc-editor.org/rfc/rfc5389">STUN</link>, and <link
+                    xlink:href="https://www.rfc-editor.org/rfc/rfc5766">TURN</link>.</para>
+        </note>
     </para>
-    
-    <section xml:id="tor">
-        <title xml:id="tor.title">Using Tor</title>
-        <para/>
-        <para>Dirauth is a cooperative crash fault tolerant voting system composed of multiple
-            dirauth nodes. However, each of these dirauth nodes must have knowledge of the other
-            dirauth node's network connection information and public cryptographic key material.
-            It's often convenient enough for dirauth operators to use a private git repo to
-            coordinate changes to the dirauth configurations and public key materials. Therefore,
-            dirauth operators wishing to operate a node behind a NAT device can configure their node
-            to listen on a RFC1918 address such as 192.168.1.22 and yet tell the other dirauth node
-            operators that their publicly routable address is some other IP address or perhaps a Tor
-            Onion address. </para>
-        <para/>
-        <para/>
-        <para>Dirauths and gateways can be hosted as Tor onion services. (Mix and service nodes
-            cannot be hosted in this manner because they communicate only inside the mix network.) </para>
-        <para/>
-        <para>Any mix node type can operate behind a NAT device by using the
-            <parameter>BindAddresses</parameter> parameter.  When
-            <parameter>BindAddresses</parameter> is set, a node listens at one address while
-            advertising a different address as configured by the <parameter>Addresses</parameter>
-            parameter, which specifies the address that the node shares with other nodes through the
-            PKI document.</para>
-        <para>If you are configuring a Gateway node to listen on a Tor onion service, then you must
-            make sure that the BindAddresses match the listening address and port in your "torrc"
-            file:</para>
-        <programlisting>
-HiddenServiceDir /var/lib/tor/my_website/
-HiddenServicePort 1234 127.0.0.1:1234
-</programlisting>
-        <para>We refer you to the Tor onion setup docs for more information:
-            https://community.torproject.org/onion-services/setup/</para>
-        <para>The corresponding Gateway config Server section might look like this:</para>
-        <programlisting>
-[Server]
-Identifier = "gnunet"
-PKISignatureScheme = "Ed25519 Sphincs+"
-WireKEM = "KYBER768-X25519"
-Addresses = [ "onion://your-onion-address.onion:1234"]
-BindAddresses = [ "tcp://127.0.0.1:1234",]
-DataDir = "/var/lib/pq-katzenpost-mixserver"
-IsGatewayNode = true
-IsServiceNode = false
-...
-</programlisting>
-        <para>DIAGRAM: ROUTER, IPs, etc.</para>
-        <para>mix node, device NAT device/router; Nat dev has an Internet route. Internall, mix node
-            binds to an internal addrexs (show configuration). This is the same for Tor, but with
-            Onion addess rahter that a static IP (see Tor and link)</para>
-        <para>NATPMP STUN TURN– these are Nat PENETRATION PROTOCLDS... <emphasis role="underline"
-                >NOT SUPPORTED</emphasis></para>
-        <para>Two diagrams...Onion and IPv4/IPv6</para>
-        <para>This confguration only allows for the Gateway nodes (which are also mix nodes).</para>
-        <para>We need a to show an excerpt from a torrc to show where the onion listening port is
-            confuigred.</para>
+    <section>
+        <title><parameter>Addresses</parameter> and <parameter>BindAddresses</parameter></title>
+        <para>In a direct network connection, the address defined in the server
+                <parameter>Addresses</parameter> parameter defines the addresses on which the node
+            listens for incoming connections, and which are advertised to other mixnet components in
+            the PKI document. By supplying the optional <parameter>BindAddresses</parameter>
+            parameter, you can define a second address group: internal addresses that are
+                <emphasis>not</emphasis> advertised in the PKI document. This is useful for NAT and
+            Tor scenarios.<note>
+                <para>The <parameter>Addresses</parameter> and <parameter>BindAddresses</parameter>
+                    parameters are closely analogous to Tor's <parameter>Address</parameter> and
+                        <parameter>ORPort</parameter> parameters. For more information, see the
+                        <link xlink:href="https://manpages.debian.org/testing/tor/torrc.5.en.html"
+                        >torrc man page</link>.</para>
+            </note></para>
+        <para>The following table shows the details for these two parameters. For more information
+            about mixnet node configuration, see <link
+                xlink:href="https://katzenpost.network/docs/admin_guide/components.html">Components
+                and configuration of the &program_name; mixnet</link>.</para>
+        <para>
+            <table frame="all">
+                <title><parameter>Addresses</parameter> and <parameter>BindAddresses</parameter>
+                    parameters</title>
+                <tgroup cols="3">
+                    <colspec colnum="1" colname="c1" colwidth="1*"/>
+                    <colspec colnum="2" colname="c2" colwidth="1.39*"/>
+                    <colspec colnum="3" colname="c3" colwidth="3.17*"/>
+                    <thead>
+                        <row>
+                            <entry><parameter>Parameter</parameter></entry>
+                            <entry>Required</entry>
+                            <entry>Description</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry><parameter>Addresses</parameter></entry>
+                            <entry>Yes</entry>
+                            <entry>
+                                <para>Specifies a list of one or more address URLs in a format that
+                                    contains the transport protocol, IP address, and port number
+                                    that the server will bind to for incoming connections. This
+                                    value is advertised in the PKI document. &program_name; supports
+                                    URLs with that start with either <code>tcp://</code> or
+                                        <code>quic://</code> such as:
+                                        <code>["tcp://192.168.1.1:30001"]</code> and
+                                        <code>["quic://192.168.1.1:40001"]</code>. Onion addresses,
+                                    identified by transport protocol onion://, are also supported on
+                                    some node types if <parameter>BindAddresses</parameter> is also
+                                    present.</para>
+                                <para>This parameter is overridden by
+                                        <parameter>BindAddresses</parameter>; see below.</para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry><parameter>BindAddresses</parameter></entry>
+                            <entry>No</entry>
+                            <entry>
+                                <para>If <emphasis role="bold">true</emphasis> (that is, if the
+                                    parameter is present), this parameter allows you to set internal
+                                    listener addresses that the server will bind to and accept
+                                    connections on, but that are not advertised in the PKI document. </para>
+                            </entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+        </para>
+        <para>For example, a mix node configuration file with a direct Internet connection, or with
+            transparent NAT hosting such as that provided by Amazon EC2, contains a
+                <code>Server</code> section specifying only the <parameter>Addresses</parameter>
+            parameter, as in the following listing:<programlisting>[Server]
+  Identifier = "mix1"
+  WireKEM = "xwing"
+  PKISignatureScheme = "Ed448-Dilithium3"
+  Addresses = ["<replaceable>tcp://127.0.0.1:30010</replaceable>",]
+  MetricsAddress = "<replaceable>127.0.0.1:30012</replaceable>"
+  DataDir = "/voting_mixnet/mix1"
+  IsGatewayNode = false
+  IsServiceNode = false</programlisting></para>
+        <para>Importantly, the value of <parameter>Addresses</parameter>, which the node advertises
+            to other peers, is its loopback address, 127.0.0.1, and a specified port. This means
+            that there is no publicly routable address for this node, and that traffic arriving at
+            the node is delivered there by a configured LAN. In all of these examples, nodes have
+            necessarily been assigned a LAN addresses, but these non-routable<link
+                xlink:href="https://www.rfc-editor.org/rfc/rfc1918"> RFC 1918</link> addresses play
+            no role in &program_name; server configurations. Rather, for portability, the
+            configurations use the logically equivalent loopback address.</para>
+        <para>In contrast to the direct connection, the next example shows part of the configuration
+            file for a similar node behind NAT, containing a <code>Server</code> section that
+            specifies both the <parameter>Addresses</parameter> and
+                <parameter>BindAddresses</parameter>parameters:<programlisting>[Server]
+  Identifier = "mix1"
+  WireKEM = "xwing"
+  PKISignatureScheme = "Ed448-Dilithium3"
+  Addresses = ["<replaceable>tcp://203.0.113.10:30010</replaceable>"]
+  BindAddresses = ["<replaceable>tcp://127.0.0.1:30010</replaceable>"]
+  MetricsAddress = "127.0.0.1:30012"
+  DataDir = "/voting_mixnet/mix1"
+  IsGatewayNode = false
+  IsServiceNode = false</programlisting></para>
+        <para>Notice that the local listening address remains unchanged, <emphasis>but has been
+                relocated to the new
+                </emphasis><parameter><emphasis>BindAddresses</emphasis></parameter><emphasis>
+                parameter</emphasis>. In addition, the value of the <parameter>Addresses</parameter>
+            parameter has been changed to a public address (the NAT router's WAN address), including
+            a port. It is assumed that the router is configured to forward traffic routed to this
+                <code>address:port</code> to the mixnet node over the LAN. </para>
     </section>
-    
-    <section xml:id="dirauths">
-        <title xml:id="dirauths.title">Using <parameter>BindAddresses</parameter> with
-                <parameter>Addresses</parameter></title>
-        
-        <para>In a conventional NAT configuration, a router sits between two IP networks, one with
-            public, globally unique addresses and the other (the LAN) with reusable local addresses.
-            A host with a public address can connect to a host with a local address because the
-            router is configured with a mapping between the two networks. The router rewrites the
-            destination and source headers of the packets that traverse it in both directions,
-            creating the illusion of an unmediated end-to-end connection. The public host sends
-            packs to a public address </para>
-        
-    </section>
-    
-    
-    
-    
-</article>
+    <section>
+        <title>Application scenarios</title>
+        <para>The following sections  illustrate supported &program_name; topologies that make use
+            of the <parameter>BindAddresses</parameter> parameter.</para>
+        <section xml:id="peer-to-peer">
+            <title xml:id="peer-to-peer.title">Peer-to-peer connections involving NAT</title>
+            <para>In this scenario, a mix node behind NAT listens on local addresses for
+                connections, while advertising a public address and port to its peer, a directory
+                authority, that is assumed to have a publicly routable address.</para>
+            <figure>
+                <info>
+                    <title>Configuring a mix node behind NAT to be available to a dirauth</title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/peer-to-peer-nat.png" scale="65"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            <para><link xlink:href="&baseURL;docs/admin_guide/pix/peer-to-peer-nat.png" xlink:show="new">Enlarge diagram</link></para>
+            <para><emphasis role="bold">Key observations</emphasis></para>
+            <itemizedlist>
+                <listitem>
+                    <para>The configuration file on the NATed mix node is
+                            <code>katzenpost.toml</code>. </para>
+                </listitem>
+                <listitem>
+                    <para>The relevant section of the configuration file is
+                        <code>[Server]</code>.</para>
+                </listitem>
+                <listitem>
+                    <para>The <parameter>Addresses</parameter> parameter specifies the publicly
+                        routable address (203.0.113.10) and a port (1234) over which the mix node
+                        can be reached from the Internet. This value is periodically advertised in
+                        the PKI document to other components of the mix network.</para>
+                </listitem>
+                <listitem>
+                    <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
+                        address (127.0.0.1) and a port (1234) on which the node listens for incoming
+                        Sphinx packets from peers.</para>
+                </listitem>
+                <listitem>
+                    <para>The mix node also has a LAN address, 192.168.0.2, which does not appear in
+                        the &program_name; configuration, but is logically equivalent to the node's
+                        loopback address, 127.0.0.1.</para>
+                </listitem>
+                <listitem>
+                    <para>The NAT router has two configured addresses, public address 203.0.113.10
+                        and LAN address 192.168.0.1.</para>
+                </listitem>
+                <listitem>
+                    <para>The NAT device routes traffic for 203.0.113.10:1234 to the LAN
+                            <code>address:port</code> of the mix node, 192.168.0.2:1234, and
+                        therefore to the configured listener bound to 127.0.0.1:1234.</para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section xml:id="client-to-gateway-nat">
+            <title xml:id="client-to-gateway-nat.title">Client-to-gateway connections involving
+                NAT</title>
+            <para>In this scenario, a gateway node behind NAT listens on local addresses for
+                connections from the Internet, while advertising a public address and port to a
+                client application that is assumed to have a publicly routable address.</para>
+            <figure>
+                <info>
+                    <title>Configuring a gateway behind NAT to be available to a client</title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/client-gateway-nat.png" scale="65"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            <para><link xlink:href="&baseURL;docs/admin_guide/pix/client-gateway-nat.png" xlink:show="new">Enlarge diagram</link></para>
+            <para><emphasis role="bold">Key observations</emphasis></para>
+            <itemizedlist>
+                <listitem>
+                    <para>The configuration file on the NATed gateway node is
+                            <code>katzenpost.toml</code>. </para>
+                </listitem>
+                <listitem>
+                    <para>The relevant section of the configuration file is
+                        <code>[Server]</code>.</para>
+                </listitem>
+                <listitem>
+                    <para>The <parameter>Addresses</parameter> parameter specifies the publicly
+                        routable address (203.0.113.10) and a port (1234) over which the gateway
+                        node can be reached from the Internet. This value is periodically advertised
+                        in the PKI document to other components of the mix network.</para>
+                </listitem>
+                <listitem>
+                    <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
+                        address (127.0.0.1) and a port (1234) on which the node listens for incoming
+                        Sphinx packets from clients.</para>
+                </listitem>
+                <listitem>
+                    <para>The gateway node also has a LAN address, 192.168.0.2, which does not
+                        appear in the &program_name; configuration, but is logically equivalent to
+                        the node's loopback address, 127.0.0.1.</para>
+                </listitem>
+                <listitem>
+                    <para>The NAT router has two configured addresses, public address 203.0.113.10,
+                        and LAN address 192.168.0.1.</para>
+                </listitem>
+                <listitem>
+                    <para>The NAT device routes traffic for 203.0.113.10:1234 to the LAN
+                            <code>address:port</code> of the gateway node, 192.168.0.2:1234, and
+                        therefore to the configured listener bound to 127.0.0.1:1234.</para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section xml:id="client-to-gateway-tor">
+            <title xml:id="client-to-gateway-tor.title">Client-to-gateway connections over
+                Tor</title>
+            <para>In this scenario, a gateway node behind NAT listens on local addresses for
+                connections from the Internet, while advertising an onion address and port to a
+                client application that is assumed to have a publicly routable address. Apart from
+                the use of an onion address, this scenario is identical to the previous one.</para>
+            <figure>
+                <info>
+                    <title>Configuring a gateway to be available to a client over Tor</title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/client-gateway-onion.png" scale="65"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            <para><link xlink:href="&baseURL;docs/admin_guide/pix/client-gateway-onion.png" xlink:show="new">Enlarge diagram</link></para>
+            <para><emphasis role="bold">Key observations</emphasis></para>
+            <itemizedlist>
+                <listitem>
+                    <para>The configuration file on the NATed gateway node is
+                            <code>katzenpost.toml</code>. </para>
+                </listitem>
+                <listitem>
+                    <para>The relevant section of the configuration file is
+                        <code>[Server]</code>.</para>
+                </listitem>
+                <listitem>
+                    <para>The gateway node exposes itself to the network as an onion (hidden)
+                        service bound to the loopback address (127.0.0.1) and a port (1234). This
+                        requires a Tor daemon to be running on the node and for the Tor
+                        configuration file <code>/etc/tor/torrc</code> to contain the lines
+                        shown.</para>
+                </listitem>
+                <listitem>
+                    <para>The <parameter>Addresses</parameter> parameter specifies the onion address
+                            (<code>address.onion</code>) and a port (1234) over which the gateway
+                        node can be reached by way of the Tor network. This value is periodically
+                        advertised in the PKI document to other components of the mix
+                        network.</para>
+                </listitem>
+                <listitem>
+                    <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
+                        address (127.0.0.1) and a port (1234) on which the node listens for incoming
+                        Sphinx packets from clients.</para>
+                </listitem>
+                <listitem>
+                    <para>The gateway node also has a LAN address, 192.168.0.2, which does not
+                        appear in the &program_name; configuration, but is logically equivalent to
+                        the node's loopback address, 127.0.0.1.</para>
+                </listitem>
+                <listitem>
+                    <para>The NAT router has two configured addresses, public address 203.0.113.10,
+                        and LAN address 192.168.0.1.</para>
+                </listitem>
+                <listitem>
+                    <para>The NAT device routes traffic for 203.0.113.10:1234 to the LAN address and
+                        port of the gateway node, 192.168.0.2:1234, and therefore to the configured
+                        onion service listener bound to 127.0.0.1:1234.</para>
+                </listitem>
+            </itemizedlist>
 
-<!--
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
-    version="5.1" xml:id="components">
-    <title xml:id="components.title">Using &program_name; from behind a NAT device</title>
-    <para>&program_name; can be used from behind NAT devices. Both mix and dirauth nodes.</para>
-    <para>Some networking scenearios do not require any manual port forwarding, such as operating an ec2 node on AWS,
-    the node listens on an internal IP address yet can receive connections that get routed to a public IP address.
-    There is a NAT device involved here but it's default policy is to route all trafic to the node.
-    Whereas in a home router NAT device, it's default policy is to block inbound connections. For this later
-    scenario, the operator must setup port forwarding to the appropriate internal IP address and port number.
-    </para>
-    <para>The dirauth is a cooperative crash fault tolerant voting system composed of multiple dirauth nodes.
-    However, each of these dirauth nodes must have knowledge of the other dirauth node's network connection information
-    and public cryptographic key material. It's often convenient enough for dirauth operators to use a private git repo to coordinate
-    changes to the dirauth configurations and public key materials. Therefore, dirauth operators wishing to
-    operate a node behind a NAT device can configure their node to listen on a RFC1918 address such as 192.168.1.22
-    and yet tell the other dirauth node operators that their publicly routable address is some other IP address or perhaps a Tor Onion address.
-	</para>
-    <para/>
-    <para/>
-    <para>Currently, besides dirauth nodes, the only other type of node that can use Tor onion services are Gateway nodes, however
-    ALL mix node types can operate behind a NAT device by using the BindAddresses option which tells the mix node to listen on the
-    "BindAddresses" set of addresses but advertise the other set of addresses denoted by the "Addresses" configuration variable name.
-	In other words, when operating nodes behind NAT devices, be sure to explicitly say which network interfaces to listen on via BindAddresses
-	and also be explicit which addresses to advertise in the PKI document via Addresses.    
-    </para>
-    <para>If you are configuring a Gateway node to listen on a Tor onion service, then you must make sure that the BindAddresses match
-    the listening address and port in your "torrc" file:</para>
-    <programlisting>
- HiddenServiceDir /var/lib/tor/my_website/
- HiddenServicePort 1234 127.0.0.1:1234
-    </programlisting>
-    <para>We refer you to the Tor onion setup docs for more information: https://community.torproject.org/onion-services/setup/</para>
-    <para>The corresponding Gateway config Server section might look like this:</para>
-    <programlisting>
-[Server]
-  Identifier = "gnunet"
+        </section>
+    </section>
+    <section>
+        <title>Using NAT with directory authorities</title>
+        <para>Directory authorities have no support for the <parameter>BindAddresses</parameter>
+            parameter. Unlike mix, gateway, and service nodes, dirauths have no mechanism to
+            announce their addresses automatically. Rather, their public addresses must be added
+            out-of-band to the PKI document on which peers and clients rely. Consequently,
+            conventional NAT works without special &program_name; configuration. This is
+            demonstrated by a scenario involving three dirauths – dirauth1, dirauth2 and dirauth3 –
+            where dirauth1 is behind NAT, with a <code>server</code> section like the following in
+            its configuration:</para>
+        <programlisting>[Server] 
+  Identifier = "dirauth1" 
   PKISignatureScheme = "Ed25519 Sphincs+"
-  WireKEM = "KYBER768-X25519"
-  Addresses = [ "onion://your-onion-address.onion:1234"]
-  BindAddresses = [ "tcp://127.0.0.1:1234",]
-  DataDir = "/var/lib/pq-katzenpost-mixserver"
-  IsGatewayNode = true
-  IsServiceNode = false
-...
-    </programlisting>
-    
-    <para>DIAGRAM: ROUTER, IPs, etc.</para>
-    <para>mix node, device NAT device/router; Nat dev has an Internet route. Internall, mix node
-        binds to an internal addrexs (show configuration). This is the same for Tor, but with Onion
-        addess rahter that a static IP  (see Tor and link)</para>
-    <para>NATPMP STUN TURN– these are Nat PENETRATION PROTOCLDS... NOT SUPPORTED</para>
-    <para>Two diagrams...Onion and IPv4/IPv6</para>
-    <para>This confguration only allows for the Gateway nodes (which are also mix nodes).</para>
-    <para>We need a to show an excerpt from a torrc to show where the onion listening port is
-        confuigred.</para>
-</chapter>
--->
+  WireKEMScheme = "KYBER768-X25519"
+  Addresses = [ "tcp://192.168.1.123:52323" ]
+  DataDir = "/var/lib/pq-katzenpost-authority"</programlisting>
+        <para>The listening address on dirauth1 is LAN IP address <code>192.168.1.123</code>. It
+            differs from the other examples in this topic by its use of a LAN address rather than
+            the loopback address (127.0.0.1). This configuration is not seen by the other dirauth
+            nodes; it only determines which network interface dirauth1 is listening on. Peer nodes,
+            such as dirauth2 and dirauth3, have configuration files containing a public IP address,
+            provided out-of-band, for dirauth1 in the <code>Authorities</code> section:</para>
+        <programlisting>[[Authorities]]
+  Identifier = "dirauth1" 
+  PKISignatureScheme = "Ed25519 Sphincs+"
+  WireKEMScheme = "KYBER768-X25519"
+  Addresses = [ "tcp://203.0.113.10:52323" ]</programlisting>
+        <para>The NAT router passes incoming connections to their destination host based on
+                <code>address:port</code> information in the usual manner.</para>
+    </section>
+  
+</article>

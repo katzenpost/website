@@ -582,12 +582,8 @@
                 as highlighted in the listing. For help in understanding these files and a complete
                 list of configuration options, follow the links in <guilabel>Table 2: Test mixnet
                     hosts</guilabel>.</para>
-        </section>
-    </section>
-    <section>
-        <info>
-            <title></title>
-        </info>
+
+
         <programlisting>katzenpost/docker/voting_mixnet/
 |---<emphasis role="bold">auth1</emphasis>
 |   |---<emphasis role="bold">authority.toml</emphasis>
@@ -679,5 +675,6 @@
 |---voting_mixnet</programlisting>
         <para>Examples of complete TOML configuration files are provided in <link xlink:href="&baseURL;docs/admin_guide/docker-config.html"
                 >Appendix: Configuration files from the Docker test mixnet</link><!--<xref linkend="docker-config" endterm="docker-config.title"/>-->.</para>
+        </section>
     </section>
 </article>
