@@ -1,0 +1,153 @@
+---
+title: 
+linkTitle: "Quickstart guide" 
+description: "" 
+url: "docs/admin_guide/quickstart.html" 
+date: "2025-02-05T09:55:56.352432243-08:00"
+draft: true 
+slug: "" 
+layout: "" 
+type: "" 
+weight: 5 
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>Quickstart guide</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+   </head>
+   <body>
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h1 class="title"><a name="quickstart"></a>Quickstart guide</h1>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <p>This topic provides collects basic Katzenpost commands and other information in a
+            single convenient place. All system commands require superuser privileges. </p>
+         <p>The commands listed here do not apply to the Katzenpost Docker image, which has its
+            own controls. For more information, see Using the <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Katzenpost
+               Docker test network</a>.</p>
+         <p>
+            <div class="table"><a name="d58e34"></a><p class="title"><b>Table&nbsp;1.&nbsp;</b></p>
+               <div class="table-contents">
+                  <table class="table" summary="" border="1">
+                     <colgroup>
+                        <col class="c1">
+                        <col class="c2">
+                     </colgroup>
+                     <thead>
+                        <tr>
+                           <th>
+                              <p>Task</p>
+                           </th>
+                           <th>
+                              <p>Resource</p>
+                           </th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr>
+                           <td>
+                              <p>Get the Katzenpost server code.</p>
+                           </td>
+                           <td>
+                              <p><span class="command"><strong>git clone
+                                       git@github.com:katzenpost/katzenpost.git</strong></span></p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>Get the Katzenpost chat client code.</p>
+                           </td>
+                           <td>
+                              <p><span class="command"><strong>git clone git@github.com:katzenpost/katzen.git</strong></span></p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>View the Katzenpost documentation.</p>
+                           </td>
+                           <td>
+                              <p><span class="command"><strong><a class="link" href="https://katzenpost.network/" target="_top">https://katzenpost.network/</a></strong></span></p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>Start the mixnet.</p>
+                           </td>
+                           <td>
+                              <p><span class="command"><strong>systemctl start pq-katzenpost-mixserver</strong></span></p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>Stop the mixnet.</p>
+                           </td>
+                           <td>
+                              <p><span class="command"><strong>systemctl stop pq-katzenpost-mixserver</strong></span></p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>Restart the mixnet.</p>
+                           </td>
+                           <td>
+                              <p><span class="command"><strong>systemctl restart
+                                       pq-katzenpost-mixserver</strong></span></p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>Start mixnet on boot.</p>
+                           </td>
+                           <td>
+                              <p><span class="command"><strong>systemctl enable pq-katzenpost-mixserver</strong></span></p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>Disable mixnet start on boot.</p>
+                           </td>
+                           <td>
+                              <p><span class="command"><strong>systemctl disable pq-katzenpost-mixserver</strong></span></p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>Control a specific mix server node</p>
+                           </td>
+                           <td>
+                              <p>Run <span class="command"><strong>pq-katzenpost-mixserver -h</strong></span> for
+                                 options.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>Control a specific directory authority </p>
+                           </td>
+                           <td>
+                              <p>Run <span class="command"><strong>pq-katzenpost-authority -h</strong></span> for
+                                 options.</p>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <p>Monitor the mixnet logs in real time.</p>
+                           </td>
+                           <td>
+                              <p><span class="command"><strong>journalctl -u pq-katzenpost-mixserver -f -n
+                                       2000</strong></span></p>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div><br class="table-break"></p>
+      </div>
+   </body>
+</html>
