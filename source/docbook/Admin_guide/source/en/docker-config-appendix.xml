@@ -28,13 +28,16 @@
     </info>
         
     <para>As an aid to adminstrators implementing a Katzenpost mixnet, this appendix provides
-        lightly edited examples of configuration files for each Katzenpost node type. These
-        files are drawn from a built instance of the <link linkend="container">Docker test
-        mixnet</link>. These code listings are meant to be used as a reference alongside the
-        detailed configuration documentation in <link xlink:href="&baseURL;docs/admin_guide/components.html"
-            >Components and configuration of the &program_name; mixnet</link><!--<xref linkend="components"/>-->. You cannot use these
-        listings as a drop-in solution in your own mixnets for reasons explained in the <link xlink:href="&baseURL;docs/admin_guide/topology.html"
-            >Network topology and components</link><!--<xref linkend="topology"/>--> section of the Docker test mixnet documentation.</para>
+    lightly edited examples of configuration files for each Katzenpost node type. These files are
+    drawn from a built instance of the <link
+      xlink:href="https://katzenpost.network/docs/admin_guide/docker.html">Docker test mixnet</link>. These code listings
+    are meant to be used as a reference alongside the detailed configuration documentation in <link
+      xlink:href="&baseURL;docs/admin_guide/components.html">Components and configuration of the
+      &program_name; mixnet</link><!--<xref linkend="components"/>-->. You cannot use these listings
+    as a drop-in solution in your own mixnets for reasons explained in the <link
+      xlink:href="&baseURL;docs/admin_guide/topology.html">Network topology and
+    components</link><!--<xref linkend="topology"/>--> section of the Docker test mixnet
+    documentation.</para>
     
         <section xml:id="dirauth-config">
             <info>

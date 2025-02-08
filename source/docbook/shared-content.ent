@@ -8,6 +8,67 @@
 <!ENTITY research_paper_link 'Place-holder for research paper link'>
 <!ENTITY baseURL 'https://katzenpost.network/'>
 
+<!ENTITY basic_commands '
+        <table frame="all">
+            <title>Basic system commands</title>
+            <tgroup cols="2">
+                <colspec colnum="1" colname="c1" colwidth="1*"/>
+                <colspec colnum="2" colname="c2" colwidth="1.27*"/>
+                <thead>
+                    <row>
+                        <entry>
+                            <para>Task</para>
+                        </entry>
+                        <entry>Command</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>
+                            <para>Start the mixnet.</para>
+                        </entry>
+                        <entry>
+                            <para><command>systemctl start pq-katzenpost-mixserver</command></para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para>Stop the mixnet.</para>
+                        </entry>
+                        <entry>
+                            <para><command>systemctl stop pq-katzenpost-mixserver</command></para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para>Restart the mixnet.</para>
+                        </entry>
+                        <entry>
+                            <para><command>systemctl restart
+                                pq-katzenpost-mixserver</command></para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para>Start mixnet on boot.</para>
+                        </entry>
+                        <entry>
+                            <para><command>systemctl enable pq-katzenpost-mixserver</command></para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para>Disable mixnet start on boot.</para>
+                        </entry>
+                        <entry>
+                            <para><command>systemctl disable
+                                pq-katzenpost-mixserver</command></para>
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>'>
+
 <!-- The following two are entities, not includes, because their XML is ill-formed.-->
 
 <!--  This one is provided directly as an entity in the Components chapter -->

@@ -8,7 +8,7 @@
 <?linkTitle "Introduction" ?>  <!-- Section menu link text -->
 <?url "docs/admin_guide/introduction.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
-<?draft true?> <!-- Optional -->
+<?draft false?> <!-- Optional -->
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->

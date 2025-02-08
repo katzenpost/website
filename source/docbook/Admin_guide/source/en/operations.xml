@@ -8,7 +8,7 @@
 <?linkTitle "Operating the mixnet" ?>  <!-- Section menu link text -->
 <?url "docs/admin_guide/operations.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
-<?draft true ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
@@ -26,7 +26,8 @@
     <info>
         <title xml:id="ops.title">Operating the &program_name; mixnet</title>
     </info>
-    <para>Intro to do.</para>
+    <para>This section describes tools and methods for managing an operational &program_name;
+        mixnet. </para>
     
   <section xml:id="management_socket">
       <info>
@@ -35,82 +36,71 @@
         
     <para>&program_name; provides a management interface that is accessed through a unix domain
             socket. The interface supports run-time changes to nodes without requiring a restart. By
-            default, the management interface is disabled. To enable it, </para>
-        <para/>
-        <para>For information about about configuring mixnet components, see.... </para>
-        <para/>
-    <para>The <code>socat</code> commandline utility can be use to connect to the management socket
-            and issue commands. Connect with a commandline like so:<itemizedlist>
-                <listitem>
-                    <programlisting>socat unix:/&lt;path-to-data-dir&gt;/management_sock STDOUT</programlisting>
-                    <para>The following commands are possible:</para>
+            default, the management interface is disabled. To enable it, change the
+                <code>Management</code> section of the node's configuration file so that
+                <code>Enable = true</code>:</para>
+        <programlisting>[Management]
+   Enable = true
+   Path = "/<replaceable>node_datadir</replaceable>/management_sock"</programlisting>
+        <para>For more information about management configuration, see the details for your node
+            type in <link xlink:href="https://katzenpost.network/docs/admin_guide/components.html"
+                >Components and configuration of the Katzenpost mixnet</link>.</para>
+    <para>Use the <link xlink:href="https://manpages.org/socat">socat</link> command-line utility to
+            connect to the management socket and issue commands, with the following syntax:</para>
+                
+                    <programlisting><prompt># </prompt><command>socat unix:/<replaceable>path-to-datadir</replaceable>/management_sock STDOUT</command></programlisting>
+                    <para>The following commands are supported.</para>
                     <itemizedlist>
                         <listitem>
-                            <para>QUIT - Exit this management socket session.</para>
+                            <para>QUIT - Exit the management socket session.</para>
                         </listitem>
                         <listitem>
-                            <para>SHUTDOWN - Cause the server to gracefully shutdown.</para>
+                            <para>SHUTDOWN - Shut down the server gracefully.</para>
                         </listitem>
                         <listitem>
-                            <para>ADD_USER - Add a user and associate it with the given link key in
-                                either hex or base64. The syntax of the command is as
-                                follows:</para>
-                            <programlisting>ADD_USER alice X25519_public_key_in_hex_or_base64
-</programlisting>
+                            <para>ADD_USER - Add a user and associate it with a public link key
+                    provided in either hexadecimal or Base64 format.  </para>
+                            <programlisting>ADD_USER <replaceable>user</replaceable> <replaceable>key</replaceable></programlisting>
                         </listitem>
                         <listitem>
-                            <para>UPDATE_USER - Update the link key of a given user. The syntax of
-                                the command is as follows:</para>
-                            <programlisting>UPDATE_USER alice X25519_public_key_in_hex_or_base64
-</programlisting>
+                            <para>UPDATE_USER - Update a user's link key.</para>
+                            <programlisting>UPDATE_USER <replaceable>user</replaceable> <replaceable>key</replaceable></programlisting>
                         </listitem>
                         <listitem>
-                            <para>REMOVE_USER - Remove a given user. The syntax of the command is as
-                                follows:</para>
-                            <programlisting>REMOVE_USER alice
-</programlisting>
+                            <para>REMOVE_USER - Remove a user.</para>
+                            <programlisting>REMOVE_USER <replaceable>user</replaceable></programlisting>
                         </listitem>
                         <listitem>
-                            <para>SET_USER_IDENTITY - Set a given user's identity key. The syntax of
-                                the command is as follows:</para>
-                            <programlisting>SET_USER_IDENTITY alice X25519_public_key_in_hex_or_base64
-</programlisting>
+                            <para>SET_USER_IDENTITY - Set a user's identity key.</para>
+                            <programlisting>SET_USER_IDENTITY <replaceable>user</replaceable> <replaceable>key</replaceable></programlisting>
                         </listitem>
                         <listitem>
-                            <para>REMOVE_USER_IDENTITY - Remove a given user's identity key. MUST be
-                                called before removing the user with the <code>REMOVE_USER</code>
-                                command. The synx of this command is as follows:</para>
-                            <programlisting>REMOVE_USER_IDENTITY alice
-</programlisting>
+                            <para>REMOVE_USER_IDENTITY - Remove a user's identity key. This command
+                    must be followed up with a  <code>REMOVE_USER</code> command.</para>
+                            <programlisting>REMOVE_USER_IDENTITY <replaceable>user</replaceable></programlisting>
                         </listitem>
                         <listitem>
-                            <para>USER_IDENTITY - Retrieve the identity key of the given user. The
-                                syntax of the command is as follows:</para>
-                            <programlisting>USER_IDENTITY alice
-</programlisting>
+                            <para>USER_IDENTITY - Retrieve a user's identity key.</para>
+                            <programlisting>USER_IDENTITY <replaceable>user</replaceable></programlisting>
                         </listitem>
                         <listitem>
-                            <para>SEND_RATE - Sets the rate limiter to the given packets per minute
-                                rate.</para>
-                            <programlisting>SEND_RATE 30
-</programlisting>
+                            <para>SEND_RATE - Set the packet rate limit to a per-minute integer
+                    value.</para>
+                            <programlisting>SEND_RATE <replaceable>value</replaceable></programlisting>
                         </listitem>
                         <listitem>
-                            <para>SEND_BURST - Sets the rate limiter burst to the given
-                                maximum.</para>
-                            <programlisting>SEND_BURST 4
-</programlisting>
+                            <para>SEND_BURST - Set the packet burst-rate  limit to a  per-minute
+                    integer value.</para>
+                            <programlisting>SEND_BURST <replaceable>value</replaceable></programlisting>
                         </listitem>
                     </itemizedlist>
-                    <para> Parameters (all) in server/config. </para>
-                    <para> Go autogeneted docs: go to godocs.org and search for
-                        katezenpost/katzenpost. -- Baseic dev docs</para>
+                    <para><?oxy_comment_start author="dwrob" timestamp="20250207T110653-0800" comment="What does this mean? Do managments commands actually edit the TOML file? What config parameter does each one of these management commands touch?"?>
+            Parameters (all) in server/config. <?oxy_comment_end?></para>
+<!--                    <para> Go autogeneted docs: go to godocs.org and search for
+                        katezenpost/katzenpost. -\- Baseic dev docs</para>
                     <para>Prometheus logging and graphing is to be recommended (has its own
                         documents)</para>
-                    <para/>
-                    <para> </para>
-                </listitem>
-            </itemizedlist></para>
+-->
     
   </section>
     <section xml:id="server-usage">
@@ -126,177 +116,67 @@ Usage of ./&mixserver_binary;:
   -f string
         Path to the server config file. (default "katzenpost.toml")
   -g    Generate the keys and exit immediately.</programlisting>
-        <para>The command output when generating keys looks like this:</para>
-        <programlisting>./server -f my_katzenpost_mix_server.toml -g
-22:51:55.377 NOTI server: Katzenpost is still pre-alpha.  DO NOT DEPEND ON IT FOR STRONG SECURITY OR ANONYMITY.
-22:51:55.377 NOTI server: AEZv5 implementation is hardware accelerated.
-22:51:55.377 NOTI server: Server identifier is: 'example.com'
-22:51:55.379 NOTI server: Server identity public key is: 2628F87F2806048C95F060DA9CD3D8F9BE7550BFB9EE85F213381BC04C047650
-22:51:55.379 NOTI server: Server link public key is: CCDC5C105E649D543DF1CF397A17638F812F95B7E572288F4602F8EC01EC4F3C
-</programlisting>
-        <para>Note that if you choose to configure logging to a file one disk, you can implement log
+        <para>The <code>-f</code> parameter can be used to specify a customized path and filename
+            for the server configuration file, which is typically
+                <filename>/etc/&mixserver_binary;/katzenpost.toml</filename>.</para>
+        <para>The <code>-g</code> option is used to generate the public and private signing and link
+            keys. By default, these must be manually copied to the directory defined by the
+                <filename>DataDir</filename> parameter in
+                <filename>/etc/&mixserver_binary;/katzenpost.toml</filename>.</para>
+<!--        <para>Note that if you choose to configure logging to a file one disk, you can implement log
             rotation by moving the log file and then sending the <code>HUP</code> to the authority
             server process. This will cause the daemon to rewrite the log file in the location
-            specified by the config file.</para>
+            specified by the config file.</para>-->
+    </section>
+    <section xml:id="voter-usage">
+        <info>
+            <title xml:id="voter-usage.title">CLI usage for directory authorities</title>
+        </info>
+        <para>Directory authorities (dirauths) may be controlled individually from the command line. </para>
+        <para>The the dirauth binary <command>&dirauth_binary;</command> has the following
+            command-line usage:</para>
+        <programlisting><prompt>$ </prompt>&dirauth_binary; -h
+Usage of &dirauth_binary;:
+  -f string
+    	Path to the authority config file. (default "katzenpost-authority.toml")
+  -g	Generate the keys and exit immediately.
+  -v	Get version info.</programlisting>
+        <para>The <code>-f</code> parameter can be used to specify a customized path and filename
+            for the server configuration file, which is typically
+                <filename>/etc/&dirauth_binary;/katzenpost-authority.toml</filename>.</para>
+        <para>The <code>-g</code> option is used to generate the public and private signing and link
+            keys. By default, these must be manually copied to the directory defined by the
+                <filename>DataDir</filename> parameter in
+                <filename>/etc/&dirauth_binary;/katzenpost.toml</filename>.</para>
     </section>
     <section>
         <title>Monitoring</title>
-        <para><code><emphasis role="bold">journalctl -u pq-katzenpost-mixserver -f -n
-                    2000</emphasis></code></para>
-        <para><code><emphasis role="bold">iftop -t -s 18000 &gt; log.txt
-            &amp;</emphasis></code></para>
-        <para><code><emphasis role="bold">bmon -p ens3</emphasis></code></para>
-        <para><emphasis role="bold">Log the system stats and active process every 5
-                seconds</emphasis></para>
-        <para> dwrob@hoh:~$ top -i -b -d 5 &gt; top-watchdog.txt</para>
-        <para><emphasis role="bold">Keep an eye on the active updating of that
-            file</emphasis></para>
-        <para> dwrob@hoh:~$ watch -d ls -l </para>
-        <para> Every 2.0s: ls -al top-watchdog.txt hoh: Sun Dec 4 11:06:17 2022</para>
-        <para> -rw-r--r-- 1 dwrob dwrob 16016638 Dec 4 11:06 top-watchdog.txt</para>
-        <para><emphasis role="bold">Watch the actual updates</emphasis></para>
-        <para> dwrob@hoh:~$ tail -f top-watchdog.txt</para>
-        <para><emphasis role="bold">Capture net/disk/sys stats in CSV</emphasis></para>
-        <para> dwrob@hoh:~$ dstat -tndcgy -N enp40s0 --output dstat.csv</para>
-        <para><emphasis role="bold">And in general</emphasis></para>
-        <para><code>dwrob@hoh:~$ bpytop</code></para>
+        <para>&program_name; logging information can be viewed in real time with the following
+            commands:</para>
+        <para>
+            <programlisting><prompt># </prompt><command><emphasis role="bold">journalctl -u &mixserver_binary; -f -n 2000</emphasis></command></programlisting>
+        </para>
+        <para>or</para>
+        <para>
+            <programlisting><prompt># </prompt><command><emphasis role="bold">journalctl -u &dirauth_binary; -f -n 2000</emphasis></command></programlisting>
+        </para>
+        <para>Logging levels include ERROR, WARNING, NOTICE, INFO, and  DEBUG, with INFO as the
+            default. For information about setting the log level, see the documentation for each
+            node type in <link
+                xlink:href="https://katzenpost.network/docs/admin_guide/components.html">Components
+                and configuration of the Katzenpost mixnet</link>.</para>
     </section>
     <section>
-        <title>Service management</title>
-        <para><code><emphasis role="bold">systemctl start
-            pq-katzenpost-mixserver</emphasis></code></para>
-        <para><code><emphasis role="bold">systemctl st</emphasis></code><code><emphasis role="bold"
-                    >op</emphasis></code><code><emphasis role="bold">
-                    pq-katzenpost-mixserver</emphasis></code></para>
-        <para><code><emphasis role="bold">systemctl </emphasis></code><code><emphasis role="bold"
-                    >re</emphasis></code><code><emphasis role="bold">start
-                    pq-katzenpost-mixserver</emphasis></code></para>
-        <para><code><emphasis role="bold">systemctl </emphasis></code><code><emphasis role="bold"
-                    >enable</emphasis></code><code><emphasis role="bold">
-                    pq-katzenpost-mixserver</emphasis></code></para>
+        <title>Managing the mixnet
+            <?oxy_comment_start author="dwrob" timestamp="20250207T122638-0800" comment="How does this work when there is a dirauth?"?>services<?oxy_comment_end?></title>
+        <para>            
+            &basic_commands;  
+        </para>
     </section>
     <section>
+
         <title>Where are the files?</title>
-        <section>
-            <title>Docker test mixnet</title>
-            <para>As provided, the <filename>docker</filename> directory consists of a Makefile and
-                and instructions for using it. Software prerequisites (other than Docker) are
-                downloaded during installation, along with the &program_name; source code, which is
-                built and launched inside of a Docker container. For more information, see </para>
-            <table frame="all">
-                <title/>
-                <tgroup cols="3">
-                    <colspec colnum="1" colname="c1" colwidth="1*"/>
-                    <colspec colnum="2" colname="newCol2" colwidth="1*"/>
-                    <colspec colnum="3" colname="c2" colwidth="1*"/>
-                    <thead>
-                        <row>
-                            <entry>
-                                <para>Directory</para>
-                            </entry>
-                            <entry>
-                                <para>File</para>
-                            </entry>
-                            <entry>
-                                <para>Comment</para>
-                            </entry>
-                        </row>
-                    </thead>
-                    <tbody>
-                        <row>
-                            <entry>
-                                <para><filename>../katzenpost/docker</filename></para>
-                            </entry>
-                            <entry>
-                                <para/>
-                            </entry>
-                            <entry>
-                                <para/>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para/>
-                            </entry>
-                            <entry>
-                                <para><filename>Makefile</filename></para>
-                            </entry>
-                            <entry>
-                                <para>Makefile to build the test mixnet</para>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para/>
-                            </entry>
-                            <entry>
-                                <para><filename>README.rst</filename></para>
-                            </entry>
-                            <entry>
-                                <para>Installation instructions</para>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para><filename>../katzenpost/docker/voting_mixnet</filename></para>
-                            </entry>
-                            <entry>
-                                <para/>
-                            </entry>
-                            <entry>
-                                <para>Only present after installation</para>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para><filename>../katzenpost/docker/voting_mixnet/auth1</filename></para>
-                            </entry>
-                            <entry>
-                                <para/>
-                            </entry>
-                            <entry>
-                                <para/>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para/>
-                            </entry>
-                            <entry>
-                                <para>authority.toml</para>
-                            </entry>
-                            <entry>
-                                <para/>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para/>
-                            </entry>
-                            <entry>
-                                <para>identity.private.pem</para>
-                            </entry>
-                            <entry>
-                                <para/>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para/>
-                            </entry>
-                            <entry>
-                                <para>identity.public.pem</para>
-                            </entry>
-                            <entry>
-                                <para/>
-                            </entry>
-                        </row>
-                    </tbody>
-                </tgroup>
-            </table>
-        </section>
-        <section>
-            <title>Single &program_name; node in a production network</title>
+
             <para>The example shows the components and configuration of a mix node. Other node types
                 (gateway, service, and directory authority) have a corresponding binary executable,
                 a TOML configuration file, a local private/public key pair, and public keys for each
@@ -453,212 +333,6 @@ Usage of ./&mixserver_binary;:
                     </tgroup>
                 </table>
             </para>
-            <para/>
-        </section>
-        <!--        <table frame="all">
-            <title/>
-            <tgroup cols="2">
-                <colspec colnum="1" colname="c1" colwidth="1*"/>
-                <colspec colnum="2" colname="c2" colwidth="1*"/>
-                <thead>
-                    <row>
-                        <entry><para></para></entry>
-                        <entry><para></para></entry>
-                    </row>
-                </thead>
-                <tbody>
-                    <row>
-                        <entry>
-                            <para>/etc/pq-katzenpost-mixserver</para>
-                        </entry>
-                        <entry>
-                            <para></para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para></para> 
-                        </entry>
-                        <entry>
-                            <para></para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para></para> 
-                        </entry>
-                        <entry>
-                            <para></para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para></para>
-                        </entry>
-                        <entry>
-                            <para></para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para></para>  
-                        </entry>
-                        <entry>
-                            <para></para> 
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para></para>  
-                        </entry>
-                        <entry>
-                            <para></para>  
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para></para> 
-                        </entry>
-                        <entry>
-                            <para></para>  
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para></para> 
-                        </entry>
-                        <entry>
-                            <para></para>
-                        </entry>
-                    </row>
-                </tbody>
-            </tgroup>
-        </table>   -->
     </section>
-    <section xml:id="gensphinx">
-        <info>
-            <title xml:id="gensphinx.title">Using <emphasis>gensphinx</emphasis></title>
-        </info>
-        <para>We need the required Go version...seems to be 1.23.</para>
-        <programlisting>./gensphinx -h
-Usage of ./gensphinx:
-  -L int
-        Number of mix layers. (default 3)
-  -UserForwardPayloadLength int
-        UserForwardPayloadLength (default 2000)
-  -kem string
-        Name of the KEM Scheme to be used with Sphinx
-  -nike string
-        Name of the NIKE Scheme to be used with Sphinx (default "x25519")</programlisting>
-        <para>it might not be totally clear from the above usage that: -nike "" must be set if you
-            want to use a KEM because you have to override the NIKE default value</para>
-        <para>not counting Gateway hop and service node hop, if "Number of mix layers" is set to 3
-            then that'd match what we normally deploy</para>
-        <para>but the super paranoid will want to increase that number</para>
-        <para>whereas in your description of gensphinx you didn't mention mix hop count</para>
-    </section>
-    <section xml:id="tuning">
-        <info>
-            <title xml:id="tuning.title"
-                ><?oxy_comment_start author="dwrob" timestamp="20250123T164541-0800" comment="Is Sphinx processing rate only thing that&apos;s tuneable?
 
-There need to be some end-to-end demonstrations of how you use this tool or tools."?>Tuning<?oxy_comment_end?>
-                the &program_name; mixnet</title>
-        </info>
-        <para>[introductory something]</para>
-        <para>This topic assumes that you have cloned the &program_name; repository locally. The
-            Python tuning script is located at the following location:</para>
-        <para>
-            <programlisting><filename>../katzenpost/tools/mixnet-params.py</filename></programlisting>
-        </para>
-        <para>Assuming uniform computational resources across all mix nodes in the network, the
-            script compares a given Sphinx packets-per-second measurement with a set of tuning
-            parameters, and
-            <?oxy_comment_start author="dwrob" timestamp="20250123T164817-0800" comment="What do you do if it&apos;s not?  What KP settings do you change? What is the definition of &quot;fast enough&quot;?"?>assesses
-            whether your Sphinx processing rate is fast enough<?oxy_comment_end?>. </para>
-        <para>Supplying the --help option displays a list of available configuration options.</para>
-        <programlisting><prompt>$ </prompt>python3 <?oxy_comment_start author="dwrob" timestamp="20250123T165118-0800" comment="Does this need to be run in some particular location."?>mixnet-params.py<?oxy_comment_end?> --help
-Usage: mixnet-params.py [OPTIONS]
-
-<?oxy_comment_start author="dwrob" timestamp="20250123T164903-0800" comment="What are these options for, and what do they mean?"?>Options:<?oxy_comment_end?>
-  --benchmark INTEGER
-  --average-delay FLOAT      per second
-  --gateways INTEGER
-  --nodes-per-layer INTEGER
-  --services INTEGER
-  --users INTEGER
-  --user-loops FLOAT         rate of decoy loops per second sent by users
-  --user-traffic INTEGER     rate of real messages per second sent by user
-  --node-loops FLOAT         rate of decoy loops per second sent by nodes
-  --hops INTEGER
-  -P, --LambdaP FLOAT        LambdaP (overrides --user-traffic)
-  -L, --LambdaL FLOAT        LambdaL (overrides --user-loops)
-  -M, --LambdaM FLOAT        LambdaP (overrides --node-loops)
-  --help                     Show this message and exit.   </programlisting>
-        <programlisting>git clone https://github.com/katzenpost/katzenpost.git;
-cd <?oxy_comment_start author="dwrob" timestamp="20250123T165037-0800" comment="Is this the only place where this &quot;go test&quot; command can be run?"?>katzenpost/core/sphinx<?oxy_comment_end?><?oxy_comment_start author="dwrob" timestamp="20250123T164344-0800" comment="What does this have to do with mixnet-params.py?"?>
-go test -bench=.<?oxy_comment_end?></programlisting>
-        <programlisting><?oxy_comment_start author="dwrob" timestamp="20250123T164424-0800" comment="What does this output mean?"?>goos: linux
-goarch: amd64
-pkg: github.com/katzenpost/katzenpost/core/sphinx<?oxy_comment_end?>
-cpu: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
-BenchmarkSphinxCreatePackets/X25519_NIKE-8         	    792	  1485541 ns/op
-BenchmarkSphinxCreatePackets/X448_NIKE-8           	    469	  2555925 ns/op
-BenchmarkSphinxCreatePackets/CTIDH512_PQ_NIKE-8    	      1	3026375627 ns/op
-BenchmarkSphinxCreatePackets/CTIDH512-X448_PQ_Hybrid_NIKE-8         	      1	3063792836 ns/op
-BenchmarkSphinxCreatePackets/CTIDH1024_PQ_NIKE-8                    	      1	12741414288 ns/op
-BenchmarkSphinxCreatePackets/CTIDH1024-X448_PQ_Hybrid_NIKE-8        	      1	12569571208 ns/op
-BenchmarkSphinxCreatePackets/X25519_KEM-8                           	   1664	   727019 ns/op
-BenchmarkSphinxCreatePackets/X448_KEM-8                             	   1090	  1082442 ns/op
-BenchmarkSphinxCreatePackets/CTIDH512_PQ_KEM-8                      	      1	1538248204 ns/op
-BenchmarkSphinxCreatePackets/CTIDH1024_PQ_KEM-8                     	      1	6109724248 ns/op
-BenchmarkSphinxCreatePackets/MLKEM768_KEM-8                         	   2221	   536917 ns/op
-BenchmarkSphinxCreatePackets/sntrup4591761_KEM-8                    	     90	 13523325 ns/op
-BenchmarkSphinxCreatePackets/FrodoKEM-640-SHAKE_KEM-8               	     37	 32329187 ns/op
-BenchmarkSphinxCreatePackets/Xwing_KEM-8                            	   1203	   944127 ns/op
-BenchmarkSphinxCreatePackets/MLKEM768-X25519_KEM-8                  	   1016	  1171913 ns/op
-BenchmarkSphinxCreatePackets/MLKEM768-X448_KEM-8                    	    793	  1509931 ns/op
-BenchmarkSphinxCreatePackets/CTIDH512-X25519_PQ_Hybrid_KEM-8        	      1	1406341839 ns/op
-BenchmarkSphinxCreatePackets/CTIDH1024-X448_PQ_Hybrid_KEM-8         	      1	5699995914 ns/op
-BenchmarkSphinxUnwrap/X25519_NIKE-8                                 	   6342	   182907 ns/op
-BenchmarkSphinxUnwrap/X448_NIKE-8                                   	   4447	   252380 ns/op
-BenchmarkSphinxUnwrap/CTIDH512_PQ_NIKE-8                            	      4	284658195 ns/op
-BenchmarkSphinxUnwrap/CTIDH512-X448_PQ_Hybrid_NIKE-8                	      4	285150375 ns/op
-BenchmarkSphinxUnwrap/CTIDH1024_PQ_NIKE-8                           	      1	1188631263 ns/op
-BenchmarkSphinxUnwrap/CTIDH1024-X448_PQ_Hybrid_NIKE-8               	      1	1192574998 ns/op
-BenchmarkSphinxUnwrap/X25519_KEM-8                                  	  10000	   101941 ns/op
-BenchmarkSphinxUnwrap/X448_KEM-8                                    	   5158	   219443 ns/op
-BenchmarkSphinxUnwrap/CTIDH512_PQ_KEM-8                             	      4	298054689 ns/op
-BenchmarkSphinxUnwrap/CTIDH1024_PQ_KEM-8                            	      1	1178171580 ns/op
-BenchmarkSphinxUnwrap/MLKEM768_KEM-8                                	   8732	   130177 ns/op
-BenchmarkSphinxUnwrap/sntrup4591761_KEM-8                           	    165	  7176763 ns/op
-BenchmarkSphinxUnwrap/FrodoKEM-640-SHAKE_KEM-8                      	    184	  6427438 ns/op
-BenchmarkSphinxUnwrap/Xwing_KEM-8                                   	   6500	   178783 ns/op
-BenchmarkSphinxUnwrap/MLKEM768-X25519_KEM-8                         	   5428	   224135 ns/op
-BenchmarkSphinxUnwrap/MLKEM768-X448_KEM-8                           	   3285	   349691 ns/op
-BenchmarkSphinxUnwrap/CTIDH512-X25519_PQ_Hybrid_KEM-8               	      4	288430198 ns/op
-BenchmarkSphinxUnwrap/CTIDH1024-X448_PQ_Hybrid_KEM-8                	      1	1219502430 ns/op
-PASS
-ok  	github.com/katzenpost/katzenpost/core/sphinx	177.826s</programlisting>
-    </section>
-    <section xml:id="voter-usage">
-        <info>
-            <title xml:id="voter-usage.title">CLI usage for directory authorities</title>
-        </info>
-        <para>Directory authorities (dirauths) may be controlled individually from the command line. </para>
-        <para>The the dirauth binary <command>&dirauth_binary;</command> has the following
-            command-pqline usage:</para>
-        <programlisting><prompt>$ </prompt>&dirauth_binary; -h
-Usage of &dirauth_binary;:
-  -f string
-    	Path to the authority config file. (default "katzenpost-authority.toml")
-  -g	Generate the keys and exit immediately.
-  -v	Get version info.</programlisting>
-        <para>The <code>-f</code> parameter can be used to specify the full path and filename of the
-            server configuration file, typically
-                <filename>/etc/pq-katzenpost-authority/katzenpost-authority.toml</filename>.</para>
-        <para>The <code>-g</code> option is used to generate the public and private signing and link
-            keys. By default, these must be manually copied to the directory defined by
-                <filename>DataDir</filename> in /etc/&mixserver_binary;/ </para>
-    </section>   
 </article>

@@ -5,7 +5,7 @@
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 <?title ?> 
-<?linkTitle "Using with NAT" ?>  <!-- Section menu link text -->
+<?linkTitle "Installation" ?>  <!-- Section menu link text -->
 <?url "docs/admin_guide/install.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
 <?draft "false" ?> <!-- Optional -->
@@ -25,9 +25,313 @@
     <info>
         <title xml:id="nat.title">Installing &program_name;</title>
     </info>
-
-    <para></para>
+    <para/>
     
+    
+    <section xml:id="requirements">    
+        <info>
+            <title xml:id="requirements.title">Requirements</title>
+        </info>
+        <para/>
+        <section xml:id="clone">
+            <info>
+                <title xml:id="clone.title">Obtain the &program_name; code</title>
+        </info>
+            <para>git clone git@github.com:katzenpost/katzenpost.git</para>
+            <para>git clone git@github.com:katzenpost/katzen.git</para>
+            <para>Get latest tagged commit.</para>
+            <para>git fetch --tags </para>
+            <para>tag=$(git describe --tags `git rev-list --tags --max-count=1`) </para>
+            <para>git checkout $tag</para>
+        </section>
+        <section xml:id="install_go">
+            <info>
+                <title xml:id="install_go.title">Install the latest Go version</title>
+            </info>
 
-  
+            <para><code>Getting </code><code>the</code><code> latest
+                            Go</code></para><para><code> https://go.dev/dl/</code></para>
+            <para>Configure environment:</para>
+            <para>export GO111MODULE=on</para>
+            <para>export CGO_CFLAGS_ALLOW="-DPARAMS=sphincs-shake-256f"</para>
+        </section>
+
+        <section xml:id="dependencies">
+            <info>        
+                <title xml:id="dependencies.title">Install additional dependencies</title>
+            </info>
+            <para>apt install git gcc build-essential libc-dev-bin</para>
+        </section>        
+    </section>
+    
+    <section xml:id="build">    
+        <info>
+            <title xml:id="build.title">Build components</title>
+        </info>
+        
+        <procedure>
+            
+            <step>
+                <para>cd server/cmd/server/</para>
+        <para> go build</para>
+            </step>   
+            <step>
+                <para></para>
+                <para> cd ../../../authority/cmd/dirauth</para>
+        <para> go build</para>
+            </step>   
+            <step>
+               
+                <para> cd ../../../panda/server/cmd/panda_server/</para>
+        <para> go build</para>
+            </step>   
+            <step>
+               
+                <para> cd ../../../../memspool/server/cmd/memspool/</para>
+        <para> go build</para>
+
+            </step>  
+            
+              
+            
+            
+            
+            
+            
+            <step>
+                <programlisting>cd katzenpost/genconfig    
+dwrob@tolt:~/katzenpost/genconfig$ ls -al
+total 15000
+drwxr-xr-x  2 dwrob dwrob     4096 Feb  5 14:10 .
+drwxr-xr-x 29 dwrob dwrob     4096 Feb  5 11:54 ..
+-rw-r--r--  1 dwrob dwrob    27098 Feb  5 11:54 main.go
+
+go build
+
+dwrob@tolt:~/katzenpost/genconfig$ ls -al
+total 15000
+drwxr-xr-x  2 dwrob dwrob     4096 Feb  5 14:10 .
+drwxr-xr-x 29 dwrob dwrob     4096 Feb  5 11:54 ..
+-rwxr-xr-x  1 dwrob dwrob 15320824 Feb  5 14:18 genconfig
+-rw-r--r--  1 dwrob dwrob    27098 Feb  5 11:54 main.go</programlisting> 
+            </step>   
+            <step>
+                <para></para>
+            </step>   
+            <step>
+                <para></para>
+            </step>   
+            <step>
+                <para></para>
+            </step>   
+            <step>
+                <para></para>
+            </step>              
+        </procedure>
+
+        <procedure>            
+            <step>
+                <para>cd ~/katzenpost</para>
+            </step>   
+            <step>
+                <para> sudo cp server/cmd/server/server /usr/local/bin/pq-katzenpost-mixserver</para>
+            </step>   
+            <step>
+                <para> sudo cp authority/cmd/dirauth/dirauth
+                /usr/local/bin/pq-katzenpost-authority</para>
+            </step>   
+            <step>
+                <para> sudo cp panda/server/cmd/panda_server/panda_server
+                /usr/local/bin/panda_server</para>
+            </step>   
+            <step>
+                <para> sudo cp memspool/server/cmd/memspool/memspool /usr/local/bin/memspool</para>
+                <para/>
+                <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>What about
+                    Katzen?<?oxy_custom_end?></para>
+                <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>What about
+                    other components (tools)?<?oxy_custom_end?></para>
+            </step>                  
+        </procedure>
+    </section>
+    <section xml:id="configure">
+        <info>
+            <title xml:id="configure.title">Configure components</title>
+        </info>
+        <para/>
+        <programlisting>dwrob@tolt:~/katzenpost/genconfig$ ./genconfig -h
+
+Usage of ./genconfig:
+-D	Dynamic topology (omit fixed topology definition)
+-L int
+    Number of layers. (default 3)
+-P int
+    First port number to use (default 30000)
+-S string
+    suffix for binaries in docker-compose.yml
+-UserForwardPayloadLength int
+    UserForwardPayloadLength (default 2000)
+-a string
+    Address to bind to (default "127.0.0.1")
+-b string
+    Path to use as baseDir option
+-d string
+    Docker image for compose-compose (default "katzenpost-go_mod")
+-dialTimeout int
+    Session dial timeout
+-gateways int
+    Number of gateways. (default 1)
+-kem string
+    Name of the KEM Scheme to be used with Sphinx
+-lD float
+    Inverse of mean of drop decoy send rate LambdaD (default 0.0005)
+-lDMax uint
+    Maximum delay for LambaD (default 3000)
+-lGMax uint
+    Maximum delay for LambdaM (default 100)
+-lL float
+    Inverse of mean of loop decoy send rate LambdaL (default 0.0005)
+-lLMax uint
+    Maximum delay for LambdaL (default 1000)
+-lM float
+    Inverse of mean of mix decoy send rate (default 0.2)
+-lMMax uint
+    Maximum delay for LambdaM (default 100)
+-lP float
+    Inverse of mean for client send rate LambdaP (default 0.001)
+-lPMax uint
+    Maximum delay for LambdaP. (default 1000)
+-log_level string
+    logging level could be set to: DEBUG, INFO, NOTICE, WARNING, ERROR, CRITICAL (default "DEBUG")
+-maxPKIDelay int
+    Initial maximum PKI retrieval delay
+-mu float
+    Inverse of mean of per hop delay. (default 0.005)
+-muMax uint
+    Maximum delay for Mu. (default 1000)
+-n int
+    Number of mixes. (default 6)
+-nike string
+    Name of the NIKE Scheme to be used with Sphinx (default "x25519")
+-noDecoy
+    Disable decoy traffic for the client (default true)
+-noMixDecoy
+    Disable decoy traffic for the mixes (default true)
+-nv int
+    Generate voting configuration (default 3)
+-o string
+    Path to write files to
+-pkiScheme string
+    PKI Signature Scheme to be used (default "ed25519")
+-pollingIntvl int
+    Polling interval
+-ratchetNike string
+    Name of the NIKE Scheme to be used with the doubleratchet (default "CTIDH512-X25519")
+-serviceNodes int
+    Number of providers. (default 1)
+-sr uint
+    Sendrate limit
+-v	Generate voting configuration
+-wirekem string
+    Name of the KEM Scheme to be used with wire protocol</programlisting>
+    </section>
+    <section xml:id="generate-keys">
+        <info>
+        <title xml:id="generate-keys.title">Generate keys</title>
+        </info>
+        <para/>
+    </section>
+    <section xml:id="service-accounts">
+        <info>
+            <title xml:id="service-account.titles">Create service accounts</title>
+        </info>
+        <para>Create a service account account for each of the node types that you deploy.</para>
+        <formalpara>
+            <title>To create a service user for a directory authority</title>
+            <para><programlisting><prompt># </prompt><command>adduser \
+    --disabled-login \
+    --disabled-password \ 
+    --system \
+    --group \
+    --home /var/lib/pq-katzenpost-authority \
+    pq-katzenpost-authority</command></programlisting></para>
+        </formalpara>
+       <formalpara>
+            <title>To create a service user for a mix, gateway, or service node</title>
+            <para><programlisting><prompt># </prompt><command>adduser \
+    --disabled-login \
+    --disabled-password \ 
+    --system \
+    --group \
+    --home /var/lib/pq-katzenpost-mixserver \
+    pq-katzenpost-mixserver</command></programlisting></para>
+        </formalpara>
+    </section>
+    <section xml:id="systemd">
+        <info>
+            <title xml:id="systemd.title">Configure systemd</title>
+        </info>
+        <para>If you are running your &program_name; components under <link
+                xlink:href="https://systemd.io/">systemd</link>, create and install a systemd
+            service file for each node type that you plan to deploy. The following scripts are
+            examples of how to do this.</para>
+        <formalpara>
+            <title>To create a systemd service file for a directory authority</title>
+            <para>
+                <programlisting>#!/bin/bash -x
+
+cat &lt;&lt; EOF > /etc/systemd/system/pq-katzenpost-mixserver.service
+[Unit]
+Description=pq Katzenpost Mix Server
+After=network.target
+
+[Service]
+IPAccounting=yes
+Type=simple
+User=pq-katzenpost-mixserver
+WorkingDirectory=/var/lib/pq-katzenpost-mixserver
+ExecStart=/usr/local/bin/pq-katzenpost-mixserver -f /etc/pq-katzenpost-mixserver/katzenpost.toml
+PrivateTmp=yes
+NoNewPrivileges=yes
+# RestartSec=5
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF</programlisting>
+            </para>            
+        </formalpara>
+        <formalpara><title>To create a systemd service file for a mix, gateway, or service node</title> 
+            <para>
+                <programlisting>#!/bin/bash -x
+
+cat &lt;&lt; EOF > /etc/systemd/system/pq-katzenpost-authority.service
+[Unit]
+Description=pq Katzenpost Authority
+After=network.target
+
+[Service]
+Type=simple
+IPAccounting=yes
+User=pq-katzenpost-authority
+WorkingDirectory=/var/lib/pq-katzenpost-authority
+ExecStart=/usr/local/bin/pq-katzenpost-authority -f /etc/pq-katzenpost-authority/authority.toml
+PrivateTmp=yes
+NoNewPrivileges=yes
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF</programlisting>
+            </para>
+        </formalpara>
+    </section>
+    <section xml:id="start-stop">    
+        <info>
+            <title xml:id="start-stop.title">Managing the mixnet</title>
+        </info> 
+        <para>            
+            &basic_commands;  
+        </para>
+    </section>
 </article>

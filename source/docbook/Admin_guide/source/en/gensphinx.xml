@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?> 
+<?linkTitle "Gensphinx" ?>  <!-- Section menu link text -->
+<?url "docs/admin_guide/gensphinx.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft false ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 60 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+    %shared-content;
+]>
+
+<article    xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
+    xml:id="gensphinx">
+
+    <info>
+        <title xml:id="gensphinx.title">Using <emphasis>gensphinx</emphasis>, the Sphinx
+            congifuration generator</title>    
+    </info>
+    
+    
+    <para>The complexity and interdependence of Sphinx parameters makes use of a dedicated
+        configuration tool necessary when are creating a new &program_name; Sphinx
+        configuration. The gensphinx tool </para>
+    <programlisting>./gensphinx -h
+Usage of ./gensphinx:
+  -L int
+        Number of mix layers. (default 3)
+  -UserForwardPayloadLength int
+        UserForwardPayloadLength (default 2000)
+  -kem string
+        Name of the KEM Scheme to be used with Sphinx
+  -nike string
+        Name of the NIKE Scheme to be used with Sphinx (default "x25519")</programlisting>
+    <para>it might not be totally clear from the above usage that: -nike "" must be set if you
+        want to use a KEM because you have to override the NIKE default value</para>
+    <para>not counting Gateway hop and service node hop, if "Number of mix layers" is set to 3
+        then that'd match what we normally deploy</para>
+    <para>but the super paranoid will want to increase that number</para>
+    <para>whereas in your description of gensphinx you didn't mention mix hop count</para>
+    </section>
+
+</article>
