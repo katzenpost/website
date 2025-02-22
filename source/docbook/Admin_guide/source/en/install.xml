@@ -25,221 +25,140 @@
     <info>
         <title xml:id="nat.title">Installing &program_name;</title>
     </info>
-    <para/>
+    <para>The section describes how to download &program_name;, set up a development environment,
+        build the code, install the &program_name; binaries, and configure the components. </para>
     
     
     <section xml:id="requirements">    
         <info>
             <title xml:id="requirements.title">Requirements</title>
         </info>
-        <para/>
+        <para>An up-to-date <link xlink:href="https://www.debian.org">Debian</link> or <link
+                xlink:href="https://ubuntu.com">Ubuntu</link> Linux system is assumed as the build
+            and hosting environment for all &program_name; server-side components. Required packages
+            include the following:</para>
+        <itemizedlist>
+            <listitem>
+                <para><command>git </command></para>
+            </listitem>
+            <listitem>
+                <para><command>gcc </command></para>
+            </listitem>
+            <listitem>
+                <para><command>build-essential</command>
+                </para>
+            </listitem>
+            <listitem>
+                <para><command>libc-dev-bin</command></para>
+            </listitem>
+        </itemizedlist>
         <section xml:id="clone">
             <info>
                 <title xml:id="clone.title">Obtain the &program_name; code</title>
         </info>
-            <para>git clone git@github.com:katzenpost/katzenpost.git</para>
-            <para>git clone git@github.com:katzenpost/katzen.git</para>
-            <para>Get latest tagged commit.</para>
-            <para>git fetch --tags </para>
-            <para>tag=$(git describe --tags `git rev-list --tags --max-count=1`) </para>
-            <para>git checkout $tag</para>
+            <para>Complete the following steps to set up a local &program_name; git repository.<procedure>
+                    <step>
+                        <para>Clone &program_name; (server
+                            components).<programlisting><prompt>$ </prompt><command>git clone git@github.com:katzenpost/katzenpost.git</command></programlisting></para>
+                    </step>
+                    <step>
+                        <para>Clone Katzen (chat client).</para>
+                        <programlisting><prompt>$ </prompt><command>git clone git@github.com:katzenpost/katzen.git</command></programlisting>
+                    </step>
+                    <step>
+                        <para>Get latest tagged commit with the following commands.</para>
+                        <programlisting><prompt>$ </prompt><command>git fetch --tags</command>
+<prompt>$ </prompt><command>tag=$(git describe --tags `git rev-list --tags --max-count=1`)</command>
+<prompt>$ </prompt><command>git checkout $tag</command> </programlisting>
+                    </step>
+                </procedure></para>
         </section>
         <section xml:id="install_go">
             <info>
                 <title xml:id="install_go.title">Install the latest Go version</title>
             </info>
 
-            <para><code>Getting </code><code>the</code><code> latest
-                            Go</code></para><para><code> https://go.dev/dl/</code></para>
-            <para>Configure environment:</para>
-            <para>export GO111MODULE=on</para>
-            <para>export CGO_CFLAGS_ALLOW="-DPARAMS=sphincs-shake-256f"</para>
-        </section>
-
-        <section xml:id="dependencies">
-            <info>        
-                <title xml:id="dependencies.title">Install additional dependencies</title>
-            </info>
-            <para>apt install git gcc build-essential libc-dev-bin</para>
+            <para>Download the latest version of the Go programming language from <link
+                    xlink:href="https://go.dev/dl">https://go.dev/dl</link> and unzip it in a
+                suitable location. As root, set the necessary environment variables:<programlisting><prompt># </prompt><command>export PATH=$PATH:/<replaceable>&lt;your Go location></replaceable>/bin</command>
+<prompt># </prompt><command>export GO111MODULE=on</command>
+<prompt># </prompt><command>export CGO_CFLAGS_ALLOW="-DPARAMS=sphincs-shake-256f"</command></programlisting><note>
+                    <para>Do not use the Debian <command>golang</command> package, which is probably
+                        too old.</para>
+                </note></para>
         </section>        
     </section>
     
     <section xml:id="build">    
         <info>
-            <title xml:id="build.title">Build components</title>
+            <title xml:id="build.title">Build server components</title>
         </info>
-        
-        <procedure>
-            
-            <step>
-                <para>cd server/cmd/server/</para>
-        <para> go build</para>
-            </step>   
-            <step>
-                <para></para>
-                <para> cd ../../../authority/cmd/dirauth</para>
-        <para> go build</para>
-            </step>   
-            <step>
-               
-                <para> cd ../../../panda/server/cmd/panda_server/</para>
-        <para> go build</para>
-            </step>   
-            <step>
-               
-                <para> cd ../../../../memspool/server/cmd/memspool/</para>
-        <para> go build</para>
-
-            </step>  
-            
-              
-            
-            
-            
-            
-            
-            <step>
-                <programlisting>cd katzenpost/genconfig    
-dwrob@tolt:~/katzenpost/genconfig$ ls -al
-total 15000
-drwxr-xr-x  2 dwrob dwrob     4096 Feb  5 14:10 .
-drwxr-xr-x 29 dwrob dwrob     4096 Feb  5 11:54 ..
--rw-r--r--  1 dwrob dwrob    27098 Feb  5 11:54 main.go
-
-go build
-
-dwrob@tolt:~/katzenpost/genconfig$ ls -al
-total 15000
-drwxr-xr-x  2 dwrob dwrob     4096 Feb  5 14:10 .
-drwxr-xr-x 29 dwrob dwrob     4096 Feb  5 11:54 ..
--rwxr-xr-x  1 dwrob dwrob 15320824 Feb  5 14:18 genconfig
--rw-r--r--  1 dwrob dwrob    27098 Feb  5 11:54 main.go</programlisting> 
-            </step>   
-            <step>
-                <para></para>
-            </step>   
-            <step>
-                <para></para>
-            </step>   
-            <step>
-                <para></para>
-            </step>   
-            <step>
-                <para></para>
-            </step>              
-        </procedure>
-
-        <procedure>            
-            <step>
-                <para>cd ~/katzenpost</para>
-            </step>   
-            <step>
-                <para> sudo cp server/cmd/server/server /usr/local/bin/pq-katzenpost-mixserver</para>
-            </step>   
-            <step>
-                <para> sudo cp authority/cmd/dirauth/dirauth
-                /usr/local/bin/pq-katzenpost-authority</para>
-            </step>   
-            <step>
-                <para> sudo cp panda/server/cmd/panda_server/panda_server
-                /usr/local/bin/panda_server</para>
-            </step>   
-            <step>
-                <para> sudo cp memspool/server/cmd/memspool/memspool /usr/local/bin/memspool</para>
-                <para/>
-                <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>What about
-                    Katzen?<?oxy_custom_end?></para>
-                <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>What about
-                    other components (tools)?<?oxy_custom_end?></para>
-            </step>                  
-        </procedure>
+        <para>To build each of the &program_name; components, navigate to the directory containing
+            its source code and run <command>go build</command>. The paths shown are relative to the
+            &program_name; repository root.</para>
+        <para>
+            <table frame="all">
+                <?oxy_comment_start author="dwrob" timestamp="20250214T102503+0100" comment="There are other directories for other components, but these are the ones included in build-pqkp.sh."?>
+                <title>Component directories<?oxy_comment_end?></title>
+                <tgroup cols="3">
+                    <colspec colnum="1" colname="c1" colwidth="1*"/>
+                    <colspec colnum="2" colname="c2" colwidth="1*"/>
+                    <colspec colnum="3" colname="newCol3" colwidth="1*"/>
+                    <thead>
+                        <row>
+                            <entry>Component</entry>
+                            <entry>Source code directory</entry>
+                            <entry>Binary</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>Mix, gateway, or service node</entry>
+                            <entry>server/cmd/server/</entry>
+                            <entry>server</entry>
+                        </row>
+                        <row>
+                            <entry>Directory authority</entry>
+                            <entry>authority/cmd/dirauth/</entry>
+                            <entry>dirauth</entry>
+                        </row>
+                        <row>
+                            <entry>Panda server</entry>
+                            <entry>panda/server/cmd/panda_server/</entry>
+                            <entry/>
+                        </row>
+                        <row>
+                            <?oxy_comment_start author="dwrob" timestamp="20250218T150240+0100" comment="Should panda and memspool even be discussed?"?>
+                            <entry>Memspool</entry>
+                            <entry>memspool/server/cmd/memspool/</entry><?oxy_comment_end?>
+                            <entry/>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+        </para>
+    </section>
+    <section>
+        <title>Install the server components</title>
+        <para>To install the server binaries, run the following commands from the katzenpost
+            repository root.</para>
+        <programlisting><prompt># </prompt>cp server/cmd/server/server /usr/local/bin/pq-katzenpost-mixserver
+<prompt># </prompt>cp authority/cmd/dirauth/dirauth /usr/local/bin/pq-katzenpost-authority
+<?oxy_comment_start author="dwrob" timestamp="20250218T150841+0100" comment="Should panda and memspool even be discussed?"?><prompt># </prompt>cp panda/server/cmd/panda_server/panda_server /usr/local/bin/panda_server
+<prompt># </prompt>cp memspool/server/cmd/memspool/memspool /usr/local/bin/memspool</programlisting><?oxy_comment_end?>
     </section>
     <section xml:id="configure">
         <info>
-            <title xml:id="configure.title">Configure components</title>
+            <title xml:id="configure.title">Create configuration files</title>
         </info>
         <para/>
-        <programlisting>dwrob@tolt:~/katzenpost/genconfig$ ./genconfig -h
-
-Usage of ./genconfig:
--D	Dynamic topology (omit fixed topology definition)
--L int
-    Number of layers. (default 3)
--P int
-    First port number to use (default 30000)
--S string
-    suffix for binaries in docker-compose.yml
--UserForwardPayloadLength int
-    UserForwardPayloadLength (default 2000)
--a string
-    Address to bind to (default "127.0.0.1")
--b string
-    Path to use as baseDir option
--d string
-    Docker image for compose-compose (default "katzenpost-go_mod")
--dialTimeout int
-    Session dial timeout
--gateways int
-    Number of gateways. (default 1)
--kem string
-    Name of the KEM Scheme to be used with Sphinx
--lD float
-    Inverse of mean of drop decoy send rate LambdaD (default 0.0005)
--lDMax uint
-    Maximum delay for LambaD (default 3000)
--lGMax uint
-    Maximum delay for LambdaM (default 100)
--lL float
-    Inverse of mean of loop decoy send rate LambdaL (default 0.0005)
--lLMax uint
-    Maximum delay for LambdaL (default 1000)
--lM float
-    Inverse of mean of mix decoy send rate (default 0.2)
--lMMax uint
-    Maximum delay for LambdaM (default 100)
--lP float
-    Inverse of mean for client send rate LambdaP (default 0.001)
--lPMax uint
-    Maximum delay for LambdaP. (default 1000)
--log_level string
-    logging level could be set to: DEBUG, INFO, NOTICE, WARNING, ERROR, CRITICAL (default "DEBUG")
--maxPKIDelay int
-    Initial maximum PKI retrieval delay
--mu float
-    Inverse of mean of per hop delay. (default 0.005)
--muMax uint
-    Maximum delay for Mu. (default 1000)
--n int
-    Number of mixes. (default 6)
--nike string
-    Name of the NIKE Scheme to be used with Sphinx (default "x25519")
--noDecoy
-    Disable decoy traffic for the client (default true)
--noMixDecoy
-    Disable decoy traffic for the mixes (default true)
--nv int
-    Generate voting configuration (default 3)
--o string
-    Path to write files to
--pkiScheme string
-    PKI Signature Scheme to be used (default "ed25519")
--pollingIntvl int
-    Polling interval
--ratchetNike string
-    Name of the NIKE Scheme to be used with the doubleratchet (default "CTIDH512-X25519")
--serviceNodes int
-    Number of providers. (default 1)
--sr uint
-    Sendrate limit
--v	Generate voting configuration
--wirekem string
-    Name of the KEM Scheme to be used with wire protocol</programlisting>
     </section>
     <section xml:id="generate-keys">
         <info>
         <title xml:id="generate-keys.title">Generate keys</title>
         </info>
-        <para/>
+        <para>When you run either the server or dirauth binary, keys are generated automatically if
+            none are found</para>
     </section>
     <section xml:id="service-accounts">
         <info>
@@ -326,12 +245,18 @@ EOF</programlisting>
             </para>
         </formalpara>
     </section>
+    <section>
+        <title>Build the chat client</title>
+        <para>To build the Katzen chat client, navigate to thekatzen repository and run <command>go
+                build</command>.<note>
+                <para>The Katzen client is not currently working.</para>
+            </note></para>
+    </section>
     <section xml:id="start-stop">    
         <info>
             <title xml:id="start-stop.title">Managing the mixnet</title>
         </info> 
-        <para>            
-            &basic_commands;  
-        </para>
+        <para> &basic_commands;<?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+            Dirauth, too<?oxy_custom_end?></para>
     </section>
 </article>

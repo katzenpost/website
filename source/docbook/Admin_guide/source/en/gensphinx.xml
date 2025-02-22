@@ -48,6 +48,6 @@ Usage of ./gensphinx:
         then that'd match what we normally deploy</para>
     <para>but the super paranoid will want to increase that number</para>
     <para>whereas in your description of gensphinx you didn't mention mix hop count</para>
-    </section>
+
 
 </article>
