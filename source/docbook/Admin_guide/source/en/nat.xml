@@ -23,27 +23,21 @@
     version="5.1" xml:id="nat">
     
     <info>
-        <title xml:id="nat.title">Using &program_name; with NAT and Tor</title>
+        <title xml:id="nat.title">Running &program_name; services behind NAT</title>
     </info>
 
     <para>Any &program_name; server node can be configured to support NAT and similar network
-        topologies (such as Tor) that traverse public and private network boundaries. All
-        &program_name; node types (mix nodes, gateway nodes, service nodes, and dirauths) can be
-        used from behind <link xlink:href="https://www.rfc-editor.org/rfc/rfc1631">network address
-            translation (NAT)</link> routers. A variation of NAT topology may be used for hosting in
-        a container environment, such as Docker, or when a node runs in a virtualized environment,
-        such as Qemu or KVM. Additionally, gateway nodes running a Tor <link
-            xlink:href="https://tb-manual.torproject.org/onion-services/">onion service</link> can
-        be accessed from the Internet using an onion address. </para>
-    <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Some indirect network
-        scenarios that involve NAT, such as Amazon EC2, are effectively transparent and require no
-        special &program_name; configuration. More t<?oxy_custom_end?>ypically, the router
-        connecting a LAN with the Internet blocks incoming connections by default, and must be
-        configured to forward traffic from the Internet to a destination LAN host based on port
-        number. (Router configuration for a NAT topology is beyond the scope of this topic.) For
-        these cases, where the host listens on a LAN <code>address:port</code> but is accessed
-        publicly from another <code>address:port</code>, &program_name; provides a mechanism to
-        specify both addresses and to share access information with peers and clients.</para>
+        topologies (such as Tor) that traverse public and private network boundaries. This applies
+        to directory authorities, gateways that allow clients to connect to the network, mix nodes,
+        and service nodes that provide protocols over the mix network such as ping and spool
+        services for storing messages or rendezvous information.</para>
+    <para>Typically, the router connecting a LAN with the Internet blocks incoming connections by
+        default, and must be configured to forward traffic from the Internet to a destination LAN
+        host based on port number. (Router configuration for a NAT topology is beyond the scope of
+        this topic.) For these cases, where the host listens on a LAN <code>address:port</code> but
+        is accessed publicly from another <code>address:port</code>, &program_name; provides a
+        mechanism to specify both addresses and to share access information with peers and
+        clients.</para>
 
     <para>
         <note>
@@ -164,14 +158,15 @@
             parameter has been changed to a public address (the NAT router's WAN address), including
             a port. It is assumed that the router is configured to forward traffic routed to this
                 <code>address:port</code> to the mixnet node over the LAN. <note>
-                <para>Directory authorities do not support the BindAddresses parameter, but can
-                    still be used behing NAT. For more information, see <xref endterm="dirauth-nat.title" linkend="dirauth-nat" /></para>
+                <para>Directory authorities do not support the <code>BindAddresses</code> parameter,
+                    but can still be used behind NAT. For more information, see <xref
+                        endterm="dirauth-nat.title" linkend="dirauth-nat"/></para>
             </note></para>
     </section>
     <section>
         <title>Hosting mix, gateway, and service nodes behind NAT</title>
-        <para>The following sections  illustrate supported &program_name; topologies that make use
-            of the <parameter>BindAddresses</parameter> parameter.</para>
+        <para>The following sections illustrate supported &program_name; topologies that make use of
+            the <parameter>BindAddresses</parameter> parameter. </para>
         <section xml:id="peer-to-peer">
             <title xml:id="peer-to-peer.title">Peer-to-peer connections involving NAT</title>
             <para>In this scenario, a mix node behind NAT listens on local addresses for
@@ -203,14 +198,14 @@
                 </listitem>
                 <listitem>
                     <para>The <parameter>Addresses</parameter> parameter specifies the publicly
-                        routable address (203.0.113.10) and a port (1234) over which the mix node
-                        can be reached from the Internet. This value is periodically advertised in
-                        the PKI document to other components of the mix network.</para>
+                        routable address:port, 203.0.113.10:1234, over which the mix node can be
+                        reached from the Internet. This value is periodically advertised in the PKI
+                        document to other components of the mix network.</para>
                 </listitem>
                 <listitem>
                     <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
-                        address (127.0.0.1) and a port (1234) on which the node listens for incoming
-                        Sphinx packets from peers.</para>
+                        address:port, 127.0.0.1:1234, on which the node listens for incoming Sphinx
+                        packets from peers.</para>
                 </listitem>
                 <listitem>
                     <para>The mix node also has a LAN address, 192.168.0.2, which does not appear in
@@ -260,14 +255,14 @@
                 </listitem>
                 <listitem>
                     <para>The <parameter>Addresses</parameter> parameter specifies the publicly
-                        routable address (203.0.113.10) and a port (1234) over which the gateway
-                        node can be reached from the Internet. This value is periodically advertised
-                        in the PKI document to other components of the mix network.</para>
+                        routable address:port, 203.0.113.10:1234, over which the gateway node can be
+                        reached from the Internet. This value is periodically advertised in the PKI
+                        document to other components of the mix network.</para>
                 </listitem>
                 <listitem>
                     <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
-                        address (127.0.0.1) and a port (1234) on which the node listens for incoming
-                        Sphinx packets from clients.</para>
+                        address:port, 127.0.0.1:1234, on which the node listens for incoming Sphinx
+                        packets from clients.</para>
                 </listitem>
                 <listitem>
                     <para>The gateway node also has a LAN address, 192.168.0.2, which does not
@@ -318,22 +313,21 @@
                 </listitem>
                 <listitem>
                     <para>The gateway node exposes itself to the network as an onion (hidden)
-                        service bound to the loopback address (127.0.0.1) and a port (1234). This
-                        requires a Tor daemon to be running on the node and for the Tor
-                        configuration file <code>/etc/tor/torrc</code> to contain the lines
-                        shown.</para>
+                        service bound to the loopback address:port, 127.0.0.1:1234. This requires a
+                        Tor daemon to be running on the node and for the Tor configuration file
+                            <code>/etc/tor/torrc</code> to contain the lines shown.</para>
                 </listitem>
                 <listitem>
-                    <para>The <parameter>Addresses</parameter> parameter specifies the onion address
-                            (<code>address.onion</code>) and a port (1234) over which the gateway
-                        node can be reached by way of the Tor network. This value is periodically
+                    <para>The <parameter>Addresses</parameter> parameter specifies the onion
+                        address:port, <code>address.onion</code>:1234, over which the gateway node
+                        can be reached by way of the Tor network. This value is periodically
                         advertised in the PKI document to other components of the mix
                         network.</para>
                 </listitem>
                 <listitem>
                     <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
-                        address (127.0.0.1) and a port (1234) on which the node listens for incoming
-                        Sphinx packets from clients.</para>
+                        address:port, 127.0.0.1:1234, on which the node listens for incoming Sphinx
+                        packets from clients.</para>
                 </listitem>
                 <listitem>
                     <para>The gateway node also has a LAN address, 192.168.0.2, which does not
@@ -356,9 +350,11 @@
     <section xml:id="dirauth-nat">
         <title xml:id="dirauth-nat.title">Hosting a directory authority behind NAT</title>
         <para>Directory authorities have no support for the <parameter>BindAddresses</parameter>
-            parameter. In this case, the <code>Addresses</code> parameter defines both the listening
-            address and the internal target of any NAT operation. A public address can be routed by
-            a NAT device to any internal target with a known route across the LAN, even to a
+            parameter. The <code>Addresses</code> parameter for directory authorities has the same
+            semantics as <code>BindAddress</code> for the other node types. Importantly, directory
+            authorities do not advertise their addresses in the network consensus because every peer
+            must already know the addresses to fetch the consensus. A public address can be routed
+            by a NAT device to any internal target with a known route across the LAN, even to a
                 <emphasis>different</emphasis> public IP address on a multihomed host, as in the
             following scenario.</para>
         <figure>
@@ -398,7 +394,7 @@
                     LAN address 192.168.0.1.</para>
             </listitem>
             <listitem>
-                <para>The NAT device routes traffic for 198.51.100.50:1234 to the IP address
+                <para>The NAT device routes traffic for 198.51.100.50:1234 to the IP address:port
                     specified in <code>Addresses</code>,  203.0.113.75:1234.</para>
             </listitem>
             <listitem>
