@@ -3,7 +3,7 @@ title:
 linkTitle: "Docker test network" 
 description: "" 
 url: "docs/admin_guide/docker.html" 
-date: "2025-01-08T12:50:03.505791475-08:00"
+date: "2025-02-25T11:53:42.219580011+01:00"
 draft: false 
 slug: "" 
 layout: "" 
@@ -47,7 +47,6 @@ weight: 20
                      <dt><span class="section"><a href="#d58e584">The Docker file tree</a></span></dt>
                   </dl>
                </dd>
-               <dt><span class="section"><a href="#d58e596"></a></span></dt>
             </dl>
          </div>
          <p>Katzenpost provides a ready-to-deploy Docker
@@ -105,7 +104,7 @@ weight: 20
                      <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                         <table border="0" summary="Note">
                            <tr>
-                              <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                              <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                               <th align="left">Note</th>
                            </tr>
                            <tr>
@@ -318,7 +317,7 @@ weight: 20
                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                   <table border="0" summary="Note">
                      <tr>
-                        <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                        <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                         <th align="left">Note</th>
                      </tr>
                      <tr>
@@ -405,7 +404,7 @@ weight: 20
                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                   <table border="0" summary="Note">
                      <tr>
-                        <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                        <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                         <th align="left">Note</th>
                      </tr>
                      <tr>
@@ -566,7 +565,7 @@ weight: 20
             <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
                <table border="0" summary="Warning">
                   <tr>
-                     <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                     <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
                      <th align="left">Warning</th>
                   </tr>
                   <tr>
@@ -581,7 +580,7 @@ weight: 20
                gray blocks represent nodes, and the arrows represent information transfer. </p>
             <div class="figure"><a name="d58e445"></a><p class="title"><b>Figure&nbsp;1.&nbsp;Test network topology</b></p>
                <div class="figure-contents">
-                  <div class="mediaobject"><img src="../../pix/katzenpost-docker.png"></div>
+                  <div class="mediaobject"><img src="pix/katzenpost-docker.png"></div>
                </div>
             </div><br class="figure-break"><p>On the left, the <span class="bold"><strong>Client</strong></span> transmits a message (shown by
                purple arrows) through the <span class="bold"><strong>Gateway node</strong></span>, across three
@@ -717,17 +716,7 @@ weight: 20
                   as highlighted in the listing. For help in understanding these files and a complete
                   list of configuration options, follow the links in <span class="guilabel">Table 2: Test mixnet
                      hosts</span>.</p>
-            </div>
-         </div>
-         <div class="section">
-            <div class="titlepage">
-               <div>
-                  <div>
-                     <h2 class="title" style="clear: both"><a name="d58e596"></a></h2>
-                  </div>
-               </div>
-            </div>
-            <pre class="programlisting">katzenpost/docker/voting_mixnet/
+               <pre class="programlisting">katzenpost/docker/voting_mixnet/
 |---<span class="bold"><strong>auth1</strong></span>
 |&nbsp;&nbsp; |---<span class="bold"><strong>authority.toml</strong></span>
 |&nbsp;&nbsp; |---identity.private.pem
@@ -816,7 +805,8 @@ weight: 20
 |&nbsp;&nbsp; |---pigeonHole.19.log
 |&nbsp;&nbsp; |---proxy.31.log
 |---voting_mixnet</pre>
-            <p>Examples of complete TOML configuration files are provided in <a class="link" href="https://katzenpost.network/docs/admin_guide/docker-config.html" target="_top">Appendix: Configuration files from the Docker test mixnet</a>.</p>
+               <p>Examples of complete TOML configuration files are provided in <a class="link" href="https://katzenpost.network/docs/admin_guide/docker-config.html" target="_top">Appendix: Configuration files from the Docker test mixnet</a>.</p>
+            </div>
          </div>
       </div>
    </body>

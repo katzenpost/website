@@ -358,7 +358,7 @@
         <para>Directory authorities have no support for the <parameter>BindAddresses</parameter>
             parameter. In this case, the <code>Addresses</code> parameter defines both the listening
             address and the internal target of any NAT operation. A public address can be routed by
-            a NAT device to any internal target accessible over the LAN, even to a
+            a NAT device to any internal target with a known route across the LAN, even to a
                 <emphasis>different</emphasis> public IP address on a multihomed host, as in the
             following scenario.</para>
         <figure>
@@ -371,61 +371,41 @@
                 </imageobject>
             </mediaobject>
         </figure>
-        
         <!-- Uses RFC 5737: IPv4 Address Blocks Reserved for Documentation -->
-        
-        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><link
-                xlink:href="&baseURL;docs/admin_guide/pix/dirauth-nat.png" xlink:show="new"
+        <para><link xlink:href="&baseURL;docs/admin_guide/pix/dirauth-nat.png" xlink:show="new"
                 >Enlarge diagram</link></para>
         <para><emphasis role="bold">Key observations</emphasis></para>
         <itemizedlist>
             <listitem>
-                <para>The configuration file on the NATed gateway node is
-                        <code>katzenpost.toml</code>. </para>
+                <para>The configuration file on the NATed dirauth is <code>authority.toml</code>.
+                </para>
             </listitem>
             <listitem>
                 <para>The relevant section of the configuration file is
                     <code>[Server]</code>.</para>
             </listitem>
             <listitem>
-                <para>The gateway node exposes itself to the network as an onion (hidden) service
-                    bound to the loopback address (127.0.0.1) and a port (1234). This requires a Tor
-                    daemon to be running on the node and for the Tor configuration file
-                        <code>/etc/tor/torrc</code> to contain the lines shown.</para>
+                <para>The <parameter>Addresses</parameter> parameter specifies a public IP
+                    address:port, 203.0.113.75:1234, on a multihomed host that also has a LAN
+                    interface. This address, however, is not the address at with the node can be
+                    reached from the Internet.</para>
             </listitem>
             <listitem>
-                <para>The <parameter>Addresses</parameter> parameter specifies the onion address
-                        (<code>address.onion</code>) and a port (1234) over which the gateway node
-                    can be reached by way of the Tor network. This value is periodically advertised
-                    in the PKI document to other components of the mix network.</para>
+                <para>There is no <parameter>BindAddresses</parameter> parameter.</para>
             </listitem>
             <listitem>
-                <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
-                    address (127.0.0.1) and a port (1234) on which the node listens for incoming
-                    Sphinx packets from clients.</para>
-            </listitem>
-            <listitem>
-                <para>The gateway node also has a LAN address, 192.168.0.2, which does not appear in
-                    the &program_name; configuration, but is logically equivalent to the node's
-                    loopback address, 127.0.0.1.</para>
-            </listitem>
-            <listitem>
-                <para>The NAT router has two configured addresses, public address 203.0.113.10, and
+                <para>The NAT device has two configured addresses, public address 198.51.100.50, and
                     LAN address 192.168.0.1.</para>
             </listitem>
             <listitem>
-                <para>The NAT device routes traffic for 203.0.113.10:1234 to the LAN address and
-                    port of the gateway node, 192.168.0.2:1234, and therefore to the configured
-                    onion service listener bound to 127.0.0.1:1234.</para>
-            </listitem><?oxy_custom_end?>
+                <para>The NAT device routes traffic for 198.51.100.50:1234 to the IP address
+                    specified in <code>Addresses</code>,  203.0.113.75:1234.</para>
+            </listitem>
+            <listitem>
+                <para>The dirauth does not advertise its address on the mix network. The address
+                    must be added to the PKI document out-of-band.</para>
+            </listitem>
         </itemizedlist>
-        <para>The NAT router passes incoming connections to their destination host based on
-                <code>address:port</code> information in the usual manner.</para>
-        <note>
-            <para>Dirauths have no mechanism to announce their addresses automatically. Unlike mix,
-                gateway, and service nodes, their public addresses must be added out-of-band to the
-                PKI document on which peers and clients rely. </para>
-        </note>
     </section>
   
 </article>
