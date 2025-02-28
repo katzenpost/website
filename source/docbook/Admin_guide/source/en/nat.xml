@@ -21,29 +21,22 @@
 
 <article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="nat">
-    
     <info>
         <title xml:id="nat.title">Using &program_name; with NAT and Tor</title>
     </info>
-
-    <para>Any &program_name; server node can be configured to support NAT and similar network
-        topologies (such as Tor) that traverse public and private network boundaries. All
-        &program_name; node types (mix nodes, gateway nodes, service nodes, and dirauths) can be
-        used from behind <link xlink:href="https://www.rfc-editor.org/rfc/rfc1631">network address
-            translation (NAT)</link> routers. A variation of NAT topology may be used for hosting in
-        a container environment, such as Docker, or when a node runs in a virtualized environment,
-        such as Qemu or KVM. Additionally, gateway nodes running a Tor <link
-            xlink:href="https://tb-manual.torproject.org/onion-services/">onion service</link> can
-        be accessed from the Internet using an onion address. </para>
-    <para>Some indirect network scenarios that involve NAT, such as Amazon EC2, are effectively
-        transparent and require no special &program_name; configuration. More typically,  the router
-        connecting a LAN with the Internet blocks incoming connections by default, and must be
-        configured to forward traffic from the Internet to a destination LAN host based on port
-        number. (Router configuration for a NAT topology is beyond the scope of this topic.) For
-        these cases, where the host listens on a LAN <code>address:port</code> but is accessed
-        publicly from another <code>address:port</code>,  &program_name; provides a mechanism to
-        specify both addresses and to share access information with peers and clients.</para>
-
+    <para><?oxy_insert_start author="dwrob" timestamp="20250228T130630-0800"?>All &program_name;
+        server node types (mix nodes, gateway nodes, service nodes, and dirauths) can be used from
+        behind <link xlink:href="https://www.rfc-editor.org/rfc/rfc1631">network address translation
+            (NAT)</link> routers. Typically, the router connecting a LAN with the Internet blocks
+        incoming connections by default, and must be configured to forward traffic from the Internet
+        to a destination LAN host based on port number. (Router configuration for a NAT topology is
+        beyond the scope of this topic.) For these cases, where the host listens on a LAN
+            <code>address:port</code> but is accessed publicly from another
+            <code>address:port</code>, &program_name; provides a mechanism to specify both addresses
+        and to share access information with peers and
+        clients.<?oxy_insert_end?><?oxy_insert_start author="dwrob" timestamp="20250228T130941-0800" type="split"?></para>
+    <para><?oxy_insert_end?><?oxy_delete author="dwrob" timestamp="20250228T130726-0800" content="Any &amp;program_name; server node can be configured to support NAT and similar network topologies (such as Tor) that traverse public and private network boundaries. All &amp;program_name; node types (mix nodes, gateway nodes, service nodes, and dirauths) can be used from behind &lt;link xlink:href=&quot;https://www.rfc-editor.org/rfc/rfc1631&quot;&gt;network address translation (NAT)&lt;/link&gt; routers. A variation of NAT topology may be used for hosting in a container environment, such as Docker, or when a node runs in a virtualized environment, such as Qemu or KVM. Additionally, gateway nodes running a Tor &lt;link xlink:href=&quot;https://tb-manual.torproject.org/onion-services/&quot;&gt;onion service&lt;/link&gt; can be accessed from the Internet using an onion address. "?></para>
+    <para><?oxy_delete author="dwrob" timestamp="20250228T130741-0800" content="Some indirect network scenarios that involve NAT, such as Amazon EC2, are effectively transparent and require no special &amp;program_name; configuration. More typically, the router connecting a LAN with the Internet blocks incoming connections by default, and must be configured to forward traffic from the Internet to a destination LAN host based on port number. (Router configuration for a NAT topology is beyond the scope of this topic.) For these cases, where the host listens on a LAN &lt;code&gt;address:port&lt;/code&gt; but is accessed publicly from another &lt;code&gt;address:port&lt;/code&gt;, &amp;program_name; provides a mechanism to specify both addresses and to share access information with peers and clients."?></para>
     <para>
         <note>
             <para>&program_name; does not support NAT penetration protocols such as <link
@@ -95,25 +88,33 @@
                                     contains the transport protocol, IP address, and port number
                                     that the server will bind to for incoming connections. This
                                     value is advertised in the PKI document. &program_name; supports
-                                    URLs with that start with either <code>tcp://</code> or
-                                        <code>quic://</code> such as:
-                                        <code>["tcp://192.168.1.1:30001"]</code> and
-                                        <code>["quic://192.168.1.1:40001"]</code>. Onion addresses,
-                                    identified by transport protocol onion://, are also supported on
-                                    some node types if <parameter>BindAddresses</parameter> is also
-                                    present.</para>
-                                <para>This parameter is overridden by
-                                        <parameter>BindAddresses</parameter>; see below.</para>
+                                    UR<?oxy_insert_start author="dwrob" timestamp="20250228T125924-0800"?>I<?oxy_insert_end?><?oxy_delete author="dwrob" timestamp="20250228T125921-0800" content="L"?>s <?oxy_insert_start author="dwrob" timestamp="20250228T130025-0800"?>in<?oxy_insert_end?><?oxy_delete author="dwrob" timestamp="20250228T130023-0800" content="with"?>
+                                    <?oxy_insert_start author="dwrob" timestamp="20250228T125937-0800"?>the
+                                    form
+                                    <emphasis>protocol://address:port</emphasis><?oxy_insert_end?><?oxy_delete author="dwrob" timestamp="20250228T125935-0800" content="that"?><?oxy_insert_start author="dwrob" timestamp="20250228T130115-0800"?>,
+                                    with tcp:// as the typical
+                                    protocol.<?oxy_insert_end?><?oxy_delete author="dwrob" timestamp="20250228T130151-0800" content=" start with either &lt;code&gt;tcp://&lt;/code&gt; or &lt;code&gt;quic://&lt;/code&gt; such as: &lt;code&gt;[&quot;tcp://192.168.1.1:30001&quot;]&lt;/code&gt; and &lt;code&gt;[&quot;quic://192.168.1.1:40001&quot;]&lt;/code&gt;. Onion addresses, identified by transport protocol onion://, are also supported on some node types if &lt;parameter&gt;BindAddresses&lt;/parameter&gt; is also present."?><?oxy_insert_start author="dwrob" timestamp="20250228T130324-0800"?>
+                                    These values are advertised in the PKI document that is shared
+                                    with peers and clients.<?oxy_insert_end?></para>
+                                <para>This
+                                    parameter<?oxy_insert_start author="dwrob" timestamp="20250228T125347-0800"?>'s
+                                    behavior<?oxy_insert_end?> is
+                                    <?oxy_insert_start author="dwrob" timestamp="20250228T125407-0800"?>replaced
+                                    <?oxy_insert_end?><?oxy_delete author="dwrob" timestamp="20250228T125433-0800" content="overridden "?>by
+                                        <parameter>BindAddresses</parameter><?oxy_insert_start author="dwrob" timestamp="20250228T125445-0800"?>
+                                    when it is present<?oxy_insert_end?>; see below.</para>
                             </entry>
                         </row>
                         <row>
                             <entry><parameter>BindAddresses</parameter></entry>
                             <entry>No</entry>
                             <entry>
-                                <para>If <emphasis role="bold">true</emphasis> (that is, if the
-                                    parameter is present), this parameter allows you to set internal
-                                    listener addresses that the server will bind to and accept
-                                    connections on, but that are not advertised in the PKI document. </para>
+                                <para>If <emphasis role="bold">true</emphasis> (that is, if
+                                    <?oxy_delete author="dwrob" timestamp="20250228T130223-0800" content="the parameter is "?>present),
+                                    this parameter <?oxy_delete author="dwrob" timestamp="20250228T130243-0800" content="allows you to "?>set<?oxy_insert_start author="dwrob" timestamp="20250228T130248-0800"?>s<?oxy_insert_end?>
+                                    <?oxy_delete author="dwrob" timestamp="20250228T125547-0800" content="internal "?>listener
+                                    addresses that the server will bind to and accept connections
+                                    on, but that are not advertised in the PKI document. </para>
                             </entry>
                         </row>
                     </tbody>
@@ -163,8 +164,8 @@
     </section>
     <section>
         <title>Application scenarios</title>
-        <para>The following sections  illustrate supported &program_name; topologies that make use
-            of the <parameter>BindAddresses</parameter> parameter.</para>
+        <para>The following sections illustrate supported &program_name; topologies that make use of
+            the <parameter>BindAddresses</parameter> parameter.</para>
         <section xml:id="peer-to-peer">
             <title xml:id="peer-to-peer.title">Peer-to-peer connections involving NAT</title>
             <para>In this scenario, a mix node behind NAT listens on local addresses for
@@ -180,7 +181,8 @@
                     </imageobject>
                 </mediaobject>
             </figure>
-            <para><link xlink:href="&baseURL;docs/admin_guide/pix/peer-to-peer-nat.png" xlink:show="new">Enlarge diagram</link></para>
+            <para><link xlink:href="&baseURL;docs/admin_guide/pix/peer-to-peer-nat.png"
+                    xlink:show="new">Enlarge diagram</link></para>
             <para><emphasis role="bold">Key observations</emphasis></para>
             <itemizedlist>
                 <listitem>
@@ -234,7 +236,8 @@
                     </imageobject>
                 </mediaobject>
             </figure>
-            <para><link xlink:href="&baseURL;docs/admin_guide/pix/client-gateway-nat.png" xlink:show="new">Enlarge diagram</link></para>
+            <para><link xlink:href="&baseURL;docs/admin_guide/pix/client-gateway-nat.png"
+                    xlink:show="new">Enlarge diagram</link></para>
             <para><emphasis role="bold">Key observations</emphasis></para>
             <itemizedlist>
                 <listitem>
@@ -289,7 +292,8 @@
                     </imageobject>
                 </mediaobject>
             </figure>
-            <para><link xlink:href="&baseURL;docs/admin_guide/pix/client-gateway-onion.png" xlink:show="new">Enlarge diagram</link></para>
+            <para><link xlink:href="&baseURL;docs/admin_guide/pix/client-gateway-onion.png"
+                    xlink:show="new">Enlarge diagram</link></para>
             <para><emphasis role="bold">Key observations</emphasis></para>
             <itemizedlist>
                 <listitem>
@@ -334,7 +338,6 @@
                         onion service listener bound to 127.0.0.1:1234.</para>
                 </listitem>
             </itemizedlist>
-
         </section>
     </section>
     <section>
@@ -367,5 +370,5 @@
         <para>The NAT router passes incoming connections to their destination host based on
                 <code>address:port</code> information in the usual manner.</para>
     </section>
-  
 </article>
+<?oxy_options track_changes="on"?>
