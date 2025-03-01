@@ -27,10 +27,10 @@
     </info>
 
     <para>Any &program_name; server node can be configured to support NAT and similar network
-        topologies (such as Tor) that traverse public and private network boundaries. This applies
-        to directory authorities, gateways that allow clients to connect to the network, mix nodes,
-        and service nodes that provide protocols over the mix network such as ping and spool
-        services for storing messages or rendezvous information.</para>
+        topologies that traverse public and private network boundaries. This applies to directory
+        authorities, gateways that allow clients to connect to the network, mix nodes, and service
+        nodes that provide protocols over the mix network such as ping and spool services for
+        storing messages or rendezvous information.</para>
     <para>Typically, the router connecting a LAN with the Internet blocks incoming connections by
         default, and must be configured to forward traffic from the Internet to a destination LAN
         host based on port number. (Router configuration for a NAT topology is beyond the scope of
@@ -54,8 +54,8 @@
             listens for incoming connections, and which are advertised to other mixnet components in
             the PKI document. By supplying the optional <parameter>BindAddresses</parameter>
             parameter, you can define a second address group: internal addresses that are
-                <emphasis>not</emphasis> advertised in the PKI document. This is useful for NAT and
-            Tor scenarios.<note>
+                <emphasis>not</emphasis> advertised in the PKI document. This is useful for NAT
+            scenarios, which involve both public and private address spaces.<note>
                 <para>The <parameter>Addresses</parameter> and <parameter>BindAddresses</parameter>
                     parameters are closely analogous to Tor's <parameter>Address</parameter> and
                         <parameter>ORPort</parameter> parameters. For more information, see the
@@ -87,18 +87,9 @@
                             <entry>Yes</entry>
                             <entry>
                                 <para>Specifies a list of one or more address URLs in a format that
-                                    contains the transport protocol, IP address, and port number
-                                    that the server will bind to for incoming connections. This
-                                    value is advertised in the PKI document. &program_name; supports
-                                    URLs with that start with either <code>tcp://</code> or
-                                        <code>quic://</code> such as:
-                                        <code>["tcp://192.168.1.1:30001"]</code> and
-                                        <code>["quic://192.168.1.1:40001"]</code>. Onion addresses,
-                                    identified by transport protocol onion://, are also supported on
-                                    some node types if <parameter>BindAddresses</parameter> is also
-                                    present.</para>
-                                <para>This parameter is overridden by
-                                        <parameter>BindAddresses</parameter>; see below.</para>
+                                    contains the transport protocol (typically TCP), IP address, and
+                                    port number that the server will bind to for incoming
+                                    connections. This value is advertised in the PKI document. </para>
                             </entry>
                         </row>
                         <row>
@@ -106,246 +97,88 @@
                             <entry>No</entry>
                             <entry>
                                 <para>If <emphasis role="bold">true</emphasis> (that is, if the
-                                    parameter is present), this parameter allows you to set internal
-                                    listener addresses that the server will bind to and accept
-                                    connections on, but that are not advertised in the PKI document. </para>
+                                    parameter is present), this parameter sets a listener address
+                                    that the server will bind to and accept connections on, but that
+                                    is not advertised in the PKI document. In this case,
+                                        <parameter>Addresses</parameter> defines a public address on
+                                    the Internet side of a NAT router, while
+                                        <parameter>BindAddresses</parameter> defines a different
+                                    address behind the NAT router. </para>
                             </entry>
                         </row>
                     </tbody>
                 </tgroup>
             </table>
         </para>
-        <para>For example, a mix node configuration file with a direct Internet connection, or with
-            transparent NAT hosting such as that provided by Amazon EC2, contains a
-                <code>Server</code> section specifying only the <parameter>Addresses</parameter>
-            parameter, as in the following listing:<programlisting>[Server]
-  Identifier = "mix1"
-  WireKEM = "xwing"
-  PKISignatureScheme = "Ed448-Dilithium3"
-  Addresses = ["<replaceable>tcp://127.0.0.1:30010</replaceable>",]
-  MetricsAddress = "<replaceable>127.0.0.1:30012</replaceable>"
-  DataDir = "/voting_mixnet/mix1"
-  IsGatewayNode = false
-  IsServiceNode = false</programlisting></para>
-        <para>Importantly, the value of <parameter>Addresses</parameter>, which the node advertises
-            to other peers, is its loopback address, 127.0.0.1, and a specified port. This means
-            that there is no publicly routable address for this node, and that traffic arriving at
-            the node is delivered there by a configured LAN. In all of these examples, nodes have
-            necessarily been assigned a LAN addresses, but these non-routable<link
-                xlink:href="https://www.rfc-editor.org/rfc/rfc1918"> RFC 1918</link> addresses play
-            no role in &program_name; server configurations. Rather, for portability, the
-            configurations use the logically equivalent loopback address.</para>
-        <para>In contrast to the direct connection, the next example shows part of the configuration
-            file for a similar node behind NAT, containing a <code>Server</code> section that
-            specifies both the <parameter>Addresses</parameter> and
-                <parameter>BindAddresses</parameter>parameters:<programlisting>[Server]
-  Identifier = "mix1"
-  WireKEM = "xwing"
-  PKISignatureScheme = "Ed448-Dilithium3"
-  Addresses = ["<replaceable>tcp://203.0.113.10:30010</replaceable>"]
-  BindAddresses = ["<replaceable>tcp://127.0.0.1:30010</replaceable>"]
-  MetricsAddress = "127.0.0.1:30012"
-  DataDir = "/voting_mixnet/mix1"
-  IsGatewayNode = false
-  IsServiceNode = false</programlisting></para>
         
-        <!-- Uses RFC 5737: IPv4 Address Blocks Reserved for Documentation -->
-        
-        <para>Notice that the local listening address remains unchanged, <emphasis>but has been
-                relocated to the new
-                </emphasis><parameter><emphasis>BindAddresses</emphasis></parameter><emphasis>
-                parameter</emphasis>. In addition, the value of the <parameter>Addresses</parameter>
-            parameter has been changed to a public address (the NAT router's WAN address), including
-            a port. It is assumed that the router is configured to forward traffic routed to this
-                <code>address:port</code> to the mixnet node over the LAN. <note>
+        <para>
+            <note>
                 <para>Directory authorities do not support the <code>BindAddresses</code> parameter,
                     but can still be used behind NAT. For more information, see <xref
                         endterm="dirauth-nat.title" linkend="dirauth-nat"/></para>
-            </note></para>
+            </note>
+        </para>
     </section>
     <section>
         <title>Hosting mix, gateway, and service nodes behind NAT</title>
-        <para>The following sections illustrate supported &program_name; topologies that make use of
-            the <parameter>BindAddresses</parameter> parameter. </para>
-        <section xml:id="peer-to-peer">
-            <title xml:id="peer-to-peer.title">Peer-to-peer connections involving NAT</title>
-            <para>In this scenario, a mix node behind NAT listens on local addresses for
-                connections, while advertising a public address and port to its peer, a directory
-                authority, that is assumed to have a publicly routable address.</para>
-            <figure>
-                <info>
-                    <title>Configuring a mix node behind NAT to be available to a dirauth</title>
-                </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/peer-to-peer-nat.png" scale="65"/>
-                    </imageobject>
-                </mediaobject>
-            </figure>
-            
-            <!-- Uses RFC 5737: IPv4 Address Blocks Reserved for Documentation -->
-            
-            <para><link xlink:href="&baseURL;docs/admin_guide/pix/peer-to-peer-nat.png" xlink:show="new">Enlarge diagram</link></para>
-            <para><emphasis role="bold">Key observations</emphasis></para>
-            <itemizedlist>
-                <listitem>
-                    <para>The configuration file on the NATed mix node is
-                            <code>katzenpost.toml</code>. </para>
-                </listitem>
-                <listitem>
-                    <para>The relevant section of the configuration file is
-                        <code>[Server]</code>.</para>
-                </listitem>
-                <listitem>
-                    <para>The <parameter>Addresses</parameter> parameter specifies the publicly
-                        routable address:port, 203.0.113.10:1234, over which the mix node can be
-                        reached from the Internet. This value is periodically advertised in the PKI
-                        document to other components of the mix network.</para>
-                </listitem>
-                <listitem>
-                    <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
-                        address:port, 127.0.0.1:1234, on which the node listens for incoming Sphinx
-                        packets from peers.</para>
-                </listitem>
-                <listitem>
-                    <para>The mix node also has a LAN address, 192.168.0.2, which does not appear in
-                        the &program_name; configuration, but is logically equivalent to the node's
-                        loopback address, 127.0.0.1.</para>
-                </listitem>
-                <listitem>
-                    <para>The NAT router has two configured addresses, public address 203.0.113.10
-                        and LAN address 192.168.0.1.</para>
-                </listitem>
-                <listitem>
-                    <para>The NAT device routes traffic for 203.0.113.10:1234 to the LAN
-                            <code>address:port</code> of the mix node, 192.168.0.2:1234, and
-                        therefore to the configured listener bound to 127.0.0.1:1234.</para>
-                </listitem>
-            </itemizedlist>
-        </section>
-        <section xml:id="client-to-gateway-nat">
-            <title xml:id="client-to-gateway-nat.title">Client-to-gateway connections involving
-                NAT</title>
-            <para>In this scenario, a gateway node behind NAT listens on local addresses for
-                connections from the Internet, while advertising a public address and port to a
-                client application that is assumed to have a publicly routable address.</para>
-            <figure>
-                <info>
-                    <title>Configuring a gateway behind NAT to be available to a client</title>
-                </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/client-gateway-nat.png" scale="65"/>
-                    </imageobject>
-                </mediaobject>
-            </figure>
-            
-            <!-- Uses RFC 5737: IPv4 Address Blocks Reserved for Documentation -->
-            
-            <para><link xlink:href="&baseURL;docs/admin_guide/pix/client-gateway-nat.png" xlink:show="new">Enlarge diagram</link></para>
-            <para><emphasis role="bold">Key observations</emphasis></para>
-            <itemizedlist>
-                <listitem>
-                    <para>The configuration file on the NATed gateway node is
-                            <code>katzenpost.toml</code>. </para>
-                </listitem>
-                <listitem>
-                    <para>The relevant section of the configuration file is
-                        <code>[Server]</code>.</para>
-                </listitem>
-                <listitem>
-                    <para>The <parameter>Addresses</parameter> parameter specifies the publicly
-                        routable address:port, 203.0.113.10:1234, over which the gateway node can be
-                        reached from the Internet. This value is periodically advertised in the PKI
-                        document to other components of the mix network.</para>
-                </listitem>
-                <listitem>
-                    <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
-                        address:port, 127.0.0.1:1234, on which the node listens for incoming Sphinx
-                        packets from clients.</para>
-                </listitem>
-                <listitem>
-                    <para>The gateway node also has a LAN address, 192.168.0.2, which does not
-                        appear in the &program_name; configuration, but is logically equivalent to
-                        the node's loopback address, 127.0.0.1.</para>
-                </listitem>
-                <listitem>
-                    <para>The NAT router has two configured addresses, public address 203.0.113.10,
-                        and LAN address 192.168.0.1.</para>
-                </listitem>
-                <listitem>
-                    <para>The NAT device routes traffic for 203.0.113.10:1234 to the LAN
-                            <code>address:port</code> of the gateway node, 192.168.0.2:1234, and
-                        therefore to the configured listener bound to 127.0.0.1:1234.</para>
-                </listitem>
-            </itemizedlist>
-        </section>
-        <section xml:id="client-to-gateway-tor">
-            <title xml:id="client-to-gateway-tor.title">Client-to-gateway connections over
-                Tor</title>
-            <para>In this scenario, a gateway node behind NAT listens on local addresses for
-                connections from the Internet, while advertising an onion address and port to a
-                client application that is assumed to have a publicly routable address. Apart from
-                the use of an onion address, this scenario is identical to the previous one.</para>
-            <figure>
-                <info>
-                    <title>Configuring a gateway to be available to a client over Tor</title>
-                </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/client-gateway-onion.png" scale="65"/>
-                    </imageobject>
-                </mediaobject>
-            </figure>
-            
-            <!-- Uses RFC 5737: IPv4 Address Blocks Reserved for Documentation -->
-            
-            <para><link xlink:href="&baseURL;docs/admin_guide/pix/client-gateway-onion.png" xlink:show="new">Enlarge diagram</link></para>
-            <para><emphasis role="bold">Key observations</emphasis></para>
-            <itemizedlist>
-                <listitem>
-                    <para>The configuration file on the NATed gateway node is
-                            <code>katzenpost.toml</code>. </para>
-                </listitem>
-                <listitem>
-                    <para>The relevant section of the configuration file is
-                        <code>[Server]</code>.</para>
-                </listitem>
-                <listitem>
-                    <para>The gateway node exposes itself to the network as an onion (hidden)
-                        service bound to the loopback address:port, 127.0.0.1:1234. This requires a
-                        Tor daemon to be running on the node and for the Tor configuration file
-                            <code>/etc/tor/torrc</code> to contain the lines shown.</para>
-                </listitem>
-                <listitem>
-                    <para>The <parameter>Addresses</parameter> parameter specifies the onion
-                        address:port, <code>address.onion</code>:1234, over which the gateway node
-                        can be reached by way of the Tor network. This value is periodically
-                        advertised in the PKI document to other components of the mix
-                        network.</para>
-                </listitem>
-                <listitem>
-                    <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
-                        address:port, 127.0.0.1:1234, on which the node listens for incoming Sphinx
-                        packets from clients.</para>
-                </listitem>
-                <listitem>
-                    <para>The gateway node also has a LAN address, 192.168.0.2, which does not
-                        appear in the &program_name; configuration, but is logically equivalent to
-                        the node's loopback address, 127.0.0.1.</para>
-                </listitem>
-                <listitem>
-                    <para>The NAT router has two configured addresses, public address 203.0.113.10,
-                        and LAN address 192.168.0.1.</para>
-                </listitem>
-                <listitem>
-                    <para>The NAT device routes traffic for 203.0.113.10:1234 to the LAN address and
-                        port of the gateway node, 192.168.0.2:1234, and therefore to the configured
-                        onion service listener bound to 127.0.0.1:1234.</para>
-                </listitem>
-            </itemizedlist>
-
-        </section>
+        <para>This section provides an example of  a &program_name; topology that make use of the
+                <parameter>BindAddresses</parameter> parameter. In this scenario, a mix node behind
+            NAT listens on local addresses for connections, while advertising a public address and
+            port to its peer, a directory authority, that is assumed to have a publicly routable
+            address.</para>
+        <para/>
+        <figure>
+            <info>
+                <title>Configuring a mix node behind NAT to be available to a dirauth</title>
+            </info>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="pix/mix-behind-nat.png" scale="65"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <!-- Uses RFC 5737: IPv4 Address Blocks Reserved for Documentation -->
+        <para><link xlink:href="&baseURL;docs/admin_guide/pix/mix-behind-nat.png" xlink:show="new"
+                >Enlarge diagram</link></para>
+        <para><emphasis role="bold">Key observations</emphasis></para>
+        <itemizedlist>
+            <listitem>
+                <para>The configuration file on the NATed mix node is <code>katzenpost.toml</code>.
+                </para>
+            </listitem>
+            <listitem>
+                <para>The relevant section of the configuration file is
+                    <code>[Server]</code>.</para>
+            </listitem>
+            <listitem>
+                <para>The <parameter>Addresses</parameter> parameter specifies the publicly routable
+                    address:port, 203.0.113.10:1234, over which the mix node can be reached from the
+                    Internet. This value is periodically advertised in the PKI document to other
+                    components of the mix network.</para>
+            </listitem>
+            <listitem>
+                <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
+                    address:port, 127.0.0.1:1234, on which the node listens for incoming Sphinx
+                    packets from peers.</para>
+            </listitem>
+            <listitem>
+                <para>The mix node also has a LAN address, 192.168.0.2, which does not appear in the
+                    &program_name; configuration, but is logically equivalent to the node's loopback
+                    address, 127.0.0.1.</para>
+            </listitem>
+            <listitem>
+                <para>The NAT router has two configured addresses, public address 203.0.113.10 and
+                    LAN address 192.168.0.1.</para>
+            </listitem>
+            <listitem>
+                <para>The NAT device routes traffic for 203.0.113.10:1234 to the LAN
+                        <code>address:port</code> of the mix node, 192.168.0.2:1234, and therefore
+                    to the configured listener bound to 127.0.0.1:1234.</para>
+            </listitem>
+        </itemizedlist>
+        <para>The configuration in this example applies equally well to a NATed gateway node or
+            service provider. A NATed gateway node would also be reachable by a client with
+            knowledge of the gateway's public address. </para>
     </section>
     <section xml:id="dirauth-nat">
         <title xml:id="dirauth-nat.title">Hosting a directory authority behind NAT</title>
@@ -363,12 +196,12 @@
             </info>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="pix/dirauth-nat.png" scale="65"/>
+                    <imagedata fileref="pix/dirauth-behind-nat.png" scale="65"/>
                 </imageobject>
             </mediaobject>
         </figure>
         <!-- Uses RFC 5737: IPv4 Address Blocks Reserved for Documentation -->
-        <para><link xlink:href="&baseURL;docs/admin_guide/pix/dirauth-nat.png" xlink:show="new"
+        <para><link xlink:href="&baseURL;docs/admin_guide/pix/dirauth-behind-nat.png" xlink:show="new"
                 >Enlarge diagram</link></para>
         <para><emphasis role="bold">Key observations</emphasis></para>
         <itemizedlist>
