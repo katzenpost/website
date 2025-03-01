@@ -23,14 +23,16 @@
     version="5.1" xml:id="nat">
     
     <info>
-        <title xml:id="nat.title">Running &program_name; services behind NAT</title>
+        <title xml:id="nat.title">NAT considerations for &program_name; servers</title>
     </info>
 
-    <para>Any &program_name; server node can be configured to support NAT and similar network
-        topologies that traverse public and private network boundaries. This applies to directory
-        authorities, gateways that allow clients to connect to the network, mix nodes, and service
-        nodes that provide protocols over the mix network such as ping and spool services for
-        storing messages or rendezvous information.</para>
+    <para>Any &program_name; server node can be configured to run behind a properly configured
+        router that supports <link xlink:href="https://www.rfc-editor.org/rfc/rfc1918">network
+            address translation</link> (NAT) and similar network topologies that traverse public and
+        private network boundaries. This applies to directory authorities, gateways that allow
+        clients to connect to the network, mix nodes, and service nodes that provide protocols over
+        the mix network such as ping and spool services for storing messages or rendezvous
+        information.</para>
     <para>Typically, the router connecting a LAN with the Internet blocks incoming connections by
         default, and must be configured to forward traffic from the Internet to a destination host
         based on port number. These target addresses are most often drawn from <link
@@ -45,8 +47,10 @@
         <note>
             <para>&program_name; does not support NAT penetration protocols such as <link
                     xlink:href="https://www.rfc-editor.org/rfc/rfc6886">NATPMP</link>, <link
-                    xlink:href="https://www.rfc-editor.org/rfc/rfc5389">STUN</link>, and <link
-                    xlink:href="https://www.rfc-editor.org/rfc/rfc5766">TURN</link>.</para>
+                    xlink:href="https://www.rfc-editor.org/rfc/rfc5389">STUN</link>, <link
+                    xlink:href="https://www.rfc-editor.org/rfc/rfc5766">TURN</link>, and <link
+                    xlink:href="https://en.wikipedia.org/wiki/Universal_Plug_and_Play"
+                >UPnP</link>.</para>
         </note>
     </para>
     <section>
