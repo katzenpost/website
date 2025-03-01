@@ -3,7 +3,7 @@ title:
 linkTitle: "Using with NAT" 
 description: "" 
 url: "docs/admin_guide/nat.html" 
-date: "2025-03-01T11:29:45.2153642-08:00"
+date: "2025-03-01T12:46:40.715123011-08:00"
 draft: "false" 
 slug: "" 
 layout: "" 
@@ -14,7 +14,7 @@ weight: 50
 <html xmlns:ng="http://docbook.org/docbook-ng">
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-      <title>Running Katzenpost services behind NAT</title>
+      <title>NAT considerations for Katzenpost servers</title>
       <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
    </head>
    <body>
@@ -22,7 +22,7 @@ weight: 50
          <div class="titlepage">
             <div>
                <div>
-                  <h1 class="title"><a name="nat"></a>Running Katzenpost services behind NAT</h1>
+                  <h1 class="title"><a name="nat"></a>NAT considerations for Katzenpost servers</h1>
                </div>
             </div>
             <hr>
@@ -30,18 +30,19 @@ weight: 50
          <div class="toc">
             <p><b>Table of Contents</b></p>
             <dl class="toc">
-               <dt><span class="section"><a href="#d58e50"><em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em></a></span></dt>
-               <dt><span class="section"><a href="#d58e129">Hosting mix, gateway, and service nodes behind NAT</a></span></dt>
+               <dt><span class="section"><a href="#d58e57"><em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em></a></span></dt>
+               <dt><span class="section"><a href="#d58e136">Hosting mix, gateway, and service nodes behind NAT</a></span></dt>
                <dt><span class="section"><a href="#dirauth-nat">Hosting a directory authority behind NAT</a></span></dt>
             </dl>
          </div>
-         <p>Any Katzenpost server node can be configured to support NAT and similar network
-            topologies that traverse public and private network boundaries. This applies to directory
-            authorities, gateways that allow clients to connect to the network, mix nodes, and
-            service
-            nodes that provide protocols over the mix network such as ping and spool services
-            for
-            storing messages or rendezvous information.</p>
+         <p>Any Katzenpost server node can be configured to run behind a properly configured
+            router that supports <a class="link" href="https://www.rfc-editor.org/rfc/rfc1918" target="_top">network
+               address translation</a> (NAT) and similar network topologies that traverse public and
+            private network boundaries. This applies to directory authorities, gateways that allow
+            clients to connect to the network, mix nodes, and service nodes that provide protocols
+            over
+            the mix network such as ping and spool services for storing messages or rendezvous
+            information.</p>
          <p>Typically, the router connecting a LAN with the Internet blocks incoming connections
             by
             default, and must be configured to forward traffic from the Internet to a destination
@@ -62,7 +63,7 @@ weight: 50
                   </tr>
                   <tr>
                      <td align="left" valign="top">
-                        <p>Katzenpost does not support NAT penetration protocols such as <a class="link" href="https://www.rfc-editor.org/rfc/rfc6886" target="_top">NATPMP</a>, <a class="link" href="https://www.rfc-editor.org/rfc/rfc5389" target="_top">STUN</a>, and <a class="link" href="https://www.rfc-editor.org/rfc/rfc5766" target="_top">TURN</a>.</p>
+                        <p>Katzenpost does not support NAT penetration protocols such as <a class="link" href="https://www.rfc-editor.org/rfc/rfc6886" target="_top">NATPMP</a>, <a class="link" href="https://www.rfc-editor.org/rfc/rfc5389" target="_top">STUN</a>, <a class="link" href="https://www.rfc-editor.org/rfc/rfc5766" target="_top">TURN</a>, and <a class="link" href="https://en.wikipedia.org/wiki/Universal_Plug_and_Play" target="_top">UPnP</a>.</p>
                      </td>
                   </tr>
                </table>
@@ -72,7 +73,7 @@ weight: 50
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="d58e50"></a><em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em></h2>
+                     <h2 class="title" style="clear: both"><a name="d58e57"></a><em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em></h2>
                   </div>
                </div>
             </div>
@@ -105,7 +106,7 @@ weight: 50
                about node configuration, see <a class="link" href="https://katzenpost.network/docs/admin_guide/components.html" target="_top">Components
                   and configuration of the Katzenpost mixnet</a>.</p>
             <p>
-               <div class="table"><a name="d58e83"></a><p class="title"><b>Table&nbsp;1.&nbsp;<em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em>
+               <div class="table"><a name="d58e90"></a><p class="title"><b>Table&nbsp;1.&nbsp;<em class="parameter"><code>Addresses</code></em> and <em class="parameter"><code>BindAddresses</code></em>
                         parameters</b></p>
                   <div class="table-contents">
                      <table class="table" summary="Addresses and BindAddresses&#xA;                    parameters" border="1">
@@ -172,7 +173,7 @@ weight: 50
             <div class="titlepage">
                <div>
                   <div>
-                     <h2 class="title" style="clear: both"><a name="d58e129"></a>Hosting mix, gateway, and service nodes behind NAT</h2>
+                     <h2 class="title" style="clear: both"><a name="d58e136"></a>Hosting mix, gateway, and service nodes behind NAT</h2>
                   </div>
                </div>
             </div>
@@ -183,7 +184,7 @@ weight: 50
                port to its peer, a directory authority, that is assumed to have a publicly routable
                address.</p>
             <p></p>
-            <div class="figure"><a name="d58e136"></a><p class="title"><b>Figure&nbsp;1.&nbsp;Accessing a mix node behind NAT </b></p>
+            <div class="figure"><a name="d58e143"></a><p class="title"><b>Figure&nbsp;1.&nbsp;Accessing a mix node behind NAT </b></p>
                <div class="figure-contents">
                   <div class="mediaobject"><img src="pix/mix-behind-nat.png" width="351"></div>
                </div>
@@ -243,7 +244,7 @@ weight: 50
                address. In a NAT scenario, these addresses can refer to any target that is situated
                on
                the LAN side of the NAT router.</p>
-            <div class="figure"><a name="d58e197"></a><p class="title"><b>Figure&nbsp;2.&nbsp;Accessing a directory authority behind NAT</b></p>
+            <div class="figure"><a name="d58e204"></a><p class="title"><b>Figure&nbsp;2.&nbsp;Accessing a directory authority behind NAT</b></p>
                <div class="figure-contents">
                   <div class="mediaobject"><img src="pix/dirauth-behind-nat.png" width="351"></div>
                </div>
