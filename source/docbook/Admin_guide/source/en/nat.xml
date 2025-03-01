@@ -32,12 +32,14 @@
         nodes that provide protocols over the mix network such as ping and spool services for
         storing messages or rendezvous information.</para>
     <para>Typically, the router connecting a LAN with the Internet blocks incoming connections by
-        default, and must be configured to forward traffic from the Internet to a destination LAN
-        host based on port number. (Router configuration for a NAT topology is beyond the scope of
-        this topic.) For these cases, where the host listens on a LAN <code>address:port</code> but
-        is accessed publicly from another <code>address:port</code>, &program_name; provides a
-        mechanism to specify both addresses and to share access information with peers and
-        clients.</para>
+        default, and must be configured to forward traffic from the Internet to a destination host
+        based on port number. These target addresses are most often drawn from <link
+            xlink:href="https://www.rfc-editor.org/rfc/rfc6598">RFC 6598</link> private address
+        space, although more exotic topologies involving public IP address may also be targeted.
+        (Router configuration for NAT topologies in general is beyond the scope of this topic.) For
+        such cases, where the host listens on a LAN-side <emphasis>address:port</emphasis> but is
+        accessed publicly using a different <emphasis>address:port</emphasis>, &program_name;
+        provides mechanisms to specify both addresses.</para>
 
     <para>
         <note>
@@ -49,11 +51,11 @@
     </para>
     <section>
         <title><parameter>Addresses</parameter> and <parameter>BindAddresses</parameter></title>
-        <para>In a direct network connection, the address defined in the server
-                <parameter>Addresses</parameter> parameter defines the addresses on which the node
+        <para>In a direct network connection, the values defined in the server
+                <parameter>Addresses</parameter> parameter define the addresses on which the node
             listens for incoming connections, and which are advertised to other mixnet components in
             the PKI document. By supplying the optional <parameter>BindAddresses</parameter>
-            parameter, you can define a second address group: internal addresses that are
+            parameter, you can define a second address group: LAN-side addresses that are
                 <emphasis>not</emphasis> advertised in the PKI document. This is useful for NAT
             scenarios, which involve both public and private address spaces.<note>
                 <para>The <parameter>Addresses</parameter> and <parameter>BindAddresses</parameter>
@@ -63,7 +65,7 @@
                         >torrc man page</link>.</para>
             </note></para>
         <para>The following table shows the details for these two parameters. For more information
-            about mixnet node configuration, see <link
+            about node configuration, see <link
                 xlink:href="https://katzenpost.network/docs/admin_guide/components.html">Components
                 and configuration of the &program_name; mixnet</link>.</para>
         <para>
@@ -86,9 +88,9 @@
                             <entry><parameter>Addresses</parameter></entry>
                             <entry>Yes</entry>
                             <entry>
-                                <para>Specifies a list of one or more address URLs in a format that
-                                    contains the transport protocol (typically TCP), IP address, and
-                                    port number that the server will bind to for incoming
+                                <para>Specifies a list of one or more address URIs in a format that
+                                    contains the transport protocol (typically TCP), an IP address,
+                                    and a port number that the node will bind to for incoming
                                     connections. This value is advertised in the PKI document. </para>
                             </entry>
                         </row>
@@ -96,14 +98,15 @@
                             <entry><parameter>BindAddresses</parameter></entry>
                             <entry>No</entry>
                             <entry>
-                                <para>If <emphasis role="bold">true</emphasis> (that is, if the
-                                    parameter is present), this parameter sets a listener address
-                                    that the server will bind to and accept connections on, but that
-                                    is not advertised in the PKI document. In this case,
-                                        <parameter>Addresses</parameter> defines a public address on
+                                <para>If <emphasis role="bold">true</emphasis> (that is, if this
+                                    parameter is present), this parameter sets listener
+                                        <emphasis>address:port</emphasis> values that the server
+                                    will bind to and accept connections on, but that are not
+                                    advertised in the PKI document. In this case,
+                                        <parameter>Addresses</parameter> defines public addresses on
                                     the Internet side of a NAT router, while
-                                        <parameter>BindAddresses</parameter> defines a different
-                                    address behind the NAT router. </para>
+                                        <parameter>BindAddresses</parameter> defines a different set
+                                    of addresses behind the NAT router. </para>
                             </entry>
                         </row>
                     </tbody>
@@ -129,7 +132,7 @@
         <para/>
         <figure>
             <info>
-                <title>Configuring a mix node behind NAT to be available to a dirauth</title>
+                <title>Accessing a mix node behind NAT </title>
             </info>
             <mediaobject>
                 <imageobject>
@@ -152,28 +155,23 @@
             </listitem>
             <listitem>
                 <para>The <parameter>Addresses</parameter> parameter specifies the publicly routable
-                    address:port, 203.0.113.10:1234, over which the mix node can be reached from the
-                    Internet. This value is periodically advertised in the PKI document to other
-                    components of the mix network.</para>
+                        <emphasis>address:port</emphasis>, 203.0.113.10:1234, over which the mix
+                    node can be reached from the Internet. This value is periodically advertised in
+                    the PKI document to other components of the mix network.</para>
             </listitem>
             <listitem>
-                <para>The <parameter>BindAddresses</parameter> parameter specifies the loopback
-                    address:port, 127.0.0.1:1234, on which the node listens for incoming Sphinx
-                    packets from peers.</para>
-            </listitem>
-            <listitem>
-                <para>The mix node also has a LAN address, 192.168.0.2, which does not appear in the
-                    &program_name; configuration, but is logically equivalent to the node's loopback
-                    address, 127.0.0.1.</para>
+                <para>The <parameter>BindAddresses</parameter> parameter specifies the LAN
+                        <emphasis>address:port</emphasis>, 192.168.0.2:1234, on which the node
+                    listens for incoming Sphinx packets from peers.</para>
             </listitem>
             <listitem>
                 <para>The NAT router has two configured addresses, public address 203.0.113.10 and
-                    LAN address 192.168.0.1.</para>
+                    private LAN address 192.168.0.1.</para>
             </listitem>
             <listitem>
-                <para>The NAT device routes traffic for 203.0.113.10:1234 to the LAN
-                        <code>address:port</code> of the mix node, 192.168.0.2:1234, and therefore
-                    to the configured listener bound to 127.0.0.1:1234.</para>
+                <para>The NAT router forwards traffic for 203.0.113.10:1234 to the mix node's LAN
+                        <emphasis>address:port</emphasis>, 192.168.0.2:1234, where the configured
+                    listener is bound.</para>
             </listitem>
         </itemizedlist>
         <para>The configuration in this example applies equally well to a NATed gateway node or
@@ -183,16 +181,17 @@
     <section xml:id="dirauth-nat">
         <title xml:id="dirauth-nat.title">Hosting a directory authority behind NAT</title>
         <para>Directory authorities have no support for the <parameter>BindAddresses</parameter>
-            parameter. The <code>Addresses</code> parameter for directory authorities has the same
-            semantics as <code>BindAddress</code> for the other node types. Importantly, directory
-            authorities do not advertise their addresses in the network consensus because every peer
-            must already know the addresses to fetch the consensus. A public address can be routed
-            by a NAT device to any internal target with a known route across the LAN, even to a
-                <emphasis>different</emphasis> public IP address on a multihomed host, as in the
-            following scenario.</para>
+            parameter. They also do not adverstise an address in the PKI document, because peers
+            must already know the address in order to fetch the document, which means that addresses
+            for dirauths must be provided out-of-band.</para>
+        <para> Consequently, the <code>Addresses</code> parameter for dirauths performs the same
+            function as <code>BindAddresses</code> on the other node types, that is, to define the
+            node's listening <emphasis>address:port</emphasis> values, but not an advertised
+            address. In a NAT scenario, these addresses can refer to any target that is situated on
+            the LAN side of the NAT router.</para>
         <figure>
             <info>
-                <title>Accessing a directory authority situated behind NAT</title>
+                <title>Accessing a directory authority behind NAT</title>
             </info>
             <mediaobject>
                 <imageobject>
@@ -214,10 +213,10 @@
                     <code>[Server]</code>.</para>
             </listitem>
             <listitem>
-                <para>The <parameter>Addresses</parameter> parameter specifies a public IP
-                    address:port, 203.0.113.75:1234, on a multihomed host that also has a LAN
-                    interface. This address, however, is not the address at with the node can be
-                    reached from the Internet.</para>
+                <para>The <parameter>Addresses</parameter> parameter specifies a private <link
+                        xlink:href="https://www.rfc-editor.org/rfc/rfc6598">RFC 6598</link>
+                    <emphasis>address:port</emphasis>, 192.168.0.2:1234. By definition, this address
+                    cannot be reached directly from the Internet.</para>
             </listitem>
             <listitem>
                 <para>There is no <parameter>BindAddresses</parameter> parameter.</para>
@@ -227,12 +226,13 @@
                     LAN address 192.168.0.1.</para>
             </listitem>
             <listitem>
-                <para>The NAT device routes traffic for 198.51.100.50:1234 to the IP address:port
-                    specified in <code>Addresses</code>,  203.0.113.75:1234.</para>
+                <para>The NAT device routes traffic targeting 198.51.100.50:1234 to the
+                        <emphasis>address:port</emphasis> specified in <code>Addresses</code>,
+                    192.168.0.2:1234.</para>
             </listitem>
             <listitem>
                 <para>The dirauth does not advertise its address on the mix network. The address
-                    must be added to the PKI document out-of-band.</para>
+                    must provided to peers out-of-band.</para>
             </listitem>
         </itemizedlist>
     </section>
