@@ -55,13 +55,14 @@
         <para>In addition to the server components, &program_name; also supports connections to
             client applications hosted externally to the mix network and communicating with it
             through gateway nodes. </para>
-        <para>A model mix network is shown in Figure 1.</para>
-        <figure><info><title>The pictured element types correspond to discrete client and server programs that
-            &program_name; requires to function. </title></info>
+        <para>A model mix network is shown in the following illustration. The pictured element types
+            correspond to discrete client and server programs that &program_name; requires to
+            function.</para>
+        <figure><info><title>Components of a production mix network</title></info>
             
-            <mediaobject>                                           
+            <mediaobject >                                           
                 <imageobject>
-                    <imagedata fileref="pix/components-production.png"/>
+                    <imagedata fileref="pix/components-production.png" />
                 </imageobject>
             </mediaobject>
             
@@ -257,8 +258,8 @@
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
                 more information about the test mixnet, see <emphasis role="bold"><link xlink:href="&baseURL;docs/admin_guide/docker.html"
                         >Using the &program_name; Docker test network</link><!--<xref linkend="container" endterm="container.title"/>--></emphasis>.</para>
-            <table frame="all"><info><title><emphasis role="bold">Directory authority (dirauth) configuration
-                        sections</emphasis></title></info>
+            <table frame="all"><info><title>Directory authority (dirauth) configuration
+                        sections</title></info>
                 
                 <tgroup cols="1">
                     <colspec colname="c1" colnum="1" colwidth="1*"/>
