@@ -12,7 +12,7 @@
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
-<?weight 20 ?> <!-- Optional -->
+<?weight 15 ?> <!-- Optional -->
 
 <!DOCTYPE article [
     <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">

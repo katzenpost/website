@@ -1,0 +1,338 @@
+---
+title: 
+linkTitle: "Installation" 
+description: "" 
+url: "docs/admin_guide/install.html" 
+date: "2025-03-03T05:20:42.690894122-08:00"
+draft: "false" 
+slug: "" 
+layout: "" 
+type: "" 
+weight: 5 
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>Installing Katzenpost</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+   </head>
+   <body>
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h1 class="title"><a name="installation"></a>Installing Katzenpost</h1>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="toc">
+            <p><b>Table of Contents</b></p>
+            <dl class="toc">
+               <dt><span class="section"><a href="#requirements">Requirements</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#clone">Obtain the Katzenpost code</a></span></dt>
+                     <dt><span class="section"><a href="#install_go">Install the latest Go version</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#build">Build server components</a></span></dt>
+               <dt><span class="section"><a href="#d58e138">Install the server components</a></span></dt>
+               <dt><span class="section"><a href="#service-accounts">Create service accounts</a></span></dt>
+               <dt><span class="section"><a href="#configure">Create configuration files</a></span></dt>
+               <dt><span class="section"><a href="#systemd">Configure systemd</a></span></dt>
+               <dt><span class="section"><a href="#generate-keys">Generate keys</a></span></dt>
+               <dt><span class="section"><a href="#d58e205">Build the chat client</a></span></dt>
+            </dl>
+         </div>
+         <p>The section provides an overview of how to download Katzenpost, set up a development
+            environment, build the code, install the Katzenpost binaries, and configure the
+            components. </p>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="requirements"></a>Requirements</h2>
+                  </div>
+               </div>
+            </div>
+            <p>An up-to-date <a class="link" href="https://www.debian.org" target="_top">Debian</a> or <a class="link" href="https://ubuntu.com" target="_top">Ubuntu</a> Linux system is assumed as the build
+               and hosting environment for all Katzenpost server-side components. Required packages
+               include the following:</p>
+            <div class="itemizedlist">
+               <ul class="itemizedlist" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p><span class="command"><strong>git </strong></span></p>
+                  </li>
+                  <li class="listitem">
+                     <p><span class="command"><strong>gcc </strong></span></p>
+                  </li>
+                  <li class="listitem">
+                     <p><span class="command"><strong>build-essential</strong></span></p>
+                  </li>
+                  <li class="listitem">
+                     <p><span class="command"><strong>libc-dev-bin</strong></span></p>
+                  </li>
+               </ul>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="clone"></a>Obtain the Katzenpost code</h3>
+                     </div>
+                  </div>
+               </div>
+               <p>Complete the following steps to set up a local Katzenpost git repository.
+                  <div class="procedure">
+                     <ol class="procedure" type="1">
+                        <li class="step">
+                           <p>Clone
+                              Katzenpost.
+                              <pre class="programlisting"><code class="prompt">$ </code><span class="command"><strong>git clone git@github.com:katzenpost/katzenpost.git</strong></span></pre>
+                           </p>
+                        </li>
+                        <li class="step">
+                           <p>Get the latest tagged commit of the Katzenpostwith the following
+                              commands.</p>
+                           <pre class="programlisting"><code class="prompt">$ </code><span class="command"><strong>git fetch --tags</strong></span><code class="prompt">$ </code><span class="command"><strong>tag=$(git describe --tags `git rev-list --tags --max-count=1`)</strong></span><code class="prompt">$ </code><span class="command"><strong>git checkout $tag</strong></span></pre>
+                        </li>
+                     </ol>
+                  </div>
+               </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="install_go"></a>Install the latest Go version</h3>
+                     </div>
+                  </div>
+               </div>
+               <p>Download the latest version of the Go programming language from <a class="link" href="https://go.dev/dl" target="_top">https://go.dev/dl</a> and unzip it in a
+                  suitable location. As root, set the necessary environment
+                  variables:
+                  <pre class="programlisting"><code class="prompt"># </code><span class="command"><strong>export PATH=$PATH:/<em class="replaceable"><code>&lt;your Go location&gt;</code></em>/bin</strong></span><code class="prompt"># </code><span class="command"><strong>export GO111MODULE=on</strong></span><code class="prompt"># </code><span class="command"><strong>export CGO_CFLAGS_ALLOW="-DPARAMS=sphincs-shake-256f"</strong></span></pre>
+               </p>
+               <p>The <code class="filename">go/bin</code> path must be included in your user $PATH
+                  environment variable.</p>
+               <p>
+                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                     <table border="0" summary="Note">
+                        <tr>
+                           <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                           <th align="left">Note</th>
+                        </tr>
+                        <tr>
+                           <td align="left" valign="top">
+                              <p>Do not use the Debian/Ubuntu <span class="command"><strong>golang</strong></span> packages. They are
+                                 probably too old.</p>
+                           </td>
+                        </tr>
+                     </table>
+                  </div>
+               </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="build"></a>Build server components</h2>
+                  </div>
+               </div>
+            </div>
+            <p>To build each of the Katzenpost components, navigate to the directory containing
+               its source code and run <span class="command"><strong>go build</strong></span>. The paths shown are relative to the
+               Katzenpost repository root.</p>
+            <p>
+               <div class="table"><a name="d58e114"></a><p class="title"><b>Table&nbsp;1.&nbsp;Component directories</b></p>
+                  <div class="table-contents">
+                     <table class="table" summary="Component directories" border="1">
+                        <colgroup>
+                           <col class="c1">
+                           <col class="c2">
+                           <col class="newCol3">
+                        </colgroup>
+                        <thead>
+                           <tr>
+                              <th>Component</th>
+                              <th>Source code directory</th>
+                              <th>Binary</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           <tr>
+                              <td>Mix, gateway, or service node</td>
+                              <td>server/cmd/server/</td>
+                              <td>server</td>
+                           </tr>
+                           <tr>
+                              <td>Directory authority</td>
+                              <td>authority/cmd/dirauth/</td>
+                              <td>dirauth</td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+               </div><br class="table-break"></p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="d58e138"></a>Install the server components</h2>
+                  </div>
+               </div>
+            </div>
+            <p>To install the server binaries, run the following commands from the katzenpost
+               repository root.</p>
+            <pre class="programlisting"><code class="prompt"># </code>cp server/cmd/server/server /usr/local/bin/pq-katzenpost-mixserver
+<code class="prompt"># </code>cp authority/cmd/dirauth/dirauth /usr/local/bin/pq-katzenpost-authority
+</pre>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="service-accounts"></a>Create service accounts</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Create a service account account for each of the node types that you deploy.</p>
+            <p><b>To create a service user for a directory authority.&nbsp;</b><pre class="programlisting"><code class="prompt"># </code><span class="command"><strong>adduser \
+    --disabled-login \
+    --disabled-password \ 
+    --system \
+    --group \
+    --home /var/lib/pq-katzenpost-authority \
+    pq-katzenpost-authority</strong></span></pre>
+            </p>
+            <p><b>To create a service user for a mix, gateway, or service node.&nbsp;</b><pre class="programlisting"><code class="prompt"># </code><span class="command"><strong>adduser \
+    --disabled-login \
+    --disabled-password \ 
+    --system \
+    --group \
+    --home /var/lib/pq-katzenpost-mixserver \
+    pq-katzenpost-mixserver</strong></span></pre>
+            </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="configure"></a>Create configuration files</h2>
+                  </div>
+               </div>
+            </div>
+            <p>It is possible, though challenging, to construct a node configuration file based on
+               the published component parameters, the example of the Docker test image, and the
+               latest
+               state of the code tree. Katzenpost currently has no configuration automation tool
+               that is ready for general use. If you plan to implement a mix network from scratch,
+               we
+               suggest that you contact the development team for assistance with configuration.</p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="systemd"></a>Configure systemd</h2>
+                  </div>
+               </div>
+            </div>
+            <p>If you are running your Katzenpost components under <a class="link" href="https://systemd.io/" target="_top">systemd</a>, create and install a systemd
+               service file for each node type that you plan to deploy. The following scripts are
+               examples of how to do this.</p>
+            <p><b>To create a systemd service file for a directory authority.&nbsp;</b><pre class="programlisting">#!/bin/bash -x
+
+cat &lt;&lt; EOF &gt; /etc/systemd/system/pq-katzenpost-mixserver.service
+[Unit]
+Description=pq Katzenpost Mix Server
+After=network.target
+
+[Service]
+IPAccounting=yes
+Type=simple
+User=pq-katzenpost-mixserver
+WorkingDirectory=/var/lib/pq-katzenpost-mixserver
+ExecStart=/usr/local/bin/pq-katzenpost-mixserver -f /etc/pq-katzenpost-mixserver/katzenpost.toml
+PrivateTmp=yes
+NoNewPrivileges=yes
+# RestartSec=5
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF</pre>
+            </p>
+            <p><b>To create a systemd service file for a mix, gateway, or service node.&nbsp;</b><pre class="programlisting">#!/bin/bash -x
+
+cat &lt;&lt; EOF &gt; /etc/systemd/system/pq-katzenpost-authority.service
+[Unit]
+Description=pq Katzenpost Authority
+After=network.target
+
+[Service]
+Type=simple
+IPAccounting=yes
+User=pq-katzenpost-authority
+WorkingDirectory=/var/lib/pq-katzenpost-authority
+ExecStart=/usr/local/bin/pq-katzenpost-authority -f /etc/pq-katzenpost-authority/authority.toml
+PrivateTmp=yes
+NoNewPrivileges=yes
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF</pre>
+            </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="generate-keys"></a>Generate keys</h2>
+                  </div>
+               </div>
+            </div>
+            <p>The first time that you run a server binary directly or using
+               systemd, identity and encryption keys are automatically generated and installed if
+               they
+               are not already present. The key location is specified by the value of
+               <code class="code">DataDir</code> in the <code class="code">[Server]</code> section of the configuration. For
+               configuration parameter details, see <a class="link" href="https://katzenpost.network/components.html" target="_top">Components 
+                  and configuration of the Katzenpost mixnet</a>. For server binary commandline options, 
+               see the <a class="link" href="https://katzenpost.network/quickstart.html" target="_top">Quickstart guide</a>.
+               </p>
+            <p>Once the keys are in place, restart the server to begin operations.</p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="d58e205"></a>Build the chat client</h2>
+                  </div>
+               </div>
+            </div>
+            <p>To build the Katzen chat client, navigate to the katzen repository and run <span class="command"><strong>go
+                     build</strong></span>.
+               <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                  <table border="0" summary="Note">
+                     <tr>
+                        <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                        <th align="left">Note</th>
+                     </tr>
+                     <tr>
+                        <td align="left" valign="top">
+                           <p>The Katzen client is under development and not currently usable..</p>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+            </p>
+         </div>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,301 @@
+---
+title: 
+linkTitle: "Quickstart" 
+description: "" 
+url: "docs/admin_guide/quickstart.html" 
+date: "2025-03-03T05:20:34.09983288-08:00"
+draft: false 
+slug: "" 
+layout: "" 
+type: "" 
+weight: 1 
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>Quickstart guide</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+   </head>
+   <body>
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h1 class="title"><a name="quickstart"></a>Quickstart guide</h1>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="toc">
+            <p><b>Table of Contents</b></p>
+            <dl class="toc">
+               <dt><span class="section"><a href="#d58e33">Systemd commands</a></span></dt>
+               <dt><span class="section"><a href="#d58e89">Server CLI commands</a></span></dt>
+               <dt><span class="section"><a href="#d58e164">Management interface</a></span></dt>
+               <dt><span class="section"><a href="#d58e247">Monitoring</a></span></dt>
+            </dl>
+         </div>
+         <p>This topic provides collects basic commands for installed Katzenpost server components
+            in a single convenient place. All system commands require superuser privileges.</p>
+         <p>The commands in this topic do not apply to the Katzenpost Docker image, which has
+            its
+            own controls. For more information, see  <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the
+               Katzenpost Docker test network</a>.</p>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="d58e33"></a>Systemd commands</h2>
+                  </div>
+               </div>
+            </div>
+            <p>These commands match the suggested systemd setup described in <a class="link" href="https://katzenpost.network/docs/admin_guide/install.html" target="_top">Installing
+                  Katzenpost</a>.</p>
+            <p>
+               <div class="table"><a name="d58e42"></a><p class="title"><b>Table&nbsp;1.&nbsp;</b></p>
+                  <div class="table-contents">
+                     <table class="table" summary="" border="1">
+                        <colgroup>
+                           <col class="c1">
+                           <col class="c2">
+                        </colgroup>
+                        <thead>
+                           <tr>
+                              <th>
+                                 <p>Task</p>
+                              </th>
+                              <th>Command</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           <tr>
+                              <td>
+                                 <p>Start a mix node. </p>
+                              </td>
+                              <td>
+                                 <p><span class="command"><strong>systemctl start pq-katzenpost-mixserver</strong></span></p>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td>
+                                 <p>Stop a mix node.</p>
+                              </td>
+                              <td>
+                                 <p><span class="command"><strong>systemctl stop pq-katzenpost-mixserver</strong></span></p>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td>
+                                 <p>Restart a mix node.</p>
+                              </td>
+                              <td>
+                                 <p><span class="command"><strong>systemctl restart
+                                          pq-katzenpost-mixserver</strong></span></p>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td>
+                                 <p>Start a diectory authority node.</p>
+                              </td>
+                              <td>
+                                 <p><span class="command"><strong>systemctl start pq-katzenpost-authority</strong></span></p>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td>
+                                 <p>Stop a diectory authority node.</p>
+                              </td>
+                              <td>
+                                 <p><span class="command"><strong>systemctl stop pq-katzenpost-authority</strong></span></p>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td>
+                                 <p>Restart a diectory authority node.</p>
+                              </td>
+                              <td>
+                                 <p><span class="command"><strong>systemctl restart
+                                          pq-katzenpost-authority</strong></span></p>
+                              </td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+               </div><br class="table-break"></p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="d58e89"></a>Server CLI commands</h2>
+                  </div>
+               </div>
+            </div>
+            <p>The primary Katzenpost server binaries are
+               <span class="command"><strong>pq-katzenpost-mixserver</strong></span>, which instantiates a mix  node, gateway
+               node, or service provider depending on its configuration, and
+               <span class="command"><strong>pq-katzenpost-authority</strong></span>, which instantiates a directory
+               authority. </p>
+            <p>
+               <div class="table"><a name="d58e99"></a><p class="title"><b>Table&nbsp;2.&nbsp;</b></p>
+                  <div class="table-contents">
+                     <table class="table" summary="" border="1">
+                        <colgroup>
+                           <col class="c1">
+                           <col class="c2">
+                        </colgroup>
+                        <thead>
+                           <tr>
+                              <th>
+                                 <p>Task</p>
+                              </th>
+                              <th>Command</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           <tr>
+                              <td>
+                                 <p>Control a mix node.</p>
+                              </td>
+                              <td>
+                                 <p>Run <span class="command"><strong>pq-katzenpost-mixserver -h</strong></span> for options.</p>
+                                 <pre class="programlisting"><code class="prompt">$ </code>pq-katzenpost-mixserver -h
+Usage of pq-katzenpost-mixserver:
+  -f string
+    	Path to the authority config file. (default "katzenpost.toml")
+  -g	Generate the keys and exit immediately.
+  -v	Get version info.</pre>
+                                 <p>The <code class="code"><span class="bold"><strong>-f</strong></span></code> parameter can
+                                    be used to specify a customized path and filename for the server
+                                    configuration file, which is typically
+                                    <code class="filename">/etc/pq-katzenpost-mixserver/katzenpost.toml</code>.</p>
+                                 <p>The <code class="code">-g</code> option is used to generate the public and
+                                    private signing and link keys. By default, these must be manually
+                                    copied to the directory defined by the <code class="filename">DataDir</code>
+                                    parameter in
+                                    <code class="filename">/etc/pq-katzenpost-mixserver/katzenpost.toml</code>.</p>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td>
+                                 <p>Control a directory authority.</p>
+                              </td>
+                              <td>
+                                 <p>Run <span class="command"><strong>pq-katzenpost-authority -h</strong></span> for options.</p>
+                                 <pre class="programlisting"><code class="prompt">$ </code>pq-katzenpost-authority -h
+Usage of pq-katzenpost-authority:
+  -f string
+    	Path to the authority config file. (default "authority.toml")
+  -g	Generate the keys and exit immediately.
+  -v	Get version info.</pre>
+                                 <p>The <code class="code"><span class="bold"><strong>-f</strong></span></code> parameter can
+                                    be used to specify a customized path and filename for the server
+                                    configuration file, which is typically
+                                    <code class="filename">/etc/pq-katzenpost-authority/authority.toml</code>.</p>
+                                 <p>The <code class="code">-g</code> option is used to generate the public and private signing and link
+                                    keys. By default, these must be manually copied to the directory defined by the
+                                    <code class="filename">DataDir</code> parameter in
+                                    <code class="filename">/etc/pq-katzenpost-authority/authority.toml</code>.</p>
+                              </td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+               </div><br class="table-break"></p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="d58e164"></a>Management interface</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Katzenpost provides a management interface that is accessed through a unix domain
+               socket. The interface supports run-time changes to nodes without requiring a restart.
+               By
+               default, the management interface is disabled. To enable it, change the
+               <code class="code">Management</code> section of the node's configuration file so that
+               <code class="code">Enable = true</code>:</p>
+            <pre class="programlisting">[Management]
+   Enable = true
+   Path = "/<em class="replaceable"><code>node_datadir</code></em>/management_sock"</pre>
+            <p>For more information about management configuration, see the details for your node
+               type in <a class="link" href="https://katzenpost.network/docs/admin_guide/components.html" target="_top">Components and configuration of the Katzenpost mixnet</a>.</p>
+            <p>Use the <a class="link" href="https://manpages.org/socat" target="_top">socat</a> command-line
+               utility to connect to the management socket and issue commands, with the following
+               syntax:</p>
+            <pre class="programlisting"><code class="prompt"># </code><span class="command"><strong>socat unix:/<em class="replaceable"><code>path-to-datadir</code></em>/management_sock STDOUT</strong></span></pre>
+            <p>The following commands are supported.</p>
+            <div class="itemizedlist">
+               <ul class="itemizedlist" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p>QUIT - Exit the management socket session.</p>
+                  </li>
+                  <li class="listitem">
+                     <p>SHUTDOWN - Shut down the server gracefully.</p>
+                  </li>
+                  <li class="listitem">
+                     <p>ADD_USER - Add a user and associate it with a public link key provided in
+                        either hexadecimal or Base64 format. </p>
+                     <pre class="programlisting">ADD_USER <em class="replaceable"><code>user</code></em><em class="replaceable"><code>key</code></em></pre>
+                  </li>
+                  <li class="listitem">
+                     <p>UPDATE_USER - Update a user's link key.</p>
+                     <pre class="programlisting">UPDATE_USER <em class="replaceable"><code>user</code></em><em class="replaceable"><code>key</code></em></pre>
+                  </li>
+                  <li class="listitem">
+                     <p>REMOVE_USER - Remove a user.</p>
+                     <pre class="programlisting">REMOVE_USER <em class="replaceable"><code>user</code></em></pre>
+                  </li>
+                  <li class="listitem">
+                     <p>SET_USER_IDENTITY - Set a user's identity key.</p>
+                     <pre class="programlisting">SET_USER_IDENTITY <em class="replaceable"><code>user</code></em><em class="replaceable"><code>key</code></em></pre>
+                  </li>
+                  <li class="listitem">
+                     <p>REMOVE_USER_IDENTITY - Remove a user's identity key. This command must be
+                        followed up with a <code class="code">REMOVE_USER</code> command.</p>
+                     <pre class="programlisting">REMOVE_USER_IDENTITY <em class="replaceable"><code>user</code></em></pre>
+                  </li>
+                  <li class="listitem">
+                     <p>USER_IDENTITY - Retrieve a user's identity key.</p>
+                     <pre class="programlisting">USER_IDENTITY <em class="replaceable"><code>user</code></em></pre>
+                  </li>
+                  <li class="listitem">
+                     <p>SEND_RATE - Set the packet rate limit to a per-minute integer value.</p>
+                     <pre class="programlisting">SEND_RATE <em class="replaceable"><code>value</code></em></pre>
+                  </li>
+                  <li class="listitem">
+                     <p>SEND_BURST - Set the packet burst-rate limit to a per-minute integer
+                        value.</p>
+                     <pre class="programlisting">SEND_BURST <em class="replaceable"><code>value</code></em></pre>
+                  </li>
+               </ul>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="d58e247"></a>Monitoring</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Katzenpost logging information can be viewed in real time with the following
+               commands:</p>
+            <p>
+               <pre class="programlisting"><code class="prompt"># </code><span class="command"><strong><span class="bold"><strong>journalctl -u pq-katzenpost-mixserver -f -n 2000</strong></span></strong></span></pre>
+            </p>
+            <p>or</p>
+            <p>
+               <pre class="programlisting"><code class="prompt"># </code><span class="command"><strong><span class="bold"><strong>journalctl -u pq-katzenpost-authority -f -n 2000</strong></span></strong></span></pre>
+            </p>
+            <p>Logging levels include ERROR, WARNING, NOTICE, INFO, and DEBUG, with INFO as the
+               default. For information about setting the log level, see the documentation for each
+               node type in <a class="link" href="https://katzenpost.network/docs/admin_guide/components.html" target="_top">Components
+                  and configuration of the Katzenpost mixnet</a>.</p>
+         </div>
+      </div>
+   </body>
+</html>

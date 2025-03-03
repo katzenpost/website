@@ -20,13 +20,14 @@
 ]>
 
 <article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
-    version="5.1" xml:id="nat">
+    version="5.1" xml:id="installation">
     
     <info>
-        <title xml:id="nat.title">Installing &program_name;</title>
+        <title xml:id="installation.title">Installing &program_name;</title>
     </info>
-    <para>The section describes how to download &program_name;, set up a development environment,
-        build the code, install the &program_name; binaries, and configure the components. </para>
+    <para>The section provides an overview of how to download &program_name;, set up a development
+        environment, build the code, install the &program_name; binaries, and configure the
+        components. </para>
     
     
     <section xml:id="requirements">    
@@ -58,15 +59,16 @@
         </info>
             <para>Complete the following steps to set up a local &program_name; git repository.<procedure>
                     <step>
-                        <para>Clone &program_name; (server
-                            components).<programlisting><prompt>$ </prompt><command>git clone git@github.com:katzenpost/katzenpost.git</command></programlisting></para>
+                        <para>Clone
+                            &program_name;.<programlisting><prompt>$ </prompt><command>git clone git@github.com:katzenpost/katzenpost.git</command></programlisting></para>
                     </step>
-                    <step>
+                    <!--<step>
                         <para>Clone Katzen (chat client).</para>
                         <programlisting><prompt>$ </prompt><command>git clone git@github.com:katzenpost/katzen.git</command></programlisting>
-                    </step>
+                    </step>-->
                     <step>
-                        <para>Get latest tagged commit with the following commands.</para>
+                        <para>Get the latest tagged commit of the &program_name;with the following
+                            commands.</para>
                         <programlisting><prompt>$ </prompt><command>git fetch --tags</command>
 <prompt>$ </prompt><command>tag=$(git describe --tags `git rev-list --tags --max-count=1`)</command>
 <prompt>$ </prompt><command>git checkout $tag</command> </programlisting>
@@ -80,12 +82,18 @@
 
             <para>Download the latest version of the Go programming language from <link
                     xlink:href="https://go.dev/dl">https://go.dev/dl</link> and unzip it in a
-                suitable location. As root, set the necessary environment variables:<programlisting><prompt># </prompt><command>export PATH=$PATH:/<replaceable>&lt;your Go location></replaceable>/bin</command>
+                suitable location. As root, set the necessary environment
+                variables:<programlisting><prompt># </prompt><command>export PATH=$PATH:/<replaceable>&lt;your Go location></replaceable>/bin</command>
 <prompt># </prompt><command>export GO111MODULE=on</command>
-<prompt># </prompt><command>export CGO_CFLAGS_ALLOW="-DPARAMS=sphincs-shake-256f"</command></programlisting><note>
-                    <para>Do not use the Debian <command>golang</command> package, which is probably
-                        too old.</para>
-                </note></para>
+<prompt># </prompt><command>export CGO_CFLAGS_ALLOW="-DPARAMS=sphincs-shake-256f"</command></programlisting></para>
+            <para>The <filename>go/bin</filename> path must be included in your user $PATH
+                environment variable.</para>
+            <para>
+                <note>
+                    <para>Do not use the Debian/Ubuntu <command>golang</command> packages. They are
+                        probably too old.</para>
+                </note>
+            </para>
         </section>        
     </section>
     
@@ -122,7 +130,7 @@
                             <entry>authority/cmd/dirauth/</entry>
                             <entry>dirauth</entry>
                         </row>
-                        <row>
+<!--                        <row>
                             <entry>Panda server</entry>
                             <entry>panda/server/cmd/panda_server/</entry>
                             <entry/>
@@ -132,7 +140,7 @@
                             <entry>Memspool</entry>
                             <entry>memspool/server/cmd/memspool/</entry><?oxy_comment_end?>
                             <entry/>
-                        </row>
+                        </row>-->
                     </tbody>
                 </tgroup>
             </table>
@@ -144,21 +152,8 @@
             repository root.</para>
         <programlisting><prompt># </prompt>cp server/cmd/server/server /usr/local/bin/pq-katzenpost-mixserver
 <prompt># </prompt>cp authority/cmd/dirauth/dirauth /usr/local/bin/pq-katzenpost-authority
-<?oxy_comment_start author="dwrob" timestamp="20250218T150841+0100" comment="Should panda and memspool even be discussed?"?><prompt># </prompt>cp panda/server/cmd/panda_server/panda_server /usr/local/bin/panda_server
-<prompt># </prompt>cp memspool/server/cmd/memspool/memspool /usr/local/bin/memspool</programlisting><?oxy_comment_end?>
-    </section>
-    <section xml:id="configure">
-        <info>
-            <title xml:id="configure.title">Create configuration files</title>
-        </info>
-        <para/>
-    </section>
-    <section xml:id="generate-keys">
-        <info>
-        <title xml:id="generate-keys.title">Generate keys</title>
-        </info>
-        <para>When you run either the server or dirauth binary, keys are generated automatically if
-            none are found</para>
+<?oxy_comment_start author="dwrob" timestamp="20250218T150841+0100" comment="Should panda and memspool even be discussed?"?><!--<prompt># </prompt>cp panda/server/cmd/panda_server/panda_server /usr/local/bin/panda_server
+<prompt># </prompt>cp memspool/server/cmd/memspool/memspool /usr/local/bin/memspool--></programlisting><?oxy_comment_end?>
     </section>
     <section xml:id="service-accounts">
         <info>
@@ -167,24 +162,38 @@
         <para>Create a service account account for each of the node types that you deploy.</para>
         <formalpara>
             <title>To create a service user for a directory authority</title>
-            <para><programlisting><prompt># </prompt><command>adduser \
+            <para>
+                <programlisting><prompt># </prompt><command>adduser \
     --disabled-login \
     --disabled-password \ 
     --system \
     --group \
     --home /var/lib/pq-katzenpost-authority \
-    pq-katzenpost-authority</command></programlisting></para>
+    pq-katzenpost-authority</command></programlisting>
+            </para>
         </formalpara>
-       <formalpara>
+        <formalpara>
             <title>To create a service user for a mix, gateway, or service node</title>
-            <para><programlisting><prompt># </prompt><command>adduser \
+            <para>
+                <programlisting><prompt># </prompt><command>adduser \
     --disabled-login \
     --disabled-password \ 
     --system \
     --group \
     --home /var/lib/pq-katzenpost-mixserver \
-    pq-katzenpost-mixserver</command></programlisting></para>
+    pq-katzenpost-mixserver</command></programlisting>
+            </para>
         </formalpara>
+    </section>
+    <section xml:id="configure">
+        <info>
+            <title xml:id="configure.title">Create configuration files</title>
+        </info>
+        <para>It is possible, though challenging, to construct a node configuration file based on
+            the published component parameters, the example of the Docker test image, and the latest
+            state of the code tree. &program_name; currently has no configuration automation tool
+            that is ready for general use. If you plan to implement a mix network from scratch, we
+            suggest that you contact the development team for assistance with configuration.</para>
     </section>
     <section xml:id="systemd">
         <info>
@@ -245,18 +254,26 @@ EOF</programlisting>
             </para>
         </formalpara>
     </section>
+    <section xml:id="generate-keys">
+        <info>
+            <title xml:id="generate-keys.title">Generate keys</title>
+        </info>
+        
+        <para>The first time that you run a server binary directly or using
+            systemd, identity and encryption keys are automatically generated and installed if they
+            are not already present. The key location is specified by the value of
+            <code>DataDir</code> in the <code>[Server]</code> section of the configuration. For
+            configuration parameter details, see <link xlink:href="&baseURL;components.html">Components 
+            and configuration of the Katzenpost mixnet</link>. For server binary commandline options, 
+            see the <link xlink:href="&baseURL;quickstart.html">Quickstart guide</link>.
+            </para>
+        <para>Once the keys are in place, restart the server to begin operations.</para>
+    </section>
     <section>
         <title>Build the chat client</title>
-        <para>To build the Katzen chat client, navigate to thekatzen repository and run <command>go
+        <para>To build the Katzen chat client, navigate to the katzen repository and run <command>go
                 build</command>.<note>
-                <para>The Katzen client is not currently working.</para>
+                <para>The Katzen client is under development and not currently usable..</para>
             </note></para>
-    </section>
-    <section xml:id="start-stop">    
-        <info>
-            <title xml:id="start-stop.title">Managing the mixnet</title>
-        </info> 
-        <para> &basic_commands;<?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
-            Dirauth, too<?oxy_custom_end?></para>
     </section>
 </article>

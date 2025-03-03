@@ -12,7 +12,7 @@
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
-<?weight 5 ?> <!-- Optional -->
+<?weight 1 ?> <!-- Optional -->
 
 <!DOCTYPE article [
     <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
@@ -26,69 +26,257 @@
     <info>
         <title xml:id="quickstart.title">Quickstart guide</title>    
     </info>
-    <para>This topic provides collects basic &program_name; commands and other information in a
-        single convenient place. All system commands require superuser privileges.</para>
-    <para>The basic system commands in the table below do not apply to the &program_name; Docker
-        image, which has its own controls. For more information, see Using the <link
-            xlink:href="https://katzenpost.network/docs/admin_guide/docker.html">&program_name;
-            Docker test network</link>.</para>
-    <para>
-        &basic_commands;  
-    </para>
-    <para>
+    <para>This topic provides collects basic commands for installed &program_name; server components
+        in a single convenient place. All system commands require superuser privileges.</para>
+    <para>The commands in this topic do not apply to the &program_name; Docker image, which has its
+        own controls. For more information, see  <link
+            xlink:href="https://katzenpost.network/docs/admin_guide/docker.html">Using the
+            &program_name; Docker test network</link>.</para>
+    
+    <section>
+        <info>
+            <title>Systemd commands</title>
+        </info>
+        <para>These commands match the suggested systemd setup described in <link
+                xlink:href="&baseURL;docs/admin_guide/install.html">Installing
+            &program_name;</link>.</para>
+        
+        <para>
+        
         <table frame="all">
-            <title>Other commands</title>
+            <title></title>
             <tgroup cols="2">
                 <colspec colnum="1" colname="c1" colwidth="1*"/>
                 <colspec colnum="2" colname="c2" colwidth="1.27*"/>
                 <thead>
                     <row>
-                        <entry><para>Task</para></entry>
+                        <entry>
+                            <para>Task</para>
+                        </entry>
                         <entry>Command</entry>
                     </row>
                 </thead>
                 <tbody>
                     <row>
-                        <entry><para>Get the &program_name; server code.</para></entry>
                         <entry>
-                            <para><command>git clone
-                                    git@github.com:katzenpost/katzenpost.git</command></para>
+                            <para>Start a mix node. </para>
                         </entry>
-                    </row>
-                    <row>
-                        <entry><para>Get the &program_name; chat client code.</para></entry>
                         <entry>
-                            <para><command>git clone git@github.com:katzenpost/katzen.git</command></para>
+                            <para><command>systemctl start pq-katzenpost-mixserver</command></para>
                         </entry>
                     </row>
                     <row>
                         <entry>
-                            <para>Control a specific mix server node</para>
+                            <para>Stop a mix node.</para>
                         </entry>
                         <entry>
-                            <para>Run <command>pq-katzenpost-mixserver -h</command> for
-                                options.</para>
+                            <para><command>systemctl stop pq-katzenpost-mixserver</command></para>
                         </entry>
                     </row>
                     <row>
                         <entry>
-                            <para>Control a specific directory authority </para>
+                            <para>Restart a mix node.</para>
                         </entry>
                         <entry>
-                            <para>Run <command>pq-katzenpost-authority -h</command> for
-                                options.</para>
+                            <para><command>systemctl restart
+                                    pq-katzenpost-mixserver</command></para>
                         </entry>
                     </row>
                     <row>
-                        <entry><para>Monitor the mixnet logs in real time.</para></entry>
                         <entry>
-                            <para><command>journalctl -u pq-katzenpost-mixserver -f -n
-                                    2000</command></para>
+                            <para>Start a diectory authority node.</para>
+                        </entry>
+                        <entry>
+                            <para><command>systemctl start pq-katzenpost-authority</command></para>
                         </entry>
                     </row>
-
+                    <row>
+                        <entry>
+                            <para>Stop a diectory authority node.</para>
+                        </entry>
+                        <entry>
+                            <para><command>systemctl stop pq-katzenpost-authority</command></para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para>Restart a diectory authority node.</para>
+                        </entry>
+                        <entry>
+                            <para><command>systemctl restart
+                                pq-katzenpost-authority</command></para>
+                        </entry>
+                    </row>
                 </tbody>
             </tgroup>
         </table>
-    </para>
+        </para>
+    </section>
+
+    
+ <section> 
+     <info>
+         <title>Server CLI commands</title>
+     </info>
+        <para>The primary &program_name; server binaries are
+                <command>pq-katzenpost-mixserver</command>, which instantiates a mix  node, gateway
+            node, or service provider depending on its configuration, and
+                <command>pq-katzenpost-authority</command>, which instantiates a directory
+            authority. </para>
+     
+
+     <para>
+        <table frame="all">
+            <title></title>
+            <tgroup cols="2">
+                <colspec colnum="1" colname="c1" colwidth="1*"/>
+                <colspec colnum="2" colname="c2" colwidth="6.5*"/>
+                <thead>
+                    <row>
+                        <entry>
+                            <para>Task</para>
+                        </entry>
+                        <entry>Command</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>
+                            <para>Control a mix node.</para>
+                        </entry>
+                        <entry>
+                            <para>Run <command>&mixserver_binary; -h</command> for options.</para>
+                            <programlisting><prompt>$ </prompt>&mixserver_binary; -h
+Usage of &mixserver_binary;:
+  -f string
+    	Path to the authority config file. (default "katzenpost.toml")
+  -g	Generate the keys and exit immediately.
+  -v	Get version info.</programlisting>
+                            <para>The <code><emphasis role="bold">-f</emphasis></code> parameter can
+                                    be used to specify a customized path and filename for the server
+                                    configuration file, which is typically
+                                        <filename>/etc/&mixserver_binary;/katzenpost.toml</filename>.</para>
+                            <para>The <code>-g</code> option is used to generate the public and
+                                private signing and link keys. By default, these must be manually
+                                copied to the directory defined by the <filename>DataDir</filename>
+                                parameter in
+                                    <filename>/etc/&mixserver_binary;/katzenpost.toml</filename>.</para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para>Control a directory authority.</para>
+                        </entry>
+                        <entry>
+                            <para>Run <command>&dirauth_binary; -h</command> for options.</para>
+                            
+                            <programlisting><prompt>$ </prompt>&dirauth_binary; -h
+Usage of &dirauth_binary;:
+  -f string
+    	Path to the authority config file. (default "authority.toml")
+  -g	Generate the keys and exit immediately.
+  -v	Get version info.</programlisting>
+                            <para>The <code><emphasis role="bold">-f</emphasis></code> parameter can
+                                    be used to specify a customized path and filename for the server
+                                    configuration file, which is typically
+                                        <filename>/etc/&dirauth_binary;/authority.toml</filename>.</para>
+                            <para>The <code>-g</code> option is used to generate the public and private signing and link
+                                keys. By default, these must be manually copied to the directory defined by the
+                                <filename>DataDir</filename> parameter in
+                                <filename>/etc/&dirauth_binary;/authority.toml</filename>.</para>
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+     </para>
+ </section>
+    <section>
+        <info>
+            <title>Management interface</title>
+        </info>
+        <para>&program_name; provides a management interface that is accessed through a unix domain
+            socket. The interface supports run-time changes to nodes without requiring a restart. By
+            default, the management interface is disabled. To enable it, change the
+                <code>Management</code> section of the node's configuration file so that
+                <code>Enable = true</code>:</para>
+        <programlisting>[Management]
+   Enable = true
+   Path = "/<replaceable>node_datadir</replaceable>/management_sock"</programlisting>
+        <para>For more information about management configuration, see the details for your node
+            type in <link xlink:href="https://katzenpost.network/docs/admin_guide/components.html"
+                >Components and configuration of the Katzenpost mixnet</link>.</para>
+        <para>Use the <link xlink:href="https://manpages.org/socat">socat</link> command-line
+            utility to connect to the management socket and issue commands, with the following
+            syntax:</para>
+        <programlisting><prompt># </prompt><command>socat unix:/<replaceable>path-to-datadir</replaceable>/management_sock STDOUT</command></programlisting>
+        <para>The following commands are supported.</para>
+        <itemizedlist>
+            <listitem>
+                <para>QUIT - Exit the management socket session.</para>
+            </listitem>
+            <listitem>
+                <para>SHUTDOWN - Shut down the server gracefully.</para>
+            </listitem>
+            <listitem>
+                <para>ADD_USER - Add a user and associate it with a public link key provided in
+                    either hexadecimal or Base64 format. </para>
+                <programlisting>ADD_USER <replaceable>user</replaceable> <replaceable>key</replaceable></programlisting>
+            </listitem>
+            <listitem>
+                <para>UPDATE_USER - Update a user's link key.</para>
+                <programlisting>UPDATE_USER <replaceable>user</replaceable> <replaceable>key</replaceable></programlisting>
+            </listitem>
+            <listitem>
+                <para>REMOVE_USER - Remove a user.</para>
+                <programlisting>REMOVE_USER <replaceable>user</replaceable></programlisting>
+            </listitem>
+            <listitem>
+                <para>SET_USER_IDENTITY - Set a user's identity key.</para>
+                <programlisting>SET_USER_IDENTITY <replaceable>user</replaceable> <replaceable>key</replaceable></programlisting>
+            </listitem>
+            <listitem>
+                <para>REMOVE_USER_IDENTITY - Remove a user's identity key. This command must be
+                    followed up with a <code>REMOVE_USER</code> command.</para>
+                <programlisting>REMOVE_USER_IDENTITY <replaceable>user</replaceable></programlisting>
+            </listitem>
+            <listitem>
+                <para>USER_IDENTITY - Retrieve a user's identity key.</para>
+                <programlisting>USER_IDENTITY <replaceable>user</replaceable></programlisting>
+            </listitem>
+            <listitem>
+                <para>SEND_RATE - Set the packet rate limit to a per-minute integer value.</para>
+                <programlisting>SEND_RATE <replaceable>value</replaceable></programlisting>
+            </listitem>
+            <listitem>
+                <para>SEND_BURST - Set the packet burst-rate limit to a per-minute integer
+                    value.</para>
+                <programlisting>SEND_BURST <replaceable>value</replaceable></programlisting>
+            </listitem>
+        </itemizedlist>
+       <!-- <para><?oxy_comment_start author="dwrob" timestamp="20250207T110653-0800" comment="What does this mean? Do managments commands actually edit the TOML file? What config parameter does each one of these management commands touch?"?>
+            Parameters (all) in server/config. <?oxy_comment_end?></para>-->
+        <!--                    <para> Go autogeneted docs: go to godocs.org and search for
+                        katezenpost/katzenpost. -\- Baseic dev docs</para>
+                    <para>Prometheus logging and graphing is to be recommended (has its own
+                        documents)</para>
+-->
+    </section>
+    <section>
+        <title>Monitoring</title>
+        <para>&program_name; logging information can be viewed in real time with the following
+            commands:</para>
+        <para>
+            <programlisting><prompt># </prompt><command><emphasis role="bold">journalctl -u &mixserver_binary; -f -n 2000</emphasis></command></programlisting>
+        </para>
+        <para>or</para>
+        <para>
+            <programlisting><prompt># </prompt><command><emphasis role="bold">journalctl -u &dirauth_binary; -f -n 2000</emphasis></command></programlisting>
+        </para>
+        <para>Logging levels include ERROR, WARNING, NOTICE, INFO, and DEBUG, with INFO as the
+            default. For information about setting the log level, see the documentation for each
+            node type in <link
+                xlink:href="https://katzenpost.network/docs/admin_guide/components.html">Components
+                and configuration of the Katzenpost mixnet</link>.</para>
+    </section>
 </article>

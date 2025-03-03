@@ -5,14 +5,14 @@
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 <?title ?> 
-<?linkTitle "Using with NAT" ?>  <!-- Section menu link text -->
+<?linkTitle "NAT considerations" ?>  <!-- Section menu link text -->
 <?url "docs/admin_guide/nat.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
 <?draft "false" ?> <!-- Optional -->
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
-<?weight 50 ?> <!-- Optional -->
+<?weight 20 ?> <!-- Optional -->
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
