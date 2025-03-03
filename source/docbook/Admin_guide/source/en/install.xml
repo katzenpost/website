@@ -30,9 +30,9 @@
         components. </para>
     
     
-    <section xml:id="requirements">    
+    <section xml:id="install-requirements">    
         <info>
-            <title xml:id="requirements.title">Requirements</title>
+            <title xml:id="install-requirements.title">Requirements</title>
         </info>
         <para>An up-to-date <link xlink:href="https://www.debian.org">Debian</link> or <link
                 xlink:href="https://ubuntu.com">Ubuntu</link> Linux system is assumed as the build

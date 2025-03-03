@@ -20,7 +20,10 @@
 ]>
 
 <article xmlns="http://docbook.org/ns/docbook"
-    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" xml:id="components">
+    version="5.1"
+    xmlns:xlink="http://www.w3.org/1999/xlink" 
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xml:id="components">
     <info>
         <title xml:id="components.title">Components and configuration of the &program_name; mixnet</title>
     </info>
@@ -459,8 +462,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: logging (/1/3)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"/>
                                 
             </section>
             <section xml:id="auth-parameters"><info><title xml:id="auth-parameters.title">Dirauth: Parameters section</title></info>
@@ -776,8 +778,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"/>
                 
             </section>
         </section>
@@ -849,8 +850,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See comment in includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--serverconfig (/1/2)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>               
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"/>               
 
             </section>
             <section xml:id="mix-logging-config"><info><title xml:id="mix-logging-config.title">Mix node: Logging section</title></info>
@@ -858,8 +858,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See comment in includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--logging (/1/3)-->
 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"/>
 
             </section>
             <section xml:id="mix-pki-config"><info><title xml:id="mix-pki-config.title">Mix node: PKI section</title></info>
@@ -867,8 +866,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See comment in includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--pki (/1/6)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"/>                
                  
             </section>
             <section xml:id="mix-management-config"><info><title xml:id="mix-management-config.title">Mix node: Management section</title></info>
@@ -876,8 +874,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: management (/1/5)-->
 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"/>
 
             </section>
             <section xml:id="mix-sphinx-config"><info><title xml:id="mix-sphinx-config.title">Mix node: SphinxGeometry section</title></info>
@@ -885,8 +882,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/> 
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"/> 
  
             </section>
             <section xml:id="mix-debug-config"><info><title xml:id="mix-debug-config.title">Mix node: Debug section</title></info>
@@ -894,8 +890,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: serverdebug (/1/7)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"/>                
  
             </section>
         </section>
@@ -969,8 +964,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: serverconfig (/1/2)-->
                                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"/>
                 
             </section>
             <section xml:id="gateway-logging-config"><info><title xml:id="gateway-logging-config.title">Gateway node: Logging section</title></info>
@@ -978,8 +972,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: logging (/1/3)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"/>
 
             </section>
             <section xml:id="gateway-gateway-section-config"><info><title xml:id="gateway-gateway-section-config.title">Gateway node: Gateway
@@ -1010,8 +1003,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: pki (/1/6)-->
                                
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"/>
                 
             </section>
             <section xml:id="gateway-management-config"><info><title xml:id="gateway-management-config.title">Gateway node: Management section</title></info>
@@ -1019,8 +1011,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: management (/1/5)-->
                               
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"/>                
 
             </section>
             <section xml:id="gateway-sphinx-config"><info><title xml:id="gateway-sphinx-config.title">Gateway node: SphinxGeometry section</title></info>
@@ -1028,8 +1019,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
                                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"/>
                 
             </section>
             <section xml:id="gateway-debug-config"><info><title xml:id="gateway-debug-config.title">Gateway node: Debug section</title></info>
@@ -1037,8 +1027,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: serverdebug (/1/7)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"/>
                 
             </section>
         </section>
@@ -1111,8 +1100,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: serverconfig (/1/2)-->
                                
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/2)"/>
                 
             </section>
             <section xml:id="service-logging-config"><info><title xml:id="service-logging-config.title">Service node: Logging section</title></info>
@@ -1120,8 +1108,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: logging (/1/3)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/3)"/>
                 
             </section>
             <section xml:id="service-servicenode-section-config"><info><title xml:id="service-servicenode-section-config.title">Service node: ServiceNode
@@ -1362,8 +1349,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: pki (/1/6)-->
 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/6)"/>
 
             </section>
             <section xml:id="service-management-config"><info><title xml:id="service-management-config.title">Service node: Management section</title></info>
@@ -1371,8 +1357,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: management (/1/5)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                                
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/5)"/>                                
 
             </section>
             <section xml:id="service-sphinx-config"><info><title xml:id="service-sphinx-config.title">Service node: SphinxGeometry section</title></info>
@@ -1380,8 +1365,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: sphinxgeometry (/1/4)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                                
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/4)"/>                                
  
             </section>
             <section xml:id="service-debug-config"><info><title xml:id="service-debug-config.title">Service node: Debug section</title></info>
@@ -1389,8 +1373,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                 <!--See includes/xincludes.xml for an explanation of the cursed DocBook addressing scheme used here. -->
                 <!--Configuration section: serverdebug (/1/7)-->
                 
-                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"
-                    xmlns:xi="http://www.w3.org/2001/XInclude"/>                
+                <xi:include href="includes/xincludes.xml" xpointer="element(/1/7)"/>                
                 
             </section>
         </section>
