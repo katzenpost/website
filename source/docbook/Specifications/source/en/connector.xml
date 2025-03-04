@@ -1,8 +1,8 @@
 <?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?title?>
-<?linkTitle "Client2 design specification" ?>
-<?url "docs/specs/client2.html" ?>
+<?linkTitle "Connector design specification" ?>
+<?url "docs/specs/connector.html" ?>
 <?description "" ?>
 <?draft false ?>
 <?slug "" ?>
@@ -23,7 +23,7 @@
     version="5.1" xml:id="client2">
 
     <info>
-        <title xml:id="client2.title">Client2 design specification</title>
+        <title xml:id="client2.title">Client connector design specification</title>
         <authorgroup>
             <author>
                 <personname>
@@ -33,14 +33,16 @@
             </author>
         </authorgroup>
         <abstract>
-            <para>This document describes the design of the new Katzenpost mix network client known
-                as client2. In particular we discuss its multiplexing and privilege separation
-                design elements as well as the protocol used by the thin client library.</para>
+            <para>This document describes the design of the Katzenpost mix network client connector.
+                In particular we discuss its multiplexing and privilege separation design elements
+                as well as the protocol used by the connector library, which is incorporated into
+                any application client that supports the connector.</para>
         </abstract>
     </info>
     <section xml:id="client2_introduction">
         <title xml:id="client2_introduction.title">1. Overview</title>
-        <para> A Katzenpost mixnet client has several responsibilities at a minimum:</para>
+        <para> An appliance for Katzenpost client connections has several responsibilities at a
+            minimum:</para>
         <itemizedlist spacing="compact">
             <listitem>
                 <para> compose Sphinx packets </para>
@@ -55,24 +57,24 @@
                 <para> keep up to date with the latest PKI document </para>
             </listitem>
         </itemizedlist>
-        <para>Client2 is essentially a long running daemon process that listens on an abstract unix
-            domain socket for incoming thin client library connections. Many client applications can
-            use the same client2 daemon. Those connections are in a sense being multiplexed into the
-            daemon’s single connection to the mix network.</para>
-        <para>Therefore applications will be integrated with Katzenpost using the thin client
-            library which gives them the capability to talk with the client2 daemon and in that way
-            interact with the mix network. The reason we call it a thin client library is because it
-            does not do any mixnet related cryptography since that is already handled by the client2
-            daemon. In particular, the PKI document is stripped by the daemon before it’s passed on
-            to the thin clients. Likewise, thin clients don’t decrypt SURB replies or compose Sphinx
-            packets, instead all the that Noise, Sphinx and PKI related cryptography is handled by
-            the daemon.</para>
+        <para>The client connector is essentially a long running daemon process that listens on an
+            abstract unix domain socket for incoming connector library connections. Many client
+            applications can use the same connector daemon. Those connections are in a sense being
+            multiplexed into the daemon’s single connection to the mix network.</para>
+        <para>Therefore applications will be integrated with Katzenpost using the connector library
+            which gives them the capability to talk with the connector daemon and in that way
+            interact with the mix network. The library itself does not do any mixnet-related
+            cryptography since that is already handled by the connector daemon. In particular, the
+            PKI document is stripped by the daemon before it’s passed on to clients using the
+            connector library. Likewise, the library doesn't decrypt SURB replies or compose Sphinx
+            packets, with Noise, Sphinx, and PKI related cryptography being handled by the
+            daemon.</para>
     </section>
     <section xml:id="thin-client-and-daemon-protocol">
-        <title xml:id="thin-client-and-daemon-protocol.title">2. Thin client and daemon
+        <title xml:id="thin-client-and-daemon-protocol.title">2. Connector library and daemon
             protocol</title>
-        <para>Note that the thin client daemon protocol uses abstract unix domain sockets in
-            datagram packet mode. The socket is of type SOCK_SEQPACKET which is defined as:</para>
+        <para>Note that the connector daemon protocol uses abstract unix domain sockets in datagram
+            packet mode. The socket is of type SOCK_SEQPACKET which is defined as:</para>
         <itemizedlist spacing="compact">
             <listitem>
                 <para>
@@ -85,34 +87,30 @@
         <section xml:id="client-socket-naming-convention">
             <title xml:id="client-socket-naming-convention.title">2.1 Client socket naming
                 convention</title>
-            <para> Thin clients MUST randomize their abstract unix domain socket name otherwise the
-                static name will prevent multiplexing because the kernel requires that the
-                connection be between uniquely nameed socket pairs. The Katzenpost reference
-                implementation of the thin client library selects a socket name with four random hex
-                digits appended to the end of the name like so: </para>
-            <programlisting>
-@katzenpost_golang_thin_client_DEADBEEF
-</programlisting>
+            <para>Clients using the connector library MUST randomize their abstract unix domain
+                socket names. Otherwise, the static name will prevent multiplexing because the
+                kernel requires that the connection be between uniquely nameed socket pairs. The
+                &program_name; reference implementation of the connector library selects a socket
+                name with four random hex digits appended to the end of the name like so: </para>
+            <programlisting>@katzenpost_golang_thin_client_DEADBEEF</programlisting>
         </section>
         <section xml:id="daemon-socket-naming-convention">
             <title xml:id="daemon-socket-naming-convention.title">2.2 Daemon socket naming
                 convention</title>
-            <para> The client2 daemon listens on an abstract unix domain socket with the following
+            <para>The connector daemon listens on an abstract unix domain socket with the following
                 name: </para>
-            <programlisting>
-@katzenpost
-</programlisting>
+            <programlisting>@katzenpost</programlisting>
         </section>
         <section xml:id="protocol-messages">
             <title xml:id="protocol-messages.title">2.3 Protocol messages</title>
-            <para> Note that there are two protocol message types and they are always CBOR encoded.
-                We do not make use of any prefix length encoding because the socket type preserves
-                message boundaries for us. Therefore we simply send over pure CBOR encoded messages. </para>
-            <para> The daemon sends the <literal>Response</literal> message which is defined in
-                golang as a struct containing an app ID and one of four possible events: </para>
-            <programlisting>
-
-type Response struct {
+            <para>The protocol includes two message types, <literal>Response</literal> and
+                    <literal>Request</literal>. We do not use prefix-length encoding for either
+                because the socket type preserves message boundaries for us, permitting us to use
+                pure CBOR encoding. </para>
+            <para>The daemon sends the <literal>Response</literal> message, which is defined as
+                follows in golang as a struct containing an app ID and one of four possible
+                events.</para>
+            <programlisting>type Response struct {
 // AppID must be a unique identity for the client application
 // that is receiving this Response.
 AppID *[AppIDLength]byte `cbor:app_id`
@@ -148,13 +146,10 @@ SURBID *[sConstants.SURBIDLength]byte `cbor:surbid`
 SentAt time.Time `cbor:sent_at`
 ReplyETA time.Duration `cbor:reply_eta`
 Err error `cbor:err`
-}
-</programlisting>
-            <para> The client sends the <literal>Request</literal> message which is defined in
-                golang as: </para>
-            <programlisting>
-
-type Request struct {
+}</programlisting>
+            <para>The client sends the <literal>Request</literal> message, which is defined in
+                golang as follows. </para>
+            <programlisting>type Request struct {
 // ID is the unique identifier with respect to the Payload.
 // This is only used by the ARQ.
 ID *[MessageIDLength]byte `cbor:id`
@@ -201,45 +196,47 @@ IsLoopDecoy bool `cbor:is_loop_decoy`
 // IsDropDecoy is set to true to indicate that this message shall
 // be a drop decoy message.
 IsDropDecoy bool `cbor:is_drop_decoy`
-}
-</programlisting>
+}</programlisting>
         </section>
         <section xml:id="protocol-description">
             <title xml:id="protocol-description.title">2.4 Protocol description</title>
-            <para> Upon connecting to the daemon socket the client must wait for two messages. The
-                first message received must have it’s <literal>is_status</literal> field set to
-                true. If so then it’s <literal>is_connected</literal> field indicates whether or not
-                the daemon has a mixnet PQ Noise protocol connection to an entry node. </para>
-            <para> Next the client awaits the second message which contains the PKI document in it’s
+            <para>Upon connecting to the daemon socket the client must wait for two messages. The
+                first message received must have its
+                    <?oxy_comment_start author="dwrob" timestamp="20250110T163639-0800" comment="Not defined in either code snippet. Is this saying that the the message is a status message?"?><literal>is_status</literal><?oxy_comment_end?>
+                field set to <emphasis role="bold">true</emphasis> and its
+                    <literal>is_connected</literal> field indicating whether or not the daemon has a
+                mixnet PQ Noise protocol connection to an entry node. </para>
+            <para>The client then awaits the second message, which contains the PKI document in its
                     <literal>payload</literal> field. This marks the end of the initial connection
                 sequence. Note that this PKI document is stripped of all cryptographic signatures. </para>
-            <para> In the next protocol phase, the client may send <literal>Request</literal>
+            <para>In the next protocol phase, the client may send <literal>Request</literal>
                 messages to the daemon in order to cause the daemon to encapsulate the given payload
-                in a Sphinx packet and send it to the entry node. Likewise the daemon my send the
+                in a Sphinx packet and send it to the gateway node. Likewise the daemon my send the
                 client <literal>Response</literal> messages at any time during this protocol phase.
-                These <literal>Response</literal> messages may indicated a connection status change,
-                a new PKI document or a message sent or reply event. </para>
+                These <literal>Response</literal> messages may indicate a connection status change,
+                a new PKI document, or a message-sent or reply event. </para>
         </section>
         <section xml:id="request-message-fields">
             <title xml:id="request-message-fields.title">2.5 Request message fields</title>
-            <para> There are several <literal>Request</literal> fields that we need to discuss. </para>
-            <para> Firstly, each <literal>Request</literal> message sent by a thin client needs to
-                have the <literal>app_id</literal> field set to an ID that is unique among the
-                applications using thin clients. The <literal>app_id</literal> is used by the daemon
-                to route <literal>Response</literal> messages to the correct thin client socket. </para>
-            <para> The rest of the fields we are concerned with are the following: </para>
+            <para>Several <literal>Request</literal> fields need further discussion.</para>
+            <para>Each <literal>Request</literal> message sent by a connector needs to have the
+                    <literal>app_id</literal> field set to an ID that is unique among the
+                applications using the connector. The <literal>app_id</literal> is used by the
+                daemon to route <literal>Response</literal> messages to the correctconnector socket. </para>
+            <para>The remaining fields must conform to the following: </para>
             <itemizedlist>
                 <listitem>
                     <para>
-                        <literal>with_surb</literal> is set to true if a Sphinx packet with a SURB
-                        in it’s payload should be sent. </para>
+                        <literal>with_surb</literal> is set to <emphasis role="bold">true</emphasis>
+                        if a Sphinx packet with a SURB in its payload should be sent. </para>
                 </listitem>
                 <listitem>
                     <para>
                         <literal>surbid</literal> is used to uniquely identify the reponse to a
-                        message sent with the <literal>with_surb</literal> field set to true. It
-                        should NOT be set if using the built-in ARQ for reliability and optional
-                        retransmissions. </para>
+                        message sent with the <literal>with_surb</literal> field set to <emphasis
+                            role="bold">true</emphasis>. It should NOT be set if using the built-in
+                        automatic repeat request (ARQ) for reliability and optional retransmission.
+                    </para>
                 </listitem>
                 <listitem>
                     <para>
@@ -252,64 +249,67 @@ IsDropDecoy bool `cbor:is_drop_decoy`
                 </listitem>
                 <listitem>
                     <para>
-                        <literal>destination_id_hash</literal> is 32 byte hash of the destination
-                        entry node’s identity public key. </para>
+                        <literal>destination_id_hash</literal> is the 32-byte hash of the
+                        destination entry node’s public identity key. </para>
                 </listitem>
                 <listitem>
                     <para>
                         <literal>recipient_queue_id</literal> is the destination queue identity.
-                        This is the destination the message will be delivered to. </para>
+                        This is the destination that the message will be delivered to. </para>
                 </listitem>
             </itemizedlist>
-            <para> If a one way message should be sent with no SURB then
-                    <literal>with_surb</literal> should be set to false and
-                    <literal>surbid</literal> may be nil. If however the thin client wishes to send
-                a reliable message using the daemon’s ARQ, then the following fields must be set: </para>
+            <para>If a on- way message should be sent with no SURB, then
+                    <literal>with_surb</literal> should be set to <emphasis role="bold"
+                    >false</emphasis> and <literal>surbid</literal> may be <emphasis role="bold"
+                    >nil</emphasis>. If, however, the thin client wishes to send a reliable message
+                using the daemon’s ARQ, then the following fields must be set: </para>
             <itemizedlist>
                 <listitem>
                     <para>
-                        <literal>id</literal> the message id which uniquely identifies this message
-                        and it’s eventual reply. </para>
+                        <literal>id</literal> specifies the message ID that uniquely identifies this
+                        message and its eventual reply.</para>
                 </listitem>
                 <listitem>
                     <para>
-                        <literal>with_surb</literal> set to true </para>
+                        <literal>with_surb</literal> is set to <emphasis role="bold"
+                        >true</emphasis>.</para>
                 </listitem>
                 <listitem>
                     <para>
-                        <literal>is_arq_send_op</literal> set to true </para>
+                        <literal>is_arq_send_op</literal> is set to <emphasis role="bold"
+                            >true</emphasis>. </para>
                 </listitem>
                 <listitem>
                     <para>
-                        <literal>payload</literal> set to the message payload, as usual. </para>
+                        <literal>payload</literal> is set to the message payload, as usual.</para>
                 </listitem>
                 <listitem>
                     <para>
-                        <literal>destination_id_hash</literal> set to the destination service node’s
-                        identity public key 32 byte hash. </para>
+                        <literal>destination_id_hash</literal> is the 32-byte hash of the
+                        destination service node’s public identity key.</para>
                 </listitem>
                 <listitem>
-                    <para>
-                        <literal>recipient_queue_id</literal> is the destination queue identity.
-                        This is the destination the message will be delivered to. </para>
+                    <para><literal>recipient_queue_id</literal> is the destination queue ID. This is
+                        the destination that the message will be delivered to. </para>
                 </listitem>
             </itemizedlist>
         </section>
         <section xml:id="response-message-fields">
             <title xml:id="response-message-fields.title">2.6 Response message fields</title>
-            <para> A thin client connection always begins with the daemon sendings the client two
-                messages, a connection status followed by a PKI document. </para>
-            <para> After this connection sequence phase, the daemon may send the thin client a
-                connection status or PKI document update at any time. </para>
-            <para> Thin clients recieve four possible events inside of <literal>Response</literal>
-                messages: </para>
+            <para>The connector library always begins a connection to the daemon with two messages,
+                a connection status followed by a PKI document. </para>
+            <para>After this connection sequence phase, the daemon may send the library a connection
+                status or PKI document update at any time. </para>
+            <para>The connector library can recieve four possible events inside of
+                    <literal>Response</literal> messages: </para>
             <orderedlist numeration="arabic" spacing="compact">
                 <listitem>
-                    <para> connection status event </para>
+                    <para>
+                        <emphasis role="bold">connection status event </emphasis></para>
                     <itemizedlist spacing="compact">
                         <listitem>
                             <para>
-                                <literal>is_connected</literal> indicated whether the client is
+                                <literal>is_connected</literal> indicates whether the client is
                                 connected or not. </para>
                         </listitem>
                         <listitem>
@@ -320,55 +320,57 @@ IsDropDecoy bool `cbor:is_drop_decoy`
                     </itemizedlist>
                 </listitem>
                 <listitem>
-                    <para> new PKI document event </para>
+                    <para><emphasis role="bold"> new PKI document event </emphasis></para>
                     <itemizedlist spacing="compact">
                         <listitem>
                             <para>
-                                <literal>payload</literal> is the CBOR serialied PKI document,
-                                stripped of all the cryptographic signatures. </para>
+                                <literal>payload</literal> is the CBOR-serialized PKI document,
+                                stripped of cryptographic signatures. </para>
                         </listitem>
                     </itemizedlist>
                 </listitem>
                 <listitem>
-                    <para> message sent event </para>
+                    <para><emphasis role="bold"> message sent event </emphasis></para>
                     <itemizedlist spacing="compact">
                         <listitem>
                             <para>
-                                <literal>message_id</literal> is a unique message ID </para>
+                                <literal>message_id</literal> is a unique message ID. </para>
                         </listitem>
                         <listitem>
                             <para>
-                                <literal>surb_id</literal> is the SURB ID </para>
+                                <literal>surb_id</literal> is the SURB ID. </para>
                         </listitem>
                         <listitem>
                             <para>
-                                <literal>sent_at</literal> is the time the message was sent </para>
+                                <literal>sent_at</literal> is the time when the message was
+                                sent.</para>
                         </listitem>
                         <listitem>
                             <para>
-                                <literal>replay_eta</literal> is the time we expect a reply </para>
+                                <literal>replay_eta</literal> is the time when we expect a
+                                reply.</para>
                         </listitem>
                         <listitem>
                             <para>
                                 <literal>err</literal> is the optional error we received when
-                                attempting to send </para>
+                                attempting to send a message. </para>
                         </listitem>
                     </itemizedlist>
                 </listitem>
                 <listitem>
-                    <para> message reply event </para>
+                    <para><emphasis role="bold"> message reply event </emphasis></para>
                     <itemizedlist spacing="compact">
                         <listitem>
                             <para>
-                                <literal>message_id</literal> is a unique message ID </para>
+                                <literal>message_id</literal> is a unique message ID. </para>
                         </listitem>
                         <listitem>
                             <para>
-                                <literal>surb_id</literal> is a the SURB ID </para>
+                                <literal>surb_id</literal> is a the SURB ID.</para>
                         </listitem>
                         <listitem>
                             <para>
-                                <literal>payload</literal> is the replay payload </para>
+                                <literal>payload</literal> is the replay payload .</para>
                         </listitem>
                         <listitem>
                             <para>
