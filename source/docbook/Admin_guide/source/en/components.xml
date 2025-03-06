@@ -27,27 +27,25 @@
     
     <para>This section of the &program_name; technical documentation provides an introduction to the
         software components that make up &program_name; and guidance on how to configure each
-        component.  The intended reader is a system administrator who wants to implement a working,
-        production &program_name; network. </para>
-    <para>For information about the theory and design of this software, see <link xlink:href="&baseURL;docs/admin_guide/introduction.html"
-        >Introducing &program_name;, a modern mixnet</link><!--<xref
-            linkend="introduction" endterm="introduction.title"/>-->. For a quickly deployable,
-        non-production test network (primarily for use by developers), <link xlink:href="&baseURL;docs/admin_guide/docker.html"
-        >Using the &program_name; Docker test network</link><!--<xref linkend="container" endterm="container.title"/>-->.</para>    
+        component. The intended reader is a system administrator who wants to implement a working,
+        production &program_name; network.</para>
+    <para>For a quickly deployable, non-production test network (primarily for use by developers),
+            <link xlink:href="&baseURL;docs/admin_guide/docker.html">Using the &program_name; Docker
+            test network</link>.</para>    
  
     <section xml:id="overview"><info><title xml:id="overview.title">Understanding the &program_name; components</title></info>
         
-        <para>The core of &program_name; consists of two program executables,
-                <!--<link linkend="voter-usage"
-                >dirauth</link> and <link linkend="server-usage">server</link>--><link
-                xlink:href="&baseURL;docs/admin_guide/operations.html#voter-usage">dirauth</link> and <link
-                xlink:href="&baseURL;docs/admin_guide/operations.html#server-usage">server</link>. Running
-            the <command>dirauth </command>commmand runs a <emphasis>directory authority</emphasis>
-            node, or <emphasis>dirauth</emphasis>, that functions as part of the mixnet's public-key
-            infrastructure (PKI). Running the <command>server</command> runs either a
-                <emphasis>mix</emphasis> node, a <emphasis>gateway</emphasis> node, or a
-                <emphasis>service</emphasis> node, depending on the configuration. Configuration
-            settings are provided in an associated <filename>katzenpost-authority.toml</filename> or
+        <para>The core of &program_name; consists of two program executables, <link
+                xlink:href="https://github.com/katzenpost/katzenpost/tree/main/authority"
+                >dirauth</link> and <link
+                xlink:href="https://github.com/katzenpost/katzenpost/tree/main/server"
+            >server</link>. Running the <command>dirauth </command>commmand runs a
+                <emphasis>directory authority</emphasis> node, or <emphasis>dirauth</emphasis>, that
+            functions as part of the mixnet's public-key infrastructure (PKI). Running the
+                <command>server</command> runs either a <emphasis>mix</emphasis> node, a
+                <emphasis>gateway</emphasis> node, or a <emphasis>service</emphasis> node, depending
+            on the configuration. Configuration settings are provided in an associated
+                <filename>katzenpost-authority.toml</filename> or
                 <filename>katzenpost.toml</filename> file respectively. </para>
         <para>In addition to the server components, &program_name; also supports connections to
             client applications hosted externally to the mix network and communicating with it
@@ -123,8 +121,11 @@
                 information outside of the mixnet, interfacing with a blockchain node, and so on.
                 Service nodes also process decoy packets. </para>
         </section>
-        <section xml:id="intro-client"><info><title xml:id="intro-client.title"><?oxy_comment_start author="dwrob" timestamp="20241114T164534-0800" comment="This will be removed or reworked when we have a client user guide."?>Clients<?oxy_comment_end?></title></info>
-            
+        <section xml:id="intro-client">
+            <info>
+                <title xml:id="intro-client.title"
+                    ><?oxy_comment_start author="dwrob" timestamp="20241114T164534-0800" comment="This will be removed or reworked when we have a client user guide."?>Clients<?oxy_comment_end?></title>
+            </info>
             <para>Client applications should be designed so that the following conditions are
                 met:</para>
             <itemizedlist>
@@ -136,7 +137,7 @@
                     <para>Service nodes and clients have no persistent relationship.</para>
                 </listitem>
                 <listitem>
-                    <para>Cleints generate a stream of packets addressed to random or pseudorandom
+                    <para>Clients generate a stream of packets addressed to random or pseudorandom
                         services regardless of whether a real service request is being made. Most of
                         these packets will be decoy traffic.</para>
                 </listitem>
@@ -152,10 +153,13 @@
                 nodes to send replies without knowing the location of the client. Newer clients
                 require a connection through the client <emphasis>connector</emphasis>, which
                 provides multiplexing and privilege separation with a consequent reduction in
-                processing overhead. These clients also implement the Pigeonhole storage and BACAP
-                protocols detailed in <emphasis role="bold">Place-holder for research paper link</emphasis>. </para>
-            <para>The following client applications are available.<table frame="all"><info><title>&program_name; clients</title></info>
-                    
+                processing overhead.<!-- These clients also implement the Pigeonhole storage and BACAP
+                protocols detailed in <emphasis
+                    role="bold">Place-holder for research paper link</emphasis>. --></para>
+            <para>The following client applications are available.<table frame="all">
+                    <info>
+                        <title>&program_name; clients</title>
+                    </info>
                     <tgroup cols="4">
                         <colspec colname="c1" colnum="1" colwidth="1*"/>
                         <colspec colname="newCol2" colnum="2" colwidth="1*"/>
@@ -180,7 +184,7 @@
                         <tbody>
                             <row>
                                 <entry>
-                                    <para><emphasis role="bold">Ping</emphasis></para>
+                                    <para>Ping</para>
                                 </entry>
                                 <entry>
                                     <para>no</para>
@@ -190,12 +194,27 @@
                                         for network testing.</para>
                                 </entry>
                                 <entry>
-                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/katzenpost/katzenpost/tree/main/ping">ping</link></para>
+                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink"
+                                            xlink:href="https://github.com/katzenpost/katzenpost/tree/main/ping"
+                                            >ping</link></para>
                                 </entry>
                             </row>
                             <row>
+                                <entry>Fetch</entry>
                                 <entry>
-                                    <para><emphasis role="bold">Katzen</emphasis></para>
+                                    <para>no</para>
+                                </entry>
+                                <entry>
+                                    <para>Fetches the PKI document containing peer
+                                        information.</para>
+                                </entry>
+                                <entry>GitHub: <link
+                                        xlink:href="https://github.com/katzenpost/katzenpost/tree/main/authority/cmd/fetch"
+                                        >fetch</link></entry>
+                            </row>
+                            <row>
+                                <entry>
+                                    <para>Katzen</para>
                                 </entry>
                                 <entry>
                                     <para>no</para>
@@ -204,12 +223,14 @@
                                     <para>A text chat client with file-transfer support.</para>
                                 </entry>
                                 <entry>
-                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/katzenpost/katzen">katzen</link></para>
+                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink"
+                                            xlink:href="https://github.com/katzenpost/katzen"
+                                            >katzen</link></para>
                                 </entry>
                             </row>
                             <row>
                                 <entry>
-                                    <para><emphasis role="bold">Status</emphasis></para>
+                                    <para>Status</para>
                                 </entry>
                                 <entry>
                                     <para>yes</para>
@@ -219,12 +240,14 @@
                                         network.</para>
                                 </entry>
                                 <entry>
-                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/katzenpost/status">status</link></para>
+                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink"
+                                            xlink:href="https://github.com/katzenpost/status"
+                                            >status</link></para>
                                 </entry>
                             </row>
                             <row>
                                 <entry>
-                                    <para><emphasis role="bold">Worldmap</emphasis></para>
+                                    <para>Worldmap</para>
                                 </entry>
                                 <entry>yes</entry>
                                 <entry>
@@ -232,7 +255,9 @@
                                         of mix network nodes. </para>
                                 </entry>
                                 <entry>
-                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/katzenpost/worldmap">worldmap</link></para>
+                                    <para>GitHub: <link xmlns:xlink="http://www.w3.org/1999/xlink"
+                                            xlink:href="https://github.com/katzenpost/worldmap"
+                                            >worldmap</link></para>
                                 </entry>
                             </row>
                         </tbody>
@@ -252,8 +277,9 @@
             <para>The following configuration is drawn from the reference implementation in
                     <filename>katzenpost/docker/dirauth_mixnet/auth1/authority.toml</filename>. In a
                 real-world mixnet, the component hosts would not be sharing a single IP address. For
-                more information about the test mixnet, see <emphasis role="bold"><link xlink:href="&baseURL;docs/admin_guide/docker.html"
-                        >Using the &program_name; Docker test network</link><!--<xref linkend="container" endterm="container.title"/>--></emphasis>.</para>
+                more information about the test mixnet, see <link
+                        xlink:href="&baseURL;docs/admin_guide/docker.html">Using the &program_name;
+                        Docker test network</link>.</para>
             <table frame="all"><info><title><emphasis role="bold">Directory authority (dirauth) configuration
                         sections</emphasis></title></info>
                 

@@ -46,14 +46,16 @@
         <table frame="all">
             <title>Systemd control commands for &program_name;</title>
             <tgroup cols="2">
-                <colspec colnum="1" colname="c1" colwidth="1*"/>
-                <colspec colnum="2" colname="c2" colwidth="1.27*"/>
+                <colspec colnum="1" colname="c1" colwidth="272.25pt"/>
+                <colspec colnum="2" colname="c2" colwidth="378pt"/>
                 <thead>
                     <row>
                         <entry>
-                            <para>Task</para>
+                            <para><emphasis role="bold">Task</emphasis></para>
                         </entry>
-                        <entry>Command</entry>
+                        <entry>
+                            <para><emphasis role="bold">Command</emphasis></para>
+                        </entry>
                     </row>
                 </thead>
                 <tbody>
@@ -62,7 +64,7 @@
                             <para>Start a mix node. </para>
                         </entry>
                         <entry>
-                            <para><command>systemctl start pq-katzenpost-mixserver</command></para>
+                            <para><command>systemctl start &mixserver_binary;</command></para>
                         </entry>
                     </row>
                     <row>
@@ -70,7 +72,7 @@
                             <para>Stop a mix node.</para>
                         </entry>
                         <entry>
-                            <para><command>systemctl stop pq-katzenpost-mixserver</command></para>
+                            <para><command>systemctl stop &mixserver_binary;</command></para>
                         </entry>
                     </row>
                     <row>
@@ -78,8 +80,7 @@
                             <para>Restart a mix node.</para>
                         </entry>
                         <entry>
-                            <para><command>systemctl restart
-                                    pq-katzenpost-mixserver</command></para>
+                            <para><command>systemctl restart &mixserver_binary;</command></para>
                         </entry>
                     </row>
                     <row>
@@ -87,7 +88,7 @@
                             <para>Start a diectory authority node.</para>
                         </entry>
                         <entry>
-                            <para><command>systemctl start pq-katzenpost-authority</command></para>
+                            <para><command>systemctl start &dirauth_binary;</command></para>
                         </entry>
                     </row>
                     <row>
@@ -95,7 +96,7 @@
                             <para>Stop a diectory authority node.</para>
                         </entry>
                         <entry>
-                            <para><command>systemctl stop pq-katzenpost-authority</command></para>
+                            <para><command>systemctl stop &dirauth_binary;</command></para>
                         </entry>
                     </row>
                     <row>
@@ -103,8 +104,7 @@
                             <para>Restart a diectory authority node.</para>
                         </entry>
                         <entry>
-                            <para><command>systemctl restart
-                                pq-katzenpost-authority</command></para>
+                            <para><command>systemctl restart &dirauth_binary;</command></para>
                         </entry>
                     </row>
                 </tbody>
@@ -118,10 +118,9 @@
      <info>
          <title>Server CLI commands</title>
      </info>
-        <para>The primary &program_name; server binaries are
-                <command>pq-katzenpost-mixserver</command>, which instantiates a mix  node, gateway
-            node, or service provider depending on its configuration, and
-                <command>pq-katzenpost-authority</command>, which instantiates a directory
+        <para>The primary &program_name; server binaries are <command>&mixserver_binary;</command>,
+            which instantiates a mix node, gateway node, or service provider depending on its
+            configuration, and <command>&dirauth_binary;</command>, which instantiates a directory
             authority. </para>
      
 
@@ -129,14 +128,15 @@
         <table frame="all">
             <title>Command options for the &program_name; server binaries</title>
             <tgroup cols="2">
-                <colspec colnum="1" colname="c1" colwidth="1*"/>
-                <colspec colnum="2" colname="c2" colwidth="6.5*"/>
+                <colspec colnum="1" colname="c1" colwidth="153.75pt"/>
+                <colspec colnum="2" colname="c2" colwidth="514.5pt"/>
                 <thead>
                     <row>
                         <entry>
-                            <para>Task</para>
+                            <para><emphasis role="bold">Task</emphasis></para>
                         </entry>
-                        <entry>Command</entry>
+                        <entry><para><emphasis role="bold">Command</emphasis></para>
+                        </entry>
                     </row>
                 </thead>
                 <tbody>
@@ -209,7 +209,7 @@ Usage of &dirauth_binary;:
         <para>Use the <link xlink:href="https://manpages.org/socat">socat</link> command-line
             utility to connect to the management socket and issue commands, with the following
             syntax:</para>
-        <programlisting><prompt># </prompt><command>socat unix:/<replaceable>path-to-datadir</replaceable>/management_sock STDOUT</command></programlisting>
+        <programlisting><prompt># </prompt><command>socat unix:/<replaceable>node-datadir</replaceable>/management_sock STDOUT</command></programlisting>
         <para>The following commands are supported.</para>
         <itemizedlist>
             <listitem>

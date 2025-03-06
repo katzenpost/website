@@ -97,17 +97,16 @@
         </section>        
     </section>
     
-    <section xml:id="build">    
+    <section xml:id="build-server-components">    
         <info>
-            <title xml:id="build.title">Build server components</title>
+            <title xml:id="build-server-components.title">Build server components</title>
         </info>
-        <para>To build each of the &program_name; components, navigate to the directory containing
-            its source code and run <command>go build</command>. The paths shown are relative to the
+        <para>To build a &program_name; server component, navigate to the directory containing its
+            source code and run <command>go build</command>. The paths shown are relative to the
             &program_name; repository root.</para>
         <para>
             <table frame="all">
-                <?oxy_comment_start author="dwrob" timestamp="20250214T102503+0100" comment="There are other directories for other components, but these are the ones included in build-pqkp.sh."?>
-                <title>Component directories<?oxy_comment_end?></title>
+                <title>Server component directories</title>
                 <tgroup cols="3">
                     <colspec colnum="1" colname="c1" colwidth="1*"/>
                     <colspec colnum="2" colname="c2" colwidth="1*"/>
@@ -122,15 +121,15 @@
                     <tbody>
                         <row>
                             <entry>Mix, gateway, or service node</entry>
-                            <entry>server/cmd/server/</entry>
-                            <entry>server</entry>
+                            <entry><filename>server/cmd/server/</filename></entry>
+                            <entry><command>server</command></entry>
                         </row>
                         <row>
                             <entry>Directory authority</entry>
-                            <entry>authority/cmd/dirauth/</entry>
-                            <entry>dirauth</entry>
+                            <entry><filename>authority/cmd/dirauth/</filename></entry>
+                            <entry><command>dirauth</command></entry>
                         </row>
-<!--                        <row>
+                        <!--                        <row>
                             <entry>Panda server</entry>
                             <entry>panda/server/cmd/panda_server/</entry>
                             <entry/>
@@ -146,14 +145,95 @@
             </table>
         </para>
     </section>
+    
+    <section xml:id="build-clients">    
+        <info>
+            <title xml:id="build-clients.title">Build clients</title>
+        </info>
+        <para>The &program_name; client components are useful for testing an operational mixnet. To
+            build them, navigate to the directory containing each component's source code and run
+                <command>go build</command>. The paths shown are relative to the &program_name;
+            repository root.</para>
+        <note>
+            <para>The <link xlink:href="https://github.com/katzenpost/katzen">Katzen</link> chat
+                client is under development and not currently functional. For more information
+                about the clients generally, see 
+                <link xlink:href="&baseURL;docs/admin_guide/components.html#intro-client">Clients</link>.</para>
+        </note>
+        <para>
+            <table frame="all">
+                <title>Client directories</title>
+                <tgroup cols="3">
+                    <colspec colnum="1" colname="c1" colwidth="1*"/>
+                    <colspec colnum="2" colname="c2" colwidth="1*"/>
+                    <colspec colnum="3" colname="newCol3" colwidth="1*"/>
+                    <thead>
+                        <row>
+                            <entry>Component</entry>
+                            <entry>Source code directory</entry>
+                            <entry>Binary or application</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>
+                                <para>Ping</para>
+                            </entry>
+                            <entry><filename>ping/</filename></entry>
+                            <entry><command>ping</command></entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para>Fetch</para>
+                            </entry>
+                            <entry>
+                                <para><filename>authority/cmd/fetch/</filename></para>
+                            </entry>  
+                            <entry>
+                                <para><command>fetch</command></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para>Status</para>
+                            </entry>
+                            <entry>Obtain from GitHub repository <link
+                                    xlink:href="https://github.com/katzenpost/status"
+                                    >katzenpost/status</link>.</entry>
+                            <entry><command>status.py</command></entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para>Worldmap</para>
+                            </entry>
+                            <entry>Obtain from GitHub repository <link
+                                    xlink:href="https://github.com/katzenpost/worldmap"
+                                    >katzenpost/worldmap</link></entry>
+                            <entry><command>world_map.py</command></entry>
+                        </row>
+                        <!--                        <row>
+                            <entry>Panda server</entry>
+                            <entry>panda/server/cmd/panda_server/</entry>
+                            <entry/>
+                        </row>
+                        <row>
+                            <?oxy_comment_start author="dwrob" timestamp="20250218T150240+0100" comment="Should panda and memspool even be discussed?"?>
+                            <entry>Memspool</entry>
+                            <entry>memspool/server/cmd/memspool/</entry><?oxy_comment_end?>
+                            <entry/>
+                        </row>-->
+                    </tbody>
+                </tgroup>
+            </table>
+        </para>
+    </section>
+    
     <section>
         <title>Install the server components</title>
         <para>To install the server binaries, run the following commands from the katzenpost
             repository root.</para>
-        <programlisting><prompt># </prompt>cp server/cmd/server/server /usr/local/bin/pq-katzenpost-mixserver
-<prompt># </prompt>cp authority/cmd/dirauth/dirauth /usr/local/bin/pq-katzenpost-authority
-<?oxy_comment_start author="dwrob" timestamp="20250218T150841+0100" comment="Should panda and memspool even be discussed?"?><!--<prompt># </prompt>cp panda/server/cmd/panda_server/panda_server /usr/local/bin/panda_server
-<prompt># </prompt>cp memspool/server/cmd/memspool/memspool /usr/local/bin/memspool--></programlisting><?oxy_comment_end?>
+        <programlisting><prompt># </prompt>cp server/cmd/server/server /usr/local/bin/&mixserver_binary;
+<prompt># </prompt>cp authority/cmd/dirauth/dirauth /usr/local/bin/&dirauth_binary;</programlisting>
     </section>
     <section xml:id="service-accounts">
         <info>
@@ -168,8 +248,8 @@
     --disabled-password \ 
     --system \
     --group \
-    --home /var/lib/pq-katzenpost-authority \
-    pq-katzenpost-authority</command></programlisting>
+    --home /var/lib/&dirauth_binary; \
+    &dirauth_binary;</command></programlisting>
             </para>
         </formalpara>
         <formalpara>
@@ -180,8 +260,8 @@
     --disabled-password \ 
     --system \
     --group \
-    --home /var/lib/pq-katzenpost-mixserver \
-    pq-katzenpost-mixserver</command></programlisting>
+    --home /var/lib/&mixserver_binary; \
+    &mixserver_binary;</command></programlisting>
             </para>
         </formalpara>
     </section>
@@ -189,11 +269,16 @@
         <info>
             <title xml:id="configure.title">Create configuration files</title>
         </info>
-        <para>It is possible, though challenging, to construct a node configuration file based on
-            the published component parameters, the example of the Docker test image, and the latest
-            state of the code tree. &program_name; currently has no configuration automation tool
-            that is ready for general use. If you plan to implement a mix network from scratch, we
-            suggest that you contact the development team for assistance with configuration.</para>
+        <para>The best way currently to construct a node configuration file is to use one of the
+            samples in <link xlink:href="&baseURL;docs/admin_guide/docker-config-appendix.html"
+                >Appendix: Configuration files from the Docker test mixnet</link>, and to modify it
+            based on the published <link xlink:href="&baseURL;docs/admin_guide/components.html"
+                >component parameters</link>, combined with attention to the latest state of the
+            code tree. Bear in mind that the IP <emphasis>address:port</emphasis> scheme used in the
+            Docker image is specific to that container environment, and is not transferable to a
+            production network without modifcation.</para>
+        <para>&program_name; currently has no configuration automation tool that is ready for
+            general use. </para>
     </section>
     <section xml:id="systemd">
         <info>
@@ -208,17 +293,17 @@
             <para>
                 <programlisting>#!/bin/bash -x
 
-cat &lt;&lt; EOF > /etc/systemd/system/pq-katzenpost-mixserver.service
+cat &lt;&lt; EOF > /etc/systemd/system/&mixserver_binary;.service
 [Unit]
-Description=pq Katzenpost Mix Server
+Description=Katzenpost Mix Server
 After=network.target
 
 [Service]
 IPAccounting=yes
 Type=simple
-User=pq-katzenpost-mixserver
-WorkingDirectory=/var/lib/pq-katzenpost-mixserver
-ExecStart=/usr/local/bin/pq-katzenpost-mixserver -f /etc/pq-katzenpost-mixserver/katzenpost.toml
+User=&mixserver_binary;
+WorkingDirectory=/var/lib/&mixserver_binary;
+ExecStart=/usr/local/bin/&mixserver_binary; -f /etc/&mixserver_binary;/katzenpost.toml
 PrivateTmp=yes
 NoNewPrivileges=yes
 # RestartSec=5
@@ -233,17 +318,17 @@ EOF</programlisting>
             <para>
                 <programlisting>#!/bin/bash -x
 
-cat &lt;&lt; EOF > /etc/systemd/system/pq-katzenpost-authority.service
+cat &lt;&lt; EOF > /etc/systemd/system/&dirauth_binary;.service
 [Unit]
-Description=pq Katzenpost Authority
+Description=Katzenpost Authority
 After=network.target
 
 [Service]
 Type=simple
 IPAccounting=yes
-User=pq-katzenpost-authority
-WorkingDirectory=/var/lib/pq-katzenpost-authority
-ExecStart=/usr/local/bin/pq-katzenpost-authority -f /etc/pq-katzenpost-authority/authority.toml
+User=&dirauth_binary;
+WorkingDirectory=/var/lib/&dirauth_binary;
+ExecStart=/usr/local/bin/&dirauth_binary; -f /etc/&dirauth_binary;/authority.toml
 PrivateTmp=yes
 NoNewPrivileges=yes
 Restart=on-failure
@@ -263,17 +348,10 @@ EOF</programlisting>
             systemd, identity and encryption keys are automatically generated and installed if they
             are not already present. The key location is specified by the value of
             <code>DataDir</code> in the <code>[Server]</code> section of the configuration. For
-            configuration parameter details, see <link xlink:href="&baseURL;components.html">Components 
+            configuration parameter details, see <link xlink:href="&baseURL;docs/admin_guide/components.html">Components 
             and configuration of the Katzenpost mixnet</link>. For server binary commandline options, 
-            see the <link xlink:href="&baseURL;quickstart.html">Quickstart guide</link>.
+            see the <link xlink:href="&baseURL;docs/admin_guide/quickstart.html">Quickstart guide</link>.
             </para>
         <para>Once the keys are in place, restart the server to begin operations.</para>
-    </section>
-    <section>
-        <title>Build the chat client</title>
-        <para>To build the Katzen chat client, navigate to the katzen repository and run <command>go
-                build</command>.<note>
-                <para>The Katzen client is under development and not currently usable..</para>
-            </note></para>
     </section>
 </article>

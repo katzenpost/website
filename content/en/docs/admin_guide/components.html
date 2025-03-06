@@ -3,7 +3,7 @@ title:
 linkTitle: "Components and configuration" 
 description: "" 
 url: "docs/admin_guide/components.html" 
-date: "2025-02-25T11:53:10.854941622+01:00"
+date: "2025-03-05T16:03:29.357286786-08:00"
 draft: false 
 slug: "" 
 layout: "" 
@@ -54,11 +54,12 @@ weight: 25
          <p>This section of the Katzenpost technical documentation provides an introduction to
             the
             software components that make up Katzenpost and guidance on how to configure each
-            component.  The intended reader is a system administrator who wants to implement a
+            component. The intended reader is a system administrator who wants to implement a
             working,
-            production Katzenpost network. </p>
-         <p>For information about the theory and design of this software, see <a class="link" href="https://katzenpost.network/docs/admin_guide/introduction.html" target="_top">Introducing Katzenpost, a modern mixnet</a>. For a quickly deployable,
-            non-production test network (primarily for use by developers), <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
+            production Katzenpost network.</p>
+         <p>For a quickly deployable, non-production test network (primarily for use by developers),
+            <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker
+               test network</a>.</p>
          <div class="section">
             <div class="titlepage">
                <div>
@@ -67,20 +68,19 @@ weight: 25
                   </div>
                </div>
             </div>
-            <p>The core of Katzenpost consists of two program executables,
-               <a class="link" href="https://katzenpost.network/docs/admin_guide/operations.html#voter-usage" target="_top">dirauth</a> and <a class="link" href="https://katzenpost.network/docs/admin_guide/operations.html#server-usage" target="_top">server</a>. Running
-               the <span class="command"><strong>dirauth </strong></span>commmand runs a <span class="emphasis"><em>directory authority</em></span>
-               node, or <span class="emphasis"><em>dirauth</em></span>, that functions as part of the mixnet's public-key
-               infrastructure (PKI). Running the <span class="command"><strong>server</strong></span> runs either a
-               <span class="emphasis"><em>mix</em></span> node, a <span class="emphasis"><em>gateway</em></span> node, or a
-               <span class="emphasis"><em>service</em></span> node, depending on the configuration. Configuration
-               settings are provided in an associated <code class="filename">katzenpost-authority.toml</code> or
+            <p>The core of Katzenpost consists of two program executables, <a class="link" href="https://github.com/katzenpost/katzenpost/tree/main/authority" target="_top">dirauth</a> and <a class="link" href="https://github.com/katzenpost/katzenpost/tree/main/server" target="_top">server</a>. Running the <span class="command"><strong>dirauth </strong></span>commmand runs a
+               <span class="emphasis"><em>directory authority</em></span> node, or <span class="emphasis"><em>dirauth</em></span>, that
+               functions as part of the mixnet's public-key infrastructure (PKI). Running the
+               <span class="command"><strong>server</strong></span> runs either a <span class="emphasis"><em>mix</em></span> node, a
+               <span class="emphasis"><em>gateway</em></span> node, or a <span class="emphasis"><em>service</em></span> node, depending
+               on the configuration. Configuration settings are provided in an associated
+               <code class="filename">katzenpost-authority.toml</code> or
                <code class="filename">katzenpost.toml</code> file respectively. </p>
             <p>In addition to the server components, Katzenpost also supports connections to
                client applications hosted externally to the mix network and communicating with it
                through gateway nodes. </p>
             <p>A model mix network is shown in Figure 1.</p>
-            <div class="figure"><a name="d58e72"></a><p class="title"><b>Figure&nbsp;1.&nbsp;The pictured element types correspond to discrete client and server programs
+            <div class="figure"><a name="d58e66"></a><p class="title"><b>Figure&nbsp;1.&nbsp;The pictured element types correspond to discrete client and server programs
                      that
                      Katzenpost requires to function. </b></p>
                <div class="figure-contents">
@@ -193,7 +193,7 @@ weight: 25
                         <p>Service nodes and clients have no persistent relationship.</p>
                      </li>
                      <li class="listitem">
-                        <p>Cleints generate a stream of packets addressed to random or pseudorandom
+                        <p>Clients generate a stream of packets addressed to random or pseudorandom
                            services regardless of whether a real service request is being made. Most of
                            these packets will be decoy traffic.</p>
                      </li>
@@ -210,10 +210,9 @@ weight: 25
                   nodes to send replies without knowing the location of the client. Newer clients
                   require a connection through the client <span class="emphasis"><em>connector</em></span>, which
                   provides multiplexing and privilege separation with a consequent reduction in
-                  processing overhead. These clients also implement the Pigeonhole storage and BACAP
-                  protocols detailed in <span class="bold"><strong>Place-holder for research paper link</strong></span>. </p>
+                  processing overhead.</p>
                <p>The following client applications are available.
-                  <div class="table"><a name="d58e147"></a><p class="title"><b>Table&nbsp;1.&nbsp;Katzenpost clients</b></p>
+                  <div class="table"><a name="d58e139"></a><p class="title"><b>Table&nbsp;1.&nbsp;Katzenpost clients</b></p>
                      <div class="table-contents">
                         <table class="table" border="1">
                            <colgroup>
@@ -241,7 +240,7 @@ weight: 25
                            <tbody>
                               <tr>
                                  <td>
-                                    <p><span class="bold"><strong>Ping</strong></span></p>
+                                    <p>Ping</p>
                                  </td>
                                  <td>
                                     <p>no</p>
@@ -255,8 +254,19 @@ weight: 25
                                  </td>
                               </tr>
                               <tr>
+                                 <td>Fetch</td>
                                  <td>
-                                    <p><span class="bold"><strong>Katzen</strong></span></p>
+                                    <p>no</p>
+                                 </td>
+                                 <td>
+                                    <p>Fetches the PKI document containing peer
+                                       information.</p>
+                                 </td>
+                                 <td>GitHub: <a class="link" href="https://github.com/katzenpost/katzenpost/tree/main/authority/cmd/fetch" target="_top">fetch</a></td>
+                              </tr>
+                              <tr>
+                                 <td>
+                                    <p>Katzen</p>
                                  </td>
                                  <td>
                                     <p>no</p>
@@ -270,7 +280,7 @@ weight: 25
                               </tr>
                               <tr>
                                  <td>
-                                    <p><span class="bold"><strong>Status</strong></span></p>
+                                    <p>Status</p>
                                  </td>
                                  <td>
                                     <p>yes</p>
@@ -285,7 +295,7 @@ weight: 25
                               </tr>
                               <tr>
                                  <td>
-                                    <p><span class="bold"><strong>Worldmap</strong></span></p>
+                                    <p>Worldmap</p>
                                  </td>
                                  <td>yes</td>
                                  <td>
@@ -323,8 +333,9 @@ weight: 25
                <p>The following configuration is drawn from the reference implementation in
                   <code class="filename">katzenpost/docker/dirauth_mixnet/auth1/authority.toml</code>. In a
                   real-world mixnet, the component hosts would not be sharing a single IP address. For
-                  more information about the test mixnet, see <span class="bold"><strong><a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a></strong></span>.</p>
-               <div class="table"><a name="d58e243"></a><p class="title"><b>Table&nbsp;2.&nbsp;<span class="bold"><strong>Directory authority (dirauth) configuration
+                  more information about the test mixnet, see <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost
+                     Docker test network</a>.</p>
+               <div class="table"><a name="d58e235"></a><p class="title"><b>Table&nbsp;2.&nbsp;<span class="bold"><strong>Directory authority (dirauth) configuration
                               sections</strong></span></b></p>
                   <div class="table-contents">
                      <table class="table" border="1">
@@ -435,7 +446,7 @@ weight: 25
                                     <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                        <table border="0" summary="Note">
                                           <tr>
-                                             <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                             <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                              <th align="left">Note</th>
                                           </tr>
                                           <tr>
@@ -594,7 +605,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                     <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                        <table border="0" summary="Note">
                                           <tr>
-                                             <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                             <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                              <th align="left">Note</th>
                                           </tr>
                                           <tr>
@@ -656,7 +667,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e475"></a></h5>
+                              <h5 class="title"><a name="d58e467"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -691,7 +702,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                  <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
                                     <table border="0" summary="Warning">
                                        <tr>
-                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
                                           <th align="left">Warning</th>
                                        </tr>
                                        <tr>
@@ -815,7 +826,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                            <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
                               <table border="0" summary="Warning">
                                  <tr>
-                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
                                     <th align="left">Warning</th>
                                  </tr>
                                  <tr>
@@ -1060,7 +1071,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                   <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                      <table border="0" summary="Note">
                         <tr>
-                           <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                           <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                            <th align="left">Note</th>
                         </tr>
                         <tr>
@@ -1097,38 +1108,19 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e782"></a></h5>
+                              <h5 class="title"><a name="d58e774"></a></h5>
                            </div>
                         </div>
                      </div>
                      <div class="informalexample">
                         <p>The <code class="code">SphinxGeometry</code> section defines parameters for the Sphinx
-                           encrypted nested-packet format used internally by Katzenpost. 
-                           
-                           <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                              <table border="0" summary="Warning">
-                                 <tr>
-                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
-                                    <th align="left">Warning</th>
-                                 </tr>
-                                 <tr>
-                                    <td align="left" valign="top">
-                                       <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
-                                          be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
-                                          parameters are interdependent and cannot be individually modified. Do not
-                                          modify the these values by hand.</p>
-                                    </td>
-                                 </tr>
-                              </table>
-                           </div>
-                        </p>
-                        <p>The settings in this section are generated by the <span class="command"><strong>gensphinx</strong></span>
-                           utility, which computes the Sphinx geometry based on the following user-supplied
-                           directives:</p>
+                           encrypted nested-packet format used internally by Katzenpost.</p>
+                        <p>The settings in this section are generated by  the <a class="link" href="https://github.com/katzenpost/katzenpost/tree/main/gensphinx" target="_top">gensphinx</a> utility, which computes the Sphinx geometry based on the
+                           following user-supplied directives:</p>
                         <div class="itemizedlist">
                            <ul class="itemizedlist" style="list-style-type: disc; ">
                               <li class="listitem">
-                                 <p>The number of  mix node layers (not counting gateway and service
+                                 <p>The number of mix node layers (not counting gateway and service
                                     nodes)</p>
                               </li>
                               <li class="listitem">
@@ -1139,10 +1131,26 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                               </li>
                            </ul>
                         </div>
-                        <p>The output in TOML should then be pasted unchanged into the node's configuration
-                           file, as shown below. For more information, 
-                           see <a class="link" href="https://katzenpost.network/docs/admin_guide/gensphinx-appendix.html" target="_top">Appendix: 
-                              Using gensphinx</a>.</p>
+                        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
+                           <table border="0" summary="Warning">
+                              <tr>
+                                 <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                 <th align="left">Warning</th>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="top">
+                                    <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                                       be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
+                                       parameters are interdependent and cannot be individually modified. Do not
+                                       modify the these values by hand.</p>
+                                 </td>
+                              </tr>
+                           </table>
+                        </div>
+                     </div>
+                     <div class="informalexample">
+                        <p>The <span class="command"><strong>gensphinx</strong></span> output in TOML should then be pasted unchanged
+                           into the node's configuration file, as shown below.</p>
                         <pre class="programlisting">[SphinxGeometry]
                 PacketLength = 3082
                 NrHops = 5
@@ -1226,10 +1234,10 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                               </li>
                               <li class="listitem">
                                  <p><span class="bold"><strong>NextNodeHopLength</strong></span></p>
-                                 <p>The <code class="code">NextNodeHopLength</code> is derived from the largest routing-information 
-                                    block that we expect to encounter. Other packets have 
-                                    <code class="code">NextNodeHop</code> + <code class="code">NodeDelay</code> sections, or a <code class="code">Recipient</code> section, both of which
-                                    are shorter.</p>
+                                 <p>The <code class="code">NextNodeHopLength</code> is derived from the largest
+                                    routing-information block that we expect to encounter. Other packets have
+                                    <code class="code">NextNodeHop</code> + <code class="code">NodeDelay</code> sections, or a
+                                    <code class="code">Recipient</code> section, both of which are shorter.</p>
                                  <p>Type: int</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -1252,7 +1260,8 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                  <p><span class="bold"><strong>KEMName</strong></span></p>
                                  <p>The name of the key encapsulation mechanism (KEM) used by Sphinx
                                     packets.</p>
-                                 <p><code class="code">NIKEName</code> and <code class="code">KEMName</code> are mutually exclusive.</p>
+                                 <p><code class="code">NIKEName</code> and <code class="code">KEMName</code> are mutually
+                                    exclusive.</p>
                                  <p>Type: string</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -1275,7 +1284,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                   real-world mixnet, the component hosts would not be sharing a single IP address. For
                   more information about the test mixnet, see <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
                <p>
-                  <div class="table"><a name="d58e946"></a><p class="title"><b>Table&nbsp;3.&nbsp;Mix node configuration sections</b></p>
+                  <div class="table"><a name="d58e939"></a><p class="title"><b>Table&nbsp;3.&nbsp;Mix node configuration sections</b></p>
                      <div class="table-contents">
                         <table class="table" border="1">
                            <colgroup>
@@ -1343,7 +1352,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e988"></a></h5>
+                              <h5 class="title"><a name="d58e981"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -1377,7 +1386,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                           <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                              <table border="0" summary="Note">
                                                 <tr>
-                                                   <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                                   <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                                    <th align="left">Note</th>
                                                 </tr>
                                                 <tr>
@@ -1448,7 +1457,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                  <p>Note that <span class="bold"><strong>BindAddresses</strong></span>, below, holds the
                                     address values for non-adverstised, internal-only listeners. The addition of
                                     <span class="bold"><strong>BindAddresses</strong></span> to the node configuration
-                                    is required for hosts connecting to the Internet through network adddress
+                                    is required for hosts connecting to the Internet through network address
                                     translation (NAT).</p>
                                  <p>Type: []string</p>
                                  <p>Required: Yes</p>
@@ -1508,7 +1517,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1138"></a></h5>
+                              <h5 class="title"><a name="d58e1131"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -1543,7 +1552,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                                  <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
                                     <table border="0" summary="Warning">
                                        <tr>
-                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
                                           <th align="left">Warning</th>
                                        </tr>
                                        <tr>
@@ -1572,7 +1581,7 @@ ldMtDsvvc9KUfE4I0+c+XQ==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1187"></a></h5>
+                              <h5 class="title"><a name="d58e1180"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -1711,7 +1720,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1256"></a></h5>
+                              <h5 class="title"><a name="d58e1249"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -1756,38 +1765,19 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1301"></a></h5>
+                              <h5 class="title"><a name="d58e1294"></a></h5>
                            </div>
                         </div>
                      </div>
                      <div class="informalexample">
                         <p>The <code class="code">SphinxGeometry</code> section defines parameters for the Sphinx
-                           encrypted nested-packet format used internally by Katzenpost. 
-                           
-                           <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                              <table border="0" summary="Warning">
-                                 <tr>
-                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
-                                    <th align="left">Warning</th>
-                                 </tr>
-                                 <tr>
-                                    <td align="left" valign="top">
-                                       <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
-                                          be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
-                                          parameters are interdependent and cannot be individually modified. Do not
-                                          modify the these values by hand.</p>
-                                    </td>
-                                 </tr>
-                              </table>
-                           </div>
-                        </p>
-                        <p>The settings in this section are generated by the <span class="command"><strong>gensphinx</strong></span>
-                           utility, which computes the Sphinx geometry based on the following user-supplied
-                           directives:</p>
+                           encrypted nested-packet format used internally by Katzenpost.</p>
+                        <p>The settings in this section are generated by  the <a class="link" href="https://github.com/katzenpost/katzenpost/tree/main/gensphinx" target="_top">gensphinx</a> utility, which computes the Sphinx geometry based on the
+                           following user-supplied directives:</p>
                         <div class="itemizedlist">
                            <ul class="itemizedlist" style="list-style-type: disc; ">
                               <li class="listitem">
-                                 <p>The number of  mix node layers (not counting gateway and service
+                                 <p>The number of mix node layers (not counting gateway and service
                                     nodes)</p>
                               </li>
                               <li class="listitem">
@@ -1798,10 +1788,26 @@ FZWJFK0R8iU52CEUxVpXTA==
                               </li>
                            </ul>
                         </div>
-                        <p>The output in TOML should then be pasted unchanged into the node's configuration
-                           file, as shown below. For more information, 
-                           see <a class="link" href="https://katzenpost.network/docs/admin_guide/gensphinx-appendix.html" target="_top">Appendix: 
-                              Using gensphinx</a>.</p>
+                        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
+                           <table border="0" summary="Warning">
+                              <tr>
+                                 <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                 <th align="left">Warning</th>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="top">
+                                    <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                                       be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
+                                       parameters are interdependent and cannot be individually modified. Do not
+                                       modify the these values by hand.</p>
+                                 </td>
+                              </tr>
+                           </table>
+                        </div>
+                     </div>
+                     <div class="informalexample">
+                        <p>The <span class="command"><strong>gensphinx</strong></span> output in TOML should then be pasted unchanged
+                           into the node's configuration file, as shown below.</p>
                         <pre class="programlisting">[SphinxGeometry]
                 PacketLength = 3082
                 NrHops = 5
@@ -1885,10 +1891,10 @@ FZWJFK0R8iU52CEUxVpXTA==
                               </li>
                               <li class="listitem">
                                  <p><span class="bold"><strong>NextNodeHopLength</strong></span></p>
-                                 <p>The <code class="code">NextNodeHopLength</code> is derived from the largest routing-information 
-                                    block that we expect to encounter. Other packets have 
-                                    <code class="code">NextNodeHop</code> + <code class="code">NodeDelay</code> sections, or a <code class="code">Recipient</code> section, both of which
-                                    are shorter.</p>
+                                 <p>The <code class="code">NextNodeHopLength</code> is derived from the largest
+                                    routing-information block that we expect to encounter. Other packets have
+                                    <code class="code">NextNodeHop</code> + <code class="code">NodeDelay</code> sections, or a
+                                    <code class="code">Recipient</code> section, both of which are shorter.</p>
                                  <p>Type: int</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -1911,7 +1917,8 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p><span class="bold"><strong>KEMName</strong></span></p>
                                  <p>The name of the key encapsulation mechanism (KEM) used by Sphinx
                                     packets.</p>
-                                 <p><code class="code">NIKEName</code> and <code class="code">KEMName</code> are mutually exclusive.</p>
+                                 <p><code class="code">NIKEName</code> and <code class="code">KEMName</code> are mutually
+                                    exclusive.</p>
                                  <p>Type: string</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -1932,7 +1939,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1458"></a></h5>
+                              <h5 class="title"><a name="d58e1452"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -2083,7 +2090,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                     <table border="0" summary="Note">
                                        <tr>
-                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                           <th align="left">Note</th>
                                        </tr>
                                        <tr>
@@ -2102,7 +2109,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                     <table border="0" summary="Note">
                                        <tr>
-                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                           <th align="left">Note</th>
                                        </tr>
                                        <tr>
@@ -2140,7 +2147,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                   <code class="filename">katzenpost/docker/dirauth_mixnet/gateway1/katzenpost.toml</code>.
                   In a real-world mixnet, the component hosts would not be sharing a single IP
                   address. For more information about the test mixnet, see <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
-               <div class="table"><a name="d58e1633"></a><p class="title"><b>Table&nbsp;4.&nbsp;Gateway node configuration sections</b></p>
+               <div class="table"><a name="d58e1627"></a><p class="title"><b>Table&nbsp;4.&nbsp;Gateway node configuration sections</b></p>
                   <div class="table-contents">
                      <table class="table" border="1">
                         <colgroup>
@@ -2212,7 +2219,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1678"></a></h5>
+                              <h5 class="title"><a name="d58e1672"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -2246,7 +2253,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                           <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                              <table border="0" summary="Note">
                                                 <tr>
-                                                   <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                                   <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                                    <th align="left">Note</th>
                                                 </tr>
                                                 <tr>
@@ -2317,7 +2324,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p>Note that <span class="bold"><strong>BindAddresses</strong></span>, below, holds the
                                     address values for non-adverstised, internal-only listeners. The addition of
                                     <span class="bold"><strong>BindAddresses</strong></span> to the node configuration
-                                    is required for hosts connecting to the Internet through network adddress
+                                    is required for hosts connecting to the Internet through network address
                                     translation (NAT).</p>
                                  <p>Type: []string</p>
                                  <p>Required: Yes</p>
@@ -2377,7 +2384,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1828"></a></h5>
+                              <h5 class="title"><a name="d58e1822"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -2412,7 +2419,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
                                     <table border="0" summary="Warning">
                                        <tr>
-                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
                                           <th align="left">Warning</th>
                                        </tr>
                                        <tr>
@@ -2470,7 +2477,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1894"></a></h5>
+                              <h5 class="title"><a name="d58e1888"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -2609,7 +2616,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e1963"></a></h5>
+                              <h5 class="title"><a name="d58e1957"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -2654,38 +2661,19 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2008"></a></h5>
+                              <h5 class="title"><a name="d58e2002"></a></h5>
                            </div>
                         </div>
                      </div>
                      <div class="informalexample">
                         <p>The <code class="code">SphinxGeometry</code> section defines parameters for the Sphinx
-                           encrypted nested-packet format used internally by Katzenpost. 
-                           
-                           <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                              <table border="0" summary="Warning">
-                                 <tr>
-                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
-                                    <th align="left">Warning</th>
-                                 </tr>
-                                 <tr>
-                                    <td align="left" valign="top">
-                                       <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
-                                          be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
-                                          parameters are interdependent and cannot be individually modified. Do not
-                                          modify the these values by hand.</p>
-                                    </td>
-                                 </tr>
-                              </table>
-                           </div>
-                        </p>
-                        <p>The settings in this section are generated by the <span class="command"><strong>gensphinx</strong></span>
-                           utility, which computes the Sphinx geometry based on the following user-supplied
-                           directives:</p>
+                           encrypted nested-packet format used internally by Katzenpost.</p>
+                        <p>The settings in this section are generated by  the <a class="link" href="https://github.com/katzenpost/katzenpost/tree/main/gensphinx" target="_top">gensphinx</a> utility, which computes the Sphinx geometry based on the
+                           following user-supplied directives:</p>
                         <div class="itemizedlist">
                            <ul class="itemizedlist" style="list-style-type: disc; ">
                               <li class="listitem">
-                                 <p>The number of  mix node layers (not counting gateway and service
+                                 <p>The number of mix node layers (not counting gateway and service
                                     nodes)</p>
                               </li>
                               <li class="listitem">
@@ -2696,10 +2684,26 @@ FZWJFK0R8iU52CEUxVpXTA==
                               </li>
                            </ul>
                         </div>
-                        <p>The output in TOML should then be pasted unchanged into the node's configuration
-                           file, as shown below. For more information, 
-                           see <a class="link" href="https://katzenpost.network/docs/admin_guide/gensphinx-appendix.html" target="_top">Appendix: 
-                              Using gensphinx</a>.</p>
+                        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
+                           <table border="0" summary="Warning">
+                              <tr>
+                                 <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                 <th align="left">Warning</th>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="top">
+                                    <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                                       be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
+                                       parameters are interdependent and cannot be individually modified. Do not
+                                       modify the these values by hand.</p>
+                                 </td>
+                              </tr>
+                           </table>
+                        </div>
+                     </div>
+                     <div class="informalexample">
+                        <p>The <span class="command"><strong>gensphinx</strong></span> output in TOML should then be pasted unchanged
+                           into the node's configuration file, as shown below.</p>
                         <pre class="programlisting">[SphinxGeometry]
                 PacketLength = 3082
                 NrHops = 5
@@ -2783,10 +2787,10 @@ FZWJFK0R8iU52CEUxVpXTA==
                               </li>
                               <li class="listitem">
                                  <p><span class="bold"><strong>NextNodeHopLength</strong></span></p>
-                                 <p>The <code class="code">NextNodeHopLength</code> is derived from the largest routing-information 
-                                    block that we expect to encounter. Other packets have 
-                                    <code class="code">NextNodeHop</code> + <code class="code">NodeDelay</code> sections, or a <code class="code">Recipient</code> section, both of which
-                                    are shorter.</p>
+                                 <p>The <code class="code">NextNodeHopLength</code> is derived from the largest
+                                    routing-information block that we expect to encounter. Other packets have
+                                    <code class="code">NextNodeHop</code> + <code class="code">NodeDelay</code> sections, or a
+                                    <code class="code">Recipient</code> section, both of which are shorter.</p>
                                  <p>Type: int</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -2809,7 +2813,8 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p><span class="bold"><strong>KEMName</strong></span></p>
                                  <p>The name of the key encapsulation mechanism (KEM) used by Sphinx
                                     packets.</p>
-                                 <p><code class="code">NIKEName</code> and <code class="code">KEMName</code> are mutually exclusive.</p>
+                                 <p><code class="code">NIKEName</code> and <code class="code">KEMName</code> are mutually
+                                    exclusive.</p>
                                  <p>Type: string</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -2830,7 +2835,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2165"></a></h5>
+                              <h5 class="title"><a name="d58e2160"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -2981,7 +2986,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                     <table border="0" summary="Note">
                                        <tr>
-                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                           <th align="left">Note</th>
                                        </tr>
                                        <tr>
@@ -3000,7 +3005,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                     <table border="0" summary="Note">
                                        <tr>
-                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                           <th align="left">Note</th>
                                        </tr>
                                        <tr>
@@ -3038,7 +3043,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                   <code class="filename">katzenpost/docker/dirauth_mixnet/servicenode1/authority.toml</code>.
                   In a real-world mixnet, the component hosts would not be sharing a single IP
                   address. For more information about the test mixnet, see <a class="link" href="https://katzenpost.network/docs/admin_guide/docker.html" target="_top">Using the Katzenpost Docker test network</a>.</p>
-               <div class="table"><a name="d58e2340"></a><p class="title"><b>Table&nbsp;5.&nbsp;Mix node configuration sections</b></p>
+               <div class="table"><a name="d58e2335"></a><p class="title"><b>Table&nbsp;5.&nbsp;Mix node configuration sections</b></p>
                   <div class="table-contents">
                      <table class="table" border="1">
                         <colgroup>
@@ -3109,7 +3114,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2385"></a></h5>
+                              <h5 class="title"><a name="d58e2380"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -3143,7 +3148,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                           <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                              <table border="0" summary="Note">
                                                 <tr>
-                                                   <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                                   <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                                    <th align="left">Note</th>
                                                 </tr>
                                                 <tr>
@@ -3214,7 +3219,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p>Note that <span class="bold"><strong>BindAddresses</strong></span>, below, holds the
                                     address values for non-adverstised, internal-only listeners. The addition of
                                     <span class="bold"><strong>BindAddresses</strong></span> to the node configuration
-                                    is required for hosts connecting to the Internet through network adddress
+                                    is required for hosts connecting to the Internet through network address
                                     translation (NAT).</p>
                                  <p>Type: []string</p>
                                  <p>Required: Yes</p>
@@ -3274,7 +3279,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2535"></a></h5>
+                              <h5 class="title"><a name="d58e2530"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -3309,7 +3314,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
                                     <table border="0" summary="Warning">
                                        <tr>
-                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
                                           <th align="left">Warning</th>
                                        </tr>
                                        <tr>
@@ -3461,7 +3466,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                     <table border="0" summary="Note">
                                        <tr>
-                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                           <th align="left">Note</th>
                                        </tr>
                                        <tr>
@@ -3542,7 +3547,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
                                           <table border="0" summary="Warning">
                                              <tr>
-                                                <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                                <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
                                                 <th align="left">Warning</th>
                                              </tr>
                                              <tr>
@@ -3589,7 +3594,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
                                           <table border="0" summary="Warning">
                                              <tr>
-                                                <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                                <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
                                                 <th align="left">Warning</th>
                                              </tr>
                                              <tr>
@@ -3622,7 +3627,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2809"></a></h5>
+                              <h5 class="title"><a name="d58e2804"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -3761,7 +3766,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2878"></a></h5>
+                              <h5 class="title"><a name="d58e2873"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -3806,38 +3811,19 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e2923"></a></h5>
+                              <h5 class="title"><a name="d58e2918"></a></h5>
                            </div>
                         </div>
                      </div>
                      <div class="informalexample">
                         <p>The <code class="code">SphinxGeometry</code> section defines parameters for the Sphinx
-                           encrypted nested-packet format used internally by Katzenpost. 
-                           
-                           <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
-                              <table border="0" summary="Warning">
-                                 <tr>
-                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
-                                    <th align="left">Warning</th>
-                                 </tr>
-                                 <tr>
-                                    <td align="left" valign="top">
-                                       <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
-                                          be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
-                                          parameters are interdependent and cannot be individually modified. Do not
-                                          modify the these values by hand.</p>
-                                    </td>
-                                 </tr>
-                              </table>
-                           </div>
-                        </p>
-                        <p>The settings in this section are generated by the <span class="command"><strong>gensphinx</strong></span>
-                           utility, which computes the Sphinx geometry based on the following user-supplied
-                           directives:</p>
+                           encrypted nested-packet format used internally by Katzenpost.</p>
+                        <p>The settings in this section are generated by  the <a class="link" href="https://github.com/katzenpost/katzenpost/tree/main/gensphinx" target="_top">gensphinx</a> utility, which computes the Sphinx geometry based on the
+                           following user-supplied directives:</p>
                         <div class="itemizedlist">
                            <ul class="itemizedlist" style="list-style-type: disc; ">
                               <li class="listitem">
-                                 <p>The number of  mix node layers (not counting gateway and service
+                                 <p>The number of mix node layers (not counting gateway and service
                                     nodes)</p>
                               </li>
                               <li class="listitem">
@@ -3848,10 +3834,26 @@ FZWJFK0R8iU52CEUxVpXTA==
                               </li>
                            </ul>
                         </div>
-                        <p>The output in TOML should then be pasted unchanged into the node's configuration
-                           file, as shown below. For more information, 
-                           see <a class="link" href="https://katzenpost.network/docs/admin_guide/gensphinx-appendix.html" target="_top">Appendix: 
-                              Using gensphinx</a>.</p>
+                        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
+                           <table border="0" summary="Warning">
+                              <tr>
+                                 <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/warning.png"></td>
+                                 <th align="left">Warning</th>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="top">
+                                    <p>The values in the <code class="code">SphinxGeometry</code> configuration section must
+                                       be programmatically generated by <span class="command"><strong>gensphinx</strong></span>. Many of the
+                                       parameters are interdependent and cannot be individually modified. Do not
+                                       modify the these values by hand.</p>
+                                 </td>
+                              </tr>
+                           </table>
+                        </div>
+                     </div>
+                     <div class="informalexample">
+                        <p>The <span class="command"><strong>gensphinx</strong></span> output in TOML should then be pasted unchanged
+                           into the node's configuration file, as shown below.</p>
                         <pre class="programlisting">[SphinxGeometry]
                 PacketLength = 3082
                 NrHops = 5
@@ -3935,10 +3937,10 @@ FZWJFK0R8iU52CEUxVpXTA==
                               </li>
                               <li class="listitem">
                                  <p><span class="bold"><strong>NextNodeHopLength</strong></span></p>
-                                 <p>The <code class="code">NextNodeHopLength</code> is derived from the largest routing-information 
-                                    block that we expect to encounter. Other packets have 
-                                    <code class="code">NextNodeHop</code> + <code class="code">NodeDelay</code> sections, or a <code class="code">Recipient</code> section, both of which
-                                    are shorter.</p>
+                                 <p>The <code class="code">NextNodeHopLength</code> is derived from the largest
+                                    routing-information block that we expect to encounter. Other packets have
+                                    <code class="code">NextNodeHop</code> + <code class="code">NodeDelay</code> sections, or a
+                                    <code class="code">Recipient</code> section, both of which are shorter.</p>
                                  <p>Type: int</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -3961,7 +3963,8 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <p><span class="bold"><strong>KEMName</strong></span></p>
                                  <p>The name of the key encapsulation mechanism (KEM) used by Sphinx
                                     packets.</p>
-                                 <p><code class="code">NIKEName</code> and <code class="code">KEMName</code> are mutually exclusive.</p>
+                                 <p><code class="code">NIKEName</code> and <code class="code">KEMName</code> are mutually
+                                    exclusive.</p>
                                  <p>Type: string</p>
                                  <p>Required: Yes</p>
                               </li>
@@ -3982,7 +3985,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                      <div class="titlepage">
                         <div>
                            <div>
-                              <h5 class="title"><a name="d58e3080"></a></h5>
+                              <h5 class="title"><a name="d58e3076"></a></h5>
                            </div>
                         </div>
                      </div>
@@ -4133,7 +4136,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                     <table border="0" summary="Note">
                                        <tr>
-                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                           <th align="left">Note</th>
                                        </tr>
                                        <tr>
@@ -4152,7 +4155,7 @@ FZWJFK0R8iU52CEUxVpXTA==
                                  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
                                     <table border="0" summary="Note">
                                        <tr>
-                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                                          <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
                                           <th align="left">Note</th>
                                        </tr>
                                        <tr>

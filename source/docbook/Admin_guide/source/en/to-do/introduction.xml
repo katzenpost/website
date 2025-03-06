@@ -73,7 +73,7 @@
   WireKEM = "KYBER768-X25519"
   Addresses = [ "onion://your-onion-address.onion:1234"]
   BindAddresses = [ "tcp://127.0.0.1:1234",]
-  DataDir = "/var/lib/pq-katzenpost-mixserver"
+  DataDir = "/var/lib/&mixserver_binary;"
   IsGatewayNode = true
   IsServiceNode = false
 ...
