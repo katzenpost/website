@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?> 
+<?linkTitle "Installation" ?>  <!-- Section menu link text -->
+<?url "docs/admin_guide/install.html" ?> <!-- Required to make image links work -->
+<?description "" ?> <!-- Optional -->
+<?draft "false" ?> <!-- Optional -->
+<?slug "" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight 5 ?> <!-- Optional -->
+
+<!DOCTYPE article [
+<!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+%shared-content;
+]>
+
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.1" xml:id="installation">
+    
+    <info>
+        <title xml:id="installation.title">Installing &program_name;</title>
+    </info>
+    <para>The section provides an overview of how to download &program_name;, set up a development
+        environment, build the code, install the &program_name; binaries, and configure the
+        components. </para>
+    
+    
+    <section xml:id="install-requirements">    
+        <info>
+            <title xml:id="install-requirements.title">Requirements</title>
+        </info>
+        <para>An up-to-date <link xlink:href="https://www.debian.org">Debian</link> or <link
+                xlink:href="https://ubuntu.com">Ubuntu</link> Linux system is assumed as the build
+            and hosting environment for all &program_name; server-side components. Required packages
+            include the following:</para>
+        <itemizedlist>
+            <listitem>
+                <para><command>git </command></para>
+            </listitem>
+            <listitem>
+                <para><command>gcc </command></para>
+            </listitem>
+            <listitem>
+                <para><command>build-essential</command>
+                </para>
+            </listitem>
+            <listitem>
+                <para><command>libc-dev-bin</command></para>
+            </listitem>
+        </itemizedlist>
+        <section xml:id="clone">
+            <info>
+                <title xml:id="clone.title">Obtain the &program_name; code</title>
+        </info>
+            <para>Complete the following steps to set up a local &program_name; git repository.<procedure>
+                    <step>
+                        <para>Clone
+                            &program_name;.<programlisting><prompt>$ </prompt><command>git clone git@github.com:katzenpost/katzenpost.git</command></programlisting></para>
+                    </step>
+                    <!--<step>
+                        <para>Clone Katzen (chat client).</para>
+                        <programlisting><prompt>$ </prompt><command>git clone git@github.com:katzenpost/katzen.git</command></programlisting>
+                    </step>-->
+                    <step>
+                        <para>Get the latest tagged commit of the &program_name;with the following
+                            commands.</para>
+                        <programlisting><prompt>$ </prompt><command>git fetch --tags</command>
+<prompt>$ </prompt><command>tag=$(git describe --tags `git rev-list --tags --max-count=1`)</command>
+<prompt>$ </prompt><command>git checkout $tag</command> </programlisting>
+                    </step>
+                </procedure></para>
+        </section>
+        <section xml:id="install_go">
+            <info>
+                <title xml:id="install_go.title">Install the latest Go version</title>
+            </info>
+
+            <para>Download the latest version of the Go programming language from <link
+                    xlink:href="https://go.dev/dl">https://go.dev/dl</link> and unzip it in a
+                suitable location. As root, set the necessary environment
+                variables:<programlisting><prompt># </prompt><command>export PATH=$PATH:/<replaceable>&lt;your Go location></replaceable>/bin</command>
+<prompt># </prompt><command>export GO111MODULE=on</command>
+<prompt># </prompt><command>export CGO_CFLAGS_ALLOW="-DPARAMS=sphincs-shake-256f"</command></programlisting></para>
+            <para>The <filename>go/bin</filename> path must be included in your user $PATH
+                environment variable.</para>
+            <para>
+                <note>
+                    <para>Do not use the Debian/Ubuntu <command>golang</command> packages. They are
+                        probably too old.</para>
+                </note>
+            </para>
+        </section>        
+    </section>
+    
+    <section xml:id="build-server-components">    
+        <info>
+            <title xml:id="build-server-components.title">Build server components</title>
+        </info>
+        <para>To build a &program_name; server component, navigate to the directory containing its
+            source code and run <command>go build</command>. The paths shown are relative to the
+            &program_name; repository root.</para>
+        <para>
+            <table frame="all">
+                <title>Server component directories</title>
+                <tgroup cols="3">
+                    <colspec colnum="1" colname="c1" colwidth="1*"/>
+                    <colspec colnum="2" colname="c2" colwidth="1*"/>
+                    <colspec colnum="3" colname="newCol3" colwidth="1*"/>
+                    <thead>
+                        <row>
+                            <entry>Component</entry>
+                            <entry>Source code directory</entry>
+                            <entry>Binary</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>Mix, gateway, or service node</entry>
+                            <entry><filename>server/cmd/server/</filename></entry>
+                            <entry><command>server</command></entry>
+                        </row>
+                        <row>
+                            <entry>Directory authority</entry>
+                            <entry><filename>authority/cmd/dirauth/</filename></entry>
+                            <entry><command>dirauth</command></entry>
+                        </row>
+                        <!--                        <row>
+                            <entry>Panda server</entry>
+                            <entry>panda/server/cmd/panda_server/</entry>
+                            <entry/>
+                        </row>
+                        <row>
+                            <?oxy_comment_start author="dwrob" timestamp="20250218T150240+0100" comment="Should panda and memspool even be discussed?"?>
+                            <entry>Memspool</entry>
+                            <entry>memspool/server/cmd/memspool/</entry><?oxy_comment_end?>
+                            <entry/>
+                        </row>-->
+                    </tbody>
+                </tgroup>
+            </table>
+        </para>
+    </section>
+    
+    <section xml:id="build-clients">    
+        <info>
+            <title xml:id="build-clients.title">Build clients</title>
+        </info>
+        <para>The &program_name; client components are useful for testing an operational mixnet. To
+            build them, navigate to the directory containing each component's source code and run
+                <command>go build</command>. The paths shown are relative to the &program_name;
+            repository root.</para>
+        <note>
+            <para>The <link xlink:href="https://github.com/katzenpost/katzen">Katzen</link> chat
+                client is under development and not currently functional. For more information
+                about the clients generally, see 
+                <link xlink:href="&baseURL;docs/admin_guide/components.html#intro-client">Clients</link>.</para>
+        </note>
+        <para>
+            <table frame="all">
+                <title>Client directories</title>
+                <tgroup cols="3">
+                    <colspec colnum="1" colname="c1" colwidth="1*"/>
+                    <colspec colnum="2" colname="c2" colwidth="1*"/>
+                    <colspec colnum="3" colname="newCol3" colwidth="1*"/>
+                    <thead>
+                        <row>
+                            <entry>Component</entry>
+                            <entry>Source code directory</entry>
+                            <entry>Binary or application</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>
+                                <para>Ping</para>
+                            </entry>
+                            <entry><filename>ping/</filename></entry>
+                            <entry><command>ping</command></entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para>Fetch</para>
+                            </entry>
+                            <entry>
+                                <para><filename>authority/cmd/fetch/</filename></para>
+                            </entry>  
+                            <entry>
+                                <para><command>fetch</command></para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para>Status</para>
+                            </entry>
+                            <entry>Obtain from GitHub repository <link
+                                    xlink:href="https://github.com/katzenpost/status"
+                                    >katzenpost/status</link>.</entry>
+                            <entry><command>status.py</command></entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para>Worldmap</para>
+                            </entry>
+                            <entry>Obtain from GitHub repository <link
+                                    xlink:href="https://github.com/katzenpost/worldmap"
+                                    >katzenpost/worldmap</link></entry>
+                            <entry><command>world_map.py</command></entry>
+                        </row>
+                        <!--                        <row>
+                            <entry>Panda server</entry>
+                            <entry>panda/server/cmd/panda_server/</entry>
+                            <entry/>
+                        </row>
+                        <row>
+                            <?oxy_comment_start author="dwrob" timestamp="20250218T150240+0100" comment="Should panda and memspool even be discussed?"?>
+                            <entry>Memspool</entry>
+                            <entry>memspool/server/cmd/memspool/</entry><?oxy_comment_end?>
+                            <entry/>
+                        </row>-->
+                    </tbody>
+                </tgroup>
+            </table>
+        </para>
+    </section>
+    
+    <section>
+        <title>Install the server components</title>
+        <para>To install the server binaries, run the following commands from the katzenpost
+            repository root.</para>
+        <programlisting><prompt># </prompt>cp server/cmd/server/server /usr/local/bin/&mixserver_binary;
+<prompt># </prompt>cp authority/cmd/dirauth/dirauth /usr/local/bin/&dirauth_binary;</programlisting>
+    </section>
+    <section xml:id="service-accounts">
+        <info>
+            <title xml:id="service-account.titles">Create service accounts</title>
+        </info>
+        <para>Create a service account account for each of the node types that you deploy.</para>
+        <formalpara>
+            <title>To create a service user for a directory authority</title>
+            <para>
+                <programlisting><prompt># </prompt><command>adduser \
+    --disabled-login \
+    --disabled-password \ 
+    --system \
+    --group \
+    --home /var/lib/&dirauth_binary; \
+    &dirauth_binary;</command></programlisting>
+            </para>
+        </formalpara>
+        <formalpara>
+            <title>To create a service user for a mix, gateway, or service node</title>
+            <para>
+                <programlisting><prompt># </prompt><command>adduser \
+    --disabled-login \
+    --disabled-password \ 
+    --system \
+    --group \
+    --home /var/lib/&mixserver_binary; \
+    &mixserver_binary;</command></programlisting>
+            </para>
+        </formalpara>
+    </section>
+    <section xml:id="configure">
+        <info>
+            <title xml:id="configure.title">Create configuration files</title>
+        </info>
+        <para>The best way currently to construct a node configuration file is to use one of the
+            samples in <link xlink:href="&baseURL;docs/admin_guide/docker-config-appendix.html"
+                >Appendix: Configuration files from the Docker test mixnet</link>, and to modify it
+            based on the published <link xlink:href="&baseURL;docs/admin_guide/components.html"
+                >component parameters</link>, combined with attention to the latest state of the
+            code tree. Bear in mind that the IP <emphasis>address:port</emphasis> scheme used in the
+            Docker image is specific to that container environment, and is not transferable to a
+            production network without modifcation.</para>
+        <para>&program_name; currently has no configuration automation tool that is ready for
+            general use. </para>
+    </section>
+    <section xml:id="systemd">
+        <info>
+            <title xml:id="systemd.title">Configure systemd</title>
+        </info>
+        <para>If you are running your &program_name; components under <link
+                xlink:href="https://systemd.io/">systemd</link>, create and install a systemd
+            service file for each node type that you plan to deploy. The following scripts are
+            examples of how to do this.</para>
+        <formalpara>
+            <title>To create a systemd service file for a directory authority</title>
+            <para>
+                <programlisting>#!/bin/bash -x
+
+cat &lt;&lt; EOF > /etc/systemd/system/&mixserver_binary;.service
+[Unit]
+Description=Katzenpost Mix Server
+After=network.target
+
+[Service]
+IPAccounting=yes
+Type=simple
+User=&mixserver_binary;
+WorkingDirectory=/var/lib/&mixserver_binary;
+ExecStart=/usr/local/bin/&mixserver_binary; -f /etc/&mixserver_binary;/katzenpost.toml
+PrivateTmp=yes
+NoNewPrivileges=yes
+# RestartSec=5
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF</programlisting>
+            </para>            
+        </formalpara>
+        <formalpara><title>To create a systemd service file for a mix, gateway, or service node</title> 
+            <para>
+                <programlisting>#!/bin/bash -x
+
+cat &lt;&lt; EOF > /etc/systemd/system/&dirauth_binary;.service
+[Unit]
+Description=Katzenpost Authority
+After=network.target
+
+[Service]
+Type=simple
+IPAccounting=yes
+User=&dirauth_binary;
+WorkingDirectory=/var/lib/&dirauth_binary;
+ExecStart=/usr/local/bin/&dirauth_binary; -f /etc/&dirauth_binary;/authority.toml
+PrivateTmp=yes
+NoNewPrivileges=yes
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF</programlisting>
+            </para>
+        </formalpara>
+    </section>
+    <section xml:id="generate-keys">
+        <info>
+            <title xml:id="generate-keys.title">Generate keys</title>
+        </info>
+        
+        <para>The first time that you run a server binary directly or using
+            systemd, identity and encryption keys are automatically generated and installed if they
+            are not already present. The key location is specified by the value of
+            <code>DataDir</code> in the <code>[Server]</code> section of the configuration. For
+            configuration parameter details, see <link xlink:href="&baseURL;docs/admin_guide/components.html">Components 
+            and configuration of the Katzenpost mixnet</link>. For server binary commandline options, 
+            see the <link xlink:href="&baseURL;docs/admin_guide/quickstart.html">Quickstart guide</link>.
+            </para>
+        <para>Once the keys are in place, restart the server to begin operations.</para>
+    </section>
+</article>

@@ -34,7 +34,7 @@
     <para>The test mix network includes the following components:</para>
     <itemizedlist>
         <listitem>
-            <para>Three directory authority (<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://katzenpost.network/docs/specs/pki/">PKI</link>) nodes</para>
+            <para>Three directory authority (<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://katzenpost.network/docs/specs/pki.html">PKI</link>) nodes</para>
         </listitem>
         <listitem>
             <para>Six <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://katzenpost.network/docs/specs/mixnet/">mix</link> nodes,
@@ -514,7 +514,7 @@
                 <tbody>
                     <row>
                         <entry morerows="2">
-                            <para><link xlink:href="&baseURL;docs/admin_guide/intro-dirauth.html"
+                            <para><link xlink:href="&baseURL;docs/admin_guide/components.html#intro-dirauth"
                                     >Directory authority</link><!--<link linkend="intro-dirauth">Directory authority</link>--></para>
                         </entry>
                         <entry>auth1</entry>
@@ -533,7 +533,7 @@
                         <entry><para>30003</para></entry>
                     </row>
                     <row>
-                        <entry><link xlink:href="&baseURL;docs/admin_guide/intro-gateway.html"
+                        <entry><link xlink:href="&baseURL;docs/admin_guide/components.html#intro-gateway"
                                 >Gateway node</link><!--<link linkend="intro-gateway">Gateway node</link>--></entry>
                         <entry>gateway1</entry>
                         <entry>Gateway node</entry>
@@ -541,7 +541,7 @@
                     </row>
                     <row>
                         <entry>
-                            <para><link xlink:href="&baseURL;docs/admin_guide/intro-service.html"
+                            <para><link xlink:href="&baseURL;docs/admin_guide/components.html#intro-service"
                                     >Service node</link><!--<link linkend="intro-service">Service node</link>--></para>
                         </entry>
                         <entry><para>servicenode1</para></entry>
@@ -550,7 +550,7 @@
                     </row>
                     <row>
                         <entry morerows="2">
-                            <para><link xlink:href="&baseURL;docs/admin_guide/intro-mix.html"
+                            <para><link xlink:href="&baseURL;docs/admin_guide/components.html#intro-mix"
                                     >Mix node</link><!--<link linkend="intro-mix">Mix node</link>--></para>
                         </entry>
                         <entry><para>mix1</para></entry>
@@ -673,7 +673,7 @@
 |   |---pigeonHole.19.log
 |   |---proxy.31.log
 |---voting_mixnet</programlisting>
-        <para>Examples of complete TOML configuration files are provided in <link xlink:href="&baseURL;docs/admin_guide/docker-config.html"
+        <para>Examples of complete TOML configuration files are provided in <link xlink:href="&baseURL;docs/admin_guide/docker-config-appendix.html"
                 >Appendix: Configuration files from the Docker test mixnet</link><!--<xref linkend="docker-config" endterm="docker-config.title"/>-->.</para>
         </section>
     </section>

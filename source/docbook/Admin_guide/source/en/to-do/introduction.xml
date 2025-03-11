@@ -8,7 +8,7 @@
 <?linkTitle "Introduction" ?>  <!-- Section menu link text -->
 <?url "docs/admin_guide/introduction.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
-<?draft true?> <!-- Optional -->
+<?draft false?> <!-- Optional -->
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
@@ -73,7 +73,7 @@
   WireKEM = "KYBER768-X25519"
   Addresses = [ "onion://your-onion-address.onion:1234"]
   BindAddresses = [ "tcp://127.0.0.1:1234",]
-  DataDir = "/var/lib/pq-katzenpost-mixserver"
+  DataDir = "/var/lib/&mixserver_binary;"
   IsGatewayNode = true
   IsServiceNode = false
 ...
@@ -88,4 +88,14 @@
     <para>This confguration only allows for the Gateway nodes (which are also mix nodes).</para>
     <para>We need a to show an excerpt from a torrc to show where the onion listening port is
         confuigred.</para>-->
+    <itemizedlist>
+        <listitem>
+            <para><emphasis role="bold">Production vs. docker test mix network</emphasis></para>
+            <para>Currently our Epoch duration is hardcoded to 20 minutes. The docker test mix
+                network uses an Epoch duration of 2 minutes and this setting is known a "warped
+                epoch". In the future we'll make the Epoch duration configuration via bash
+                environmental variable, see github issue:
+                https://github.com/katzenpost/katzenpost/issues/744 </para>
+        </listitem>
+    </itemizedlist>
 </article>

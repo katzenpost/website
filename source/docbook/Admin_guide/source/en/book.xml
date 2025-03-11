@@ -1,0 +1,44 @@
+<?xml version='1.0'?>       
+ <!DOCTYPE book [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+    %shared-content; 
+    <!ATTLIST xi:include xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ATTLIST xi:fallback xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" >   
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >          
+]>
+
+<book xmlns="http://docbook.org/ns/docbook"
+    version="5.1"
+    xmlns:xlink="http://www.w3.org/1999/xlink" 
+    xmlns:xi="http://www.w3.org/2001/XInclude"  
+    xml:id="admin_guide">
+    <info>
+        <title xml:id="admin_guide.title">&program_name; administrator's guide</title>
+    </info>
+    
+<!--     
+     <!ELEMENT xi:fallback ANY > 
+    <!ELEMENT xi:include (xi:fallback?) > 
+-->
+   
+    <xi:include href="quickstart.xml"></xi:include> 
+    <xi:include href="install.xml"></xi:include>
+    <xi:include href="components.xml"></xi:include>    
+    <xi:include href="docker.xml"></xi:include>
+    <xi:include href="nat.xml"></xi:include>    
+    <xi:include href="docker-config-appendix.xml"></xi:include>
+
+</book> 
