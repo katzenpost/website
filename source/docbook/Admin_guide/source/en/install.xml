@@ -303,7 +303,8 @@ IPAccounting=yes
 Type=simple
 User=&mixserver_binary;
 WorkingDirectory=/var/lib/&mixserver_binary;
-ExecStart=/usr/local/bin/&mixserver_binary; -f /etc/&mixserver_binary;/katzenpost.toml
+ExecStart=/usr/local/bin/&mixserver_binary;  \
+   -f /etc/&mixserver_binary;/katzenpost.toml
 PrivateTmp=yes
 NoNewPrivileges=yes
 # RestartSec=5
@@ -328,7 +329,8 @@ Type=simple
 IPAccounting=yes
 User=&dirauth_binary;
 WorkingDirectory=/var/lib/&dirauth_binary;
-ExecStart=/usr/local/bin/&dirauth_binary; -f /etc/&dirauth_binary;/authority.toml
+ExecStart=/usr/local/bin/&dirauth_binary; \
+   -f /etc/&dirauth_binary;/authority.toml
 PrivateTmp=yes
 NoNewPrivileges=yes
 Restart=on-failure

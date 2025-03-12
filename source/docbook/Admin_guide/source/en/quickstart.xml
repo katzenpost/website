@@ -46,8 +46,8 @@
         <table frame="all">
             <title>Systemd control commands for &program_name;</title>
             <tgroup cols="2">
-                <colspec colnum="1" colname="c1" colwidth="272.25pt"/>
-                <colspec colnum="2" colname="c2" colwidth="378pt"/>
+                <colspec colnum="1" colname="c1" colwidth="15%"/>
+                <colspec colnum="2" colname="c2" colwidth="*"/>
                 <thead>
                     <row>
                         <entry>
@@ -128,8 +128,8 @@
         <table frame="all">
             <title>Command options for the &program_name; server binaries</title>
             <tgroup cols="2">
-                <colspec colnum="1" colname="c1" colwidth="153.75pt"/>
-                <colspec colnum="2" colname="c2" colwidth="514.5pt"/>
+                <colspec colnum="1" colname="c1" colwidth="1*"/>
+                <colspec colnum="2" colname="c2" colwidth="7*"/>
                 <thead>
                     <row>
                         <entry>
@@ -148,10 +148,11 @@
                             <para>Run <command>&mixserver_binary; -h</command> for options.</para>
                             <programlisting><prompt>$ </prompt>&mixserver_binary; -h
 Usage of &mixserver_binary;:
-  -f string
-    	Path to the authority config file. (default "katzenpost.toml")
-  -g	Generate the keys and exit immediately.
-  -v	Get version info.</programlisting>
+   -f   string
+        Path to the authority config file. 
+        (default "katzenpost.toml")
+   -g   Generate the keys and exit immediately.
+   -v   Get version info.</programlisting>
                             <para>The <code><emphasis role="bold">-f</emphasis></code> parameter can
                                     be used to specify a customized path and filename for the server
                                     configuration file, which is typically
@@ -172,10 +173,11 @@ Usage of &mixserver_binary;:
                             
                             <programlisting><prompt>$ </prompt>&dirauth_binary; -h
 Usage of &dirauth_binary;:
-  -f string
-    	Path to the authority config file. (default "authority.toml")
-  -g	Generate the keys and exit immediately.
-  -v	Get version info.</programlisting>
+   -f   string
+        Path to the authority config file. 
+        (default "authority.toml")
+   -g   Generate the keys and exit immediately.
+   -v   Get version info.</programlisting>
                             <para>The <code><emphasis role="bold">-f</emphasis></code> parameter can
                                     be used to specify a customized path and filename for the server
                                     configuration file, which is typically

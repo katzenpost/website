@@ -44,72 +44,79 @@
             <para>Source: <filename>../katzenpost/docker/voting_mixnet/auth1/authority.toml</filename></para>
     
             <programlisting>[Server]
-  Identifier = "auth1"
-  WireKEMScheme = "xwing"
-  PKISignatureScheme = "Ed448-Dilithium3"
-  Addresses = ["tcp://127.0.0.1:30001"]
-  DataDir = "/voting_mixnet/auth1"
+ Identifier = "auth1"
+ WireKEMScheme = "xwing"
+ PKISignatureScheme = "Ed448-Dilithium3"
+ Addresses = ["tcp://127.0.0.1:30001"]
+ DataDir = "/voting_mixnet/auth1"
 
 [[Authorities]]
-  Identifier = "auth1"
-  IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nfvcvAfUpeu7lMHjQBw [...] Gpi8ovBXl9ENIHLwA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
-  PKISignatureScheme = "Ed448-Dilithium3"
-  LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nsxxS04mftoEmwjxE/w [...] expP2fbERpGQwVNg==\n-----END XWING PUBLIC KEY-----\n"
-  WireKEMScheme = "xwing"
-  Addresses = ["tcp://127.0.0.1:30001"]
+ Identifier = "auth1"
+ IdentityPublicKey = \
+   "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nfvcvAfUpeu7lMHjQBw [...] \
+   Gpi8ovBXl9ENIHLwA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+ PKISignatureScheme = "Ed448-Dilithium3"
+ LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nsxxS04mftoEmwjxE/w [...] \
+   expP2fbERpGQwVNg==\n-----END XWING PUBLIC KEY-----\n"
+ WireKEMScheme = "xwing"
+ Addresses = ["tcp://127.0.0.1:30001"]
 
 [[Authorities]]
-  Identifier = "auth2"
-  IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\n5nsy6uFQ1782fZ+iYn [...] Sdr2xoinylYJr/3AA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
-  PKISignatureScheme = "Ed448-Dilithium3"
-  LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nkQzCJvaS6jg06szLea [...] PG1Bzx1JwHGFxRBQ==\n-----END XWING PUBLIC KEY-----\n"
-  WireKEMScheme = "xwing"
-  Addresses = ["tcp://127.0.0.1:30002"]
+ Identifier = "auth2"
+ IdentityPublicKey = \
+   "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\n5nsy6uFQ1782fZ+iYn [...] \
+   Sdr2xoinylYJr/3AA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+ PKISignatureScheme = "Ed448-Dilithium3"
+ LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nkQzCJvaS6jg06szLea [...] \
+  PG1Bzx1JwHGFxRBQ==\n-----END XWING PUBLIC KEY-----\n"
+ WireKEMScheme = "xwing"
+ Addresses = ["tcp://127.0.0.1:30002"]
 
 [[Authorities]]
-  Identifier = "auth3"
-  IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nJzkFpS035de1PmA2MM [...] jo6Z7is9GLs0YxVQA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
-  PKISignatureScheme = "Ed448-Dilithium3"
-  LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\n+pIUsgEGwHa8k4GZcb [...] 1mxoc+4kcgZWuOAg==\n-----END XWING PUBLIC KEY-----\n"
-  WireKEMScheme = "xwing"
-  Addresses = ["tcp://127.0.0.1:30003"]
+ Identifier = "auth3"
+ IdentityPublicKey = \
+   "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nJzkFpS035de1PmA2MM [...] \
+   jo6Z7is9GLs0YxVQA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+ PKISignatureScheme = "Ed448-Dilithium3"
+ LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\n+pIUsgEGwHa8k4GZcb [...] \
+   1mxoc+4kcgZWuOAg==\n-----END XWING PUBLIC KEY-----\n"
+ WireKEMScheme = "xwing"
+ Addresses = ["tcp://127.0.0.1:30003"]
 
 [Logging]
-  Disable = false
-  File = "katzenpost.log"
-  Level = "INFO"
+ Disable = false
+ File = "katzenpost.log"
+ Level = "INFO"
 
 [Parameters]
-  SendRatePerMinute = 0
-  Mu = 0.005
-  MuMaxDelay = 1000
-  LambdaP = 0.001
-  LambdaPMaxDelay = 1000
-  LambdaL = 0.0005
-  LambdaLMaxDelay = 1000
-  LambdaD = 0.0005
-  LambdaDMaxDelay = 3000
-  LambdaM = 0.0005
-  LambdaG = 0.0
-  LambdaMMaxDelay = 100
-  LambdaGMaxDelay = 100
+ SendRatePerMinute = 0
+ Mu = 0.005
+ MuMaxDelay = 1000
+ LambdaP = 0.001
+ LambdaPMaxDelay = 1000
+ LambdaL = 0.0005
+ LambdaLMaxDelay = 1000
+ LambdaD = 0.0005
+ LambdaDMaxDelay = 3000
+ LambdaM = 0.0005
+ LambdaG = 0.0
+ LambdaMMaxDelay = 100
+ LambdaGMaxDelay = 100
 
 [Debug]
-  Layers = 3
-  MinNodesPerLayer = 1
-  GenerateOnly = false
+ Layers = 3
+ MinNodesPerLayer = 1
+ GenerateOnly = false
 
 [[Mixes]]
-  Identifier = "mix1"
-  IdentityPublicKeyPem = "../mix1/identity.public.pem"
-
+ Identifier = "mix1"
+ IdentityPublicKeyPem = "../mix1/identity.public.pem"
 [[Mixes]]
-  Identifier = "mix2"
-  IdentityPublicKeyPem = "../mix2/identity.public.pem"
-
+ Identifier = "mix2"
+ IdentityPublicKeyPem = "../mix2/identity.public.pem"
 [[Mixes]]
-  Identifier = "mix3"
-  IdentityPublicKeyPem = "../mix3/identity.public.pem"
+ Identifier = "mix3"
+ IdentityPublicKeyPem = "../mix3/identity.public.pem"
 
 [[GatewayNodes]]
   Identifier = "gateway1"
@@ -120,40 +127,34 @@
   IdentityPublicKeyPem = "../servicenode1/identity.public.pem"
 
 [Topology]
-
-  [[Topology.Layers]]
-
-    [[Topology.Layers.Nodes]]
-      Identifier = "mix1"
-      IdentityPublicKeyPem = "../mix1/identity.public.pem"
-
-  [[Topology.Layers]]
-
-    [[Topology.Layers.Nodes]]
-      Identifier = "mix2"
-      IdentityPublicKeyPem = "../mix2/identity.public.pem"
-
-  [[Topology.Layers]]
-
-    [[Topology.Layers.Nodes]]
-      Identifier = "mix3"
-      IdentityPublicKeyPem = "../mix3/identity.public.pem"
+ [[Topology.Layers]]
+   [[Topology.Layers.Nodes]]
+     Identifier = "mix1"
+     IdentityPublicKeyPem = "../mix1/identity.public.pem"
+ [[Topology.Layers]]
+   [[Topology.Layers.Nodes]]
+     Identifier = "mix2"
+     IdentityPublicKeyPem = "../mix2/identity.public.pem"
+ [[Topology.Layers]]
+   [[Topology.Layers.Nodes]]
+     Identifier = "mix3"
+     IdentityPublicKeyPem = "../mix3/identity.public.pem"
 
 [SphinxGeometry]
-  PacketLength = 3082
-  NrHops = 5
-  HeaderLength = 476
-  RoutingInfoLength = 410
-  PerHopRoutingInfoLength = 82
-  SURBLength = 572
-  SphinxPlaintextHeaderLength = 2
-  PayloadTagLength = 32
-  ForwardPayloadLength = 2574
-  UserForwardPayloadLength = 2000
-  NextNodeHopLength = 65
-  SPRPKeyMaterialLength = 64
-  NIKEName = "x25519"
-  KEMName = ""</programlisting>
+ PacketLength = 3082
+ NrHops = 5
+ HeaderLength = 476
+ RoutingInfoLength = 410
+ PerHopRoutingInfoLength = 82
+ SURBLength = 572
+ SphinxPlaintextHeaderLength = 2
+ PayloadTagLength = 32
+ ForwardPayloadLength = 2574
+ UserForwardPayloadLength = 2000
+ NextNodeHopLength = 65
+ SPRPKeyMaterialLength = 64
+ NIKEName = "x25519"
+ KEMName = ""</programlisting>
 </section>
 <section xml:id="mix-node-config">
     <info>
@@ -161,88 +162,100 @@
     </info>      
     <para>Source: <filename>../katzenpost/docker/voting_mixnet/mix1/katzenpost.toml</filename></para>
     <programlisting>[Server]
-  Identifier = "mix1"
-  WireKEM = "xwing"
-  PKISignatureScheme = "Ed448-Dilithium3"
-  Addresses = ["tcp://127.0.0.1:30010", "quic://[::1]:30011"]
-  MetricsAddress = "127.0.0.1:30012"
-  DataDir = "/voting_mixnet/mix1"
-  IsGatewayNode = false
-  IsServiceNode = false
+ Identifier = "mix1"
+ WireKEM = "xwing"
+ PKISignatureScheme = "Ed448-Dilithium3"
+ Addresses = ["tcp://127.0.0.1:30010", "quic://[::1]:30011"]
+ MetricsAddress = "127.0.0.1:30012"
+ DataDir = "/voting_mixnet/mix1"
+ IsGatewayNode = false
+ IsServiceNode = false
 
 [Logging]
-  Disable = false
-  File = "katzenpost.log"
-  Level = "INFO"
+ Disable = false
+ File = "katzenpost.log"
+ Level = "INFO"
 
 [PKI]
-  [PKI.Voting]
+ [PKI.Voting]
+
+   [[PKI.Voting.Authorities]]
+     Identifier = "auth1"
+     IdentityPublicKey = \
+      "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nfvcvAfUpeu7lMHjQBw [...] \
+      Gpi8ovBXl9ENIHLwA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+     PKISignatureScheme = "Ed448-Dilithium3"
+     LinkPublicKey = \
+      "-----BEGIN XWING PUBLIC KEY-----\nsxxS04mftoEmwjxE/w [...] \
+      expP2fbERpGQwVNg==\n-----END XWING PUBLIC KEY-----\n"
+     WireKEMScheme = "xwing"
+     Addresses = ["tcp://127.0.0.1:30001"]
 
     [[PKI.Voting.Authorities]]
-      Identifier = "auth1"
-      IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nfvcvAfUpeu7lMHjQBw [...] Gpi8ovBXl9ENIHLwA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
-      PKISignatureScheme = "Ed448-Dilithium3"
-      LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nsxxS04mftoEmwjxE/w [...] expP2fbERpGQwVNg==\n-----END XWING PUBLIC KEY-----\n"
-      WireKEMScheme = "xwing"
-      Addresses = ["tcp://127.0.0.1:30001"]
+     Identifier = "auth2"
+     IdentityPublicKey = \
+      "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\n5nsy6uFQ1782fZ+iYn [...] \
+      Sdr2xoinylYJr/3AA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+     PKISignatureScheme = "Ed448-Dilithium3"
+     LinkPublicKey = \
+      "-----BEGIN XWING PUBLIC KEY-----\nkQzCJvaS6jg06szLea [...] \
+      PG1Bzx1JwHGFxRBQ==\n-----END XWING PUBLIC KEY-----\n"
+     WireKEMScheme = "xwing"
+     Addresses = ["tcp://127.0.0.1:30002"]
 
     [[PKI.Voting.Authorities]]
-      Identifier = "auth2"
-      IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\n5nsy6uFQ1782fZ+iYn [...] Sdr2xoinylYJr/3AA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+     Identifier = "auth3"
+     IdentityPublicKey = \
+      "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nJzkFpS035de1PmA2M [...] \
+      jo6Z7is9GLs0YxVQA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
       PKISignatureScheme = "Ed448-Dilithium3"
-      LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nkQzCJvaS6jg06szLea [...] PG1Bzx1JwHGFxRBQ==\n-----END XWING PUBLIC KEY-----\n"
-      WireKEMScheme = "xwing"
-      Addresses = ["tcp://127.0.0.1:30002"]
-
-    [[PKI.Voting.Authorities]]
-      Identifier = "auth3"
-      IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nJzkFpS035de1PmA2M [...] jo6Z7is9GLs0YxVQA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
-      PKISignatureScheme = "Ed448-Dilithium3"
-      LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\n+pIUsgEGwHa8k4GZcb [...] 1mxoc+4kcgZWuOAg==\n-----END XWING PUBLIC KEY-----\n"
-      WireKEMScheme = "xwing"
-      Addresses = ["tcp://127.0.0.1:30003"]
+     LinkPublicKey = \
+      "-----BEGIN XWING PUBLIC KEY-----\n+pIUsgEGwHa8k4GZcb [...] \
+      1mxoc+4kcgZWuOAg==\n-----END XWING PUBLIC KEY-----\n"
+     WireKEMScheme = "xwing"
+     Addresses = ["tcp://127.0.0.1:30003"]
 
 [Management]
-  Enable = false
-  Path = "/voting_mixnet/mix1/management_sock"
+ Enable = false
+ Path = "/voting_mixnet/mix1/management_sock"
 
 [SphinxGeometry]
-  PacketLength = 3082
-  NrHops = 5
-  HeaderLength = 476
-  RoutingInfoLength = 410
-  PerHopRoutingInfoLength = 82
-  SURBLength = 572
-  SphinxPlaintextHeaderLength = 2
-  PayloadTagLength = 32
-  ForwardPayloadLength = 2574
-  UserForwardPayloadLength = 2000
-  NextNodeHopLength = 65
-  SPRPKeyMaterialLength = 64
-  NIKEName = "x25519"
-  KEMName = ""
+ PacketLength = 3082
+ NrHops = 5
+ HeaderLength = 476
+ RoutingInfoLength = 410
+ PerHopRoutingInfoLength = 82
+ SURBLength = 572
+ SphinxPlaintextHeaderLength = 2
+ PayloadTagLength = 32
+ ForwardPayloadLength = 2574
+ UserForwardPayloadLength = 2000
+ NextNodeHopLength = 65
+ SPRPKeyMaterialLength = 64
+ NIKEName = "x25519"
+ KEMName = ""
 
 [Debug]
-  NumSphinxWorkers = 16
-  NumServiceWorkers = 3
-  NumGatewayWorkers = 3
-  NumKaetzchenWorkers = 3
-  SchedulerExternalMemoryQueue = false
-  SchedulerQueueSize = 0
-  SchedulerMaxBurst = 16
-  UnwrapDelay = 250
-  GatewayDelay = 500
-  ServiceDelay = 500
-  KaetzchenDelay = 750
-  SchedulerSlack = 150
-  SendSlack = 50
-  DecoySlack = 15000
-  ConnectTimeout = 60000
-  HandshakeTimeout = 30000
-  ReauthInterval = 30000
-  SendDecoyTraffic = false
-  DisableRateLimit = false
-  GenerateOnly = false</programlisting>
+ NumSphinxWorkers = 16
+ NumServiceWorkers = 3
+ NumGatewayWorkers = 3
+ NumKaetzchenWorkers = 3
+ SchedulerExternalMemoryQueue = false
+ SchedulerQueueSize = 0
+ SchedulerMaxBurst = 16
+ UnwrapDelay = 250
+ GatewayDelay = 500
+ ServiceDelay = 500
+ KaetzchenDelay = 750
+ SchedulerSlack = 150
+ SendSlack = 50
+ DecoySlack = 15000
+ ConnectTimeout = 60000
+ HandshakeTimeout = 30000
+ ReauthInterval = 30000
+ SendDecoyTraffic = false
+ DisableRateLimit = false
+ GenerateOnly = false</programlisting>
     </section>
     <section xml:id="gateway-node-config">
         <info>
@@ -250,99 +263,112 @@
         </info>       
         <para>Source: <filename>../katzenpost/docker/voting_mixnet/gateway1/katzenpost.toml</filename></para>
         <programlisting>[Server]
-  Identifier = "gateway1"
-  WireKEM = "xwing"
-  PKISignatureScheme = "Ed448-Dilithium3"
-  Addresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005", "onion://thisisjustatestoniontoverifythatconfigandpkiworkproperly.onion:4242"]
-  BindAddresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005"]
-  MetricsAddress = "127.0.0.1:30006"
-  DataDir = "/voting_mixnet/gateway1"
-  IsGatewayNode = true
-  IsServiceNode = false
+ Identifier = "gateway1"
+ WireKEM = "xwing"
+ PKISignatureScheme = "Ed448-Dilithium3"
+ Addresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005", \
+  "onion://thisisjustatestoniontoverifythatconfigandpkiwork.onion:4242"]
+ BindAddresses = ["tcp://127.0.0.1:30004", "quic://[::1]:30005"]
+ MetricsAddress = "127.0.0.1:30006"
+ DataDir = "/voting_mixnet/gateway1"
+ IsGatewayNode = true
+ IsServiceNode = false
 
 [Logging]
-  Disable = false
-  File = "katzenpost.log"
-  Level = "INFO"
+ Disable = false
+ File = "katzenpost.log"
+ Level = "INFO"
 
 [Gateway]
-  [Gateway.UserDB]
-    Backend = "bolt"
-    [Gateway.UserDB.Bolt]
-      UserDB = "/voting_mixnet/gateway1/users.db"
-  [Gateway.SpoolDB]
-    Backend = "bolt"
-    [Gateway.SpoolDB.Bolt]
-      SpoolDB = "/voting_mixnet/gateway1/spool.db"
+ [Gateway.UserDB]
+  Backend = "bolt"
+  [Gateway.UserDB.Bolt]
+   UserDB = "/voting_mixnet/gateway1/users.db"
+ [Gateway.SpoolDB]
+  Backend = "bolt"
+ [Gateway.SpoolDB.Bolt]
+  SpoolDB = "/voting_mixnet/gateway1/spool.db"
 
 [PKI]
-  [PKI.Voting]
+ [PKI.Voting]
 
-    [[PKI.Voting.Authorities]]
-      Identifier = "auth1"
-      IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nfvcvAfUpeu7lMHjQBw [...] Gpi8ovBXl9ENIHLwA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
-      PKISignatureScheme = "Ed448-Dilithium3"
-      LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nsxxS04mftoEmwjxE/w [...] expP2fbERpGQwVNg==\n-----END XWING PUBLIC KEY-----\n"
-      WireKEMScheme = "xwing"
-      Addresses = ["tcp://127.0.0.1:30001"]
+  [[PKI.Voting.Authorities]]
+   Identifier = "auth1"
+   IdentityPublicKey = \
+    "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nfvcvAfUpeu7lMHjQBw [...] \
+    Gpi8ovBXl9ENIHLwA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+   PKISignatureScheme = "Ed448-Dilithium3"
+   LinkPublicKey = \
+    "-----BEGIN XWING PUBLIC KEY-----\nsxxS04mftoEmwjxE/w [...] \
+    expP2fbERpGQwVNg==\n-----END XWING PUBLIC KEY-----\n"
+   WireKEMScheme = "xwing"
+   Addresses = ["tcp://127.0.0.1:30001"]
 
-    [[PKI.Voting.Authorities]]
-      Identifier = "auth2"
-      IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\n5nsy6uFQ1782fZ+iYn [...] Sdr2xoinylYJr/3AA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
-      PKISignatureScheme = "Ed448-Dilithium3"
-      LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nkQzCJvaS6jg06szLea [...] PG1Bzx1JwHGFxRBQ==\n-----END XWING PUBLIC KEY-----\n"
-      WireKEMScheme = "xwing"
-      Addresses = ["tcp://127.0.0.1:30002"]
+  [[PKI.Voting.Authorities]]
+   Identifier = "auth2"
+   IdentityPublicKey = \
+    "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\n5nsy6uFQ1782fZ+iYn [...] \
+    Sdr2xoinylYJr/3AA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+    PKISignatureScheme = "Ed448-Dilithium3"
+   LinkPublicKey = \
+    "-----BEGIN XWING PUBLIC KEY-----\nkQzCJvaS6jg06szLea [...] \
+    PG1Bzx1JwHGFxRBQ==\n-----END XWING PUBLIC KEY-----\n"
+   WireKEMScheme = "xwing"
+   Addresses = ["tcp://127.0.0.1:30002"]
 
-    [[PKI.Voting.Authorities]]
-      Identifier = "auth3"
-      IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nJzkFpS035de1PmA2MM [...] jo6Z7is9GLs0YxVQA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
-      PKISignatureScheme = "Ed448-Dilithium3"
-      LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\n+pIUsgEGwHa8k4GZcb [...] 1mxoc+4kcgZWuOAg==\n-----END XWING PUBLIC KEY-----\n"
-      WireKEMScheme = "xwing"
-      Addresses = ["tcp://127.0.0.1:30003"]
+  [[PKI.Voting.Authorities]]
+   Identifier = "auth3"
+   IdentityPublicKey = \
+    "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nJzkFpS035de1PmA2MM [...] \
+    jo6Z7is9GLs0YxVQA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+   PKISignatureScheme = "Ed448-Dilithium3"
+   LinkPublicKey = \
+    "-----BEGIN XWING PUBLIC KEY-----\n+pIUsgEGwHa8k4GZcb [...] \
+    1mxoc+4kcgZWuOAg==\n-----END XWING PUBLIC KEY-----\n"
+   WireKEMScheme = "xwing"
+   Addresses = ["tcp://127.0.0.1:30003"]
 
 [Management]
-  Enable = true
-  Path = "/voting_mixnet/gateway1/management_sock"
+ Enable = true
+ Path = "/voting_mixnet/gateway1/management_sock"
 
 [SphinxGeometry]
-  PacketLength = 3082
-  NrHops = 5
-  HeaderLength = 476
-  RoutingInfoLength = 410
-  PerHopRoutingInfoLength = 82
-  SURBLength = 572
-  SphinxPlaintextHeaderLength = 2
-  PayloadTagLength = 32
-  ForwardPayloadLength = 2574
-  UserForwardPayloadLength = 2000
-  NextNodeHopLength = 65
-  SPRPKeyMaterialLength = 64
-  NIKEName = "x25519"
-  KEMName = ""
+ PacketLength = 3082
+ NrHops = 5
+ HeaderLength = 476
+ RoutingInfoLength = 410
+ PerHopRoutingInfoLength = 82
+ SURBLength = 572
+ SphinxPlaintextHeaderLength = 2
+ PayloadTagLength = 32
+ ForwardPayloadLength = 2574
+ UserForwardPayloadLength = 2000
+ NextNodeHopLength = 65
+ SPRPKeyMaterialLength = 64
+ NIKEName = "x25519"
+ KEMName = ""
 
 [Debug]
-  NumSphinxWorkers = 16
-  NumServiceWorkers = 3
-  NumGatewayWorkers = 3
-  NumKaetzchenWorkers = 3
-  SchedulerExternalMemoryQueue = false
-  SchedulerQueueSize = 0
-  SchedulerMaxBurst = 16
-  UnwrapDelay = 250
-  GatewayDelay = 500
-  ServiceDelay = 500
-  KaetzchenDelay = 750
-  SchedulerSlack = 150
-  SendSlack = 50
-  DecoySlack = 15000
-  ConnectTimeout = 60000
-  HandshakeTimeout = 30000
-  ReauthInterval = 30000
-  SendDecoyTraffic = false
-  DisableRateLimit = false
-  GenerateOnly = false</programlisting>
+ NumSphinxWorkers = 16
+ NumServiceWorkers = 3
+ NumGatewayWorkers = 3
+ NumKaetzchenWorkers = 3
+ SchedulerExternalMemoryQueue = false
+ SchedulerQueueSize = 0
+ SchedulerMaxBurst = 16
+ UnwrapDelay = 250
+ GatewayDelay = 500
+ ServiceDelay = 500
+ KaetzchenDelay = 750
+ SchedulerSlack = 150
+ SendSlack = 50
+ DecoySlack = 15000
+ ConnectTimeout = 60000
+ HandshakeTimeout = 30000
+ ReauthInterval = 30000
+ SendDecoyTraffic = false
+ DisableRateLimit = false
+ GenerateOnly = false</programlisting>
     </section>
     <section xml:id="service-node-config">
         <info>
@@ -350,142 +376,158 @@
         <para>Source:
                 <filename>../katzenpost/docker/voting_mixnet/servicenode1/katzenpost.toml</filename></para>
         <programlisting>[Server]
-  Identifier = "servicenode1"
-  WireKEM = "xwing"
-  PKISignatureScheme = "Ed448-Dilithium3"
-  Addresses = ["tcp://127.0.0.1:30007", "quic://[::1]:30008"]
-  MetricsAddress = "127.0.0.1:30009"
-  DataDir = "/voting_mixnet/servicenode1"
-  IsGatewayNode = false
-  IsServiceNode = true
+ Identifier = "servicenode1"
+ WireKEM = "xwing"
+ PKISignatureScheme = "Ed448-Dilithium3"
+ Addresses = ["tcp://127.0.0.1:30007", "quic://[::1]:30008"]
+ MetricsAddress = "127.0.0.1:30009"
+ DataDir = "/voting_mixnet/servicenode1"
+ IsGatewayNode = false
+ IsServiceNode = true
 
 [Logging]
-  Disable = false
-  File = "katzenpost.log"
-  Level = "INFO"
+ Disable = false
+ File = "katzenpost.log"
+ Level = "INFO"
 
 [ServiceNode]
 
-  [[ServiceNode.Kaetzchen]]
-    Capability = "echo"
-    Endpoint = "+echo"
-    Disable = false
+ [[ServiceNode.Kaetzchen]]
+  Capability = "echo"
+  Endpoint = "+echo"
+  Disable = false
 
-  [[ServiceNode.Kaetzchen]]
-    Capability = "testdest"
-    Endpoint = "+testdest"
-    Disable = false
+ [[ServiceNode.Kaetzchen]]
+  Capability = "testdest"
+  Endpoint = "+testdest"
+  Disable = false
 
-  [[ServiceNode.CBORPluginKaetzchen]]
-    Capability = "spool"
-    Endpoint = "+spool"
-    Command = "/voting_mixnet/memspool.alpine"
-    MaxConcurrency = 1
-    Disable = false
-    [ServiceNode.CBORPluginKaetzchen.Config]
-      data_store = "/voting_mixnet/servicenode1/memspool.storage"
-      log_dir = "/voting_mixnet/servicenode1"
+ [[ServiceNode.CBORPluginKaetzchen]]
+  Capability = "spool"
+  Endpoint = "+spool"
+  Command = "/voting_mixnet/memspool.alpine"
+  MaxConcurrency = 1
+  Disable = false
 
-  [[ServiceNode.CBORPluginKaetzchen]]
-    Capability = "pigeonhole"
-    Endpoint = "+pigeonhole"
-    Command = "/voting_mixnet/pigeonhole.alpine"
-    MaxConcurrency = 1
-    Disable = false
-    [ServiceNode.CBORPluginKaetzchen.Config]
-      db = "/voting_mixnet/servicenode1/map.storage"
-      log_dir = "/voting_mixnet/servicenode1"
+ [ServiceNode.CBORPluginKaetzchen.Config]
+   data_store = "/voting_mixnet/servicenode1/memspool.storage"
+   log_dir = "/voting_mixnet/servicenode1"
 
-  [[ServiceNode.CBORPluginKaetzchen]]
-    Capability = "panda"
-    Endpoint = "+panda"
-    Command = "/voting_mixnet/panda_server.alpine"
-    MaxConcurrency = 1
-    Disable = false
-    [ServiceNode.CBORPluginKaetzchen.Config]
-      fileStore = "/voting_mixnet/servicenode1/panda.storage"
-      log_dir = "/voting_mixnet/servicenode1"
-      log_level = "INFO"
+ [[ServiceNode.CBORPluginKaetzchen]]
+  Capability = "pigeonhole"
+  Endpoint = "+pigeonhole"
+  Command = "/voting_mixnet/pigeonhole.alpine"
+  MaxConcurrency = 1
+  Disable = false
 
-  [[ServiceNode.CBORPluginKaetzchen]]
-    Capability = "http"
-    Endpoint = "+http"
-    Command = "/voting_mixnet/proxy_server.alpine"
-    MaxConcurrency = 1
-    Disable = false
-    [ServiceNode.CBORPluginKaetzchen.Config]
-      host = "localhost:4242"
-      log_dir = "/voting_mixnet/servicenode1"
-      log_level = "DEBUG"
+ [ServiceNode.CBORPluginKaetzchen.Config]
+  db = "/voting_mixnet/servicenode1/map.storage"
+  log_dir = "/voting_mixnet/servicenode1"
+
+ [[ServiceNode.CBORPluginKaetzchen]]
+   Capability = "panda"
+   Endpoint = "+panda"
+   Command = "/voting_mixnet/panda_server.alpine"
+   MaxConcurrency = 1
+   Disable = false
+
+ [ServiceNode.CBORPluginKaetzchen.Config]
+  fileStore = "/voting_mixnet/servicenode1/panda.storage"
+  log_dir = "/voting_mixnet/servicenode1"
+  log_level = "INFO"
+
+ [[ServiceNode.CBORPluginKaetzchen]]
+  Capability = "http"
+  Endpoint = "+http"
+  Command = "/voting_mixnet/proxy_server.alpine"
+  MaxConcurrency = 1
+  Disable = false
+
+ [ServiceNode.CBORPluginKaetzchen.Config]
+  host = "localhost:4242"
+  log_dir = "/voting_mixnet/servicenode1"
+  log_level = "DEBUG"
 
 [PKI]
-  [PKI.Voting]
+ [PKI.Voting]
 
-    [[PKI.Voting.Authorities]]
-      Identifier = "auth1"
-      IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nfvcvAfUpeu7lMHjQBw [...] Gpi8ovBXl9ENIHLwA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
-      PKISignatureScheme = "Ed448-Dilithium3"
-      LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nsxxS04mftoEmwjxE/w [...] expP2fbERpGQwVNg==\n-----END XWING PUBLIC KEY-----\n"
-      WireKEMScheme = "xwing"
-      Addresses = ["tcp://127.0.0.1:30001"]
+  [[PKI.Voting.Authorities]]
+   Identifier = "auth1"
+   IdentityPublicKey = \
+    "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nfvcvAfUpeu7lMHjQBw [...] \
+    Gpi8ovBXl9ENIHLwA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+   PKISignatureScheme = "Ed448-Dilithium3"
+   LinkPublicKey = \
+    "-----BEGIN XWING PUBLIC KEY-----\nsxxS04mftoEmwjxE/w [...] \
+    expP2fbERpGQwVNg==\n-----END XWING PUBLIC KEY-----\n"
+   WireKEMScheme = "xwing"
+   Addresses = ["tcp://127.0.0.1:30001"]
 
-    [[PKI.Voting.Authorities]]
-      Identifier = "auth2"
-      IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\n5nsy6uFQ1782fZ+iYn [...] Sdr2xoinylYJr/3AA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
-      PKISignatureScheme = "Ed448-Dilithium3"
-      LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\nkQzCJvaS6jg06szLea [...] PG1Bzx1JwHGFxRBQ==\n-----END XWING PUBLIC KEY-----\n"
-      WireKEMScheme = "xwing"
-      Addresses = ["tcp://127.0.0.1:30002"]
+  [[PKI.Voting.Authorities]]
+   Identifier = "auth2"
+   IdentityPublicKey = \
+    "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\n5nsy6uFQ1782fZ+iYn [...] \
+    Sdr2xoinylYJr/3AA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+   PKISignatureScheme = "Ed448-Dilithium3"
+   LinkPublicKey = \
+    "-----BEGIN XWING PUBLIC KEY-----\nkQzCJvaS6jg06szLea [...] \
+    PG1Bzx1JwHGFxRBQ==\n-----END XWING PUBLIC KEY-----\n"
+   WireKEMScheme = "xwing"
+   Addresses = ["tcp://127.0.0.1:30002"]
 
-    [[PKI.Voting.Authorities]]
-      Identifier = "auth3"
-      IdentityPublicKey = "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nJzkFpS035de1PmA2MM [...] jo6Z7is9GLs0YxVQA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
-      PKISignatureScheme = "Ed448-Dilithium3"
-      LinkPublicKey = "-----BEGIN XWING PUBLIC KEY-----\n+pIUsgEGwHa8k4GZcb [...] 1mxoc+4kcgZWuOAg==\n-----END XWING PUBLIC KEY-----\n"
-      WireKEMScheme = "xwing"
-      Addresses = ["tcp://127.0.0.1:30003"]
+  [[PKI.Voting.Authorities]]
+   Identifier = "auth3"
+   IdentityPublicKey = \
+    "-----BEGIN ED448-DILITHIUM3 PUBLIC KEY-----\nJzkFpS035de1PmA2MM [...] \
+    jo6Z7is9GLs0YxVQA=\n-----END ED448-DILITHIUM3 PUBLIC KEY-----\n"
+   PKISignatureScheme = "Ed448-Dilithium3"
+   LinkPublicKey = \
+    "-----BEGIN XWING PUBLIC KEY-----\n+pIUsgEGwHa8k4GZcb [...] \
+    1mxoc+4kcgZWuOAg==\n-----END XWING PUBLIC KEY-----\n"
+   WireKEMScheme = "xwing"
+   Addresses = ["tcp://127.0.0.1:30003"]
 
 [Management]
-  Enable = true
-  Path = "/voting_mixnet/servicenode1/management_sock"
+ Enable = true
+ Path = "/voting_mixnet/servicenode1/management_sock"
 
 [SphinxGeometry]
-  PacketLength = 3082
-  NrHops = 5
-  HeaderLength = 476
-  RoutingInfoLength = 410
-  PerHopRoutingInfoLength = 82
-  SURBLength = 572
-  SphinxPlaintextHeaderLength = 2
-  PayloadTagLength = 32
-  ForwardPayloadLength = 2574
-  UserForwardPayloadLength = 2000
-  NextNodeHopLength = 65
-  SPRPKeyMaterialLength = 64
-  NIKEName = "x25519"
-  KEMName = ""
+ PacketLength = 3082
+ NrHops = 5
+ HeaderLength = 476
+ RoutingInfoLength = 410
+ PerHopRoutingInfoLength = 82
+ SURBLength = 572
+ SphinxPlaintextHeaderLength = 2
+ PayloadTagLength = 32
+ ForwardPayloadLength = 2574
+ UserForwardPayloadLength = 2000
+ NextNodeHopLength = 65
+ SPRPKeyMaterialLength = 64
+ NIKEName = "x25519"
+ KEMName = ""
 
 [Debug]
-  NumSphinxWorkers = 16
-  NumServiceWorkers = 3
-  NumGatewayWorkers = 3
-  NumKaetzchenWorkers = 4
-  SchedulerExternalMemoryQueue = false
-  SchedulerQueueSize = 0
-  SchedulerMaxBurst = 16
-  UnwrapDelay = 250
-  GatewayDelay = 500
-  ServiceDelay = 500
-  KaetzchenDelay = 750
-  SchedulerSlack = 150
-  SendSlack = 50
-  DecoySlack = 15000
-  ConnectTimeout = 60000
-  HandshakeTimeout = 30000
-  ReauthInterval = 30000
-  SendDecoyTraffic = false
-  DisableRateLimit = false
-  GenerateOnly = false</programlisting>
+ NumSphinxWorkers = 16
+ NumServiceWorkers = 3
+ NumGatewayWorkers = 3
+ NumKaetzchenWorkers = 4
+ SchedulerExternalMemoryQueue = false
+ SchedulerQueueSize = 0
+ SchedulerMaxBurst = 16
+ UnwrapDelay = 250
+ GatewayDelay = 500
+ ServiceDelay = 500
+ KaetzchenDelay = 750
+ SchedulerSlack = 150
+ SendSlack = 50
+ DecoySlack = 15000
+ ConnectTimeout = 60000
+ HandshakeTimeout = 30000
+ ReauthInterval = 30000
+ SendDecoyTraffic = false
+ DisableRateLimit = false
+ GenerateOnly = false</programlisting>
 
     </section>    
 </article>
