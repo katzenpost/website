@@ -56,11 +56,13 @@
             
             <mediaobject>                                           
                 <imageobject>
-                    <imagedata fileref="pix/components-production.png"/>
+                    <imagedata fileref="pix/components-production.png" scale="65"/>
                 </imageobject>
             </mediaobject>
             
         </figure>
+        <para><link xlink:href="&baseURL;docs/admin_guide/pix/components-production.png" xlink:show="new"
+                >Enlarge diagram</link></para>
         <para>The mix network contains an <emphasis>n</emphasis>-layer topology of mix-nodes, with
             three nodes per layer in this example. Sphinx packets traverse the network in one
             direction only. The gateway nodes allow clients to interact with the mix network. The

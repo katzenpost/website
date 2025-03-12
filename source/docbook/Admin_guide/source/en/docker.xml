@@ -282,18 +282,18 @@
                 the network activity.</para>
             <para>
                 <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make watch</command>
-    ...
-    &lt;output&gt;
-    ...</programlisting>
+   ...
+   &lt;output&gt;
+   ...</programlisting>
             </para>
             <para>When installation is complete, the mix servers vote and reach a consensus. You can
                 use the <command>wait</command> target to wait for the mixnet to get consensus and
                 be ready to use. This can also take several minutes:</para>
             <para>
                 <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make wait</command>
-    ...
-    &lt;output&gt;
-    ...</programlisting>
+   ...
+   &lt;output&gt;
+   ...</programlisting>
             </para>
             <para>You can confirm that installation and configuration are complete by issuing the
                     <command>status</command> command from the same or another terminal. When the
@@ -301,9 +301,10 @@
                 information similar to the following:</para>
             <para>
                 <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make status</command>
-    ...
-    00:15:15.003 NOTI state: Consensus made for epoch 1851128 with 3/3 signatures: &amp;{Epoch: 1851128 GenesisEpoch: 1851118
-    ...</programlisting>
+   ...
+   00:15:15.003 NOTI state: Consensus made for epoch 1851128 with \
+   3/3 signatures: &amp;{Epoch: 1851128 GenesisEpoch: 1851118
+   ...</programlisting>
             </para>
         </section>
         <section xml:id="test-mixnet">
@@ -318,12 +319,12 @@
             <para>If the network is functioning properly, the resulting output contains lines
                 similar to the following:</para>
             <programlisting>19:29:53.541 INFO gateway1_client: sending loop decoy
-    !19:29:54.108 INFO gateway1_client: sending loop decoy
-    19:29:54.632 INFO gateway1_client: sending loop decoy
-    19:29:55.160 INFO gateway1_client: sending loop decoy
-    !19:29:56.071 INFO gateway1_client: sending loop decoy
-    !19:29:59.173 INFO gateway1_client: sending loop decoy
-    !Success rate is 100.000000 percent 10/10)</programlisting>
+   !19:29:54.108 INFO gateway1_client: sending loop decoy
+   19:29:54.632 INFO gateway1_client: sending loop decoy
+   19:29:55.160 INFO gateway1_client: sending loop decoy
+   !19:29:56.071 INFO gateway1_client: sending loop decoy
+   !19:29:59.173 INFO gateway1_client: sending loop decoy
+   !Success rate is 100.000000 percent 10/10)</programlisting>
             <para>lf <command>run-ping</command> fails to receive a reply, it eventually times out
                 with an error message. If this happens, try the command again. </para>
             <note>
@@ -362,36 +363,39 @@
                         command:</para>
                     <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make clean-bin</command>
     
-    [ -e voting_mixnet ] &amp;&amp; cd voting_mixnet &amp;&amp; DOCKER_HOST=unix:///run/user/1000/podman/podman.sock docker-compose down --remove-orphans; rm -fv running.stamp
-    Stopping voting_mixnet_auth3_1        ... done
-    Stopping voting_mixnet_servicenode1_1 ... done
-    Stopping voting_mixnet_metrics_1      ... done
-    Stopping voting_mixnet_mix3_1         ... done
-    Stopping voting_mixnet_auth2_1        ... done
-    Stopping voting_mixnet_mix2_1         ... done
-    Stopping voting_mixnet_gateway1_1     ... done
-    Stopping voting_mixnet_auth1_1        ... done
-    Stopping voting_mixnet_mix1_1         ... done
-    Removing voting_mixnet_auth3_1        ... done
-    Removing voting_mixnet_servicenode1_1 ... done
-    Removing voting_mixnet_metrics_1      ... done
-    Removing voting_mixnet_mix3_1         ... done
-    Removing voting_mixnet_auth2_1        ... done
-    Removing voting_mixnet_mix2_1         ... done
-    Removing voting_mixnet_gateway1_1     ... done
-    Removing voting_mixnet_auth1_1        ... done
-    Removing voting_mixnet_mix1_1         ... done
-    removed 'running.stamp'
-    rm -vf ./voting_mixnet/*.alpine
-    removed './voting_mixnet/echo_server.alpine'
-    removed './voting_mixnet/fetch.alpine'
-    removed './voting_mixnet/memspool.alpine'
-    removed './voting_mixnet/panda_server.alpine'
-    removed './voting_mixnet/pigeonhole.alpine'
-    removed './voting_mixnet/ping.alpine'
-    removed './voting_mixnet/reunion_katzenpost_server.alpine'
-    removed './voting_mixnet/server.alpine'
-    removed './voting_mixnet/voting.alpine'</programlisting>
+   [ -e voting_mixnet ] &amp;&amp; cd voting_mixnet &amp;&amp; \
+      DOCKER_HOST=unix:///run/user/1000/podman/podman.sock \
+      docker-compose down \
+      --remove-orphans; rm -fv running.stamp
+   Stopping voting_mixnet_auth3_1        ... done
+   Stopping voting_mixnet_servicenode1_1 ... done
+   Stopping voting_mixnet_metrics_1      ... done
+   Stopping voting_mixnet_mix3_1         ... done
+   Stopping voting_mixnet_auth2_1        ... done
+   Stopping voting_mixnet_mix2_1         ... done
+   Stopping voting_mixnet_gateway1_1     ... done
+   Stopping voting_mixnet_auth1_1        ... done
+   Stopping voting_mixnet_mix1_1         ... done
+   Removing voting_mixnet_auth3_1        ... done
+   Removing voting_mixnet_servicenode1_1 ... done
+   Removing voting_mixnet_metrics_1      ... done
+   Removing voting_mixnet_mix3_1         ... done
+   Removing voting_mixnet_auth2_1        ... done
+   Removing voting_mixnet_mix2_1         ... done
+   Removing voting_mixnet_gateway1_1     ... done
+   Removing voting_mixnet_auth1_1        ... done
+   Removing voting_mixnet_mix1_1         ... done
+   removed 'running.stamp'
+   rm -vf ./voting_mixnet/*.alpine
+   removed './voting_mixnet/echo_server.alpine'
+   removed './voting_mixnet/fetch.alpine'
+   removed './voting_mixnet/memspool.alpine'
+   removed './voting_mixnet/panda_server.alpine'
+   removed './voting_mixnet/pigeonhole.alpine'
+   removed './voting_mixnet/ping.alpine'
+   removed './voting_mixnet/reunion_katzenpost_server.alpine'
+   removed './voting_mixnet/server.alpine'
+   removed './voting_mixnet/voting.alpine'</programlisting>
                     <para>This command leaves in place the cryptographic keys, the state data, and
                         the logs.</para>
                 </listitem>
@@ -407,31 +411,34 @@
                         command:</para>
                     <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make clean-local</command>
                         
-    [ -e voting_mixnet ] &amp;&amp; cd voting_mixnet &amp;&amp; DOCKER_HOST=unix:///run/user/1000/podman/podman.sock docker-compose down --remove-orphans; rm -fv running.stamp
-    Removing voting_mixnet_mix2_1         ... done
-    Removing voting_mixnet_auth1_1        ... done
-    Removing voting_mixnet_auth2_1        ... done
-    Removing voting_mixnet_gateway1_1     ... done
-    Removing voting_mixnet_mix1_1         ... done
-    Removing voting_mixnet_auth3_1        ... done
-    Removing voting_mixnet_mix3_1         ... done
-    Removing voting_mixnet_servicenode1_1 ... done
-    Removing voting_mixnet_metrics_1      ... done
-    removed 'running.stamp'
-    rm -vf ./voting_mixnet/*.alpine
-    removed './voting_mixnet/echo_server.alpine'
-    removed './voting_mixnet/fetch.alpine'
-    removed './voting_mixnet/memspool.alpine'
-    removed './voting_mixnet/panda_server.alpine'
-    removed './voting_mixnet/pigeonhole.alpine'
-    removed './voting_mixnet/reunion_katzenpost_server.alpine'
-    removed './voting_mixnet/server.alpine'
-    removed './voting_mixnet/voting.alpine'
-    git clean -f -x voting_mixnet
-    Removing voting_mixnet/
-    git status .
-    On branch main
-    Your branch is up to date with 'origin/main'.</programlisting>
+   [ -e voting_mixnet ] &amp;&amp; cd voting_mixnet &amp;&amp; \
+      DOCKER_HOST=unix:///run/user/1000/podman/podman.sock \
+      docker-compose down \
+      --remove-orphans; rm -fv running.stamp
+   Removing voting_mixnet_mix2_1         ... done
+   Removing voting_mixnet_auth1_1        ... done
+   Removing voting_mixnet_auth2_1        ... done
+   Removing voting_mixnet_gateway1_1     ... done
+   Removing voting_mixnet_mix1_1         ... done
+   Removing voting_mixnet_auth3_1        ... done
+   Removing voting_mixnet_mix3_1         ... done
+   Removing voting_mixnet_servicenode1_1 ... done
+   Removing voting_mixnet_metrics_1      ... done
+   removed 'running.stamp'
+   rm -vf ./voting_mixnet/*.alpine
+   removed './voting_mixnet/echo_server.alpine'
+   removed './voting_mixnet/fetch.alpine'
+   removed './voting_mixnet/memspool.alpine'
+   removed './voting_mixnet/panda_server.alpine'
+   removed './voting_mixnet/pigeonhole.alpine'
+   removed './voting_mixnet/reunion_katzenpost_server.alpine'
+   removed './voting_mixnet/server.alpine'
+   removed './voting_mixnet/voting.alpine'
+   git clean -f -x voting_mixnet
+   Removing voting_mixnet/
+   git status .
+   On branch main
+   Your branch is up to date with 'origin/main'.</programlisting>
                 </listitem>
                 <listitem>
                     <para><command>clean</command></para>
@@ -474,11 +481,13 @@
 
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="pix/katzenpost-docker.png" scale="100"/>
+                    <imagedata fileref="pix/katzenpost-docker.png" scale="65"/>
                 </imageobject>               
              </mediaobject>
             
         </figure>
+        <para><link xlink:href="&baseURL;docs/admin_guide/pix/katzenpost-docker.png" xlink:show="new"
+                >Enlarge diagram</link></para>
         <para>On the left, the <emphasis role="bold">Client</emphasis> transmits a message (shown by
             purple arrows) through the <emphasis role="bold">Gateway node</emphasis>, across three
                 <emphasis role="bold">mix node</emphasis> layers, to the <emphasis role="bold">Service node</emphasis>. The <emphasis role="bold">Service node</emphasis>
