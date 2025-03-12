@@ -474,11 +474,13 @@
 
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="pix/katzenpost-docker.png" scale="100"/>
+                    <imagedata fileref="pix/katzenpost-docker.png" scale="65"/>
                 </imageobject>               
              </mediaobject>
             
         </figure>
+        <para><link xlink:href="&baseURL;docs/admin_guide/pix/katzenpost-docker.png" xlink:show="new"
+                >Enlarge diagram</link></para>
         <para>On the left, the <emphasis role="bold">Client</emphasis> transmits a message (shown by
             purple arrows) through the <emphasis role="bold">Gateway node</emphasis>, across three
                 <emphasis role="bold">mix node</emphasis> layers, to the <emphasis role="bold">Service node</emphasis>. The <emphasis role="bold">Service node</emphasis>
