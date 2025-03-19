@@ -1,7 +1,7 @@
 <?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?title?>
-<?linkTitle "Connector design specification" ?>
+<?linkTitle "Client connector design" ?>
 <?url "docs/specs/connector.html" ?>
 <?description "" ?>
 <?draft false ?>
@@ -58,7 +58,7 @@
             </listitem>
         </itemizedlist>
         <para>The client connector is essentially a long running daemon process that listens on an
-            abstract unix domain socket for incoming connector library connections. Many client
+            abstract Unix domain socket for incoming connector library connections. Many client
             applications can use the same connector daemon. Those connections are in a sense being
             multiplexed into the daemon’s single connection to the mix network.</para>
         <para>Therefore applications will be integrated with Katzenpost using the connector library
@@ -73,7 +73,7 @@
     <section xml:id="thin-client-and-daemon-protocol">
         <title xml:id="thin-client-and-daemon-protocol.title">2. Connector library and daemon
             protocol</title>
-        <para>Note that the connector daemon protocol uses abstract unix domain sockets in datagram
+        <para>Note that the connector daemon protocol uses abstract Unix domain sockets in datagram
             packet mode. The socket is of type SOCK_SEQPACKET which is defined as:</para>
         <itemizedlist spacing="compact">
             <listitem>
@@ -87,9 +87,9 @@
         <section xml:id="client-socket-naming-convention">
             <title xml:id="client-socket-naming-convention.title">2.1 Client socket naming
                 convention</title>
-            <para>Clients using the connector library MUST randomize their abstract unix domain
+            <para>Clients using the connector library MUST randomize their abstract Unix domain
                 socket names. Otherwise, the static name will prevent multiplexing because the
-                kernel requires that the connection be between uniquely nameed socket pairs. The
+                kernel requires that the connection be between uniquely named socket pairs. The
                 &program_name; reference implementation of the connector library selects a socket
                 name with four random hex digits appended to the end of the name like so: </para>
             <programlisting>@katzenpost_golang_thin_client_DEADBEEF</programlisting>
@@ -97,7 +97,7 @@
         <section xml:id="daemon-socket-naming-convention">
             <title xml:id="daemon-socket-naming-convention.title">2.2 Daemon socket naming
                 convention</title>
-            <para>The connector daemon listens on an abstract unix domain socket with the following
+            <para>The connector daemon listens on an abstract Unix domain socket with the following
                 name: </para>
             <programlisting>@katzenpost</programlisting>
         </section>
@@ -222,7 +222,8 @@ IsDropDecoy bool `cbor:is_drop_decoy`
             <para>Each <literal>Request</literal> message sent by a connector needs to have the
                     <literal>app_id</literal> field set to an ID that is unique among the
                 applications using the connector. The <literal>app_id</literal> is used by the
-                daemon to route <literal>Response</literal> messages to the correctconnector socket. </para>
+                daemon to route <literal>Response</literal> messages to the correct connector
+                socket. </para>
             <para>The remaining fields must conform to the following: </para>
             <itemizedlist>
                 <listitem>
@@ -232,11 +233,10 @@ IsDropDecoy bool `cbor:is_drop_decoy`
                 </listitem>
                 <listitem>
                     <para>
-                        <literal>surbid</literal> is used to uniquely identify the reponse to a
+                        <literal>surbid</literal> is used to uniquely identify the response to a
                         message sent with the <literal>with_surb</literal> field set to <emphasis
                             role="bold">true</emphasis>. It should NOT be set if using the built-in
-                        automatic repeat request (ARQ) for reliability and optional retransmission.
-                    </para>
+                        automatic repeat request (ARQ) for reliability and optional retransmission. </para>
                 </listitem>
                 <listitem>
                     <para>
@@ -258,7 +258,7 @@ IsDropDecoy bool `cbor:is_drop_decoy`
                         This is the destination that the message will be delivered to. </para>
                 </listitem>
             </itemizedlist>
-            <para>If a on- way message should be sent with no SURB, then
+            <para>If a one-way message should be sent with no SURB, then
                     <literal>with_surb</literal> should be set to <emphasis role="bold"
                     >false</emphasis> and <literal>surbid</literal> may be <emphasis role="bold"
                     >nil</emphasis>. If, however, the thin client wishes to send a reliable message
@@ -300,7 +300,7 @@ IsDropDecoy bool `cbor:is_drop_decoy`
                 a connection status followed by a PKI document. </para>
             <para>After this connection sequence phase, the daemon may send the library a connection
                 status or PKI document update at any time. </para>
-            <para>The connector library can recieve four possible events inside of
+            <para>The connector library can receive four possible events inside of
                     <literal>Response</literal> messages: </para>
             <orderedlist numeration="arabic" spacing="compact">
                 <listitem>

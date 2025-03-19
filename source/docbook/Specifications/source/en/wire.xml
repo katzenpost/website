@@ -5,7 +5,7 @@
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 <?title ?>
-<?linkTitle "Wire Protocol" ?>  <!-- Section menu link text -->
+<?linkTitle "Wire protocol" ?>  <!-- Section menu link text -->
 <?url "docs/specs/wire_protocol.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
 <?draft false ?> <!-- Optional -->
