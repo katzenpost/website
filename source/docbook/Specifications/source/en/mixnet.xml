@@ -1,7 +1,7 @@
 <?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?title?>
-<?linkTitle "Mix network specification" ?>
+<?linkTitle "Mix network design" ?>
 <?url "docs/specs/mixspec.html" ?>
 <?description "" ?>
 <?draft false ?>
