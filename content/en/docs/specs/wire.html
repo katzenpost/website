@@ -1,0 +1,479 @@
+---
+title: 
+linkTitle: "Wire protocol" 
+description: "" 
+url: "docs/specs/wire_protocol.html" 
+date: "2025-03-26T14:54:50.769508726-07:00"
+draft: false 
+slug: "" 
+layout: "" 
+type: "" 
+weight: 50
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>Katzenpost mix network wire protocol</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+      <meta name="description" content="This document defines the Katzenpost Mix Network Wire Protocol for use in all network communications to, from, and within the Katzenpost Mix Network.">
+   </head>
+   <body>
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h1 class="title"><a name="wire_protocol"></a>Katzenpost mix network wire protocol</h1>
+               </div>
+               <div>
+                  <div class="authorgroup">
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Yawning</span> <span class="surname">Angel</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">David</span> <span class="surname">Stainton</span></h3>
+                     </div>
+                  </div>
+               </div>
+               <div>
+                  <div class="abstract">
+                     <p class="title"><b>Abstract</b></p>
+                     <p>This document defines the Katzenpost Mix Network Wire Protocol for use in all
+                        network communications to, from, and within the Katzenpost Mix Network.</p>
+                  </div>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="toc">
+            <p><b>Table of Contents</b></p>
+            <dl class="toc">
+               <dt><span class="section"><a href="#conventions-used-in-this-document">1.1 Conventions Used in This Document</a></span></dt>
+               <dt><span class="section"><a href="#wire_protocol_introduction">1. Introduction</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#key-encapsulation-mechanism">1.2 Key Encapsulation Mechanism</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#core-protocol">2. Core Protocol</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#handshake-phase">2.1 Handshake Phase</a></span></dt>
+                     <dt><span class="section"><a href="#handshake-authentication">2.1.1 Handshake Authentication</a></span></dt>
+                     <dt><span class="section"><a href="#data-transfer-phase">2.2 Data Transfer Phase</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#predefined-commands">3. Predefined Commands</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#the-no_op-command">3.1 The no_op Command</a></span></dt>
+                     <dt><span class="section"><a href="#the-disconnect-command">3.2 The disconnect Command</a></span></dt>
+                     <dt><span class="section"><a href="#the-send_packet-command">3.3 The send_packet Command</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#command-padding">4. Command Padding</a></span></dt>
+               <dt><span class="section"><a href="#anonymity-considerations">5. Anonymity Considerations</a></span></dt>
+               <dt><span class="section"><a href="#security-considerations">6. Security Considerations</a></span></dt>
+               <dt><span class="section"><a href="#acknowledgments">Acknowledgments</a></span></dt>
+               <dt><span class="section"><a href="#appendix-a.-references">References</a></span></dt>
+            </dl>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="conventions-used-in-this-document"></a>1.1 Conventions Used in This Document</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>,
+               <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD
+                     NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and
+               <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be interpreted as described in <a class="xref" href="#RFC2119">the section called &#x201c;References&#x201d;</a>. </p>
+            <p> The <span class="quote">&#x201c;<span class="quote">C</span>&#x201d;</span> style Presentation Language as described in <a class="xref" href="#RFC5246">the section called &#x201c;References&#x201d;</a> Section 4 is used to represent data structures, except for
+               cryptographic attributes, which are specified as opaque byte vectors. </p>
+            <p><code class="literal">x | y</code> denotes the concatenation of x and y. </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="wire_protocol_introduction"></a>1. Introduction</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The Katzenpost Mix Network Wire Protocol (KMNWP) is the custom wire protocol for
+               all
+               network communications to, from, and within the Katzenpost Mix Network. This protocol
+               provides mutual authentication, and an additional layer of cryptographic security
+               and
+               forward secrecy. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="key-encapsulation-mechanism"></a>1.2 Key Encapsulation Mechanism</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> This protocol uses ANY Key Encapsulation Mechanism. However it&#x2019;s recommended that
+                  most users select a hybrid post quantum KEM such as Xwing. <a class="xref" href="#XWING">the section called &#x201c;References&#x201d;</a></p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="core-protocol"></a>2. Core Protocol</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The protocol is based on Kyber and Trevor Perrin&#x2019;s Noise Protocol Framework <a class="xref" href="#NOISE">the section called &#x201c;References&#x201d;</a> along with <span class="quote">&#x201c;<span class="quote">Post Quantum Noise</span>&#x201d;</span> paper <a class="link" href="#PQNOISE">PQNOISE</a>. Older previous versions of our transport were
+               based on <a class="link" href="#NOISEHFS">NOISEHFS</a>. </p>
+            <p> Our transport protocol begins with a prologue, Noise handshake, followed by a stream
+               of Noise Transport messages in a minimal framing layer, over a TCP/IP connection.
+               </p>
+            <p> Our Noise protocol is configurable via the KEM selection in the TOML configuration
+               files, here&#x2019;s an example PQ Noise protocol string: </p>
+            <pre class="programlisting">
+Noise_pqXX_Xwing_ChaChaPoly_BLAKE2b
+</pre>
+            <p> The protocol string is a very condensed description of our protocol. We use the pqXX
+               two way Noise pattern which is described as follows: </p>
+            <pre class="programlisting">
+pqXX: -&gt; e &lt;- ekem, s -&gt; skem, s &lt;- skem
+</pre>
+            <p> The next part of the protocol string specifies the KEM, <code class="literal">Xwing</code>
+               which is a hybrid KEM where the share secret outputs of both X25519 and MLKEM768 are
+               combined. </p>
+            <p> Finally the <code class="literal">ChaChaPoly_BLAKE2b</code> parts of the protocol string
+               indicate which stream cipher and hash function we are using. </p>
+            <p> As a non-standard modification to the Noise protocol, the 65535 byte message length
+               limit is increased to 1300000 bytes. We send very large messages over our Noise protocol
+               because of our using the Sphincs+ signature scheme which has signatures that are about
+               49k bytes. </p>
+            <p> It is assumed that all parties using the KMNWP protocol have a fixed long or short
+               lived <code class="literal">Xwing</code> keypair <a class="link" href="#XWING">XWING</a>, the public
+               component of which is known to the other party in advance. How such keys are distributed
+               is beyond the scope of this document. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="handshake-phase"></a>2.1 Handshake Phase</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> All sessions start in the Handshake Phase, in which an anonymous authenticated
+                  handshake is conducted. </p>
+               <p> The handshake is a unmodified Noise handshake, with a fixed prologue prefacing
+                  the initiator's first Noise handshake message. This prologue is also used as the
+                  <code class="literal">prologue</code> input to the Noise HandshakeState
+                  <code class="literal">Initialize()</code> operation for both the initiator and responder. </p>
+               <p> The prologue is defined to be the following structure: </p>
+               <pre class="programlisting">
+struct {
+uint8_t protocol_version; /* 0x03 */
+} Prologue;
+</pre>
+               <p> As all Noise handshake messages are fixed sizes, no additional framing is
+                  required for the handshake. </p>
+               <p> Implementations MUST preserve the Noise handshake hash <code class="literal">[h]</code> for
+                  the purpose of implementing authentication (Section 2.3). </p>
+               <p> Implementations MUST reject handshake attempts by terminating the session
+                  immediately upon any Noise protocol handshake failure and when, as a responder, they
+                  receive a Prologue containing an unknown protocol_version value. </p>
+               <p> Implementations SHOULD impose reasonable timeouts for the handshake process, and
+                  SHOULD terminate sessions that are taking too long to handshake. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="handshake-authentication"></a>2.1.1 Handshake Authentication</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Mutual authentication is done via exchanging fixed sized payloads as part of the
+                  <code class="literal">pqXX</code> handshake consisting of the following structure: </p>
+               <pre class="programlisting">
+struct {
+uint8_t ad_len;
+opaque additional_data[ad_len];
+opaque padding[255 - ad_len];
+uint32_t unix_time;
+} AuthenticateMessage;
+</pre>
+               <p> Where: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">ad_len</code> - The length of the optional additional data.
+                           </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">additional_data</code> - Optional additional data, such as a
+                           username, if any. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">unix_time</code> - 0 for the initiator, the approximate number
+                           of seconds since 1970-01-01 00:00:00 UTC for the responder. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> The initiator MUST send the <code class="literal">AuthenticateMessage</code> after it has
+                  received the peer's response (so after <code class="literal">-&gt; s, se</code> in Noise
+                  parlance). </p>
+               <p> The contents of the optional <code class="literal">additional_data</code> field is
+                  deliberately left up to the implementation, however it is RECOMMENDED that
+                  implementations pad the field to be a consistent length regardless of contents to
+                  avoid leaking information about the authenticating identity. </p>
+               <p> To authenticate the remote peer given an AuthenticateMessage, the receiving peer
+                  must validate the <code class="literal">s</code> component of the Noise handshake (the remote
+                  peer's long term public key) with the known value, along with any of the information
+                  in the <code class="literal">additional_data</code> field such as the user name, if any. </p>
+               <p> If the validation procedure succeeds, the peer is considered authenticated. If
+                  the validation procedure fails for any reason, the session MUST be terminated
+                  immediately. </p>
+               <p> Responders MAY add a slight amount (+- 10 seconds) of random noise to the
+                  unix_time value to avoid leaking precise load information via packet queueing delay.
+                  </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="data-transfer-phase"></a>2.2 Data Transfer Phase</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Upon successfully concluding the handshake the session enters the Data Transfer
+                  Phase, where the initiator and responder can exchange KMNWP messages. </p>
+               <p> A KMNWP message is defined to be the following structure: </p>
+               <pre class="programlisting">enum {
+no_op(0),
+disconnect(1),
+send_packet(2),
+
+(255),
+} Command;
+
+struct {
+Command command;
+uint8_t reserved;    /* MUST be '0x00' */
+uint32_t msg_length; /* 0 &lt;= msg_length &lt;= 1048554) */
+opaque message[msg_length];
+opaque padding[];    /* length is implicit */
+} Message;</pre>
+               <p> Notes: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p> The padding field, if any MUST be padded with <code class="literal">'0x00'</code>
+                           bytes. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> All outgoing Message(s) are encrypted and authenticated into a pair of Noise
+                  Transport messages, each containing one of the following structures: </p>
+               <pre class="programlisting">struct {
+uint32_t message_length;
+} CiphertextHeader;
+
+struct {
+uint32_t message[ciphertext_length-16];
+} Ciphertext;</pre>
+               <p> Notes: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p> The <code class="literal">ciphertext_length</code> field includes the Noise
+                           protocol overhead of 16 bytes, for the Noise Transport message containing
+                           the Ciphertext. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> All outgoing Message(s) are preceded by a Noise Transport Message containing a
+                  <code class="literal">CiphertextHeader</code>, indicating the size of the Noise Transport
+                  Message transporting the Message Ciphertext. After generating both Noise Transport
+                  Messages, the sender MUST call the Noise CipherState <code class="literal">Rekey()</code>
+                  operation. </p>
+               <p> To receive incoming Ciphertext messages, first the Noise Transport Message
+                  containing the CiphertextHeader is consumed off the network, authenticated and
+                  decrypted, giving the receiver the length of the Noise Transport Message containing
+                  the actual message itself. The second Noise Transport Message is consumed off the
+                  network, authenticated and decrypted, with the resulting message being returned to
+                  the caller for processing. After receiving both Noise Transport Messages, the
+                  receiver MUST call the Noise CipherState <code class="literal">Rekey()</code> operation. </p>
+               <p> Implementations MUST immediately terminate the session any of the
+                  <code class="literal">DecryptWithAd()</code> operations fails. </p>
+               <p> Implementations MUST immediately terminate the session if an unknown command is
+                  received in a Message, or if the Message is otherwise malformed in any way. </p>
+               <p> Implementations MAY impose a reasonable idle timeout, and terminate the session
+                  if it expires. </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="predefined-commands"></a>3. Predefined Commands</h2>
+                  </div>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-no_op-command"></a>3.1 The no_op Command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The <code class="literal">no_op</code> command is a command that explicitly is a No
+                  Operation, to be used to implement functionality such as keep-alives and or
+                  application layer padding. </p>
+               <p> Implementations MUST NOT send any message payload accompanying this command, and
+                  all received command data MUST be discarded without interpretation. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-disconnect-command"></a>3.2 The disconnect Command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The <code class="literal">disconnect</code> command is a command that is used to signal
+                  explicit session termination. Upon receiving a disconnect command, implementations
+                  MUST interpret the command as a signal from the peer that no additional commands
+                  will be sent, and destroy the cryptographic material in the receive CipherState. </p>
+               <p> While most implementations will likely wish to terminate the session upon
+                  receiving this command, any additional behavior is explicitly left up to the
+                  implementation and application. </p>
+               <p> Implementations MUST NOT send any message payload accompanying this command, and
+                  MUST not send any further traffic after sending a disconnect command. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-send_packet-command"></a>3.3 The send_packet Command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The <code class="literal">send_packet</code> command is the command that is used by the
+                  initiator to transmit a Sphinx Packet over the network. The command&#x2019;s message is the
+                  Sphinx Packet destined for the responder. </p>
+               <p> Initiators MUST terminate the session immediately upon reception of a
+                  <code class="literal">send_packet</code> command. </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="command-padding"></a>4. Command Padding</h2>
+                  </div>
+               </div>
+            </div>
+            <p> We use traffic padding to hide from a passive network observer which command has
+               been
+               sent or received. </p>
+            <p> Among the set of padded commands we exclude the <code class="literal">Consensus</code> command
+               because it&#x2019;s contents are a very large payload which is usually many times larger
+               than
+               our Sphinx packets. Therefore we only pad these commands: </p>
+            <p> GetConsensus NoOp Disconnect SendPacket RetrieveMessage MessageACK Message
+               MessageEmpty </p>
+            <p> However we split them up into two directions, client to server and server to client
+               because they differ in size due to the difference in size between
+               <code class="literal">SendPacket</code> and <code class="literal">Message</code>: </p>
+            <p> Client to Server commands: </p>
+            <p> NoOp SendPacket Disconnect RetrieveMessage GetConsensus </p>
+            <p> Server to client commands: </p>
+            <p> Message MessageACK MessageEmpty </p>
+            <p> The <code class="literal">GetConsensus</code> command is a special case because we only want to
+               pad it when it&#x2019;s sent over the mixnet. We don&#x2019;t want to pad it when sending to the
+               dirauths. Although it would not be so terrible if it&#x2019;s padded when sent to the dirauths&#x2026;
+               it would just needlessly take up bandwidth without providing any privacy benefits.
+               </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="anonymity-considerations"></a>5. Anonymity Considerations</h2>
+                  </div>
+               </div>
+            </div>
+            <p> Adversaries being able to determine that two parties are communicating via KMNWP
+               is
+               beyond the threat model of this protocol. At a minimum, it is trivial to determine
+               that
+               a KMNWP handshake is being performed, due to the length of each handshake message,
+               and
+               the fixed positions of the various public keys. </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="security-considerations"></a>6. Security Considerations</h2>
+                  </div>
+               </div>
+            </div>
+            <p> It is imperative that implementations use ephemeral keys for every handshake as the
+               security properties of the Kyber KEM are totally lost if keys are ever reused. </p>
+            <p> Kyber was chosen as the KEM algorithm due to it&#x2019;s conservative parameterization,
+               simplicty of implementation, and high performance in software. It is hoped that the
+               addition of a quantum resistant algorithm will provide forward secrecy even in the
+               event
+               that large scale quantum computers are applied to historical intercepts. </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="acknowledgments"></a>Acknowledgments</h2>
+                  </div>
+               </div>
+            </div>
+            <p> I would like to thank Trevor Perrin for providing feedback during the design of this
+               protocol, and answering questions regarding Noise. </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="appendix-a.-references"></a>References</h2>
+                  </div>
+               </div>
+            </div>
+            <p><a name="XWING"></a><span class="bold"><strong>XWING</strong></span></p>
+            <p>Manuel Barbosa, Deirdre Connolly, João Diogo Duarte, Aaron Kaiser, Peter Schwabe,
+               Karoline Varner, Bas Westerbaan, <span class="quote">&#x201c;<span class="quote">X-Wing: The Hybrid KEM You&#x2019;ve Been Looking
+                     For</span>&#x201d;</span>,
+               <a class="link" href="https://eprint.iacr.org/2024/039.pdf" target="_top">https://eprint.iacr.org/2024/039.pdf</a>.</p>
+            <p><a name="NOISE"></a><span class="bold"><strong>NOISE</strong></span></p>
+            <p>Perrin, T., <span class="quote">&#x201c;<span class="quote">The Noise Protocol Framework</span>&#x201d;</span>, May 2017,
+               <a class="link" href="https://noiseprotocol.org/noise.pdf" target="_top">https://noiseprotocol.org/noise.pdf</a>.</p>
+            <p><a name="NOISEHFS"></a><span class="bold"><strong>NOISEHFS</strong></span></p>
+            <p>Weatherley, R., <span class="quote">&#x201c;<span class="quote">Noise Extension: Hybrid Forward Secrecy</span>&#x201d;</span>,
+               <a class="link" href="https://github.com/noiseprotocol/noise_hfs_spec/blob/master/output/noise_hfs.pdf" target="_top">https://github.com/noiseprotocol/noise_hfs_spec/blob/master/output/noise_hfs.pdf</a>.</p>
+            <p><a name="PQNOISE"></a><span class="bold"><strong>PQNOISE</strong></span></p>
+            <p>Yawning Angel, Benjamin Dowling, Andreas Hülsing, Peter Schwabe and Florian Weber,
+               <span class="quote">&#x201c;<span class="quote">Post Quantum Noise</span>&#x201d;</span>, September 2023, 
+               <a class="link" href="https://eprint.iacr.org/2022/539.pdf" target="_top">https://eprint.iacr.org/2022/539.pdf</a>.</p>
+            <p><a name="RFC2119"></a><span class="bold"><strong>RFC2119</strong></span></p>
+            <p>Bradner, S., <span class="quote">&#x201c;<span class="quote">Key words for use in RFCs to Indicate Requirement
+                     Levels</span>&#x201d;</span>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a class="link" href="http://www.rfc-editor.org/info/rfc2119" target="_top">http://www.rfc-editor.org/info/rfc2119</a>.</p>
+            <p><a name="RFC5246"></a><span class="bold"><strong>RFC5246</strong></span></p>
+            <p>Dierks, T. and E. Rescorla, <span class="quote">&#x201c;<span class="quote">The Transport Layer Security (TLS) Protocol
+                     Version 1.2</span>&#x201d;</span>, RFC 5246, DOI 10.17487/RFC5246, August 2008, <a class="link" href="http://www.rfc-editor.org/info/rfc5246" target="_top">http://www.rfc-editor.org/info/rfc5246</a>.</p>
+            <p><a name="RFC7748"></a><span class="bold"><strong>RFC7748</strong></span></p>
+            <p>Langley, A., Hamburg, M., and S. Turner, <span class="quote">&#x201c;<span class="quote">Elliptic Curves for Security</span>&#x201d;</span>, RFC 7748, January 2016, 
+               <a class="link" href="https://www.rfc-editor.org/info/rfc7748" target="_top">https://www.rfc-editor.org/info/rfc7748</a>.</p>
+         </div>
+      </div>
+   </body>
+</html>

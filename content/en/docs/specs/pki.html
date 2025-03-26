@@ -1,0 +1,1386 @@
+---
+title: 
+linkTitle: "Public key infrastructure" 
+description: "" 
+url: "docs/specs/pki.html" 
+date: "2025-03-26T14:54:34.494324886-07:00"
+draft: false 
+slug: "" 
+layout: "" 
+type: "" 
+weight: 35
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>Public key infrastructure</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+      <meta name="description" content="">
+   </head>
+   <body>
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h1 class="title"><a name="pki"></a>Public key infrastructure</h1>
+               </div>
+               <div>
+                  <div class="authorgroup">
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Yawning</span> <span class="surname">Angel</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Claudia</span> <span class="surname">Diaz</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Ania</span> <span class="surname">Piotrowska</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">David</span> <span class="surname">Stainton</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname"></span> <span class="surname">Masala</span></h3>
+                     </div>
+                  </div>
+               </div>
+               <div>
+                  <div class="abstract">
+                     <p class="title"><b>Abstract</b></p>
+                     <p></p>
+                  </div>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="toc">
+            <p><b>Table of Contents</b></p>
+            <dl class="toc">
+               <dt><span class="section"><a href="#terminology">Terminology</a></span></dt>
+               <dt><span class="section"><a href="#conventions-used-in-this-document">Conventions used in this document</a></span></dt>
+               <dt><span class="section"><a href="#pki_introduction">1. Introduction</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#security-properties-overview">1.2 Security properties overview</a></span></dt>
+                     <dt><span class="section"><a href="#differences-from-tor-and-mixminion-directory-authority-systems">1.3 Differences from Tor and Mixminion directory authority systems</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#overview-of-mix-pki-interaction">2. Overview of mix PKI interaction</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#pki-protocol-schedule">2.1 PKI protocol schedule</a></span></dt>
+                     <dt><span class="section"><a href="#directory-authority-server-schedule">2.1.1 Directory authority server schedule</a></span></dt>
+                     <dt><span class="section"><a href="#mix-schedule">2.1.2 Mix schedule</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#voting-for-consensus-protocol">3. Voting for consensus protocol</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#protocol-messages">3.1 Protocol messages</a></span></dt>
+                     <dt><span class="section"><a href="#mix-descriptor-and-directory-signing">3.1.1 Mix descriptor and directory signing</a></span></dt>
+                     <dt><span class="section"><a href="#vote-exchange">3.2 Vote exchange</a></span></dt>
+                     <dt><span class="section"><a href="#reveal-exchange">3.3 Reveal exchange</a></span></dt>
+                     <dt><span class="section"><a href="#cert-exchange">3.4 Cert exchange</a></span></dt>
+                     <dt><span class="section"><a href="#vote-tabulation-for-consensus-computation">3.5 Vote tabulation for consensus computation</a></span></dt>
+                     <dt><span class="section"><a href="#signature-collection">3.6 Signature collection</a></span></dt>
+                     <dt><span class="section"><a href="#publication">3.7 Publication</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#pki-protocol-data-structures">4. PKI Protocol data structures</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#mix-descriptor-format">4.1 Mix descriptor format</a></span></dt>
+                     <dt><span class="section"><a href="#scheduling-mix-downtime">4.1.1 Scheduling mix downtime</a></span></dt>
+                     <dt><span class="section"><a href="#directory-format">4.2 Directory format</a></span></dt>
+                     <dt><span class="section"><a href="#shared-random-value-structure">4.3 Shared random value structure</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#pki-wire-protocol">5. PKI wire protocol</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#mix-descriptor-publication">5.1 Mix descriptor publication</a></span></dt>
+                     <dt><span class="section"><a href="#the-post_descriptor-command">5.1.1 The post_descriptor command</a></span></dt>
+                     <dt><span class="section"><a href="#the-post_descriptor_status-command">5.1.2 The post_descriptor_status command</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#voting">6. Voting</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#the-vote-command">6.1. The vote command</a></span></dt>
+                     <dt><span class="section"><a href="#the-vote_status-command">6.2. The vote_status command</a></span></dt>
+                     <dt><span class="section"><a href="#the-get_vote-command">6.3. The get_vote command</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#retrieval-of-consensus">7. Retrieval of consensus</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#the-get_consensus-command">7.1 The get_consensus command</a></span></dt>
+                     <dt><span class="section"><a href="#the-consensus-command">7.2 The consensus command</a></span></dt>
+                     <dt><span class="section"><a href="#the-cert-command">7.3. The Cert command</a></span></dt>
+                     <dt><span class="section"><a href="#the-certstatus-command">7.4. The CertStatus command</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#signature-exchange">8. Signature exchange</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#the-sig-command">8.1. The sig command</a></span></dt>
+                     <dt><span class="section"><a href="#the-sigstatus-command">8.2. The sig_status command</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#scalability-considerations">9. Scalability considerations</a></span></dt>
+               <dt><span class="section"><a href="#future-work">10. Future work</a></span></dt>
+               <dt><span class="section"><a href="#anonymity-considerations">11. Anonymity considerations</a></span></dt>
+               <dt><span class="section"><a href="#security-considerations">12. Security considerations</a></span></dt>
+               <dt><span class="section"><a href="#acknowledgements">Acknowledgements</a></span></dt>
+               <dt><span class="section"><a href="#appendix-a.-references">References</a></span></dt>
+            </dl>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="terminology"></a>Terminology</h2>
+                  </div>
+               </div>
+            </div>
+            <p>The following terms are used in this specification.</p>
+            <div class="variablelist">
+               <dl class="variablelist">
+                  <dt><span class="term">PKI</span></dt>
+                  <dd>
+                     <p>Public key infrastructure</p>
+                  </dd>
+                  <dt><span class="term">directory authority system</span></dt>
+                  <dd>
+                     <p>Refers to specific PKI schemes used by Mixminion and Tor.</p>
+                  </dd>
+                  <dt><span class="term">MSL</span></dt>
+                  <dd>
+                     <p>Maximum segment lifetime, currently set to 120 seconds.</p>
+                  </dd>
+                  <dt><span class="term">mix descriptor</span></dt>
+                  <dd>
+                     <p>A database record which describes a component mix.</p>
+                  </dd>
+                  <dt><span class="term">family</span></dt>
+                  <dd>
+                     <p>Identifier of security domains or entities operating one or more mixes in
+                        the network. This is used to inform the path selection algorithm.</p>
+                  </dd>
+                  <dt><span class="term">nickname</span></dt>
+                  <dd>
+                     <p>A nickname string that is unique in the consensus document, see Katzenpost
+                        Mix Network Specification section 2.2. Network Topology.</p>
+                  </dd>
+                  <dt><span class="term">layer</span></dt>
+                  <dd>
+                     <p>The layer indicates which network topology layer a particular mix resides
+                        in.</p>
+                  </dd>
+                  <dt><span class="term">provider</span></dt>
+                  <dd>
+                     <p>A service operated by a third party that Clients communicate directly with
+                        to communicate with the Mixnet. It is responsible for Client authentication,
+                        forwarding outgoing messages to the Mixnet, and storing incoming messages
+                        for the Client. The Provider MUST have the ability to perform cryptographic
+                        operations on the relayed messages.</p>
+                  </dd>
+               </dl>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="conventions-used-in-this-document"></a>Conventions used in this document</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>,
+               <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD
+                     NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and
+               <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be interpreted as described in <a class="link" href="#RFC2119">RFC2119</a>. </p>
+            <p> The <span class="quote">&#x201c;<span class="quote">C</span>&#x201d;</span> style Presentation Language as described in <a class="link" href="#RFC5246">RFC5246</a> Section 4 is used to represent data structures for
+               additional cryptographic wire protocol commands. <a class="link" href="#KATZMIXWIRE">KATZMIXWIRE</a></p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="pki_introduction"></a>1. Introduction</h2>
+                  </div>
+               </div>
+            </div>
+            <p> Mixnets are designed with the assumption that a Public Key Infrastructure (PKI)
+               exists and it gives each client the same view of the network. This specification is
+               inspired by the Tor and Mixminion Directory Authority systems <a class="link" href="#MIXMINIONDIRAUTH">MIXMINIONDIRAUTH</a><a class="link" href="#TORDIRAUTH">TORDIRAUTH</a> whose main features are precisely what we
+               need for our PKI. These are decentralized systems meant to be collectively operated
+               by
+               multiple entities. </p>
+            <p> The mix network directory authority system (PKI) is essentially a cooperative
+               decentralized database and voting system that is used to produce network consensus
+               documents which mix clients periodically retrieve and use for their path selection
+               algorithm when creating Sphinx packets. These network consensus documents are derived
+               from a voting process between the Directory Authority servers. </p>
+            <p> This design prevents mix clients from using only a partial view of the network for
+               their path selection so as to avoid fingerprinting and bridging attacks <a class="link" href="#FINGERPRINTING">FINGERPRINTING</a>, <a class="link" href="#BRIDGING">BRIDGING</a>, and <a class="link" href="#LOCALVIEW">LOCALVIEW</a>. </p>
+            <p> The PKI is also used by Authority operators to specify network-wide parameters, for
+               example in the Katzenpost Decryption Mix Network <a class="link" href="#KATZMIXNET">KATZMIXNET</a> the Poisson mix strategy is used and, therefore, all clients must
+               use the same lambda parameter for their exponential distribution function when choosing
+               hop delays in the path selection. The Mix Network Directory Authority system, aka
+               PKI,
+               SHALL be used to distribute such network-wide parameters in the network consensus
+               document that have an impact on security and performance. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="security-properties-overview"></a>1.2 Security properties overview</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> This Directory Authority system has the following feature goals and security
+                  properties: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p> All Directory Authority servers must agree with each other on the set of
+                           Directory Authorities. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> All Directory Authority servers must agree with each other on the set of
+                           mixes. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> This system is intentionally designed to provide identical network
+                           consensus documents to each mix client. This mitigates epistemic attacks
+                           against the client path selection algorithm such as fingerprinting and
+                           bridge attacks <a class="link" href="#FINGERPRINTING">FINGERPRINTING</a><a class="link" href="#BRIDGING">BRIDGING</a>. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> This system is NOT byzantine-fault-tolerant, it instead allows for manual
+                           intervention upon consensus fault by the Directory Authority operators.
+                           Further, these operators are responsible for expelling bad acting operators
+                           from the system. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> This system enforces the network policies such as mix join policy wherein
+                           intentionally closed mixnets will prevent arbitrary hosts from joining the
+                           network by authenticating all descriptor signatures with a list of allowed
+                           public keys. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> The Directory Authority system for a given mix network is essentially the
+                           root of all authority. </p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="differences-from-tor-and-mixminion-directory-authority-systems"></a>1.3 Differences from Tor and Mixminion directory authority systems</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> In this document we specify a Directory Authority system which is different from
+                  that of Tor's and Mixminion&#x2019;s in a number of ways: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p> The list of valid mixes is expressed in an allowlist. For the time being
+                           there is no specified <span class="quote">&#x201c;<span class="quote">bandwidth authority</span>&#x201d;</span> system which
+                           verifies the health of mixes (Further research required in this area).
+                           </p>
+                     </li>
+                     <li class="listitem">
+                        <p> There&#x2019;s no non-directory channel to inform clients that a node is down,
+                           so it will end up being a lot of packet loss, since clients will continue to
+                           include the missing node in their path selection until keys published by the
+                           node expire and it falls out of the consensus. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> The schema of the mix descriptors is different from that used in
+                           Mixminion and Tor, including a change which allows our mix descriptor to
+                           express <span class="emphasis"><em>n</em></span> Sphinx mix routing public keys in a single
+                           mix descriptor whereas in the Tor and Mixminion Directory Authority systems,
+                           <span class="emphasis"><em>n</em></span> descriptors are used. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> The serialization format of mix descriptors is different from that used
+                           in Mixminion and Tor. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> The shared random number computation is performed every voting round, and
+                           is required for a vote to be accepted by each authority. The shared random
+                           number is used to deterministically generate the network topology. </p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="overview-of-mix-pki-interaction"></a>2. Overview of mix PKI interaction</h2>
+                  </div>
+               </div>
+            </div>
+            <p> Each Mix MUST rotate the key pair used for Sphinx packet processing periodically
+               for
+               forward secrecy reasons and to keep the list of seen packet tags short. <a class="link" href="#SPHINX09">SPHINX09</a><a class="link" href="#SPHINXSPEC">SPHINXSPEC</a> The Katzenpost Mix Network uses a fixed
+               interval (<code class="literal">epoch</code>), so that key rotations happen simultaneously
+               throughout the network, at predictable times. </p>
+            <p> Each Directory Authority server MUST use some time synchronization protocol in order
+               to correctly use this protocol. This Directory Authority system requires time
+               synchronization to within a few minutes. </p>
+            <p> Let each epoch be exactly <code class="literal">1200 seconds (20 minutes)</code> in duration,
+               and the 0th Epoch begin at <code class="literal">2017-06-01 00:00 UTC</code>. </p>
+            <p> To facilitate smooth operation of the network and to allow for delays that span
+               across epoch boundaries, Mixes MUST publish keys to the PKI for at least 3 epochs
+               in
+               advance, unless the mix will be otherwise unavailable in the near future due to planned
+               downtime. </p>
+            <p> At an epoch boundary, messages encrypted to keys from the previous epoch are accepted
+               for a grace period of 2 minutes. </p>
+            <p> Thus, at any time, keys for all Mixes for the Nth through N + 2nd epoch will be
+               available, allowing for a maximum round trip (forward message + SURB) delay + transit
+               time of 40 minutes. SURB lifetime is limited to a single epoch because of the key
+               rotation epoch, however this shouldn&#x2019;t present any useability problems since SURBs
+               are
+               only used for sending ACK messages from the destination Provider to the sender. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="pki-protocol-schedule"></a>2.1 PKI protocol schedule</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> There are two main constraints to Authority schedule: </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist" type="1">
+                     <li class="listitem">
+                        <p> There MUST be enough key material extending into the future so that
+                           clients are able to construct Sphinx packets with a forward and reply paths.
+                           </p>
+                     </li>
+                     <li class="listitem">
+                        <p> All participants should have enough time to participate in the protocol;
+                           upload descriptors, vote, generate documents, download documents, establish
+                           connections for user traffic. </p>
+                     </li>
+                  </ol>
+               </div>
+               <p> The epoch duration of 20 minutes is more than adequate for these two constraints.
+                  </p>
+               <p><span class="emphasis"><em>NOTE: perhaps we should make it shorter? but first let&#x2019;s do some scaling
+                        and bandwidth calculations to see how bad it gets&#x2026;</em></span></p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="directory-authority-server-schedule"></a>2.1.1 Directory authority server schedule</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Directory Authority server interactions are conducted according to the following
+                  schedule, where <code class="literal">T</code> is the beginning of the current epoch, and
+                  <code class="literal">P</code> is the length of the epoch period. </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">T</code> - Epoch begins </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">T + P/2</code> - Vote exchange </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">T + (5/8)*P</code> - Reveal exchange </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">T + (6/8)*P</code> - Tabulation and signature exchange </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">T + (7/8)*P</code> - Publish consensus </p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="mix-schedule"></a>2.1.2 Mix schedule</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Mix PKI interactions are conducted according to the following schedule, where T
+                  is the beginning of the current epoch. </p>
+               <p><code class="literal">T + P/8</code> - Deadline for publication of all mixes documents for the
+                  next epoch. </p>
+               <p><code class="literal">T + (7/8)*P</code> - This marks the beginning of the period where mixes
+                  perform staggered fetches of the PKI consensus document. </p>
+               <p><code class="literal">T + (8/9)*P</code> - Start establishing connections to the new set of
+                  relevant mixes in advance of the next epoch. </p>
+               <p><code class="literal">T + P - 1MSL</code> - Start accepting new Sphinx packets encrypted to
+                  the next epoch&#x2019;s keys. </p>
+               <p><code class="literal">T + P + 1MSL</code> - Stop accepting new Sphinx packets encrypted to the
+                  previous epoch&#x2019;s keys, close connections to peers no longer listed in the PKI
+                  documents and erase the list of seen packet tags. </p>
+               <p> Mix layer changes are controlled by the Directory Authorities and therefore a mix
+                  can be reassigned to a different layer in our stratified topology at any new epoch.
+                  Mixes will maintain incoming and outgoing connections to the various nodes until all
+                  mix keys have expired, iff the node is still listed anywhere in the current
+                  document. </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="voting-for-consensus-protocol"></a>3. Voting for consensus protocol</h2>
+                  </div>
+               </div>
+            </div>
+            <p> In our Directory Authority protocol, all the actors conduct their behavior according
+               to a common schedule as outlined in section "2.1 PKI Protocol Schedule". The
+               Directory Authority servers exchange messages to reach consensus about the network.
+               Other tasks they perform include collecting mix descriptor uploads from each mix for
+               each key rotation epoch, voting, shared random number generation, signature exchange
+               and
+               publishing of the network consensus documents. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="protocol-messages"></a>3.1 Protocol messages</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> There are only two document types in this protocol: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><code class="literal">mix_descriptor</code>: A mix descriptor describes a mix. </p>
+                     </li>
+                     <li class="listitem">
+                        <p><code class="literal">directory</code>: A directory contains a list of descriptors and
+                           other information that describe the mix network. </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> Mix descriptor and directory documents MUST be properly signed. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="mix-descriptor-and-directory-signing"></a>3.1.1 Mix descriptor and directory signing</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Mixes MUST compose mix descriptors which are signed using their private identity
+                  key, an ed25519 key. Directories are signed by one or more Directory Authority
+                  servers using their authority key, also an ed25519 key. In all cases, signing is
+                  done using JWS <a class="link" href="#RFC7515">RFC7515</a>. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="vote-exchange"></a>3.2 Vote exchange</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> As described in section <span class="quote">&#x201c;<span class="quote">2.1 PKI Protocol Schedule</span>&#x201d;</span>, the Directory
+                  Authority servers begin the voting process 1/8 of an epoch period after the start
+                  of
+                  a new epoch. Each Authority exchanges vote directory messages with each other. </p>
+               <p> Authorities archive votes from other authorities and make them available for
+                  retreival. Upon receiving a new vote, the authority examines it for new descriptors
+                  and includes any valid descriptors in its view of the network. </p>
+               <p> Each Authority includes in its vote a hashed value committing to a choice of a
+                  random number for the vote. See section 4.3 for more details. </p>
+               <p><span class="strong"><strong>3.2.1 Voting Wire Protocol Commands</strong></span></p>
+               <p> The Katzenpost Wire Protocol as described in <code class="literal">KATZMIXWIRE</code> is
+                  used by Authorities to exchange votes. We define additional wire protocol commands
+                  for sending votes: </p>
+               <pre class="programlisting">enum {
+
+:   vote(22), vote_status(23),
+
+} Command;</pre>
+               <p> The structures of these commands are defined as follows: </p>
+               <pre class="programlisting">struct {
+:   uint64_t epoch_number; opaque public_key[ED25519_KEY_LENGTH];
+opaque payload[];
+
+} VoteCommand;
+
+struct {
+:   uint8 error_code;
+
+} VoteStatusCommand;</pre>
+               <p><span class="strong"><strong>3.2.2 The vote Command</strong></span></p>
+               <p> The vote command is used to send a PKI document to a peer Authority during the
+                  voting period of the PKI schedule. </p>
+               <p> The payload field contains the signed and serialized PKI document representing
+                  the sending Authority&#x2019;s vote. The public_key field contains the public identity key
+                  of the sending Authority which the receiving Authority can use to verify the
+                  signature of the payload. The epoch_number field is used by the receiving party to
+                  quickly check the epoch for the vote before deserializing the payload. </p>
+               <p> Each authority MUST include its commit value for the shared random computation in
+                  this phase along with its signed vote. This computation is derived from the Tor
+                  Shared Random Subsystem, <a class="link" href="#TORSRV">TORSRV</a>. </p>
+               <p><span class="strong"><strong>3.2.3 The vote_status Command</strong></span></p>
+               <p> The vote_status command is used to reply to a vote command. The error_code field
+                  indicates if there was a failure in the receiving of the PKI document. </p>
+               <pre class="programlisting">enum {
+
+:   vote_ok(0), /\* None error condition. */ vote_too_early(1), /*
+The Authority should try again later. */ vote_too_late(2), /*
+This round of voting was missed. \*/
+}</pre>
+               <p> The epoch_number field of the vote struct is compared with the epoch that is
+                  currently being voted on. vote_too_early and vote_too_late are replied back to the
+                  voter to report that their vote was not accepted. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="reveal-exchange"></a>3.3 Reveal exchange</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> As described in section <span class="quote">&#x201c;<span class="quote">2.1 PKI Protocol Schedule</span>&#x201d;</span>, the Directory
+                  Authority servers exchange the reveal values after they have exchanged votes which
+                  contain a commit value. Each Authority exchanges reveal messages with each other.
+                  </p>
+               <p> 3.3.1 Reveal Wire Protocol Commands </p>
+               <p> The Katzenpost Wire Protocol as described in <a class="link" href="#KATZMIXWIRE">KATZMIXWIRE</a> is used by Authorities to exchange reveal values previously
+                  commited to in their votes. We define additional wire protocol commands for
+                  exchanging reveals: </p>
+               <pre class="programlisting">enum {
+:   reveal(25), reveal_status(26),
+} Command;</pre>
+               <p> The structures of these commands are defined as follows: </p>
+               <pre class="programlisting">struct {
+:   uint64_t epoch_number; opaque public_key[ED25519_KEY_LENGTH];
+opaque payload[];
+
+} RevealCommand;
+
+struct {
+:   uint8 error_code;
+
+} RevealStatusCommand;</pre>
+               <p><span class="strong"><strong>3.3.2 The reveal Command</strong></span></p>
+               <p> The reveal command is used to send a reveal value to a peer authority during the
+                  reveal period of the PKI schedule. </p>
+               <p> The payload field contains the signed and serialized reveal value. The public_key
+                  field contains the public identity key of the sending Authority which the receiving
+                  Authority can use to verify the signature of the payload. The epoch_number field is
+                  used by the receiving party to quickly check the epoch for the reveal before
+                  deserializing the payload. </p>
+               <p><span class="strong"><strong>3.3.3 The reveal_status Command</strong></span></p>
+               <p> The reveal_status command is used to reply to a reveal command. The error_code
+                  field indicates if there was a failure in the receiving of the shared random reveal
+                  value. </p>
+               <pre class="programlisting">enum {
+
+:   reveal_ok(8), /* None error condition. */ reveal_too_early(9), 
+/* The Authority should try again later. */
+reveal_not_authorized(10), /* The Authority was rejected. */
+reveal_already_received(11), /* The Authority has already revealed
+this round. */ reveal_too_late(12) /* This round of revealing was
+missed. */
+
+} Errorcodes;</pre>
+               <p> The epoch_number field of the reveal struct is compared with the epoch that is
+                  currently being voted on. reveal_too_early and reveal_too_late are replied back to
+                  the authority to report their reveal was not accepted. The status code
+                  reveal_not_authorized is used if the Authority is rejected. The
+                  reveal_already_received is used to report that a valid reveal command was already
+                  received for this round. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="cert-exchange"></a>3.4 Cert exchange</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The Cert command is the same as a Vote but contains the set of Reveal values as
+                  seen by the voting peer. In order to ensure that a misconfigured or malicious
+                  Authority operator cannot amplify their ability to influence the threshold voting
+                  process, after Reveal messages have been exchanged, Authorities vote again,
+                  including the Reveals seen by them. Authorities may not introduce new MixDescriptors
+                  at this phase in the protocol. </p>
+               <p> Otherwise, a consensus partition can be obtained by witholding Reveal values from
+                  a threshold number of Peers. In the case of an even-number of Authorities, a denial
+                  of service by a single Authority was observed. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="vote-tabulation-for-consensus-computation"></a>3.5 Vote tabulation for consensus computation</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The main design constraint of the vote tabulation algorithm is that it MUST be a
+                  deterministic process that produces the same result for each directory authority
+                  server. This result is known as a network consensus file. </p>
+               <p> A network consensus file is a well formed directory struct where the
+                  <code class="literal">status</code> field is set to <code class="literal">consensus</code> and
+                  contains 0 or more descriptors, the mix directory is signed by 0 or more directory
+                  authority servers. If signed by the full voting group then this is called a fully
+                  signed consensus. </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem">
+                        <p> Validate each vote directory: </p>
+                     </li>
+                  </ol>
+               </div>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p> that the liveness fields correspond to the following epoch </p>
+                     </li>
+                     <li class="listitem">
+                        <p> status is <code class="literal">vote</code></p>
+                     </li>
+                     <li class="listitem">
+                        <p> version number matches ours </p>
+                     </li>
+                  </ul>
+               </div>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="2">
+                        <p> Compute a consensus directory: </p>
+                     </li>
+                  </ol>
+               </div>
+               <p> Here we include a modified section from the Mixminion PKI spec <a class="link" href="#MIXMINIONDIRAUTH">MIXMINIONDIRAUTH</a>: </p>
+               <p> For each distinct mix identity in any vote directory: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p> If there are multiple nicknames for a given identity, do not include any
+                           descriptors for that identity. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> If half or fewer of the votes include the identity, do not include any
+                           descriptors for the identity. <span class="emphasis"><em>This also guarantees that there will
+                                 be only one identity per nickname.</em></span></p>
+                     </li>
+                     <li class="listitem">
+                        <p> If we are including the identity, then for each distinct descriptor that
+                           appears in any vote directory: </p>
+                        <div class="itemizedlist">
+                           <ul class="itemizedlist compact" style="list-style-type: circle; ">
+                              <li class="listitem">
+                                 <p> Do not include the descriptor if it will have expired on the date
+                                    the directory will be published. </p>
+                              </li>
+                              <li class="listitem">
+                                 <p> Do not include the descriptor if it is superseded by other
+                                    descriptors for this identity. </p>
+                              </li>
+                              <li class="listitem">
+                                 <p> Do not include the descriptor if it not valid in the next epoch.
+                                    </p>
+                              </li>
+                              <li class="listitem">
+                                 <p> Otherwise, include the descriptor. </p>
+                              </li>
+                           </ul>
+                        </div>
+                     </li>
+                     <li class="listitem">
+                        <p> Sort the list of descriptors by the signature field so that creation of
+                           the consensus is reproducible. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Set directory <code class="literal">status</code> field to
+                           <code class="literal">consensus</code>. </p>
+                     </li>
+                  </ul>
+               </div>
+               <div class="orderedlist">
+                  <ol class="orderedlist" type="1">
+                     <li class="listitem" value="3">
+                        <p> Compute a shared random number from the values revealed in the
+                           <span class="quote">&#x201c;<span class="quote">Reveal</span>&#x201d;</span> step. Authorities whose reveal value does not
+                           verify their commit value MUST be excluded from the consensus round.
+                           Authorities ensure that their peers MUST participate in Commit-and-Reveal,
+                           and MUST use correct Reveal values obtained from other Peers as part of the
+                           <span class="quote">&#x201c;<span class="quote">Cert</span>&#x201d;</span> exchange. </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Generate or update the network topology using the shared random number as
+                           a seed to a deterministic random number generator that determines the order
+                           that new mixes are placed into the topology. </p>
+                     </li>
+                  </ol>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="signature-collection"></a>3.6 Signature collection</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Each Authority signs their view of consensus, and exchanges detached Signatures
+                  with each other. Upon receiving each Signature it is added to the signatures on the
+                  Consensus if it validates the Consensus. The Authority SHOULD warn the administrator
+                  if network partition is detected. </p>
+               <p> If there is disagreement about the consensus directory, each authority collects
+                  signatures from only the servers which it agrees with about the final consensus. </p>
+               <p> // TODO: consider exchanging peers votes amongst authorities (or hashes thereof)
+                  to // ensure that an authority has distributed one and only unique vote amongst its
+                  peers. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="publication"></a>3.7 Publication</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> If the consensus is signed by a majority of members of the voting group then it's
+                  a valid consensus and it is published. </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="pki-protocol-data-structures"></a>4. PKI Protocol data structures</h2>
+                  </div>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="mix-descriptor-format"></a>4.1 Mix descriptor format</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Note that there is no signature field. This is because mix descriptors are
+                  serialized and signed using JWS. The <code class="literal">IdentityKey</code> field is a
+                  public ed25519 key. The <code class="literal">MixKeys</code> field is a map from epoch to
+                  public X25519 keys which is what the Sphinx packet format uses. </p>
+               <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                  <table border="0" summary="Note: Note">
+                     <tr>
+                        <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                        <th align="left">Note</th>
+                     </tr>
+                     <tr>
+                        <td align="left" valign="top">
+                           <p> XXX David: replace the following example with a JWS example: </p>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+               <pre class="programlisting">{
+"Version": 0,
+"Name": "",
+"Family": "",
+"Email": "",
+"AltContactInfo":"",
+"IdentityKey": "",
+"LinkKey":"",
+"MixKeys": {
+"Epoch": "EpochPubKey",
+},
+"Addresses": ["IP:Port"],
+"Layer": 0,
+"LoadWeight":0,
+"AuthenticationType":""
+}</pre>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="scheduling-mix-downtime"></a>4.1.1 Scheduling mix downtime</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Mix operators can publish a half empty mix descriptor for future epochs to
+                  schedule downtime. The mix descriptor fields that MUST be populated are: </p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p> Version </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Name </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Family </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Email </p>
+                     </li>
+                     <li class="listitem">
+                        <p> Layer </p>
+                     </li>
+                     <li class="listitem">
+                        <p> IdentityKey </p>
+                     </li>
+                     <li class="listitem">
+                        <p> MixKeys </p>
+                     </li>
+                  </ul>
+               </div>
+               <p> The map in the field called "MixKeys" should reflect the scheduled
+                  downtime for one or more epochs by not have those epochs as keys in the map. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="directory-format"></a>4.2 Directory format</h3>
+                     </div>
+                  </div>
+               </div>
+               <p><span class="emphasis"><em>Note: replace the following example with a JWS example</em></span></p>
+               <pre class="programlisting">{
+"Signatures": [],
+"Version": 0,
+"Status": "vote",
+"Lambda" : 0.274,
+"MaxDelay" : 30,
+"Topology" : [],
+"Providers" : [],
+}</pre>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="shared-random-value-structure"></a>4.3 Shared random value structure</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> Katzenpost&#x2019;s Shared Random Value computation is inspired by Tor&#x2019;s Shared Random
+                  Subsystem <a class="link" href="#TORSRV">TORSRV</a>. </p>
+               <p> Each voting round a commit value is included in the votes sent to other
+                  authorities. These are produced as follows: </p>
+               <pre class="programlisting">H = blake2b-256
+
+COMMIT = Uint64(epoch) | H(REVEAL) REVEAL = Uint64(epoch) | H(RN)</pre>
+               <p> After the votes are collected from the voting round, and before signature
+                  exchange, the Shared Random Value field of the consensus document is the output of
+                  H
+                  over the input string calculated as follows: </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem">
+                        <p> Validated Reveal commands received including the authorities own reveal
+                           are sorted by reveal value in ascending order and appended to the input in
+                           format IdentityPublicKeyBytes_n | RevealValue_n </p>
+                     </li>
+                  </ol>
+               </div>
+               <p> However instead of the Identity Public Key bytes we instead encode the Reveal
+                  with the blake2b 256 bit hash of the public key bytes. </p>
+               <div class="orderedlist">
+                  <ol class="orderedlist compact" type="1">
+                     <li class="listitem" value="2">
+                        <p> If a SharedRandomValue for the previous epoch exists, it is appended to
+                           the input string, otherwise 32 NUL (x00) bytes are used. </p>
+                     </li>
+                  </ol>
+               </div>
+               <pre class="programlisting">REVEALS = ID_a \| R_a \| ID_b \| R_b \| \... SharedRandomValue =
+H("shared-random" | Uint64(epoch) | REVEALS | PREVIOUS_SRV)</pre>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="pki-wire-protocol"></a>5. PKI wire protocol</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The Katzenpost Wire Protocol as described in <a class="link" href="#KATZMIXWIRE">KATZMIXWIRE</a> is used by both clients and by Directory Authority peers. In
+               the following section we describe additional wire protocol commands for publishing
+               mix descriptors, voting and consensus retrieval. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="mix-descriptor-publication"></a>5.1 Mix descriptor publication</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The following commands are used for publishing mix descriptors and setting
+                  mix descriptor status: </p>
+               <pre class="programlisting">enum {
+/* Extending the wire protocol Commands. */
+post_descriptor(20),
+post_descriptor_status(21),
+}</pre>
+               <p> The structures of these command are defined as follows: </p>
+               <pre class="programlisting">struct {
+uint64_t epoch_number;
+opaque payload[];
+} PostDescriptor;
+
+struct {
+uint8 error_code;
+} PostDescriptorStatus;</pre>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-post_descriptor-command"></a>5.1.1 The post_descriptor command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The post_descriptor command allows mixes to publish their descriptors.
+                  </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-post_descriptor_status-command"></a>5.1.2 The post_descriptor_status command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The post_descriptor_status command is sent in response to a post_descriptor
+                  command, and uses the following error codes: </p>
+               <pre class="programlisting">enum {
+descriptor_ok(0),
+descriptor_invalid(1),
+descriptor_conflict(2),
+descriptor_forbidden(3),
+} ErrorCodes;</pre>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="voting"></a>6. Voting</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The following commands are used by Authorities to exchange votes: </p>
+            <pre class="programlisting">enum {
+vote(22),
+vote_status(23),
+get_vote(24),
+} Command;</pre>
+            <p> The structures of these commands are defined as follows: </p>
+            <pre class="programlisting">struct {
+uint64_t epoch_number;
+opaque public_key[ED25519_KEY_LENGTH];
+opaque payload[];
+} VoteCommand;
+
+struct {
+uint8 error_code;
+} VoteStatusCommand;</pre>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-vote-command"></a>6.1. The vote command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The <code class="literal">vote</code> command is used to send a PKI document to a peer
+                  Authority during the voting period of the PKI schedule. </p>
+               <p> The payload field contains the signed and serialized PKI document
+                  representing the sending Authority&#x2019;s vote. The public_key field contains the
+                  public identity key of the sending Authority which the receiving Authority can
+                  use to verify the signature of the payload. The epoch_number field is used by
+                  the receiving party to quickly check the epoch for the vote before deserializing
+                  the payload. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-vote_status-command"></a>6.2. The vote_status command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The <code class="literal">vote_status</code> command is used to reply to a vote
+                  command. The error_code field indicates if there was a failure in the receiving
+                  of the PKI document. </p>
+               <pre class="programlisting">enum {
+vote_ok(0),               /* None error condition. */
+vote_too_early(1),        /* The Authority should try again later. */
+vote_too_late(2),         /* This round of voting was missed. */
+vote_not_authorized(3),   /* The voter's key is not authorized. */
+vote_not_signed(4),       /* The vote signature verification failed */
+vote_malformed(5),        /* The vote payload was invalid */
+vote_already_received(6), /* The vote was already received */
+vote_not_found(7),        /* The vote was not found */
+}</pre>
+               <p> The epoch_number field of the vote struct is compared with the epoch that is
+                  currently being voted on. vote_too_early and vote_too_late are replied back to
+                  the voter to report that their vote was not accepted. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-get_vote-command"></a>6.3. The get_vote command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The <code class="literal">get_vote</code> command is used to request a PKI document
+                  (vote) from a peer Authority. The epoch field contains the epoch from which to
+                  request the vote, and the public_key field contains the public identity key of
+                  the Authority of the requested vote. A successful query is responded to with a
+                  vote command, and queries that fail are responded to with a vote_status command
+                  with error_code vote_not_found(7). </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="retrieval-of-consensus"></a>7. Retrieval of consensus</h2>
+                  </div>
+               </div>
+            </div>
+            <p> Providers in the Katzenpost mix network system <a class="link" href="#KATZMIXNET">KATZMIXNET</a> may cache validated network consensus files and serve
+               them to clients over the mix network's link layer wire protocol <a class="link" href="#KATZMIXWIRE">KATZMIXWIRE</a>. We define additional wire protocol
+               commands for requesting and sending PKI consensus documents: </p>
+            <pre class="programlisting">enum {
+/* Extending the wire protocol Commands. */
+get_consensus(18),
+consensus(19),
+} Command;
+
+The structures of these commands are defined as follows:</pre>
+            <pre class="programlisting">struct {
+uint64_t epoch_number;
+} GetConsensusCommand;
+
+struct {
+uint8 error_code;
+opaque payload[];
+} ConsensusCommand;</pre>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-get_consensus-command"></a>7.1 The get_consensus command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The get_consensus command is a command that is used to retrieve a recent
+                  consensus document. If a given get_consensus command contains an Epoch value
+                  that is either too big or too small then a reply consensus command is sent with
+                  an empty payload. Otherwise if the consensus request is valid then a consensus
+                  command containing a recent consensus document is sent in reply. </p>
+               <p> Initiators MUST terminate the session immediately upon reception of a
+                  get_consensus command. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-consensus-command"></a>7.2 The consensus command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The consensus command is a command that is used to send a recent consensus
+                  document. The error_code field indicates if there was a failure in retrieval of
+                  the PKI consensus document. </p>
+               <pre class="programlisting">enum {
+consensus_ok(0),        /* None error condition and SHOULD be accompanied with
+a valid consensus payload. */
+consensus_not_found(1), /* The client should try again later. */
+consensus_gone(2),      /* The consensus will not be available in the future. */
+} ErrorCodes;</pre>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-cert-command"></a>7.3. The Cert command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The <code class="literal">cert</code> command is used to send a PKI document to a peer
+                  Authority during the voting period of the PKI schedule. It is the same as the
+                  <code class="literal">vote</code> command, but must contain the set of
+                  SharedRandomCommit and SharedRandomReveal values as seen by the Authority during
+                  the voting process. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-certstatus-command"></a>7.4. The CertStatus command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The <code class="literal">cert_status</code> command is the response to a
+                  <code class="literal">cert</code> command, and is the same as a
+                  <code class="literal">vote_status</code> response, other than the command identifier.
+                  Responses are CertOK, CertTooEarly, CertNotAuthorized, CertNotSigned,
+                  CertAlreadyReceived, CertTooLate </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="signature-exchange"></a>8. Signature exchange</h2>
+                  </div>
+               </div>
+            </div>
+            <p> Signatures exchange is the final round of the consensus protocol and consists
+               of the Sig and SigStatus commands. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-sig-command"></a>8.1. The sig command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The <code class="literal">sig</code> command contains a detached Signature from PublicKey
+                  of Consensus for Epoch. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="the-sigstatus-command"></a>8.2. The sig_status command</h3>
+                     </div>
+                  </div>
+               </div>
+               <p> The <code class="literal">sig_status</code> command is the response to a
+                  <code class="literal">sig</code> command. Responses are SigOK, SigNotAuthorized,
+                  SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid. </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="scalability-considerations"></a>9. Scalability considerations</h2>
+                  </div>
+               </div>
+            </div>
+            <p><span class="emphasis"><em>TODO: notes on scaling, bandwidth usage etc.</em></span></p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="future-work"></a>10. Future work</h2>
+                  </div>
+               </div>
+            </div>
+            <div class="itemizedlist">
+               <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p> byzantine fault tolerance </p>
+                  </li>
+                  <li class="listitem">
+                     <p> PQ crypto signatures for all PKI documents: mix descriptors and
+                        directories. <a class="link" href="#SPHINCS256">SPHINCS256</a> could be used, we
+                        already have a golang implementation: https://github.com/Yawning/sphincs256/
+                        </p>
+                  </li>
+                  <li class="listitem">
+                     <p> Make a Bandwidth Authority system to measure health of the network. Also
+                        perform load balancing as described in <a class="link" href="#PEERFLOW">PEERFLOW</a>? </p>
+                  </li>
+                  <li class="listitem">
+                     <p> Implement byzantine attack defenses as described in <a class="link" href="#MIRANDA">MIRANDA</a> and <a class="link" href="#MIXRELIABLE">MIXRELIABLE</a> where mix link performance proofs are recorded and
+                        used in a reputation system. </p>
+                  </li>
+                  <li class="listitem">
+                     <p> Choose a different serialization/schema language? </p>
+                  </li>
+                  <li class="listitem">
+                     <p> Use a append only merkle tree instead of this voting protocol. </p>
+                  </li>
+               </ul>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="anonymity-considerations"></a>11. Anonymity considerations</h2>
+                  </div>
+               </div>
+            </div>
+            <div class="itemizedlist">
+               <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p> This system is intentionally designed to provide identical network consensus
+                        documents to each mix client. This mitigates epistemic attacks against the
+                        client path selection algorithm such as fingerprinting and bridge attacks <a class="link" href="#FINGERPRINTING">FINGERPRINTING</a>, <a class="link" href="#BRIDGING">BRIDGING</a>. </p>
+                  </li>
+                  <li class="listitem">
+                     <p> If consensus has failed and thus there is more than one consensus file,
+                        clients MUST NOT use this compromised consensus and refuse to run. </p>
+                  </li>
+                  <li class="listitem">
+                     <p> We try to avoid randomizing the topology because doing so splits the
+                        anonymity sets on each mix into two. That is, packets belonging to the previous
+                        topology versus the current topology are trivially distinguishable. On the other
+                        hand if enough mixes fall out of consensus eventually the mixnet will need to be
+                        rebalanced to avoid an attacker compromised path selection. One example of this
+                        would be the case where the adversary controls the only mix is one layer of the
+                        network topology. </p>
+                  </li>
+               </ul>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="security-considerations"></a>12. Security considerations</h2>
+                  </div>
+               </div>
+            </div>
+            <div class="itemizedlist">
+               <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p> The Directory Authority / PKI system for a given mix network is essentially
+                        the root of all authority in the system. The PKI controls the contents of the
+                        network consensus documents that mix clients download and use to inform their
+                        path selection. Therefore if the PKI as a whole becomes compromised then so will
+                        the rest of the system in terms of providing the main security properties
+                        described as traffic analysis resistance. Therefore a decentralized voting
+                        protocol is used so that the system is more resiliant when attacked, in
+                        accordance with the principle of least authority. <a class="link" href="#SECNOTSEP">SECNOTSEP</a></p>
+                  </li>
+                  <li class="listitem">
+                     <p> Short epoch durations make it is more practical to make corrections to
+                        network state using the PKI voting rounds. </p>
+                  </li>
+                  <li class="listitem">
+                     <p> Fewer epoch keys published in advance is a more conservative security policy
+                        because it implies reduced exposure to key compromise attacks. </p>
+                  </li>
+                  <li class="listitem">
+                     <p> A bad acting Directory Authority who lies on each vote and votes
+                        inconsistently can trivially cause a denial of service for each voting round.
+                        </p>
+                  </li>
+               </ul>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="acknowledgements"></a>Acknowledgements</h2>
+                  </div>
+               </div>
+            </div>
+            <p> We would like to thank Nick Mathewson for answering design questions and thorough
+               design review. </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="appendix-a.-references"></a>References</h2>
+                  </div>
+               </div>
+            </div>
+            <p><a name="BRIDGING"></a><span class="bold"><strong>BRIDGING</strong></span></p>
+            <p>Danezis, G., Syverson, P., <span class="quote">&#x201c;<span class="quote">Bridging and Fingerprinting: Epistemic Attacks
+                     on Route Selection</span>&#x201d;</span>, Proceedings of PETS 2008, Leuven, Belgium,
+               July 2008, <a class="link" href="https://www.freehaven.net/anonbib/cache/danezis-pet2008.pdf" target="_top">https://www.freehaven.net/anonbib/cache/danezis-pet2008.pdf</a>.</p>
+            <p><a name="FINGERPRINTING"></a><span class="bold"><strong>FINGERPRINTING</strong></span></p>
+            <p>Danezis, G., Clayton, R., <span class="quote">&#x201c;<span class="quote">Route Finger printing in Anonymous
+                     Communications</span>&#x201d;</span>, 
+               <a class="link" href="https://www.cl.cam.ac.uk/~rnc1/anonroute.pdf" target="_top">https://www.cl.cam.ac.uk/~rnc1/anonroute.pdf</a>.</p>
+            <p><a name="KATZMIXNET"></a><span class="bold"><strong>KATZMIXNET</strong></span></p>
+            <p>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Katzenpost
+                     Mix Network Specification</span>&#x201d;</span>, June 2017, 
+               <a class="link" href="https://katzenpost.network/docs/specs/pdf/mixnet.pdf" target="_top">https://katzenpost.network/docs/specs/pdf/mixnet.pdf</a>.</p>
+            <p><a name="KATZMIXWIRE"></a><span class="bold"><strong>KATZMIXWIRE</strong></span></p>
+            <p>Angel, Y., <span class="quote">&#x201c;<span class="quote">Katzenpost Mix Network Wire Protocol Specification</span>&#x201d;</span>, June 2017, 
+               <a class="link" href="https://katzenpost.network/docs/specs/pdf/wire.pdf" target="_top">https://katzenpost.network/docs/specs/pdf/wire.pdf</a>.</p>
+            <p><a name="LOCALVIEW"></a><span class="bold"><strong>LOCALVIEW</strong></span></p>
+            <p>Gogolewski, M., Klonowski, M., Kutylowsky, M., <span class="quote">&#x201c;<span class="quote">Local View Attack on
+                     Anonymous Communication</span>&#x201d;</span>,
+               <a class="link" href="https://cs.pwr.edu.pl/kutylowski/articles/LocalView-WWW.pdf" target="_top">https://cs.pwr.edu.pl/kutylowski/articles/LocalView-WWW.pdf</a>.</p>
+            <p><a name="MIRANDA"></a><span class="bold"><strong>MIRANDA</strong></span></p>
+            <p>Leibowitz, H., Piotrowska, A., Danezis, G., Herzberg, A., <span class="quote">&#x201c;<span class="quote">No right
+                     to ramain silent: Isolating Malicious Mixes</span>&#x201d;</span>, 2017, 
+               <a class="link" href="https://eprint.iacr.org/2017/1000.pdf" target="_top">https://eprint.iacr.org/2017/1000.pdf</a>.</p>
+            <p><a name="MIXMINIONDIRAUTH"></a><span class="bold"><strong>MIXMINIONDIRAUTH</strong></span></p>
+            <p>Danezis, G., Dingledine, R., Mathewson, N., <span class="quote">&#x201c;<span class="quote">Type III (Mixminion) Mix
+                     Directory Specification</span>&#x201d;</span>, December 2005, 
+               <a class="link" href="https://www.mixminion.net/dir-spec.txt" target="_top">https://www.mixminion.net/dir-spec.txt</a>.</p>
+            <p><a name="MIXRELIABLE"></a><span class="bold"><strong>MIXRELIABLE</strong></span></p>
+            <p>Dingledine, R., Freedman, M., Hopwood, D., Molnar, D., <span class="quote">&#x201c;<span class="quote">A Reputation
+                     System to Increase MIX-Net Reliability</span>&#x201d;</span>, 2001, Information Hiding, 4th
+               International Workshop, 
+               <a class="link" href="https://www.freehaven.net/anonbib/cache/mix-acc.pdf" target="_top">https://www.freehaven.net/anonbib/cache/mix-acc.pdf</a>.</p>
+            <p><a name="PEERFLOW"></a><span class="bold"><strong>PEERFLOW</strong></span></p>
+            <p>Johnson, A., Jansen, R., Segal, A., Syverson, P., <span class="quote">&#x201c;<span class="quote">PeerFlow: Secure Load
+                     Balancing in Tor</span>&#x201d;</span>, July 2017, Proceedings on Privacy Enhancing Technologies, 
+               <a class="link" href="https://petsymposium.org/2017/papers/issue2/paper12-2017-2-source.pdf" target="_top">https://petsymposium.org/2017/papers/issue2/paper12-2017-2-source.pdf</a>.</p>
+            <p><a name="RFC2119"></a><span class="bold"><strong>RFC2119</strong></span></p>
+            <p>Bradner, S., <span class="quote">&#x201c;<span class="quote">Key words for use in RFCs to Indicate Requirement
+                     Levels</span>&#x201d;</span>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a class="link" href="http://www.rfc-editor.org/info/rfc2119" target="_top">http://www.rfc-editor.org/info/rfc2119</a>.</p>
+            <p><a name="RFC5246"></a><span class="bold"><strong>RFC5246</strong></span></p>
+            <p>Dierks, T. and E. Rescorla, <span class="quote">&#x201c;<span class="quote">The Transport Layer Security (TLS) Protocol
+                     Version 1.2</span>&#x201d;</span>, RFC 5246, DOI 10.17487/RFC5246, August 2008, <a class="link" href="http://www.rfc-editor.org/info/rfc5246" target="_top">http://www.rfc-editor.org/info/rfc5246</a>.</p>
+            <p><a name="RFC7515"></a><span class="bold"><strong>RFC7515</strong></span></p>
+            <p>Jones, M., Bradley, J., Sakimura, N., <span class="quote">&#x201c;<span class="quote">JSON Web Signature (JWS)</span>&#x201d;</span>, May 2015, 
+               <a class="link" href="https://www.rfc-editor.org/info/rfc7515" target="_top">https://www.rfc-editor.org/info/rfc7515</a>.</p>
+            <p><a name="SECNOTSEP"></a><span class="bold"><strong>SECNOTSEP</strong></span></p>
+            <p>Miller, M., Tulloh, B., Shapiro, J., <span class="quote">&#x201c;<span class="quote">The Structure of Authority: Why
+                     Security Is not a Separable Concer</span>&#x201d;</span>,
+               <a class="link" href="http://www.erights.org/talks/no-sep/secnotsep.pdf" target="_top">http://www.erights.org/talks/no-sep/secnotsep.pdf</a>.</p>
+            <p><a name="SPHINCS256"></a><span class="bold"><strong>SPHINCS256</strong></span></p>
+            <p>Bernstein, D., Hopwood, D., Hulsing, A., Lange, T., Niederhagen, R., Papachristodoulou,
+               L., Schwabe, P., Wilcox O'Hearn, Z., 
+               <span class="quote">&#x201c;<span class="quote">SPHINCS: practical stateless hash-based signatures</span>&#x201d;</span>,
+               <a class="link" href="http://sphincs.cr.yp.to/sphincs-20141001.pdf" target="_top">http://sphincs.cr.yp.to/sphincs-20141001.pdf</a>.</p>
+            <p><a name="SPHINX09"></a><span class="bold"><strong>SPHINX09</strong></span></p>
+            <p>Danezis, G., Goldberg, I., <span class="quote">&#x201c;<span class="quote">Sphinx: A Compact and Provably Secure Mix
+                     Format</span>&#x201d;</span>, DOI 10.1109/SP.2009.15, May 2009, <a class="link" href="https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf" target="_top">https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</a>.</p>
+            <p><a name="SPHINXSPEC"></a><span class="bold"><strong>SPHINXSPEC</strong></span></p>
+            <p>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Sphinx Mix Network Cryptographic Packet Format Specification</span>&#x201d;</span>, July 2017, 
+               <a class="link" href="https://katzenpost.network/docs/specs/pdf/sphinx.pdf" target="_top">https://katzenpost.network/docs/specs/pdf/sphinx.pdf</a>.</p>
+            <p><a name="TORDIRAUTH"></a><span class="bold"><strong>TORDIRAUTH</strong></span></p>
+            <p><span class="quote">&#x201c;<span class="quote">Tor directory protocol, version 3</span>&#x201d;</span>, 
+               <a class="link" href="https://spec.torproject.org/dir-spec/index.html" target="_top">https://spec.torproject.org/dir-spec/index.html</a>.</p>
+            <p><a name="TORSRV"></a><span class="bold"><strong>TORSRV</strong></span></p>
+            <p><span class="quote">&#x201c;<span class="quote">Tor Shared Random Subsystem Specification</span>&#x201d;</span>, 
+               <a class="link" href="https://spec.torproject.org/srv-spec/index.html" target="_top">https://spec.torproject.org/srv-spec/index.html</a>.</p>
+         </div>
+      </div>
+   </body>
+</html>

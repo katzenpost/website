@@ -1,0 +1,297 @@
+---
+title: 
+linkTitle: "Provider-side autoresponder extension" 
+description: "" 
+url: "docs/admin_guide/kaetzchen.html" 
+date: "2025-03-26T15:20:32.373286764-07:00"
+draft: false 
+slug: "" 
+layout: "" 
+type: "" 
+weight: 5
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>Provider-side autoresponder extension (Kaetzchen)</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+      <meta name="description" content="This interface is meant to provide support for various autoresponder agents Kaetzchen that run on Katzenpost provider instances, thus bypassing the need to run a discrete client instance to provide functionality. The use-cases for such agents include, but are not limited to, user identity key lookup, a discard address, and a loop-back responder for the purpose of cover traffic.">
+   </head>
+   <body>
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h1 class="title"><a name="kaetzchen"></a>Provider-side autoresponder extension (Kaetzchen)</h1>
+               </div>
+               <div>
+                  <div class="authorgroup">
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Yawning</span> <span class="surname">Angel</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">Kali</span> <span class="surname">Kaneko</span></h3>
+                     </div>
+                     <div class="author">
+                        <h3 class="author"><span class="firstname">David</span> <span class="surname">Stainton</span></h3>
+                     </div>
+                  </div>
+               </div>
+               <div>
+                  <div class="abstract">
+                     <p class="title"><b>Abstract</b></p>
+                     <p> This interface is meant to provide support for various autoresponder agents
+                        <span class="quote">&#x201c;<span class="quote">Kaetzchen</span>&#x201d;</span> that run on Katzenpost provider instances, thus
+                        bypassing the need to run a discrete client instance to provide functionality. The
+                        use-cases for such agents include, but are not limited to, user identity key lookup,
+                        a discard address, and a loop-back responder for the purpose of cover
+                        traffic.</p>
+                  </div>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="toc">
+            <p><b>Table of Contents</b></p>
+            <dl class="toc">
+               <dt><span class="section"><a href="#d58e35">Conventions Used in This Document</a></span></dt>
+               <dt><span class="section"><a href="#terminology">Terminology</a></span></dt>
+               <dt><span class="section"><a href="#extension-overview">1. Extension Overview</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="#agent-requirements">1.1 Agent Requirements</a></span></dt>
+                     <dt><span class="section"><a href="#mix-message-formats">1.2 Mix Message Formats</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="#pki-extensions">2. PKI Extensions</a></span></dt>
+               <dt><span class="section"><a href="#anonymity-considerations">3. Anonymity Considerations</a></span></dt>
+               <dt><span class="section"><a href="#security-considerations">4. Security Considerations</a></span></dt>
+               <dt><span class="section"><a href="#acknowledgments">Acknowledgments</a></span></dt>
+               <dt><span class="section"><a href="#appendix-a.-references">References</a></span></dt>
+            </dl>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="d58e35"></a>Conventions Used in This Document</h2>
+                  </div>
+               </div>
+            </div>
+            <p> The key words <span class="quote">&#x201c;<span class="quote">MUST</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MUST NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">REQUIRED</span>&#x201d;</span>,
+               <span class="quote">&#x201c;<span class="quote">SHALL</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHALL NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">SHOULD
+                     NOT</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">RECOMMENDED</span>&#x201d;</span>, <span class="quote">&#x201c;<span class="quote">MAY</span>&#x201d;</span>, and
+               <span class="quote">&#x201c;<span class="quote">OPTIONAL</span>&#x201d;</span> in this document are to be interpreted as described in <a class="link" href="#RFC2119">RFC2119</a>. </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="terminology"></a>Terminology</h2>
+                  </div>
+               </div>
+            </div>
+            <p>The following terms are used in this specification.</p>
+            <div class="variablelist">
+               <dl class="variablelist">
+                  <dt><span class="term">SURB</span></dt>
+                  <dd>
+                     <p>Single use reply block. SURBs are used to achieve recipient anonymity,
+                        that is to say, SURBs function as a cryptographic delivery token that
+                        you can give to another client entity so that they can send you a
+                        message without them knowing your identity or location on the network.
+                        See <code class="literal">SPHINXSPEC</code> and <code class="literal">SPHINX</code>.</p>
+                  </dd>
+                  <dt><span class="term">BlockSphinxPlaintext</span></dt>
+                  <dd>
+                     <p>The payload structure which is encapsulated by the Sphinx body.</p>
+                  </dd>
+               </dl>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="extension-overview"></a>1. Extension Overview</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Each Kaetzchen agent will register as a potential recipient on its Provider. When
+               the Provider receives a forward packet destined for a Kaetzchen instance, it will
+               hand off the fully unwrapped packet along with its corresponding SURB to the agent,
+               which will then act on the packet and optionally reply utilizing the SURB.</p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="agent-requirements"></a>1.1 Agent Requirements</h3>
+                     </div>
+                  </div>
+               </div>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p>Each agent operation MUST be idempotent.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Each agent operation request and response MUST fit within one Sphinx
+                           packet.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Each agent SHOULD register a recipient address that is prefixed with (Or
+                           another standardized delimiter, agreed to by all participating providers in
+                           a given mixnet).</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Each agent SHOULD register a recipient address that consists of an RFC5322
+                           dot-atom value, and MUST register recipient addresses that are at most 64
+                           octets in length.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>The first byte of the agent's response payload MUST be 0x01 to allow
+                           clients to easily differentiate between SURB-ACKs and agent
+                           responses.</p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="mix-message-formats"></a>1.2 Mix Message Formats</h3>
+                     </div>
+                  </div>
+               </div>
+               <p>Messages from clients to Kaetzchen use the following payload format in the forward
+                  Sphinx packet:</p>
+               <pre class="programlisting">struct {
+uint8_t flags;
+uint8_t reserved; /* Set to 0x00. */
+select (flags) {
+case 0:
+opaque padding[sizeof(SphinxSURB)];
+case 1:
+SphinxSURB surb;
+}
+opaque plaintext[];
+} KaetzchenMessage;</pre>
+               <p>The plaintext component of a <code class="literal">KaetzchenMessage</code> MUST be padded by
+                  appending <span class="quote">&#x201c;<span class="quote">0x00</span>&#x201d;</span> bytes to make the final total size of a
+                  <code class="literal">KaetzchenMessage</code> equal to that of a
+                  <code class="literal">BlockSphinxPlaintext</code>.</p>
+               <p>Messages (replies) from the Kaetzchen to client use the following payload format
+                  in the SURB generated packet:</p>
+               <pre class="programlisting">struct {
+opaque plaintext[];
+} KaetzchenReply;</pre>
+               <p>The plaintext component of a <code class="literal">KaetzchenReply</code> MUST be padded by
+                  appending <span class="quote">&#x201c;<span class="quote">0x00</span>&#x201d;</span> bytes to make the final total size of a
+                  <code class="literal">KaetzchenReply</code> equal to that of a
+                  <code class="literal">BlockSphinxPlaintext</code></p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="pki-extensions"></a>2. PKI Extensions</h2>
+                  </div>
+               </div>
+            </div>
+            <p>Each provider SHOULD publish the list of publicly accessible Kaetzchen agent
+               endpoints in its MixDescriptor, along with any other information required to utilize
+               the agent.</p>
+            <p>Provider should make this information available in the form of a map in which the
+               keys are the label used to identify a given service, and the value is a map with
+               arbitrary keys.</p>
+            <p>Valid service names refer to the services defined in extensions to this
+               specification. Every service MUST be implemented by one and only one Kaetzchen
+               agent.</p>
+            <p>For each service, the provider MUST advertise a field for the endpoint at which
+               the Kaetzchen agent can be reached, as a key value pair where the key is
+               <code class="literal">endpoint</code>, and the value is the provider side endpoint
+               identifier.</p>
+            <pre class="programlisting">{ "kaetzchen":
+{ "keyserver" : {
+"endpoint": "+keyserver",
+"version" : 1 } },
+{ "discard" : {
+"endpoint": "+discard", } },
+{ "loop" : {
+"endpoint": "+loopback",
+"restrictedToUsers": true } },
+}</pre>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="anonymity-considerations"></a>3. Anonymity Considerations</h2>
+                  </div>
+               </div>
+            </div>
+            <p>In the event that the mix keys for the entire return path are compromised, it is
+               possible for adversaries to unwrap the SURB and determine the final recipient of the
+               reply.</p>
+            <p>Depending on what sort of operations a given agent implements, there may be
+               additional anonymity impact that requires separate consideration.</p>
+            <p>Clients MUST NOT have predictable retranmission otherwise this makes active
+               confirmations attacks possible which could be used to discover the ingress Provider
+               of the client.</p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="security-considerations"></a>4. Security Considerations</h2>
+                  </div>
+               </div>
+            </div>
+            <p>It is possible to use this mechanism to flood a victim with unwanted traffic by
+               constructing a request with a SURB destined for the target.</p>
+            <p>Depending on the operations implemented by each agent, the added functionality may
+               end up being a vector for Denial of Service attacks in the form of CPU or network
+               overload.</p>
+            <p>Unless the agent implements additional encryption, message integrity and privacy
+               is limited to that which is provided by the base Sphinx packet format and
+               parameterization.</p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="acknowledgments"></a>Acknowledgments</h2>
+                  </div>
+               </div>
+            </div>
+            <p>The inspiration for this extension comes primarily from a design by Vincent
+               Breitmoser.</p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="appendix-a.-references"></a>References</h2>
+                  </div>
+               </div>
+            </div>
+            <p><a name="KATZMIXPKI"></a><span class="bold"><strong>KATZMIXPKI</strong></span></p>
+            <p>Angel, Y., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Katzenpost Mix Network Public Key Infrastructure Specification</span>&#x201d;</span>, December 2017, <a class="link" href="https://katzenpost.network/docs/specs/pdf/pki.pdf" target="_top">https://katzenpost.network/docs/specs/pdf/pki.pdf</a>.</p>
+            <p><a name="RFC2119"></a><span class="bold"><strong>RFC2119</strong></span></p>
+            <p>Bradner, S., <span class="quote">&#x201c;<span class="quote">Key words for use in RFCs to Indicate Requirement
+                     Levels</span>&#x201d;</span>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a class="link" href="http://www.rfc-editor.org/info/rfc2119" target="_top">http://www.rfc-editor.org/info/rfc2119</a>.</p>
+            <p><a name="RFC5322"></a><span class="bold"><strong>RFC5322</strong></span></p>
+            <p>Resnick, P., Ed., <span class="quote">&#x201c;<span class="quote">Internet Message Format</span>&#x201d;</span>, RFC 5322, DOI 10.17487/RFC5322, October 2008, <a class="link" href="https://www.rfc-editor.org/info/rfc5322" target="_top">https://www.rfc-editor.org/info/rfc5322</a>.</p>
+            <p><a name="SPHINX09"></a><span class="bold"><strong>SPHINX09</strong></span></p>
+            <p>Danezis, G., Goldberg, I., <span class="quote">&#x201c;<span class="quote">Sphinx: A Compact and Provably Secure Mix
+                     Format</span>&#x201d;</span>, DOI 10.1109/SP.2009.15, May 2009, <a class="link" href="https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf" target="_top">https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</a>.</p>
+            <p><a name="SPHINXSPEC"></a><span class="bold"><strong>SPHINXSPEC</strong></span></p>
+            <p>Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">&#x201c;<span class="quote">Sphinx Mix Network Cryptographic Packet Format Specification</span>&#x201d;</span>, July 2017, 
+               <a class="link" href="https://katzenpost.network/docs/specs/pdf/sphinx.pdf" target="_top">https://katzenpost.network/docs/specs/pdf/sphinx.pdf</a>.</p>
+         </div>
+      </div>
+   </body>
+</html>
