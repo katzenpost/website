@@ -20,20 +20,20 @@ A Katzenpost mixnet client has several responsibilities at minimum:
 * send and receive Noise protocol messages
 * keep up to date with the latest PKI document
 
-The client connector is essentially a long running daemon process that
-listens on an abstract Unix domain socket for incoming connector library
-connections. Many client applications can use the same connector daemon.
-Those connections are in a sense being multiplexed into the daemon's
-single connection to the mix network.
+This document describes the design of the new Katzenpost mix network
+client known as client2. In particular we discuss it's multiplexing and
+privilege separation design elements as well as the protocol used by the
+thin client library.
 
 Therefore applications will be integrated with Katzenpost using the
-connector library which gives them the capability to talk with the
-connector daemon and in that way interact with the mix network. The
-library itself does not do any mixnet-related cryptography since that is
-already handled by the connector daemon. In particular, the PKI document
-is stripped by the daemon before it's passed on to clients using the
-connector library. Likewise, the library doesn\'t decrypt SURB replies
-or compose Sphinx packets, with Noise, Sphinx, and PKI related
+connector library known as a thin client library which gives them the
+capability to talk with the connector daemon and in that way interact
+with the mix network. The library itself does not do any
+mixnet-related cryptography since that is already handled by the
+connector daemon. In particular, the PKI document is stripped by the
+daemon before it's passed on to clients using the connector
+library. Likewise, the library doesn\'t decrypt SURB replies or
+compose Sphinx packets, with Noise, Sphinx, and PKI related
 cryptography being handled by the daemon.
 
 # 2. Connector library and daemon protocol {#thin-client-and-daemon-protocol}
