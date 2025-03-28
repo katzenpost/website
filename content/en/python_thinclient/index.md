@@ -10,8 +10,14 @@ version: 0
 draft: false
 ---
 
-Katzenpost Python Thin Client
-=============================
+<!-- spacer -->
+
+&nbsp;
+
+&nbsp;
+
+
+## Katzenpost Python Thin Client
 
 This module provides a minimal async Python client for communicating with the
 Katzenpost client daemon over an abstract Unix domain socket. It allows
