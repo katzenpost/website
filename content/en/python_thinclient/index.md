@@ -1,4 +1,4 @@
-----
+---
 title: "Katzenpost Python Thin Client"
 linkTitle: "Katzenpost Python Thin Client"
 url: "docs/python_thin_client.html"
@@ -8,7 +8,7 @@ tags: [""]
 author: ["David Stainton"]
 version: 0
 draft: false
-----
+---
 
 Katzenpost Python Thin Client
 =============================
