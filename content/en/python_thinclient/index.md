@@ -1,4 +1,4 @@
----
+----
 title: "Katzenpost Python Thin Client"
 linkTitle: "Katzenpost Python Thin Client"
 url: "docs/python_thin_client.html"
@@ -8,30 +8,54 @@ tags: [""]
 author: ["David Stainton"]
 version: 0
 draft: false
----
+----
 
-# Table of Contents
+Katzenpost Python Thin Client
+=============================
 
-* [katzenpost\_thinclient](#katzenpost_thinclient)
-  * [ServiceDescriptor](#katzenpost_thinclient.ServiceDescriptor)
-  * [Config](#katzenpost_thinclient.Config)
-  * [ThinClient](#katzenpost_thinclient.ThinClient)
-    * [start](#katzenpost_thinclient.ThinClient.start)
-    * [stop](#katzenpost_thinclient.ThinClient.stop)
-    * [pki\_document](#katzenpost_thinclient.ThinClient.pki_document)
-    * [get\_services](#katzenpost_thinclient.ThinClient.get_services)
-    * [get\_service](#katzenpost_thinclient.ThinClient.get_service)
-    * [new\_message\_id](#katzenpost_thinclient.ThinClient.new_message_id)
-    * [new\_surb\_id](#katzenpost_thinclient.ThinClient.new_surb_id)
-    * [send\_message\_without\_reply](#katzenpost_thinclient.ThinClient.send_message_without_reply)
-    * [send\_message](#katzenpost_thinclient.ThinClient.send_message)
-    * [send\_reliable\_message](#katzenpost_thinclient.ThinClient.send_reliable_message)
-    * [pretty\_print\_pki\_doc](#katzenpost_thinclient.ThinClient.pretty_print_pki_doc)
-    * [await\_message\_reply](#katzenpost_thinclient.ThinClient.await_message_reply)
+This module provides a minimal async Python client for communicating with the
+Katzenpost client daemon over an abstract Unix domain socket. It allows
+applications to send and receive messages via the mix network by interacting
+with the daemon.
 
-<a id="katzenpost_thinclient"></a>
+The thin client handles:
+- Connecting to the local daemon
+- Sending messages
+- Receiving events and responses from the daemon
+- Accessing the current PKI document and service descriptors
 
-# katzenpost\_thinclient
+All cryptographic operations, including PQ Noise transport, Sphinx
+packet construction, and retransmission mechanisms are handled by the
+client daemon, and not this thin client library.
+
+For more information, see our client integration guide:
+https://katzenpost.network/docs/client_integration/
+
+
+Usage Example
+-------------
+
+```python
+import asyncio
+from thinclient import ThinClient, Config
+
+def on_message_reply(event):
+    print("Got reply:", event)
+
+async def main():
+    cfg = Config(on_message_reply=on_message_reply)
+    client = ThinClient(cfg)
+    loop = asyncio.get_running_loop()
+    await client.start(loop)
+
+    service = client.get_service("echo")
+    surb_id = client.new_surb_id()
+    client.send_message(surb_id, "hello mixnet", *service.to_destination())
+
+    await client.await_message_reply()
+
+asyncio.run(main())
+```
 
 <a id="katzenpost_thinclient.ServiceDescriptor"></a>
 
