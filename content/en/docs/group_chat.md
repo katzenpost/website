@@ -18,15 +18,6 @@ which is detailed in Section 4 of our paper: https://arxiv.org/abs/2501.02933
 The source code to BACAP is found here: https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go
 The API docs for BACAP is found here: https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.55/bacap
 
-We also refer to the Reunion protocol which is a n-way PAKE with strong anonymity properties.
-The reunion design is discussed in this PhD thesis:
-
-https://research.tue.nl/en/publications/communication-in-a-world-of-pervasive-surveillance-sources-and-me
-
-Currently there is a python reference implementation which can be found here: https://codeberg.org/rendezvous/reunion/
-
-However the core cryptography of the Reunion protocol was ported to golang, here: https://github.com/katzenpost/reunion/
-
 
 # Introduction
 
@@ -46,7 +37,7 @@ every other member:
 Group State:
     * "MembershipCaps": For each member:
         * BACAP read caps
-		* nick name
+        * nick name
     * MembershipHash (hash of "MembershipCaps")
 
 
@@ -60,8 +51,8 @@ All messages are SingleMessage if they fit in one BACAP slot, or an AllOrNothing
 
 // TextPayload encapsulates a normal text message.
 type TextPayload struct {
-	// Payload contains a normal UTF-8 text message to be displayed inline.
-	Payload []byte
+    // Payload contains a normal UTF-8 text message to be displayed inline.
+    Payload []byte
 }
 ```
 
@@ -71,12 +62,12 @@ type TextPayload struct {
 
 // Introduction introduces a new member to the group.
 type Introduction struct {
-	// DisplayName is the party's name to be displayed in chat clients.
-	DisplayName string
-	
-	// UniversalReadCap is the BACAP UniversalReadCap
-	// which lets you read all messages posted by this user.
-	UniversalReadCap *bacap.UniversalReadCap
+    // DisplayName is the party's name to be displayed in chat clients.
+    DisplayName string
+    
+    // UniversalReadCap is the BACAP UniversalReadCap
+    // which lets you read all messages posted by this user.
+    UniversalReadCap *bacap.UniversalReadCap
 }
 ```
 
@@ -92,15 +83,15 @@ arbitrary file attachments.
 // FileUpload encapsulates several file types
 // which result in different client behaviors.
 type FileUpload struct {
-	// Payload contains the file payload.
-	Payload []byte
-	
-	// FileType is the identifier for each file type.
-	// Valid file types are:
-	// "image"
-	// "sound"
-	// "arbitrary"
-	FileType string
+    // Payload contains the file payload.
+    Payload []byte
+    
+    // FileType is the identifier for each file type.
+    // Valid file types are:
+    // "image"
+    // "sound"
+    // "arbitrary"
+    FileType string
 }
 ```
 
@@ -114,16 +105,16 @@ The WHO message type is used to query who is currently in the group.
 type Who struct {}
 ```
 
-* WHOREPLY
+* REPLYWHO
 
-The WHOREPLY message answers the WHO query with an AllOrNothingMessage
+The REPLYWHO message answers the WHO query with an AllOrNothingMessage
 BACAP stream containing read caps for all group chat members.
 
 ```golang
 
 
-type WhoReply struct {
-	Payload *bacap.BacapStream
+type ReplyWho struct {
+    Payload *bacap.BacapStream
 }
 ```
 
@@ -136,17 +127,17 @@ and is serialized with CBOR:
 
 // GroupChatMessage encapsulates all chat message types.
 type GroupChatMessage struct {
-	// Version is used to ensure we can change this message type in the future.
-	Version int
+    // Version is used to ensure we can change this message type in the future.
+    Version int
 
-	// MembershipHash is the hash of the user's PleaseAdd message.
-	MembershipHash *[32]byte
-	
-	TextPayload *TextPayload
-	Introduction *Introduction
-	FileUpload *FileUpload
-	Who *Who
-	WhoReply *WhoReply
+    // MembershipHash is the hash of the user's PleaseAdd message.
+    MembershipHash *[32]byte
+    
+    TextPayload *TextPayload
+    Introduction *Introduction
+    FileUpload *FileUpload
+    Who *Who
+    ReplyWho *ReplyWho
 }
 ```
 
@@ -159,20 +150,20 @@ whatever) is essentially everybody exchanges `PleaseAdd` messages:
 
 // PleaseAdd is a message used by a client to try and gain access to a chat group.
 type PleaseAdd struct {
-	// DisplayName is the party's name to be displayed in chat clients.
-	DisplayName string
-	
-	// UniversalReadCap is the BACAP UniversalReadCap
-	// which lets you read all messages posted by this user.
-	UniversalReadCap *bacap.UniversalReadCap
+    // DisplayName is the party's name to be displayed in chat clients.
+    DisplayName string
+    
+    // UniversalReadCap is the BACAP UniversalReadCap
+    // which lets you read all messages posted by this user.
+    UniversalReadCap *bacap.UniversalReadCap
 }
 
 type SignedPleaseAdd struct {
-	// PleaseAdd contains the CBOR serialized PleaseAdd struct.
-	PleaseAdd []byte
-	
-	// Signature contains the cryptographic signature over the PleaseAdd field.
-	Signature []byte
+    // PleaseAdd contains the CBOR serialized PleaseAdd struct.
+    PleaseAdd []byte
+    
+    // Signature contains the cryptographic signature over the PleaseAdd field.
+    Signature []byte
 }
 ```
 
@@ -182,7 +173,7 @@ channel between introducer member and new member:
 ```golang
 
 type Invitation struct {
-	GroupName string
+    GroupName string
 }
 ```
 
@@ -194,25 +185,29 @@ which essentially says "I want to join your group" and it provides that new memb
 BACAP Universal Read Capability, their display name and a cryptographic signature
 produced by their BACAP write capability.
 
-3. The introducer receives the `SignedPleaseAdd` message, and if they
-like the Display Name, they publish the `SignedPleaseAdd` to their own
-BACAP stream for the rest of the group to read. Otherwise the
-introducer replies to the invited party with a
-`PleaseReviseDisplayName` message.
+3. The introducer receives the `SignedPleaseAdd` message
+   3.1 If the introducer does not like the DisplayName, they reply to the invited party with a `PleaseReviseDisplayName` message that contains the original SignedPleaseAdd. Then they wait for a new `SignedPleaseAdd`.
 
-1. the new member needs existing members read caps
-2. existing members need the new member's read cap
+4. If they like the Display Name, they:
+    4.a) existing members need the new member's read cap: introducer publishes the `SignedPleaseAdd` to their own BACAP stream for the rest of the group to read.
+    4.b) the new member needs existing members read caps: reply to the new member: ReplyWho, containing read caps for all existing members.
+    4.c) IMPORTANT: 4.a) and 4.b) MUST be sent in the same AllOrNothingMessage, despite 4.a) going to the introducer's own BACAP stream for the group and 4.b) being writes to the BACAP stream the introducer is using to communicate with the new member.
 
+    4.2 NOTE: We COULD send this as part of the initial INVITATION, but then we get these silent members that can read stuff that nobody knows about, which is an anti-goal.
 
-   - Fuck: how do we do this AllOrNothing when we need to tell both the group the PLEASEADD and the new member needs to know the WHOREPLY ?
-      - Courier would need to be able to post the "release" to two separate boxes, which is something we didn't talk about in the paper (but maybe it already works):
-          - The BACAP stream for the introducer (so the rest of group can see the PLEASEADD)
-          - The new member needs to get a read cap for the introducer's BACAP stream
-            - we COULD send this as part of the initial INVITATION, but then we get these silent members that can read stuff that nobody knows about, that sucks
-            
 - Good question: What if we are adding a whole bunch of people at once; do we really need to upload all the members n times?
 
 
 FUTURE WORK:
     - Forward secrecy: Can add two extensions that allow transmitting public keys + stuff encrypted under those public keys
+    - We also refer to the Reunion protocol which is a n-way PAKE with strong anonymity properties. The reunion design is discussed in this PhD thesis:
+
+    https://research.tue.nl/en/publications/communication-in-a-world-of-pervasive-surveillance-sources-and-me
+
+
+    Currently there is a python reference implementation which can be found here: https://codeberg.org/rendezvous/reunion/
+
+
+    However the core cryptography of the Reunion protocol was ported to golang, here: https://github.com/katzenpost/reunion/
+
 
