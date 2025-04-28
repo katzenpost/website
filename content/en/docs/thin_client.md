@@ -47,8 +47,8 @@ Clients using the connector library MUST randomize their abstract Unix
 domain socket names. Otherwise, the static name will prevent
 multiplexing because the kernel requires that the connection be between
 uniquely named socket pairs. The Katzenpost reference implementation of
-the connector library selects a socket name with four random hex digits
-appended to the end of the name like so:
+the connector library selects a socket name with four random bytes
+written as hex digits appended to the end of the name like so:
 
     @katzenpost_golang_thin_client_DEADBEEF
 

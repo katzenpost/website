@@ -37,28 +37,27 @@ It can be extended to be used by any language that has a CBOR
 serialization library and can talk over TCP or UNIX domain
 socket. Currently there are three thin client libraries:
 
-* golang reference thin client source code:
-  https://github.com/katzenpost/katzenpost/tree/main/client2 golang
+* **golang**
+  source code: https://github.com/katzenpost/katzenpost/tree/main/client2
   thin client API docs:
   https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.46/client2/thin
 
-* rust thin client source code:
-  https://github.com/katzenpost/thin_client/blob/main/src/lib.rs
+* **rust**
+  source code: https://github.com/katzenpost/thin_client/blob/main/src/lib.rs
+  API docs: https://docs.rs/katzenpost_thin_client/0.0.4/katzenpost_thin_client/
+  example: https://github.com/katzenpost/thin_client/blob/main/examples/echo_ping.rs
 
-* working rust example using thin client:
-  https://github.com/katzenpost/thin_client/blob/main/examples/echo_ping.rs
-
-* python thin client source code:
-  https://github.com/katzenpost/thin_client/blob/main/thinclient/__init__.py
-  
-* working python examples using python thin client:
+* **python**
+  source code: https://github.com/katzenpost/thin_client/blob/main/thinclient/__init__.py
+  API docs: https://katzenpost.network/docs/python_thin_client.html
+  examples:
   https://github.com/katzenpost/thin_client/blob/main/examples/echo_ping.rs
   https://github.com/katzenpost/status
   https://github.com/katzenpost/worldmap
 
 
-NOTE: It might be helpful to use a mixnet that already exists.
-Please see: [How to Use Namenlos Mixnet](/howto_use_namenlos_mixnet/).
+**NOTE**: *It might be helpful to new users to use a mixnet that already exists instead of trying to create your own. Please see:*
+[How to Use Namenlos Mixnet](/howto_use_namenlos_mixnet/).
 
 
 ## Thin client configuration
@@ -84,7 +83,7 @@ which is stored in the payload so that a reply can be received.
 
 You'll need a view of the mix network in order to send packets. The
 PKI (public key infrastructure) document is published by the mix
-netowrk's set of directory authorities, and you fetch it from one of
+network's set of directory authorities, and you fetch it from one of
 the gateways. This is not unlike <i>Tor</i> and <i>mixminion</i>. The
 PKI document updates every epoch, which currenttly is 20 minutes.
 
@@ -205,7 +204,7 @@ For example:
 As a client you need to be able to gather PKI documents for each epoch
 that your packets will be used in. This is important for our Sphinx
 based routing protocol because the mix keys used for the mix node's
-Sphinx packet decryption are used only for for Epoch and then they
+Sphinx packet decryption are used only for one Epoch and then they
 expire. Our PKI document publishes several Epochs worth of future mix
 keys so that the upcoming Epoch boundary will not cause any
 transmission failures.
