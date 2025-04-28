@@ -57,7 +57,7 @@ socket. Currently there are three thin client libraries:
 
 
 **NOTE**: *It might be helpful to new users to use a mixnet that already exists instead of trying to create your own. Please see:*
-[How to Use Namenlos Mixnet](/howto_use_namenlos_mixnet/).
+[How to Use Namenlos Mixnet](/docs/howto_use_namenlos_mixnet/).
 
 
 ## Thin client configuration
