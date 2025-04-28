@@ -5,7 +5,7 @@ https://pad.riseup.net/p/AnVCjXrhqWbdHCFlPogk# Group Chat Client Design Specific
 
 Here we define the client behavior and describe how it sends and receives BACAP streams and individual messages as well as the AllOrNothing streams. All of this interaction of the client is mediated through the courier services who interact with the storage replicas.
 
-((THis is kind of also the Pigeonhole specification))
+((This is kind of also the Pigeonhole specification))
 
 
 Definition of BACAP: "Echomix: a Strong Anonymity System with Messaging" chapter 4:
@@ -133,7 +133,7 @@ type ReplicaMessageReply struct {
 
     ErrorCode     uint8
     EnvelopeHash  *[32]byte
-    EnvelopeReply []byte
+    EnvelopeReply []byte    // TODO we haven't defined this
 }
 ```
 
@@ -273,7 +273,7 @@ type CourierAllOrNothingACK struct {
 }
 ```
 
-# AllOrNothing potential use cases
+## AllOrNothing potential use cases
 
 
 In no particular order:
@@ -288,6 +288,76 @@ In no particular order:
 * Group chat uses it in all cases where it needs to send long messages (files, pictures, audio, long cryptographic keys like the group membership list)
 
 
+# Protocol narration example:
+    
+    Alice wants to send a message to Bob, who is already connected to Alice.
+    i.e. Alice will be writing to box 12345 that Bob is trying to read from.
+    
+1. She sends:
+  - SPHINX packet containing:
+    - SPHINX header:
+        - Routing commands to make it arrive at a Courier (KP Service Provider)
+    - SPHINX payload:
+        - reply SURB
+        - Payload encrypted for a Courier (chosen at random): CourierEnvelope
+          The envelope tells the Courier about two randomly chosen replicas
+          ("intermediate replicas").
+    - Alice doesn't know whether the packet makes it through the network or not.
+      Until she receives a reply, she will keep resending the CourierEnvelope to
+      the same Courier. (TODO: This spec needs names for all these timers)
+
+2. The Courier receives the CourierEnvelope from Alice.
+   2.1) The Courier records the EnvelopeHash of the CourierEnvelope in its CourierBookKeeping datastructure.
+   2.2) If the Courier has already seen that hash, GOTO STEP 4.
+
+3) The Courier sends an ACK to Alice using the SURB on file for Alice, telling her to stop resending the CourierEnvelope. If there's no SURB, the Courier waits for the next resent CourierEnvelope from Alice matching the EnvelopeHash.
+   3.1) The Courier constructs two ReplicaMessage and put them in its outgoing queue for the two intermediate replicas. (Bear in mind that each Courier maintains constant-rate traffic with all replicas).
+   3.2) It will keep doing this for each intermediate replica until it receives an ACK from that replica.
+
+   Alice is done with her part now.
+
+4) The two "intermediate replicas" receive the two ReplicaMessage.
+   4.1) They decrypt them and compute the "designated replicas" based on the BACAP box ID. TODO see paper for how that works. TODO: each intermediate replica should only contact one designated replica, but how does it do that without knowing about the other intermediate replica? we need to add a field somewhere.
+   4.2) They put ACKs in their outgoing queue for the Courier saying "we have got these messages (see step 3.2)", referencing the EnvelopeHash. This tells the Courier to stop resending to the intermediate replicas.
+   4.3) They put the decrypted contents (a ReplicaWrite BACAP tuple: box ID 12345; signature; encrypted payload) in their outgoing queues for the "designated replicas".
+   4.4) Each replica waits for a reply from its designated replica.
+   4.5) When the intermediate replica receives its ACK from the designated replica, the intermediate replica is done.
+
+  Bob now wants to check if Alice has written a message at box 12345
+
+5) Similar to step 1, Bob sends a SPHINX packet to a Courier chosen at random.
+
+     5.1) The payload is a CourierEnvelope:
+
+          - Two intermediate replicas
+
+          - Its encrypted payload is a ReplicaRead command (reference box ID 12345)
+
+   5.2) This is resent to the same Courier until a reply comes in.
+
+6) Courier receives Bob's CourierEnvelope (see step 2)
+
+7) (see step 3)
+
+8) The two intermediate replicas receive the two ReplicaMessage (containing Bob's ReplicaRead)
+   8.1) (see 4.1)
+   8.2) (see 4.2)
+   8.3) (see 4.3)
+   8.4) (see 4.4)
+   8.5) When the intermediate replica receives its ACK from the designated replica, it will include the (perhaps confusingly named) ReplicaWrite (BACAP tuple).
+   8.6) The intermediate replica wraps it in a ReplicaMessageReply encrypted for Bob's ReplicaMessage.EPubKey and puts it in its outgoing queue for the Courier.
 
 
+9) The Courier receives two ReplicaMessageReply.
+   9.1) It matches ReplicaMessageReply.EnvelopeHash to its recorded state (step 2.1).
+   9.2) If it has a SURB on file for Bob, it forwards a ReplicaMessageReply to Alice.
+   9.3) Either way it stores the ReplicaMessageReply "for a while".
+
+10) Bob keeps resending his CourierEnvelope from 5) until he receives a ReplicaMessageReply
+   10.1) Bob decrypts it with the private key corresponding to his
+         CourierEnvelope.EPubKey
+   10.2) It's either a ReplicaWrite / BACAP tuple (TODO Bob doesn't really need to receive the PK since he asked for it TODO), or a NACK. If it's a NACK, goto 10).
+   10.3) Bob can now read Alice's message.
+   
+   Bob is done.
 
