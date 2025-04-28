@@ -248,11 +248,11 @@ The connector library can receive four possible events inside of
     -   `message_id` is a unique message ID.
     -   `surb_id` is the SURB ID.
     -   `sent_at` is the time when the message was sent.
-    -   `replay_eta` is the time when we expect a reply.
+    -   `reply_eta` is the time when we expect a reply.
     -   `err` is the optional error we received when attempting to send
         a message.
 4.  **message reply event**
     -   `message_id` is a unique message ID.
     -   `surb_id` is a the SURB ID.
-    -   `payload` is the replay payload .
+    -   `payload` is the reply payload .
     -   `err` is the error, if any.
