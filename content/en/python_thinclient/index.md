@@ -16,8 +16,10 @@ draft: false
 
 &nbsp;
 
+# katzenpost\_thinclient
 
-## Katzenpost Python Thin Client
+Katzenpost Python Thin Client
+=============================
 
 This module provides a minimal async Python client for communicating with the
 Katzenpost client daemon over an abstract Unix domain socket. It allows
@@ -49,7 +51,7 @@ def on_message_reply(event):
     print("Got reply:", event)
 
 async def main():
-    cfg = Config(on_message_reply=on_message_reply)
+    cfg = Config("./thinclient.toml", on_message_reply=on_message_reply)
     client = ThinClient(cfg)
     loop = asyncio.get_running_loop()
     await client.start(loop)
@@ -62,6 +64,28 @@ async def main():
 
 asyncio.run(main())
 ```
+
+<a id="katzenpost_thinclient.Geometry"></a>
+
+## Geometry Objects
+
+```python
+class Geometry()
+```
+
+Geometry represents the Sphinx Geometry and is used by the
+`ConfigFile` type to load our TOML config file.
+
+<a id="katzenpost_thinclient.ConfigFile"></a>
+
+## ConfigFile Objects
+
+```python
+class ConfigFile()
+```
+
+ConfigFile represents everything loaded from a TOML file:
+network, address, and geometry.
 
 <a id="katzenpost_thinclient.ServiceDescriptor"></a>
 
