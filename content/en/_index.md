@@ -48,5 +48,10 @@ Meet the world-class experts behind Katzenpost.
 Access Katzenpost source code on GitHub to explore, contribute, or integrate with our project.
 {{% /blocks/section %}}
 
+{{% blocks/feature icon="fa-users" title="Our Sponsors" url="/pages/sponsors" %}}
+Past and present sponsors of the Katzenpost free software project.
+{{% /blocks/feature %}}
+
+
 {{% /blocks/section %}}
 
