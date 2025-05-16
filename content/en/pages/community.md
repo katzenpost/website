@@ -3,6 +3,7 @@ title: "Katzenpost Community"
 linkTitle: "Community"
 description: ""
 slug: "/community/"
+menu: {main: {weight: 5}}
 type: "pages"
 ---
 
