@@ -1,31 +1,48 @@
-https://pad.riseup.net/p/AnVCjXrhqWbdHCFlPogk# Group Chat Client Design Specification
+# Pigeonhole Design Specification
+
+
+# Abstract
+
+This is the specification of the Pigeonhole protocol.
+
+Here we define the client behavior and describe how it sends and
+receives BACAP streams and individual messages as well as the
+AllOrNothing streams. All of this interaction of the client is
+mediated through the courier services who interact with the storage
+replicas.
 
 
 # Introduction
 
-Here we define the client behavior and describe how it sends and receives BACAP streams and individual messages as well as the AllOrNothing streams. All of this interaction of the client is mediated through the courier services who interact with the storage replicas.
-
-((This is kind of also the Pigeonhole specification))
-
-
-Definition of BACAP: "Echomix: a Strong Anonymity System with Messaging" chapter 4:
+Definition of BACAP: "Echomix: a Strong Anonymity System with
+Messaging" chapter 4:
     https://arxiv.org/abs/2501.02933
-    This specification describes an instantiation of the protocol briefly described in "5.6. End-to-end reliable group channels" in that paper.
 
+This specification describes an instantiation of the protocol briefly
+described in "5.6. End-to-end reliable group channels" in that paper.
 
 Implementation of core primitives:
     https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go
 
+
 # Glossary
 
-* (BACAP?) Box: Box has a Box ID (which is also public key), Signature and Ciphertext Signed Payload
+* (BACAP?) Box: Box has a Box ID (which is also public key), Signature
+  and Ciphertext Signed Payload
 
-* Courier: a service that runs on the service nodes and interacts with storage replicas. Proxies requests from clients and routes replies back to clients (via SURBs).
+* Courier: a service that runs on the service nodes and interacts with
+  storage replicas. Proxies requests from clients and routes replies
+  back to clients (via SURBs).
 
-* Storage replica: The actual storage nodes where message ciphertexts are stored and retrieved.
+* Storage replica: The actual storage nodes where message ciphertexts
+  are stored and retrieved.
 
-* Intermediate replica. See [5.4.1. Writing messages]
-     """These intermediate replicas are chosen independently of the two final replicas for that box ID which are derived using the sharding scheme. The reason Alice designates intermediate replicas, as opposed to addressing the final replicas directly, is to avoid revealing to the courier which shard the box falls into."""
+* Intermediate replica. See [5.4.1. Writing messages] """These
+  intermediate replicas are chosen independently of the two final
+  replicas for that box ID which are derived using the sharding
+  scheme. The reason Alice designates intermediate replicas, as
+  opposed to addressing the final replicas directly, os as to avoid
+  revealing to the courier which shard the box falls into."""
 
 
 
@@ -60,6 +77,9 @@ Implementation of core primitives:
             a) 32 bytes: BACAP box ID (M ctx i )
             b) BACAP payload (c ctx i )
             c) 64 bytes: BACAP signature (s ctx i )
+
+
+# Protocol Messages
 
 ```golang
 
@@ -117,11 +137,16 @@ type ReplicaMessage struct {
 }
 ```
 
-CourierEnvelope specifies intermediate replica IDs and NOT the final destination replica IDs. The courier service writes to the specified IDs and the storage node
-replication will take care of writing it to the correct storage node and Box ID.
+CourierEnvelope specifies intermediate replica IDs and NOT the final
+destination replica IDs. The courier service writes to the specified
+IDs and the storage node replication will take care of writing it to
+the correct storage node and Box ID.
 
-CourierEnvelope type is used to save bandwidth. It is sent by clients to the courier services. The courier service then transforms one CourierEnvelope into two ReplicaMessage types, one for each destination replica. The courier then forwards those
-two ReplicaMessage's to their respective replicas.
+CourierEnvelope type is used to save bandwidth. It is sent by clients
+to the courier services. The courier service then transforms one
+CourierEnvelope into two ReplicaMessage types, one for each
+destination replica. The courier then forwards those two
+ReplicaMessage's to their respective replicas.
 
 The courier expects an asynchronous ReplicaMessageReply in response from each replica:
 
@@ -138,7 +163,9 @@ type ReplicaMessageReply struct {
 ```
 
 
-The courier MUST keep track of EnvelopeHash'es of ALL ReplicaMessage's which it sends to the replicas. AND it must link each of these hashes to a client SURB so that it can send a reply.
+The courier MUST keep track of EnvelopeHash'es of ALL ReplicaMessage's
+which it sends to the replicas. AND it must link each of these hashes
+to a client SURB so that it can send a reply.
 
 
 
@@ -168,11 +195,16 @@ type CourierEnvelopeReply struct {
 }
 ```
 
-    - Clients ask for the reply from Replica either number 1 or number 2 in each message to the courier (ReplyIndex).
-    - The courier replies with the corresponding reply if it has that reply.
-      - If it doesn't have the reply, but it does have the other reply, it sends the ReplicaMessageReply that it *does* have to the client.
-        - It always indicates to the client *which* replica's reply it sent (1 or 2).
-    - If the client doesnt receive an answer with a MessageReply, it will eventually resend the read request.
+* Clients ask for the reply from Replica either number 1 or number 2
+  in each message to the courier (ReplyIndex).
+* The courier replies with the corresponding reply if it has that
+  reply.
+* If it doesn't have the reply, but it does have the other reply, it
+  sends the ReplicaMessageReply that it *does* have to the client.
+* It always indicates to the client *which* replica's reply it sent (1
+  or 2).
+* If the client doesnt receive an answer with a MessageReply, it will
+  eventually resend the read request.
 
 These two message types are embedded
 
@@ -232,29 +264,50 @@ type ReplicaWriteReply struct {
 
 ```
 
+# Protocol Flow Annotations
+
+![protatocol annotatation image of writes](annotated_write.png "Annotated Writes")
+
+![protatocol annotatation image of reads](annotated_read.png "Annotated Reads")
+
+
 
 # Pigeonhole AllOrNothing protocol
 
-This AllOrNothing message is an "at most once" delivery mechanism,
-its purpose is to ensure that a set of individual BACAP writes either succeed or fail atomically from the point of a Replica (or 2nd party client reader) trying to correlate the sending Client's failure to transmit multiple messages at once with network interruptions on the sending Client's side of the network.
+This AllOrNothing message is an "at most once" delivery mechanism, its
+purpose is to ensure that a set of individual BACAP writes either
+succeed or fail atomically from the point of a Replica (or 2nd party
+client reader) trying to correlate the sending Client's failure to
+transmit multiple messages at once with network interruptions on the
+sending Client's side of the network.
 
-Regardless of the number of messages in the set, the adversaries get to observe "at most once" that the sending client interacted with the network.
+Regardless of the number of messages in the set, the adversaries get
+to observe "at most once" that the sending client interacted with the
+network.
 
 ## Step 1
 
 First, the client uploads a BACAP stream to the storage replicas.
 
-The stream payloads are filled with []CourierEnvelope concatenated back-to-back.
-Since CourierEnvelope is strictly larger than a BACAP payload, because they themselves contain BACAP payloads, multiple stream boxes will be used.
+The stream payloads are filled with []CourierEnvelope concatenated
+back-to-back.  Since CourierEnvelope is strictly larger than a BACAP
+payload, because they themselves contain BACAP payloads, multiple
+stream boxes will be used.
 
 ## Step 2.
 
-The client sends the BACAP stream read capability to the courier service.
-And tells the courier to decrypt them and process the embedded CourierEnvelope structs.
+The client sends the BACAP stream read capability to the courier
+service.  And tells the courier to decrypt them and process the
+embedded CourierEnvelope structs.
 
-The courier does NOT need to keep track of the EnvelopeHash for each of the contained CourierEnvelope for the purpose of replying to the client (which is in this case the courier itself), but it does need to keep resending them to the replicas until the intermediate replicas have ACK'ed them.
+The courier does NOT need to keep track of the EnvelopeHash for each
+of the contained CourierEnvelope for the purpose of replying to the
+client (which is in this case the courier itself), but it does need to
+keep resending them to the replicas until the intermediate replicas
+have ACK'ed them.
 
-OTOH the courier MUST keep track of the hash of the CourierAtMostOnce message and MUST NOT process a stream more than once.
+OTOH the courier MUST keep track of the hash of the CourierAtMostOnce
+message and MUST NOT process a stream more than once.
 
 ```golang
 
@@ -279,13 +332,20 @@ type CourierAllOrNothingACK struct {
 In no particular order:
 
 * Atomically writing to two or more boxes
-  - The boxes can reside on distinct streams (or not); the courier doesn't know anything about streams of the CourierEnvelopes.
-* Sending long messages that span more than one BACAP payload, like a file / document / picture.
-* Group chat join uses All or Nothing protocol when we add a new member to the group:
-    
-    * The person introducing a new member writes to their group chat stream
-    * The person introducing a new member also writes to their existing conversation stream that the new member is reading
-* Group chat uses it in all cases where it needs to send long messages (files, pictures, audio, long cryptographic keys like the group membership list)
+  - The boxes can reside on distinct streams (or not); the courier
+    doesn't know anything about streams of the CourierEnvelopes.
+* Sending long messages that span more than one BACAP payload, like a
+  file / document / picture.
+* Group chat join uses All or Nothing protocol when we add a new
+  member to the group:
+    * The person introducing a new member writes to their group chat
+      stream
+    * The person introducing a new member also writes to their
+      existing conversation stream that the new member is reading
+* Group chat uses it in all cases where it needs to send long messages
+  (files, pictures, audio, long cryptographic keys like the group
+  membership list)
+
 
 
 # Protocol narration example:
@@ -357,7 +417,5 @@ In no particular order:
    10.1) Bob decrypts it with the private key corresponding to his
          CourierEnvelope.EPubKey
    10.2) It's either a ReplicaWrite / BACAP tuple (TODO Bob doesn't really need to receive the PK since he asked for it TODO), or a NACK. If it's a NACK, goto 10).
-   10.3) Bob can now read Alice's message.
-   
-   Bob is done.
+   10.3) Bob can now read Alice's message. Bob is done.
 
