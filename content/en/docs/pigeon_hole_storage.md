@@ -1,5 +1,14 @@
-# Pigeonhole Design Specification
-
+---
+title: "Pigeonhole Design Specification"
+linkTitle: "Connector"
+url: "docs/specs/pigeonhole.html"
+description: ""
+categories: [""]
+tags: [""]
+author: ["David Stainton"]
+version: 0
+draft: false
+---
 
 # Abstract
 
