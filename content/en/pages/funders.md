@@ -1,12 +1,12 @@
 ---
-title: "Katzenpost Sponsors"
-linkTitle: "Sponsors"
+title: "Katzenpost Funders"
+linkTitle: "Funders"
 description: ""
-slug: "/sponsors/"
+slug: "/funders/"
 type: "pages"
 ---
 
-# Current Sponsors
+# Current Funders
 
 * [Wau Holland Stiftung](https://www.wauland.de/en/)
 
@@ -37,7 +37,7 @@ type: "pages"
 <BR>
 <BR>
 
-# Past Sponsors
+# Past Funders
 
 * [EU Commission Grant project known as the "Panoramix 2020"](https://panoramix-project.eu/)
 
