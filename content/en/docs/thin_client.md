@@ -1,7 +1,7 @@
 ---
-title: "Katzenpost Client Design aka Connector"
-linkTitle: "Connector"
-url: "docs/specs/connector.html"
+title: "Katzenpost Thin Client Design"
+linkTitle: "Katzenpost Thin Client"
+url: "docs/specs/thin_client.html"
 description: ""
 categories: [""]
 tags: [""]
