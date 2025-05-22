@@ -1,6 +1,6 @@
 ---
 title: "Pigeonhole Design Specification"
-linkTitle: "Connector"
+linkTitle: "Pigeonhole Design Specification"
 url: "docs/specs/pigeonhole.html"
 description: ""
 categories: [""]
@@ -275,9 +275,9 @@ type ReplicaWriteReply struct {
 
 # Protocol Flow Annotations
 
-![protatocol annotatation image of writes](annotated_write.png "Annotated Writes")
+![protatocol annotatation image of writes](/docs/specs/annotated_write.png "Annotated Writes")
 
-![protatocol annotatation image of reads](annotated_read.png "Annotated Reads")
+![protatocol annotatation image of reads](/docs/specs/annotated_read.png "Annotated Reads")
 
 
 
