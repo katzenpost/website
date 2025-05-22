@@ -273,7 +273,10 @@ type ReplicaWriteReply struct {
 
 ```
 
-# Protocol Flow Annotations
+# Protocol Sequence Annotations
+
+The following two images indicate the protocol from for reads and writes without
+showing the replication. This is the simplest way to annotate the protocol sequences:
 
 ![protatocol annotatation image of writes](/docs/specs/annotated_write.png "Annotated Writes")
 
