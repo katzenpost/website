@@ -107,22 +107,17 @@ type CourierEnvelope struct {
     // ReplyIndex is described:
 
     //  The client will be resending its thing to the courier until it receives
-
-     // a reply. The courier is responsible for NOT sending each of those resent
-
+    // a reply. The courier is responsible for NOT sending each of those resent
     // messages to the replicas. It can use the EnvelopeHash to deduplicate.
-
     // When the client sends a CourierEnvelope that the courier has already got
-
     // ReplicaMessageReply's for, the courier needs to respond with one of those.
-
     // ReplyIndex will let the client choose which one. I guess it could be a bool.
 
     ReplyIndex uint8 
 
 
-// these two fields below get hashed to form the EnvelopeHash later used
-// in ReplicaMessageReply:
+// these two fields below get hashed using blake2b to form the EnvelopeHash value which
+// is 32 bytes and later used in ReplicaMessageReply:
 
     // SenderEPubKey 
     SenderEPubKey []byte   // x25519 + ctidh1024 NIKE key of the client
