@@ -5,7 +5,7 @@ url: "docs/specs/pigeonhole.html"
 description: ""
 categories: [""]
 tags: [""]
-author: ["David Stainton"]
+author: ["Threebit Hacker", "David Stainton"]
 version: 0
 draft: false
 ---
