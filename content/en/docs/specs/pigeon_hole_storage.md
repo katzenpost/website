@@ -1,6 +1,6 @@
 ---
-title: "Pigeonhole Design Specification"
-linkTitle: "Pigeonhole Design Specification"
+title: "Pigeonhole scattered storage specification"
+linkTitle: "Pigeonhole scattered storage specification"
 url: "docs/specs/pigeonhole.html"
 description: ""
 categories: [""]
@@ -12,60 +12,52 @@ draft: false
 
 # Abstract
 
-This is the specification of the Pigeonhole protocol.
-
-Here we define the client behavior and describe how it sends and
-receives BACAP streams and individual messages as well as the
-AllOrNothing streams. All of this interaction of the client is
-mediated through the courier services who interact with the storage
-replicas.
+In this specification we describe the components and protocols that compose Pigeonhole scattered storage. We define the behavior of communication clients that send and retrieve individual messages, BACAP streams, and AllOrNothing streams. Client actions are mediated through courier services that interact with storage replicas.
 
 
 # Introduction
 
-Definition of BACAP: "Echomix: a Strong Anonymity System with
-Messaging" chapter 4:
-    https://arxiv.org/abs/2501.02933
+Pigeonhole scattered storage enables persistent anonymous communication in which participants experience a coherent sequence of messages or a continuous data stream, but where user relationships and relations between data blocks remain unlinkable not only from the perspective of third-party observers, but also from that of the mixnet components. This latter attribute provides resilience against deanonymization by compromised mixnet nodes.
 
-This specification describes an instantiation of the protocol briefly
-described in "5.6. End-to-end reliable group channels" in that paper.
+The data blocks that Pigeonhole stores are supplied by the BACAP (Blinding-and-Capability) scheme. BACAP maintains a private distributed hash table that tracks message ownership, storage locations, delivery notications,and read/write permissions (capabilities). Data is wrapped in layers of signed encryption that disclose this metadata only as needed by the appropriate users or machine agents. All communication among users consists of user-generated read or write queries to Pigeonhole storage, never directly to other users, and never under compulsion by other users or by mixnet components.
 
-Implementation of core primitives:
-    https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go
-
+By sharing access capabilities and storage locations among multiple users, BACAP permits group communications. This specification describes an instantiation of the scheme briefly described in "5.6. End-to-end reliable group channels" in that paper. For more information about BACAP, see "Echomix: a Strong Anonymity System with Messaging", chapter 4: https://arxiv.org/abs/2501.02933. For an understanding of how the core BACAP primitives are implemented,see     https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go.
 
 # Glossary
 
-* (BACAP?) Box: Box has a Box ID (which is also public key), Signature
-  and Ciphertext Signed Payload
+* **Box**: BACAP's unit of data storage. Each box has a box ID (which also serves as its public key), a signature, and a ciphertext signed payload.
 
-* Courier: a service that runs on the service nodes and interacts with
+* **Courier**: Service that runs on a service node and interacts with
   storage replicas. Proxies requests from clients and routes replies
   back to clients (via SURBs).
 
-* Storage replica: The actual storage nodes where message ciphertexts
+* **Storage replica**: The actual storage nodes where message ciphertexts
   are stored and retrieved.
 
-* Intermediate replica. See [5.4.1. Writing messages] """These
-  intermediate replicas are chosen independently of the two final
-  replicas for that box ID which are derived using the sharding
+* **Intermediate replica**: See "5.4.1. Writing messages": 
+```
+  These intermediate replicas are chosen independently of the two final
+  replicas for that box ID, which they are derived using the sharding
   scheme. The reason Alice designates intermediate replicas, as
-  opposed to addressing the final replicas directly, os as to avoid
-  revealing to the courier which shard the box falls into."""
+  opposed to addressing the final replicas directly, is to avoid
+  revealing to the courier which shard the box falls into.
+```
 
-
-
-# Protocol parameters
-* The maximum size of BACAP messages in Katzenpost is:
+# BACAP parameters
+The maximum size of a BACAP message in Katzenpost is defined as follows.
     
     SphinxGeometry's UserForwardPayloadLength - CBOR overhead = Max BACAP Payload
     
         // TODO: This is a rough estimate, we need to additionally account for
         // TODO: courier commands (overhead where the client is telling the
         // courier what to do; "go read from this BACAP stream" etc)
+
     BACAP_PAYLOAD_SIZE (c_i^{ctx}) = UserForwardPayloadLength - COURIER_ENVELOPE_SIZE
+
     COURIER_ENVELOPE_SIZE = 32 + CTIDH1024PKSIZE + 2*(32+1) + REPLICA_ENVELOPE_SIZE
+
     REPLICA_ENVELOPE_SIZE = 32 + CTIDH1024PKSIZE + 32 + BACAP PAYLOAD SIZE 32 + 64
+
     CTIDH1024PKSIZE = ??? is this just 128 bytes ???
 
     Appendix II: courier envelopes (the courier sees, coming in via SPHINX) 
