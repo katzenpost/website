@@ -35,96 +35,109 @@ By sharing access capabilities and storage locations among multiple users, BACAP
   are stored and retrieved.
 
 * **Intermediate replica**: See "5.4.1. Writing messages": 
-```
-  These intermediate replicas are chosen independently of the two final
+
+  Intermediate replicas are chosen independently of the two final
   replicas for that box ID, which they are derived using the sharding
   scheme. The reason Alice designates intermediate replicas, as
   opposed to addressing the final replicas directly, is to avoid
   revealing to the courier which shard the box falls into.
+
+# BACAP message parameters
+
+BACAP messages in Katzenpost are defined as follows.
+
+```
+Max BACAP payload = SphinxGeometry's UserForwardPayloadLength - CBOR overhead
 ```
 
-# BACAP parameters
-The maximum size of a BACAP message in Katzenpost is defined as follows.
-    
-    SphinxGeometry's UserForwardPayloadLength - CBOR overhead = Max BACAP Payload
-    
-        // TODO: This is a rough estimate, we need to additionally account for
-        // TODO: courier commands (overhead where the client is telling the
-        // courier what to do; "go read from this BACAP stream" etc)
+```  
+BACAP_PAYLOAD_SIZE (c_i^{ctx}) = UserForwardPayloadLength – COURIER_ENVELOPE_SIZE
+```
+```
+COURIER_ENVELOPE_SIZE = 32 bytes + CTIDH1024PKSIZE + 2*(32+1) bytes + REPLICA_ENVELOPE_SIZE
+```
+```
+REPLICA_ENVELOPE_SIZE = 32 bytes + CTIDH1024PKSIZE + 32 bytes + BACAP PAYLOAD SIZE 32 + 64 bytes
+```
+```
+CTIDH1024PKSIZE = ??? is this just 128 bytes ???
+```
 
-    BACAP_PAYLOAD_SIZE (c_i^{ctx}) = UserForwardPayloadLength - COURIER_ENVELOPE_SIZE
+Courier envelopes (seen by courier, coming in via SPHINX) have the following structure:
 
-    COURIER_ENVELOPE_SIZE = 32 + CTIDH1024PKSIZE + 2*(32+1) + REPLICA_ENVELOPE_SIZE
+```
+1) Sender’s ephemeral hybrid public key:
+    a) x25519 public key: 32 bytes
+    b) CTIDH-1024 public key
+2) For each designated replica:
+    Envelope DEK encrypted with shared secret between sender private key 
+    and replica public key: 32 bytes
+3) Replica/shard id designating each replica to contact: 1 byte
+4) ReplicaEnvelope: 32 bytes + CTIDH1024PKSIZE + 32 bytes + BACAP PAYLOAD SIZE 32 + 64 bytes  
+```
 
-    REPLICA_ENVELOPE_SIZE = 32 + CTIDH1024PKSIZE + 32 + BACAP PAYLOAD SIZE 32 + 64
+Replica envelopes (seen by storage replicas) have the following structure:
 
-    CTIDH1024PKSIZE = ??? is this just 128 bytes ???
-
-    Appendix II: courier envelopes (the courier sees, coming in via SPHINX) 
-        1) The sender’s ephemeral hybrid public key:
-           a) 32 bytes: x25519 public key
-           b) CTIDH-1024 public key
-        2) for each designated replica:
-           32 bytes: envelope DEK encrypted with shared secret between sender private key and replica public key 
-        3) 1 byte: replica/shard id designating each replica to contact
-        4) ReplicaEnvelope: 32 + CTIDH1024PKSIZE + 32 + BACAP PAYLOAD SIZE 32 + 64
-    
-    Appendix III replica envelopes (that the storage replicas see):
-        1) sender’s ephemeral public key
-           a) 32 bytes: x25519 public key
-           b) CTIDH-1024 public key
-        2) 32 bytes: 256-bit DEK encrypted to the replica’s public key
-        3) enveloped message, encrypted with DEK, containing a BACAP message:
-            a) 32 bytes: BACAP box ID (M ctx i )
-            b) BACAP payload (c ctx i )
-            c) 64 bytes: BACAP signature (s ctx i )
+```
+1) Sender’s ephemeral public key
+    a) x25519 public key: 32 bytes
+    b) CTIDH-1024 public key
+2) 256-bit DEK encrypted to the replica’s public key: 32 bytes
+3) Enveloped message, encrypted with DEK, containing a BACAP message:
+    a) BACAP box ID (M ctx i ): 32 bytes
+    b) BACAP payload (c ctx i )
+    c) BACAP signature (s ctx i ): 64 bytes
+```
 
 
-# Protocol Messages
+# Message types and interactions (golang)
 
-```golang
+**CourierEnvelope**
 
-// This is sent from the Client to its Courier.
-// This is used when the Client is trying to either read or write a single BACAP box.
+```
+// Sent from the client to its courier.
+// Used when the client is trying to either read or write a single BACAP box.
+
 type CourierEnvelope struct {
 
-    // IntermediateReplicas are used to initially send the message to, and eventually
-    // the message gets replicated to the correct locations. This hides the correct 
-    // locations from the courier.
+    // Messages are initially sent to IntermediateReplicas, and eventually
+    // replicated to their locations. This hides the real locations from the
+    // courier.
+
     IntermediateReplicas      [2]uint8
 
     // DEK is used for each replica: ReplicaMessage.DEK
+
     DEK           [2]*[32]byte
 
-    // ReplyIndex is described:
-
-    //  The client will be resending its thing to the courier until it receives
-
-     // a reply. The courier is responsible for NOT sending each of those resent
-
-    // messages to the replicas. It can use the EnvelopeHash to deduplicate.
-
-    // When the client sends a CourierEnvelope that the courier has already got
-
-    // ReplicaMessageReply's for, the courier needs to respond with one of those.
-
-    // ReplyIndex will let the client choose which one. I guess it could be a bool.
+    // Explanation of ReplyIndex:
+    //
+    // The client resends its messages to the courier until it receives
+    // a reply. The courier is responsible for NOT sending each of those resent
+    // messages to the replicas. It can use the EnvelopeHash to deduplicate them.
+    // When the client sends a CourierEnvelope for which the courier already has   
+    // multiple instances of ReplicaMessageReply, the courier needs to respond 
+    // with exactly one of those. ReplyIndex lets the client choose which one.  
+    // Could also be a bool.
 
     ReplyIndex uint8 
 
-
-// these two fields below get hashed to form the EnvelopeHash later used
-// in ReplicaMessageReply:
+    // The next two fields are hashed to form the EnvelopeHash that is 
+    // later used in ReplicaMessageReply:
 
     // SenderEPubKey 
     SenderEPubKey []byte   // x25519 + ctidh1024 NIKE key of the client
 
-    // Ciphertext is encrypted and MAC'ed
+    // Ciphertext is encrypted and MACed
     Ciphertext    []byte // ReplicaMessage.Ciphertext
 }
+```
+**ReplicaMessage**
 
-// ReplicaMessage used over wire protocol from couriers to replicas,
+```
+// ReplicaMessage is sent over the wire protocol from couriers to replicas,
 // one replica at a time.
+
 type ReplicaMessage struct {
     Cmds   *Commands
     Geo    *geo.Geometry
@@ -140,20 +153,15 @@ type ReplicaMessage struct {
 
 CourierEnvelope specifies intermediate replica IDs and NOT the final
 destination replica IDs. The courier service writes to the specified
-IDs and the storage node replication will take care of writing it to
-the correct storage node and Box ID.
+IDs, while storage node replication takes care of writing it to
+the correct storage node and box ID.
 
-CourierEnvelope type is used to save bandwidth. It is sent by clients
-to the courier services. The courier service then transforms one
-CourierEnvelope into two ReplicaMessage types, one for each
-destination replica. The courier then forwards those two
-ReplicaMessage's to their respective replicas.
+The CourierEnvelope type is used to save bandwidth. It is sent by clients
+to the courier services. The courier service then transforms one CourierEnvelope into two ReplicaMessage types, one for each destination replica. The courier forwards those two ReplicaMessage instances to their respective replicas.
 
 The courier expects an asynchronous ReplicaMessageReply in response from each replica:
 
-```golang
-// ReplicaMessageReply is sent by replicas to couriers as a reply
-// to the ReplicaMessage command.
+```
 type ReplicaMessageReply struct {
     Cmds *Commands
 
@@ -163,17 +171,14 @@ type ReplicaMessageReply struct {
 }
 ```
 
-
-The courier MUST keep track of EnvelopeHash'es of ALL ReplicaMessage's
-which it sends to the replicas. AND it must link each of these hashes
+The courier MUST keep track of each EnvelopeHash and each ReplicaMessage
+that it sends to the replicas, AND it must link each of these hashes
 to a client SURB so that it can send a reply.
 
 
+For each EnvelopeHash, the courier keeps a map to CourierBookKeeping:
 
-For each EnvelopeHash it needs to remember:
-
-```golang
-// for each EnvelopeHash, the courier keeps a map from EnvelopeHash to CourierBookKeeping
+```
 type CourierBookKeeping struct {
     SURB [2]*[]byte // maybe we only need one
 
@@ -182,14 +187,16 @@ type CourierBookKeeping struct {
     EnvelopeReplies [2]*ReplicaMessageReply // from replicas to courier, eventually sent to client
 }
 ```
-The Courier sends to the client:
-```golang
-type CourierEnvelopeReply struct {
-    EnvelopeHash EnvelopeHash // the envelopehash this reply corresponds to
 
+The Courier sends to the client:
+
+```
+type CourierEnvelopeReply struct {
+    EnvelopeHash EnvelopeHash // the EnvelopeHash that this reply corresponds to
 
     // ReplyIndex is a copy of the CourierEnvelope.ReplyIndex field from the
-    // CourierEnvelope that this CourierEnvelopeREply corresponds to
+    // CourierEnvelope that this CourierEnvelopeReply corresponds to
+
     ReplyIndex uint8
 
     Payload ReplicaMessageReply
