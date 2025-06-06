@@ -19,9 +19,11 @@ In this specification we describe the components and protocols that compose Pige
 
 Pigeonhole scattered storage enables persistent anonymous communication in which participants experience a coherent sequence of messages or a continuous data stream, but where user relationships and relations between data blocks remain unlinkable not only from the perspective of third-party observers, but also from that of the mixnet components. This latter attribute provides resilience against deanonymization by compromised mixnet nodes.
 
-The data blocks that Pigeonhole stores are supplied by the BACAP (Blinding-and-Capability) scheme. BACAP maintains a private distributed hash table that tracks message ownership, storage locations, delivery notications,and read/write permissions (capabilities). Data is wrapped in layers of signed encryption that disclose this metadata only as needed by the appropriate users or machine agents. All communication among users consists of user-generated read or write queries to Pigeonhole storage, never directly to other users, and never under compulsion by other users or by mixnet components.
+The data blocks that Pigeonhole stores are supplied by the BACAP (Blinding-and-Capability) scheme. BACAP maintains a private distributed hash table that tracks message ownership, storage locations, delivery notifications,and read/write permissions (capabilities). Data is wrapped in layers of signed encryption that disclose this metadata only as needed by the appropriate users or machine agents. All communication among users consists of user-generated read or write queries to Pigeonhole storage, never directly to other users, and never under compulsion by other users or by mixnet components.
 
-By sharing access capabilities and storage locations among multiple users, BACAP permits group communications. This specification describes an instantiation of the scheme briefly described in "5.6. End-to-end reliable group channels" in that paper. For more information about BACAP, see "Echomix: a Strong Anonymity System with Messaging", chapter 4: https://arxiv.org/abs/2501.02933. For an understanding of how the core BACAP primitives are implemented,see     https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go.
+By sharing access capabilities and storage locations among multiple users, BACAP permits group communications. This specification describes an instantiation of the scheme briefly described in "5.6. End-to-end reliable group channels" in that paper. For more information about BACAP, see "Echomix: a Strong Anonymity System with Messaging", chapter 4: https://arxiv.org/abs/2501.02933. For an understanding of how the core BACAP primitives are implemented,see https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go.
+
+All code snippets are in Golang.
 
 # Glossary
 
@@ -90,14 +92,26 @@ Replica envelopes (seen by storage replicas) have the following structure:
 ```
 
 
-# Message types and interactions (golang)
+# Message types and interactions
+
+**Overview**
+
+* For each message passed to a courier, clients ask for a reply from either replica  
+  number 1 or number 2.
+* The courier returns the corresponding reply if it has that reply. If it doesn't  
+  have the requested reply, but it does have the other reply, it sends the reply  
+  that it *does* have to the client. The courier indicates in either case which 
+  replica the reply came from.
+* If the client doesn’t receive any reply, it will eventually resend the request.
 
 **CourierEnvelope**
 
-```
-// Sent from the client to its courier.
-// Used when the client is trying to either read or write a single BACAP box.
+Sent from a client to its courier when the client is trying to either read or write a single BACAP box.
 
+```CourierEnvelope``` specifies intermediate replica IDs and NOT the final
+destination replica IDs. Saving bandwidth, only one ```CourierEnvelope``` needs to be sent to the courier, which then writes to each of the specified IDs.  
+
+```
 type CourierEnvelope struct {
 
     // Messages are initially sent to IntermediateReplicas, and eventually
@@ -116,7 +130,7 @@ type CourierEnvelope struct {
     // a reply. The courier is responsible for NOT sending each of those resent
     // messages to the replicas. It can use the EnvelopeHash to deduplicate them.
     // When the client sends a CourierEnvelope for which the courier already has   
-    // multiple instances of ReplicaMessageReply, the courier needs to respond 
+    // multiple ReplicaMessageReply objects, the courier needs to respond 
     // with exactly one of those. ReplyIndex lets the client choose which one.  
     // Could also be a bool.
 
@@ -132,12 +146,15 @@ type CourierEnvelope struct {
     Ciphertext    []byte // ReplicaMessage.Ciphertext
 }
 ```
+
 **ReplicaMessage**
 
-```
-// ReplicaMessage is sent over the wire protocol from couriers to replicas,
-// one replica at a time.
+Sent over the wire protocol from a courier to the replicas, one replica at a time.
 
+The courier service transforms one ```CourierEnvelope``` into two ```ReplicaMessage``` objects, one for each destination replica. The courier forwards those two ```ReplicaMessage``` objects to their respective replicas.
+
+
+```
 type ReplicaMessage struct {
     Cmds   *Commands
     Geo    *geo.Geometry
@@ -151,15 +168,9 @@ type ReplicaMessage struct {
 }
 ```
 
-CourierEnvelope specifies intermediate replica IDs and NOT the final
-destination replica IDs. The courier service writes to the specified
-IDs, while storage node replication takes care of writing it to
-the correct storage node and box ID.
+**ReplicaMessageReply**
 
-The CourierEnvelope type is used to save bandwidth. It is sent by clients
-to the courier services. The courier service then transforms one CourierEnvelope into two ReplicaMessage types, one for each destination replica. The courier forwards those two ReplicaMessage instances to their respective replicas.
-
-The courier expects an asynchronous ReplicaMessageReply in response from each replica:
+In response to a ```ReplicaMessage```, the courier expects an asynchronous ```ReplicaMessageReply``` from each replica.
 
 ```
 type ReplicaMessageReply struct {
@@ -171,12 +182,11 @@ type ReplicaMessageReply struct {
 }
 ```
 
-The courier MUST keep track of each EnvelopeHash and each ReplicaMessage
-that it sends to the replicas, AND it must link each of these hashes
-to a client SURB so that it can send a reply.
+**CourierBookKeeping**
 
+The courier MUST keep track of each each ```ReplicaMessage``` and each ```EnvelopeHash``` (in ```ReplicaMessageReply```) that it sends to the replicas, AND it must link each of the hashes to a client SURB so that it can send a reply.
 
-For each EnvelopeHash, the courier keeps a map to CourierBookKeeping:
+For each EnvelopeHash, the courier keeps a map to ```CourierBookKeeping```:
 
 ```
 type CourierBookKeeping struct {
@@ -188,7 +198,9 @@ type CourierBookKeeping struct {
 }
 ```
 
-The Courier sends to the client:
+**CourierEnvelopeReply**
+
+Sent by the courier to the client.
 
 ```
 type CourierEnvelopeReply struct {
@@ -203,35 +215,27 @@ type CourierEnvelopeReply struct {
 }
 ```
 
-* Clients ask for the reply from Replica either number 1 or number 2
-  in each message to the courier (ReplyIndex).
-* The courier replies with the corresponding reply if it has that
-  reply.
-* If it doesn't have the reply, but it does have the other reply, it
-  sends the ReplicaMessageReply that it *does* have to the client.
-* It always indicates to the client *which* replica's reply it sent (1
-  or 2).
-* If the client doesnt receive an answer with a MessageReply, it will
-  eventually resend the read request.
+# Embedded message types
 
-These two message types are embedded
+These message types are not used directly on the wire protocol, but are embedded in other message types.
 
-```golang
+**ReplicaRead** 
 
-// ReplicaRead isn't used directly on the wire protocol
-// but is embedded inside the ReplicaMessage which of course
-// are sent by the couriers to the replicas.
+Embedded inside ```ReplicaMessage```, which is sent by couriers to replicas.
+
+```
 type ReplicaRead struct {
     Cmds *Commands
 
     BoxID *[32]byte
 }
+```
 
-// ReplicaReadReply isn't used directly on the wire protocol
-// but is embedded inside the ReplicaMessageReply which of course
-// are sent by the replicas to the couriers. Therefore the
-// ReplicaReadReply command is never padded because it is always
-// encapsulated by the ReplicaMessageReply which is padded.
+**ReplicaReadReply**
+
+Embedded inside ```ReplicaMessageReply```, which is sent by replicas to couriers. ```ReplicaReadReply``` needs no padding because ```ReplicaMessageReply``` has padding.
+
+```
 type ReplicaReadReply
  struct {
     Cmds *Commands
@@ -244,15 +248,17 @@ type ReplicaReadReply
 }
 ```
 
-These message types below are only used for storage node replication between replicas:
-
-```golang
+# Internal message types
 
 
-// ReplicaWrite has two distinct uses. Firstly, it is
-// to be used directly on the wire for replication between replicas.
-// Secondly, it can be embedded inside a ReplicaMessage which of course
-// are sent from couriers to replicas.
+These message types are only used for storage node replication between replicas.
+
+
+**ReplicaWrite**
+
+Can be used directly on the wire for replication between replicas, or embedded inside a ```ReplicaMessage``` object which is sent from a courier to a replica.
+
+```
 type ReplicaWrite struct {
     Cmds *Commands
 
@@ -260,10 +266,13 @@ type ReplicaWrite struct {
     Signature *[32]byte
     Payload   []byte
 }
+```
 
-// ReplicaWriteReply can facilitate replication between replicas as the
-// reply to the ReplicaWrite command. Otherwise it is embedded in a
-// ReplicaMessageReply and sent from replicas to couriers.
+**ReplicaWriteReply**
+
+Facilitates replication between replicas as the reply to the ```ReplicaWrite``` command. It can also be embedded in a ```ReplicaMessageReply``` object sent from a replica to courier.
+
+```
 type ReplicaWriteReply struct {
     Cmds *Commands
 
@@ -272,12 +281,15 @@ type ReplicaWriteReply struct {
 
 ```
 
-# Protocol Sequence Annotations
+# Protocol sequence visualizations
 
-The following two images indicate the protocol from for reads and writes without
-showing the replication. This is the simplest way to annotate the protocol sequences:
+For simplicity, the following diagrams illustrate the Pigeonhole write and read operations while omitting replication.
+
+**Pigeonhole write operation**
 
 ![protatocol annotatation image of writes](/docs/specs/annotated_write.png "Annotated Writes")
+
+**Pigeonhole read operation**
 
 ![protatocol annotatation image of reads](/docs/specs/annotated_read.png "Annotated Reads")
 
