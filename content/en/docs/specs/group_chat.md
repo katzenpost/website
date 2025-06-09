@@ -1,5 +1,5 @@
 ---
-title: "Katzenpost Group Chat Design"
+title:
 linkTitle: "Group Chat"
 url: "docs/specs/group_chat.html"
 description: ""
@@ -9,6 +9,8 @@ author: ["Threebit Hacker", "David Stainton"]
 version: 0
 draft: false
 ---
+
+# Katzenpost Group Chat Design
 
 # Prerequisites
 

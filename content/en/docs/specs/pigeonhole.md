@@ -1,7 +1,7 @@
 ---
-title: "Pigeonhole scattered storage specification"
-linkTitle: "Pigeonhole scattered storage specification"
-url: "docs/specs/pigeonhole.html"
+title:
+linkTitle: "Pigeonhole Protocol Design Specification"
+url: "docs/specs/pigeonhole"
 description: ""
 categories: [""]
 tags: [""]
@@ -10,18 +10,44 @@ version: 0
 draft: false
 ---
 
+# Pigeonhole Protocol Design Specification
+
 # Abstract
 
-In this specification we describe the components and protocols that compose Pigeonhole scattered storage. We define the behavior of communication clients that send and retrieve individual messages, BACAP streams, and AllOrNothing streams. Client actions are mediated through courier services that interact with storage replicas.
+In this specification we describe the components and protocols that
+compose Pigeonhole scattered storage. We define the behavior of
+communication clients that send and retrieve individual messages,
+BACAP streams, and AllOrNothing streams. Client actions are mediated
+through courier services that interact with storage replicas.
 
 
 # Introduction
 
-Pigeonhole scattered storage enables persistent anonymous communication in which participants experience a coherent sequence of messages or a continuous data stream, but where user relationships and relations between data blocks remain unlinkable not only from the perspective of third-party observers, but also from that of the mixnet components. This latter attribute provides resilience against deanonymization by compromised mixnet nodes.
+Pigeonhole scattered storage enables persistent anonymous
+communication in which participants experience a coherent sequence of
+messages or a continuous data stream, but where user relationships and
+relations between data blocks remain unlinkable not only from the
+perspective of third-party observers, but also from that of the mixnet
+components. This latter attribute provides resilience against
+deanonymization by compromised mixnet nodes.
 
-The data blocks that Pigeonhole stores are supplied by the BACAP (Blinding-and-Capability) scheme. BACAP maintains a private distributed hash table that tracks message ownership, storage locations, delivery notifications,and read/write permissions (capabilities). Data is wrapped in layers of signed encryption that disclose this metadata only as needed by the appropriate users or machine agents. All communication among users consists of user-generated read or write queries to Pigeonhole storage, never directly to other users, and never under compulsion by other users or by mixnet components.
+The data blocks that Pigeonhole stores are supplied by the BACAP
+(Blinding-and-Capability) scheme. The Pigeonhole protocol scatters
+messages around the many storage servers and among a space of BACAP Box IDs.
+From a passive network observer's perspective all of this is seemingly random.
+All communication among users consists of
+user-generated read or write queries to Pigeonhole storage, never
+directly to other users.
 
-By sharing access capabilities and storage locations among multiple users, BACAP permits group communications. This specification describes an instantiation of the scheme briefly described in "5.6. End-to-end reliable group channels" in that paper. For more information about BACAP, see "Echomix: a Strong Anonymity System with Messaging", chapter 4: https://arxiv.org/abs/2501.02933. For an understanding of how the core BACAP primitives are implemented,see https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go.
+
+Many protocols are possible to compose using Pigeonhole communication channels,
+including group communications. This specification
+describes the protocols that are also detailed in our paper, in section entitled
+"5.6. End-to-end reliable group channels". For more
+information about BACAP, see "Echomix: a Strong Anonymity System with
+Messaging", chapter 4: https://arxiv.org/abs/2501.02933. For an
+understanding of how the core BACAP primitives are implemented,see
+https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go.
 
 All code snippets are in Golang.
 
