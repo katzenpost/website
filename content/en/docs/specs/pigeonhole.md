@@ -1,7 +1,7 @@
 ---
-title: "Pigeonhole Design Specification"
-linkTitle: "Pigeonhole Design Specification"
-url: "docs/specs/pigeonhole.html"
+title:
+linkTitle: "Pigeonhole Protocol Design Specification"
+url: "docs/specs/pigeonhole"
 description: ""
 categories: [""]
 tags: [""]
@@ -10,129 +10,177 @@ version: 0
 draft: false
 ---
 
+# Pigeonhole Protocol Design Specification
+
 # Abstract
 
-This is the specification of the Pigeonhole protocol.
-
-Here we define the client behavior and describe how it sends and
-receives BACAP streams and individual messages as well as the
-AllOrNothing streams. All of this interaction of the client is
-mediated through the courier services who interact with the storage
-replicas.
+In this specification we describe the components and protocols that
+compose Pigeonhole scattered storage. We define the behavior of
+communication clients that send and retrieve individual messages,
+BACAP streams, and AllOrNothing streams. Client actions are mediated
+through courier services that interact with storage replicas.
 
 
 # Introduction
 
-Definition of BACAP: "Echomix: a Strong Anonymity System with
-Messaging" chapter 4:
-    https://arxiv.org/abs/2501.02933
+Pigeonhole scattered storage enables persistent anonymous
+communication in which participants experience a coherent sequence of
+messages or a continuous data stream, but where user relationships and
+relations between data blocks remain unlinkable not only from the
+perspective of third-party observers, but also from that of the mixnet
+components. This latter attribute provides resilience against
+deanonymization by compromised mixnet nodes.
 
-This specification describes an instantiation of the protocol briefly
-described in "5.6. End-to-end reliable group channels" in that paper.
+The data blocks that Pigeonhole stores are supplied by the BACAP
+(Blinding-and-Capability) scheme. The Pigeonhole protocol scatters
+messages around the many storage servers and among a space of BACAP Box IDs.
+From a passive network observer's perspective all of this is seemingly random.
+All communication among users consists of
+user-generated read or write queries to Pigeonhole storage, never
+directly to other users.
 
-Implementation of core primitives:
-    https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go
 
+Many protocols are possible to compose using Pigeonhole communication channels,
+including group communications. This specification
+describes the protocols that are also detailed in our paper, in section entitled
+"5.6. End-to-end reliable group channels". For more
+information about BACAP, see "Echomix: a Strong Anonymity System with
+Messaging", chapter 4: https://arxiv.org/abs/2501.02933. For an
+understanding of how the core BACAP primitives are implemented,see
+https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go.
+
+All code snippets are in Golang.
 
 # Glossary
 
-* (BACAP?) Box: Box has a Box ID (which is also public key), Signature
-  and Ciphertext Signed Payload
+* **Box**: BACAP's unit of data storage. Each box has a box ID (which also serves as its public key), a signature, and a ciphertext signed payload.
 
-* Courier: a service that runs on the service nodes and interacts with
+* **Courier**: Service that runs on a service node and interacts with
   storage replicas. Proxies requests from clients and routes replies
   back to clients (via SURBs).
 
-* Storage replica: The actual storage nodes where message ciphertexts
+* **Storage replica**: The actual storage nodes where message ciphertexts
   are stored and retrieved.
 
-* Intermediate replica. See [5.4.1. Writing messages] """These
-  intermediate replicas are chosen independently of the two final
-  replicas for that box ID which are derived using the sharding
+* **Intermediate replica**: See "5.4.1. Writing messages": 
+
+  Intermediate replicas are chosen independently of the two final
+  replicas for that box ID, which they are derived using the sharding
   scheme. The reason Alice designates intermediate replicas, as
-  opposed to addressing the final replicas directly, os as to avoid
-  revealing to the courier which shard the box falls into."""
+  opposed to addressing the final replicas directly, is to avoid
+  revealing to the courier which shard the box falls into.
+
+# BACAP message parameters
+
+BACAP messages in Katzenpost are defined as follows.
+
+```
+Max BACAP payload = SphinxGeometry's UserForwardPayloadLength - CBOR overhead
+```
+
+```  
+BACAP_PAYLOAD_SIZE (c_i^{ctx}) = UserForwardPayloadLength – COURIER_ENVELOPE_SIZE
+```
+```
+COURIER_ENVELOPE_SIZE = 32 bytes + CTIDH1024PKSIZE + 2*(32+1) bytes + REPLICA_ENVELOPE_SIZE
+```
+```
+REPLICA_ENVELOPE_SIZE = 32 bytes + CTIDH1024PKSIZE + 32 bytes + BACAP PAYLOAD SIZE 32 + 64 bytes
+```
+```
+CTIDH1024PKSIZE = ??? is this just 128 bytes ???
+```
+
+Courier envelopes (seen by courier, coming in via SPHINX) have the following structure:
+
+```
+1) Sender’s ephemeral hybrid public key:
+    a) x25519 public key: 32 bytes
+    b) CTIDH-1024 public key
+2) For each designated replica:
+    Envelope DEK encrypted with shared secret between sender private key 
+    and replica public key: 32 bytes
+3) Replica/shard id designating each replica to contact: 1 byte
+4) ReplicaEnvelope: 32 bytes + CTIDH1024PKSIZE + 32 bytes + BACAP PAYLOAD SIZE 32 + 64 bytes  
+```
+
+Replica envelopes (seen by storage replicas) have the following structure:
+
+```
+1) Sender’s ephemeral public key
+    a) x25519 public key: 32 bytes
+    b) CTIDH-1024 public key
+2) 256-bit DEK encrypted to the replica’s public key: 32 bytes
+3) Enveloped message, encrypted with DEK, containing a BACAP message:
+    a) BACAP box ID (M ctx i ): 32 bytes
+    b) BACAP payload (c ctx i )
+    c) BACAP signature (s ctx i ): 64 bytes
+```
 
 
+# Message types and interactions
 
-# Protocol parameters
-* The maximum size of BACAP messages in Katzenpost is:
-    
-    SphinxGeometry's UserForwardPayloadLength - CBOR overhead = Max BACAP Payload
-    
-        // TODO: This is a rough estimate, we need to additionally account for
-        // TODO: courier commands (overhead where the client is telling the
-        // courier what to do; "go read from this BACAP stream" etc)
-    BACAP_PAYLOAD_SIZE (c_i^{ctx}) = UserForwardPayloadLength - COURIER_ENVELOPE_SIZE
-    COURIER_ENVELOPE_SIZE = 32 + CTIDH1024PKSIZE + 2*(32+1) + REPLICA_ENVELOPE_SIZE
-    REPLICA_ENVELOPE_SIZE = 32 + CTIDH1024PKSIZE + 32 + BACAP PAYLOAD SIZE 32 + 64
-    CTIDH1024PKSIZE = ??? is this just 128 bytes ???
+**Overview**
 
-    Appendix II: courier envelopes (the courier sees, coming in via SPHINX) 
-        1) The sender’s ephemeral hybrid public key:
-           a) 32 bytes: x25519 public key
-           b) CTIDH-1024 public key
-        2) for each designated replica:
-           32 bytes: envelope DEK encrypted with shared secret between sender private key and replica public key 
-        3) 1 byte: replica/shard id designating each replica to contact
-        4) ReplicaEnvelope: 32 + CTIDH1024PKSIZE + 32 + BACAP PAYLOAD SIZE 32 + 64
-    
-    Appendix III replica envelopes (that the storage replicas see):
-        1) sender’s ephemeral public key
-           a) 32 bytes: x25519 public key
-           b) CTIDH-1024 public key
-        2) 32 bytes: 256-bit DEK encrypted to the replica’s public key
-        3) enveloped message, encrypted with DEK, containing a BACAP message:
-            a) 32 bytes: BACAP box ID (M ctx i )
-            b) BACAP payload (c ctx i )
-            c) 64 bytes: BACAP signature (s ctx i )
+* For each message passed to a courier, clients ask for a reply from either replica  
+  number 1 or number 2.
+* The courier returns the corresponding reply if it has that reply. If it doesn't  
+  have the requested reply, but it does have the other reply, it sends the reply  
+  that it *does* have to the client. The courier indicates in either case which 
+  replica the reply came from.
+* If the client doesn’t receive any reply, it will eventually resend the request.
 
+**CourierEnvelope**
 
-# Protocol Messages
+Sent from a client to its courier when the client is trying to either read or write a single BACAP box.
 
-```golang
+```CourierEnvelope``` specifies intermediate replica IDs and NOT the final
+destination replica IDs. Saving bandwidth, only one ```CourierEnvelope``` needs to be sent to the courier, which then writes to each of the specified IDs.  
 
-// This is sent from the Client to its Courier.
-// This is used when the Client is trying to either read or write a single BACAP box.
+```
 type CourierEnvelope struct {
 
-    // IntermediateReplicas are used to initially send the message to, and eventually
-    // the message gets replicated to the correct locations. This hides the correct 
-    // locations from the courier.
+    // Messages are initially sent to IntermediateReplicas, and eventually
+    // replicated to their locations. This hides the real locations from the
+    // courier.
+
     IntermediateReplicas      [2]uint8
 
     // DEK is used for each replica: ReplicaMessage.DEK
+
     DEK           [2]*[32]byte
 
-    // ReplyIndex is described:
-
-    //  The client will be resending its thing to the courier until it receives
-
-     // a reply. The courier is responsible for NOT sending each of those resent
-
-    // messages to the replicas. It can use the EnvelopeHash to deduplicate.
-
-    // When the client sends a CourierEnvelope that the courier has already got
-
-    // ReplicaMessageReply's for, the courier needs to respond with one of those.
-
-    // ReplyIndex will let the client choose which one. I guess it could be a bool.
+    // Explanation of ReplyIndex:
+    //
+    // The client resends its messages to the courier until it receives
+    // a reply. The courier is responsible for NOT sending each of those resent
+    // messages to the replicas. It can use the EnvelopeHash to deduplicate them.
+    // When the client sends a CourierEnvelope for which the courier already has   
+    // multiple ReplicaMessageReply objects, the courier needs to respond 
+    // with exactly one of those. ReplyIndex lets the client choose which one.  
+    // Could also be a bool.
 
     ReplyIndex uint8 
 
-
-// these two fields below get hashed to form the EnvelopeHash later used
-// in ReplicaMessageReply:
+    // The next two fields are hashed to form the EnvelopeHash that is 
+    // later used in ReplicaMessageReply:
 
     // SenderEPubKey 
     SenderEPubKey []byte   // x25519 + ctidh1024 NIKE key of the client
 
-    // Ciphertext is encrypted and MAC'ed
+    // Ciphertext is encrypted and MACed
     Ciphertext    []byte // ReplicaMessage.Ciphertext
 }
+```
 
-// ReplicaMessage used over wire protocol from couriers to replicas,
-// one replica at a time.
+**ReplicaMessage**
+
+Sent over the wire protocol from a courier to the replicas, one replica at a time.
+
+The courier service transforms one ```CourierEnvelope``` into two ```ReplicaMessage``` objects, one for each destination replica. The courier forwards those two ```ReplicaMessage``` objects to their respective replicas.
+
+
+```
 type ReplicaMessage struct {
     Cmds   *Commands
     Geo    *geo.Geometry
@@ -146,22 +194,11 @@ type ReplicaMessage struct {
 }
 ```
 
-CourierEnvelope specifies intermediate replica IDs and NOT the final
-destination replica IDs. The courier service writes to the specified
-IDs and the storage node replication will take care of writing it to
-the correct storage node and Box ID.
+**ReplicaMessageReply**
 
-CourierEnvelope type is used to save bandwidth. It is sent by clients
-to the courier services. The courier service then transforms one
-CourierEnvelope into two ReplicaMessage types, one for each
-destination replica. The courier then forwards those two
-ReplicaMessage's to their respective replicas.
+In response to a ```ReplicaMessage```, the courier expects an asynchronous ```ReplicaMessageReply``` from each replica.
 
-The courier expects an asynchronous ReplicaMessageReply in response from each replica:
-
-```golang
-// ReplicaMessageReply is sent by replicas to couriers as a reply
-// to the ReplicaMessage command.
+```
 type ReplicaMessageReply struct {
     Cmds *Commands
 
@@ -171,17 +208,13 @@ type ReplicaMessageReply struct {
 }
 ```
 
+**CourierBookKeeping**
 
-The courier MUST keep track of EnvelopeHash'es of ALL ReplicaMessage's
-which it sends to the replicas. AND it must link each of these hashes
-to a client SURB so that it can send a reply.
+The courier MUST keep track of each each ```ReplicaMessage``` and each ```EnvelopeHash``` (in ```ReplicaMessageReply```) that it sends to the replicas, AND it must link each of the hashes to a client SURB so that it can send a reply.
 
+For each EnvelopeHash, the courier keeps a map to ```CourierBookKeeping```:
 
-
-For each EnvelopeHash it needs to remember:
-
-```golang
-// for each EnvelopeHash, the courier keeps a map from EnvelopeHash to CourierBookKeeping
+```
 type CourierBookKeeping struct {
     SURB [2]*[]byte // maybe we only need one
 
@@ -190,49 +223,45 @@ type CourierBookKeeping struct {
     EnvelopeReplies [2]*ReplicaMessageReply // from replicas to courier, eventually sent to client
 }
 ```
-The Courier sends to the client:
-```golang
-type CourierEnvelopeReply struct {
-    EnvelopeHash EnvelopeHash // the envelopehash this reply corresponds to
 
+**CourierEnvelopeReply**
+
+Sent by the courier to the client.
+
+```
+type CourierEnvelopeReply struct {
+    EnvelopeHash EnvelopeHash // the EnvelopeHash that this reply corresponds to
 
     // ReplyIndex is a copy of the CourierEnvelope.ReplyIndex field from the
-    // CourierEnvelope that this CourierEnvelopeREply corresponds to
+    // CourierEnvelope that this CourierEnvelopeReply corresponds to
+
     ReplyIndex uint8
 
     Payload ReplicaMessageReply
 }
 ```
 
-* Clients ask for the reply from Replica either number 1 or number 2
-  in each message to the courier (ReplyIndex).
-* The courier replies with the corresponding reply if it has that
-  reply.
-* If it doesn't have the reply, but it does have the other reply, it
-  sends the ReplicaMessageReply that it *does* have to the client.
-* It always indicates to the client *which* replica's reply it sent (1
-  or 2).
-* If the client doesnt receive an answer with a MessageReply, it will
-  eventually resend the read request.
+# Embedded message types
 
-These two message types are embedded
+These message types are not used directly on the wire protocol, but are embedded in other message types.
 
-```golang
+**ReplicaRead** 
 
-// ReplicaRead isn't used directly on the wire protocol
-// but is embedded inside the ReplicaMessage which of course
-// are sent by the couriers to the replicas.
+Embedded inside ```ReplicaMessage```, which is sent by couriers to replicas.
+
+```
 type ReplicaRead struct {
     Cmds *Commands
 
     BoxID *[32]byte
 }
+```
 
-// ReplicaReadReply isn't used directly on the wire protocol
-// but is embedded inside the ReplicaMessageReply which of course
-// are sent by the replicas to the couriers. Therefore the
-// ReplicaReadReply command is never padded because it is always
-// encapsulated by the ReplicaMessageReply which is padded.
+**ReplicaReadReply**
+
+Embedded inside ```ReplicaMessageReply```, which is sent by replicas to couriers. ```ReplicaReadReply``` needs no padding because ```ReplicaMessageReply``` has padding.
+
+```
 type ReplicaReadReply
  struct {
     Cmds *Commands
@@ -245,15 +274,17 @@ type ReplicaReadReply
 }
 ```
 
-These message types below are only used for storage node replication between replicas:
-
-```golang
+# Internal message types
 
 
-// ReplicaWrite has two distinct uses. Firstly, it is
-// to be used directly on the wire for replication between replicas.
-// Secondly, it can be embedded inside a ReplicaMessage which of course
-// are sent from couriers to replicas.
+These message types are only used for storage node replication between replicas.
+
+
+**ReplicaWrite**
+
+Can be used directly on the wire for replication between replicas, or embedded inside a ```ReplicaMessage``` object which is sent from a courier to a replica.
+
+```
 type ReplicaWrite struct {
     Cmds *Commands
 
@@ -261,10 +292,13 @@ type ReplicaWrite struct {
     Signature *[32]byte
     Payload   []byte
 }
+```
 
-// ReplicaWriteReply can facilitate replication between replicas as the
-// reply to the ReplicaWrite command. Otherwise it is embedded in a
-// ReplicaMessageReply and sent from replicas to couriers.
+**ReplicaWriteReply**
+
+Facilitates replication between replicas as the reply to the ```ReplicaWrite``` command. It can also be embedded in a ```ReplicaMessageReply``` object sent from a replica to courier.
+
+```
 type ReplicaWriteReply struct {
     Cmds *Commands
 
@@ -273,12 +307,15 @@ type ReplicaWriteReply struct {
 
 ```
 
-# Protocol Sequence Annotations
+# Protocol sequence visualizations
 
-The following two images indicate the protocol from for reads and writes without
-showing the replication. This is the simplest way to annotate the protocol sequences:
+For simplicity, the following diagrams illustrate the Pigeonhole write and read operations while omitting replication.
+
+**Pigeonhole write operation**
 
 ![protatocol annotatation image of writes](/docs/specs/annotated_write.png "Annotated Writes")
+
+**Pigeonhole read operation**
 
 ![protatocol annotatation image of reads](/docs/specs/annotated_read.png "Annotated Reads")
 

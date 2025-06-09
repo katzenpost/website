@@ -1,5 +1,5 @@
 ---
-title: "Katzenpost Thin Client Design"
+title:
 linkTitle: "Katzenpost Thin Client"
 url: "docs/specs/thin_client.html"
 description: ""
@@ -10,6 +10,7 @@ version: 0
 draft: false
 ---
 
+# Katzenpost Thin Client Design
 
 # 1. Introduction
 
