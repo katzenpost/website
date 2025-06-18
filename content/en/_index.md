@@ -1,12 +1,12 @@
 ---
 title: "Katzenpost"
-description: "Katzenpost is a free and open source software project."
+description: "Katzenpost is a free and open source software project advancing anonymous communication through innovative mixnet protocols."
 ---
 
 <!-- Hero -->
 {{< blocks/cover image_anchor="top" height="auto" color="white">}}
-<h1>Katzenpost: Anonymous Communication for Everyone</h1>
-<p>Advanced mixnet protocols for secure, private, and anonymous online communication.</p>
+<h1>Katzenpost: Post Quantum Mix Network</h1>
+<p>Revolutionary post-quantum packet switching anonymous communication!</p>
 {{< /blocks/cover >}}
 
 <!-- Lead Section -->
@@ -14,11 +14,11 @@ description: "Katzenpost is a free and open source software project."
 Katzenpost is a free and open-source software project advancing
 anonymous communication through innovative mixnet protocols. As the
 world's first post-quantum mixnet, Katzenpost integrates cutting-edge
-cryptography to ensure future-proof privacy. Our rigorous security
-design includes the first-ever comprehensive threat model for a
-mixnet, setting a new standard for secure, resilient online
-communication.
+cryptography to ensure future-proof privacy. Our design innovations are
+documented in our paper and in our documentation.
+
 {{% /blocks/lead %}}
+
 
 <!-- Triplet Section: Gray -->
 {{% blocks/section color="dark" type="row" %}}

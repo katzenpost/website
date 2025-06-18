@@ -1,4 +1,7 @@
 main:
+  - name: "Paper"
+    weight: 45
+    url: "https://arxiv.org/abs/2501.02933"
   - name: "Code"
     weight: 50
     url: "https://github.com/katzenpost"
