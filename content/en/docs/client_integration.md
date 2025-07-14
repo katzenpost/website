@@ -14,7 +14,7 @@ slug: "/client_integration/"
 ## Overview
 
 This guide is intended to help developers connect their applications
-and projects to a Katzenpost mixnet.
+and projects to a Katzenpost mixnet client.
 
 The Katzenpost client daemon - <b>kpclientd</b> - connects to the
 Katzenpost mixnet. It has <i>thin client</i> libraries in Go, Python
@@ -31,7 +31,7 @@ that it's the outgoing connection from the client that has the
 mixnet's privacy properties.
 
 Our thin client protocol is described here:
-https://katzenpost.network/docs/specs/connector.html
+https://katzenpost.network/docs/specs/thin_client.html
 
 It can be extended to be used by any language that has a CBOR
 serialization library and can talk over TCP or UNIX domain
@@ -41,7 +41,7 @@ socket. Currently there are three thin client libraries:
 {{% tab header="**Go**" %}}
 **Source code:** https://github.com/katzenpost/katzenpost/tree/main/client2
 
-**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.46/client2/thin
+**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.55/client2/thin
 
 The Go thin client provides a comprehensive API for interacting with the Katzenpost mixnet.
 {{% /tab %}}
@@ -70,52 +70,72 @@ The Python thin client is ideal for rapid prototyping and integration with exist
 {{% /tab %}}
 {{< /tabpane >}}
 
+### Table Of Contents
 
-**NOTE**: *It might be helpful to new users to use a mixnet that already exists instead of trying to create your own. Please see:*
-[How to Use Namenlos Mixnet](/docs/howto_use_namenlos_mixnet/).
+The three main sections of this guide:
 
-
-## Thin client configuration
-
-The thin client configuration has at most two sections:
-
-1. Callbacks for handling received events.
-2. Sphinx Geometry for determining the maximum size of usable payload
-   in a Sphinx packet.
-
-NOTE: currently only the golang thin client has the Sphinx geometry in
-it's configuration. The other implementations are configured with only
-callbacks.
-
-The only use the thin client or application would have for the Sphinx
-geometry is to learn the application's maximum payload capacity which
-is not the same as the Sphinx packet payload size because of the SURB
-which is stored in the payload so that a reply can be received.
+* [Core functionality API](#core-functionality)
+* [Legacy API](#legacy-api)
+* [Pigeonhole Channel API](#conclusion)
 
 
+## Core functionality
 
-## Getting the PKI document from your app
+### Connecting and Disconnecting
 
-You'll need a view of the mix network in order to send packets. The
-PKI (public key infrastructure) document is published by the mix
-network's set of directory authorities, and you fetch it from one of
-the gateways. This is not unlike <i>Tor</i> and <i>mixminion</i>. The
-PKI document updates every epoch, which currenttly is 20 minutes.
-
-The setup process as in the example above will fetch your first
-network config and PKI document so you can start interacting with the
-network, but you need your client to update the doc as needed.
-
-You can obtain a PKI document using the thin client API:
+The thin client connects and disconnects from the kpclientd daemon
+like so:
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-import (
-    cpki "github.com/katzenpost/katzenpost/core/pki"
-)
+thin := thin.NewThinClient(cfg)
 
-// PKIDocument returns the current PKI document
-func (t *ThinClient) PKIDocument() *cpki.Document {}
+// connect to kpclientd daemon
+err = thin.Dial()
+if err != nil {
+    panic(err)
+}
+
+// ... do stuff ...
+
+// disconnect from kpclientd daemon
+thin.Close()
+{{< /tab >}}
+
+{{< tab header="Rust" lang="rust" >}}
+// connect to kpclientd daemon
+let client = ThinClient::new(cfg).await?;
+
+// ... do stuff ...
+
+// disconnect from kpclientd daemon
+client.stop().await?;
+
+{{< /tab >}}
+
+{{< tab header="Python" lang="python" >}}
+thin_client = ThinClient(config)
+
+# connect to kpclientd daemon
+await thin_client.start()
+
+# ... do stuff ...
+
+# disconnect from kpclientd daemon
+thin_client.stop()
+{{< /tab >}}
+{{< /tabpane >}}
+
+### Get a view of the network via the PKI Document
+
+`kpclient` needs the PKI document for internal use for Sphinx packet routing.
+However applications will also need the PKI document to learn about the
+mixnet services that are available and to choose which ones to use.
+
+You can obtain a PKI document using the thin client API, like so:
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
 
 // Usage example:
 doc := thin.PKIDocument()
@@ -135,6 +155,8 @@ doc = thin_client.pki_document()
 {{< /tab >}}
 {{< /tabpane >}}
 
+### Get a random instance of a specific service
+
 When creating an app that works over a mixnet, you will need to
 interact with <i>mixnet services</i> that are listed in the PKI
 document. For example, our mixnet ping CLI tool gets a random echo
@@ -143,18 +165,10 @@ that information:
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-thin := thin.NewThinClient(cfg)
-err = thin.Dial()
-if err != nil {
-    panic(err)
-}
-
 desc, err := thin.GetService("echo")
 if err != nil {
     panic(err)
 }
-
-// handle business here
 {{< /tab >}}
 
 {{< tab header="Rust" lang="rust" >}}
@@ -166,124 +180,23 @@ service_descriptor = thin_client.get_service(doc, service_name)
 {{< /tab >}}
 {{< /tabpane >}}
 
-The `GetService` is a convenient helper method which searches the PKI
+The `GetService` or `get_service` is a convenient helper method which searches the PKI
 document for the the service name we give it and then selects a random
 entry from that set. I don't care which XYZ service I talk to just so
-long as I can talk to one of them.
+long as I can talk to one of them. The result is that you procure a
+`service descriptor object` which contains a destination mix descriptor
+and a destination queue ID.
 
-```golang
-// ServiceDescriptor describe a mixnet Gateway-side service.
-type ServiceDescriptor struct {
-	// RecipientQueueID is the service name or queue ID.
-	RecipientQueueID []byte
-	// Gateway name.
-	MixDescriptor *cpki.MixDescriptor
-}
-```
-
-The result is that you procure a destination mix identity hash and a
-destination queue ID so that the mix node routes the message to the
-service.
-
-The hash algorithm used is provided by "github.com/katzenpost/hpqc"
-("golang.org/x/crypto/blake2b.Sum256")
-
-```golang
-func Sum256(data []byte) [blake2b.Size256]byte {}
-```
-
-For example:
-
-```golang
-    import (
-        "github.com/katzenpost/hpqc/hash"
-        "github.com/katzenpost/katzenpost/thin"
-    )
-
-	thin := thin.NewThinClient(cfg)
-	err = thin.Dial()
-	if err != nil {
-		panic(err)
-	}
-
-	desc, err := thin.GetService("echo")
-	if err != nil {
-		panic(err)
-	}
-    serviceIdHash := hash.Sum256(desc.MixDescriptor.IdentityKey)
-    serviceQueueID := desc.RecipientQueueID
-```
-
-As a client you need to be able to gather PKI documents for each epoch
-that your packets will be used in. This is important for our Sphinx
-based routing protocol because the mix keys used for the mix node's
-Sphinx packet decryption are used only for one Epoch and then they
-expire. Our PKI document publishes several Epochs worth of future mix
-keys so that the upcoming Epoch boundary will not cause any
-transmission failures.
-
-## Sending a message
-
-Each send operation that a thin client can do requires you to specify
-the payload to be sent and the destination mix node identity hash and
-the destination recipient queue identity.
-
-The API by design lets you specify either a SURB ID or a message ID
-for the sent message depending on if it's using an ARQ to send
-reliably or not. This implies that the application using the thin
-client must do it's own book keeping to keep track of which replies
-and their associated identities.
-
-The simplest way to send a message is using the `SendMessageWithoutReply` method:
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-// SendMessageWithoutReply sends a message encapsulated in a Sphinx packet, without any SURB.
-// No reply will be possible.
-func (t *ThinClient) SendMessageWithoutReply(payload []byte, destNode *[32]byte, destQueue []byte) error
-
-// Example usage:
-err := thin.SendMessageWithoutReply(payload, &serviceIdHash, serviceQueueID)
-if err != nil {
-    panic(err)
-}
-{{< /tab >}}
-
-{{< tab header="Rust" lang="rust" >}}
-// Send a message without expecting a reply
-thin_client.send_message_without_reply(payload, dest_node, dest_queue).await?;
-{{< /tab >}}
-
-{{< tab header="Python" lang="python" >}}
-# Send a message without expecting a reply
-thin_client.send_message_without_reply(payload, dest_node, dest_queue)
-{{< /tab >}}
-{{< /tabpane >}}
-
-This method sends a Sphinx packet encapsulating the given payload to
-the given destination. No SURB is sent, so no reply can ever be
-received. This is a one-way message.
-
-The rest of the message sending methods of the thin client are
-variations of this basic send but with some more complexity added. For
-example, you can choose to send a message with or without the help of
-an ARQ error correction scheme where retransmissions are automatically
-sent when the other party doesn't receive your message. Or keep it
-minimal and send a message with a SURB in the payload so that the
-service can send you a reply. Also as a convenience, our Go API has
-blocking and non-blocking method calls for these operations.
-
-The Rust and Python thin client APIs are very similar. Knowledge of
-one is easily transferable to another implementation.
-
-
-
-## Receiving events and messages
+## Receiving Thin Client Events and Service Reply Messages
 
 It's worth noting that our Go thin client implementation gives you
 an events channel for receiving events from the client daemon, whereas
 the Python and Rust thin clients allow you to specify callbacks for
-each event type. Both approaches are equivalent to each other.
+each event type. Both approaches are equivalent to each other. HOWEVER,
+the events channel approach is more flexible and allows you to
+easily write higher level abstractions that do automatic retries.
+So we might consider updating our Rust and Python thin clients to use
+the events channel approach.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -354,43 +267,88 @@ thin_client.start()
 ### Thin client events
 
 Here I'll tell you a bit about each of the events that thin clients
+receive. Firstly, these are the core events that all thin clients
 receive:
 
-* ShutdownEvent: This event tells your application that the Katzenpost
+* `shutdown_event`: This event tells your application that the Katzenpost
   client daemon is shutting down.
 
-* ConnectionStatusEvent: This event notifies your app of a network
+* `connection_status_event`: This event notifies your app of a network
   connectvity status change, which is either connected or not
   connected.
 
-* NewPKIDocumentEvent: This event tells encapsulates the new PKI
+* `new_pki_document_event`: This event tells encapsulates the new PKI
   document, a view of the network, including a list of network
   services.
 
-* MessageSentEvent: This event tells your app that it's message was
+# Legacy API
+
+## Legacy Events
+
+These are the events that are specific to sending and
+receiving messages using the legacy API:
+
+* `message_sent_event`: This event tells your app that it's message was
   successfully sent to a gateway node on the mix network.
 
-* MessageReplyEvent: This event encapsulates a reply from a service on
+* `message_reply_event`: This event encapsulates a reply from a service on
   the mixnet.
 
-* MessageIDGarbageCollected: This event is an ARQ garbage collecton
+* `arq_garbage_collected_event`: This event is an ARQ garbage collecton
   event which is used to notify clients so that they can clean up
   their ARQ specific book keeping, if any.
 
+## Sending a message
+
+Each send operation that a thin client can do requires you to specify
+the payload to be sent and the destination mix node identity hash and
+the destination recipient queue identity.
+
+The API by design lets you specify either a SURB ID or a message ID
+for the sent message depending on if it's using an ARQ to send
+reliably or not. This implies that the application using the thin
+client must do it's own book keeping to keep track of which replies
+and their associated identities.
+
+The simplest way to send a message is using the `SendMessageWithoutReply` method:
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// Send a message without waiting for a reply
+err := thin.SendMessageWithoutReply(payload, &serviceIdHash, serviceQueueID)
+if err != nil {
+    panic(err)
+}
+{{< /tab >}}
+
+{{< tab header="Rust" lang="rust" >}}
+// Send a message without waiting for a reply
+thin_client.send_message_without_reply(payload, dest_node, dest_queue).await?;
+{{< /tab >}}
+
+{{< tab header="Python" lang="python" >}}
+# Send a message without waiting for a reply
+thin_client.send_message_without_reply(payload, dest_node, dest_queue)
+{{< /tab >}}
+{{< /tabpane >}}
+
+This method sends a Sphinx packet encapsulating the given payload to
+the given destination. No SURB is sent, so no reply can ever be
+received. This is a one-way message.
+
+The rest of the message sending methods of the thin client are
+variations of this basic send but with some more complexity added. For
+example, you can choose to send a message with or without the help of
+an ARQ error correction scheme where retransmissions are automatically
+sent when the other party doesn't receive your message. Or keep it
+minimal and send a message with a SURB in the payload so that the
+service can send you a reply. Also as a convenience, our Go API has
+blocking and non-blocking method calls for these operations.
+
+The Rust and Python thin client APIs are very similar. Knowledge of
+one is easily transferable to another implementation.
 
 
-## Conclusion
+## Pigeonhole Channel API
 
-This is a guide to performing very low level and basic interactions
-with mixnet services. Send a message to a mixnet service and receive a
-reply. Very basic but also a powerful building block.
-
-In the future we plan on:
-
-* writing various messaging systems and making their client controls
-  exposed to the thin client
-
-* writing higher level protocol additions to this thin client API that
-  would allow clients to send and receive streams of data. Streaming
-  data is useful for a variety of applications where strict datagrams
-  may not be as easily useful.
+*not yet written*
