@@ -375,6 +375,39 @@ pre {
     }
 }
 
+/* Fix tabpane container width - constrain to content area */
+.tabpane, [class*="tabpane"], .tab-pane, .tab-content, .nav-tabs {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* Force all tabpane elements to respect container width */
+.tab-pane pre, .tab-content pre, .tabpane pre {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Override any Bootstrap or theme defaults for tabpanes */
+.nav-tabs-wrapper, .tab-content-wrapper, div:has(.nav-tabs), div:has(.tab-content) {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+/* Nuclear option - ensure content area elements don't exceed container */
+.td-content * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* But allow text and inline elements to flow normally */
+.td-content p, .td-content span, .td-content a, .td-content strong, .td-content em {
+    max-width: none !important;
+}
+
 /* Pagination and navigation elements */
 .pagination .page-link {
     background-color: #404040 !important;
