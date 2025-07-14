@@ -23,14 +23,11 @@ taxonomies:
   tag: tags
   category: categories
 
-# Highlighting config
-pygmentsCodeFences: true
-pygmentsUseClasses: false
-# Use the new Chroma Go highlighter in Hugo.
-pygmentsUseClassic: false
-# pygmentsOptions: "linenos=table"
-# See https://help.farbox.com/pygments.html
-pygmentsStyle: tango
+# Highlighting config (deprecated - moved to markup.highlight section below)
+# pygmentsCodeFences: true
+# pygmentsUseClasses: false
+# pygmentsUseClassic: false
+# pygmentsStyle: monokai
 
 # Configure how URLs look like per section.
 permalinks:
@@ -60,9 +57,12 @@ markup:
       unsafe: true
   highlight:
     # See a complete list of available styles at https://xyproto.github.io/splash/docs/all.html
-    style: tango
-    # Uncomment if you want your chosen highlight style used for code blocks without a specified language
-    # guessSyntax: true
+    style: monokai
+    lineNos: false
+    noClasses: false
+    codeFences: true
+    guessSyntax: true
+    tabWidth: 4
 
 # Everything below this are Site Params
 

@@ -1,4 +1,7 @@
 /* Bootstrap classes - _styles_project.scss */
+
+/* Import Chroma monokai syntax highlighting */
+@import "chroma_monokai";
 @font-face {
   font-family: 'Fira Sans';
   font-style: italic;
@@ -132,3 +135,261 @@ header.article-meta {
 .td-page-meta__child  { display: none !important; }
 .td-page-meta__issue  { display: none !important; }
 .td-page-meta__project-issue  { display: none !important; }
+
+/* Gray background theme with black code blocks */
+body {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+}
+
+.td-main {
+    background-color: #2d2d2d !important;
+}
+
+.td-content {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+}
+
+/* Readable text colors */
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+}
+
+/* Text colors - exclude code blocks from color overrides */
+p:not(.chroma *), li:not(.chroma *), td:not(.chroma *), th:not(.chroma *), span:not(.chroma *) {
+    color: #e0e0e0 !important;
+}
+
+/* Readable links against gray background - but exclude tags */
+a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/categories/"]) {
+    color: #66b3ff !important;
+    text-decoration: none !important;
+
+    &:hover {
+        color: #99ccff !important;
+        text-decoration: underline !important;
+    }
+
+    &:visited {
+        color: #8db3ff !important;
+    }
+}
+
+/* Navigation styling */
+.td-navbar {
+    background-color: #1a1a1a !important;
+
+    .navbar-nav .nav-link {
+        color: #ffffff !important;
+
+        &:hover {
+            color: #66b3ff !important;
+        }
+    }
+
+    .navbar-brand {
+        color: #ffffff !important;
+
+        &:hover {
+            color: #66b3ff !important;
+        }
+    }
+}
+
+.td-sidebar {
+    background-color: #333333 !important;
+
+    .td-sidebar-nav .td-sidebar-link {
+        color: #e0e0e0 !important;
+
+        &:hover {
+            color: #66b3ff !important;
+            background-color: #404040 !important;
+        }
+
+        &.tree-root {
+            color: #ffffff !important;
+        }
+    }
+}
+
+/* Code blocks - force black background */
+.highlight, .highlight pre, .chroma, .chroma pre, pre, pre code {
+    background-color: #000000 !important;
+    color: #f8f8f2 !important;
+}
+
+.highlight {
+    border: 1px solid #444444 !important;
+    border-radius: 4px !important;
+    margin: 1rem 0 !important;
+    background-color: #000000 !important;
+
+    pre {
+        margin: 0 !important;
+        padding: 1rem !important;
+        border: none !important;
+        border-radius: 4px !important;
+        overflow-x: auto !important;
+        background-color: #000000 !important;
+    }
+}
+
+/* Force black background for all code-related elements */
+div.highlight, div.highlight pre, div.chroma, div.chroma pre {
+    background-color: #000000 !important;
+}
+
+/* Tabbed panes code blocks */
+.tab-pane .highlight, .tab-pane .chroma, .tab-pane pre {
+    background-color: #000000 !important;
+}
+
+/* Inline code styling */
+code:not(.chroma code) {
+    color: #f8f8f2 !important;
+    background-color: #000000 !important;
+    padding: 0.2rem 0.4rem !important;
+    border-radius: 3px !important;
+    font-size: 0.9em !important;
+}
+
+/* Override any Bootstrap/Docsy code block styles */
+.td-content pre, .td-content code, .td-content .highlight {
+    background-color: #000000 !important;
+}
+
+/* Ensure all pre elements have black background */
+pre {
+    background-color: #000000 !important;
+    color: #f8f8f2 !important;
+    border: 1px solid #444444 !important;
+    border-radius: 4px !important;
+    padding: 1rem !important;
+}
+
+/* Override any theme defaults */
+.td-content .highlight pre {
+    background-color: #000000 !important;
+    margin: 0 !important;
+    border: none !important;
+}
+
+/* Tables with dark background */
+.table {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+
+    th {
+        background-color: #0d0d0d !important;
+        color: #ffffff !important;
+        border-color: #444444 !important;
+    }
+
+    td {
+        background-color: #1a1a1a !important;
+        color: #e0e0e0 !important;
+        border-color: #444444 !important;
+    }
+
+    &.table-striped tbody tr:nth-of-type(odd) {
+        background-color: #222222 !important;
+
+        td {
+            background-color: #222222 !important;
+        }
+    }
+}
+
+/* Blog and content area link fixes */
+.td-content {
+    a {
+        color: #66b3ff !important;
+        background-color: transparent !important;
+
+        &:hover {
+            color: #99ccff !important;
+            background-color: rgba(102, 179, 255, 0.1) !important;
+        }
+    }
+}
+
+/* Blog post navigation and tag links */
+.blog-tags a, .td-blog-posts-list a {
+    color: #66b3ff !important;
+    background-color: #404040 !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 3px !important;
+
+    &:hover {
+        color: #ffffff !important;
+        background-color: #66b3ff !important;
+    }
+}
+
+/* Blog post date styling - make more readable */
+.text-body-secondary, .text-muted, small.text-body-secondary {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+}
+
+/* Fix tag readability - target the actual HTML classes */
+.taxonomy-term {
+    color: #000000 !important;
+    background-color: #f0f0f0 !important;
+
+    .taxonomy-label {
+        color: #000000 !important;
+    }
+}
+
+/* Tabpane styling - black background */
+.tab-content, .tab-pane {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #444444 !important;
+    border-radius: 4px !important;
+    padding: 1rem !important;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid #444444 !important;
+
+    .nav-link {
+        background-color: #333333 !important;
+        color: #ffffff !important;
+        border: 1px solid #444444 !important;
+        border-bottom: none !important;
+
+        &:hover {
+            background-color: #555555 !important;
+            color: #ffffff !important;
+        }
+
+        &.active {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            border-bottom: 1px solid #000000 !important;
+        }
+    }
+}
+
+/* Pagination and navigation elements */
+.pagination .page-link {
+    background-color: #404040 !important;
+    color: #e0e0e0 !important;
+    border-color: #555555 !important;
+
+    &:hover {
+        background-color: #66b3ff !important;
+        color: #ffffff !important;
+        border-color: #66b3ff !important;
+    }
+
+    &.active {
+        background-color: #66b3ff !important;
+        border-color: #66b3ff !important;
+        color: #ffffff !important;
+    }
+}
