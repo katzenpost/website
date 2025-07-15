@@ -35,7 +35,8 @@ https://katzenpost.network/docs/specs/thin_client.html
 
 It can be extended to be used by any language that has a CBOR
 serialization library and can talk over TCP or UNIX domain
-socket. Currently there are three thin client libraries:
+socket. Currently there are three thin client libraries and
+the reference implementation is written in golang:
 
 {{< tabpane text=true >}}
 {{% tab header="**Go**" %}}
@@ -72,11 +73,13 @@ The Python thin client is ideal for rapid prototyping and integration with exist
 
 ### Table Of Contents
 
-The three main sections of this guide:
+*The three main sections of this guide:*
 
-* [Core functionality API](#core-functionality)
-* [Legacy API](#legacy-api)
-* [Pigeonhole Channel API](#conclusion)
+| Section | Description |
+|---------|-------------|
+| [Core functionality API](#core-functionality) | Basic client operations: connection management, PKI documents, mixnet service discovery, events/replies |
+| [Legacy API](#legacy-api) | Message oriented communication with mixnet services, with optional ARQ error correction scheme |
+| [**Pigeonhole Channel API**](#pigeonhole-channel-api) | Reliable, ordered, persistent, replicated communication channels |
 
 
 ## Core functionality
@@ -88,18 +91,26 @@ like so:
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-thin := thin.NewThinClient(cfg)
-
-// connect to kpclientd daemon
-err = thin.Dial()
+// Load thin client configuration
+cfg, err := thin.LoadFile("thinclient.toml")
 if err != nil {
-    panic(err)
+    log.Fatal(err)
+}
+
+logging := &config.Logging{Level: "INFO"}
+// create thin client
+client := thin.NewThinClient(cfg, logging)
+
+// Connect to kpclientd daemon
+err = client.Dial()
+if err != nil {
+    log.Fatal(err)
 }
 
 // ... do stuff ...
 
-// disconnect from kpclientd daemon
-thin.Close()
+// Disconnect from kpclientd daemon
+client.Close()
 {{< /tab >}}
 
 {{< tab header="Rust" lang="rust" >}}
@@ -281,7 +292,15 @@ receive:
   document, a view of the network, including a list of network
   services.
 
+
 # Legacy API
+
+The legacy API implements a message oriented send and receive protocol
+that mixnet clients can use to interact with specific mixnet services
+that they choose to interact with. This inevitably creates a non-uniform
+packet distribution on the service nodes which a clever adversary could
+use to try and deanonymize clients. Therefore for that and many other reasons
+we are encouraging the use of the pigeonhole channel API instead.
 
 ## Legacy Events
 
@@ -310,45 +329,174 @@ reliably or not. This implies that the application using the thin
 client must do it's own book keeping to keep track of which replies
 and their associated identities.
 
-The simplest way to send a message is using the `SendMessageWithoutReply` method:
+The simplest way to send a message is using the `SendMessage` method:
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-// Send a message without waiting for a reply
-err := thin.SendMessageWithoutReply(payload, &serviceIdHash, serviceQueueID)
+// Send a message
+err := thin.SendMessage(payload, &serviceIdHash, serviceQueueID)
 if err != nil {
     panic(err)
 }
 {{< /tab >}}
-
 {{< tab header="Rust" lang="rust" >}}
-// Send a message without waiting for a reply
-thin_client.send_message_without_reply(payload, dest_node, dest_queue).await?;
+// Send a message
+thin_client.send_message(payload, dest_node, dest_queue).await?;
 {{< /tab >}}
-
 {{< tab header="Python" lang="python" >}}
-# Send a message without waiting for a reply
-thin_client.send_message_without_reply(payload, dest_node, dest_queue)
+# Send a message
+thin_client.send_message(payload, dest_node, dest_queue)
 {{< /tab >}}
 {{< /tabpane >}}
-
-This method sends a Sphinx packet encapsulating the given payload to
-the given destination. No SURB is sent, so no reply can ever be
-received. This is a one-way message.
-
-The rest of the message sending methods of the thin client are
-variations of this basic send but with some more complexity added. For
-example, you can choose to send a message with or without the help of
-an ARQ error correction scheme where retransmissions are automatically
-sent when the other party doesn't receive your message. Or keep it
-minimal and send a message with a SURB in the payload so that the
-service can send you a reply. Also as a convenience, our Go API has
-blocking and non-blocking method calls for these operations.
-
-The Rust and Python thin client APIs are very similar. Knowledge of
-one is easily transferable to another implementation.
 
 
 ## Pigeonhole Channel API
 
-*not yet written*
+The Pigeonhole channel API implements a channel oriented send and receive
+protocol that mixnet clients can use to compose many different types of
+communications protocols, such as group chat, one on one chat, file
+sharing, streaming media, and more.
+
+The details of the Pigeonhole protocol are described in our paper:
+[Echomix: a Strong Anonymity System with Messaging](https://arxiv.org/abs/2501.02933)
+
+NOTE that just like the core and legacy thin client API, this is a
+request/response protocol and our so called "commands" are embedded
+in our `Request` type which thin clients send to the kpclientd daemon,
+and events our embedded in our `Response` type which the daemon sends
+to thin clients.
+
+Our new Pigeonhole Channel API has the following Thinclient commands:
+
+* `create_write_channel`
+* `create_read_channel`
+* `close_channel`
+* `write_channel`
+* `read_channel`
+* `resume_write_channel`
+* `resume_read_channel`
+* `resume_write_channel_query`
+* `resume_read_channel_query`
+* `send_channel_query`
+
+Only the `send_channel_query` command causes network traffic. The other
+commands are used to prepare our cryptographic state and our query payloads
+which can be sent via the `send_channel_query` command. This is a crash fault
+tolerant API and thus each of the reply event types are used for transmitting
+cryptographic state information so that if there's a crash the application
+can resume where it left off.
+
+The following are the events that are specific to the pigeonhole channel API:
+
+* `create_write_channel_reply`
+* `create_read_channel_reply`
+* `close_channel_reply`
+* `write_channel_reply`
+* `read_channel_reply`
+* `resume_write_channel_reply`
+* `resume_read_channel_reply`
+* `resume_write_channel_query_reply`
+* `resume_read_channel_query_reply`
+* `channel_query_sent_event`
+* `channel_query_reply_event`
+
+Please refer to our API documentation for more information about the above commands and events.
+
+**WARNING: The Pigeonhole Channel API has not yet been implemented in the Rust and Python thin clients.**
+
+{{< tabpane text=true >}}
+{{% tab header="**Go**" %}}
+**Source code:** https://github.com/katzenpost/katzenpost/tree/main/client2
+
+**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.55/client2/thin
+
+{{% /tab %}}
+
+{{% tab header="**Rust**" %}}
+**Source code:** https://github.com/katzenpost/thin_client/blob/main/src/lib.rs
+
+**API docs:** https://docs.rs/katzenpost_thin_client/0.0.4/katzenpost_thin_client/
+
+**Example:** https://github.com/katzenpost/thin_client/blob/main/examples/echo_ping.rs
+
+The Rust thin client provides async/await support for modern Rust applications.
+{{% /tab %}}
+
+{{% tab header="**Python**" %}}
+**Source code:** https://github.com/katzenpost/thin_client/blob/main/thinclient/__init__.py
+
+**API docs:** https://katzenpost.network/docs/python_thin_client.html
+
+**Examples:**
+- https://github.com/katzenpost/thin_client/blob/main/examples/echo_ping.rs
+- https://github.com/katzenpost/status
+- https://github.com/katzenpost/worldmap
+
+The Python thin client is ideal for rapid prototyping and integration with existing Python applications.
+{{% /tab %}}
+{{< /tabpane >}}
+
+
+
+### Alice sends Bob a message
+
+This demonstrates Alice sending a message to Bob using the Pigeonhole Channel API:
+1. Alice creates a write channel
+2. Alice prepares her message for transmission
+3. Alice gets courier destination and sends the message
+4. Alice sends the query and waits for confirmation the message was stored
+5. Bob creates a read channel using Alice's read capability
+6. Bob creates a read query
+7. Bob sends the read queries until a reply is received
+8. Bob verifies he received Alice's original message
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, err := aliceThinClient.CreateWriteChannel(ctx)
+
+// 2. Alice prepares her message for transmission
+aliceMessage := []byte("Hello Bob!")
+writeReply, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage)
+
+// 3. Alice gets courier destination and sends the message
+destNode, destQueue, err := aliceThinClient.GetCourierDestination()
+aliceMessageID := aliceThinClient.NewMessageID()
+
+// 4. Alice sends the query and waits for confirmation the message was stored
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID,
+    writeReply.SendMessagePayload, destNode, destQueue, aliceMessageID)
+
+// 5. Bob creates a read channel using Alice's read capability
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+
+// 6. Bob creates a read query
+readReply1, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+
+// 7. Bob sends the read queries until a reply is received
+bobMessageID1 := bobThinClient.NewMessageID()
+var bobReceivedMessage []byte
+for i := 0; i < 10; i++ {
+	bobReceivedMessage, err = bobThinClient.SendChannelQueryAwaitReply(
+        ctx,
+        bobChannelID,
+        readReply1.SendMessagePayload,
+        destNode,
+        destQueue,
+        bobMessageID1)
+	assert.NoError(t, err)
+	if len(bobReceivedMessage) > 0 {
+		break
+	}
+}
+
+// 8. Bob verifies he received Alice's original message
+if bytes.Equal(aliceMessage, bobReceivedMessage) {
+    log.Println("Bob successfully received Alice's message!")
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
