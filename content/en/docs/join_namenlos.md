@@ -1,6 +1,6 @@
 ---
-title: "How to Use the Namenlos Mixnet"
-linkTitle: ""
+title: ""
+linkTitle: "How to Use the Namenlos Mixnet"
 description: ""
 categories: [""]
 tags: [""]
@@ -9,6 +9,8 @@ version: 0
 draft: false
 slug: "/howto_use_namenlos_mixnet/"
 ---
+
+<h1>How to Use the Namenlos Mixnet</h1>
 
 <i>namenlos</i> is a Katzenpost mixnet ran by the KP team.
 It is our canonical example of a Katzenpost-type mixnet instance.

@@ -1,7 +1,10 @@
 ---
-title: Administration guide
+title:
+linktitle: "Administration guide"
 weight: 6
 ---
+
+# Administration guide
 
 {{% pageinfo %}}
 Use the documentation in this section to explore how the mixnet works and to implement your own.
