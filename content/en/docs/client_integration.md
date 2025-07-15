@@ -42,7 +42,7 @@ the reference implementation is written in golang:
 {{% tab header="**Go**" %}}
 **Source code:** https://github.com/katzenpost/katzenpost/tree/main/client2
 
-**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.55/client2/thin
+**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost/client2/thin
 
 The Go thin client provides a comprehensive API for interacting with the Katzenpost mixnet.
 {{% /tab %}}
@@ -352,10 +352,9 @@ thin_client.send_message(payload, dest_node, dest_queue)
 
 ## Pigeonhole Channel API
 
-The Pigeonhole channel API implements a channel oriented send and receive
-protocol that mixnet clients can use to compose many different types of
-communications protocols, such as group chat, one on one chat, file
-sharing, streaming media, and more.
+The Pigeonhole channel API implements a low level channel oriented API
+which provides reliable, ordered, persistent, replicated communication
+in addition to being resistant to active and passive attacks.
 
 The details of the Pigeonhole protocol are described in our paper:
 [Echomix: a Strong Anonymity System with Messaging](https://arxiv.org/abs/2501.02933)
@@ -408,7 +407,7 @@ Please refer to our API documentation for more information about the above comma
 {{% tab header="**Go**" %}}
 **Source code:** https://github.com/katzenpost/katzenpost/tree/main/client2
 
-**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.55/client2/thin
+**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost/client2/thin
 
 {{% /tab %}}
 
@@ -605,8 +604,6 @@ for i := 0; i < 10; i++ {
 {{< /tabpane >}}
 
 
-
-
 ### Channel Resumptions
 
 This is a crash fault tolerant API and thus each of the reply event types are used for transmitting cryptographic state information so that if there's a crash the application can resume where it left off. BEWARE that channel IDs are ephemeral and are not to be
@@ -616,12 +613,12 @@ There are exactly 6 types of channel resumptions:
 
 | Type | Channel | State | Description |
 |------|---------|-------|-------------|
-| 1 | Write | Never written to | Resume a write channel that was never written to |
-| 2 | Read | Never read from | Resume a read channel that was never read from |
-| 3 | Write | Query sent | Resume a write channel that was used to create a write query which was sent |
-| 4 | Read | Query sent | Resume a read channel that was used to create a read query which was sent |
-| 5 | Write | Query not sent | Resume a write channel that was used to create a write query which was not sent |
-| 6 | Read | Query not sent | Resume a read channel that was used to create a read query which was not sent |
+| 1 | Write | Never written to | [Resume a write channel that was never written to](#trivial-write-channel-resumption-work-flow) |
+| 2 | Read | Never read from | [Resume a read channel that was never read from](#trivial-read-channel-resumption-work-flow) |
+| 3 | Write | Query sent | [Resume a write channel that was used to create a write query which was sent](#write-channel-resumption-after-sending-a-query) |
+| 4 | Read | Query sent | [Resume a read channel that was used to create a read query which was sent](#read-channel-resumption-after-sending-a-query) |
+| 5 | Write | Query not sent | [Resume a write channel that was used to create a write query which was not sent](#write-channel-resumption-after-preparing-an-unsent-write-query) |
+| 6 | Read | Query not sent | [Resume a read channel that was used to create a read query which was not sent](#read-channel-resumption-after-preparing-an-unsent-read-query) |
 
 #### Trivial Write Channel Resumption Work Flow
 
