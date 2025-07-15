@@ -73,13 +73,30 @@ The Python thin client is ideal for rapid prototyping and integration with exist
 
 ### Table Of Contents
 
-*The three main sections of this guide:*
+*Complete guide sections:*
 
 | Section | Description |
 |---------|-------------|
-| [Core functionality API](#core-functionality) | Basic client operations: connection management, PKI documents, mixnet service discovery, events/replies |
-| [Legacy API](#legacy-api) | Message oriented communication with mixnet services, with optional ARQ error correction scheme |
-| [**Pigeonhole Channel API**](#pigeonhole-channel-api) | Reliable, ordered, persistent, replicated communication channels |
+| **🔹 [Overview](#overview)** | **Introduction to Katzenpost client integration and thin client libraries** |
+| **🔸 [Core functionality API](#core-functionality)** | **Basic client operations: connection management, PKI documents, mixnet service discovery, events/replies** |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Connecting and Disconnecting](#connecting-and-disconnecting) | How to establish and terminate connections to the kpclientd daemon |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Get a view of the network via the PKI Document](#get-a-view-of-the-network-via-the-pki-document) | Obtaining network topology and service information |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Get a random instance of a specific service](#get-a-random-instance-of-a-specific-service) | Finding and selecting mixnet services |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Receiving Thin Client Events and Service Reply Messages](#receiving-thin-client-events-and-service-reply-messages) | Event handling patterns and message processing |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Thin client events](#thin-client-events) | Core events: shutdown, connection status, and PKI document updates |
+| **🔸 [Legacy API](#legacy-api)** | **Message oriented communication with mixnet services, with optional ARQ error correction scheme** |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Legacy Events](#legacy-events) | Events specific to the legacy message API |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Sending a message](#sending-a-message) | How to send messages using the legacy API |
+| **🔸 [Pigeonhole Channel API](#pigeonhole-channel-api)** | **Reliable, ordered, persistent, replicated communication channels** |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Trivial Example: Alice sends Bob a message](#trivial-example-alice-sends-bob-a-message) | Basic channel communication workflow |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Reading From Both Storage Replicas](#reading-from-both-storage-replicas) | Accessing redundant message storage |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Channel Resumptions](#channel-resumptions) | Crash fault tolerance and state recovery |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• [Trivial Write Channel Resumption Work Flow](#trivial-write-channel-resumption-work-flow) | Resuming unused write channels |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• [Trivial Read Channel Resumption Work Flow](#trivial-read-channel-resumption-work-flow) | Resuming unused read channels |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• [Write Channel Resumption After Sending A Query](#write-channel-resumption-after-sending-a-query) | Resuming write channels after network operations |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• [Read Channel Resumption After Sending A Query](#read-channel-resumption-after-sending-a-query) | Resuming read channels after network operations |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• [Write Channel Resumption After Preparing an Unsent Write Query](#write-channel-resumption-after-preparing-an-unsent-write-query) | Resuming channels with prepared but unsent queries |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• [Read Channel Resumption After Preparing an Unsent Read Query](#read-channel-resumption-after-preparing-an-unsent-read-query) | Resuming read channels with prepared but unsent queries |
 
 
 ## Core functionality
