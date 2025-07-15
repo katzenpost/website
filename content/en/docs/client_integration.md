@@ -1,6 +1,6 @@
 ---
-title: "Katzenpost Client Integration Guide"
-linkTitle: ""
+title:
+linkTitle: Katzenpost Client Integration Guide
 description: ""
 categories: [""]
 tags: [""]

@@ -1,9 +1,12 @@
 ---
-title: Specifications
+title: 
+linkTitle: "Specifications"
 weight: 6
 draft: false
 type: page
 ---
+
+# Specifications
 
 {{% pageinfo %}}
 These technical specifications describe the specifics of Katzenpost protocols and implementations, and are aimed primarily at software developers.
