@@ -438,7 +438,7 @@ The Python thin client is ideal for rapid prototyping and integration with exist
 
 
 
-### Alice sends Bob a message
+### Trivial Example: Alice sends Bob a message
 
 This demonstrates Alice sending a message to Bob using the Pigeonhole Channel API:
 1. Alice creates a write channel
@@ -493,6 +493,552 @@ for i := 0; i < 10; i++ {
 // 8. Bob verifies he received Alice's original message
 if bytes.Equal(aliceMessage, bobReceivedMessage) {
     log.Println("Bob successfully received Alice's message!")
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+### Reading From Both Storage Replicas
+
+Pigeonhole protocols uses a hash based sharding scheme to scatter messages
+around the mixnet. This means that each message is stored in two
+different storage replicas. The read query will only return a message if
+it is found in the first storage replica that is queried. If the message
+is not found in the first storage replica, the read query will return an
+empty message.
+
+It is up to the application to decide whether to retry the read query
+with the second storage replica. Reading the second storage replica's
+copy of our message requires using the last two arguments of the `ReadChannel` method,
+like so:
+
+1. Alice creates a write channel
+2. Alice prepares a write query
+3. Alice sends the write query
+4. Bob creates a read channel with the readcap from Alice
+5. Bob prepares his first read query
+6. Bob sends his first read query and waits for reply
+7. Bob prepares his second read query, specifying the next message index and reply index
+8. Bob sends his second read query and waits for reply
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, nextMessageIndex, err := aliceThinClient.CreateWriteChannel(ctx)
+
+// 2. Alice prepares a write queryaliceMessage := []byte("Message from Alice")
+writeReply, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage)
+if err != nil {
+    log.Fatal("Failed to write message:", err)
+}
+
+// 3. Alice sends the write query
+destNode, destQueue, err := aliceThinClient.GetCourierDestination()
+if err != nil {
+    log.Fatal("Failed to get courier destination:", err)
+}
+messageID := aliceThinClient.NewMessageID()
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID,
+    writeReply.SendMessagePayload, destNode, destQueue, messageID)
+if err != nil {
+    log.Fatal("Failed to send message:", err)
+}
+
+// 4. Bob creates a read channel with the readcap from Alice
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+if err != nil {
+    log.Fatal("Failed to create read channel:", err)
+}
+
+// 5. Bob prepares his first read query
+readReply1, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to prepare read:", err)
+}
+
+// 6. Bob sends his first read query and waits for reply
+bobMessageID := bobThinClient.NewMessageID()
+var bobReceivedMessage []byte
+for i := 0; i < 10; i++ {
+	bobReceivedMessage, err = bobThinClient.SendChannelQueryAwaitReply(
+        ctx,
+        bobChannelID,
+        readReply1.SendMessagePayload,
+        destNode,
+        destQueue,
+        bobMessageID)
+	assert.NoError(t, err)
+	if len(bobReceivedMessage) > 0 {
+		break
+	}
+}
+
+// 7. Bob prepares his second read query, specifying the next message index and reply index
+readReply2, err = bobThinClient.ReadChannel(ctx, bobChannelID, nextMessageIndex, readReply.ReplyIndex)
+if err != nil {
+    log.Fatal("Failed to prepare read:", err)
+}
+
+// 8. Bob sends his second read query and waits for reply
+for i := 0; i < 10; i++ {
+	bobReceivedMessage, err = bobThinClient.SendChannelQueryAwaitReply(
+        ctx,
+        bobChannelID,
+        readReply2.SendMessagePayload,
+        destNode,
+        destQueue,
+        bobMessageID)
+	assert.NoError(t, err)
+	if len(bobReceivedMessage) > 0 {
+		break
+	}
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+
+
+### Channel Resumptions
+
+This is a crash fault tolerant API and thus each of the reply event types are used for transmitting cryptographic state information so that if there's a crash the application can resume where it left off. BEWARE that channel IDs are ephemeral and are not to be
+persisted.
+
+There are exactly 6 types of channel resumptions:
+
+| Type | Channel | State | Description |
+|------|---------|-------|-------------|
+| 1 | Write | Never written to | Resume a write channel that was never written to |
+| 2 | Read | Never read from | Resume a read channel that was never read from |
+| 3 | Write | Query sent | Resume a write channel that was used to create a write query which was sent |
+| 4 | Read | Query sent | Resume a read channel that was used to create a read query which was sent |
+| 5 | Write | Query not sent | Resume a write channel that was used to create a write query which was not sent |
+| 6 | Read | Query not sent | Resume a read channel that was used to create a read query which was not sent |
+
+#### Trivial Write Channel Resumption Work Flow
+
+1. Alice creates a write channel
+2. Alice closes the write channel
+3. Alice resumes the write channel
+
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, err := aliceThinClient.CreateWriteChannel(ctx)
+
+// 2. Alice closes the write channel
+aliceThinClient.CloseChannel(ctx, aliceChannelID)
+
+// 3. Alice resumes the write channel
+aliceThinClient.ResumeWriteChannel(ctx, writeCap, nil)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+#### Trivial Read Channel Resumption Work Flow
+
+1. Alice creates a write channel
+2. Bob creates a read channel using Alice's read capability
+3. Bob closes the read channel
+4. Bob resumes the read channel
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, err := aliceThinClient.CreateWriteChannel(ctx)
+
+// 2. Bob creates a read channel using Alice's read capability
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+
+// 3. Bob closes the read channel
+bobThinClient.CloseChannel(ctx, bobChannelID)
+
+// 4. Bob resumes the read channel
+bobThinClient.ResumeReadChannel(ctx, readCap, nil, nil)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+#### Write Channel Resumption After Sending A Query
+
+1. Alice creates a write channel
+2. Alice prepares her write query
+3. Alice sends the write query
+4. Alice closes the write channel
+5. Alice resumes the write channel
+6. Alice sends a second write query
+7. Bob creates a read channel
+8. Bob reads the first message from the channel
+9. Bob reads the second message from the channel
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, nextMessageIndex, err := aliceThinClient.CreateWriteChannel(ctx)
+if err != nil {
+    log.Fatal("Failed to create write channel:", err)
+}
+
+// 2. Alice prepares her write query
+aliceMessage1 := []byte("First message from Alice")
+writeReply1, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage1)
+if err != nil {
+    log.Fatal("Failed to prepare first write:", err)
+}
+
+// 3. Alice sends the write query
+destNode, destQueue, err := aliceThinClient.GetCourierDestination()
+if err != nil {
+    log.Fatal("Failed to get courier destination:", err)
+}
+
+messageID1 := aliceThinClient.NewMessageID()
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID,
+    writeReply1.SendMessagePayload, destNode, destQueue, messageID1)
+if err != nil {
+    log.Fatal("Failed to send first message:", err)
+}
+
+// 4. Alice closes the write channel
+err = aliceThinClient.CloseChannel(ctx, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+// 5. Alice resumes the write channel
+resumedChannelID, err := aliceThinClient.ResumeWriteChannel(ctx, writeCap, writeReply1.NextMessageIndex)
+if err != nil {
+    log.Fatal("Failed to resume write channel:", err)
+}
+
+// 6. Alice sends a second write query
+aliceMessage2 := []byte("Second message from Alice")
+writeReply2, err := aliceThinClient.WriteChannel(ctx, resumedChannelID, aliceMessage2)
+if err != nil {
+    log.Fatal("Failed to prepare second write:", err)
+}
+
+messageID2 := aliceThinClient.NewMessageID()
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, resumedChannelID,
+    writeReply2.SendMessagePayload, destNode, destQueue, messageID2)
+if err != nil {
+    log.Fatal("Failed to send second message:", err)
+}
+
+// 7. Bob creates a read channel
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+if err != nil {
+    log.Fatal("Failed to create read channel:", err)
+}
+
+// 8. Bob reads the first message from the channel
+readReply1, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to read first message:", err)
+}
+
+// Send the read query to retrieve the first message
+bobMessageID1 := bobThinClient.NewMessageID()
+firstMessagePayload, err := bobThinClient.SendChannelQueryAwaitReply(ctx, bobChannelID,
+    readReply1.SendMessagePayload, destNode, destQueue, bobMessageID1)
+if err != nil {
+    log.Fatal("Failed to retrieve first message:", err)
+}
+
+// 9. Bob reads the second message from the channel
+readReply2, err := bobThinClient.ReadChannel(ctx, bobChannelID, readReply1.NextMessageIndex, nil)
+if err != nil {
+    log.Fatal("Failed to read second message:", err)
+}
+
+bobMessageID2 := bobThinClient.NewMessageID()
+secondMessagePayload, err := bobThinClient.SendChannelQueryAwaitReply(ctx, bobChannelID,
+    readReply2.SendMessagePayload, destNode, destQueue, bobMessageID2)
+if err != nil {
+    log.Fatal("Failed to retrieve second message:", err)
+}
+
+// Verify messages were received correctly
+if bytes.Equal(aliceMessage1, firstMessagePayload) {
+    log.Println("Bob successfully received Alice's first message!")
+}
+if bytes.Equal(aliceMessage2, secondMessagePayload) {
+    log.Println("Bob successfully received Alice's second message!")
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### Read Channel Resumption After Sending A Query
+
+1. Alice creates a write channel
+2. Alice writes the first message to the channel
+3. Alice writes the second message to the channel
+3. Bob creates a read channel with the readcap from Alice
+4. Bob reads the first message from the channel
+5. Bob closes the read channel
+6. Bob resumes the read channel
+7. Bob reads the second message from the channel
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, nextMessageIndex, err := aliceThinClient.CreateWriteChannel(ctx)
+if err != nil {
+    log.Fatal("Failed to create write channel:", err)
+}
+
+// 2. Alice writes the first message to the channel
+aliceMessage1 := []byte("First message from Alice")
+writeReply1, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage1)
+if err != nil {
+    log.Fatal("Failed to write first message:", err)
+}
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID, writeReply1.SendMessagePayload, destNode, destQueue, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to send first message:", err)
+}
+
+// 3. Alice writes the second message to the channel
+aliceMessage2 := []byte("Second message from Alice")
+writeReply2, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage2)
+if err != nil {
+    log.Fatal("Failed to write second message:", err)
+}
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID, writeReply2.SendMessagePayload, destNode, destQueue, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to send first message:", err)
+}
+
+// 4. Bob creates a read channel with the readcap from Alice
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+if err != nil {
+    log.Fatal("Failed to create read channel:", err)
+}
+
+// 5. Bob reads the first message from the channel
+readReply1, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to read first message:", err)
+}
+_, err = bobThinClient.SendChannelQueryAwaitReply(ctx, bobChannelID, readReply1.SendMessagePayload, destNode, destQueue, bobChannelID)
+if err != nil {
+    log.Fatal("Failed to send first message:", err)
+}
+
+// 6. Bob closes the read channel
+err = bobThinClient.CloseChannel(ctx, bobChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+// 7. Bob resumes the read channel
+resumedBobChannelID, err := bobThinClient.ResumeReadChannel(ctx, readCap, readReply1.NextMessageIndex, readReply1.ReplyIndex)
+if err != nil {
+    log.Fatal("Failed to resume read channel:", err)
+}
+
+// 8. Bob reads the second message from the channel
+readReply2, err := bobThinClient.ReadChannel(ctx, resumedBobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to read second message:", err)
+}
+_, err = bobThinClient.SendChannelQueryAwaitReply(ctx, resumedBobChannelID, readReply2.SendMessagePayload, destNode, destQueue, bobChannelID)
+if err != nil {
+    log.Fatal("Failed to send second message:", err)
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+#### Write Channel Resumption After Preparing an Unsent Write Query
+
+1. Alice creates a write channel
+2. Alice prepares her write query
+3. Alice closes the write channel
+4. Alice resumes the write channel
+5. Alice sends the write query
+6. Bob creates a read channel
+7. Bob reads the message from the channel
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, nextMessageIndex, err :=
+    aliceThinClient.CreateWriteChannel(ctx)
+if err != nil {
+    log.Fatal("Failed to create write channel:", err)
+}
+
+// 2. Alice prepares her write query
+aliceMessage := []byte("Message from Alice")
+writeReply, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage)
+if err != nil {
+    log.Fatal("Failed to prepare write:", err)
+}
+
+// 3. Alice closes the write channel
+err = aliceThinClient.CloseChannel(ctx, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+// 4. Alice resumes the write channel
+resumedChannelID, err := aliceThinClient.ResumeWriteChannel(ctx, writeCap, writeReply.NextMessageIndex)
+if err != nil {
+    log.Fatal("Failed to resume write channel:", err)
+}
+
+// 5. Alice sends the write query
+destNode, destQueue, err := aliceThinClient.GetCourierDestination()
+if err != nil {
+    log.Fatal("Failed to get courier destination:", err)
+}
+messageID := aliceThinClient.NewMessageID()
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, resumedChannelID,
+    writeReply.SendMessagePayload, destNode, destQueue, messageID)
+if err != nil {
+    log.Fatal("Failed to send message:", err)
+}
+
+// 6. Bob creates a read channel
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+if err != nil {
+    log.Fatal("Failed to create read channel:", err)
+}
+
+// 7. Bob reads the message from the channel
+readReply, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to read message:", err)
+}
+
+bobMessageID := bobThinClient.NewMessageID()
+readPayload, err := bobThinClient.SendChannelQueryAwaitReply(ctx, bobChannelID,
+    readReply.SendMessagePayload, destNode, destQueue, bobMessageID)
+if err != nil {
+    log.Fatal("Failed to retrieve message:", err)
+}
+
+// Verify the message content matches
+if bytes.Equal(aliceMessage, readPayload) {
+    log.Println("Bob: Successfully received and verified message")
+}
+
+// Clean up channels
+err = aliceThinClient.CloseChannel(ctx, resumedChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+err = bobThinClient.CloseChannel(ctx, bobChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### Read Channel Resumption After Preparing an Unsent Read Query
+
+1. Alice creates a write channel
+2. Alice writes the first message to the channel
+3. Bob creates a read channel with the readcap from Alice
+4. Bob prepares his read query
+5. Bob closes the read channel
+6. Bob resumes the read channel
+7. Bob sends the read query and await reply
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, nextMessageIndex, err := aliceThinClient.CreateWriteChannel(ctx)
+if err != nil {
+    log.Fatal("Failed to create write channel:", err)
+}
+
+// 2. Alice writes the first message to the channel
+aliceMessage := []byte("Message from Alice")
+writeReply, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage)
+if err != nil {
+    log.Fatal("Failed to write message:", err)
+}
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID, writeReply.SendMessagePayload, destNode, destQueue, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to send message:", err)
+}
+
+// 3. Bob creates a read channel with the readcap from Alice
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+if err != nil {
+    log.Fatal("Failed to create read channel:", err)
+}
+
+// 4. Bob prepares his read query
+readReply, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to prepare read:", err)
+}
+
+// 5. Bob closes the read channel
+err = bobThinClient.CloseChannel(ctx, bobChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+// 6. Bob resumes the read channel
+resumedBobChannelID, err := bobThinClient.ResumeReadChannel(ctx, readCap, readReply.NextMessageIndex, readReply.ReplyIndex)
+if err != nil {
+    log.Fatal("Failed to resume read channel:", err)
+}
+
+// 7. Bob sends the read query and await reply
+readPayload, err := bobThinClient.SendChannelQueryAwaitReply(ctx, resumedBobChannelID, readReply.SendMessagePayload, destNode, destQueue, bobMessageID)
+if err != nil {
+    log.Fatal("Failed to retrieve message:", err)
+}
+
+// Verify the message content matches
+if bytes.Equal(aliceMessage, readPayload) {
+    log.Println("Bob: Successfully received and verified message")
+}
+
+// Clean up channels
+err = aliceThinClient.CloseChannel(ctx, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+err = bobThinClient.CloseChannel(ctx, resumedBobChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
 }
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
