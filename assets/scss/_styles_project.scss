@@ -426,3 +426,23 @@ pre {
         color: #ffffff !important;
     }
 }
+
+/* Pageinfo styling - much darker background for better text readability */
+.pageinfo {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    border: 1px solid #444444 !important;
+    border-radius: 4px !important;
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.pageinfo-primary {
+    background-color: #1a1a1a !important;
+    border-color: #004b6b !important;
+}
+
+.pageinfo p {
+    color: #ffffff !important;
+    margin-bottom: 0 !important;
+}
