@@ -42,7 +42,7 @@ the reference implementation is written in golang:
 {{% tab header="**Go**" %}}
 **Source code:** https://github.com/katzenpost/katzenpost/tree/main/client2
 
-**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.55/client2/thin
+**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost/client2/thin
 
 The Go thin client provides a comprehensive API for interacting with the Katzenpost mixnet.
 {{% /tab %}}
@@ -407,7 +407,7 @@ Please refer to our API documentation for more information about the above comma
 {{% tab header="**Go**" %}}
 **Source code:** https://github.com/katzenpost/katzenpost/tree/main/client2
 
-**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.55/client2/thin
+**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost/client2/thin
 
 {{% /tab %}}
 
