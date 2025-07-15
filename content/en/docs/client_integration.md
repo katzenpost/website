@@ -14,7 +14,7 @@ slug: "/client_integration/"
 ## Overview
 
 This guide is intended to help developers connect their applications
-and projects to a Katzenpost mixnet.
+and projects to a Katzenpost mixnet client.
 
 The Katzenpost client daemon - <b>kpclientd</b> - connects to the
 Katzenpost mixnet. It has <i>thin client</i> libraries in Go, Python
@@ -31,17 +31,18 @@ that it's the outgoing connection from the client that has the
 mixnet's privacy properties.
 
 Our thin client protocol is described here:
-https://katzenpost.network/docs/specs/connector.html
+https://katzenpost.network/docs/specs/thin_client.html
 
 It can be extended to be used by any language that has a CBOR
 serialization library and can talk over TCP or UNIX domain
-socket. Currently there are three thin client libraries:
+socket. Currently there are three thin client libraries and
+the reference implementation is written in golang:
 
 {{< tabpane text=true >}}
 {{% tab header="**Go**" %}}
 **Source code:** https://github.com/katzenpost/katzenpost/tree/main/client2
 
-**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.46/client2/thin
+**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.55/client2/thin
 
 The Go thin client provides a comprehensive API for interacting with the Katzenpost mixnet.
 {{% /tab %}}
@@ -70,52 +71,82 @@ The Python thin client is ideal for rapid prototyping and integration with exist
 {{% /tab %}}
 {{< /tabpane >}}
 
+### Table Of Contents
 
-**NOTE**: *It might be helpful to new users to use a mixnet that already exists instead of trying to create your own. Please see:*
-[How to Use Namenlos Mixnet](/docs/howto_use_namenlos_mixnet/).
+*The three main sections of this guide:*
 
-
-## Thin client configuration
-
-The thin client configuration has at most two sections:
-
-1. Callbacks for handling received events.
-2. Sphinx Geometry for determining the maximum size of usable payload
-   in a Sphinx packet.
-
-NOTE: currently only the golang thin client has the Sphinx geometry in
-it's configuration. The other implementations are configured with only
-callbacks.
-
-The only use the thin client or application would have for the Sphinx
-geometry is to learn the application's maximum payload capacity which
-is not the same as the Sphinx packet payload size because of the SURB
-which is stored in the payload so that a reply can be received.
+| Section | Description |
+|---------|-------------|
+| [Core functionality API](#core-functionality) | Basic client operations: connection management, PKI documents, mixnet service discovery, events/replies |
+| [Legacy API](#legacy-api) | Message oriented communication with mixnet services, with optional ARQ error correction scheme |
+| [**Pigeonhole Channel API**](#pigeonhole-channel-api) | Reliable, ordered, persistent, replicated communication channels |
 
 
+## Core functionality
 
-## Getting the PKI document from your app
+### Connecting and Disconnecting
 
-You'll need a view of the mix network in order to send packets. The
-PKI (public key infrastructure) document is published by the mix
-network's set of directory authorities, and you fetch it from one of
-the gateways. This is not unlike <i>Tor</i> and <i>mixminion</i>. The
-PKI document updates every epoch, which currenttly is 20 minutes.
-
-The setup process as in the example above will fetch your first
-network config and PKI document so you can start interacting with the
-network, but you need your client to update the doc as needed.
-
-You can obtain a PKI document using the thin client API:
+The thin client connects and disconnects from the kpclientd daemon
+like so:
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-import (
-    cpki "github.com/katzenpost/katzenpost/core/pki"
-)
+// Load thin client configuration
+cfg, err := thin.LoadFile("thinclient.toml")
+if err != nil {
+    log.Fatal(err)
+}
 
-// PKIDocument returns the current PKI document
-func (t *ThinClient) PKIDocument() *cpki.Document {}
+logging := &config.Logging{Level: "INFO"}
+// create thin client
+client := thin.NewThinClient(cfg, logging)
+
+// Connect to kpclientd daemon
+err = client.Dial()
+if err != nil {
+    log.Fatal(err)
+}
+
+// ... do stuff ...
+
+// Disconnect from kpclientd daemon
+client.Close()
+{{< /tab >}}
+
+{{< tab header="Rust" lang="rust" >}}
+// connect to kpclientd daemon
+let client = ThinClient::new(cfg).await?;
+
+// ... do stuff ...
+
+// disconnect from kpclientd daemon
+client.stop().await?;
+
+{{< /tab >}}
+
+{{< tab header="Python" lang="python" >}}
+thin_client = ThinClient(config)
+
+# connect to kpclientd daemon
+await thin_client.start()
+
+# ... do stuff ...
+
+# disconnect from kpclientd daemon
+thin_client.stop()
+{{< /tab >}}
+{{< /tabpane >}}
+
+### Get a view of the network via the PKI Document
+
+`kpclient` needs the PKI document for internal use for Sphinx packet routing.
+However applications will also need the PKI document to learn about the
+mixnet services that are available and to choose which ones to use.
+
+You can obtain a PKI document using the thin client API, like so:
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
 
 // Usage example:
 doc := thin.PKIDocument()
@@ -135,6 +166,8 @@ doc = thin_client.pki_document()
 {{< /tab >}}
 {{< /tabpane >}}
 
+### Get a random instance of a specific service
+
 When creating an app that works over a mixnet, you will need to
 interact with <i>mixnet services</i> that are listed in the PKI
 document. For example, our mixnet ping CLI tool gets a random echo
@@ -143,18 +176,10 @@ that information:
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-thin := thin.NewThinClient(cfg)
-err = thin.Dial()
-if err != nil {
-    panic(err)
-}
-
 desc, err := thin.GetService("echo")
 if err != nil {
     panic(err)
 }
-
-// handle business here
 {{< /tab >}}
 
 {{< tab header="Rust" lang="rust" >}}
@@ -166,124 +191,23 @@ service_descriptor = thin_client.get_service(doc, service_name)
 {{< /tab >}}
 {{< /tabpane >}}
 
-The `GetService` is a convenient helper method which searches the PKI
+The `GetService` or `get_service` is a convenient helper method which searches the PKI
 document for the the service name we give it and then selects a random
 entry from that set. I don't care which XYZ service I talk to just so
-long as I can talk to one of them.
+long as I can talk to one of them. The result is that you procure a
+`service descriptor object` which contains a destination mix descriptor
+and a destination queue ID.
 
-```golang
-// ServiceDescriptor describe a mixnet Gateway-side service.
-type ServiceDescriptor struct {
-	// RecipientQueueID is the service name or queue ID.
-	RecipientQueueID []byte
-	// Gateway name.
-	MixDescriptor *cpki.MixDescriptor
-}
-```
-
-The result is that you procure a destination mix identity hash and a
-destination queue ID so that the mix node routes the message to the
-service.
-
-The hash algorithm used is provided by "github.com/katzenpost/hpqc"
-("golang.org/x/crypto/blake2b.Sum256")
-
-```golang
-func Sum256(data []byte) [blake2b.Size256]byte {}
-```
-
-For example:
-
-```golang
-    import (
-        "github.com/katzenpost/hpqc/hash"
-        "github.com/katzenpost/katzenpost/thin"
-    )
-
-	thin := thin.NewThinClient(cfg)
-	err = thin.Dial()
-	if err != nil {
-		panic(err)
-	}
-
-	desc, err := thin.GetService("echo")
-	if err != nil {
-		panic(err)
-	}
-    serviceIdHash := hash.Sum256(desc.MixDescriptor.IdentityKey)
-    serviceQueueID := desc.RecipientQueueID
-```
-
-As a client you need to be able to gather PKI documents for each epoch
-that your packets will be used in. This is important for our Sphinx
-based routing protocol because the mix keys used for the mix node's
-Sphinx packet decryption are used only for one Epoch and then they
-expire. Our PKI document publishes several Epochs worth of future mix
-keys so that the upcoming Epoch boundary will not cause any
-transmission failures.
-
-## Sending a message
-
-Each send operation that a thin client can do requires you to specify
-the payload to be sent and the destination mix node identity hash and
-the destination recipient queue identity.
-
-The API by design lets you specify either a SURB ID or a message ID
-for the sent message depending on if it's using an ARQ to send
-reliably or not. This implies that the application using the thin
-client must do it's own book keeping to keep track of which replies
-and their associated identities.
-
-The simplest way to send a message is using the `SendMessageWithoutReply` method:
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-// SendMessageWithoutReply sends a message encapsulated in a Sphinx packet, without any SURB.
-// No reply will be possible.
-func (t *ThinClient) SendMessageWithoutReply(payload []byte, destNode *[32]byte, destQueue []byte) error
-
-// Example usage:
-err := thin.SendMessageWithoutReply(payload, &serviceIdHash, serviceQueueID)
-if err != nil {
-    panic(err)
-}
-{{< /tab >}}
-
-{{< tab header="Rust" lang="rust" >}}
-// Send a message without expecting a reply
-thin_client.send_message_without_reply(payload, dest_node, dest_queue).await?;
-{{< /tab >}}
-
-{{< tab header="Python" lang="python" >}}
-# Send a message without expecting a reply
-thin_client.send_message_without_reply(payload, dest_node, dest_queue)
-{{< /tab >}}
-{{< /tabpane >}}
-
-This method sends a Sphinx packet encapsulating the given payload to
-the given destination. No SURB is sent, so no reply can ever be
-received. This is a one-way message.
-
-The rest of the message sending methods of the thin client are
-variations of this basic send but with some more complexity added. For
-example, you can choose to send a message with or without the help of
-an ARQ error correction scheme where retransmissions are automatically
-sent when the other party doesn't receive your message. Or keep it
-minimal and send a message with a SURB in the payload so that the
-service can send you a reply. Also as a convenience, our Go API has
-blocking and non-blocking method calls for these operations.
-
-The Rust and Python thin client APIs are very similar. Knowledge of
-one is easily transferable to another implementation.
-
-
-
-## Receiving events and messages
+## Receiving Thin Client Events and Service Reply Messages
 
 It's worth noting that our Go thin client implementation gives you
 an events channel for receiving events from the client daemon, whereas
 the Python and Rust thin clients allow you to specify callbacks for
-each event type. Both approaches are equivalent to each other.
+each event type. Both approaches are equivalent to each other. HOWEVER,
+the events channel approach is more flexible and allows you to
+easily write higher level abstractions that do automatic retries.
+So we might consider updating our Rust and Python thin clients to use
+the events channel approach.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -354,43 +278,771 @@ thin_client.start()
 ### Thin client events
 
 Here I'll tell you a bit about each of the events that thin clients
+receive. Firstly, these are the core events that all thin clients
 receive:
 
-* ShutdownEvent: This event tells your application that the Katzenpost
+* `shutdown_event`: This event tells your application that the Katzenpost
   client daemon is shutting down.
 
-* ConnectionStatusEvent: This event notifies your app of a network
+* `connection_status_event`: This event notifies your app of a network
   connectvity status change, which is either connected or not
   connected.
 
-* NewPKIDocumentEvent: This event tells encapsulates the new PKI
+* `new_pki_document_event`: This event tells encapsulates the new PKI
   document, a view of the network, including a list of network
   services.
 
-* MessageSentEvent: This event tells your app that it's message was
+
+# Legacy API
+
+The legacy API implements a message oriented send and receive protocol
+that mixnet clients can use to interact with specific mixnet services
+that they choose to interact with. This inevitably creates a non-uniform
+packet distribution on the service nodes which a clever adversary could
+use to try and deanonymize clients. Therefore for that and many other reasons
+we are encouraging the use of the pigeonhole channel API instead.
+
+## Legacy Events
+
+These are the events that are specific to sending and
+receiving messages using the legacy API:
+
+* `message_sent_event`: This event tells your app that it's message was
   successfully sent to a gateway node on the mix network.
 
-* MessageReplyEvent: This event encapsulates a reply from a service on
+* `message_reply_event`: This event encapsulates a reply from a service on
   the mixnet.
 
-* MessageIDGarbageCollected: This event is an ARQ garbage collecton
+* `arq_garbage_collected_event`: This event is an ARQ garbage collecton
   event which is used to notify clients so that they can clean up
   their ARQ specific book keeping, if any.
 
+## Sending a message
+
+Each send operation that a thin client can do requires you to specify
+the payload to be sent and the destination mix node identity hash and
+the destination recipient queue identity.
+
+The API by design lets you specify either a SURB ID or a message ID
+for the sent message depending on if it's using an ARQ to send
+reliably or not. This implies that the application using the thin
+client must do it's own book keeping to keep track of which replies
+and their associated identities.
+
+The simplest way to send a message is using the `SendMessage` method:
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// Send a message
+err := thin.SendMessage(payload, &serviceIdHash, serviceQueueID)
+if err != nil {
+    panic(err)
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+// Send a message
+thin_client.send_message(payload, dest_node, dest_queue).await?;
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+# Send a message
+thin_client.send_message(payload, dest_node, dest_queue)
+{{< /tab >}}
+{{< /tabpane >}}
 
 
-## Conclusion
+## Pigeonhole Channel API
 
-This is a guide to performing very low level and basic interactions
-with mixnet services. Send a message to a mixnet service and receive a
-reply. Very basic but also a powerful building block.
+The Pigeonhole channel API implements a channel oriented send and receive
+protocol that mixnet clients can use to compose many different types of
+communications protocols, such as group chat, one on one chat, file
+sharing, streaming media, and more.
 
-In the future we plan on:
+The details of the Pigeonhole protocol are described in our paper:
+[Echomix: a Strong Anonymity System with Messaging](https://arxiv.org/abs/2501.02933)
 
-* writing various messaging systems and making their client controls
-  exposed to the thin client
+NOTE that just like the core and legacy thin client API, this is a
+request/response protocol and our so called "commands" are embedded
+in our `Request` type which thin clients send to the kpclientd daemon,
+and events our embedded in our `Response` type which the daemon sends
+to thin clients.
 
-* writing higher level protocol additions to this thin client API that
-  would allow clients to send and receive streams of data. Streaming
-  data is useful for a variety of applications where strict datagrams
-  may not be as easily useful.
+Our new Pigeonhole Channel API has the following Thinclient commands:
+
+* `create_write_channel`
+* `create_read_channel`
+* `close_channel`
+* `write_channel`
+* `read_channel`
+* `resume_write_channel`
+* `resume_read_channel`
+* `resume_write_channel_query`
+* `resume_read_channel_query`
+* `send_channel_query`
+
+Only the `send_channel_query` command causes network traffic. The other
+commands are used to prepare our cryptographic state and our query payloads
+which can be sent via the `send_channel_query` command. This is a crash fault
+tolerant API and thus each of the reply event types are used for transmitting
+cryptographic state information so that if there's a crash the application
+can resume where it left off.
+
+The following are the events that are specific to the pigeonhole channel API:
+
+* `create_write_channel_reply`
+* `create_read_channel_reply`
+* `close_channel_reply`
+* `write_channel_reply`
+* `read_channel_reply`
+* `resume_write_channel_reply`
+* `resume_read_channel_reply`
+* `resume_write_channel_query_reply`
+* `resume_read_channel_query_reply`
+* `channel_query_sent_event`
+* `channel_query_reply_event`
+
+Please refer to our API documentation for more information about the above commands and events.
+
+**WARNING: The Pigeonhole Channel API has not yet been implemented in the Rust and Python thin clients.**
+
+{{< tabpane text=true >}}
+{{% tab header="**Go**" %}}
+**Source code:** https://github.com/katzenpost/katzenpost/tree/main/client2
+
+**API docs:** https://pkg.go.dev/github.com/katzenpost/katzenpost@v0.0.55/client2/thin
+
+{{% /tab %}}
+
+{{% tab header="**Rust**" %}}
+**Source code:** https://github.com/katzenpost/thin_client/blob/main/src/lib.rs
+
+**API docs:** https://docs.rs/katzenpost_thin_client/0.0.4/katzenpost_thin_client/
+
+**Example:** https://github.com/katzenpost/thin_client/blob/main/examples/echo_ping.rs
+
+The Rust thin client provides async/await support for modern Rust applications.
+{{% /tab %}}
+
+{{% tab header="**Python**" %}}
+**Source code:** https://github.com/katzenpost/thin_client/blob/main/thinclient/__init__.py
+
+**API docs:** https://katzenpost.network/docs/python_thin_client.html
+
+**Examples:**
+- https://github.com/katzenpost/thin_client/blob/main/examples/echo_ping.rs
+- https://github.com/katzenpost/status
+- https://github.com/katzenpost/worldmap
+
+The Python thin client is ideal for rapid prototyping and integration with existing Python applications.
+{{% /tab %}}
+{{< /tabpane >}}
+
+
+
+### Trivial Example: Alice sends Bob a message
+
+This demonstrates Alice sending a message to Bob using the Pigeonhole Channel API:
+1. Alice creates a write channel
+2. Alice prepares her message for transmission
+3. Alice gets courier destination and sends the message
+4. Alice sends the query and waits for confirmation the message was stored
+5. Bob creates a read channel using Alice's read capability
+6. Bob creates a read query
+7. Bob sends the read queries until a reply is received
+8. Bob verifies he received Alice's original message
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, err := aliceThinClient.CreateWriteChannel(ctx)
+
+// 2. Alice prepares her message for transmission
+aliceMessage := []byte("Hello Bob!")
+writeReply, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage)
+
+// 3. Alice gets courier destination and sends the message
+destNode, destQueue, err := aliceThinClient.GetCourierDestination()
+aliceMessageID := aliceThinClient.NewMessageID()
+
+// 4. Alice sends the query and waits for confirmation the message was stored
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID,
+    writeReply.SendMessagePayload, destNode, destQueue, aliceMessageID)
+
+// 5. Bob creates a read channel using Alice's read capability
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+
+// 6. Bob creates a read query
+readReply1, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+
+// 7. Bob sends the read queries until a reply is received
+bobMessageID1 := bobThinClient.NewMessageID()
+var bobReceivedMessage []byte
+for i := 0; i < 10; i++ {
+	bobReceivedMessage, err = bobThinClient.SendChannelQueryAwaitReply(
+        ctx,
+        bobChannelID,
+        readReply1.SendMessagePayload,
+        destNode,
+        destQueue,
+        bobMessageID1)
+	assert.NoError(t, err)
+	if len(bobReceivedMessage) > 0 {
+		break
+	}
+}
+
+// 8. Bob verifies he received Alice's original message
+if bytes.Equal(aliceMessage, bobReceivedMessage) {
+    log.Println("Bob successfully received Alice's message!")
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+### Reading From Both Storage Replicas
+
+Pigeonhole protocols uses a hash based sharding scheme to scatter messages
+around the mixnet. This means that each message is stored in two
+different storage replicas. The read query will only return a message if
+it is found in the first storage replica that is queried. If the message
+is not found in the first storage replica, the read query will return an
+empty message.
+
+It is up to the application to decide whether to retry the read query
+with the second storage replica. Reading the second storage replica's
+copy of our message requires using the last two arguments of the `ReadChannel` method,
+like so:
+
+1. Alice creates a write channel
+2. Alice prepares a write query
+3. Alice sends the write query
+4. Bob creates a read channel with the readcap from Alice
+5. Bob prepares his first read query
+6. Bob sends his first read query and waits for reply
+7. Bob prepares his second read query, specifying the next message index and reply index
+8. Bob sends his second read query and waits for reply
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, nextMessageIndex, err := aliceThinClient.CreateWriteChannel(ctx)
+
+// 2. Alice prepares a write queryaliceMessage := []byte("Message from Alice")
+writeReply, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage)
+if err != nil {
+    log.Fatal("Failed to write message:", err)
+}
+
+// 3. Alice sends the write query
+destNode, destQueue, err := aliceThinClient.GetCourierDestination()
+if err != nil {
+    log.Fatal("Failed to get courier destination:", err)
+}
+messageID := aliceThinClient.NewMessageID()
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID,
+    writeReply.SendMessagePayload, destNode, destQueue, messageID)
+if err != nil {
+    log.Fatal("Failed to send message:", err)
+}
+
+// 4. Bob creates a read channel with the readcap from Alice
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+if err != nil {
+    log.Fatal("Failed to create read channel:", err)
+}
+
+// 5. Bob prepares his first read query
+readReply1, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to prepare read:", err)
+}
+
+// 6. Bob sends his first read query and waits for reply
+bobMessageID := bobThinClient.NewMessageID()
+var bobReceivedMessage []byte
+for i := 0; i < 10; i++ {
+	bobReceivedMessage, err = bobThinClient.SendChannelQueryAwaitReply(
+        ctx,
+        bobChannelID,
+        readReply1.SendMessagePayload,
+        destNode,
+        destQueue,
+        bobMessageID)
+	assert.NoError(t, err)
+	if len(bobReceivedMessage) > 0 {
+		break
+	}
+}
+
+// 7. Bob prepares his second read query, specifying the next message index and reply index
+readReply2, err = bobThinClient.ReadChannel(ctx, bobChannelID, nextMessageIndex, readReply.ReplyIndex)
+if err != nil {
+    log.Fatal("Failed to prepare read:", err)
+}
+
+// 8. Bob sends his second read query and waits for reply
+for i := 0; i < 10; i++ {
+	bobReceivedMessage, err = bobThinClient.SendChannelQueryAwaitReply(
+        ctx,
+        bobChannelID,
+        readReply2.SendMessagePayload,
+        destNode,
+        destQueue,
+        bobMessageID)
+	assert.NoError(t, err)
+	if len(bobReceivedMessage) > 0 {
+		break
+	}
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+
+
+### Channel Resumptions
+
+This is a crash fault tolerant API and thus each of the reply event types are used for transmitting cryptographic state information so that if there's a crash the application can resume where it left off. BEWARE that channel IDs are ephemeral and are not to be
+persisted.
+
+There are exactly 6 types of channel resumptions:
+
+| Type | Channel | State | Description |
+|------|---------|-------|-------------|
+| 1 | Write | Never written to | Resume a write channel that was never written to |
+| 2 | Read | Never read from | Resume a read channel that was never read from |
+| 3 | Write | Query sent | Resume a write channel that was used to create a write query which was sent |
+| 4 | Read | Query sent | Resume a read channel that was used to create a read query which was sent |
+| 5 | Write | Query not sent | Resume a write channel that was used to create a write query which was not sent |
+| 6 | Read | Query not sent | Resume a read channel that was used to create a read query which was not sent |
+
+#### Trivial Write Channel Resumption Work Flow
+
+1. Alice creates a write channel
+2. Alice closes the write channel
+3. Alice resumes the write channel
+
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, err := aliceThinClient.CreateWriteChannel(ctx)
+
+// 2. Alice closes the write channel
+aliceThinClient.CloseChannel(ctx, aliceChannelID)
+
+// 3. Alice resumes the write channel
+aliceThinClient.ResumeWriteChannel(ctx, writeCap, nil)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+#### Trivial Read Channel Resumption Work Flow
+
+1. Alice creates a write channel
+2. Bob creates a read channel using Alice's read capability
+3. Bob closes the read channel
+4. Bob resumes the read channel
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, err := aliceThinClient.CreateWriteChannel(ctx)
+
+// 2. Bob creates a read channel using Alice's read capability
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+
+// 3. Bob closes the read channel
+bobThinClient.CloseChannel(ctx, bobChannelID)
+
+// 4. Bob resumes the read channel
+bobThinClient.ResumeReadChannel(ctx, readCap, nil, nil)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+#### Write Channel Resumption After Sending A Query
+
+1. Alice creates a write channel
+2. Alice prepares her write query
+3. Alice sends the write query
+4. Alice closes the write channel
+5. Alice resumes the write channel
+6. Alice sends a second write query
+7. Bob creates a read channel
+8. Bob reads the first message from the channel
+9. Bob reads the second message from the channel
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, nextMessageIndex, err := aliceThinClient.CreateWriteChannel(ctx)
+if err != nil {
+    log.Fatal("Failed to create write channel:", err)
+}
+
+// 2. Alice prepares her write query
+aliceMessage1 := []byte("First message from Alice")
+writeReply1, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage1)
+if err != nil {
+    log.Fatal("Failed to prepare first write:", err)
+}
+
+// 3. Alice sends the write query
+destNode, destQueue, err := aliceThinClient.GetCourierDestination()
+if err != nil {
+    log.Fatal("Failed to get courier destination:", err)
+}
+
+messageID1 := aliceThinClient.NewMessageID()
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID,
+    writeReply1.SendMessagePayload, destNode, destQueue, messageID1)
+if err != nil {
+    log.Fatal("Failed to send first message:", err)
+}
+
+// 4. Alice closes the write channel
+err = aliceThinClient.CloseChannel(ctx, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+// 5. Alice resumes the write channel
+resumedChannelID, err := aliceThinClient.ResumeWriteChannel(ctx, writeCap, writeReply1.NextMessageIndex)
+if err != nil {
+    log.Fatal("Failed to resume write channel:", err)
+}
+
+// 6. Alice sends a second write query
+aliceMessage2 := []byte("Second message from Alice")
+writeReply2, err := aliceThinClient.WriteChannel(ctx, resumedChannelID, aliceMessage2)
+if err != nil {
+    log.Fatal("Failed to prepare second write:", err)
+}
+
+messageID2 := aliceThinClient.NewMessageID()
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, resumedChannelID,
+    writeReply2.SendMessagePayload, destNode, destQueue, messageID2)
+if err != nil {
+    log.Fatal("Failed to send second message:", err)
+}
+
+// 7. Bob creates a read channel
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+if err != nil {
+    log.Fatal("Failed to create read channel:", err)
+}
+
+// 8. Bob reads the first message from the channel
+readReply1, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to read first message:", err)
+}
+
+// Send the read query to retrieve the first message
+bobMessageID1 := bobThinClient.NewMessageID()
+firstMessagePayload, err := bobThinClient.SendChannelQueryAwaitReply(ctx, bobChannelID,
+    readReply1.SendMessagePayload, destNode, destQueue, bobMessageID1)
+if err != nil {
+    log.Fatal("Failed to retrieve first message:", err)
+}
+
+// 9. Bob reads the second message from the channel
+readReply2, err := bobThinClient.ReadChannel(ctx, bobChannelID, readReply1.NextMessageIndex, nil)
+if err != nil {
+    log.Fatal("Failed to read second message:", err)
+}
+
+bobMessageID2 := bobThinClient.NewMessageID()
+secondMessagePayload, err := bobThinClient.SendChannelQueryAwaitReply(ctx, bobChannelID,
+    readReply2.SendMessagePayload, destNode, destQueue, bobMessageID2)
+if err != nil {
+    log.Fatal("Failed to retrieve second message:", err)
+}
+
+// Verify messages were received correctly
+if bytes.Equal(aliceMessage1, firstMessagePayload) {
+    log.Println("Bob successfully received Alice's first message!")
+}
+if bytes.Equal(aliceMessage2, secondMessagePayload) {
+    log.Println("Bob successfully received Alice's second message!")
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### Read Channel Resumption After Sending A Query
+
+1. Alice creates a write channel
+2. Alice writes the first message to the channel
+3. Alice writes the second message to the channel
+3. Bob creates a read channel with the readcap from Alice
+4. Bob reads the first message from the channel
+5. Bob closes the read channel
+6. Bob resumes the read channel
+7. Bob reads the second message from the channel
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, nextMessageIndex, err := aliceThinClient.CreateWriteChannel(ctx)
+if err != nil {
+    log.Fatal("Failed to create write channel:", err)
+}
+
+// 2. Alice writes the first message to the channel
+aliceMessage1 := []byte("First message from Alice")
+writeReply1, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage1)
+if err != nil {
+    log.Fatal("Failed to write first message:", err)
+}
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID, writeReply1.SendMessagePayload, destNode, destQueue, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to send first message:", err)
+}
+
+// 3. Alice writes the second message to the channel
+aliceMessage2 := []byte("Second message from Alice")
+writeReply2, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage2)
+if err != nil {
+    log.Fatal("Failed to write second message:", err)
+}
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID, writeReply2.SendMessagePayload, destNode, destQueue, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to send first message:", err)
+}
+
+// 4. Bob creates a read channel with the readcap from Alice
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+if err != nil {
+    log.Fatal("Failed to create read channel:", err)
+}
+
+// 5. Bob reads the first message from the channel
+readReply1, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to read first message:", err)
+}
+_, err = bobThinClient.SendChannelQueryAwaitReply(ctx, bobChannelID, readReply1.SendMessagePayload, destNode, destQueue, bobChannelID)
+if err != nil {
+    log.Fatal("Failed to send first message:", err)
+}
+
+// 6. Bob closes the read channel
+err = bobThinClient.CloseChannel(ctx, bobChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+// 7. Bob resumes the read channel
+resumedBobChannelID, err := bobThinClient.ResumeReadChannel(ctx, readCap, readReply1.NextMessageIndex, readReply1.ReplyIndex)
+if err != nil {
+    log.Fatal("Failed to resume read channel:", err)
+}
+
+// 8. Bob reads the second message from the channel
+readReply2, err := bobThinClient.ReadChannel(ctx, resumedBobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to read second message:", err)
+}
+_, err = bobThinClient.SendChannelQueryAwaitReply(ctx, resumedBobChannelID, readReply2.SendMessagePayload, destNode, destQueue, bobChannelID)
+if err != nil {
+    log.Fatal("Failed to send second message:", err)
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+#### Write Channel Resumption After Preparing an Unsent Write Query
+
+1. Alice creates a write channel
+2. Alice prepares her write query
+3. Alice closes the write channel
+4. Alice resumes the write channel
+5. Alice sends the write query
+6. Bob creates a read channel
+7. Bob reads the message from the channel
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, nextMessageIndex, err :=
+    aliceThinClient.CreateWriteChannel(ctx)
+if err != nil {
+    log.Fatal("Failed to create write channel:", err)
+}
+
+// 2. Alice prepares her write query
+aliceMessage := []byte("Message from Alice")
+writeReply, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage)
+if err != nil {
+    log.Fatal("Failed to prepare write:", err)
+}
+
+// 3. Alice closes the write channel
+err = aliceThinClient.CloseChannel(ctx, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+// 4. Alice resumes the write channel
+resumedChannelID, err := aliceThinClient.ResumeWriteChannel(ctx, writeCap, writeReply.NextMessageIndex)
+if err != nil {
+    log.Fatal("Failed to resume write channel:", err)
+}
+
+// 5. Alice sends the write query
+destNode, destQueue, err := aliceThinClient.GetCourierDestination()
+if err != nil {
+    log.Fatal("Failed to get courier destination:", err)
+}
+messageID := aliceThinClient.NewMessageID()
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, resumedChannelID,
+    writeReply.SendMessagePayload, destNode, destQueue, messageID)
+if err != nil {
+    log.Fatal("Failed to send message:", err)
+}
+
+// 6. Bob creates a read channel
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+if err != nil {
+    log.Fatal("Failed to create read channel:", err)
+}
+
+// 7. Bob reads the message from the channel
+readReply, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to read message:", err)
+}
+
+bobMessageID := bobThinClient.NewMessageID()
+readPayload, err := bobThinClient.SendChannelQueryAwaitReply(ctx, bobChannelID,
+    readReply.SendMessagePayload, destNode, destQueue, bobMessageID)
+if err != nil {
+    log.Fatal("Failed to retrieve message:", err)
+}
+
+// Verify the message content matches
+if bytes.Equal(aliceMessage, readPayload) {
+    log.Println("Bob: Successfully received and verified message")
+}
+
+// Clean up channels
+err = aliceThinClient.CloseChannel(ctx, resumedChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+err = bobThinClient.CloseChannel(ctx, bobChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### Read Channel Resumption After Preparing an Unsent Read Query
+
+1. Alice creates a write channel
+2. Alice writes the first message to the channel
+3. Bob creates a read channel with the readcap from Alice
+4. Bob prepares his read query
+5. Bob closes the read channel
+6. Bob resumes the read channel
+7. Bob sends the read query and await reply
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// 1. Alice creates a write channel
+aliceChannelID, readCap, writeCap, nextMessageIndex, err := aliceThinClient.CreateWriteChannel(ctx)
+if err != nil {
+    log.Fatal("Failed to create write channel:", err)
+}
+
+// 2. Alice writes the first message to the channel
+aliceMessage := []byte("Message from Alice")
+writeReply, err := aliceThinClient.WriteChannel(ctx, aliceChannelID, aliceMessage)
+if err != nil {
+    log.Fatal("Failed to write message:", err)
+}
+_, err = aliceThinClient.SendChannelQueryAwaitReply(ctx, aliceChannelID, writeReply.SendMessagePayload, destNode, destQueue, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to send message:", err)
+}
+
+// 3. Bob creates a read channel with the readcap from Alice
+bobChannelID, err := bobThinClient.CreateReadChannel(ctx, readCap)
+if err != nil {
+    log.Fatal("Failed to create read channel:", err)
+}
+
+// 4. Bob prepares his read query
+readReply, err := bobThinClient.ReadChannel(ctx, bobChannelID, nil, nil)
+if err != nil {
+    log.Fatal("Failed to prepare read:", err)
+}
+
+// 5. Bob closes the read channel
+err = bobThinClient.CloseChannel(ctx, bobChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+// 6. Bob resumes the read channel
+resumedBobChannelID, err := bobThinClient.ResumeReadChannel(ctx, readCap, readReply.NextMessageIndex, readReply.ReplyIndex)
+if err != nil {
+    log.Fatal("Failed to resume read channel:", err)
+}
+
+// 7. Bob sends the read query and await reply
+readPayload, err := bobThinClient.SendChannelQueryAwaitReply(ctx, resumedBobChannelID, readReply.SendMessagePayload, destNode, destQueue, bobMessageID)
+if err != nil {
+    log.Fatal("Failed to retrieve message:", err)
+}
+
+// Verify the message content matches
+if bytes.Equal(aliceMessage, readPayload) {
+    log.Println("Bob: Successfully received and verified message")
+}
+
+// Clean up channels
+err = aliceThinClient.CloseChannel(ctx, aliceChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+
+err = bobThinClient.CloseChannel(ctx, resumedBobChannelID)
+if err != nil {
+    log.Fatal("Failed to close channel:", err)
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< /tabpane >}}
