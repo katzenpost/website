@@ -79,11 +79,12 @@
                 </note>
             </listitem>
         </itemizedlist>
-        <para>On Debian, these software requirements can be installed with the following commands
+        <para>On Debian/Ubuntu, these software requirements can be installed with the following commands
             (running as superuser). <command>Apt</command> will pull in the needed
             dependencies.</para>
         <programlisting><prompt># </prompt><command>apt update</command>
-<prompt># </prompt><command>apt install git golang make docker docker-compose podman</command></programlisting>       
+<prompt># </prompt><command>apt install git golang make podman podman-compose</command></programlisting>
+        <para>Note: You can also install Docker and docker-compose instead of Podman, but Podman is recommended as it runs rootless by default.</para>
     </section>   
     <section xml:id="install_kp">
         <info>
@@ -112,20 +113,16 @@
                     out.<programlisting><prompt>~/katzenpost$ </prompt><command>git checkout -b devel</command></programlisting></para>
             </step>
             <step performance="required">
-                <para>(Optional) If you are using Podman, complete the following steps:</para>
+                <para>(Optional) If you are using Podman, enable the Podman socket service:</para>
                 <procedure>
                     <step performance="required">
-                        <para>Point the DOCKER_HOST environment variable at the Podman
-                            process.</para>
-                        <programlisting><prompt>$ </prompt><command>export DOCKER_HOST=unix:///var/run/user/$(id -u)/podman/podman.sock</command></programlisting>
-                    </step>
-                    <step performance="required">
-                        <para> Set up and start the Podman server (as superuser).</para>
-                        <programlisting><prompt>$ </prompt><command>podman system service -t 0 $DOCKER_HOST &amp;</command>
-<prompt>$ </prompt><command>systemctl --user enable --now podman.socket</command>
-                        </programlisting>
+                        <para>Enable and start the Podman socket service (as regular user, no superuser privileges needed):</para>
+                        <programlisting><prompt>$ </prompt><command>systemctl --user enable --now podman.socket</command></programlisting>
                     </step>
                 </procedure>
+                <note>
+                    <para>Modern Podman automatically handles the DOCKER_HOST environment variable and socket configuration. The Makefile will detect and use Podman automatically.</para>
+                </note>
             </step>
         </procedure>        
     </section>           
@@ -263,17 +260,14 @@
                     considerations:</para>
                 <itemizedlist>
                     <listitem>
-                        <para>If you intend to use Docker, you need to run <command>make</command>
-                            as superuser. If you are using <command>sudo</command> to elevate your
-                            privileges, you need to edit
-                                <filename>katzenpost/docker/Makefile</filename> to prepend
-                                <command>sudo</command> to each command contained in it.</para>
+                        <para>If you are using Podman (recommended), no superuser privileges are required.
+                            Simply run <command>make start</command> as a regular user.</para>
                     </listitem>
                     <listitem>
-                        <para>If you have Podman installed on your system and you nonetheless want
-                            to run Docker, you can override the default behavior by adding the
-                            argument <command>docker=docker</command> to the command as in the
-                            following:<programlisting><prompt>~/katzenpost/docker$ </prompt><command>make run docker=docker</command> </programlisting></para>
+                        <para>If you intend to use Docker instead of Podman, you may need to run <command>make</command>
+                            as superuser depending on your Docker configuration. You can override the automatic
+                            Podman selection by adding the argument <command>docker=docker</command> to the command:
+                            <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make start docker=docker</command></programlisting></para>
                     </listitem>
                 </itemizedlist>
             </note>

@@ -119,10 +119,11 @@ weight: 20
                   </li>
                </ul>
             </div>
-            <p>On Debian, these software requirements can be installed with the following commands
+            <p>On Debian/Ubuntu, these software requirements can be installed with the following commands
                (running as superuser). <span class="command"><strong>Apt</strong></span> will pull in the needed
                dependencies.</p>
-            <pre class="programlisting"><code class="prompt"># </code><span class="command"><strong>apt update</strong></span><code class="prompt"># </code><span class="command"><strong>apt install git golang make docker docker-compose podman</strong></span></pre>
+            <pre class="programlisting"><code class="prompt"># </code><span class="command"><strong>apt update</strong></span><code class="prompt"># </code><span class="command"><strong>apt install git golang make podman podman-compose</strong></span></pre>
+            <p>Note: You can also install Docker and docker-compose instead of Podman, but Podman is recommended as it runs rootless by default.</p>
          </div>
          <div class="section">
             <div class="titlepage">
@@ -157,19 +158,27 @@ weight: 20
                      </p>
                   </li>
                   <li class="step">
-                     <p>(Optional) If you are using Podman, complete the following steps:</p>
+                     <p>(Optional) If you are using Podman, enable the Podman socket service:</p>
                      <div class="procedure">
                         <ol class="procedure" type="1">
                            <li class="step">
-                              <p>Point the DOCKER_HOST environment variable at the Podman
-                                 process.</p>
-                              <pre class="programlisting"><code class="prompt">$ </code><span class="command"><strong>export DOCKER_HOST=unix:///var/run/user/$(id -u)/podman/podman.sock</strong></span></pre>
-                           </li>
-                           <li class="step">
-                              <p> Set up and start the Podman server (as superuser).</p>
-                              <pre class="programlisting"><code class="prompt">$ </code><span class="command"><strong>podman system service -t 0 $DOCKER_HOST &amp;</strong></span><code class="prompt">$ </code><span class="command"><strong>systemctl --user enable --now podman.socket</strong></span></pre>
+                              <p>Enable and start the Podman socket service (as regular user, no superuser privileges needed):</p>
+                              <pre class="programlisting"><code class="prompt">$ </code><span class="command"><strong>systemctl --user enable --now podman.socket</strong></span></pre>
                            </li>
                         </ol>
+                     </div>
+                     <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                        <table border="0" summary="Note">
+                           <tr>
+                              <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/img/note.png"></td>
+                              <th align="left">Note</th>
+                           </tr>
+                           <tr>
+                              <td align="left" valign="top">
+                                 <p>Modern Podman automatically handles the DOCKER_HOST environment variable and socket configuration. The Makefile will detect and use Podman automatically.</p>
+                              </td>
+                           </tr>
+                        </table>
                      </div>
                   </li>
                </ol>
@@ -327,18 +336,14 @@ weight: 20
                            <div class="itemizedlist">
                               <ul class="itemizedlist" style="list-style-type: disc; ">
                                  <li class="listitem">
-                                    <p>If you intend to use Docker, you need to run <span class="command"><strong>make</strong></span>
-                                       as superuser. If you are using <span class="command"><strong>sudo</strong></span> to elevate your
-                                       privileges, you need to edit
-                                       <code class="filename">katzenpost/docker/Makefile</code> to prepend
-                                       <span class="command"><strong>sudo</strong></span> to each command contained in it.</p>
+                                    <p>If you are using Podman (recommended), no superuser privileges are required.
+                                       Simply run <span class="command"><strong>make start</strong></span> as a regular user.</p>
                                  </li>
                                  <li class="listitem">
-                                    <p>If you have Podman installed on your system and you nonetheless want
-                                       to run Docker, you can override the default behavior by adding the
-                                       argument <span class="command"><strong>docker=docker</strong></span> to the command as in the
-                                       following:
-                                       <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make run docker=docker</strong></span></pre>
+                                    <p>If you intend to use Docker instead of Podman, you may need to run <span class="command"><strong>make</strong></span>
+                                       as superuser depending on your Docker configuration. You can override the automatic
+                                       Podman selection by adding the argument <span class="command"><strong>docker=docker</strong></span> to the command:
+                                       <pre class="programlisting"><code class="prompt">~/katzenpost/docker$ </code><span class="command"><strong>make start docker=docker</strong></span></pre>
                                     </p>
                                  </li>
                               </ul>
