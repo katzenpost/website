@@ -16,3 +16,4 @@ type: "base"
 | 🎧   | **[Audio Engineering Considerations for a Modern Mixnet](/docs/audio_eng)**          | Technical analysis of audio transmission challenges and solutions for modern mixnets, with a focus on usability and scalability. | [HTML](/docs/audio_eng) / [PDF](/research/Audio_Engineering_Considerations_for_a_Modern_Mixnet.pdf)    |
 | 🔥 | **[Client Integration Guide](/docs/client_integration)**                             | Guide to integrating your application with thin client libraries | [HTML](/docs/client_integration)
 | 📝  | **[How to Use the Namenlos Mixnet](/docs/howto_use_namenlos_mixnet)**                 | Guide to using the Namenlos mixnet | [HTML](/docs/howto_use_namenlos_mixnet)]
+| 🐳  | **[Run a Katzenpost Mix server in a Docker container](/docs/run_katzenpost_mixnode_docker)** | Guide to running a Katzenpost mix server in a Docker container | [HTML](/docs/run_katzenpost_mixnode_docker)
