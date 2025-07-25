@@ -16,14 +16,14 @@ slug: "/run_katzenpost_mixnode_docker/"
 
 * Access to the `namenlos` git repo
 
-## Preparing host filesystem
+## Preparing the host filesystem
 
-    mkdir katzenpost-server
-    cd katzenpost-server
+    mkdir katzenpost-mix
+    cd katzenpost-mix
     mkdir {conf,data}
     chmod 700 data
 
-All further actions are performed from the `katzenpost-server` directory.
+All further actions are performed from the `katzenpost-mix` directory.
 
 ## Building the Docker image
 
@@ -64,23 +64,44 @@ All further actions are performed from the `katzenpost-server` directory.
 * Build Docker image:
 
     ```
-    docker build -t katzenpost/server --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
+    docker build -t katzenpost/mix --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
     ```
 
-* Create `run.sh` to run the server (adjust to your port) and make it executable:
+* Create `service.sh` (modify to match your port) to manage the server:
 
     ```
     #!/bin/bash
 
-    docker run -d --restart=always \
-        --name katzenpost-server -h kp-server \
+    CMD=${1:-start}
+    case ${CMD} in
+        genkeys)
+            MODE="-ti --rm"
+            EXEC="/usr/bin/server -g"
+            ;;
+        start)
+            MODE="-d --restart=unless-stopped"
+            EXEC=""
+            ;;
+        stop)
+            docker stop katzenpost-mix
+            docker rm katzenpost-mix
+            exit
+            ;;
+        *)
+            echo "unknown command"
+            exit 1
+            ;;
+    esac
+
+    docker run ${MODE} \
+        --name katzenpost-mix -h katzenpost-mix \
         -p 0.0.0.0:<port>:8181 \
         -v $(pwd)/conf:/conf \
-        -v $(pwd)/data:/var/lib/pq-katzenpost-mixserver \
-        katzenpost/server
+        -v $(pwd)/data:/var/lib/katzenpost \
+        katzenpost/mix ${EXEC}
     ```
 
-    Always run this script while in the `katzenpost-server` directory.
+    Always run this script while in the `katzenpost-mix` directory.
 
 ## Creating a configuration file
 
@@ -91,9 +112,9 @@ All further actions are performed from the `katzenpost-server` directory.
     Identifier = "<yourname>"
     PKISignatureScheme = "Ed25519 Sphincs+"
     WireKEM = "KYBER768-X25519"
-    Addresses = [ "tcp://<public-ipv4>:<port>", "tcp://<public-ipv6>:<port>" ]
-    BindAddresses = [ "tcp://127.0.0.1:8181", "tcp://[::1]:8181" ]
-    DataDir = "/var/lib/pq-katzenpost-mixserver"
+    Addresses = [ "tcp://<public-ipv4>:<port>" ]
+    BindAddresses = [ "tcp://0.0.0.0:8181" ]
+    DataDir = "/var/lib/katzenpost"
     IsGatewayNode = false
     IsServiceNode = false
 
@@ -104,30 +125,23 @@ All further actions are performed from the `katzenpost-server` directory.
 
     ```
 
-* Assemble the configuration file `conf/katzenpost.toml`:
+* Build the configuration file `conf/katzenpost.toml`:
+
+    1. In the `namenlos` repo, change into the `configs` directory and run `make`.
+
+    2. Copy the generated configuration file:
 
     ```
-    cat \
-        <namelos.repo>/configs/SSOT/mixes/<yourname>-pq-mixserver.toml \ <namelos.repo>/configs/pki.toml \
-        <namelos.repo>/configs/SSOT/mixserver.toml \
-        <namelos.repo>/configs/SSOT/sphinx.toml \
-    > conf/katzenpost.toml
+    cp <namelos.repo>/configs/<yourname>-pq-mixserver.toml conf/katzenpost.toml
     ```
 
 ## Generating and extracting keys
 
-* Run the server for the first time:
+* Run the server to generate the keys:
 
     ```
-    ./run.sh
+    ./service.sh genkeys
     ```
-* Monitor execution:
-
-    ```
-    docker logs -f katzenpost-server
-    ```
-
-    Once the server has started sucessfully, the Docker container can be stopped and removed.
 
 * Check that keys (`*.pem`) have been created in the `data/` directory and copy the public identity key to the `namenlos` repo:
 
@@ -144,7 +158,8 @@ All further actions are performed from the `katzenpost-server` directory.
     git push
     ```
 
-## Running the server
+## Starting/stopping the server
 
-    cd katzenpost-server
-    ./run.sh
+    cd katzenpost-mix
+    ./service.sh [start|stop]
+
