@@ -18,10 +18,12 @@ slug: "/run_katzenpost_mixnode_docker/"
 
 ## Preparing the host filesystem
 
-    mkdir katzenpost-mix
-    cd katzenpost-mix
-    mkdir {conf,data}
-    chmod 700 data
+```bash
+mkdir katzenpost-mix
+cd katzenpost-mix
+mkdir {conf,data}
+chmod 700 data
+```
 
 All further actions are performed from the `katzenpost-mix` directory.
 
@@ -29,7 +31,7 @@ All further actions are performed from the `katzenpost-mix` directory.
 
 * Create `Dockerfile`:
 
-    ```
+    ```docker
     FROM golang:bookworm AS builder
 
     LABEL authors="<ops@cryptonymity.net>"
@@ -63,13 +65,13 @@ All further actions are performed from the `katzenpost-mix` directory.
 
 * Build Docker image:
 
-    ```
-    docker build -t katzenpost/mix --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
-    ```
+```bash
+docker build -t katzenpost/mix --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
+```
 
 * Create `service.sh` (modify to match your port) to manage the server:
 
-    ```
+    ```bash
     #!/bin/bash
 
     CMD=${1:-start}
@@ -107,7 +109,7 @@ All further actions are performed from the `katzenpost-mix` directory.
 
 * Create a new file named `<yourname>-pq-mixserver.toml` in `<namenlos.repo>/configs/SSOT/mixes` and adjust `Identifier` and  IP/port setting in `Addresses`:
 
-    ```
+    ```toml
     [Server]
     Identifier = "<yourname>"
     PKISignatureScheme = "Ed25519 Sphincs+"
@@ -139,27 +141,27 @@ All further actions are performed from the `katzenpost-mix` directory.
 
 * Run the server to generate the keys:
 
-    ```
-    ./service.sh genkeys
-    ```
+```
+./service.sh genkeys
+```
 
 * Check that keys (`*.pem`) have been created in the `data/` directory and copy the public identity key to the `namenlos` repo:
 
-    ```
-    cp data/identity.public.pem <namelos.repo>/keys/mixserver-keys/<yourname>_mix_id_pub_key.pem
-    ```
+```bash
+cp data/identity.public.pem <namelos.repo>/keys/mixserver-keys/<yourname>_mix_id_pub_key.pem
+```
 
 * Update the repo:
 
-    ```
-    cd <namenlos.repo>/configs
-    make
-    git commit -a
-    git push
-    ```
+```bash
+cd <namenlos.repo>/configs
+make
+git commit -a
+git push
+```
 
 ## Starting/stopping the server
-
-    cd katzenpost-mix
-    ./service.sh [start|stop]
-
+```bash
+cd katzenpost-mix
+./service.sh [start|stop]
+```
