@@ -567,6 +567,51 @@ if alice_message == bob_received_message.as_slice() {
 }
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
+# 1. Alice creates a write channel
+alice_channel_id, read_cap, _write_cap = await alice_thin_client.create_write_channel()
+
+# 2. Alice prepares her message for transmission
+alice_message = b"Hello Bob!"
+write_reply = await alice_thin_client.write_channel(alice_channel_id, alice_message)
+
+# 3. Alice gets courier destination and sends the message
+dest_node, dest_queue = await alice_thin_client.get_courier_destination()
+alice_message_id = ThinClient.new_message_id()
+
+# 4. Alice sends the query and waits for confirmation the message was stored
+_reply = await alice_thin_client.send_channel_query_await_reply(
+    alice_channel_id,
+    write_reply.send_message_payload,
+    dest_node,
+    dest_queue,
+    alice_message_id
+)
+
+# 5. Bob creates a read channel using Alice's read capability
+bob_channel_id = await bob_thin_client.create_read_channel(read_cap)
+
+# 6. Bob creates a read query
+read_reply1 = await bob_thin_client.read_channel(bob_channel_id, None, None)
+
+# 7. Bob sends the read queries until a reply is received
+bob_message_id1 = ThinClient.new_message_id()
+bob_received_message = b""
+for i in range(10):
+    payload = await bob_thin_client.send_channel_query_await_reply(
+        bob_channel_id,
+        read_reply1.send_message_payload,
+        dest_node,
+        dest_queue,
+        bob_message_id1
+    )
+    if payload:
+        bob_received_message = payload
+        break
+    await asyncio.sleep(0.5)
+
+# 8. Bob verifies he received Alice's original message
+if alice_message == bob_received_message:
+    print("Bob successfully received Alice's message!")
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -742,6 +787,66 @@ for i in 0..10 {
 }
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
+# 1. Alice creates a write channel
+alice_channel_id, read_cap, _write_cap = await alice_thin_client.create_write_channel()
+
+# 2. Alice prepares a write query
+alice_message = b"Message from Alice"
+write_reply = await alice_thin_client.write_channel(alice_channel_id, alice_message)
+
+# 3. Alice sends the write query
+dest_node, dest_queue = await alice_thin_client.get_courier_destination()
+message_id = ThinClient.new_message_id()
+_reply = await alice_thin_client.send_channel_query_await_reply(
+    alice_channel_id,
+    write_reply.send_message_payload,
+    dest_node,
+    dest_queue,
+    message_id
+)
+
+# 4. Bob creates a read channel with the readcap from Alice
+bob_channel_id = await bob_thin_client.create_read_channel(read_cap)
+
+# 5. Bob prepares his first read query
+read_reply1 = await bob_thin_client.read_channel(bob_channel_id, None, None)
+
+# 6. Bob sends his first read query and waits for reply
+bob_message_id = ThinClient.new_message_id()
+bob_received_message = b""
+for i in range(10):
+    payload = await bob_thin_client.send_channel_query_await_reply(
+        bob_channel_id,
+        read_reply1.send_message_payload,
+        dest_node,
+        dest_queue,
+        bob_message_id
+    )
+    if payload:
+        bob_received_message = payload
+        break
+    await asyncio.sleep(0.5)
+
+# 7. Bob prepares his second read query, specifying the next message index and reply index
+read_reply2 = await bob_thin_client.read_channel(
+    bob_channel_id,
+    write_reply.next_message_index,
+    read_reply1.reply_index
+)
+
+# 8. Bob sends his second read query and waits for reply
+for i in range(10):
+    payload = await bob_thin_client.send_channel_query_await_reply(
+        bob_channel_id,
+        read_reply2.send_message_payload,
+        dest_node,
+        dest_queue,
+        bob_message_id
+    )
+    if payload:
+        bob_received_message = payload
+        break
+    await asyncio.sleep(0.5)
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -791,6 +896,14 @@ alice_thin_client.close_channel(alice_channel_id).await?;
 alice_thin_client.resume_write_channel(write_cap, None).await?;
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
+# 1. Alice creates a write channel
+alice_channel_id, _read_cap, write_cap = await alice_thin_client.create_write_channel()
+
+# 2. Alice closes the write channel
+await alice_thin_client.close_channel(alice_channel_id)
+
+# 3. Alice resumes the write channel
+await alice_thin_client.resume_write_channel(write_cap, None)
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -830,6 +943,17 @@ bob_thin_client.close_channel(bob_channel_id).await?;
 bob_thin_client.resume_read_channel(read_cap, None, None).await?;
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
+# 1. Alice creates a write channel
+alice_channel_id, read_cap, _write_cap = await alice_thin_client.create_write_channel()
+
+# 2. Bob creates a read channel using Alice's read capability
+bob_channel_id = await bob_thin_client.create_read_channel(read_cap)
+
+# 3. Bob closes the read channel
+await bob_thin_client.close_channel(bob_channel_id)
+
+# 4. Bob resumes the read channel
+await bob_thin_client.resume_read_channel(read_cap, None, None)
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -1022,6 +1146,82 @@ if alice_message2 == second_message_payload.as_slice() {
 }
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
+# 1. Alice creates a write channel
+alice_channel_id, read_cap, write_cap = await alice_thin_client.create_write_channel()
+
+# 2. Alice prepares her write query
+alice_message1 = b"First message from Alice"
+write_reply1 = await alice_thin_client.write_channel(alice_channel_id, alice_message1)
+
+# 3. Alice sends the write query
+dest_node, dest_queue = await alice_thin_client.get_courier_destination()
+message_id1 = ThinClient.new_message_id()
+_reply1 = await alice_thin_client.send_channel_query_await_reply(
+    alice_channel_id,
+    write_reply1.send_message_payload,
+    dest_node,
+    dest_queue,
+    message_id1
+)
+
+# 4. Alice closes the write channel
+await alice_thin_client.close_channel(alice_channel_id)
+
+# 5. Alice resumes the write channel
+resumed_channel_id = await alice_thin_client.resume_write_channel(
+    write_cap,
+    write_reply1.next_message_index
+)
+
+# 6. Alice sends a second write query
+alice_message2 = b"Second message from Alice"
+write_reply2 = await alice_thin_client.write_channel(resumed_channel_id, alice_message2)
+
+message_id2 = ThinClient.new_message_id()
+_reply2 = await alice_thin_client.send_channel_query_await_reply(
+    resumed_channel_id,
+    write_reply2.send_message_payload,
+    dest_node,
+    dest_queue,
+    message_id2
+)
+
+# 7. Bob creates a read channel
+bob_channel_id = await bob_thin_client.create_read_channel(read_cap)
+
+# 8. Bob reads the first message from the channel
+read_reply1 = await bob_thin_client.read_channel(bob_channel_id, None, None)
+
+bob_message_id1 = ThinClient.new_message_id()
+first_message_payload = await bob_thin_client.send_channel_query_await_reply(
+    bob_channel_id,
+    read_reply1.send_message_payload,
+    dest_node,
+    dest_queue,
+    bob_message_id1
+)
+
+# 9. Bob reads the second message from the channel
+read_reply2 = await bob_thin_client.read_channel(
+    bob_channel_id,
+    read_reply1.next_message_index,
+    None
+)
+
+bob_message_id2 = ThinClient.new_message_id()
+second_message_payload = await bob_thin_client.send_channel_query_await_reply(
+    bob_channel_id,
+    read_reply2.send_message_payload,
+    dest_node,
+    dest_queue,
+    bob_message_id2
+)
+
+# Verify messages were received correctly
+if alice_message1 == first_message_payload:
+    print("Bob successfully received Alice's first message!")
+if alice_message2 == second_message_payload:
+    print("Bob successfully received Alice's second message!")
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -1169,6 +1369,68 @@ let _second_message = alice_thin_client.send_channel_query_await_reply(
 ).await?;
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
+# 1. Alice creates a write channel
+alice_channel_id, read_cap, _write_cap = await alice_thin_client.create_write_channel()
+
+# 2. Alice writes the first message to the channel
+alice_message1 = b"First message from Alice"
+write_reply1 = await alice_thin_client.write_channel(alice_channel_id, alice_message1)
+dest_node, dest_queue = await alice_thin_client.get_courier_destination()
+alice_message_id1 = ThinClient.new_message_id()
+_reply1 = await alice_thin_client.send_channel_query_await_reply(
+    alice_channel_id,
+    write_reply1.send_message_payload,
+    dest_node,
+    dest_queue,
+    alice_message_id1
+)
+
+# 3. Alice writes the second message to the channel
+alice_message2 = b"Second message from Alice"
+write_reply2 = await alice_thin_client.write_channel(alice_channel_id, alice_message2)
+alice_message_id2 = ThinClient.new_message_id()
+_reply2 = await alice_thin_client.send_channel_query_await_reply(
+    alice_channel_id,
+    write_reply2.send_message_payload,
+    dest_node,
+    dest_queue,
+    alice_message_id2
+)
+
+# 4. Bob creates a read channel with the readcap from Alice
+bob_channel_id = await bob_thin_client.create_read_channel(read_cap)
+
+# 5. Bob reads the first message from the channel
+read_reply1 = await bob_thin_client.read_channel(bob_channel_id, None, None)
+bob_message_id1 = ThinClient.new_message_id()
+_first_message = await bob_thin_client.send_channel_query_await_reply(
+    bob_channel_id,
+    read_reply1.send_message_payload,
+    dest_node,
+    dest_queue,
+    bob_message_id1
+)
+
+# 6. Bob closes the read channel
+await bob_thin_client.close_channel(bob_channel_id)
+
+# 7. Bob resumes the read channel
+resumed_bob_channel_id = await bob_thin_client.resume_read_channel(
+    read_cap,
+    read_reply1.next_message_index,
+    read_reply1.reply_index
+)
+
+# 8. Bob reads the second message from the channel
+read_reply2 = await bob_thin_client.read_channel(resumed_bob_channel_id, None, None)
+bob_message_id2 = ThinClient.new_message_id()
+_second_message = await bob_thin_client.send_channel_query_await_reply(
+    resumed_bob_channel_id,
+    read_reply2.send_message_payload,
+    dest_node,
+    dest_queue,
+    bob_message_id2
+)
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -1311,6 +1573,55 @@ alice_thin_client.close_channel(resumed_channel_id).await?;
 bob_thin_client.close_channel(bob_channel_id).await?;
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
+# 1. Alice creates a write channel
+alice_channel_id, read_cap, write_cap = await alice_thin_client.create_write_channel()
+
+# 2. Alice prepares her write query
+alice_message = b"Message from Alice"
+write_reply = await alice_thin_client.write_channel(alice_channel_id, alice_message)
+
+# 3. Alice closes the write channel
+await alice_thin_client.close_channel(alice_channel_id)
+
+# 4. Alice resumes the write channel
+resumed_channel_id = await alice_thin_client.resume_write_channel(
+    write_cap,
+    write_reply.next_message_index
+)
+
+# 5. Alice sends the write query
+dest_node, dest_queue = await alice_thin_client.get_courier_destination()
+message_id = ThinClient.new_message_id()
+_reply = await alice_thin_client.send_channel_query_await_reply(
+    resumed_channel_id,
+    write_reply.send_message_payload,
+    dest_node,
+    dest_queue,
+    message_id
+)
+
+# 6. Bob creates a read channel
+bob_channel_id = await bob_thin_client.create_read_channel(read_cap)
+
+# 7. Bob reads the message from the channel
+read_reply = await bob_thin_client.read_channel(bob_channel_id, None, None)
+
+bob_message_id = ThinClient.new_message_id()
+read_payload = await bob_thin_client.send_channel_query_await_reply(
+    bob_channel_id,
+    read_reply.send_message_payload,
+    dest_node,
+    dest_queue,
+    bob_message_id
+)
+
+# Verify the message content matches
+if alice_message == read_payload:
+    print("Bob: Successfully received and verified message")
+
+# Clean up channels
+await alice_thin_client.close_channel(resumed_channel_id)
+await bob_thin_client.close_channel(bob_channel_id)
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -1442,5 +1753,54 @@ alice_thin_client.close_channel(alice_channel_id).await?;
 bob_thin_client.close_channel(resumed_bob_channel_id).await?;
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
+# 1. Alice creates a write channel
+alice_channel_id, read_cap, _write_cap = await alice_thin_client.create_write_channel()
+
+# 2. Alice writes the first message to the channel
+alice_message = b"Message from Alice"
+write_reply = await alice_thin_client.write_channel(alice_channel_id, alice_message)
+dest_node, dest_queue = await alice_thin_client.get_courier_destination()
+alice_message_id = ThinClient.new_message_id()
+_reply = await alice_thin_client.send_channel_query_await_reply(
+    alice_channel_id,
+    write_reply.send_message_payload,
+    dest_node,
+    dest_queue,
+    alice_message_id
+)
+
+# 3. Bob creates a read channel with the readcap from Alice
+bob_channel_id = await bob_thin_client.create_read_channel(read_cap)
+
+# 4. Bob prepares his read query
+read_reply = await bob_thin_client.read_channel(bob_channel_id, None, None)
+
+# 5. Bob closes the read channel
+await bob_thin_client.close_channel(bob_channel_id)
+
+# 6. Bob resumes the read channel
+resumed_bob_channel_id = await bob_thin_client.resume_read_channel(
+    read_cap,
+    read_reply.next_message_index,
+    read_reply.reply_index
+)
+
+# 7. Bob sends the read query and await reply
+bob_message_id = ThinClient.new_message_id()
+read_payload = await bob_thin_client.send_channel_query_await_reply(
+    resumed_bob_channel_id,
+    read_reply.send_message_payload,
+    dest_node,
+    dest_queue,
+    bob_message_id
+)
+
+# Verify the message content matches
+if alice_message == read_payload:
+    print("Bob: Successfully received and verified message")
+
+# Clean up channels
+await alice_thin_client.close_channel(alice_channel_id)
+await bob_thin_client.close_channel(resumed_bob_channel_id)
 {{< /tab >}}
 {{< /tabpane >}}
