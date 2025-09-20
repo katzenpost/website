@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?> 
+<?linkTitle "Chat client user guide" ?>  <!-- Section menu link text -->
+<?url "docs/chat_client/user-guide.html" ?> <!-- Required to make image links work -->
+<?description ?> <!-- Optional -->
+<?draft "false" ?> <!-- Optional -->
+<?slug "chat" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight "1" ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+    %shared-content;
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+
+<section    xmlns="http://docbook.org/ns/docbook"
+            xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
+            xml:id="CHANGE_ME1">
+    <info>  
+        <title xml:id="CHANGE_ME1.title">General title</title> <!-- Match to title PI above. -->          
+    </info>
+        
+    <para>Lorem Ipsum je jednostavno probni tekst koji se koristi u tiskarskoj i slovoslagarskoj 
+        industriji. Lorem Ipsum postoji kao industrijski standard još od 16-og stoljeća, kada je 
+        nepoznati tiskar uzeo tiskarsku galiju slova i posložio ih da bi napravio knjigu s uzorkom 
+        tiska.</para>
+     
+    <section xml:id="CHANGE_ME2">  
+        <info>  
+            <title xml:id="CHANGE_ME2.title">Subsection1 title</title>          
+        </info>
+            
+        <para>Lorem Ipsum je jednostavno probni tekst koji se koristi u tiskarskoj i slovoslagarskoj 
+            industriji. Lorem Ipsum postoji kao industrijski standard još od 16-og stoljeća, kada je 
+            nepoznati tiskar uzeo tiskarsku galiju slova i posložio ih da bi napravio knjigu s uzorkom 
+            tiska.</para>        
+    </section>
+  
+    <section xml:id="CHANGE_ME3">  
+        <info>  
+            <title xml:id="CHANGE_ME3.title">Subsection2 title</title>          
+        </info>
+        
+        <para>Lorem Ipsum je jednostavno probni tekst koji se koristi u tiskarskoj i slovoslagarskoj 
+            industriji. Lorem Ipsum postoji kao industrijski standard još od 16-og stoljeća, kada je 
+            nepoznati tiskar uzeo tiskarsku galiju slova i posložio ih da bi napravio knjigu s uzorkom 
+            tiska.</para>   
+    </section>
+    
+   
+    <section xml:id="CHANGE_ME4">  
+        <info>  
+            <title xml:id="CHANGE_ME4.title">Subsection3 title</title>          
+        </info>
+        
+        <para>Lorem Ipsum je jednostavno probni tekst koji se koristi u tiskarskoj i slovoslagarskoj 
+            industriji. Lorem Ipsum postoji kao industrijski standard još od 16-og stoljeća, kada je 
+            nepoznati tiskar uzeo tiskarsku galiju slova i posložio ih da bi napravio knjigu s uzorkom 
+            tiska.</para>   
+    </section>
+    
+    <section xml:id="CHANGE_ME5">  
+        <info>  
+            <title xml:id="CHANGE_ME5.title">Subsection4 title</title>          
+        </info>
+        
+        <para>Lorem Ipsum je jednostavno probni tekst koji se koristi u tiskarskoj i slovoslagarskoj 
+            industriji. Lorem Ipsum postoji kao industrijski standard još od 16-og stoljeća, kada je 
+            nepoznati tiskar uzeo tiskarsku galiju slova i posložio ih da bi napravio knjigu s uzorkom 
+            tiska.</para>   
+    </section>
+    
+</section>
+
