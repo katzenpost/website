@@ -45,11 +45,77 @@
     <info>  
         <title xml:id="CHANGE_ME1.title">General title</title> <!-- Match to title PI above. -->          
     </info>
-        
-    <para>Lorem Ipsum je jednostavno probni tekst koji se koristi u tiskarskoj i slovoslagarskoj 
-        industriji. Lorem Ipsum postoji kao industrijski standard još od 16-og stoljeća, kada je 
-        nepoznati tiskar uzeo tiskarsku galiju slova i posložio ih da bi napravio knjigu s uzorkom 
-        tiska.</para>
+    <para>Echomix is for people who value their anonymity. Importantly, anonymity is not the same
+        thing as encyrption. Encryption has become standard in modern communication (with the
+        notable exceptions of SMS messaging and e-mail), and most users of text chat and Internet
+        audio are satisfied with protecting  the content of their writing and speech. Anonymity,
+        however, means that the identities of people in an electronic conversation cannot be tied to
+        real-world identities by any direct or indirect means. It is reasonable to ask, Why should
+        anyone care about that?</para>
+    <para>The answer is apparent from the kinds of individuals and institutions who value knowledge
+        of who is talking to whom. Though the law doesn't protect this kind of information very
+        strongly, identifying the members of a network of people in contact with each other is often
+        more useful than knowing the content of any particular conversation.</para>
+    <itemizedlist>
+        <listitem>
+            <para>While the content of telephone conversations is shielded by strong limitations on
+                wire-tapping, criminal investigators generally don't even need a warrant to capture,
+                via <link xlink:href="https://en.wikipedia.org/wiki/Pen_register">pen traps</link>,
+                the identities of people conversing. </para>
+        </listitem>
+        <listitem>
+            <para>The United States Postal Service routinely photographs and stores the address
+                information of mail passing through its system. The USPS <link
+                    xlink:href="https://www.washingtonpost.com/news/federal-eye/wp/2014/11/20/postal-service-almost-never-denies-mail-surveillance-requests/"
+                    >almost never</link> denies requests for this information. from <link
+                    xlink:href="https://www.nytimes.com/2013/07/04/us/monitoring-of-snail-mail.html"
+                    >law enforcement and others</link>.</para>
+        </listitem>
+        <listitem>
+            <para>Most dramatically, US intelligence agencies use cell phone metadata to track and
+                target suspected terrorists for drone and missile attacks. National Security Agency
+                director Gen. Michael Hayden famously <link
+                    xlink:href="https://abcnews.go.com/blogs/headlines/2014/05/ex-nsa-chief-we-kill-people-based-on-metadata"
+                    >stated</link>, "We kill people based on metadata."</para>
+        </listitem>
+        <listitem>
+            <para>dfdf</para>
+        </listitem>
+    </itemizedlist>
+    <para/>
+    <para>Threat model and security guarantees.</para>
+    <itemizedlist>
+        <listitem>
+            <para>Global passive adversaries (timing/correlation attacks)</para>
+        </listitem>
+        <listitem>
+            <para>Encryption vs. anonymity</para>
+        </listitem>
+        <listitem>
+            <para>Social graphs</para>
+        </listitem>
+        <listitem>
+            <para>Dishonest service providers.</para>
+        </listitem>
+        <listitem>
+            <para>Collection of metadata – All metadata collected will eventually be seized, whether
+                by hackers, police, domestic intelligence, foreign intelligence, or criminals. The
+                only way protect data is not to possess it.</para>
+        </listitem>
+    </itemizedlist>
+    <para>Trade-offs</para>
+    <para/>
+    <itemizedlist>
+        <listitem>
+            <para>No live video.</para>
+        </listitem>
+        <listitem>
+            <para>Live audio still in development.</para>
+        </listitem>
+        <listitem>
+            <para>Keeping track of identities.</para>
+        </listitem>
+    </itemizedlist>
      
     <section xml:id="CHANGE_ME2">  
         <info>  
