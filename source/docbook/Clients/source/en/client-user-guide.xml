@@ -5,7 +5,7 @@
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 <?title ?> 
-<?linkTitle "Chat client user guide" ?>  <!-- Section menu link text -->
+<?linkTitle "Echomix chat user guide" ?>  <!-- Section menu link text -->
 <?url "docs/chat_client/user-guide.html" ?> <!-- Required to make image links work -->
 <?description ?> <!-- Optional -->
 <?draft "false" ?> <!-- Optional -->
@@ -43,94 +43,64 @@
             xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
             xml:id="CHANGE_ME1">
     <info>  
-        <title xml:id="CHANGE_ME1.title">General title</title> <!-- Match to title PI above. -->          
+        <title xml:id="CHANGE_ME1.title">&program_name; chat user guide</title> <!-- Match to "title" or "linkTitle" promming instruction above. -->          
     </info>
-    <para>Echomix is for people who value their anonymity. Importantly, anonymity is not the same
-        thing as encyrption. Encryption has become standard in modern communication (with the
-        notable exceptions of SMS messaging and e-mail), and most users of text chat and Internet
-        audio are satisfied with protecting  the content of their writing and speech. Anonymity,
-        however, means that the identities of people in an electronic conversation cannot be tied to
-        real-world identities by any direct or indirect means. It is reasonable to ask, Why should
-        anyone care about that?</para>
-    <para>The answer is apparent from the kinds of individuals and institutions who value knowledge
-        of who is talking to whom. Though the law doesn't protect this kind of information very
-        strongly, identifying the members of a network of people in contact with each other is often
-        more useful than knowing the content of any particular conversation.</para>
-    <itemizedlist>
-        <listitem>
-            <para>While the content of telephone conversations is shielded by strong limitations on
-                wire-tapping, criminal investigators generally don't even need a warrant to capture,
-                via <link xlink:href="https://en.wikipedia.org/wiki/Pen_register">pen traps</link>,
-                the identities of people conversing. </para>
-        </listitem>
-        <listitem>
-            <para>The United States Postal Service routinely photographs and stores the address
-                information of mail passing through its system. The USPS <link
-                    xlink:href="https://www.washingtonpost.com/news/federal-eye/wp/2014/11/20/postal-service-almost-never-denies-mail-surveillance-requests/"
-                    >almost never</link> denies requests for this information. from <link
-                    xlink:href="https://www.nytimes.com/2013/07/04/us/monitoring-of-snail-mail.html"
-                    >law enforcement and others</link>.</para>
-        </listitem>
-        <listitem>
-            <para>Most dramatically, US intelligence agencies use cell phone metadata to track and
-                target suspected terrorists for drone and missile attacks. National Security Agency
-                director Gen. Michael Hayden famously <link
-                    xlink:href="https://abcnews.go.com/blogs/headlines/2014/05/ex-nsa-chief-we-kill-people-based-on-metadata"
-                    >stated</link>, "We kill people based on metadata."</para>
-        </listitem>
-        <listitem>
-            <para>dfdf</para>
-        </listitem>
-    </itemizedlist>
-    <para/>
-    <para>Threat model and security guarantees.</para>
-    <itemizedlist>
-        <listitem>
-            <para>Global passive adversaries (timing/correlation attacks)</para>
-        </listitem>
-        <listitem>
-            <para>Encryption vs. anonymity</para>
-        </listitem>
-        <listitem>
-            <para>Social graphs</para>
-        </listitem>
-        <listitem>
-            <para>Dishonest service providers.</para>
-        </listitem>
-        <listitem>
-            <para>Collection of metadata – All metadata collected will eventually be seized, whether
-                by hackers, police, domestic intelligence, foreign intelligence, or criminals. The
-                only way protect data is not to possess it.</para>
-        </listitem>
-    </itemizedlist>
-    <para>Trade-offs</para>
-    <para/>
-    <itemizedlist>
-        <listitem>
-            <para>No live video.</para>
-        </listitem>
-        <listitem>
-            <para>Live audio still in development.</para>
-        </listitem>
-        <listitem>
-            <para>Keeping track of identities.</para>
-        </listitem>
-    </itemizedlist>
+    <para>The &program_name; message-sharing system is designed for people who have something to
+        say, but who also value their anonymity. Importantly, anonymity is not the same thing as
+        encryption, which protects the <emphasis>content</emphasis> of communication over the
+        Internet. Anonymity, on the other hand, protects the <emphasis>people</emphasis>.
+        &program_name; text and audio chat prevents the disclosure of its users' real-world
+        identities by direct or indirect means. </para>
+    <para>This guide explains how to use the &chat_client; text and audio chat client. The client
+        uses an &program_name; network to share one-on-one and group messages while protecting both
+        the content of your conversations and identifying information about you. For technical
+        information about how Echomix works, see <link xlink:href="sdsdsd">blah</link>. To learn
+            <emphasis>why</emphasis> Echomix works as it does, see <link xlink:href="sdsdsd"
+            >Frequent asked questions</link> .</para>
+    <section>
+        <title>Requirements for the &chat_client; chat client</title>
+        <para>To use the &chat_client; chat client, you need a computer running the
+            <?oxy_comment_start author="dwrob" timestamp="20251002T141316+0200" comment="Try a Mac as well."?>GNU/Linux<?oxy_comment_end?>
+            operating system on x86-64 hardware. The &chat_client; software is provided as an <link
+                xlink:href="https://appimage.org/">AppImage</link> package, and should run without
+            problems on any modern Linux distribution, including, but not limited to, Ubuntu,
+            Debian, openSUSE, CentOS, Fedora, and Arch. </para>
+        <para>An AppImage package contains all of the supporting software libraries needed to run
+            the included application, so there is no need to install the software directly on your
+            system. However, you do need to install AppImage itself on your system before you can
+            run AppImage packages. For more information,. consult the procedures for installing
+            application on your Linux distribution.</para>
+    </section>
      
     <section xml:id="CHANGE_ME2">  
         <info>  
-            <title xml:id="CHANGE_ME2.title">Subsection1 title</title>          
+            <title xml:id="CHANGE_ME2.title">Installing the &chat_client; chat client</title>          
         </info>
-            
-        <para>Lorem Ipsum je jednostavno probni tekst koji se koristi u tiskarskoj i slovoslagarskoj 
-            industriji. Lorem Ipsum postoji kao industrijski standard još od 16-og stoljeća, kada je 
-            nepoznati tiskar uzeo tiskarsku galiju slova i posložio ih da bi napravio knjigu s uzorkom 
-            tiska.</para>        
+        <para>The &chat_client; client is available as an AppImage package from the &program_name;
+            site at <link xlink:href="https://katzenpost.network/downloads"
+                >https://katzenpost.network/downloads</link>. Complete the following procedure.<procedure>
+                <step>
+                    <para>Download the the AppImage package to a convenient location on your
+                        computer. </para>
+                </step>
+                <step>
+                    <para>In a terminal, navigate to the directory containing the
+                        &chat_client;-x86_64.AppImage file. Set the executable flag as
+                        follows:</para>                    
+                        <programlisting><prompt>~$ </prompt><command>chmod +x &chat_client;-x86_64.AppImage</command></programlisting>
+                    <para>Note that you may need root permissions to perform this step.</para>
+                </step>
+                <step>
+                    <para>You can now start Echo from a graphical file manager or directly at the
+                        command line:</para>
+                    <programlisting><prompt>~$ </prompt><command>./&chat_client;-x86_64.AppImage</command></programlisting>
+                </step>
+            </procedure></para>        
     </section>
   
     <section xml:id="CHANGE_ME3">  
         <info>  
-            <title xml:id="CHANGE_ME3.title">Subsection2 title</title>          
+            <title xml:id="CHANGE_ME3.title">Creating and managing contacts in &chat_client;</title>          
         </info>
         
         <para>Lorem Ipsum je jednostavno probni tekst koji se koristi u tiskarskoj i slovoslagarskoj 
@@ -142,7 +112,8 @@
    
     <section xml:id="CHANGE_ME4">  
         <info>  
-            <title xml:id="CHANGE_ME4.title">Subsection3 title</title>          
+            <title xml:id="CHANGE_ME4.title">Sending and receiving &chat_client; text
+                messages</title>          
         </info>
         
         <para>Lorem Ipsum je jednostavno probni tekst koji se koristi u tiskarskoj i slovoslagarskoj 
@@ -153,7 +124,7 @@
     
     <section xml:id="CHANGE_ME5">  
         <info>  
-            <title xml:id="CHANGE_ME5.title">Subsection4 title</title>          
+            <title xml:id="CHANGE_ME5.title">Using &chat_client; audio</title>          
         </info>
         
         <para>Lorem Ipsum je jednostavno probni tekst koji se koristi u tiskarskoj i slovoslagarskoj 
@@ -161,6 +132,139 @@
             nepoznati tiskar uzeo tiskarsku galiju slova i posložio ih da bi napravio knjigu s uzorkom 
             tiska.</para>   
     </section>
+    <section>
+        <title>Frequently asked questions</title>
+        <para>Users of conventional encrypted chat tools (Meta WhatsApp, Meta Messenger, Apple
+            iMessage, Signal, etc.) may wonder, "Why should I care about that?" Many people may not
+            care. However, businesses, governments, and criminals care very much about your identity
+            and all of the information linked to it.</para>
+        <para>
+            <itemizedlist>
+                <listitem>
+                    <para>Internet businesses routinely harvest and sell sensitive identity data to
+                        profit from invasively personalized ads and other sources.</para>
+                </listitem>
+                <listitem>
+                    <para>Governments, especially law enforcement and spy agencies, collect and
+                        store any data about identity, movements, employment, and political views
+                        that they can get their hands on, sacrificing the privacy of millions of
+                        innocent people to catch a tiny number of suspected criminals.</para>
+                </listitem>
+                <listitem>
+                    <para>Actual criminals make daily use of the data they steal from these same
+                        businesses and governments, enabling identity theft, credit-card fraud, and
+                        blackmail.</para>
+                </listitem>
+            </itemizedlist>
+        </para>
+        <para>Consequently, &program_name; users are likely to be drawn from the following
+            demographics.</para>
+        <itemizedlist>
+            <listitem>
+                <para>People and groups who are likely to be under surveillance by government
+                    entities, including corrupt police forces and intelligence agencies.</para>
+            </listitem>
+            <listitem>
+                <para>People facing business or government censorship.</para>
+            </listitem>
+            <listitem>
+                <para>Businesses aware of the dangers of leaking internal information to their local
+                    and global competitors or to their own or other governments.</para>
+            </listitem>
+            <listitem>
+                <para>Non-profit organizations engaging in advocacy that earns them enemies in high
+                    places with powerful surveillance capabilities.</para>
+            </listitem>
+            <listitem>
+                <para>People worried about the utter insecurity of personal data stored in both
+                    cloud and on-premises databases that are accessible from the Internet.</para>
+            </listitem>
+            <listitem>
+                <para>People who want to use the Internet for communication, but who viscerally
+                    detest being the raw material that feeds <link
+                        xlink:href="https://en.wikipedia.org/wiki/Surveillance_capitalism"
+                        >surveillance capitalism</link>.</para>
+                <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Hiding who
+                    is talking to whom<?oxy_custom_end?></para>
+            </listitem>
+        </itemizedlist>
+        <!--    <para>The answer is apparent from the kinds of individuals and institutions who value knowledge
+        of who is talking to whom. Though the law doesn't protect this kind of information very
+        strongly, identifying the members of a network of people in contact with each other is often
+        more useful than knowing the content of any particular conversation.</para>
+    <itemizedlist>
+        <listitem>
+            <para>While the <emphasis>content</emphasis> of telephone communication is shielded by
+                strong limitations on wire-tapping, far weaker rules restrict the use of <link
+                    xlink:href="https://en.wikipedia.org/wiki/Pen_register">pen register / trap and
+                    trace devices</link> to capture the identities of people engaged in private
+                conversations. </para>
+        </listitem>
+        <listitem>
+            <para>The United States Postal Service routinely photographs and stores the address
+                information of mail passing through its system. The USPS <link
+                    xlink:href="https://www.washingtonpost.com/news/federal-eye/wp/2014/11/20/postal-service-almost-never-denies-mail-surveillance-requests/"
+                    >almost never</link> denies requests for this information. from <link
+                    xlink:href="https://www.nytimes.com/2013/07/04/us/monitoring-of-snail-mail.html"
+                    >law enforcement and others</link>.</para>
+        </listitem>
+        <listitem>
+            <para>Most dramatically, US intelligence agencies use cell phone metadata (account data
+                and geolocation) to target suspected terrorists for drone and missile attacks. As
+                National Security Agency director Gen. Michael Hayden famously <link
+                    xlink:href="https://abcnews.go.com/blogs/headlines/2014/05/ex-nsa-chief-we-kill-people-based-on-metadata"
+                    >stated</link>, "We kill people based on metadata."</para>
+        </listitem>
+    </itemizedlist>-->
+        <para>And what about crime?</para>
+        <para>The Namenlos network</para>
+        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Threat
+            model<?oxy_custom_end?> and security guarantees.</para>
+        <itemizedlist>
+            <listitem>
+                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                <para>Global passive adversaries (timing/correlation
+                    attacks)<?oxy_custom_end?></para>
+                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                <para>Second-party anonymity – why it matters<?oxy_custom_end?> …GPA can take
+                    advantage of the additional metadata contacts have about other contacts.</para>
+                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                <para>aim for neutrality<?oxy_custom_end?></para>
+            </listitem>
+            <listitem>
+                <para>Encryption vs. anonymity</para>
+            </listitem>
+            <listitem>
+                <para>Social graphs</para>
+            </listitem>
+            <listitem>
+                <para>Dishonest service providers.</para>
+            </listitem>
+            <listitem>
+                <para>Collection of metadata – All metadata collected will eventually be seized,
+                    whether by hackers, police, domestic intelligence, foreign intelligence, or
+                    criminals. The only way protect data is not to possess it.</para>
+            </listitem>
+        </itemizedlist>
+        <para>Trade-offs</para>
+        <para/>
+        <itemizedlist>
+            <listitem>
+                <para>No live video.</para>
+            </listitem>
+            <listitem>
+                <para>Live audio still in development.</para>
+            </listitem>
+            <listitem>
+                <para>Keeping track of identities.</para>
+            </listitem>
+        </itemizedlist>
+        <para/>
+        <para><link
+                xlink:href="https://papersplease.org/wp/2025/10/01/ice-is-buying-location-data-from-smartphone-apps-etc/"
+            /></para>
+        <para/>
+        <para/>
+    </section>
     
 </section>
-
