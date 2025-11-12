@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title ?> 
+<?linkTitle "Echomix chat user guide" ?>  <!-- Section menu link text -->
+<?url "docs/chat_client/user-guide.html" ?> <!-- Required to make image links work -->
+<?description ?> <!-- Optional -->
+<?draft "false" ?> <!-- Optional -->
+<?slug "chat" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight "1" ?> <!-- Optional -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+    %shared-content;
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+
+<section    xmlns="http://docbook.org/ns/docbook"
+            xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
+            xml:id="CHANGE_ME1">
+    <info>  
+        <title xml:id="CHANGE_ME1.title">&program_name; chat user guide</title> <!-- Match to "title" or "linkTitle" promming instruction above. -->          
+    </info>
+    <para>The &program_name; message-sharing system is designed for people who have something to
+        say, but who also value their anonymity. Importantly, anonymity is not the same thing as
+        encryption, which protects the <emphasis>content</emphasis> of communication over the
+        Internet. Anonymity, on the other hand, protects the <emphasis>people</emphasis>.
+        &program_name; text and audio chat prevents the disclosure of its users' real-world
+        identities by direct or indirect means. </para>
+    <para>This guide explains how to use the &chat_client; text <!--and audio--> chat client. The
+        client uses an &program_name; network to share one-to-one and group messages while
+        protecting both the content of your conversations and identifying information about you. For
+        technical information about how Echomix works, see <link xlink:href="sdsdsd">blah</link>. To
+        learn <emphasis>why</emphasis> Echomix works as it does, see <link xlink:href="sdsdsd"
+            >Frequent asked questions</link> .</para>
+<!--    <section>
+        <title>Requirements for the &chat_client; chat client</title>
+        <para>To use the &chat_client; chat client, you need a computer running the
+            <?oxy_comment_start author="dwrob" timestamp="20251002T141316+0200" comment="Try a Mac as well."?>GNU/Linux<?oxy_comment_end?>
+            operating system on x86-64 hardware. The &chat_client; software is provided as an <link
+                xlink:href="https://appimage.org/">AppImage</link> package, and should run without
+            problems on any modern Linux distribution, including, but not limited to, Ubuntu,
+            Debian, openSUSE, CentOS, Fedora, and Arch. </para>
+        <para>An AppImage package contains all of the supporting software libraries needed to run
+            the included application, so there is no need to install the software directly on your
+            system. However, you do need to install AppImage itself on your system before you can
+            run AppImage packages. For more information,. consult the procedures for installing
+            application on your Linux distribution.</para>
+    </section>-->
+     
+    <section xml:id="CHANGE_ME2">  
+        <info>  
+            <title xml:id="CHANGE_ME2.title">Installing the &chat_client; chat client </title>          
+        </info>
+        <para>The &chat_client; client is available as a Docker image or as Python code available
+            from GitHub. Complete of the the following procedures.</para>
+            
+            <procedure>
+                <title>Docker procedure</title>
+            <para>To prepare to use the Docker image, first install <link
+                    xlink:href="https://www.docker.com">Docker</link> and <link
+                    xlink:href="https://docs.docker.com/compose/">Docker Compose</link> or,
+                alternatively, the drop-in daemonless Docker-equivalents <link
+                    xlink:href="https://podman.io">Podman</link> and <link
+                    xlink:href="https://docs.podman.io/en/latest/markdown/podman-compose.1.html"
+                    >Podman Compose</link>. We recommend using Podman because it runs by default
+                without root privileges .</para>
+            <step>
+                <para>On Debian or Ubuntu, Podman can be installed with the following commands
+                    (running as superuser). <command>Apt</command> will pull in the needed
+                    dependencies.</para>
+                <programlisting><prompt># </prompt><command>apt update</command>
+<prompt># </prompt><command>apt install make podman podman-compose</command></programlisting>
+            </step>
+                <step>
+                <para>Download the &chat_client; client from
+                        <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><link
+                        xlink:href="https://katzenpost.network/downloads"
+                        >https://katzenpost.network/downloads</link><?oxy_custom_end?> to a
+                    convenient location on your
+                    computer.<?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?></para><?oxy_custom_end?>
+            </step>
+                <step><para>In a terminal, navigate to the directory containing the package and unzip it.</para></step>
+                <step><para>In the
+                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>xxx<?oxy_custom_end?>
+                    directory, start the client in a container using the provided
+                    Makefile.<programlisting><prompt>~$ </prompt><command>make</command></programlisting></para></step>                        
+            </procedure>
+        <procedure>
+            <title>Python code procedure</title>
+            <para>To prepare to use the &chat_client; client source code, you need Git and Python3
+                installed on your Debian or Ubuntu system. Our recommended method of building the
+                application is to run it in a Python virtual environment using the Makefile included
+                with the code.</para>
+            <step>
+                <para>Install the latest Git, Python3, and Make on your
+                    system.<programlisting><prompt># </prompt><command>apt update</command>
+<prompt># </prompt><command>apt install git python3 make</command></programlisting></para>
+            </step>
+            <step>
+                <para>Clone the &chat_client; repository at <link
+                        xlink:href="https://github.com/katzenpost/katzenqt"/>.</para>
+            </step>
+            <step>
+                <para>In the <filename>katzenqt</filename> directory, create a virtual environment,
+                    load additional required software, and start the client using the following
+                    commands.<programlisting><prompt>~$ </prompt><command>python3 -m venv myvenv</command>
+<prompt>~$ </prompt><command>source myvenv/bin/activate</command>
+<prompt>~$ </prompt><command>pip install --upgrade pip</command>
+<prompt>~$ </prompt><command>pip install 'git+https://github.com/katzenpost/thin_client@a5f87b9623eb349ba376d7e7555c3154302216e8'</command>
+<prompt>~$ </prompt><command>pip install -e .</command>
+<prompt>~$ </prompt><command>make</command></programlisting></para>
+            </step>
+        </procedure>
+            <!--            <procedure>
+                <title>AppImage procedure</title>
+                <step>
+                    <para>Download the the AppImage package to a convenient location on your
+                        computer. </para>
+                </step>
+                <step>
+                    <para>In a terminal, navigate to the directory containing the
+                        &chat_client;-x86_64.AppImage file. Set the executable flag as
+                        follows:</para>
+                    <programlisting><prompt>~$ </prompt><command>chmod +x &chat_client;-x86_64.AppImage</command></programlisting>
+                    <para>Note that you may need root permissions to perform this step.</para>
+                </step>
+                <step>
+                    <para>You can now start Echo from a graphical file manager or directly at the
+                        command line:</para>
+                    <programlisting><prompt>~$ </prompt><command>./&chat_client;-x86_64.AppImage</command></programlisting>
+                </step>
+            </procedure>     -->
+    </section>
+    <section>
+        <title>Communicating through the &chat_client; client</title>
+        <para>At first glance, &chat_client; looks much like other chat clients. It has two panes,
+            one for contacts and one for messages; it has a number of modes such as chat, file
+            transfer, and voice communication; and so on. </para>
+        <note>
+            <para>At present, only chat works.</para>
+        </note>
+        <para>However, this is communication tool that emphasizes anonymity, so certain procedures
+            are different, and some familiar terms have slightly changed meanings. </para>
+        <itemizedlist>
+            <listitem>
+                <para>&chat_client; and &program_name; contain no information about real-world
+                    identities behind contacts. There are no e-mail addresses, telephone numbers,
+                    postal addresses, or anything similar involved.</para>
+            </listitem>
+            <listitem>
+                <para>Contact display names are arbitrary.</para>
+            </listitem>
+            <listitem>
+                <para>Contacts in one conversation are unconnected with contacts in other
+                    conversations.</para>
+            </listitem>
+            <listitem>
+                <para>Connecting with contacts requires an out-of-band (OOB) step. This is a task
+                    that you and another real-world person carry out separately from &chat_client;
+                    and &program_name;.</para>
+            </listitem>
+            <listitem>
+                <para/>
+            </listitem>
+        </itemizedlist>
+        
+        
+        <figure><info><title>Exploring the client</title></info>
+            
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="pix/xxx.png" scale="65"/>
+                </imageobject>               
+            </mediaobject>
+            
+        </figure>
+        
+        
+        <para/>
+        <section xml:id="CHANGE_ME3">
+            <info>
+                <title xml:id="CHANGE_ME3.title">Create conversations</title>
+            </info>
+            <para>Communication in &chat_client; takes place in the context of conversations. A
+                conversation may contain just two particpants, or it may include a large group. The
+                first thing that a new user of &chat_client; must do is create a conversation. Each
+                participating contact also creates a conversation.</para>
+            <para><emphasis role="bold">To create a conversation</emphasis></para>
+            <para>
+                <procedure>
+                    <step>
+                        <para>Open &chat_client;.</para>
+                    </step>
+                    <step>
+                        <para>In the toolbar, click the <guilabel>New conversation</guilabel>
+                            button.</para>
+                    </step>
+                    <step>
+                        <para>In the <guilabel>New conversation</guilabel> window, type a name in
+                            the <guilabel>Choose conversation name</guilabel> field. This name is
+                            how you identify the conversation in your own &chat_client; client. It
+                            may differ from what your contacts call their corresponding
+                            conversations. Click <guilabel>OK</guilabel> when finished.</para>
+                    </step>
+                    <step>
+                        <para>Type a name for yourself in the field labeled <guilabel>Choose (your)
+                                name displayed to the other user(s)</guilabel>. Click
+                                <guilabel>OK</guilabel> when finished. Your contacts will see this
+                            name when the accept your invitation,
+                            <?oxy_comment_start author="dwrob" timestamp="20251105T173215-0800" comment="Is this actually supported?"?>although
+                            they may assign some other name to you<?oxy_comment_end?>.</para>
+                    </step>
+                </procedure>               
+            </para>
+            <para>In the left pane of the client, labeled <guilabel>Conversations and
+                    contacts</guilabel>, the name of your new conversation is displayed along with
+                your own name as the first contact. In the right pane, labeled
+                    <guilabel>Messages</guilabel>,
+                &chat_client;<?oxy_comment_start author="dwrob" timestamp="20251105T173304-0800" comment="This should look more like a stage direction than like a regular message."?>
+                prints a greeting message<?oxy_comment_end?>.</para>
+            <para>You can create
+                <?oxy_comment_start author="dwrob" timestamp="20251105T173506-0800" comment="Is there in fact a limitation, other than all available RAM?"?>any
+                number<?oxy_comment_end?> of conversations, each completely separate from the
+                others.</para>
+        </section>
+        <section xml:id="CHANGE_ME4">
+            <info>
+                <title xml:id="CHANGE_ME4.title">Invite a contact to a conversation</title>
+            </info>
+            <para>sdsdsd</para>
+        </section>
+        <section>
+            <title>Accept an invitation</title>
+            <para>dfererer</para>
+        </section>
+        <section>
+            <title>Exchange messages with contacts</title>
+            <para>erererer</para>
+        </section>
+    </section>
+    <section>
+        <title>Frequently asked questions</title>
+        <para>Users of conventional encrypted chat tools (Meta WhatsApp, Meta Messenger, Apple
+            iMessage, Signal, etc.) may wonder, "Why should I care about that?" Many people may not
+            care. However, businesses, governments, and criminals care very much about your identity
+            and all of the information linked to it.</para>
+        <para>
+            <itemizedlist>
+                <listitem>
+                    <para>Internet businesses routinely harvest and sell sensitive identity data to
+                        profit from invasively personalized ads and other sources.</para>
+                </listitem>
+                <listitem>
+                    <para>Governments, especially law enforcement and spy agencies, collect and
+                        store any data about identity, movements, employment, and political views
+                        that they can get their hands on, sacrificing the privacy of millions of
+                        innocent people to catch a tiny number of suspected criminals.</para>
+                </listitem>
+                <listitem>
+                    <para>Actual criminals make daily use of the data they steal from these same
+                        businesses and governments, enabling identity theft, credit-card fraud, and
+                        blackmail.</para>
+                </listitem>
+            </itemizedlist>
+        </para>
+        <para>Consequently, &program_name; users are likely to be drawn from the following
+            demographics.</para>
+        <itemizedlist>
+            <listitem>
+                <para>People and groups who are likely to be under surveillance by government
+                    entities, including corrupt police forces and intelligence agencies.</para>
+            </listitem>
+            <listitem>
+                <para>People facing business or government censorship.</para>
+            </listitem>
+            <listitem>
+                <para>Businesses aware of the dangers of leaking internal information to their local
+                    and global competitors or to their own or other governments.</para>
+            </listitem>
+            <listitem>
+                <para>Non-profit organizations engaging in advocacy that earns them enemies in high
+                    places with powerful surveillance capabilities.</para>
+            </listitem>
+            <listitem>
+                <para>People worried about the utter insecurity of personal data stored in both
+                    cloud and on-premises databases that are accessible from the Internet.</para>
+            </listitem>
+            <listitem>
+                <para>People who want to use the Internet for communication, but who viscerally
+                    detest being the raw material that feeds <link
+                        xlink:href="https://en.wikipedia.org/wiki/Surveillance_capitalism"
+                        >surveillance capitalism</link>.</para>
+                <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Hiding who
+                    is talking to whom<?oxy_custom_end?></para>
+            </listitem>
+        </itemizedlist>
+        <!--    <para>The answer is apparent from the kinds of individuals and institutions who value knowledge
+        of who is talking to whom. Though the law doesn't protect this kind of information very
+        strongly, identifying the members of a network of people in contact with each other is often
+        more useful than knowing the content of any particular conversation.</para>
+    <itemizedlist>
+        <listitem>
+            <para>While the <emphasis>content</emphasis> of telephone communication is shielded by
+                strong limitations on wire-tapping, far weaker rules restrict the use of <link
+                    xlink:href="https://en.wikipedia.org/wiki/Pen_register">pen register / trap and
+                    trace devices</link> to capture the identities of people engaged in private
+                conversations. </para>
+        </listitem>
+        <listitem>
+            <para>The United States Postal Service routinely photographs and stores the address
+                information of mail passing through its system. The USPS <link
+                    xlink:href="https://www.washingtonpost.com/news/federal-eye/wp/2014/11/20/postal-service-almost-never-denies-mail-surveillance-requests/"
+                    >almost never</link> denies requests for this information. from <link
+                    xlink:href="https://www.nytimes.com/2013/07/04/us/monitoring-of-snail-mail.html"
+                    >law enforcement and others</link>.</para>
+        </listitem>
+        <listitem>
+            <para>Most dramatically, US intelligence agencies use cell phone metadata (account data
+                and geolocation) to target suspected terrorists for drone and missile attacks. As
+                National Security Agency director Gen. Michael Hayden famously <link
+                    xlink:href="https://abcnews.go.com/blogs/headlines/2014/05/ex-nsa-chief-we-kill-people-based-on-metadata"
+                    >stated</link>, "We kill people based on metadata."</para>
+        </listitem>
+    </itemizedlist>-->
+        <para>And what about crime?</para>
+        <para>The Namenlos network</para>
+        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Threat
+            model<?oxy_custom_end?> and security guarantees.</para>
+        <itemizedlist>
+            <listitem>
+                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                <para>Global passive adversaries (timing/correlation
+                    attacks)<?oxy_custom_end?></para>
+                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                <para>Second-party anonymity – why it matters<?oxy_custom_end?> …GPA can take
+                    advantage of the additional metadata contacts have about other contacts.</para>
+                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                <para>aim for neutrality<?oxy_custom_end?></para>
+            </listitem>
+            <listitem>
+                <para>Encryption vs. anonymity</para>
+            </listitem>
+            <listitem>
+                <para>Social graphs</para>
+            </listitem>
+            <listitem>
+                <para>Dishonest service providers.</para>
+            </listitem>
+            <listitem>
+                <para>Collection of metadata – All metadata collected will eventually be seized,
+                    whether by hackers, police, domestic intelligence, foreign intelligence, or
+                    criminals. The only way protect data is not to possess it.</para>
+            </listitem>
+        </itemizedlist>
+        <para>Trade-offs</para>
+        <para/>
+        <itemizedlist>
+            <listitem>
+                <para>No live video.</para>
+            </listitem>
+            <listitem>
+                <para>Live audio still in development.</para>
+            </listitem>
+            <listitem>
+                <para>Keeping track of identities.</para>
+            </listitem>
+        </itemizedlist>
+        <para/>
+        <para><link
+                xlink:href="https://papersplease.org/wp/2025/10/01/ice-is-buying-location-data-from-smartphone-apps-etc/"
+            /></para>
+        <para/>
+        <para/>
+    </section>
+    
+</section>
