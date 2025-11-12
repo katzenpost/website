@@ -473,6 +473,65 @@
         <title>Frequently asked questions
             <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>–
             TODO<?oxy_custom_end?></title>
+        <para/>
+        <section>
+            <title>Why does anonymity matter?</title>
+            <para/>
+        </section>
+        <section>
+            <title>What makes &chat_client; different from other chat clients?</title>
+            <para/>
+        </section>
+        <section>
+            <title>I use an end-to-end encrypted chat service. Is that good enough?</title>
+            <para/>
+        </section>
+        <section>
+            <title>What kind of users need anonymity protection?</title>
+            <para/>
+        </section>
+        <section>
+            <title>I am just an ordinary person with nothing to hide. Why should I worry about being
+                anonymous?</title>
+            <para/>
+        </section>
+        <section>
+            <title>Why are governments and businesses so interested in my metadata?</title>
+            <para/>
+        </section>
+        <section>
+            <title>What makes mixnets special?</title>
+            <para/>
+        </section>
+        <section>
+            <title>Who is hosting the &program_name; servers?</title>
+            <para/>
+        </section>
+        <section>
+            <title>Will &chat_client; ever have audio chat, or video chat?</title>
+            <para/>
+        </section>
+        <section>
+            <title>Is this legal?</title>
+            <para/>
+        </section>
+        <section>
+            <title>Why is out-of-band (OOB) secret sharing so important in &chat_client;?</title>
+            <para/>
+        </section>
+        <section>
+            <title>Who made &program_name; and &chat_client;?</title>
+            <para/>
+        </section>
+        <section>
+            <title>What information could authorities retrieve by seizing your computer with
+                Katzen?</title>
+            <para>How thorough is the local anonymization? Could e2e keys and contact identifiers be
+                discovered? Is the database encrypted?</para>
+        </section>
+    </section>
+    <section>
+        <title>Blah</title>
         <para>Users of conventional encrypted chat tools (Meta WhatsApp, Meta Messenger, Apple
             iMessage, Signal, etc.) may wonder, "Why should I care about that?" Many people may not
             care. However, businesses, governments, and criminals care very much about your identity
@@ -638,10 +697,9 @@
             run AppImage packages. For more information,. consult the procedures for installing
             application on your Linux distribution.</para>
     </section>-->
-        
-     <para>For technical information about the invitation process, see <link
+        <para>For technical information about the invitation process, see <link
                 xlink:href="https://katzenpost.network/docs/specs/group_chat.html">Katzenpost Group
-                Chat Design</link>.</para>   
+                Chat Design</link>.</para>
     </section>
     
 </section>
