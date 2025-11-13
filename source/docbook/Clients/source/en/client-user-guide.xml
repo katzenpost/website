@@ -117,7 +117,7 @@
             </info>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="pix/client-overview.jpg" scale="50"/>
+                    <imagedata fileref="pix/client-overview.jpg" scale="80"/>
                 </imageobject>
                 <caption><para>&chat_client; consists of a menu bar, a toolbar, two panes, and a status bar (not visible).
                         The <guilabel>Conversations and contacts</guilabel> displays existing
@@ -194,7 +194,7 @@
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-convo-2.jpg" scale="50"/>
+                                    <imagedata fileref="pix/client-convo-2.jpg" scale="80"/>
                                 </imageobject>
                                 <caption>
                                     <para>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
@@ -220,7 +220,7 @@
                     </info>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="pix/client-convo-2.jpg" scale="50"/>
+                            <imagedata fileref="pix/client-convo-2.jpg" scale="80"/>
                         </imageobject>
                         <caption>
                             <para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -248,7 +248,7 @@
                 </info>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="pix/client-convo-3.jpg" scale="50"/>
+                        <imagedata fileref="pix/client-convo-3.jpg" scale="80"/>
                     </imageobject>
                     <caption>
                         <para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -357,7 +357,7 @@
                     </info>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="pix/client-invite-1.jpg" scale="50"/>
+                            <imagedata fileref="pix/client-invite-1.jpg" scale="80"/>
                         </imageobject>
                         <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
                                 labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
@@ -401,7 +401,7 @@
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-accept-1.jpg" scale="50"/>
+                                    <imagedata fileref="pix/client-accept-1.jpg" scale="80"/>
                                 </imageobject>
                                 <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
                                         labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
@@ -426,7 +426,7 @@
                     </info>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="pix/client-accept-2.jpg" scale="50"/>
+                            <imagedata fileref="pix/client-accept-2.jpg" scale="80"/>
                         </imageobject>
                         <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
                                 labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
@@ -460,7 +460,7 @@
                     </info>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="pix/client-accept-3.jpg" scale="50"/>
+                            <imagedata fileref="pix/client-accept-3.jpg" scale="80"/>
                         </imageobject>
                         <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
                                 labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
@@ -481,7 +481,7 @@
                     </info>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="pix/xxx.png" scale="50"/>
+                            <imagedata fileref="pix/xxx.png" scale="80"/>
                         </imageobject>
                         <caption>
                             <para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -533,11 +533,34 @@
         </section>
         <section>
             <title>Will &chat_client; ever have audio chat, or video chat?</title>
-            <para/>
+            <para>Mixnet-based communications have high latency by design. This has little impact on
+                low-bandwidth text communications, but it is very likely disqualifying for video.
+                Therefore we do not plan to offer video chat. Audio, however, can be more readily
+                compressed and optimized than video, and we do plan to offer video chat in the
+                future. For more information see <link
+                    xlink:href="https://katzenpost.network/docs/audio_eng/">Audio Engineering
+                    Considerations for a Modern Mixnet</link>.</para>
         </section>
         <section>
             <title>Is this legal?</title>
-            <para/>
+            <para>Let's take "this" as meaning end-to-end encryption and metadata minimization. The
+                answer depends on the jurisdiction and the political weather. Countries such as
+                China and Iran that attempt to exert complete and ruthless control over citizens'
+                communication would probably forbid and block &chat_client; just as they do Signal
+                and Tor, with a full range of possible punishments for offenders. However, Western
+                democracies also enforce comprehensive surveillance over their citizens,
+                particularly as a tool for law enforcement or flexibly defined "national security."
+                The United States, the United Kingdom, and members of the European Union try
+                constantly to expand legal surveillance and to pass laws mandating backdoors in
+                encrypted devices, so far being thwarted either by public advocacy or by the
+                commercial self-interest of technology vendors. Users of surveillance-resistant
+                communication tools must understand the laws that apply to them, keep in mind the
+                ways that those laws are stretched and broken by corrupt police, and protect
+                themselves appropriately. If you knowingly violate your local laws while trusting in
+                clever technology to keep you safe, remember that you must make excellent technology
+                choices, use the tools perfectly, maintain operational security worthy of a
+                clandestine agent, and have very good luck. In a genuinely threatening environment,
+                the wisest path is often to avoid technological solutions altogether.</para>
         </section>
         <section>
             <title>Why is out-of-band (OOB) secret sharing so important in &chat_client;?</title>
@@ -545,7 +568,12 @@
         </section>
         <section>
             <title>Who made &program_name; and &chat_client;?</title>
-            <para/>
+            <para>&program_name; was created by a team of programmers, cryptographers,
+                mathemeticians, academics, tech industry veterans, and privacy advocates. We stand
+                on the shoulders of giants. Our current core contributors and past contributers are
+                listed at <link xlink:href="https://katzenpost.network/pages/team/">&program_name;
+                    Team</link>, and you can see who has been doing what by visiting our <link
+                    xlink:href="https://github.com/katzenpost">GitHub site</link>.  </para>
         </section>
         <section>
             <title>What information could authorities retrieve by seizing your computer with
