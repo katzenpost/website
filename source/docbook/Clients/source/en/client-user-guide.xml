@@ -268,27 +268,55 @@
             <info>
                 <title xml:id="CHANGE_ME4.title">Adding contacts to a conversation</title>
             </info>
-            <para>Once you have a created a conversation, you can begin adding contacts to it. This
-                requires issuing an invitation that you pass OOB to one or more &chat_client; users.
-                An invitation is a Base64-encoded string that designates a conversation and offers a
-                display name to represent you there. An &chat_client; user who receives your
-                invitation accepts it by returning a message, in &chat_client;, that grants read
-                access to members of your conversation, and also offers a display name. When the
-                process is complete, the new contact's display name will appear in the list of
-                contacts for each participant in the conversation.</para>
+            <para>Once you have a created a conversation, you can begin adding contacts to it. Users
+                of &chat_client; have no fixed user names or passwords; instead, they bear arbitrary
+                display names (which can be changed) and exert control over message streams hosted
+                on the &program_name; network. To communicate with each other, contacts share their
+                addresses and grant read permissions to each other. Authentication takes place once
+                in the real world before communication over the mixnet begins.</para>
+            <para>A user setting up a contact generates an authentication token called an
+                    <emphasis>invitation</emphasis>.  The invitation is a Base64-encoded string with
+                the following contents:<itemizedlist>
+                    <listitem>
+                        <para>a display name </para>
+                    </listitem>
+                    <listitem>
+                        <para>a mixnet storage address that doubles as read permission  </para>
+                    </listitem>
+                </itemizedlist></para>
+            <para>The initiating user delivers the invitation OOB to one or more recipients, who
+                enter the string into &chat_client; and send their own addresses and signed read
+                permissions to the first user, who publishes the shared read permissions for all
+                group members to see. When the process is complete, the new contact names display in
+                the list of contacts for each participant in the conversation. The following diagram
+                details the exchange of data that takes place between contacts and the mixnet. For
+                more information, see <link
+                    xlink:href="https://katzenpost.network/docs/specs/group_chat.html"
+                    >&program_name; Group Chat Design</link>.</para>
             
-            <!--                <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Add
-                    separate link for each contact? But then how to invite a group … and there is a
-                    limited amount of traffic you can send … more than 30 contacts probably will
-                    fail. the more contacts, the slower, because of the traffic profile
-                    requirements. </para>
-                <para>multi member </para>
-                <para>No new invitter name per contact.</para>
-                <para>The UI allows a note to be written.</para>
-                <para>Accepting: you are entering a new conversation, you have to pick a name you
-                    will be known as, and provide key.</para>
-                <para>Back to alice: a history of invitees. Display of status of who has accepted
-                    and joined. Alice just waits, takes no action.<?oxy_custom_end?></para>-->
+            
+            <figure>
+                <info>
+                    <title>Mechanism for adding contacts</title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/katzen-contact-ladder.png" scale="80"/>
+                    </imageobject>
+                    <caption>
+                        <para>The diagram illustrates two important aspects of the &program_name;
+                            and &chat_client; security. First, the initial authentication of a
+                            contact is done in a face-to-face meeting rather than electronically.
+                            Second, all messaging consists of queries to the mixnet, which operates
+                            somewhat like a dead-drop. Users post materials there, and other users
+                            can be authorized to read those materials, but there is no direct
+                            contact between users after the initial analog authentication. The
+                            &chat_client; client represents these transactions in a traditional chat
+                            interface, even though the mechanism does but resemble traditional
+                            chat.</para>
+                    </caption>
+                </mediaobject>
+            </figure>
             
             
             
@@ -301,12 +329,10 @@
 
             </important>
             <warning>
-                <para>It is possible to simply send the invitation to your contact through an
-                    existing electronic channel. However, doing this degrades the &program_name;
-                    anonymity protections to the level of anonymity offered by the channel you use.
-                        <emphasis>Never do this.</emphasis> When encryption breaks, the damage, with
-                    up-to-date forward secrecy, may be limited in scope. When anonymity breaks, the
-                    damage is total. </para>
+                <para>It is possible to simply send your invitation through an alternative
+                    electronic channel. However, doing this degrades the &program_name; anonymity
+                    protections to the level of anonymity offered by the channel that you
+                    use.</para>
             </warning>
             <para><emphasis role="bold">To invite a new contact to a conversation</emphasis></para>
             <para>
@@ -470,9 +496,7 @@
         </section>
     </section>
     <section>
-        <title>Frequently asked questions
-            <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>–
-            TODO<?oxy_custom_end?></title>
+        <title>Frequently asked questions</title>
         <para/>
         <section>
             <title>Why does anonymity matter?</title>
@@ -500,7 +524,7 @@
             <para/>
         </section>
         <section>
-            <title>What makes mixnets special?</title>
+            <title>What is special about a mixnet?</title>
             <para/>
         </section>
         <section>
