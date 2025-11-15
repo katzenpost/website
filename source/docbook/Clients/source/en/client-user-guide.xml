@@ -421,51 +421,16 @@
         </section>
         <section>
             <title>Exchanging messages in a conversation</title>
-            <para>When we look at the perspectives of Alice and Bob side-by-side, as in <emphasis
-                    role="bold">Figure 6</emphasis>, a few features of &chat_client; set it apart
-                from other chat clients.</para>
-            <itemizedlist>
-                <listitem>
-                    <para>Conversations are the main organizing principle. </para>
-                </listitem>
-                <listitem>
-                    <para>Contacts are members of a conversation.</para>
-                </listitem>
-                <listitem>
-                    <para><emphasis role="underline">Conversations</emphasis> may have any number of
-                        contacts, that is, all conversations are <emphasis>groups</emphasis>.
-                        One-to-one conversations are groups with exactly two members.</para>
-                </listitem>
-                <listitem>
-                    <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>The
-                        conversations that you see listed are ones that you created and named.  Your
-                        contacts see their own conversations that they created and named.</para>
-                </listitem><?oxy_custom_end?>
-                <listitem>
-                    <para>When you create a conversation, you are creating and naming a
-                        <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>message
-                        stream.</para>
-                </listitem><?oxy_custom_end?>
-                <listitem>
-                    <para>You have <emphasis>write</emphasis> permissions to message streams that
-                        you created; nobody else does.</para>
-                </listitem>
-                <listitem>
-                    <para>Users can share <emphasis>read</emphasis> permissions to a message stream
-                        with other users.</para>
-                </listitem>
-                <listitem>
-                    <para>The view of a conversation that you sees in the
-                            <guilabel>Messages</guilabel> pane is a virtual message log collated by
-                        &chat_client; based on shared read permissions. This is how each contact
-                        that is read into a conversation can see the same virtual log. </para>
-                </listitem>
-            </itemizedlist>
-            <para>Exchanging messages in &chat_client; follows standard chat-client practice.  Alice
-                and Bob see a conversation that is </para>
-
-            
-            <para/>
+            <note>
+                <para>Exchanging messages in &chat_client; is done much as you do it any chat
+                    program. However, when you look at the perspectives of Alice and Bob
+                    side-by-side, as in <emphasis role="bold">Figure 6</emphasis>, something strange
+                    pops out: Their (shared?) conversation has two different names. This is a
+                    glimpse into the anonymity architecture behind &chat_client;, and is explained
+                    in <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>¿WTF? –
+                    How do conversations and contacts actually work?<?oxy_custom_end?>
+                </para>
+            </note>
             
             <figure>
                 <info>
@@ -589,28 +554,57 @@
         <title>Frequently asked questions</title>
         <para/>
         <section>
-            <title>Why does anonymity matter?</title>
+            <title>¿WTF? – How do conversations and contacts actually work? </title>
             <para/>
+            <itemizedlist>
+                <listitem>
+                    <para>Conversations are the main organizing principle in &chat_client;. </para>
+                </listitem>
+                <listitem>
+                    <para>Contacts are members of a conversation, and they exist only in the context
+                        of a particular conversation.
+                        <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>[Why?
+                        Anonymity. Contacts must have no discoverable relation to real-world
+                        identities., or to repeated instances of themselves. All names are display
+                        names. All display names are arbitrary.]<?oxy_custom_end?></para>
+                </listitem>
+                <listitem>
+                    <para>Conversations may have any number of contacts, that is, all conversations
+                        are <emphasis>groups</emphasis>. One-to-one conversations are groups with
+                        exactly two members.</para>
+                </listitem>
+                <listitem>
+                    <para>The conversations that you see listed in <guilabel>Conversations and
+                            contacts</guilabel> are ones that you created and named. Your contacts
+                        see their own conversations that they created and named. </para>
+                </listitem>
+                <listitem>
+                    <para>When you create a conversation, you are also creating a <emphasis>message
+                            stream</emphasis>. A message stream is an address in the distributed
+                        internal storage of the mixnet. It can contain any number of linked, ordered
+                        messages posted there by its
+                        owner.<?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?></para>
+                </listitem><?oxy_custom_end?>
+                <listitem>
+                    <para>You have <emphasis>write permissions</emphasis> to message streams that
+                        you created; nobody else does.</para>
+                </listitem>
+                <listitem>
+                    <para>You can share <emphasis>read permissions</emphasis> to a message stream
+                        that you created with other users.</para>
+                </listitem>
+                <listitem>
+                    <para>The view of a conversation that you see in your
+                            <guilabel>Messages</guilabel> pane is a <emphasis>virtual</emphasis>
+                        message log collated by &chat_client;. It is based on read permissions that
+                        you and your contacts have mutually shared in this specific context. This is
+                        how you can all see the same virtual log of messages when you are each
+                        looking at a different conversation. </para>
+                </listitem>
+            </itemizedlist>
         </section>
         <section>
-            <title>What makes &chat_client; different from other chat clients?</title>
-            <para/>
-        </section>
-        <section>
-            <title>I use an end-to-end encrypted chat service. Is that good enough?</title>
-            <para/>
-        </section>
-        <section>
-            <title>What kind of users need anonymity protection?</title>
-            <para/>
-        </section>
-        <section>
-            <title>I am just an ordinary person with nothing to hide. Why should I worry about being
-                anonymous?</title>
-            <para/>
-        </section>
-        <section>
-            <title>How does contact bootstrapping work?</title>
+            <title>¿WTF? – What is this out-of-band secret sharing stuff?</title>
             <para>The following diagram details the exchange of data that takes place
                 <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>between contacts
                 and the m<?oxy_custom_end?>ixnet. For more information, see <link
@@ -618,7 +612,7 @@
                     >&program_name; Group Chat Design</link>.</para>
             <figure>
                 <info>
-                    <title></title>
+                    <title/>
                 </info>
                 <mediaobject>
                     <imageobject>
@@ -638,6 +632,28 @@
                     </caption>
                 </mediaobject>
             </figure>
+        </section>
+        <section/>
+        <section>
+            <title>Why does anonymity matter?</title>
+            <para/>
+        </section>
+        <section>
+            <title>What makes &chat_client; different from other chat clients?</title>
+            <para/>
+        </section>
+        <section>
+            <title>I use an end-to-end encrypted chat service. Is that good enough?</title>
+            <para/>
+        </section>
+        <section>
+            <title>What kind of users need anonymity protection?</title>
+            <para/>
+        </section>
+        <section>
+            <title>I am just an ordinary person with nothing to hide. Why should I worry about being
+                anonymous?</title>
+            <para/>
         </section>
         <section>
             <title>How does message exchange work?</title>
@@ -686,10 +702,6 @@
                 choices, use the tools perfectly, maintain operational security worthy of a
                 clandestine agent, and have very good luck. In a genuinely threatening environment,
                 the wisest path is often to avoid technological solutions altogether.</para>
-        </section>
-        <section>
-            <title>Why is out-of-band (OOB) secret sharing so important in &chat_client;?</title>
-            <para/>
         </section>
         <section>
             <title>Who made &program_name; and &chat_client;?</title>
