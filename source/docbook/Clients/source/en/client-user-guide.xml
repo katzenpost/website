@@ -107,33 +107,37 @@
             one for messages, and a number of communication modes such as text chat, file transfer,
             and voice. The following illustration shows how &chat_client; looks when you first open
             it after installation.</para>
+        <para>&chat_client; consists of a menu bar, a toolbar, two panes, and a status bar (not
+            visible). The <guilabel>Conversations and contacts</guilabel> displays existing
+            conversations and the contacts specific to them. The <guilabel>Messages</guilabel> pane
+            displays the title of the selected conversation (if any), its messgae log, an
+                <guilabel>Invite a contact</guilabel> button for adding new members, and a text box
+            near the bottom for typing new messages. Buttons in the toolbar include <guilabel>New
+                conversation</guilabel> (opening a dialog to configure a conversation),
+                <guilabel>Accept invitation</guilabel> (opening a dialog to accept or refuse an
+            invitation from another user), <guilabel>Documentation</guilabel> (activating, once
+            implemented, the internal help system), and <guilabel>Quit</guilabel> (which shuts down
+            the client). The tabs at the bottom of the <guilabel>Messages</guilabel> pane allow
+            selection of a communication mode, with only single-line message input currrently
+            implemented.</para>
         <note>
             <para>At present, only text chat works. Grayed out elements in the &chat_client;
                 interface are not yet implemented.</para>
         </note>
+        <para>The following screen capture shows &chat_client; as it appears when open for the first
+            time.</para>
         <figure>
             <info>
-                <title>&chat_client;client on first use</title>
+                <title/>
             </info>
             <mediaobject>
                 <imageobject>
                     <imagedata fileref="pix/client-overview.jpg" scale="80"/>
                 </imageobject>
-                <caption><para>&chat_client; consists of a menu bar, a toolbar, two panes, and a status bar (not visible).
-                        The <guilabel>Conversations and contacts</guilabel> displays existing
-                        conversations and the contacts specific to them.  The
-                            <guilabel>Messages</guilabel> pane displays the title of the selected
-                        conversation (if any), its messgae log, an <guilabel>Invite a
-                            contact</guilabel> button for adding new members, and a text box near
-                        the bottom for typing new messages. Buttons in the toolbar include
-                            <guilabel>New conversation</guilabel> (opening a dialog to configure a
-                        conversation), <guilabel>Accept invitation</guilabel> (opening a dialog to
-                        accept or refuse an invitation from another user),
-                            <guilabel>Documentation</guilabel> (activating, once implemented, the
-                        internal help system), and <guilabel>Quit</guilabel> (which shuts down the
-                        client). The tabs at the bottom of the <guilabel>Messages</guilabel> pane
-                        allow selection of a communication mode, with only single-line message input
-                        currrently implemented.</para>
+                <caption>
+                    <para><emphasis role="bold">Figure 1.</emphasis> This screen capture shows the
+                        elements of the &chat_client; client interface prior to any
+                        configuration.</para>
                 </caption>
             </mediaobject>
         </figure>
@@ -174,7 +178,8 @@
             <para>
                 <procedure>
                     <step>
-                        <para>Open &chat_client;.</para>
+                        <para>Open &chat_client;. Until a conversation has been created, the
+                                <guilabel>Messages</guilabel> pane prompts you to create one.</para>
                     </step>
                     <step>
                         <para>In the toolbar, click the <guilabel>New conversation</guilabel>
@@ -186,83 +191,86 @@
                             how you identify the conversation in your own &chat_client; client. It
                             may differ from what your contacts call their corresponding
                             conversations. Click <guilabel>OK</guilabel> when finished.</para>
-                    </step>
-                    <step>
+                        
+                        <para>In the following screen capture, the <guilabel>New
+                                conversation</guilabel> is being filled out.</para>
+                 
                         <figure>
                             <info>
-                                <title>Creating a conversation – conversation name</title>
+                                <title/>
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-convo-2.jpg" scale="80"/>
+                                    <imagedata fileref="pix/client-convo-1.jpg" scale="80"/>
                                 </imageobject>
                                 <caption>
-                                    <para>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                                        sed do eiusmod tempor incididunt ut labore et dolore magna
-                                        aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                                        ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                                        Duis aute irure dolor in reprehenderit in voluptate velit
-                                        esse cillum dolore eu fugiat nulla pariatur. </para>
+                                    <para><emphasis role="bold">Figure 2.</emphasis> In this
+                                        example, a user creates a first conversation called
+                                            <guilabel>My first conversation</guilabel>.</para>
                                 </caption>
                             </mediaobject>
                         </figure>
                     </step>
                     <step>
                         <para>Type a name for yourself in the field labeled <guilabel>Choose (your)
-                                name displayed to the other user(s)</guilabel>. Click
-                                <guilabel>OK</guilabel> when finished. Your contacts will see this
-                            name when the accept your invitation,
-                            <?oxy_comment_start author="dwrob" timestamp="20251105T173215-0800" comment="Is this actually supported?"?>although
-                            they may assign some other name to you<?oxy_comment_end?>.</para>
-               <figure>
-                    <info>
-                        <title>Creating a conversation – display name</title>
-                    </info>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="pix/client-convo-2.jpg" scale="80"/>
-                        </imageobject>
-                        <caption>
-                            <para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-                                ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                                aliquip ex ea commodo consequat. Duis aute irure dolor in
-                                reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                                pariatur. </para>
-                        </caption>
-                    </mediaobject>
-                </figure>                                       
+                                name displayed to the other user(s)</guilabel>. Your contacts will
+                            see this name when they accept your invitation.</para>
+                        <para>In the following screen capture, a display name has been
+                            provided.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/client-convo-2.jpg" scale="80"/>
+                                </imageobject>
+                                <caption>
+                                    <para>The user gives her name as <guilabel>Alice</guilabel> in
+                                        the context of this conversation.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                    <step>
+                        <para>Click <guilabel>OK</guilabel> when finished.</para>
+                        <para>Now, in the <guilabel>Conversations and contacts</guilabel> pane, the
+                            name of your new conversation is displayed along with your own name. In
+                            the <guilabel>Messages</guilabel> pane,
+                            &chat_client;<?oxy_comment_start author="dwrob" timestamp="20251105T173304-0800" comment="This should look more like a stage direction than like a regular message."?>
+                            prints a greeting message<?oxy_comment_end?>.</para>       
+                        
+                        <para>The final result resembles the following:</para>
+                        
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/client-convo-3.jpg" scale="80"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 3.</emphasis> In the
+                                            <guilabel>Conversations and contacts</guilabel> pane,
+                                        you can select a conversation, and the selection will be
+                                        displayed in the <guilabel>Messages</guilabel> pane. You can
+                                        use the <guilabel>Type to filter contacts</guilabel> text
+                                        box to find a specific contact name and the conversations
+                                        that contain it.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                        
+                        
+                        
                     </step>
                 </procedure>
  
             </para>
-            <para>In the left pane of the client, labeled <guilabel>Conversations and
-                    contacts</guilabel>, the name of your new conversation is displayed along with
-                your own name as the first contact. In the right pane, labeled
-                    <guilabel>Messages</guilabel>,
-                &chat_client;<?oxy_comment_start author="dwrob" timestamp="20251105T173304-0800" comment="This should look more like a stage direction than like a regular message."?>
-                prints a greeting message<?oxy_comment_end?>.</para>
-            <figure>
-                <info>
-                    <title>Creating a conversation – completed</title>
-                </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/client-convo-3.jpg" scale="80"/>
-                    </imageobject>
-                    <caption>
-                        <para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-                            minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                            ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                            voluptate velit esse cillum dolore eu fugiat nulla pariatur. </para>
-                    </caption>
-                </mediaobject>
-            </figure>
-            <para>You can create
-                <?oxy_comment_start author="dwrob" timestamp="20251105T173506-0800" comment="Is there in fact a limitation, other than all available RAM?"?>any
-                number<?oxy_comment_end?> of conversations, each completely separate from the
-                others.</para>
+
+            <para>You can create any number of conversations, each completely separate from the
+                others. </para>
         </section>
         <section xml:id="CHANGE_ME4">
             <info>
@@ -288,35 +296,7 @@
                 enter the string into &chat_client; and send their own addresses and signed read
                 permissions to the first user, who publishes the shared read permissions for all
                 group members to see. When the process is complete, the new contact names display in
-                the list of contacts for each participant in the conversation. The following diagram
-                details the exchange of data that takes place between contacts and the mixnet. For
-                more information, see <link
-                    xlink:href="https://katzenpost.network/docs/specs/group_chat.html"
-                    >&program_name; Group Chat Design</link>.</para>
-            
-            
-            <figure>
-                <info>
-                    <title>Mechanism for adding contacts</title>
-                </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/katzen-contact-ladder.png" scale="80"/>
-                    </imageobject>
-                    <caption>
-                        <para>The diagram illustrates two important aspects of the &program_name;
-                            and &chat_client; security. First, the initial authentication of a
-                            contact is done in a face-to-face meeting rather than electronically.
-                            Second, all messaging consists of queries to the mixnet, which operates
-                            somewhat like a dead-drop. Users post materials there, and other users
-                            can be authorized to read those materials, but there is no direct
-                            contact between users after the initial analog authentication. The
-                            &chat_client; client represents these transactions in a traditional chat
-                            interface, even though the mechanism does but resemble traditional
-                            chat.</para>
-                    </caption>
-                </mediaobject>
-            </figure>
+                the list of contacts for each participant in the conversation. </para>
             
             
             
@@ -350,20 +330,19 @@
                             display name in the field labeled <guilabel>Choose (your) name displayed
                                 to the other user</guilabel>, then click
                             <guilabel>OK</guilabel>.</para>
-                        
+                        <para>The following example shows the <guilabel>Invite contact</guilabel>
+                            window with "Alice" specified as the issuer. </para>        
                 <figure>
                     <info>
-                        <title>Inviting a contact</title>
+                        <title/>
                     </info>
                     <mediaobject>
                         <imageobject>
                             <imagedata fileref="pix/client-invite-1.jpg" scale="80"/>
                         </imageobject>
-                        <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                                labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                dolore eu fugiat nulla pariatur. </para>
+                        <caption><para><emphasis role="bold">Figure 4.</emphasis> The generated invitation string has "Alice"
+                                        embedded as its creator, which is helpful to the recipient
+                                        in the next steps.</para>
                         </caption>
                     </mediaobject>
                 </figure>                        
@@ -374,7 +353,8 @@
                             MISSING PENDING IMPLEMENTION<?oxy_custom_end?></para>
                     </step>
                     <step>
-                        <para>Provide the invitation string to your intended contact OOB.</para>
+                        <para>Complete the invitation process by providing the invitation string
+                            out-of-band to your intended contact .</para>
                     </step>
                 </procedure>
 
@@ -384,115 +364,225 @@
             <para>
                 <procedure>
                     <step>
-                        <para>Open &chat_client;.</para>
+                        <para>Open &chat_client;. (In the example, our perspective shifts to Bob,
+                            who is the user receiving Alice's invitation.)</para>
                     </step>
                     <step>
                         <para>In the toolbar, click <guilabel>Accept invitation</guilabel>.</para>
                     </step>
                     <step>
-                        <para>I<?oxy_comment_start author="dwrob" timestamp="20251108T162349-0800" comment="Edit the strings"?>n
-                            the <guilabel>Accept invitation</guilabel> window, type or paste the
-                            invitation string into the field labeled <guilabel>Copy-paste the invite
-                                you received</guilabel>, then click <guilabel>OK</guilabel>.</para>
-                        
+                        <para>In the <guilabel>Accept invitation</guilabel> window, type or paste
+                            the invitation string into the field labeled <guilabel>Copy-paste the
+                                invite you received</guilabel>. Your client should resemble the
+                            following:</para>
                         <figure>
                             <info>
-                                <title>Accepting an invitation – string entered</title>
+                                <title/>
                             </info>
                             <mediaobject>
                                 <imageobject>
                                     <imagedata fileref="pix/client-accept-1.jpg" scale="80"/>
                                 </imageobject>
-                                <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                        exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                                        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                        dolore eu fugiat nulla pariatur. </para>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 5.</emphasis> Bob has entered
+                                        the invitation string into the <guilabel>Accept
+                                            invitation</guilabel> window.</para>
                                 </caption>
                             </mediaobject>
-                        </figure>                       
-                        
-                    </step><?oxy_comment_end?>
-                    <step>
-                        <para><?oxy_comment_start author="dwrob" timestamp="20251108T162632-0800" comment="But there is no alternative as yet, so more TODO. Also edit the string."?>In
-                            <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>TODO<?oxy_custom_end?>
-                            window, click <guilabel>OK</guilabel> if you accept the offered display
-                            name.<?oxy_comment_end?></para>
-                        
-                        
-                <figure>
-                    <info>
-                        <title>Accepting an invitation – inviter's display name</title>
-                    </info>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="pix/client-accept-2.jpg" scale="80"/>
-                        </imageobject>
-                        <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                                labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                dolore eu fugiat nulla pariatur. </para>
-                        </caption>
-                    </mediaobject>
-                </figure>                        
-                        
-                        
+                        </figure>
                     </step>
                     <step>
-                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><?oxy_comment_start author="dwrob" timestamp="20251108T163212-0800" comment="The client currently lets me add myself on both sides of the chat." mid="11"?>MORE?<?oxy_custom_end?><?oxy_comment_end mid="11"?></para>
+                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Missing
+                            step pending implementation: Bob confirms that The expected display name
+                            (Alice?) was embedded in the string.<?oxy_custom_end?></para>
+                    </step>
+                    <step>
+                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><?oxy_comment_start author="dwrob" timestamp="20251108T163212-0800" comment="Note that the client currently lets me add myself on both sides of the chat." mid="5"?>Click
+                                <guilabel>OK</guilabel>.<?oxy_custom_end?><?oxy_comment_end mid="5"?></para>
                     </step>
                 </procedure>
-
             </para>
-            <para>
-
-            </para>
-            <para>
-
-            </para>
-            <para>Members of the conversation should see each other in their lists of contact, and
+            <para>As shown below, Alice and Bob now appear in each other's contact lists, and they
                 can begin exchanging messages.</para>
-            
                 <figure>
                     <info>
-                        <title>Accepting an invitation – completed</title>
+                        <title/>
                     </info>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="pix/client-accept-3.jpg" scale="80"/>
+                            <imagedata fileref="pix/client-messages-1.jpg" scale="80"/>
                         </imageobject>
-                        <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                                labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                dolore eu fugiat nulla pariatur. </para>
+                        <caption><para><emphasis role="bold">Figure 6.</emphasis> Alice and Bob with their respective conversations
+                            and contact lists.</para>
                         </caption>
                     </mediaobject>
-                </figure>            
-            
+                </figure>
+
         </section>
         <section>
             <title>Exchanging messages in a conversation</title>
-            <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
-            <para>TODO<?oxy_custom_end?><figure>
-                    <info>
-                        <title>Exchanging messages</title>
-                    </info>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="pix/xxx.png" scale="80"/>
-                        </imageobject>
-                        <caption>
-                            <para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-                                ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                                aliquip ex ea commodo consequat. Duis aute irure dolor in
-                                reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                                pariatur. </para>
-                        </caption>
-                    </mediaobject>
-                </figure></para>
+            <para>When we look at the perspectives of Alice and Bob side-by-side, as in <emphasis
+                    role="bold">Figure 6</emphasis>, a few features of &chat_client; set it apart
+                from other chat clients.</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Conversations are the main organizing principle. </para>
+                </listitem>
+                <listitem>
+                    <para>Contacts are members of a conversation.</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="underline">Conversations</emphasis> may have any number of
+                        contacts, that is, all conversations are <emphasis>groups</emphasis>.
+                        One-to-one conversations are groups with exactly two members.</para>
+                </listitem>
+                <listitem>
+                    <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>The
+                        conversations that you see listed are ones that you created and named.  Your
+                        contacts see their own conversations that they created and named.</para>
+                </listitem><?oxy_custom_end?>
+                <listitem>
+                    <para>When you create a conversation, you are creating and naming a
+                        <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>message
+                        stream.</para>
+                </listitem><?oxy_custom_end?>
+                <listitem>
+                    <para>You have <emphasis>write</emphasis> permissions to message streams that
+                        you created; nobody else does.</para>
+                </listitem>
+                <listitem>
+                    <para>Users can share <emphasis>read</emphasis> permissions to a message stream
+                        with other users.</para>
+                </listitem>
+                <listitem>
+                    <para>The view of a conversation that you sees in the
+                            <guilabel>Messages</guilabel> pane is a virtual message log collated by
+                        &chat_client; based on shared read permissions. This is how each contact
+                        that is read into a conversation can see the same virtual log. </para>
+                </listitem>
+            </itemizedlist>
+            <para>Exchanging messages in &chat_client; follows standard chat-client practice.  Alice
+                and Bob see a conversation that is </para>
+
+            
+            <para/>
+            
+            <figure>
+                <info>
+                    <title>Alice sends message</title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/client-messages-3.jpg" scale="80"/>
+                    </imageobject>
+                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                            dolore eu fugiat nulla pariatur. </para>
+                    </caption>
+                </mediaobject>
+            </figure>                       
+            
+            <para/>
+            
+            <figure>
+                <info>
+                    <title>Bob receives Alice's message</title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/client-messages-4.jpg" scale="80"/>
+                    </imageobject>
+                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                            dolore eu fugiat nulla pariatur. </para>
+                    </caption>
+                </mediaobject>
+            </figure>                                  
+            
+            
+            <para/>
+            
+            <figure>
+                <info>
+                    <title>Bob types a message to Alice</title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/client-messages-5.jpg" scale="80"/>
+                    </imageobject>
+                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                            dolore eu fugiat nulla pariatur. </para>
+                    </caption>
+                </mediaobject>
+            </figure>                                           
+            
+            <para/>
+            
+            
+            <figure>
+                <info>
+                    <title>Bob sends message</title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/client-messages-6.jpg" scale="80"/>
+                    </imageobject>
+                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                            dolore eu fugiat nulla pariatur. </para>
+                    </caption>
+                </mediaobject>
+            </figure>  
+                        
+            <para/> 
+            
+            <figure>
+                <info>
+                    <title>Alice receives Bob's message</title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/client-messages-7.jpg" scale="80"/>
+                    </imageobject>
+                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                            dolore eu fugiat nulla pariatur. </para>
+                    </caption>
+                </mediaobject>
+            </figure>              
+            
+            <para/>
+            
+            <figure>
+                <info>
+                    <title>Messaging continues</title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/client-messages-8.jpg" scale="80"/>
+                    </imageobject>
+                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                            dolore eu fugiat nulla pariatur. </para>
+                    </caption>
+                </mediaobject>
+            </figure>                          
+            
+            <para/>
+            
         </section>
     </section>
     <section>
@@ -518,6 +608,41 @@
             <title>I am just an ordinary person with nothing to hide. Why should I worry about being
                 anonymous?</title>
             <para/>
+        </section>
+        <section>
+            <title>How does contact bootstrapping work?</title>
+            <para>The following diagram details the exchange of data that takes place
+                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>between contacts
+                and the m<?oxy_custom_end?>ixnet. For more information, see <link
+                    xlink:href="https://katzenpost.network/docs/specs/group_chat.html"
+                    >&program_name; Group Chat Design</link>.</para>
+            <figure>
+                <info>
+                    <title></title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/katzen-contact-ladder.png" scale="80"/>
+                    </imageobject>
+                    <caption>
+                        <para>The diagram illustrates two important aspects of the &program_name;
+                            and &chat_client; security. First, the initial authentication of a
+                            contact is done in a face-to-face meeting rather than electronically.
+                            Second, all messaging consists of queries to the mixnet, which operates
+                            somewhat like a dead-drop. Users post materials there, and other users
+                            can be authorized to read those materials, but there is no direct
+                            contact between users after the initial analog authentication. The
+                            &chat_client; client represents these transactions in a traditional chat
+                            interface, even though the mechanism does but resemble traditional
+                            chat.</para>
+                    </caption>
+                </mediaobject>
+            </figure>
+        </section>
+        <section>
+            <title>How does message exchange work?</title>
+            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>TODO … a
+                diagram continuing the one above.<?oxy_custom_end?></para>
         </section>
         <section>
             <title>Why are governments and businesses so interested in my metadata?</title>
@@ -569,11 +694,11 @@
         <section>
             <title>Who made &program_name; and &chat_client;?</title>
             <para>&program_name; was created by a team of programmers, cryptographers,
-                mathemeticians, academics, tech industry veterans, and privacy advocates. We stand
-                on the shoulders of giants. Our current core contributors and past contributers are
-                listed at <link xlink:href="https://katzenpost.network/pages/team/">&program_name;
-                    Team</link>, and you can see who has been doing what by visiting our <link
-                    xlink:href="https://github.com/katzenpost">GitHub site</link>.  </para>
+                mathemeticians, academics, tech industry veterans, and privacy advocates. Our
+                current core contributors and past contributers are listed at <link
+                    xlink:href="https://katzenpost.network/pages/team/">&program_name; Team</link>,
+                and you can see who has been doing what by visiting our <link
+                    xlink:href="https://github.com/katzenpost">GitHub site</link>. </para>
         </section>
         <section>
             <title>What information could authorities retrieve by seizing your computer with
@@ -749,9 +874,6 @@
             run AppImage packages. For more information,. consult the procedures for installing
             application on your Linux distribution.</para>
     </section>-->
-        <para>For technical information about the invitation process, see <link
-                xlink:href="https://katzenpost.network/docs/specs/group_chat.html">Katzenpost Group
-                Chat Design</link>.</para>
     </section>
     
 </section>
