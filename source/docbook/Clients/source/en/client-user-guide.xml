@@ -5,7 +5,7 @@
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 <?title ?> 
-<?linkTitle "Echomix chat user guide" ?>  <!-- Section menu link text -->
+<?linkTitle "Katzen chat user guide" ?>  <!-- Section menu link text -->
 <?url "docs/chat_client/user-guide.html" ?> <!-- Required to make image links work -->
 <?description ?> <!-- Optional -->
 <?draft "false" ?> <!-- Optional -->
@@ -39,11 +39,11 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<section    xmlns="http://docbook.org/ns/docbook"
-            xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
-            xml:id="CHANGE_ME1">
-    <info>  
-        <title xml:id="CHANGE_ME1.title">&chat_client; chat client user guide</title> <!-- Match to "title" or "linkTitle" promming instruction above. -->          
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.1" xml:id="client_guide">
+    <info>
+        <title xml:id="client_guide.title">&chat_client; chat client user guide</title>
+        <!-- Match to "title" or "linkTitle" processing instruction above. -->
     </info>
     <para>This guide introduces the &chat_client; chat client. With &chat_client; you can securely
         share one-to-one and group messages with contacts. &chat_client; relies on &program_name;,
@@ -52,16 +52,19 @@
         the <emphasis>content</emphasis> of communication over the Internet. Anonymity is about
         protecting <emphasis>people</emphasis>. </para>
     <para>For technical information about how &program_name; and mixnets in general work, see
-            <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><link
-            xlink:href="sdsdsd">blah</link>. <?oxy_custom_end?>To learn more about
-            <emphasis>why</emphasis> &program_name; works as it does, see <link xlink:href="sdsdsd"
-            >Frequently asked questions</link> .</para>
-     
-    <section xml:id="CHANGE_ME2">  
-        <info>  
-            <title xml:id="CHANGE_ME2.title">Installing and starting &chat_client;</title>          
+            <?oxy_comment_start author="dwrob" timestamp="20251116T165750-0800" comment="This has disappeared into a black hole, but we should revive and update it."?><link
+            xlink:href="https://web.archive.org/web/20240813022824/https://github.com/katzenpost/docs/blob/master/mixnet_academy/syllabus.rst#mix-network-fundamentals"
+            >Learn Mix Networks for Great Good</link><?oxy_comment_end?> and  <link
+            xlink:href="https://katzenpost.network/docs/">Katzenpost Documentation</link>. To learn
+        more about <emphasis>why</emphasis> &program_name; works as it does, see <link
+            xlink:href="sdsdsd">Frequently asked questions</link> .</para>
+    <?oxy_comment_start author="dwrob" timestamp="20251116T145113-0800" comment="Pending implmentation of Docker image."?>
+    <section xml:id="installation">
+        <info>
+            <title xml:id="installation.title">Installing and starting
+                &chat_client;<?oxy_comment_end?></title>
         </info>
-        <para>The &chat_client; client is available as a Docker image or as Python code available
+        <!--        <para>The &chat_client; client is available as a Docker image or as Python code available
             from GitHub. To run it, you need a computer that runs or emulates the Linux operating
             system. (We have tested &chat_client; on <link xlink:href="https://www.debian.org/"
                 >Debian </link> and <link xlink:href="https://ubuntu.com/">Ubuntu</link>.) You can
@@ -91,16 +94,16 @@
                 <para>
                     <programlisting><prompt>~$ </prompt><command>python3 -m venv myvenv</command>
 <prompt>~$ </prompt><command>source myvenv/bin/activate</command>
-<prompt>~$ </prompt><command>pip install --upgrade pip</command>
+<prompt>~$ </prompt><command>pip install -\-upgrade pip</command>
 <prompt>~$ </prompt><command>pip install 'git+https://github.com/katzenpost/thin_client@a5f87b9623eb349ba376d7e7555c3154302216e8'</command>
 <prompt>~$ </prompt><command>pip install -e .</command>
 <prompt>~$ </prompt><command>make</command></programlisting>
                 </para>
             </step>
-        </procedure>
+        </procedure>-->
     </section>
-    <section>
-        <title>Communicating through the &chat_client; client</title>
+    <section xml:id="communicating">
+        <title xml:id="communicating.title">Communicating through the &chat_client; client</title>
         <para>This section describes how to configure and use &chat_client; for secure, anonymous
             communication. </para>
         <para>Like many other chat clients, &chat_client;exhibits two panes, one for contacts and
@@ -124,15 +127,15 @@
             <para>At present, only text chat works. Grayed out elements in the &chat_client;
                 interface are not yet implemented.</para>
         </note>
-        <para>The following screen capture shows &chat_client; as it appears when open for the first
-            time.</para>
+        <para>The following screen capture shows &chat_client; as it appears when opened for the
+            first time.</para>
         <figure>
             <info>
                 <title/>
             </info>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="pix/client-overview.jpg" scale="80"/>
+                    <imagedata fileref="pix/client-overview.jpg" scale="30"/>
                 </imageobject>
                 <caption>
                     <para><emphasis role="bold">Figure 1.</emphasis> This screen capture shows the
@@ -155,7 +158,7 @@
             </listitem>
             <listitem>
                 <para>Without phone numbers or email as anchors for identity, &chat_client; users
-                    require  a real-world encounters to verify who they are and to share
+                    require a real-world encounters to verify who they are and to share
                     cryptographic secrets. This kind of contact bootstrapping occurs out-of-band
                     (OOB), that is, without reliance on the primary communication channel. The
                     concept is similar to the key-signing parties that PGP email users employ to
@@ -166,9 +169,9 @@
         </itemizedlist>
         <para>Consequently, <emphasis>conversations</emphasis> are the real organizing principle in
             &chat_client;.</para>
-        <section xml:id="CHANGE_ME3">
+        <section xml:id="conversations">
             <info>
-                <title xml:id="CHANGE_ME3.title">Creating conversations</title>
+                <title xml:id="conversations.title">Creating conversations</title>
             </info>
             <para>Communication in &chat_client; takes place in the context of conversations. A
                 conversation may contain just two particpants, or it may involve a large group. The
@@ -191,17 +194,15 @@
                             how you identify the conversation in your own &chat_client; client. It
                             may differ from what your contacts call their corresponding
                             conversations. Click <guilabel>OK</guilabel> when finished.</para>
-                        
                         <para>In the following screen capture, the <guilabel>New
                                 conversation</guilabel> is being filled out.</para>
-                 
                         <figure>
                             <info>
                                 <title/>
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-convo-1.jpg" scale="80"/>
+                                    <imagedata fileref="pix/client-convo-1.jpg" scale="30"/>
                                 </imageobject>
                                 <caption>
                                     <para><emphasis role="bold">Figure 2.</emphasis> In this
@@ -223,7 +224,7 @@
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-convo-2.jpg" scale="80"/>
+                                    <imagedata fileref="pix/client-convo-2.jpg" scale="30"/>
                                 </imageobject>
                                 <caption>
                                     <para>The user gives her name as <guilabel>Alice</guilabel> in
@@ -238,17 +239,15 @@
                             name of your new conversation is displayed along with your own name. In
                             the <guilabel>Messages</guilabel> pane,
                             &chat_client;<?oxy_comment_start author="dwrob" timestamp="20251105T173304-0800" comment="This should look more like a stage direction than like a regular message."?>
-                            prints a greeting message<?oxy_comment_end?>.</para>       
-                        
+                            prints a greeting message<?oxy_comment_end?>.</para>
                         <para>The final result resembles the following:</para>
-                        
                         <figure>
                             <info>
                                 <title/>
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-convo-3.jpg" scale="80"/>
+                                    <imagedata fileref="pix/client-convo-3.jpg" scale="30"/>
                                 </imageobject>
                                 <caption>
                                     <para><emphasis role="bold">Figure 3.</emphasis> In the
@@ -261,20 +260,15 @@
                                 </caption>
                             </mediaobject>
                         </figure>
-                        
-                        
-                        
                     </step>
                 </procedure>
- 
             </para>
-
             <para>You can create any number of conversations, each completely separate from the
                 others. </para>
         </section>
-        <section xml:id="CHANGE_ME4">
+        <section xml:id="adding_contacts">
             <info>
-                <title xml:id="CHANGE_ME4.title">Adding contacts to a conversation</title>
+                <title xml:id="adding_contacts.title">Adding contacts to a conversation</title>
             </info>
             <para>Once you have a created a conversation, you can begin adding contacts to it. Users
                 of &chat_client; have no fixed user names or passwords; instead, they bear arbitrary
@@ -283,13 +277,13 @@
                 addresses and grant read permissions to each other. Authentication takes place once
                 in the real world before communication over the mixnet begins.</para>
             <para>A user setting up a contact generates an authentication token called an
-                    <emphasis>invitation</emphasis>.  The invitation is a Base64-encoded string with
+                    <emphasis>invitation</emphasis>. The invitation is a Base64-encoded string with
                 the following contents:<itemizedlist>
                     <listitem>
                         <para>a display name </para>
                     </listitem>
                     <listitem>
-                        <para>a mixnet storage address that doubles as read permission  </para>
+                        <para>a mixnet storage address that doubles as read permission </para>
                     </listitem>
                 </itemizedlist></para>
             <para>The initiating user delivers the invitation OOB to one or more recipients, who
@@ -297,16 +291,12 @@
                 permissions to the first user, who publishes the shared read permissions for all
                 group members to see. When the process is complete, the new contact names display in
                 the list of contacts for each participant in the conversation. </para>
-            
-            
-            
             <important>
                 <para>We recommend writing the invitation string on a piece paper, and presenting
                     this physically to the person whom you are inviting. The paper bearing the
                     string should be guarded carefully and destroyed once its purpose is achieved.
                     Any person gaining access to it could read all messages in the associated
                     conversation.</para>
-
             </important>
             <warning>
                 <para>It is possible to simply send your invitation through an alternative
@@ -331,22 +321,22 @@
                                 to the other user</guilabel>, then click
                             <guilabel>OK</guilabel>.</para>
                         <para>The following example shows the <guilabel>Invite contact</guilabel>
-                            window with "Alice" specified as the issuer. </para>        
-                <figure>
-                    <info>
-                        <title/>
-                    </info>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="pix/client-invite-1.jpg" scale="80"/>
-                        </imageobject>
-                        <caption><para><emphasis role="bold">Figure 4.</emphasis> The generated invitation string has "Alice"
-                                        embedded as its creator, which is helpful to the recipient
-                                        in the next steps.</para>
-                        </caption>
-                    </mediaobject>
-                </figure>                        
-                        
+                            window with "Alice" specified as the issuer. </para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/client-invite-1.jpg" scale="30"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 4.</emphasis> The generated
+                                        invitation string has "Alice" embedded as its creator, which
+                                        is helpful to the recipient in the next steps.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
                     </step>
                     <step>
                         <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>STEP
@@ -357,7 +347,6 @@
                             out-of-band to your intended contact .</para>
                     </step>
                 </procedure>
-
             </para>
             <para><emphasis role="bold">To accept an invitation that you have
                 received</emphasis></para>
@@ -381,7 +370,7 @@
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-accept-1.jpg" scale="80"/>
+                                    <imagedata fileref="pix/client-accept-1.jpg" scale="30"/>
                                 </imageobject>
                                 <caption>
                                     <para><emphasis role="bold">Figure 5.</emphasis> Bob has entered
@@ -397,164 +386,240 @@
                             (Alice?) was embedded in the string.<?oxy_custom_end?></para>
                     </step>
                     <step>
-                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><?oxy_comment_start author="dwrob" timestamp="20251108T163212-0800" comment="Note that the client currently lets me add myself on both sides of the chat." mid="5"?>Click
-                                <guilabel>OK</guilabel>.<?oxy_custom_end?><?oxy_comment_end mid="5"?></para>
+                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><?oxy_comment_start author="dwrob" timestamp="20251108T163212-0800" comment="Note that the client currently lets me add myself on both sides of the chat." mid="6"?>Click
+                                <guilabel>OK</guilabel>.<?oxy_custom_end?><?oxy_comment_end mid="6"?></para>
                     </step>
                 </procedure>
             </para>
             <para>As shown below, Alice and Bob now appear in each other's contact lists, and they
                 can begin exchanging messages.</para>
-                <figure>
-                    <info>
-                        <title/>
-                    </info>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="pix/client-messages-1.jpg" scale="80"/>
-                        </imageobject>
-                        <caption><para><emphasis role="bold">Figure 6.</emphasis> Alice and Bob with their respective conversations
-                            and contact lists.</para>
-                        </caption>
-                    </mediaobject>
-                </figure>
-
+            <figure>
+                <info>
+                    <title/>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/client-messages-1.jpg" scale="30"/>
+                    </imageobject>
+                    <caption>
+                        <para><emphasis role="bold">Figure 6.</emphasis> Alice and Bob with their
+                            respective conversations and contact lists.</para>
+                    </caption>
+                </mediaobject>
+            </figure>
         </section>
-        <section>
-            <title>Exchanging messages in a conversation</title>
+        <section xml:id="messaging">
+            <title xml:id="messaging.title">Exchanging messages in a conversation</title>
+            <para>&chat_client; resembles other chat program in the way that you exchange messages
+                with your contacts. This section provides an example of a conversation between two
+                participants. The procedures shown can be generalized to larger group conversations
+                as well.</para>
             <note>
-                <para>Exchanging messages in &chat_client; is done much as you do it any chat
-                    program. However, when you look at the perspectives of Alice and Bob
-                    side-by-side, as in <emphasis role="bold">Figure 6</emphasis>, something strange
-                    pops out: Their (shared?) conversation has two different names. This is a
-                    glimpse into the anonymity architecture behind &chat_client;, and is explained
-                    in <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>¿WTF? –
-                    How do conversations and contacts actually work?<?oxy_custom_end?>
-                </para>
+                <para>When you look at the perspectives of Alice and Bob side-by-side, as in
+                        <emphasis role="bold">Figure 6</emphasis>, something strange pops out: Their
+                    (shared?) conversation has two different names. This provides a glimpse into the
+                    anonymity architecture behind &chat_client;, and is explained in <xref
+                        linkend="faq_conversations_and_contacts"/></para>
             </note>
-            
-            <figure>
-                <info>
-                    <title>Alice sends message</title>
-                </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/client-messages-3.jpg" scale="80"/>
-                    </imageobject>
-                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                            dolore eu fugiat nulla pariatur. </para>
-                    </caption>
-                </mediaobject>
-            </figure>                       
-            
-            <para/>
-            
-            <figure>
-                <info>
-                    <title>Bob receives Alice's message</title>
-                </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/client-messages-4.jpg" scale="80"/>
-                    </imageobject>
-                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                            dolore eu fugiat nulla pariatur. </para>
-                    </caption>
-                </mediaobject>
-            </figure>                                  
-            
-            
-            <para/>
-            
-            <figure>
-                <info>
-                    <title>Bob types a message to Alice</title>
-                </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/client-messages-5.jpg" scale="80"/>
-                    </imageobject>
-                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                            dolore eu fugiat nulla pariatur. </para>
-                    </caption>
-                </mediaobject>
-            </figure>                                           
-            
-            <para/>
-            
-            
-            <figure>
-                <info>
-                    <title>Bob sends message</title>
-                </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/client-messages-6.jpg" scale="80"/>
-                    </imageobject>
-                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                            dolore eu fugiat nulla pariatur. </para>
-                    </caption>
-                </mediaobject>
-            </figure>  
+            <procedure>
+                <title>To exchange messages between two contacts</title>
+                <para>The procedure picks up where the previous section, <xref
+                        linkend="adding_contacts"/>, left off. The examples continue to show both
+                    sides of the Alice/Bob conversation.</para>
+                <step>
+                    <para>Alice composes a message to Bob by typing it in the <guilabel>Single-line
+                            message</guilabel> box at the bottom of the
+                            <guilabel>Messages</guilabel> pane.</para>
+                    <figure>
+                        <info>
+                            <title/>
+                        </info>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="pix/client-messages-2.jpg" scale="30"/>
+                            </imageobject>
+                            <caption>
+                                <para>Alice can see what conversation she is in by looking at the
+                                    highlighted conversation name in Conversations and contacts
+                                    pane, and at the heading in the Messages pane.
+                                    <?oxy_comment_start author="dwrob" timestamp="20251116T143632-0800" comment="This has not been implemnted yet. In the final version of the screen shots, there should be several different conversations in order to demonstrate this. They should not all be symmetrical. The color coding will extract order from confusion."?>The
+                                    two panes also color-coordinate, providing another cue as to the
+                                    context.<?oxy_comment_end?> This becomes important when there
+                                    are many conversations present and they need to be
+                                    distinguishable from each other.</para>
+                            </caption>
+                        </mediaobject>
+                    </figure>
+                </step>
+                <step>
+                    <para>When Alice is done typing the message, she presses Enter to send
+                            it.</para>
+                    <figure>
+                        <info>
+                            <title/>
+                        </info>
                         
-            <para/> 
-            
-            <figure>
-                <info>
-                    <title>Alice receives Bob's message</title>
-                </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/client-messages-7.jpg" scale="80"/>
-                    </imageobject>
-                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                            dolore eu fugiat nulla pariatur. </para>
-                    </caption>
-                </mediaobject>
-            </figure>              
-            
-            <para/>
-            
-            <figure>
-                <info>
-                    <title>Messaging continues</title>
-                </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/client-messages-8.jpg" scale="80"/>
-                    </imageobject>
-                    <caption><para>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                            dolore eu fugiat nulla pariatur. </para>
-                    </caption>
-                </mediaobject>
-            </figure>                          
-            
-            <para/>
-            
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="pix/client-messages-3.jpg" scale="30"/>
+                            </imageobject>
+                            <caption>
+                                <para>Alice's sent message is visible in her Messages pane. The
+                                    in-flight arrow next to her name indicates that Bob has not yet
+                                    received the message, as is apparent in his &chat_client;
+                                    window.</para>
+                            </caption>
+                        </mediaobject>
+                    </figure>
+                </step>
+                <step>
+                    <para>Bob receives Alice's message</para>
+                    <figure>
+                        <info>
+                            <title/>
+                        </info>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="pix/client-messages-4.jpg" scale="30"/>
+                            </imageobject>
+                            <caption>
+                                <para>Bob's &chat_client; window now displays Alice's message, and
+                                    the in-flight arrow has dissappeared from Alice's window.</para>
+                            </caption>
+                        </mediaobject>
+                    </figure>
+                </step>
+                <step>
+                    <para>Bob types and sends a reply to Alice.</para>
+                    <figure>
+                        <info>
+                            <title/>
+                        </info>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="pix/client-messages-6.jpg" scale="30"/>
+                            </imageobject>
+                            <caption>
+                                <para>With Bob's message sent, his <guilabel>Messages</guilabel>
+                                    pane shows the in-flight arrow pending delivery.</para>
+                            </caption>
+                        </mediaobject>
+                    </figure>
+                    <para/>
+                </step>
+                <step>
+                    <para>Alice receives Bob's reply and they continue to converse.</para>
+                    <figure>
+                        <info>
+                            <title/>
+                        </info>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="pix/client-messages-8.jpg" scale="30"/>
+                            </imageobject>
+                            <caption>
+                                <para>Success!</para>
+                            </caption>
+                        </mediaobject>
+                    </figure>
+                </step>
+            </procedure>
         </section>
     </section>
-    <section>
-        <title>Frequently asked questions</title>
+    <section xml:id="faq">
+        <title xml:id="faq.title">Frequently asked questions</title>
         <para/>
-        <section>
-            <title>¿WTF? – How do conversations and contacts actually work? </title>
+        <section xml:id="faq_anonymity">
+            <title xml:id="faq_anonymity.title">What kind of user needs anonymity
+                protection?</title>
+            <para>Here are some likely candidates.</para>
+            <itemizedlist>
+                <listitem>
+                    <para>People and groups who are likely to be under surveillance by government
+                        entities, from corrupt police forces to intelligence agencies.</para>
+                </listitem>
+                <listitem>
+                    <para>People facing business or government censorship.</para>
+                </listitem>
+                <listitem>
+                    <para>Businesses aware of the dangers of leaking internal information to their
+                        local and global competitors or to their own or other governments.</para>
+                </listitem>
+                <listitem>
+                    <para>Non-profit organizations engaging in advocacy that earns them enemies in
+                        high places with powerful surveillance capabilities.</para>
+                </listitem>
+                <listitem>
+                    <para>People worried about the utter insecurity of personal data stored in both
+                        cloud and on-premises databases that are accessible from the
+                        Internet.</para>
+                </listitem>
+                <listitem>
+                    <para>People who want to use the Internet for communication, but who dislike
+                        being the raw material that feeds <link
+                            xlink:href="https://en.wikipedia.org/wiki/Surveillance_capitalism"
+                            >surveillance capitalism</link>.</para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section xml:id="faq_metadata">
+            <title xml:id="faq_metadata.title">I use an end-to-end encrypted chat service. Is that
+                good enough?</title>
+            <para>Not necessarily. Your identity and other <emphasis>metadata</emphasis> may be more
+                interesting to snoops than your <emphasis>data</emphasis> (what you say). Your
+                network of contacts – who is talking to whom – is usually the most valuable
+                knowledge about you. Legal protections for this kind of information are weaker than
+                for communication content. Here are some examples:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Internet businesses routinely harvest and sell sensitive identity data to
+                        profit from invasively personalized ads and other sources.</para>
+                </listitem>
+                <listitem>
+                    <para>Governments, especially law enforcement and spy agencies, collect and
+                        store any data about identity, movements, employment, and political views
+                        that they can get their hands on, sacrificing the privacy of millions of
+                        innocent people to catch a tiny number of suspected criminals.</para>
+                </listitem>
+                <listitem>
+                    <para>Actual criminals make daily use of the data they steal from these same
+                        businesses and governments, enabling identity theft, credit-card fraud, and
+                        blackmail.</para>
+                </listitem>
+                <listitem>
+                    <para>While the <emphasis>content</emphasis> of telephone communication is
+                        shielded by strong limitations on wire-tapping, far weaker rules restrict
+                        the use of <link xlink:href="https://en.wikipedia.org/wiki/Pen_register">pen
+                            register / trap and trace devices</link> to capture the identities of
+                        people engaged in private conversations. </para>
+                </listitem>
+                <listitem>
+                    <para>The United States Postal Service routinely photographs and stores the
+                        address information of mail passing through its system. The USPS <link
+                            xlink:href="https://www.washingtonpost.com/news/federal-eye/wp/2014/11/20/postal-service-almost-never-denies-mail-surveillance-requests/"
+                            >almost never</link> denies requests for this information. from <link
+                            xlink:href="https://www.nytimes.com/2013/07/04/us/monitoring-of-snail-mail.html"
+                            >law enforcement and others</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>Most dramatically, US intelligence agencies use cell phone metadata
+                        (account data and geolocation) to target suspected terrorists for drone and
+                        missile attacks. As National Security Agency Director Gen. Michael Hayden
+                        famously <link
+                            xlink:href="https://abcnews.go.com/blogs/headlines/2014/05/ex-nsa-chief-we-kill-people-based-on-metadata"
+                            >stated</link>, "We kill people based on metadata."</para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section xml:id="faq_nothingtohide">
+            <title xml:id="faq_nothingtohide.title">I am just an ordinary person with nothing to
+                hide. Why should I worry about being anonymous?</title>
+            <para><emphasis>You</emphasis> do not decide if you have something to hide. The
+                businesses, governments, and individuals snooping into your data decide that.</para>
+        </section>
+        <section xml:id="faq_conversations_and_contacts">
+            <title xml:id="faq_conversations_and_contacts.title">How do conversations and contacts
+                actually work? </title>
             <para/>
             <itemizedlist>
                 <listitem>
@@ -562,11 +627,9 @@
                 </listitem>
                 <listitem>
                     <para>Contacts are members of a conversation, and they exist only in the context
-                        of a particular conversation.
-                        <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>[Why?
-                        Anonymity. Contacts must have no discoverable relation to real-world
-                        identities., or to repeated instances of themselves. All names are display
-                        names. All display names are arbitrary.]<?oxy_custom_end?></para>
+                        of a particular conversation. Contacts must have no discoverable relation to
+                        real-world identities, or even to repeated instances of themselves. All
+                        names are display names. All display names are arbitrary.</para>
                 </listitem>
                 <listitem>
                     <para>Conversations may have any number of contacts, that is, all conversations
@@ -603,11 +666,14 @@
                 </listitem>
             </itemizedlist>
         </section>
-        <section>
-            <title>¿WTF? – What is this out-of-band secret sharing stuff?</title>
-            <para>The following diagram details the exchange of data that takes place
-                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>between contacts
-                and the m<?oxy_custom_end?>ixnet. For more information, see <link
+        <section xml:id="faq_oob">
+            <title xml:id="faq_oob.title">What is this out-of-band (OOB) secret sharing
+                stuff?</title>
+            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>The OOB
+                invitation is the first step in guaranteeing anonymity in the face of electronic
+                surveillance. It is explicitly <emphasis>not</emphasis> electronic. The following
+                diagram details the data exchanges involved in setting up
+                contacts.<?oxy_custom_end?> For more information, see <link
                     xlink:href="https://katzenpost.network/docs/specs/group_chat.html"
                     >&program_name; Group Chat Design</link>.</para>
             <figure>
@@ -616,7 +682,7 @@
                 </info>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="pix/katzen-contact-ladder.png" scale="80"/>
+                        <imagedata fileref="pix/katzen-contact-ladder.png" scale="30"/>
                     </imageobject>
                     <caption>
                         <para>The diagram illustrates two important aspects of the &program_name;
@@ -633,47 +699,15 @@
                 </mediaobject>
             </figure>
         </section>
-        <section/>
-        <section>
-            <title>Why does anonymity matter?</title>
-            <para/>
-        </section>
-        <section>
-            <title>What makes &chat_client; different from other chat clients?</title>
-            <para/>
-        </section>
-        <section>
-            <title>I use an end-to-end encrypted chat service. Is that good enough?</title>
-            <para/>
-        </section>
-        <section>
-            <title>What kind of users need anonymity protection?</title>
-            <para/>
-        </section>
-        <section>
-            <title>I am just an ordinary person with nothing to hide. Why should I worry about being
-                anonymous?</title>
-            <para/>
-        </section>
-        <section>
-            <title>How does message exchange work?</title>
+        <section xml:id="faq_message_exchange">
+            <title xml:id="faq_message_exchange.title">How does message exchange work?</title>
             <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>TODO … a
-                diagram continuing the one above.<?oxy_custom_end?></para>
+                diagram continuing the one above. 2 diagrams, one for
+                groups?<?oxy_custom_end?></para>
         </section>
-        <section>
-            <title>Why are governments and businesses so interested in my metadata?</title>
-            <para/>
-        </section>
-        <section>
-            <title>What is special about a mixnet?</title>
-            <para/>
-        </section>
-        <section>
-            <title>Who is hosting the &program_name; servers?</title>
-            <para/>
-        </section>
-        <section>
-            <title>Will &chat_client; ever have audio chat, or video chat?</title>
+        <section xml:id="faq_audio_video">
+            <title xml:id="faq_audio_video.title">Will &chat_client; ever have audio chat, or video
+                chat?</title>
             <para>Mixnet-based communications have high latency by design. This has little impact on
                 low-bandwidth text communications, but it is very likely disqualifying for video.
                 Therefore we do not plan to offer video chat. Audio, however, can be more readily
@@ -682,8 +716,8 @@
                     xlink:href="https://katzenpost.network/docs/audio_eng/">Audio Engineering
                     Considerations for a Modern Mixnet</link>.</para>
         </section>
-        <section>
-            <title>Is this legal?</title>
+        <section xml:id="faq_legal">
+            <title xml:id="faq_legal.title">Is this legal?</title>
             <para>Let's take "this" as meaning end-to-end encryption and metadata minimization. The
                 answer depends on the jurisdiction and the political weather. Countries such as
                 China and Iran that attempt to exert complete and ruthless control over citizens'
@@ -703,8 +737,8 @@
                 clandestine agent, and have very good luck. In a genuinely threatening environment,
                 the wisest path is often to avoid technological solutions altogether.</para>
         </section>
-        <section>
-            <title>Who made &program_name; and &chat_client;?</title>
+        <section xml:id="faq_whois">
+            <title xml:id="faq_whois.title">Who made &program_name; and &chat_client;?</title>
             <para>&program_name; was created by a team of programmers, cryptographers,
                 mathemeticians, academics, tech industry veterans, and privacy advocates. Our
                 current core contributors and past contributers are listed at <link
@@ -712,180 +746,40 @@
                 and you can see who has been doing what by visiting our <link
                     xlink:href="https://github.com/katzenpost">GitHub site</link>. </para>
         </section>
-        <section>
+        <!--        <section>
             <title>What information could authorities retrieve by seizing your computer with
                 Katzen?</title>
             <para>How thorough is the local anonymization? Could e2e keys and contact identifiers be
                 discovered? Is the database encrypted?</para>
         </section>
+        
+         <section>
+            <title>Why are governments and businesses so interested in my metadata?</title>
+            <para/>
+        </section>
+        <section>
+            <title>What is special about a mixnet?</title>
+            <para/>
+        </section>
+        <section>
+            <title>Who is hosting the &program_name; servers?</title>
+            <para/>
+        </section>       
+        <section>
+            <title>Why does anonymity matter?</title>
+            <para/>
+        </section>
+        <section>
+            <title/>
+            <para/>
+        </section>
+        <section>
+            <title>What makes &chat_client; different from other chat clients?</title>
+            <para/>
+        </section>     
+        
+        
+        
+        -->
     </section>
-    <section>
-        <title>Blah</title>
-        <para>Users of conventional encrypted chat tools (Meta WhatsApp, Meta Messenger, Apple
-            iMessage, Signal, etc.) may wonder, "Why should I care about that?" Many people may not
-            care. However, businesses, governments, and criminals care very much about your identity
-            and all of the information linked to it.</para>
-        <para>
-            <itemizedlist>
-                <listitem>
-                    <para>Internet businesses routinely harvest and sell sensitive identity data to
-                        profit from invasively personalized ads and other sources.</para>
-                </listitem>
-                <listitem>
-                    <para>Governments, especially law enforcement and spy agencies, collect and
-                        store any data about identity, movements, employment, and political views
-                        that they can get their hands on, sacrificing the privacy of millions of
-                        innocent people to catch a tiny number of suspected criminals.</para>
-                </listitem>
-                <listitem>
-                    <para>Actual criminals make daily use of the data they steal from these same
-                        businesses and governments, enabling identity theft, credit-card fraud, and
-                        blackmail.</para>
-                </listitem>
-            </itemizedlist>
-        </para>
-        <para>Consequently, &program_name; users are likely to be drawn from the following
-            demographics.</para>
-        <itemizedlist>
-            <listitem>
-                <para>People and groups who are likely to be under surveillance by government
-                    entities, including corrupt police forces and intelligence agencies.</para>
-            </listitem>
-            <listitem>
-                <para>People facing business or government censorship.</para>
-            </listitem>
-            <listitem>
-                <para>Businesses aware of the dangers of leaking internal information to their local
-                    and global competitors or to their own or other governments.</para>
-            </listitem>
-            <listitem>
-                <para>Non-profit organizations engaging in advocacy that earns them enemies in high
-                    places with powerful surveillance capabilities.&chat_client_binary;</para>
-            </listitem>
-            <listitem>
-                <para>People worried about the utter insecurity of personal data stored in both
-                    cloud and on-premises databases that are accessible from the Internet.</para>
-            </listitem>
-            <listitem>
-                <para>People who want to use the Internet for communication, but who viscerally
-                    detest being the raw material that feeds <link
-                        xlink:href="https://en.wikipedia.org/wiki/Surveillance_capitalism"
-                        >surveillance capitalism</link>.</para>
-                <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Hiding who
-                    is talking to whom<?oxy_custom_end?></para>
-            </listitem>
-        </itemizedlist>
-        <!--    <para>The answer is apparent from the kinds of individuals and institutions who value knowledge
-        of who is talking to whom. Though the law doesn't protect this kind of information very
-        strongly, identifying the members of a network of people in contact with each other is often
-        more useful than knowing the content of any particular conversation.</para>
-    <itemizedlist>
-        <listitem>
-            <para>While the <emphasis>content</emphasis> of telephone communication is shielded by
-                strong limitations on wire-tapping, far weaker rules restrict the use of <link
-                    xlink:href="https://en.wikipedia.org/wiki/Pen_register">pen register / trap and
-                    trace devices</link> to capture the identities of people engaged in private
-                conversations. </para>
-        </listitem>
-        <listitem>
-            <para>The United States Postal Service routinely photographs and stores the address
-                information of mail passing through its system. The USPS <link
-                    xlink:href="https://www.washingtonpost.com/news/federal-eye/wp/2014/11/20/postal-service-almost-never-denies-mail-surveillance-requests/"
-                    >almost never</link> denies requests for this information. from <link
-                    xlink:href="https://www.nytimes.com/2013/07/04/us/monitoring-of-snail-mail.html"
-                    >law enforcement and others</link>.</para>
-        </listitem>
-        <listitem>
-            <para>Most dramatically, US intelligence agencies use cell phone metadata (account data
-                and geolocation) to target suspected terrorists for drone and missile attacks. As
-                National Security Agency director Gen. Michael Hayden famously <link
-                    xlink:href="https://abcnews.go.com/blogs/headlines/2014/05/ex-nsa-chief-we-kill-people-based-on-metadata"
-                    >stated</link>, "We kill people based on metadata."</para>
-        </listitem>
-    </itemizedlist>-->
-        <para>And what about crime?</para>
-        <para>The Namenlos network</para>
-        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Threat
-            model<?oxy_custom_end?> and security guarantees.</para>
-        <itemizedlist>
-            <listitem>
-                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
-                <para>Global passive adversaries (timing/correlation
-                    attacks)<?oxy_custom_end?></para>
-                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
-                <para>Second-party anonymity – why it matters<?oxy_custom_end?> …GPA can take
-                    advantage of the additional metadata contacts have about other contacts.</para>
-                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
-                <para>aim for neutrality<?oxy_custom_end?></para>
-            </listitem>
-            <listitem>
-                <para>Encryption vs. anonymity</para>
-            </listitem>
-            <listitem>
-                <para>Social graphs</para>
-            </listitem>
-            <listitem>
-                <para>Dishonest service providers.</para>
-            </listitem>
-            <listitem>
-                <para>Collection of metadata – All metadata collected will eventually be seized,
-                    whether by hackers, police, domestic intelligence, foreign intelligence, or
-                    criminals. The only way protect data is not to possess it.</para>
-            </listitem>
-        </itemizedlist>
-        <para>Trade-offs</para>
-        <para/>
-        <itemizedlist>
-            <listitem>
-                <para>No live video.</para>
-            </listitem>
-            <listitem>
-                <para>Live audio still in development.</para>
-            </listitem>
-            <listitem>
-                <para>Keeping track of identities.</para>
-            </listitem>
-        </itemizedlist>
-        <para/>
-        <para><link
-                xlink:href="https://papersplease.org/wp/2025/10/01/ice-is-buying-location-data-from-smartphone-apps-etc/"
-            /></para>
-        <para/>
-        <para/>
-        <!--            <procedure>
-                <title>AppImage procedure</title>
-                <step>
-                    <para>Download the the AppImage package to a convenient location on your
-                        computer. </para>
-                </step>
-                <step>
-                    <para>In a terminal, navigate to the directory containing the
-                        &chat_client;-x86_64.AppImage file. Set the executable flag as
-                        follows:</para>
-                    <programlisting><prompt>~$ </prompt><command>chmod +x &chat_client;-x86_64.AppImage</command></programlisting>
-                    <para>Note that you may need root permissions to perform this step.</para>
-                </step>
-                <step>
-                    <para>You can now start &chat_client; from a graphical file manager or directly at the
-                        command line:</para>
-                    <programlisting><prompt>~$ </prompt><command>./&chat_client;-x86_64.AppImage</command></programlisting>
-                </step>
-            </procedure>     
-
-    <section>
-        <title>Requirements for the &chat_client; chat client</title>
-        <para>To use the &chat_client; chat client, you need a computer running the
-            <?oxy_comment_start author="dwrob" timestamp="20251002T141316+0200" comment="Try a Mac as well."?>GNU/Linux<?oxy_comment_end?>
-            operating system on x86-64 hardware. The &chat_client; software is provided as an <link
-                xlink:href="https://appimage.org/">AppImage</link> package, and should run without
-            problems on any modern Linux distribution, including, but not limited to, Ubuntu,
-            Debian, openSUSE, CentOS, Fedora, and Arch. </para>
-        <para>An AppImage package contains all of the supporting software libraries needed to run
-            the included application, so there is no need to install the software directly on your
-            system. However, you do need to install AppImage itself on your system before you can
-            run AppImage packages. For more information,. consult the procedures for installing
-            application on your Linux distribution.</para>
-    </section>-->
-    </section>
-    
 </section>
