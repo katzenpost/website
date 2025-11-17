@@ -54,7 +54,7 @@
     <para>For technical information about how &program_name; and mixnets in general work, see
             <?oxy_comment_start author="dwrob" timestamp="20251116T165750-0800" comment="This has disappeared into a black hole, but we should revive and update it."?><link
             xlink:href="https://web.archive.org/web/20240813022824/https://github.com/katzenpost/docs/blob/master/mixnet_academy/syllabus.rst#mix-network-fundamentals"
-            >Learn Mix Networks for Great Good</link><?oxy_comment_end?> and  <link
+            >Learn Mix Networks for Great Good</link><?oxy_comment_end?> and <link
             xlink:href="https://katzenpost.network/docs/">Katzenpost Documentation</link>. To learn
         more about <emphasis>why</emphasis> &program_name; works as it does, see <link
             xlink:href="sdsdsd">Frequently asked questions</link> .</para>
@@ -121,415 +121,463 @@
                 </imageobject>
                 <caption>
                     <para><emphasis role="bold">Figure 1.</emphasis> This screen capture shows the
-                        elements of the &chat_client; client interface prior to any
-                        configuration.</para>
+                        elements of the &chat_client; client interface prior to configuration or
+                        use.</para>
                 </caption>
             </mediaobject>
         </figure>
         <para>&chat_client; consists of a menu bar, a toolbar, two panes, and a status bar (not
-            visible). The <emphasis role="bold">Conversations and contacts</emphasis> displays
-            existing conversations and the contacts specific to them. The <emphasis role="bold"
-                >Messages</emphasis> pane displays the title of the selected conversation (if any),
-            its message log, an <emphasis role="bold">Invite a contact</emphasis> button for adding
-            new participants, and a text box near the bottom for typing new messages. Buttons in the
-            toolbar include <emphasis role="bold">New conversation</emphasis> (opening a dialog to
-            configure a conversation), <emphasis role="bold">Accept invitation</emphasis> (opening a
-            dialog to accept or refuse an invitation from another user), <emphasis role="bold"
-                >Documentation</emphasis> (activating, once implemented, the internal help system),
-            and <emphasis role="bold">Quit</emphasis> (which shuts down the client). The tabs at the
-            bottom of the <emphasis role="bold">Messages</emphasis> pane allow selection of a
-            communication mode, with only single-line message input currently implemented.</para>
+            visible). <itemizedlist>
+                <listitem>
+                    <para>The <emphasis role="bold">Conversations and contacts</emphasis> pane
+                        displays existing conversations and the contacts specific to them. </para>
+                </listitem>
+                <listitem>
+                    <para>The <emphasis role="bold">Messages</emphasis> pane displays the title of
+                        the selected conversation (if any), its message log, an <emphasis
+                            role="bold">Invite a contact</emphasis> button for adding new
+                        participants, and a text box near the bottom for typing new messages.</para>
+                </listitem>
+                <listitem>
+                    <para> Buttons in the toolbar include <emphasis role="bold">New
+                            conversation</emphasis> (opening a dialog to configure a conversation),
+                            <emphasis role="bold">Accept invitation</emphasis> (opening a dialog to
+                        accept or refuse an invitation from another user), <emphasis role="bold"
+                            >Documentation</emphasis> (activating, once implemented, the internal
+                        help system), and <emphasis role="bold">Quit</emphasis> (which shuts down
+                        the client).</para>
+                </listitem>
+                <listitem>
+                    <para>The tabs at the bottom of the <emphasis role="bold">Messages</emphasis>
+                        pane allow selection of a communication mode, with only single-line message
+                        input currently implemented.</para>
+                </listitem>
+            </itemizedlist></para>
         <note>
             <para>At present, only text chat works. Grayed out elements in the &chat_client;
                 interface are not yet implemented.</para>
         </note>
-        <para>Despite appearances, &chat_client;'s emphasis on anonymity means that familiar
-            concepts take on new meanings, particularly the idea of a "contact."</para>
-        <itemizedlist>
-            <listitem>
-                <para>Contact names are arbitrary. Contacts in one conversation are unconnected with
-                    contacts in other conversations.</para>
-            </listitem>
-            <listitem>
-                <para>&chat_client; and &program_name; operate with no information about the
-                    real-world identities behind contacts. There are no e-mail addresses, telephone
-                    numbers, postal addresses, or anything similar involved. </para>
-            </listitem>
-            <listitem>
-                <para>Without phone numbers or email as anchors for identity, &chat_client; users
-                    require a real-world encounters to verify who they are and to share
-                    cryptographic secrets. This kind of contact bootstrapping occurs out-of-band
-                    (OOB), that is, without reliance on the primary communication channel. The
-                    concept is similar to the key-signing parties that PGP email users employ to
-                    build a <link xlink:href="https://en.wikipedia.org/wiki/Web_of_trust">web of
-                        trust</link>, with the difference being that encrypted email provides little
-                    anonymity protection. </para>
-            </listitem>
-        </itemizedlist>
-        <section xml:id="conversations">
+        <section xml:id="contacts">
             <info>
-                <title xml:id="conversations.title">Creating conversations</title>
+                <title xml:id="contacts.title">About contacts</title>
             </info>
-            <para>Communication in &chat_client; takes place in the context of conversations. A
-                conversation may contain just two participants, or it may involve a large group. The
-                first thing that a new user of &chat_client; must do is create a conversation. Each
-                participating contact also creates a conversation.</para>
-            <para><emphasis role="bold">To create a conversation</emphasis></para>
-            <para>
-                <procedure>
-                    <step>
-                        <para>Open &chat_client;. Until a conversation has been created, the
-                                <emphasis role="bold">Messages</emphasis> pane prompts you to create one.</para>
-                    </step>
-                    <step>
-                        <para>In the toolbar, click the <emphasis role="bold">New conversation</emphasis>
-                            button.</para>
-                    </step>
-                    <step>
-                        <para>In the <emphasis role="bold">New conversation</emphasis> window, type
-                            a name in the <emphasis role="bold">Choose conversation name</emphasis>
-                            field. This name is how you identify the conversation in your own
-                            &chat_client; client. It may differ from what your contacts call their
-                            corresponding conversation. Click <emphasis role="bold">OK</emphasis>
-                            when finished.</para>
-                        <para>In the following screen capture, the <emphasis role="bold">New
-                                conversation</emphasis> field  is being filled out.</para>
-                        <figure>
-                            <info>
-                                <title/>
-                            </info>
-                            <mediaobject>
-                                <imageobject>
-                                    <imagedata fileref="pix/client-convo-1.jpg" scale="30"/>
-                                </imageobject>
-                                <caption>
-                                    <para><emphasis role="bold">Figure 2.</emphasis> In this
-                                        example, a user creates a first conversation called
-                                            <emphasis role="bold">My first conversation</emphasis>.</para>
-                                </caption>
-                            </mediaobject>
-                        </figure>
-                    </step>
-                    <step>
-                        <para>Type a name for yourself in the field labeled <emphasis role="bold">Choose (your)
-                                name displayed to the other user(s)</emphasis>. Your contacts will
-                            see this name when they accept your invitation.</para>
-                        <para>In the following screen capture, a display name has been
-                            provided.</para>
-                        <figure>
-                            <info>
-                                <title/>
-                            </info>
-                            <mediaobject>
-                                <imageobject>
-                                    <imagedata fileref="pix/client-convo-2.jpg" scale="30"/>
-                                </imageobject>
-                                <caption>
-                                    <para>The user gives her name as <emphasis role="bold">Alice</emphasis> in
-                                        the context of this conversation.</para>
-                                </caption>
-                            </mediaobject>
-                        </figure>
-                    </step>
-                    <step>
-                        <para>Click <emphasis role="bold">OK</emphasis> when finished.</para>
-                        <para>Now, in the <emphasis role="bold">Conversations and
-                                contacts</emphasis> pane, the name of your new conversation is
-                            displayed along with your display name. In the <emphasis role="bold"
-                                >Messages</emphasis> pane,
-                            &chat_client;<?oxy_comment_start author="dwrob" timestamp="20251105T173304-0800" comment="This should look more like a stage direction than like a regular message."?>
-                            prints a greeting message<?oxy_comment_end?>.</para>
-                        <para>The final result resembles the following:</para>
-                        <figure>
-                            <info>
-                                <title/>
-                            </info>
-                            <mediaobject>
-                                <imageobject>
-                                    <imagedata fileref="pix/client-convo-3.jpg" scale="30"/>
-                                </imageobject>
-                                <caption>
-                                    <para><emphasis role="bold">Figure 3.</emphasis> In the
-                                            <emphasis role="bold">Conversations and contacts</emphasis> pane,
-                                        you can select a conversation, and the selection will be
-                                        displayed in the <emphasis role="bold">Messages</emphasis> pane. You can
-                                        use the <emphasis role="bold">Type to filter contacts</emphasis> text
-                                        box to find a specific contact name and the conversations
-                                        that contain it.</para>
-                                </caption>
-                            </mediaobject>
-                        </figure>
-                    </step>
-                </procedure>
-            </para>
-            <para>You can create any number of conversations, each completely separate from the
-                others. </para>
-        </section>
-        <section xml:id="adding_contacts">
-            <info>
-                <title xml:id="adding_contacts.title">Adding contacts to a conversation</title>
-            </info>
-            <para>Once you have a created a conversation, you can begin adding contacts to it. As a
-                user of &chat_client; , have no fixed user name or password; instead, you assign a
-                name of your choosing for each conversation that you create. </para>
-            <para>A user setting up a contact generates an authentication token called an
-                    <emphasis>invitation</emphasis>. The invitation is a Base64-encoded string with
-                the following contents:<itemizedlist>
-                    <listitem>
-                        <para>a display name </para>
-                    </listitem>
-                    <listitem>
-                        <para>a mixnet storage address that doubles as read permission </para>
-                    </listitem>
-                </itemizedlist></para>
-            <para>The initiating user delivers the invitation out-of-band to one or more recipients,
-                who must enter the string into &chat_client; and send their own addresses and signed
-                read permissions to the first user, who publishes the shared read permissions for
-                all group members to see. When the process is complete, the new contact names
-                display in the list of contacts for each participant in the conversation. </para>
-            <important>
-                <para>We recommend writing the invitation string on a piece paper, and presenting
-                    this physically to the person or persons you are inviting. The paper bearing the
-                    string should be guarded carefully and destroyed after use. Any person gaining
-                    access to it could read all messages in the associated conversation.</para>
-            </important>
-            <warning>
-                <para>It is possible to simply send your invitation through an alternative
-                    electronic channel. However, doing this permanently degrades the &program_name;
-                    anonymity protections to the level of anonymity offered by the channel that you
-                    used.</para>
-            </warning>
-            <para><emphasis role="bold">To invite a new contact to a conversation</emphasis></para>
-            <para>
-                <procedure>
-                    <step>
-                        <para>Open &chat_client;.</para>
-                    </step>
-                    <step>
-                        <para>With the desired conversation selected,  click <emphasis role="bold"
-                                >Invite a contact</emphasis> in the <emphasis role="bold"
-                                >Messages</emphasis> pane.</para>
-                    </step>
-                    <step>
-                        <para><?oxy_comment_start author="dwrob" timestamp="20251116T182319-0800" comment="Is this choice going away?"?>In
-                            the <emphasis role="bold">Invite contact</emphasis> window, type your
-                            desired display name in the field labeled <emphasis role="bold">Choose
-                                (your) name displayed to the other user</emphasis>, then click
-                                <emphasis role="bold">OK</emphasis>.</para><?oxy_comment_end?>
-                        <para>The following example shows the <emphasis role="bold">Invite
-                                contact</emphasis> window with "Alice" specified as the issuer. </para>
-                        <figure>
-                            <info>
-                                <title/>
-                            </info>
-                            <mediaobject>
-                                <imageobject>
-                                    <imagedata fileref="pix/client-invite-1.jpg" scale="30"/>
-                                </imageobject>
-                                <caption>
-                                    <para><emphasis role="bold">Figure 4.</emphasis> The generated
-                                        invitation string has "Alice" embedded as its creator, which
-                                        is helpful to the recipient in the next steps.</para>
-                                </caption>
-                            </mediaobject>
-                        </figure>
-                    </step>
-                    <step>
-                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>STEP
-                            MISSING PENDING IMPLEMENTATION<?oxy_custom_end?></para>
-                    </step>
-                    <step>
-                        <para>Complete the invitation process by providing the invitation string
-                            out-of-band to your intended contact .</para>
-                    </step>
-                </procedure>
-            </para>
-            <para><emphasis role="bold">To accept an invitation that you have
-                received</emphasis></para>
-            <para>
-                <procedure>
-                    <step>
-                        <para>Open &chat_client;. (In the following example, our perspective shifts
-                            to Bob, who is the user receiving Alice's invitation.)</para>
-                    </step>
-                    <step>
-                        <para>In the toolbar, click <emphasis role="bold">Accept invitation</emphasis>.</para>
-                    </step>
-                    <step>
-                        <para>In the <emphasis role="bold">Accept invitation</emphasis> window, type
-                            or paste the invitation string into the field labeled <emphasis
-                                role="bold">Copy-paste the
-                                <?oxy_comment_start author="dwrob" timestamp="20251116T182445-0800" comment="I think I changed this wording in the code."?>invite<?oxy_comment_end?>
-                                you received</emphasis>. Your client should resemble the
-                            following:</para>
-                        <figure>
-                            <info>
-                                <title/>
-                            </info>
-                            <mediaobject>
-                                <imageobject>
-                                    <imagedata fileref="pix/client-accept-1.jpg" scale="30"/>
-                                </imageobject>
-                                <caption>
-                                    <para><emphasis role="bold">Figure 5.</emphasis> Bob has entered
-                                        the invitation string into the <emphasis role="bold">Accept
-                                            invitation</emphasis> window.</para>
-                                </caption>
-                            </mediaobject>
-                        </figure>
-                    </step>
-                    <step>
-                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>STEPS
-                            MISSING PENDING IMPLEMENTATION<?oxy_custom_end?>
-                        </para>
-                    </step>
-                    <step>
-                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Bob
-                            confirms that The expected display name (Alice?) was embedded in the
-                            string. Still there?<?oxy_custom_end?></para>
-                    </step>
-                    <step>
-                        <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
-                        <para><?oxy_comment_start author="dwrob" timestamp="20251108T163212-0800" comment="Note that the client currently lets me add myself on both sides of the chat." mid="9"?>Click
-                                <emphasis role="bold"
-                            >OK</emphasis>.<?oxy_custom_end?><?oxy_comment_end mid="9"?></para>
-                    </step>
-                </procedure>
-            </para>
-            <para>As shown below, Alice and Bob now appear in each other's contact lists, and they
-                can begin exchanging messages.</para>
-            <figure>
+            <para>Despite appearances, &chat_client;'s emphasis on anonymity means that familiar
+                terms take on new meanings, particularly the idea of a "contact."</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Contact names are arbitrary. Contacts in one conversation are unconnected
+                        with contacts in other conversations. Each chat participant can choose a
+                        unique name for each conversation.</para>
+                </listitem>
+                <listitem>
+                    <para>&chat_client; and &program_name; operate with no information about the
+                        real-world identities behind contacts. There are no e-mail addresses,
+                        telephone numbers, postal addresses, or anything similar involved. </para>
+                </listitem>
+                <listitem>
+                    <para>Without phone numbers or email as anchors for identity, &chat_client;
+                        users require a real-world encounters to verify who they are and to share
+                        cryptographic secrets. This kind of contact bootstrapping occurs out-of-band
+                        (OOB), that is, without reliance on the primary communication channel
+                        (&chat_client;). The concept is similar to the key-signing parties that PGP
+                        email users employ to build a <link
+                            xlink:href="https://en.wikipedia.org/wiki/Web_of_trust">web of
+                            trust</link>. </para>
+                </listitem>
+            </itemizedlist>
+            <section xml:id="conversations">
                 <info>
-                    <title/>
+                    <title xml:id="conversations.title">Creating conversations</title>
                 </info>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="pix/client-messages-1.jpg" scale="30"/>
-                    </imageobject>
-                    <caption>
-                        <para><emphasis role="bold">Figure 6.</emphasis> Alice and Bob with their
-                            respective conversations and contact lists.</para>
-                    </caption>
-                </mediaobject>
-            </figure>
-        </section>
-        <section xml:id="messaging">
-            <title xml:id="messaging.title">Exchanging messages in a conversation</title>
-            <para>&chat_client; resembles other chat programs in its procedure for exchanging
-                messages. This section provides an example of a conversation between two
-                participants. The procedures shown can be generalized to larger group conversations
-                as well.</para>
-            <note>
-                <para>When you look at the perspectives of Alice and Bob side-by-side, as in
-                        <emphasis role="bold">Figure 6</emphasis>, something strange pops out: Their
-                    (shared?) conversation has two different names. This provides a glimpse into the
-                    anonymity architecture behind &chat_client;, and is explained in the FAQ:<xref
-                        linkend="faq_conversations_and_contacts"/></para>
-            </note>
-            <procedure>
-                <title>To exchange messages between two contacts</title>
-                <para>This procedure picks up where the previous section, <xref
-                        linkend="adding_contacts"/>, left off. The examples continue to show both
-                    sides of the Alice/Bob conversation.</para>
-                <step>
-                    <para>Alice composes a message to Bob by typing it in the <emphasis role="bold">Single-line
-                            message</emphasis> box at the bottom of the
-                            <emphasis role="bold">Messages</emphasis> pane.</para>
-                    <figure>
-                        <info>
-                            <title/>
-                        </info>
-                        <mediaobject>
-                            <imageobject>
-                                <imagedata fileref="pix/client-messages-2.jpg" scale="30"/>
-                            </imageobject>
-                            <caption>
-                                <para>Alice can see what conversation she is in by looking at the
-                                    highlighted conversation name in <emphasis role="bold"
-                                        >Conversations and contacts</emphasis> pane, and at the
-                                    heading in the <emphasis role="bold">Messages</emphasis> pane.
-                                    <?oxy_comment_start author="dwrob" timestamp="20251116T143632-0800" comment="This has not been implemented yet. In the final version of the screen shots, there should be several different conversations in order to demonstrate this. They should not all be symmetrical. The color coding will extract order from confusion."?>The
-                                    two panes also color-coordinate, providing another cue as to the
-                                    context.<?oxy_comment_end?> This becomes important when there
-                                    are many conversations present and you need to avoid confusing
-                                    them.</para>
-                            </caption>
-                        </mediaobject>
-                    </figure>
-                </step>
-                <step>
-                    <para>When Alice is done typing the message, she presses <emphasis role="bold"
-                            >Enter</emphasis> to send it.</para>
-                    <figure>
-                        <info>
-                            <title/>
-                        </info>
-                        
-                        <mediaobject>
-                            <imageobject>
-                                <imagedata fileref="pix/client-messages-3.jpg" scale="30"/>
-                            </imageobject>
-                            <caption>
-                                <para>Alice's sent message is visible in her <emphasis role="bold"
-                                        >Messages</emphasis> pane. The in-flight arrow next to her
-                                    name indicates that Bob has not yet received the message, as is
-                                    apparent in his &chat_client; window.</para>
-                            </caption>
-                        </mediaobject>
-                    </figure>
-                </step>
-                <step>
-                    <para>Bob receives Alice's message.</para>
-                    <figure>
-                        <info>
-                            <title/>
-                        </info>
-                        <mediaobject>
-                            <imageobject>
-                                <imagedata fileref="pix/client-messages-4.jpg" scale="30"/>
-                            </imageobject>
-                            <caption>
-                                <para>Bob's &chat_client; window now displays Alice's message, and
-                                    the in-flight arrow has disappeared from Alice's window.</para>
-                            </caption>
-                        </mediaobject>
-                    </figure>
-                </step>
-                <step>
-                    <para>Bob types and sends a reply to Alice.</para>
-                    <figure>
-                        <info>
-                            <title/>
-                        </info>
-                        <mediaobject>
-                            <imageobject>
-                                <imagedata fileref="pix/client-messages-6.jpg" scale="30"/>
-                            </imageobject>
-                            <caption>
-                                <para>With Bob's message sent, his <emphasis role="bold">Messages</emphasis>
-                                    pane shows the in-flight arrow pending delivery.</para>
-                            </caption>
-                        </mediaobject>
-                    </figure>
-                    <para/>
-                </step>
-                <step>
-                    <para>Alice receives Bob's reply and they continue to converse.</para>
-                    <figure>
-                        <info>
-                            <title/>
-                        </info>
-                        <mediaobject>
-                            <imageobject>
-                                <imagedata fileref="pix/client-messages-8.jpg" scale="30"/>
-                            </imageobject>
-                            <caption>
-                                <para>Success!</para>
-                            </caption>
-                        </mediaobject>
-                    </figure>
-                </step>
-            </procedure>
+                <para>Communication in &chat_client; takes place in the context of conversations. A
+                    conversation may contain just two participants, or it may involve a large group.
+                    The first thing that a new user of &chat_client; must do is create a
+                    conversation. This must happen before you  can invite contacts or accept
+                    invitations.</para>
+                <para><emphasis role="bold">To create a conversation</emphasis></para>
+                <para>
+                    <procedure>
+                        <step>
+                            <para>Open &chat_client;. Until a conversation has been created, the
+                                    <emphasis role="bold">Messages</emphasis> pane prompts you to
+                                create one.</para>
+                        </step>
+                        <step>
+                            <para>In the toolbar, click the <emphasis role="bold">New
+                                    conversation</emphasis> button.</para>
+                        </step>
+                        <step>
+                            <para>In the <emphasis role="bold">New conversation</emphasis> window,
+                                type a name in the <emphasis role="bold">Choose conversation
+                                    name</emphasis> field. This name is how you identify the
+                                conversation in your own &chat_client; client. It may differ from
+                                what your contacts call their corresponding conversation. Click
+                                    <emphasis role="bold">OK</emphasis> when finished.</para>
+                            <para>In the following screen capture, the <emphasis role="bold">New
+                                    conversation</emphasis> field is being filled out.</para>
+                            <figure>
+                                <info>
+                                    <title/>
+                                </info>
+                                <mediaobject>
+                                    <imageobject>
+                                        <imagedata fileref="pix/client-convo-1.jpg" scale="30"/>
+                                    </imageobject>
+                                    <caption>
+                                        <para><emphasis role="bold">Figure 2.</emphasis> In this
+                                            example, a user creates a first conversation called
+                                                <emphasis role="bold">My first
+                                                conversation</emphasis>.</para>
+                                    </caption>
+                                </mediaobject>
+                            </figure>
+                        </step>
+                        <step>
+                            <para>Type a name for yourself in the field labeled
+                                    <?oxy_comment_start author="dwrob" timestamp="20251117T090934-0800" comment="Revise this wording depending on how the workflow ends up."?><emphasis
+                                    role="bold">Choose (your) name displayed to the other
+                                    user(s)</emphasis><?oxy_comment_end?>. Your contacts will see
+                                this name when they accept your invitation.</para>
+                            <para>The following screen capture shows a name that was typed in by the
+                                user.</para>
+                            <figure>
+                                <info>
+                                    <title/>
+                                </info>
+                                <mediaobject>
+                                    <imageobject>
+                                        <imagedata fileref="pix/client-convo-2.jpg" scale="30"/>
+                                    </imageobject>
+                                    <caption>
+                                        <para><emphasis role="bold">Figure 3.</emphasis> The user
+                                            types in <emphasis role="bold">Alice</emphasis> as her
+                                            name in the context of this conversation.</para>
+                                    </caption>
+                                </mediaobject>
+                            </figure>
+                        </step>
+                        <step>
+                            <para>Click <emphasis role="bold">OK</emphasis> when finished.</para>
+                            <para>Now, in the <emphasis role="bold">Conversations and
+                                    contacts</emphasis> pane, the name of your new conversation is
+                                displayed along with your display name. In the <emphasis role="bold"
+                                    >Messages</emphasis> pane,
+                                &chat_client;<?oxy_comment_start author="dwrob" timestamp="20251105T173304-0800" comment="This should look more like a stage direction than like a regular message."?>
+                                prints a greeting message<?oxy_comment_end?>.</para>
+                            <para>The final result resembles the following:</para>
+                            <figure>
+                                <info>
+                                    <title/>
+                                </info>
+                                <mediaobject>
+                                    <imageobject>
+                                        <imagedata fileref="pix/client-convo-3.jpg" scale="30"/>
+                                    </imageobject>
+                                    <caption>
+                                        <para><emphasis role="bold">Figure 4.</emphasis> In the
+                                                <emphasis role="bold">Conversations and
+                                                contacts</emphasis> pane, you can select a
+                                            conversation. The selected conversation will be
+                                            displayed in the <emphasis role="bold"
+                                                >Messages</emphasis> pane. You can use the <emphasis
+                                                role="bold">Type to filter contacts</emphasis> text
+                                            box to find a specific contact name and the
+                                            conversations that contain it.</para>
+                                    </caption>
+                                </mediaobject>
+                            </figure>
+                        </step>
+                    </procedure>
+                </para>
+                <para>You can create any number of conversations, each completely separate from the
+                    others. </para>
+            </section>
+            <section xml:id="adding_contacts">
+                <info>
+                    <title xml:id="adding_contacts.title">Adding contacts to a conversation</title>
+                </info>
+                <para>Once you have a created a conversation, you can begin adding contacts to it.
+                    As a user of &chat_client;, you have no fixed user name or password; instead,
+                    you assign a name of your choosing for each conversation and potentially for
+                    each contact.</para>
+                <para>A user setting up a contact generates an authentication token called an
+                        <emphasis>invitation</emphasis>. The invitation is a Base64-encoded string
+                    with the following contents:<itemizedlist>
+                        <listitem>
+                            <para>a display name </para>
+                        </listitem>
+                        <listitem>
+                            <para>a mixnet storage address that doubles as read permission </para>
+                        </listitem>
+                    </itemizedlist></para>
+                <para>The initiating user delivers the invitation out-of-band to one or more
+                    recipient, who enter the invitation string into &chat_client; and, by accepting
+                    it,  send their own addresses and signed read permissions to the first user, who
+                    publishes the shared read permissions for all group members to see. When the
+                    process is complete, the new contact names display in the list of contacts for
+                    each participant in the conversation. </para>
+                <important>
+                    <para>We recommend writing the invitation string on a piece paper, and
+                        presenting this physically to the person or persons you are inviting. The
+                        paper bearing the string should be guarded carefully and destroyed after
+                        use. Any person gaining access to it could read all messages in the
+                        associated conversation.</para>
+                </important>
+                <warning>
+                    <para>It is possible to simply send your invitation through an alternative
+                        electronic channel. However, doing this permanently degrades the
+                        &program_name; anonymity protections to the level of anonymity offered by
+                        the channel that you used.</para>
+                </warning>
+                <para><emphasis role="bold">To invite a new contact to a
+                    conversation</emphasis></para>
+                <para>
+                    <procedure>
+                        <step>
+                            <para>Open &chat_client;.</para>
+                        </step>
+                        <step>
+                            <para>With the desired conversation selected, click <emphasis
+                                    role="bold">Invite a contact</emphasis> in the <emphasis
+                                    role="bold">Messages</emphasis> pane.</para>
+                        </step>
+                        <step>
+                            <para><?oxy_comment_start author="dwrob" timestamp="20251116T182319-0800" comment="Is this choice going away?"?>In
+                                the <emphasis role="bold">Invite contact</emphasis> window, type
+                                your desired display name in the field labeled <emphasis role="bold"
+                                    >Choose (your) name displayed to the other user</emphasis>, then
+                                click <emphasis role="bold">OK</emphasis>.</para><?oxy_comment_end?>
+                            <para>The following screen capture shows the <emphasis role="bold"
+                                    >Invite contact</emphasis> window with "Alice" specified as the
+                                issuer. </para>
+                            <figure>
+                                <info>
+                                    <title/>
+                                </info>
+                                <mediaobject>
+                                    <imageobject>
+                                        <imagedata fileref="pix/client-invite-1.jpg" scale="30"/>
+                                    </imageobject>
+                                    <caption>
+                                        <para><emphasis role="bold">Figure 5.</emphasis> The
+                                            invitation string has "Alice" embedded as its creator,
+                                            which is helpful to the recipient in the next
+                                            steps.</para>
+                                    </caption>
+                                </mediaobject>
+                            </figure>
+                        </step>
+                        <step>
+                            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>STEP
+                                MISSING PENDING IMPLEMENTATION<?oxy_custom_end?></para>
+                        </step>
+                        <step>
+                            <para>Complete the invitation process by providing the invitation string
+                                out-of-band to your intended contact.</para>
+                        </step>
+                    </procedure>
+                </para>
+                <para><emphasis role="bold">To accept an invitation that you have
+                        received</emphasis></para>
+                <para>
+                    <procedure>
+                        <step>
+                            <para>Open &chat_client;. (In the following example, our perspective
+                                shifts to Bob, who is the user receiving Alice's invitation.)</para>
+                        </step>
+                        <step>
+                            <para>In the toolbar, click <emphasis role="bold">Accept
+                                    invitation</emphasis>.</para>
+                        </step>
+                        <step>
+                            <para>In the <emphasis role="bold">Accept invitation</emphasis> window,
+                                type or paste the invitation string into the field labeled <emphasis
+                                    role="bold">Copy-paste the
+                                    <?oxy_comment_start author="dwrob" timestamp="20251116T182445-0800" comment="I think I changed this wording in the code."?>invite<?oxy_comment_end?>
+                                    you received</emphasis>. Your client should resemble the
+                                following:</para>
+                            <figure>
+                                <info>
+                                    <title/>
+                                </info>
+                                <mediaobject>
+                                    <imageobject>
+                                        <imagedata fileref="pix/client-accept-1.jpg" scale="30"/>
+                                    </imageobject>
+                                    <caption>
+                                        <para><emphasis role="bold">Figure 6.</emphasis> Bob has
+                                            entered the invitation string into the <emphasis
+                                                role="bold">Accept invitation</emphasis>
+                                            window.</para>
+                                    </caption>
+                                </mediaobject>
+                            </figure>
+                        </step>
+                        <step>
+                            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>STEPS
+                                MISSING PENDING IMPLEMENTATION<?oxy_custom_end?>
+                            </para>
+                        </step>
+                        <step>
+                            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Bob
+                                confirms that The expected display name (Alice?) was embedded in the
+                                string. Still there?<?oxy_custom_end?></para>
+                        </step>
+                        <step>
+                            <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                            <para><?oxy_comment_start author="dwrob" timestamp="20251108T163212-0800" comment="Note that the client currently lets me add myself on both sides of the chat." mid="10"?>Click
+                                    <emphasis role="bold"
+                                >OK</emphasis>.<?oxy_custom_end?><?oxy_comment_end mid="10"?></para>
+                        </step>
+                    </procedure>
+                </para>
+                <para>As shown below, Alice and Bob now appear in each other's contact lists, and
+                    they can begin exchanging messages.</para>
+                <figure>
+                    <info>
+                        <title/>
+                    </info>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="pix/client-messages-1.jpg" scale="30"/>
+                        </imageobject>
+                        <caption>
+                            <para><emphasis role="bold">Figure 7.</emphasis> Alice and Bob are shown
+                                with their respective conversations and contact lists. Although
+                                Alice started this conversation, she doesn't control the name it
+                                goes by in other users' clients.</para>
+                        </caption>
+                    </mediaobject>
+                </figure>
+            </section>
+            <section xml:id="messaging">
+                <title xml:id="messaging.title">Exchanging messages in a conversation</title>
+                <para>&chat_client; resembles other chat programs in its procedure for exchanging
+                    messages. This section provides an example of a conversation between two
+                    participants. The procedures shown can be generalized to larger group
+                    conversations as well.</para>
+                <note>
+                    <para>When you look at the perspectives of Alice and Bob side-by-side, as in
+                            <emphasis role="bold">Figure 7</emphasis>, something strange pops out:
+                        Their (shared?) conversation has two different names. This provides a
+                        glimpse into the anonymity architecture behind &chat_client;, and is
+                        explained in the FAQ:<xref linkend="faq_conversations_and_contacts"/></para>
+                </note>
+                <procedure>
+                    <title>To exchange messages between two contacts</title>
+                    <para>This procedure picks up where the previous section, <xref
+                            linkend="adding_contacts"/>, left off. The examples continue to show
+                        both sides of the Alice/Bob conversation.</para>
+                    <step>
+                        <para>Alice composes a message to Bob by typing it in the <emphasis
+                                role="bold">Single-line message</emphasis> box at the bottom of the
+                                <emphasis role="bold">Messages</emphasis> pane, as shown in the
+                            following screen capture.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/client-messages-2.jpg" scale="30"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 8.</emphasis> Alice can see
+                                        what conversation she is in by looking at the highlighted
+                                        conversation name in <emphasis role="bold">Conversations and
+                                            contacts</emphasis> pane, and at the heading in the
+                                            <emphasis role="bold">Messages</emphasis> pane.
+                                        <?oxy_comment_start author="dwrob" timestamp="20251116T143632-0800" comment="This has not been implemented yet. In the final version of the screen shots, there should be several different conversations in order to demonstrate this. They should not all be symmetrical. The color coding will extract order from confusion."?>The
+                                        two panes also color-coordinate, providing another cue as to
+                                        the context.<?oxy_comment_end?> This becomes important when
+                                        there are many conversations present and you need to avoid
+                                        confusing them.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                    <step>
+                        <para>When Alice is done typing the message, she presses <emphasis
+                                role="bold">Enter</emphasis> to send it.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/client-messages-3.jpg" scale="30"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 9.</emphasis> Alice's sent
+                                        message is visible in her <emphasis role="bold"
+                                            >Messages</emphasis> pane. The in-flight arrow next to
+                                        her name indicates that Bob has not yet received the
+                                        message, as is apparent in his &chat_client; window.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                    <step>
+                        <para>In the following screen capture, Bob has received Alice's
+                            message.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/client-messages-4.jpg" scale="30"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 10.</emphasis> Bob's
+                                        &chat_client; window now displays Alice's message, and the
+                                        in-flight arrow has disappeared from Alice's window.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                    <step>
+                        <para>In the next screen capture, Bob types and sends a reply to
+                            Alice.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/client-messages-6.jpg" scale="30"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 11.</emphasis> With Bob's
+                                        message sent, his <emphasis role="bold">Messages</emphasis>
+                                        pane shows the in-flight arrow pending delivery.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                        <para/>
+                    </step>
+                    <step>
+                        <para>In this last screen capture, Alice has received Bob's reply and they
+                            continue to converse.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/client-messages-8.jpg" scale="30"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 12.</emphasis> Success!
+                                        Several messages have been exchanged and the absence of
+                                        in-flight arrows indicates that no messages are pending at
+                                        the moment.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                </procedure>
+            </section>
         </section>
     </section>
     <section xml:id="faq">
@@ -657,9 +705,10 @@
                         exactly two members.</para>
                 </listitem>
                 <listitem>
-                    <para>The conversations that you see listed in <emphasis role="bold">Conversations and
-                            contacts</emphasis> are ones that you created and named. Your contacts
-                        see their own conversations that they created and named. </para>
+                    <para>The conversations that you see listed in <emphasis role="bold"
+                            >Conversations and contacts</emphasis> are ones that you created and
+                        named. Your contacts see their own conversations that they created and
+                        named. </para>
                 </listitem>
                 <listitem>
                     <para>When you create a conversation, you are also creating a <emphasis>message
@@ -677,12 +726,12 @@
                         that you created with other users. (And vice versa.)</para>
                 </listitem>
                 <listitem>
-                    <para>The view of a conversation that you see in your
-                            <emphasis role="bold">Messages</emphasis> pane is a <emphasis>virtual</emphasis>
-                        message log collated by &chat_client;. It is based on read permissions that
-                        you and your contacts have mutually shared in this specific context. This is
-                        how you can all see the same virtual log of messages when you are each
-                        looking at a different conversation. </para>
+                    <para>The view of a conversation that you see in your <emphasis role="bold"
+                            >Messages</emphasis> pane is a <emphasis>virtual</emphasis> message log
+                        collated by &chat_client;. It is based on read permissions that you and your
+                        contacts have mutually shared in this specific context. This is how you can
+                        all see the same virtual log of messages when you are each looking at a
+                        different conversation. </para>
                 </listitem>
             </itemizedlist>
         </section>
