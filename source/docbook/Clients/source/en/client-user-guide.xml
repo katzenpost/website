@@ -42,15 +42,15 @@
 <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="client_guide">
     <info>
-        <title xml:id="client_guide.title">&chat_client; chat client user guide</title>
+        <title xml:id="client_guide.title">&chat_client; chat client guide</title>
         <!-- Match to "title" or "linkTitle" processing instruction above. -->
     </info>
     <para>This guide introduces the &chat_client; chat client. With &chat_client; you can securely
-        share one-to-one and group messages with contacts. &chat_client; relies on &program_name;,
-        an advanced mixnet system designed for people who have something to say, but who also value
-        their anonymity. Importantly, anonymity is not the same thing as encryption, which protects
-        the <emphasis>content</emphasis> of communication over the Internet. Anonymity is about
-        protecting <emphasis>people</emphasis>. </para>
+        share one-to-one and group messages with other &chat_client; users. &chat_client; relies on
+        &program_name;, an advanced mixnet system designed for people who have something to say, but
+        who also value their anonymity. Anonymity is not the same thing as encryption, which
+        protects the <emphasis>content</emphasis> of communication over the Internet. Anonymity is
+        about protecting <emphasis>people</emphasis>. </para>
     <para>For technical information about how &program_name; and mixnets in general work, see
             <?oxy_comment_start author="dwrob" timestamp="20251116T165750-0800" comment="This has disappeared into a black hole, but we should revive and update it."?><link
             xlink:href="https://web.archive.org/web/20240813022824/https://github.com/katzenpost/docs/blob/master/mixnet_academy/syllabus.rst#mix-network-fundamentals"
@@ -106,27 +106,9 @@
         <title xml:id="communicating.title">Communicating through the &chat_client; client</title>
         <para>This section describes how to configure and use &chat_client; for secure, anonymous
             communication. </para>
-        <para>Like many other chat clients, &chat_client;exhibits two panes, one for contacts and
+        <para>Like many other chat clients, &chat_client; exhibits two panes, one for contacts and
             one for messages, and a number of communication modes such as text chat, file transfer,
-            and voice. The following illustration shows how &chat_client; looks when you first open
-            it after installation.</para>
-        <para>&chat_client; consists of a menu bar, a toolbar, two panes, and a status bar (not
-            visible). The <guilabel>Conversations and contacts</guilabel> displays existing
-            conversations and the contacts specific to them. The <guilabel>Messages</guilabel> pane
-            displays the title of the selected conversation (if any), its messgae log, an
-                <guilabel>Invite a contact</guilabel> button for adding new members, and a text box
-            near the bottom for typing new messages. Buttons in the toolbar include <guilabel>New
-                conversation</guilabel> (opening a dialog to configure a conversation),
-                <guilabel>Accept invitation</guilabel> (opening a dialog to accept or refuse an
-            invitation from another user), <guilabel>Documentation</guilabel> (activating, once
-            implemented, the internal help system), and <guilabel>Quit</guilabel> (which shuts down
-            the client). The tabs at the bottom of the <guilabel>Messages</guilabel> pane allow
-            selection of a communication mode, with only single-line message input currrently
-            implemented.</para>
-        <note>
-            <para>At present, only text chat works. Grayed out elements in the &chat_client;
-                interface are not yet implemented.</para>
-        </note>
+            and voice. </para>
         <para>The following screen capture shows &chat_client; as it appears when opened for the
             first time.</para>
         <figure>
@@ -144,8 +126,25 @@
                 </caption>
             </mediaobject>
         </figure>
-        <para>Despite appearances, Katzen's emphasis on anonymity means that familiar concepts take
-            on new meanings, particularly the idea of a "contact."</para>
+        <para>&chat_client; consists of a menu bar, a toolbar, two panes, and a status bar (not
+            visible). The <emphasis role="bold">Conversations and contacts</emphasis> displays
+            existing conversations and the contacts specific to them. The <emphasis role="bold"
+                >Messages</emphasis> pane displays the title of the selected conversation (if any),
+            its message log, an <emphasis role="bold">Invite a contact</emphasis> button for adding
+            new participants, and a text box near the bottom for typing new messages. Buttons in the
+            toolbar include <emphasis role="bold">New conversation</emphasis> (opening a dialog to
+            configure a conversation), <emphasis role="bold">Accept invitation</emphasis> (opening a
+            dialog to accept or refuse an invitation from another user), <emphasis role="bold"
+                >Documentation</emphasis> (activating, once implemented, the internal help system),
+            and <emphasis role="bold">Quit</emphasis> (which shuts down the client). The tabs at the
+            bottom of the <emphasis role="bold">Messages</emphasis> pane allow selection of a
+            communication mode, with only single-line message input currently implemented.</para>
+        <note>
+            <para>At present, only text chat works. Grayed out elements in the &chat_client;
+                interface are not yet implemented.</para>
+        </note>
+        <para>Despite appearances, &chat_client;'s emphasis on anonymity means that familiar
+            concepts take on new meanings, particularly the idea of a "contact."</para>
         <itemizedlist>
             <listitem>
                 <para>Contact names are arbitrary. Contacts in one conversation are unconnected with
@@ -167,14 +166,12 @@
                     anonymity protection. </para>
             </listitem>
         </itemizedlist>
-        <para>Consequently, <emphasis>conversations</emphasis> are the real organizing principle in
-            &chat_client;.</para>
         <section xml:id="conversations">
             <info>
                 <title xml:id="conversations.title">Creating conversations</title>
             </info>
             <para>Communication in &chat_client; takes place in the context of conversations. A
-                conversation may contain just two particpants, or it may involve a large group. The
+                conversation may contain just two participants, or it may involve a large group. The
                 first thing that a new user of &chat_client; must do is create a conversation. Each
                 participating contact also creates a conversation.</para>
             <para><emphasis role="bold">To create a conversation</emphasis></para>
@@ -182,20 +179,21 @@
                 <procedure>
                     <step>
                         <para>Open &chat_client;. Until a conversation has been created, the
-                                <guilabel>Messages</guilabel> pane prompts you to create one.</para>
+                                <emphasis role="bold">Messages</emphasis> pane prompts you to create one.</para>
                     </step>
                     <step>
-                        <para>In the toolbar, click the <guilabel>New conversation</guilabel>
+                        <para>In the toolbar, click the <emphasis role="bold">New conversation</emphasis>
                             button.</para>
                     </step>
                     <step>
-                        <para>In the <guilabel>New conversation</guilabel> window, type a name in
-                            the <guilabel>Choose conversation name</guilabel> field. This name is
-                            how you identify the conversation in your own &chat_client; client. It
-                            may differ from what your contacts call their corresponding
-                            conversations. Click <guilabel>OK</guilabel> when finished.</para>
-                        <para>In the following screen capture, the <guilabel>New
-                                conversation</guilabel> is being filled out.</para>
+                        <para>In the <emphasis role="bold">New conversation</emphasis> window, type
+                            a name in the <emphasis role="bold">Choose conversation name</emphasis>
+                            field. This name is how you identify the conversation in your own
+                            &chat_client; client. It may differ from what your contacts call their
+                            corresponding conversation. Click <emphasis role="bold">OK</emphasis>
+                            when finished.</para>
+                        <para>In the following screen capture, the <emphasis role="bold">New
+                                conversation</emphasis> field  is being filled out.</para>
                         <figure>
                             <info>
                                 <title/>
@@ -207,14 +205,14 @@
                                 <caption>
                                     <para><emphasis role="bold">Figure 2.</emphasis> In this
                                         example, a user creates a first conversation called
-                                            <guilabel>My first conversation</guilabel>.</para>
+                                            <emphasis role="bold">My first conversation</emphasis>.</para>
                                 </caption>
                             </mediaobject>
                         </figure>
                     </step>
                     <step>
-                        <para>Type a name for yourself in the field labeled <guilabel>Choose (your)
-                                name displayed to the other user(s)</guilabel>. Your contacts will
+                        <para>Type a name for yourself in the field labeled <emphasis role="bold">Choose (your)
+                                name displayed to the other user(s)</emphasis>. Your contacts will
                             see this name when they accept your invitation.</para>
                         <para>In the following screen capture, a display name has been
                             provided.</para>
@@ -227,17 +225,18 @@
                                     <imagedata fileref="pix/client-convo-2.jpg" scale="30"/>
                                 </imageobject>
                                 <caption>
-                                    <para>The user gives her name as <guilabel>Alice</guilabel> in
+                                    <para>The user gives her name as <emphasis role="bold">Alice</emphasis> in
                                         the context of this conversation.</para>
                                 </caption>
                             </mediaobject>
                         </figure>
                     </step>
                     <step>
-                        <para>Click <guilabel>OK</guilabel> when finished.</para>
-                        <para>Now, in the <guilabel>Conversations and contacts</guilabel> pane, the
-                            name of your new conversation is displayed along with your own name. In
-                            the <guilabel>Messages</guilabel> pane,
+                        <para>Click <emphasis role="bold">OK</emphasis> when finished.</para>
+                        <para>Now, in the <emphasis role="bold">Conversations and
+                                contacts</emphasis> pane, the name of your new conversation is
+                            displayed along with your display name. In the <emphasis role="bold"
+                                >Messages</emphasis> pane,
                             &chat_client;<?oxy_comment_start author="dwrob" timestamp="20251105T173304-0800" comment="This should look more like a stage direction than like a regular message."?>
                             prints a greeting message<?oxy_comment_end?>.</para>
                         <para>The final result resembles the following:</para>
@@ -251,10 +250,10 @@
                                 </imageobject>
                                 <caption>
                                     <para><emphasis role="bold">Figure 3.</emphasis> In the
-                                            <guilabel>Conversations and contacts</guilabel> pane,
+                                            <emphasis role="bold">Conversations and contacts</emphasis> pane,
                                         you can select a conversation, and the selection will be
-                                        displayed in the <guilabel>Messages</guilabel> pane. You can
-                                        use the <guilabel>Type to filter contacts</guilabel> text
+                                        displayed in the <emphasis role="bold">Messages</emphasis> pane. You can
+                                        use the <emphasis role="bold">Type to filter contacts</emphasis> text
                                         box to find a specific contact name and the conversations
                                         that contain it.</para>
                                 </caption>
@@ -270,12 +269,9 @@
             <info>
                 <title xml:id="adding_contacts.title">Adding contacts to a conversation</title>
             </info>
-            <para>Once you have a created a conversation, you can begin adding contacts to it. Users
-                of &chat_client; have no fixed user names or passwords; instead, they bear arbitrary
-                display names (which can be changed) and exert control over message streams hosted
-                on the &program_name; network. To communicate with each other, contacts share their
-                addresses and grant read permissions to each other. Authentication takes place once
-                in the real world before communication over the mixnet begins.</para>
+            <para>Once you have a created a conversation, you can begin adding contacts to it. As a
+                user of &chat_client; , have no fixed user name or password; instead, you assign a
+                name of your choosing for each conversation that you create. </para>
             <para>A user setting up a contact generates an authentication token called an
                     <emphasis>invitation</emphasis>. The invitation is a Base64-encoded string with
                 the following contents:<itemizedlist>
@@ -286,23 +282,22 @@
                         <para>a mixnet storage address that doubles as read permission </para>
                     </listitem>
                 </itemizedlist></para>
-            <para>The initiating user delivers the invitation OOB to one or more recipients, who
-                enter the string into &chat_client; and send their own addresses and signed read
-                permissions to the first user, who publishes the shared read permissions for all
-                group members to see. When the process is complete, the new contact names display in
-                the list of contacts for each participant in the conversation. </para>
+            <para>The initiating user delivers the invitation out-of-band to one or more recipients,
+                who must enter the string into &chat_client; and send their own addresses and signed
+                read permissions to the first user, who publishes the shared read permissions for
+                all group members to see. When the process is complete, the new contact names
+                display in the list of contacts for each participant in the conversation. </para>
             <important>
                 <para>We recommend writing the invitation string on a piece paper, and presenting
-                    this physically to the person whom you are inviting. The paper bearing the
-                    string should be guarded carefully and destroyed once its purpose is achieved.
-                    Any person gaining access to it could read all messages in the associated
-                    conversation.</para>
+                    this physically to the person or persons you are inviting. The paper bearing the
+                    string should be guarded carefully and destroyed after use. Any person gaining
+                    access to it could read all messages in the associated conversation.</para>
             </important>
             <warning>
                 <para>It is possible to simply send your invitation through an alternative
-                    electronic channel. However, doing this degrades the &program_name; anonymity
-                    protections to the level of anonymity offered by the channel that you
-                    use.</para>
+                    electronic channel. However, doing this permanently degrades the &program_name;
+                    anonymity protections to the level of anonymity offered by the channel that you
+                    used.</para>
             </warning>
             <para><emphasis role="bold">To invite a new contact to a conversation</emphasis></para>
             <para>
@@ -311,17 +306,18 @@
                         <para>Open &chat_client;.</para>
                     </step>
                     <step>
-                        <para>With the desired conversation selected, in the
-                                <guilabel>Messages</guilabel> pane on the right, click
-                                <guilabel>Invite a contact</guilabel>.</para>
+                        <para>With the desired conversation selected,  click <emphasis role="bold"
+                                >Invite a contact</emphasis> in the <emphasis role="bold"
+                                >Messages</emphasis> pane.</para>
                     </step>
                     <step>
-                        <para>In the <guilabel>Invite contact</guilabel> window, type your desired
-                            display name in the field labeled <guilabel>Choose (your) name displayed
-                                to the other user</guilabel>, then click
-                            <guilabel>OK</guilabel>.</para>
-                        <para>The following example shows the <guilabel>Invite contact</guilabel>
-                            window with "Alice" specified as the issuer. </para>
+                        <para><?oxy_comment_start author="dwrob" timestamp="20251116T182319-0800" comment="Is this choice going away?"?>In
+                            the <emphasis role="bold">Invite contact</emphasis> window, type your
+                            desired display name in the field labeled <emphasis role="bold">Choose
+                                (your) name displayed to the other user</emphasis>, then click
+                                <emphasis role="bold">OK</emphasis>.</para><?oxy_comment_end?>
+                        <para>The following example shows the <emphasis role="bold">Invite
+                                contact</emphasis> window with "Alice" specified as the issuer. </para>
                         <figure>
                             <info>
                                 <title/>
@@ -340,7 +336,7 @@
                     </step>
                     <step>
                         <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>STEP
-                            MISSING PENDING IMPLEMENTION<?oxy_custom_end?></para>
+                            MISSING PENDING IMPLEMENTATION<?oxy_custom_end?></para>
                     </step>
                     <step>
                         <para>Complete the invitation process by providing the invitation string
@@ -353,16 +349,18 @@
             <para>
                 <procedure>
                     <step>
-                        <para>Open &chat_client;. (In the example, our perspective shifts to Bob,
-                            who is the user receiving Alice's invitation.)</para>
+                        <para>Open &chat_client;. (In the following example, our perspective shifts
+                            to Bob, who is the user receiving Alice's invitation.)</para>
                     </step>
                     <step>
-                        <para>In the toolbar, click <guilabel>Accept invitation</guilabel>.</para>
+                        <para>In the toolbar, click <emphasis role="bold">Accept invitation</emphasis>.</para>
                     </step>
                     <step>
-                        <para>In the <guilabel>Accept invitation</guilabel> window, type or paste
-                            the invitation string into the field labeled <guilabel>Copy-paste the
-                                invite you received</guilabel>. Your client should resemble the
+                        <para>In the <emphasis role="bold">Accept invitation</emphasis> window, type
+                            or paste the invitation string into the field labeled <emphasis
+                                role="bold">Copy-paste the
+                                <?oxy_comment_start author="dwrob" timestamp="20251116T182445-0800" comment="I think I changed this wording in the code."?>invite<?oxy_comment_end?>
+                                you received</emphasis>. Your client should resemble the
                             following:</para>
                         <figure>
                             <info>
@@ -374,20 +372,27 @@
                                 </imageobject>
                                 <caption>
                                     <para><emphasis role="bold">Figure 5.</emphasis> Bob has entered
-                                        the invitation string into the <guilabel>Accept
-                                            invitation</guilabel> window.</para>
+                                        the invitation string into the <emphasis role="bold">Accept
+                                            invitation</emphasis> window.</para>
                                 </caption>
                             </mediaobject>
                         </figure>
                     </step>
                     <step>
-                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Missing
-                            step pending implementation: Bob confirms that The expected display name
-                            (Alice?) was embedded in the string.<?oxy_custom_end?></para>
+                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>STEPS
+                            MISSING PENDING IMPLEMENTATION<?oxy_custom_end?>
+                        </para>
                     </step>
                     <step>
-                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><?oxy_comment_start author="dwrob" timestamp="20251108T163212-0800" comment="Note that the client currently lets me add myself on both sides of the chat." mid="6"?>Click
-                                <guilabel>OK</guilabel>.<?oxy_custom_end?><?oxy_comment_end mid="6"?></para>
+                        <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Bob
+                            confirms that The expected display name (Alice?) was embedded in the
+                            string. Still there?<?oxy_custom_end?></para>
+                    </step>
+                    <step>
+                        <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                        <para><?oxy_comment_start author="dwrob" timestamp="20251108T163212-0800" comment="Note that the client currently lets me add myself on both sides of the chat." mid="9"?>Click
+                                <emphasis role="bold"
+                            >OK</emphasis>.<?oxy_custom_end?><?oxy_comment_end mid="9"?></para>
                     </step>
                 </procedure>
             </para>
@@ -410,26 +415,26 @@
         </section>
         <section xml:id="messaging">
             <title xml:id="messaging.title">Exchanging messages in a conversation</title>
-            <para>&chat_client; resembles other chat program in the way that you exchange messages
-                with your contacts. This section provides an example of a conversation between two
+            <para>&chat_client; resembles other chat programs in its procedure for exchanging
+                messages. This section provides an example of a conversation between two
                 participants. The procedures shown can be generalized to larger group conversations
                 as well.</para>
             <note>
                 <para>When you look at the perspectives of Alice and Bob side-by-side, as in
                         <emphasis role="bold">Figure 6</emphasis>, something strange pops out: Their
                     (shared?) conversation has two different names. This provides a glimpse into the
-                    anonymity architecture behind &chat_client;, and is explained in <xref
+                    anonymity architecture behind &chat_client;, and is explained in the FAQ:<xref
                         linkend="faq_conversations_and_contacts"/></para>
             </note>
             <procedure>
                 <title>To exchange messages between two contacts</title>
-                <para>The procedure picks up where the previous section, <xref
+                <para>This procedure picks up where the previous section, <xref
                         linkend="adding_contacts"/>, left off. The examples continue to show both
                     sides of the Alice/Bob conversation.</para>
                 <step>
-                    <para>Alice composes a message to Bob by typing it in the <guilabel>Single-line
-                            message</guilabel> box at the bottom of the
-                            <guilabel>Messages</guilabel> pane.</para>
+                    <para>Alice composes a message to Bob by typing it in the <emphasis role="bold">Single-line
+                            message</emphasis> box at the bottom of the
+                            <emphasis role="bold">Messages</emphasis> pane.</para>
                     <figure>
                         <info>
                             <title/>
@@ -440,20 +445,21 @@
                             </imageobject>
                             <caption>
                                 <para>Alice can see what conversation she is in by looking at the
-                                    highlighted conversation name in Conversations and contacts
-                                    pane, and at the heading in the Messages pane.
-                                    <?oxy_comment_start author="dwrob" timestamp="20251116T143632-0800" comment="This has not been implemnted yet. In the final version of the screen shots, there should be several different conversations in order to demonstrate this. They should not all be symmetrical. The color coding will extract order from confusion."?>The
+                                    highlighted conversation name in <emphasis role="bold"
+                                        >Conversations and contacts</emphasis> pane, and at the
+                                    heading in the <emphasis role="bold">Messages</emphasis> pane.
+                                    <?oxy_comment_start author="dwrob" timestamp="20251116T143632-0800" comment="This has not been implemented yet. In the final version of the screen shots, there should be several different conversations in order to demonstrate this. They should not all be symmetrical. The color coding will extract order from confusion."?>The
                                     two panes also color-coordinate, providing another cue as to the
                                     context.<?oxy_comment_end?> This becomes important when there
-                                    are many conversations present and they need to be
-                                    distinguishable from each other.</para>
+                                    are many conversations present and you need to avoid confusing
+                                    them.</para>
                             </caption>
                         </mediaobject>
                     </figure>
                 </step>
                 <step>
-                    <para>When Alice is done typing the message, she presses Enter to send
-                            it.</para>
+                    <para>When Alice is done typing the message, she presses <emphasis role="bold"
+                            >Enter</emphasis> to send it.</para>
                     <figure>
                         <info>
                             <title/>
@@ -464,16 +470,16 @@
                                 <imagedata fileref="pix/client-messages-3.jpg" scale="30"/>
                             </imageobject>
                             <caption>
-                                <para>Alice's sent message is visible in her Messages pane. The
-                                    in-flight arrow next to her name indicates that Bob has not yet
-                                    received the message, as is apparent in his &chat_client;
-                                    window.</para>
+                                <para>Alice's sent message is visible in her <emphasis role="bold"
+                                        >Messages</emphasis> pane. The in-flight arrow next to her
+                                    name indicates that Bob has not yet received the message, as is
+                                    apparent in his &chat_client; window.</para>
                             </caption>
                         </mediaobject>
                     </figure>
                 </step>
                 <step>
-                    <para>Bob receives Alice's message</para>
+                    <para>Bob receives Alice's message.</para>
                     <figure>
                         <info>
                             <title/>
@@ -484,7 +490,7 @@
                             </imageobject>
                             <caption>
                                 <para>Bob's &chat_client; window now displays Alice's message, and
-                                    the in-flight arrow has dissappeared from Alice's window.</para>
+                                    the in-flight arrow has disappeared from Alice's window.</para>
                             </caption>
                         </mediaobject>
                     </figure>
@@ -500,7 +506,7 @@
                                 <imagedata fileref="pix/client-messages-6.jpg" scale="30"/>
                             </imageobject>
                             <caption>
-                                <para>With Bob's message sent, his <guilabel>Messages</guilabel>
+                                <para>With Bob's message sent, his <emphasis role="bold">Messages</emphasis>
                                     pane shows the in-flight arrow pending delivery.</para>
                             </caption>
                         </mediaobject>
@@ -532,11 +538,12 @@
         <section xml:id="faq_anonymity">
             <title xml:id="faq_anonymity.title">What kind of user needs anonymity
                 protection?</title>
-            <para>Here are some likely candidates.</para>
+            <para>Here are some examples of users who require anonymity.</para>
             <itemizedlist>
                 <listitem>
                     <para>People and groups who are likely to be under surveillance by government
-                        entities, from corrupt police forces to intelligence agencies.</para>
+                        entities, whether dishonest bureaucrats, corrupt police forces, or
+                        intelligence agencies.</para>
                 </listitem>
                 <listitem>
                     <para>People facing business or government censorship.</para>
@@ -546,8 +553,14 @@
                         local and global competitors or to their own or other governments.</para>
                 </listitem>
                 <listitem>
-                    <para>Non-profit organizations engaging in advocacy that earns them enemies in
-                        high places with powerful surveillance capabilities.</para>
+                    <para>Journalists, and anyone who communicates with a journalist.</para>
+                </listitem>
+                <listitem>
+                    <para>Whistle-blowers.</para>
+                </listitem>
+                <listitem>
+                    <para>Non-profit organizations engaging in advocacy that earns them enemies with
+                        powerful surveillance capabilities.</para>
                 </listitem>
                 <listitem>
                     <para>People worried about the utter insecurity of personal data stored in both
@@ -555,8 +568,8 @@
                         Internet.</para>
                 </listitem>
                 <listitem>
-                    <para>People who want to use the Internet for communication, but who dislike
-                        being the raw material that feeds <link
+                    <para>People who want to use the Internet but dislike being the raw material
+                        that feeds <link
                             xlink:href="https://en.wikipedia.org/wiki/Surveillance_capitalism"
                             >surveillance capitalism</link>.</para>
                 </listitem>
@@ -567,24 +580,24 @@
                 good enough?</title>
             <para>Not necessarily. Your identity and other <emphasis>metadata</emphasis> may be more
                 interesting to snoops than your <emphasis>data</emphasis> (what you say). Your
-                network of contacts – who is talking to whom – is usually the most valuable
-                knowledge about you. Legal protections for this kind of information are weaker than
-                for communication content. Here are some examples:</para>
+                network of contacts – who is talking to whom – is often the most valuable
+                information about you. Legal protections for metadata are weaker than for
+                communication content. Here are some examples:</para>
             <itemizedlist>
                 <listitem>
                     <para>Internet businesses routinely harvest and sell sensitive identity data to
                         profit from invasively personalized ads and other sources.</para>
                 </listitem>
                 <listitem>
-                    <para>Governments, especially law enforcement and spy agencies, collect and
-                        store any data about identity, movements, employment, and political views
-                        that they can get their hands on, sacrificing the privacy of millions of
-                        innocent people to catch a tiny number of suspected criminals.</para>
+                    <para>Governments, especially law enforcement, will collect and store any data
+                        about your identity, movements, employment, and political views that they
+                        can get their hands on, sacrificing the privacy of millions of innocent
+                        people to catch a tiny number of suspected criminals.</para>
                 </listitem>
                 <listitem>
                     <para>Actual criminals make daily use of the data they steal from these same
                         businesses and governments, enabling identity theft, credit-card fraud, and
-                        blackmail.</para>
+                        extortion.</para>
                 </listitem>
                 <listitem>
                     <para>While the <emphasis>content</emphasis> of telephone communication is
@@ -620,7 +633,14 @@
         <section xml:id="faq_conversations_and_contacts">
             <title xml:id="faq_conversations_and_contacts.title">How do conversations and contacts
                 actually work? </title>
-            <para/>
+            <para>The &chat_client; and the &program_name; system devote a great deal of engineering
+                effort to prevent surveillance adversaries from discovering who you are and whom you
+                are talking with. Importantly, after your initial meeting to hand off an invitation,
+                you have no actual contact with your contacts. Instead, users communicate solely
+                with the &program_name; mixnet, which serves as a dead-drop for each user's
+                messages. </para>
+            <para>Here is a very sparse summary of how the pieces fit together to provide usable
+                communication despite all of the anonymization and indirection.</para>
             <itemizedlist>
                 <listitem>
                     <para>Conversations are the main organizing principle in &chat_client;. </para>
@@ -637,8 +657,8 @@
                         exactly two members.</para>
                 </listitem>
                 <listitem>
-                    <para>The conversations that you see listed in <guilabel>Conversations and
-                            contacts</guilabel> are ones that you created and named. Your contacts
+                    <para>The conversations that you see listed in <emphasis role="bold">Conversations and
+                            contacts</emphasis> are ones that you created and named. Your contacts
                         see their own conversations that they created and named. </para>
                 </listitem>
                 <listitem>
@@ -654,11 +674,11 @@
                 </listitem>
                 <listitem>
                     <para>You can share <emphasis>read permissions</emphasis> to a message stream
-                        that you created with other users.</para>
+                        that you created with other users. (And vice versa.)</para>
                 </listitem>
                 <listitem>
                     <para>The view of a conversation that you see in your
-                            <guilabel>Messages</guilabel> pane is a <emphasis>virtual</emphasis>
+                            <emphasis role="bold">Messages</emphasis> pane is a <emphasis>virtual</emphasis>
                         message log collated by &chat_client;. It is based on read permissions that
                         you and your contacts have mutually shared in this specific context. This is
                         how you can all see the same virtual log of messages when you are each
@@ -669,11 +689,14 @@
         <section xml:id="faq_oob">
             <title xml:id="faq_oob.title">What is this out-of-band (OOB) secret sharing
                 stuff?</title>
-            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>The OOB
-                invitation is the first step in guaranteeing anonymity in the face of electronic
-                surveillance. It is explicitly <emphasis>not</emphasis> electronic. The following
-                diagram details the data exchanges involved in setting up
-                contacts.<?oxy_custom_end?> For more information, see <link
+            <para>The OOB invitation is the first step in guaranteeing anonymity in the face of
+                electronic surveillance. It is explicitly <emphasis>not</emphasis> electronic. OOB
+                is a solution to a difficult and fundamental problem of encrypted communications:
+                    <link xlink:href="https://en.wikipedia.org/wiki/Key_exchange">key
+                    exchange</link>. A real-world solution recommends itself because almost no
+                electronic solution protects anonymity. </para>
+            <para>The following diagram details the data exchanges involved in setting up contacts.
+                For more information, see <link
                     xlink:href="https://katzenpost.network/docs/specs/group_chat.html"
                     >&program_name; Group Chat Design</link>.</para>
             <figure>
@@ -705,6 +728,11 @@
                 diagram continuing the one above. 2 diagrams, one for
                 groups?<?oxy_custom_end?></para>
         </section>
+        <section>
+            <title>What is special about a mixnet?</title>
+            <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+            <para>TODO …<?oxy_custom_end?></para>
+        </section>
         <section xml:id="faq_audio_video">
             <title xml:id="faq_audio_video.title">Will &chat_client; ever have audio chat, or video
                 chat?</title>
@@ -731,7 +759,7 @@
                 commercial self-interest of technology vendors. Users of surveillance-resistant
                 communication tools must understand the laws that apply to them, keep in mind the
                 ways that those laws are stretched and broken by corrupt police, and protect
-                themselves appropriately. If you knowingly violate your local laws while trusting in
+                themselves appropriately. If you plan to violate your local laws while trusting in
                 clever technology to keep you safe, remember that you must make excellent technology
                 choices, use the tools perfectly, maintain operational security worthy of a
                 clandestine agent, and have very good luck. In a genuinely threatening environment,
@@ -740,8 +768,8 @@
         <section xml:id="faq_whois">
             <title xml:id="faq_whois.title">Who made &program_name; and &chat_client;?</title>
             <para>&program_name; was created by a team of programmers, cryptographers,
-                mathemeticians, academics, tech industry veterans, and privacy advocates. Our
-                current core contributors and past contributers are listed at <link
+                mathematicians, academics, tech industry veterans, and privacy advocates. Our
+                current core contributors and past contributors are listed at <link
                     xlink:href="https://katzenpost.network/pages/team/">&program_name; Team</link>,
                 and you can see who has been doing what by visiting our <link
                     xlink:href="https://github.com/katzenpost">GitHub site</link>. </para>
@@ -757,10 +785,7 @@
             <title>Why are governments and businesses so interested in my metadata?</title>
             <para/>
         </section>
-        <section>
-            <title>What is special about a mixnet?</title>
-            <para/>
-        </section>
+
         <section>
             <title>Who is hosting the &program_name; servers?</title>
             <para/>
