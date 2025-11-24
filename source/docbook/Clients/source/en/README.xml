@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+    %shared-content;
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.1" xml:id="README">
+    <info>
+        <title xml:id="README.title">KatzenQT README</title>
+    </info>
+    <para>&chat_client_QT; is a text chat client that uses the anonymity-preserving &program_name;
+        mix network to transport messages. This document describes the process for building
+        &chat_client_QT; from code and running it. These instructions assume that you are using a
+        computer running a Debian-based Linux distribution.</para>
+    <section>
+        <title>Clone git repositories</title>
+        <para>Clone or download the following code repositories.</para>
+        <itemizedlist>
+            <listitem>
+                <para><code>git clone https://github.com/katzenpost/katzenpost -b
+                        tb/debug2025-09-21</code>
+                </para>
+            </listitem>
+            <listitem>
+                <para><code>git clone https://github.com/katzenpost/katzenqt</code></para>
+            </listitem>
+        </itemizedlist>
+    </section>
+    <section>
+        <title>Set up build environment</title>
+        <para>You need Python and Go to build &chat_client_QT; and its supporting libraries.</para>
+        <para><emphasis role="bold">Python</emphasis></para>
+        <para>Check your system for an installation of Python3 and install if needed. These
+            procedures are tested against version 3.13.</para>
+        <para>Also install the following additional packages if they are not present.</para>
+        <itemizedlist>
+            <listitem>
+                <para><code>python3-pip</code></para>
+            </listitem>
+            <listitem>
+                <para><code>python3.13-venv</code></para>
+            </listitem>
+            <listitem>
+                <para><code>libxcb-cursor0</code></para>
+            </listitem>
+        </itemizedlist>
+        <para><emphasis role="bold">Go</emphasis></para>
+        <para>Install <code>golang-1.24</code> and its dependencies.</para>
+        <para><emphasis role="bold">Make</emphasis></para>
+        <para>Install <code>make</code>.</para>
+    </section>
+    <section>
+        <title>Build &program_name; <code>clientd</code></title>
+        <para>The &program_name; client daemon, <code>clientd</code>, which runs on your local
+            system, supports privilege-separated, multiplexed connections to applications such as
+            &chat_client_QT;. <code>Clientd</code> connects to &program_name;gateway nodes and and
+            is reponsible for encrypting and decrypting traffic.</para>
+        <para>Build and deploy <code>clientd</code> as follows.</para>
+        <orderedlist>
+            <listitem>
+                <para>In the <code>katzenpost</code> repository, navigate to
+                        <code>katzenpost/cmd/kpclientd/</code>.</para>
+            </listitem>
+            <listitem>
+                <para>Run <code>go build</code>.</para>
+            </listitem>
+            <listitem>
+                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                <para>Copy the resulting binary <code>main</code> to the root directory of your
+                    cloned &chat_client_QT; repository.<?oxy_custom_end?></para>
+            </listitem>
+        </orderedlist>
+        <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+        <para>Client applications connect to <code>clientd</code> using the &program_name;
+            thin-client. In these procedures, the thin-client is installed by pip as described
+            below.<?oxy_custom_end?></para>
+    </section>
+    <section>
+        <title>Obtain clientd configuration </title>
+        <para>Obtain a configuration file for <code>clientd</code> (<code>client.toml</code>)
+            from<?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+        …?</para><?oxy_custom_end?>
+    </section>
+    <section>
+        <title>Access Katzenpost mix network</title>
+        <para>Before starting &chat_client_QT;, a &program_name; mix network needs to be running and
+            accessible. There are two available options.</para>
+        <itemizedlist>
+            <listitem>
+                <para>For testing purposes, you can use the &program_name; Docker image, which sets
+                    up a complete &program_name; mix network on your local system. For more
+                    information, see <link
+                        xlink:href="https://katzenpost.network/docs/admin_guide/docker.html">Using
+                        the Katzenpost Docker test
+                    network</link>.<?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                    [How is this connection configured?]<?oxy_custom_end?></para>
+            </listitem>
+            <listitem>
+                <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Connect to
+                    a public network [Again, connect how?]</para>
+            </listitem><?oxy_custom_end?>
+        </itemizedlist>
+    </section>
+    <section>
+        <title>Create and provision a Python virtual environment</title>
+        <para> In your &chat_client_QT; repository root, run the following
+            commands:<programlisting>$ python3 -m venv myvenv
+$ pip install --upgrade pip
+$ pip install 'git+https://github.com/katzenpost/thin_client@a5f87b9623eb349ba376d7e7555c3154302216e8'
+$ pip install -e .</programlisting></para>
+    </section>
+    <section>
+        <title>Run KatzenQT</title>
+        <para>In your &chat_client_QT; repository root, run the following commands></para>
+        <para>
+            <programlisting>$ source myvenv/bin/activate
+$ make</programlisting>
+        </para>
+    </section>
+
+
+
+
+
+
+
+
+
+
+</section>
