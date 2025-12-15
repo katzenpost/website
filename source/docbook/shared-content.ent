@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!ENTITY program_name 'Katzenpost'>
-<!ENTITY chat_client 'Katzen'>
+<!ENTITY chat_client 'KatzenQT'>
 <!ENTITY chat_client_QT 'KatzenQT'>
 <!ENTITY chat_client_binary 'katzen'>
 <!ENTITY mixserver_binary 'katzenpost-mixserver'>

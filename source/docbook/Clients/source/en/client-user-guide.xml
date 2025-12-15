@@ -64,43 +64,51 @@
             <title xml:id="installation.title">Installing and starting
                 &chat_client;<?oxy_comment_end?></title>
         </info>
-        <!--        <para>The &chat_client; client is available as a Docker image or as Python code available
-            from GitHub. To run it, you need a computer that runs or emulates the Linux operating
-            system. (We have tested &chat_client; on <link xlink:href="https://www.debian.org/"
-                >Debian </link> and <link xlink:href="https://ubuntu.com/">Ubuntu</link>.) You can
-            install &chat_client; by completing one of the following procedures.</para>
+        <para>The &chat_client; client is available as Python code on GitHub. To run it, you need a
+            computer that runs or emulates the Linux operating system. (We have tested &chat_client;
+            on <link xlink:href="https://www.debian.org/">Debian </link> and <link
+                xlink:href="https://ubuntu.com/">Ubuntu</link>.) You also need Git, Make, Python3,
+            and support for Python virtual environments to be installed. This can be done as
+            follows:</para>
+        <para>
+            <programlisting><prompt># </prompt><command>apt update</command>
+<prompt># </prompt><command>apt install git python3 make python3-venv</command></programlisting>
+        </para>
         <procedure>
-            <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
-            <title>Python code procedure<?oxy_custom_end?></title>
-            <para>To prepare to use the &chat_client; client source code, you need Git and Python3
-                installed on your Debian or Ubuntu system. Our recommended method of building the
-                application is to run it in a Python virtual environment using the Makefile included
-                with the code.</para>
+            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><emphasis
+                    role="bold">To install &chat_client_QT;</emphasis></para>
             <step>
-                <para>Install the latest Git, Python3, and Make on your
-                    system.<programlisting><prompt># </prompt><command>apt update</command>
-<prompt># </prompt><command>apt install git python3 make</command></programlisting></para>
-            </step>
-            <step>
-                <para>Clone the &chat_client; repository at <link
-                        xlink:href="https://github.com/katzenpost/katzenqt"/>. NO</para>
+                <para>Open a virtual terminal and clone the &chat_client; repository at <link
+                        xlink:href="https://github.com/katzenpost/katzenqt"/>.</para>
             </step>
             <step>
                 <para>In the <filename>katzenqt</filename> directory, create a virtual environment,
                     load additional required software, and start the client using the following
                     commands.</para>
-            </step>
-            <step>
-                <para>
-                    <programlisting><prompt>~$ </prompt><command>python3 -m venv myvenv</command>
+                <programlisting><prompt>~$ </prompt><command>python3 -m venv myvenv</command>
 <prompt>~$ </prompt><command>source myvenv/bin/activate</command>
-<prompt>~$ </prompt><command>pip install -\-upgrade pip</command>
+<prompt>~$ </prompt><command>pip install --upgrade pip</command>
 <prompt>~$ </prompt><command>pip install 'git+https://github.com/katzenpost/thin_client@a5f87b9623eb349ba376d7e7555c3154302216e8'</command>
 <prompt>~$ </prompt><command>pip install -e .</command>
 <prompt>~$ </prompt><command>make</command></programlisting>
-                </para>
             </step>
-        </procedure>-->
+        </procedure>
+        <para>Your terminal must remain open while running &chat_client_QT;. The terminal displays
+            information that you will need to cut and paste to complete the procedures described
+            below.</para>
+        <para>For testing, you can open multiple &chat_client_QT; clients with discrete histories by
+            invoking <emphasis role="bold">make</emphasis> with a variable as follows:</para>
+        <para>
+            <programlisting><prompt>$ </prompt><command>KQT_STATE=A make</command>
+<prompt>$ </prompt><command>KQT_STATE=B make</command>
+
+Etc.</programlisting>
+        </para>
+        <para>When you have grown to hate all of these clients and their imaginary histories, you
+            can nuke them back to the Stone Age like this:</para>
+        <para>
+            <programlisting><prompt>$ </prompt><command>rm /home/&lt;username>/.local/share/katzenqt/*</command><?oxy_custom_end?></programlisting>
+        </para>
     </section>
     <section xml:id="communicating">
         <title xml:id="communicating.title">Communicating through the &chat_client; client</title>
@@ -172,11 +180,11 @@
                 <listitem>
                     <para>&chat_client; and &program_name; operate with no information about the
                         real-world identities behind contacts. There are no e-mail addresses,
-                        telephone numbers, postal addresses, or anything similar involved. </para>
+                        telephone numbers, postal addresses, or anything similar. </para>
                 </listitem>
                 <listitem>
-                    <para>Without phone numbers or email as anchors for identity, &chat_client;
-                        users require a real-world encounters to verify who they are and to share
+                    <para>Without phone numbers or email as anchors for identity, &chat_client;users
+                        require a real-world encounter to verify who they are and to share
                         cryptographic secrets. This kind of contact bootstrapping occurs out-of-band
                         (OOB), that is, without reliance on the primary communication channel
                         (&chat_client;). The concept is similar to the key-signing parties that PGP
@@ -187,12 +195,11 @@
             </itemizedlist>
             <section xml:id="conversations">
                 <info>
+                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
                     <title xml:id="conversations.title">Creating conversations</title>
                 </info>
-                <para>Communication in &chat_client; takes place in the context of conversations. A
-                    conversation may contain just two participants, or it may involve a large group.
-                    The first thing that a new user of &chat_client; must do is create a
-                    conversation. This must happen before you  can invite contacts or accept
+                <para>The first thing that a new user of &chat_client; must do is create a
+                    conversation. This must happen before you can invite contacts or accept
                     invitations.</para>
                 <para><emphasis role="bold">To create a conversation</emphasis></para>
                 <para>
@@ -211,7 +218,7 @@
                                 type a name in the <emphasis role="bold">Choose conversation
                                     name</emphasis> field. This name is how you identify the
                                 conversation in your own &chat_client; client. It may differ from
-                                what your contacts call their corresponding conversation. Click
+                                what your contact calls their corresponding conversation. Click
                                     <emphasis role="bold">OK</emphasis> when finished.</para>
                             <para>In the following screen capture, the <emphasis role="bold">New
                                     conversation</emphasis> field is being filled out.</para>
@@ -264,7 +271,7 @@
                                     >Messages</emphasis> pane,
                                 &chat_client;<?oxy_comment_start author="dwrob" timestamp="20251105T173304-0800" comment="This should look more like a stage direction than like a regular message."?>
                                 prints a greeting message<?oxy_comment_end?>.</para>
-                            <para>The final result resembles the following:</para>
+                            <para>The final result resembles the following:</para><?oxy_custom_end?>
                             <figure>
                                 <info>
                                     <title/>
@@ -289,20 +296,20 @@
                         </step>
                     </procedure>
                 </para>
-                <para>You can create any number of conversations, each completely separate from the
-                    others. </para>
+                <para>You can create any number of conversations, each one separated completely from
+                    other conversation. </para>
             </section>
             <section xml:id="adding_contacts">
                 <info>
-                    <title xml:id="adding_contacts.title">Adding contacts to a conversation</title>
+                    <title xml:id="adding_contacts.title">Establishing contacts</title>
                 </info>
                 <para>Once you have a created a conversation, you can begin adding contacts to it.
                     As a user of &chat_client;, you have no fixed user name or password; instead,
                     you assign a name of your choosing for each conversation and potentially for
                     each contact.</para>
                 <para>A user setting up a contact generates an authentication token called an
-                        <emphasis>invitation</emphasis>. The invitation is a Base64-encoded string
-                    with the following contents:<itemizedlist>
+                        <emphasis>voucher</emphasis>. The voucher is a Base64-encoded string with
+                    the following contents:<itemizedlist>
                         <listitem>
                             <para>a display name </para>
                         </listitem>
@@ -310,18 +317,19 @@
                             <para>a mixnet storage address that doubles as read permission </para>
                         </listitem>
                     </itemizedlist></para>
-                <para>The initiating user delivers the invitation out-of-band to one or more
-                    recipient, who enter the invitation string into &chat_client; and, by accepting
-                    it,  send their own addresses and signed read permissions to the first user, who
-                    publishes the shared read permissions for all group members to see. When the
-                    process is complete, the new contact names display in the list of contacts for
-                    each participant in the conversation. </para>
+                <para>A user who makes a request for a new contact delivers the voucher out-of-band
+                    to one or more recipients, who enter the invitation string into &chat_client;
+                    and, by accepting it, send their own addresses and signed read permissions to
+                    the first user, who publishes the shared read permissions for all group members
+                    to see. When the process is complete, the new contact names display in the list
+                    of contacts for each participant in the conversation. </para>
                 <important>
                     <para>We recommend writing the invitation string on a piece paper, and
-                        presenting this physically to the person or persons you are inviting. The
+                        presenting this physically to the person or persons you are inviting.
+                        <?oxy_comment_start author="dwrob" timestamp="20251214T192703-0800" comment="In the voucher arrangement, a compromise only affects the ephemeral voucher sequence, not a message sequence."?>The
                         paper bearing the string should be guarded carefully and destroyed after
-                        use. Any person gaining access to it could read all messages in the
-                        associated conversation.</para>
+                        use.<?oxy_comment_end?><!-- Any person gaining access to it could read all messages in the
+                        associated conversation.--></para>
                 </important>
                 <warning>
                     <para>It is possible to simply send your invitation through an alternative
@@ -329,12 +337,12 @@
                         &program_name; anonymity protections to the level of anonymity offered by
                         the channel that you used.</para>
                 </warning>
-                <para><emphasis role="bold">To invite a new contact to a
-                    conversation</emphasis></para>
+                <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><emphasis
+                        role="bold">To a request a new contact</emphasis></para>
                 <para>
                     <procedure>
                         <step>
-                            <para>Open &chat_client;.</para>
+                            <para>Open &chat_client; as described above.</para>
                         </step>
                         <step>
                             <para>With the desired conversation selected, click <emphasis
@@ -368,8 +376,9 @@
                             </figure>
                         </step>
                         <step>
-                            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>STEP
-                                MISSING PENDING IMPLEMENTATION<?oxy_custom_end?></para>
+                            <para>Inspect the &chat_client; terminal output and copy the Base64
+                                block that was created. Save this string long enough to copy it to
+                                paper.</para>
                         </step>
                         <step>
                             <para>Complete the invitation process by providing the invitation string
@@ -379,48 +388,62 @@
                 </para>
                 <para><emphasis role="bold">To accept an invitation that you have
                         received</emphasis></para>
-                <para>
-                    <procedure>
-                        <step>
-                            <para>Open &chat_client;. (In the following example, our perspective
-                                shifts to Bob, who is the user receiving Alice's invitation.)</para>
-                        </step>
-                        <step>
-                            <para>In the toolbar, click <emphasis role="bold">Accept
-                                    invitation</emphasis>.</para>
-                        </step>
-                        <step>
-                            <para>In the <emphasis role="bold">Accept invitation</emphasis> window,
-                                type or paste the invitation string into the field labeled <emphasis
-                                    role="bold">Copy-paste the
-                                    <?oxy_comment_start author="dwrob" timestamp="20251116T182445-0800" comment="I think I changed this wording in the code."?>invite<?oxy_comment_end?>
-                                    you received</emphasis>. Your client should resemble the
-                                following:</para>
-                            <figure>
-                                <info>
-                                    <title/>
-                                </info>
-                                <mediaobject>
-                                    <imageobject>
-                                        <imagedata fileref="pix/client-accept-1.jpg" scale="30"/>
-                                    </imageobject>
-                                    <caption>
-                                        <para><emphasis role="bold">Figure 6.</emphasis> Bob has
-                                            entered the invitation string into the <emphasis
-                                                role="bold">Accept invitation</emphasis>
-                                            window.</para>
-                                    </caption>
-                                </mediaobject>
-                            </figure>
-                        </step>
-                        <step>
+                <procedure>
+                    <step>
+                        <para>Open &chat_client;. (In the following example, our perspective shifts
+                            to Bob, who is the user receiving Alice's invitation.)</para>
+                    </step>
+                    <step>
+                        <para>In the toolbar, click <emphasis role="bold">Accept
+                                invitation</emphasis>.</para>
+                    </step>
+                    <step>
+                        <para>In the <emphasis role="bold">Accept invitation</emphasis> window, type
+                            or paste the invitation string into the field labeled <emphasis
+                                role="bold">Copy-paste the
+                                <?oxy_comment_start author="dwrob" timestamp="20251116T182445-0800" comment="I think I changed this wording in the code."?>invite<?oxy_comment_end?>
+                                you received</emphasis>. Your client should resemble the
+                            following:</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/client-accept-1.jpg" scale="30"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 6.</emphasis> Bob has entered
+                                        the invitation string into the <emphasis role="bold">Accept
+                                            invitation</emphasis> window.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                    <step>
+                        <para>Bob clicks <guiicon>OK</guiicon> twice, accepting the string and the
+                            proposed display name. Bob now list Alice as a contact and has read
+                            permissions on Alice's conversation.</para>
+                    </step>
+                    <step>
+                        <para>Bob must start the same procedure in reverse. In his selected
+                            conversation, he clicks <emphasis role="bold">Invite contact</emphasis>,
+                            generates a Base64 string, and conveys it to Alice. Alice clicks
+                                <emphasis role="bold">Accept invitation</emphasis>, types the Base64
+                            string into her client, and clicks <emphasis role="bold">OK</emphasis>
+                            twice.</para>
+                    </step>
+                </procedure>
+                <para>As shown below, Alice and Bob now appear in each other's contact lists, and
+                    they can begin exchanging messages.</para><?oxy_custom_end?>
+                <!--                     <step>
                             <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>STEPS
                                 MISSING PENDING IMPLEMENTATION<?oxy_custom_end?>
                             </para>
                         </step>
                         <step>
                             <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Bob
-                                confirms that The expected display name (Alice?) was embedded in the
+                                confirms that the expected display name (Alice?) was embedded in the
                                 string. Still there?<?oxy_custom_end?></para>
                         </step>
                         <step>
@@ -428,11 +451,7 @@
                             <para><?oxy_comment_start author="dwrob" timestamp="20251108T163212-0800" comment="Note that the client currently lets me add myself on both sides of the chat." mid="10"?>Click
                                     <emphasis role="bold"
                                 >OK</emphasis>.<?oxy_custom_end?><?oxy_comment_end mid="10"?></para>
-                        </step>
-                    </procedure>
-                </para>
-                <para>As shown below, Alice and Bob now appear in each other's contact lists, and
-                    they can begin exchanging messages.</para>
+                        </step>-->
                 <figure>
                     <info>
                         <title/>
