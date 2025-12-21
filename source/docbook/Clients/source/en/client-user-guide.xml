@@ -58,7 +58,7 @@
             xlink:href="https://katzenpost.network/docs/">Katzenpost Documentation</link>. To learn
         more about <emphasis>why</emphasis> &program_name; works as it does, see <link
             xlink:href="sdsdsd">Frequently asked questions</link> .</para>
-    <?oxy_comment_start author="dwrob" timestamp="20251116T145113-0800" comment="Pending implmentation of Docker image."?>
+    <?oxy_comment_start author="dwrob" timestamp="20251116T145113-0800" comment="Pending implementation of Docker image or whatever it will be."?>
     <section xml:id="installation">
         <info>
             <title xml:id="installation.title">Installing and starting
@@ -67,48 +67,98 @@
         <para>The &chat_client; client is available as Python code on GitHub. To run it, you need a
             computer that runs or emulates the Linux operating system. (We have tested &chat_client;
             on <link xlink:href="https://www.debian.org/">Debian </link> and <link
-                xlink:href="https://ubuntu.com/">Ubuntu</link>.) You also need Git, Make, Python3,
-            and support for Python virtual environments to be installed. This can be done as
-            follows:</para>
-        <para>
-            <programlisting><prompt># </prompt><command>apt update</command>
-<prompt># </prompt><command>apt install git python3 make python3-venv</command></programlisting>
-        </para>
+                xlink:href="https://ubuntu.com/">Ubuntu</link>.) </para>
+        <para>Complete the following procedures to begin using &chat_client; on your compatible
+            system.</para>
         <procedure>
-            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><emphasis
-                    role="bold">To install &chat_client_QT;</emphasis></para>
             <step>
-                <para>Open a virtual terminal and clone the &chat_client; repository at <link
-                        xlink:href="https://github.com/katzenpost/katzenqt"/>.</para>
+                <title>Install required software packages</title>
+                <para>To prepare to access and build the &chat_client; code, run the following
+                    commands to be sure that you have the tools installed. You must have root
+                    privileges to do this.</para>
+                <programlisting><prompt># </prompt><command>apt update</command>
+<prompt># </prompt><command>apt install git python3 make python3-venv</command></programlisting>
             </step>
-            <step>
-                <para>In the <filename>katzenqt</filename> directory, create a virtual environment,
-                    load additional required software, and start the client using the following
-                    commands.</para>
+            <step><title>Install the Namenlos Git repository</title>
+                <para>Namenlos is an experimental, volunteer-operated, public mix network. &chat_client;                
+                    depends on Namenlos to send and receive messages, and it requires configuration data                              
+                    that is contained by the Namenlos code repository. </para>
+                <para>Open a virtual terminal and clone the Namenlos repository at <link
+                     xlink:href="https://github.com/katzenpost/namenlos"/> as follows.</para>
+                <programlisting>~$ <command>git clone https://github.com/katzenpost/namenlos.git</command></programlisting>         
+            </step>
+            <step><title>Install the &chat_client_QT; Git repository</title>
+                <substeps>
+                    <step>
+                        <para>Open a virtual terminal and clone the &chat_client; code repository at <link
+                        xlink:href="https://github.com/katzenpost/katzenqt"/> as
+                        follows.<programlisting><prompt>~$ </prompt><command>git clone https://github.com/katzenpost/katzenqt.git</command></programlisting></para>                                     
+                    </step>
+                                
+                    <step>
+                    
+                        <para>In the root directory of the repository, check out the currently required
+                        development branch as follows.</para>
+                    
+                        <para>
+                        <programlisting><prompt>~/katzenqt$ </prompt><command>git checkout message_box_index_length_validation</command></programlisting>
+                    
+                        </para>
+                    </step>
+                </substeps>                
+            </step>
+            <step><title>Start the &program_name; client daemon</title>
+            
+                           <para>Before you start &chat_client_QT;, the &program_name; multiplexing client
+                    daemon must be running on your local system. A daemon binary is included in the
+                    repository &chat_client_QT;. Start it as
+                    follows:<programlisting><prompt>~/katzenqt$ </prompt><command>./kpclientd -c ~/namenlos/configs/client2.toml</command></programlisting></para>
+                <note>
+                    <para>This command contains an argument referencing a configuration file located
+                        in the Namenlos repository. The path shown in the example may differ from
+                        what your system requires.</para>
+                </note>
+                    <para>This terminal must remain open while running <emphasis role="bold"
+                >kpclientd</emphasis>.</para>
+
+            </step>
+ 
+
+            <step><title>Build and start &chat_client_QT;</title>
+
+               
+                <para>In another terminal, in the root directory of the &chat_client_QT; repository,
+                    run the following commands to create a virtual Python environment, load
+                    additional required software, and start &chat_client_QT;.</para>
+                
+               
                 <programlisting><prompt>~$ </prompt><command>python3 -m venv myvenv</command>
 <prompt>~$ </prompt><command>source myvenv/bin/activate</command>
 <prompt>~$ </prompt><command>pip install --upgrade pip</command>
-<prompt>~$ </prompt><command>pip install 'git+https://github.com/katzenpost/thin_client@a5f87b9623eb349ba376d7e7555c3154302216e8'</command>
+<prompt>~$ </prompt><command>pip install 'git+https://github.com/katzenpost/thin_client@487d2b8e46440abba5bb4db95a168353de2d45d9'</command>
 <prompt>~$ </prompt><command>pip install -e .</command>
 <prompt>~$ </prompt><command>make</command></programlisting>
-            </step>
-        </procedure>
-        <para>Your terminal must remain open while running &chat_client_QT;. The terminal displays
+
+        
+                <para>This terminal must remain open while running &chat_client_QT;. The terminal displays
             information that you will need to cut and paste to complete the procedures described
             below.</para>
-        <para>For testing, you can open multiple &chat_client_QT; clients with discrete histories by
-            invoking <emphasis role="bold">make</emphasis> with a variable as follows:</para>
-        <para>
-            <programlisting><prompt>$ </prompt><command>KQT_STATE=A make</command>
-<prompt>$ </prompt><command>KQT_STATE=B make</command>
-
-Etc.</programlisting>
-        </para>
-        <para>When you have grown to hate all of these clients and their imaginary histories, you
-            can nuke them back to the Stone Age like this:</para>
-        <para>
-            <programlisting><prompt>$ </prompt><command>rm /home/&lt;username>/.local/share/katzenqt/*</command><?oxy_custom_end?></programlisting>
-        </para>
+                <note>
+                    <para>For testing, you can open multiple &chat_client_QT; clients with discrete
+                        histories by invoking <emphasis role="bold">make</emphasis> with a variable
+                        as follows:</para>
+                    <programlisting><prompt>$ </prompt><command>KQT_STATE=A make</command>
+<prompt>$ </prompt><command>KQT_STATE=B make</command>   
+Etc.</programlisting>        
+                    <para>When you are done with these clients, you can remove them as
+                        follows.</para>
+                    
+                    <programlisting><prompt>$ </prompt><command>rm /home/&lt;username>/.local/share/katzenqt/*</command></programlisting>
+                    
+                    
+                </note>   
+            </step>
+        </procedure>
     </section>
     <section xml:id="communicating">
         <title xml:id="communicating.title">Communicating through the &chat_client; client</title>
@@ -195,7 +245,6 @@ Etc.</programlisting>
             </itemizedlist>
             <section xml:id="conversations">
                 <info>
-                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
                     <title xml:id="conversations.title">Creating conversations</title>
                 </info>
                 <para>The first thing that a new user of &chat_client; must do is create a
@@ -271,7 +320,7 @@ Etc.</programlisting>
                                     >Messages</emphasis> pane,
                                 &chat_client;<?oxy_comment_start author="dwrob" timestamp="20251105T173304-0800" comment="This should look more like a stage direction than like a regular message."?>
                                 prints a greeting message<?oxy_comment_end?>.</para>
-                            <para>The final result resembles the following:</para><?oxy_custom_end?>
+                            <para>The final result resembles the following:</para>
                             <figure>
                                 <info>
                                     <title/>
@@ -304,10 +353,10 @@ Etc.</programlisting>
                     <title xml:id="adding_contacts.title">Establishing contacts</title>
                 </info>
                 <para>Once you have a created a conversation, you can begin adding contacts to it.
-                    As a user of &chat_client;, you have no fixed user name or password; instead,
-                    you assign a name of your choosing for each conversation and potentially for
-                    each contact.</para>
-                <para>A user setting up a contact generates an authentication token called an
+                    As a user of &chat_client;,you have no fixed user name or password; instead, you
+                    assign a name of your choosing for each conversation and potentially for each
+                    contact.</para>
+                <para>A user setting up a contact generates an authentication token called a
                         <emphasis>voucher</emphasis>. The voucher is a Base64-encoded string with
                     the following contents:<itemizedlist>
                         <listitem>
@@ -323,6 +372,25 @@ Etc.</programlisting>
                     the first user, who publishes the shared read permissions for all group members
                     to see. When the process is complete, the new contact names display in the list
                     of contacts for each participant in the conversation. </para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="pix/simple-voucher-handshake.png" scale="60"/>
+                        </imageobject>
+                        <caption>
+                            <para>The diagram illustrates two important aspects of &program_name;
+                                and &chat_client; security. First, the initial authentication of a
+                                contact is done in a face-to-face meeting rather than
+                                electronically. Second, all messaging consists of queries to the
+                                mixnet, which operates somewhat as a dead-drop. Max and Moritz post
+                                materials there, and authorize each other to read those materials,
+                                but there is no direct contact between them after the initial
+                                real-world meeting. </para>
+                        </caption>
+                    </mediaobject>
+                </informalfigure>
+                
+                
                 <important>
                     <para>We recommend writing the invitation string on a piece paper, and
                         presenting this physically to the person or persons you are inviting.
@@ -337,8 +405,7 @@ Etc.</programlisting>
                         &program_name; anonymity protections to the level of anonymity offered by
                         the channel that you used.</para>
                 </warning>
-                <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?><emphasis
-                        role="bold">To a request a new contact</emphasis></para>
+                <para><emphasis role="bold">To a request a new contact</emphasis></para>
                 <para>
                     <procedure>
                         <step>
@@ -435,7 +502,7 @@ Etc.</programlisting>
                     </step>
                 </procedure>
                 <para>As shown below, Alice and Bob now appear in each other's contact lists, and
-                    they can begin exchanging messages.</para><?oxy_custom_end?>
+                    they can begin exchanging messages.</para>
                 <!--                     <step>
                             <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>STEPS
                                 MISSING PENDING IMPLEMENTATION<?oxy_custom_end?>
@@ -733,9 +800,8 @@ Etc.</programlisting>
                     <para>When you create a conversation, you are also creating a <emphasis>message
                             stream</emphasis>. A message stream is an address in the distributed
                         internal storage of the mixnet. It can contain any number of linked, ordered
-                        messages posted there by its
-                        owner.<?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?></para>
-                </listitem><?oxy_custom_end?>
+                        messages posted there by its owner.</para>
+                </listitem>
                 <listitem>
                     <para>You have <emphasis>write permissions</emphasis> to message streams that
                         you created; nobody else does.</para>
@@ -755,7 +821,7 @@ Etc.</programlisting>
             </itemizedlist>
         </section>
         <section xml:id="faq_oob">
-            <title xml:id="faq_oob.title">What is this out-of-band (OOB) secret sharing
+            <title xml:id="faq_oob.title">What is this out-of-band (OOB) secret-sharing
                 stuff?</title>
             <para>The OOB invitation is the first step in guaranteeing anonymity in the face of
                 electronic surveillance. It is explicitly <emphasis>not</emphasis> electronic. OOB
@@ -767,39 +833,17 @@ Etc.</programlisting>
                 For more information, see <link
                     xlink:href="https://katzenpost.network/docs/specs/group_chat.html"
                     >&program_name; Group Chat Design</link>.</para>
-            <figure>
-                <info>
-                    <title/>
-                </info>
+                        
+            <informalfigure>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="pix/katzen-contact-ladder.png" scale="30"/>
+                        <imagedata fileref="pix/kp-ladders-vouchers.png" scale="50"/>
                     </imageobject>
                     <caption>
-                        <para>The diagram illustrates two important aspects of the &program_name;
-                            and &chat_client; security. First, the initial authentication of a
-                            contact is done in a face-to-face meeting rather than electronically.
-                            Second, all messaging consists of queries to the mixnet, which operates
-                            somewhat like a dead-drop. Users post materials there, and other users
-                            can be authorized to read those materials, but there is no direct
-                            contact between users after the initial analog authentication. The
-                            &chat_client; client represents these transactions in a traditional chat
-                            interface, even though the mechanism does but resemble traditional
-                            chat.</para>
+                        <para>The diagram illustrates...TO-DO</para>
                     </caption>
                 </mediaobject>
-            </figure>
-        </section>
-        <section xml:id="faq_message_exchange">
-            <title xml:id="faq_message_exchange.title">How does message exchange work?</title>
-            <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>TODO … a
-                diagram continuing the one above. 2 diagrams, one for
-                groups?<?oxy_custom_end?></para>
-        </section>
-        <section>
-            <title>What is special about a mixnet?</title>
-            <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
-            <para>TODO …<?oxy_custom_end?></para>
+            </informalfigure>
         </section>
         <section xml:id="faq_audio_video">
             <title xml:id="faq_audio_video.title">Will &chat_client; ever have audio chat, or video
@@ -842,37 +886,5 @@ Etc.</programlisting>
                 and you can see who has been doing what by visiting our <link
                     xlink:href="https://github.com/katzenpost">GitHub site</link>. </para>
         </section>
-        <!--        <section>
-            <title>What information could authorities retrieve by seizing your computer with
-                Katzen?</title>
-            <para>How thorough is the local anonymization? Could e2e keys and contact identifiers be
-                discovered? Is the database encrypted?</para>
-        </section>
-        
-         <section>
-            <title>Why are governments and businesses so interested in my metadata?</title>
-            <para/>
-        </section>
-
-        <section>
-            <title>Who is hosting the &program_name; servers?</title>
-            <para/>
-        </section>       
-        <section>
-            <title>Why does anonymity matter?</title>
-            <para/>
-        </section>
-        <section>
-            <title/>
-            <para/>
-        </section>
-        <section>
-            <title>What makes &chat_client; different from other chat clients?</title>
-            <para/>
-        </section>     
-        
-        
-        
-        -->
     </section>
 </section>
