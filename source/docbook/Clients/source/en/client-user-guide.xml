@@ -42,7 +42,7 @@
 <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="client_guide">
     <info>
-        <title xml:id="client_guide.title">&chat_client; chat client guide</title>
+        <title xml:id="client_guide.title">&chat_client; chat client guide [Pre-release]</title>
         <!-- Match to "title" or "linkTitle" processing instruction above. -->
     </info>
     <para>This guide introduces the &chat_client; chat client. With &chat_client; you can securely
@@ -58,12 +58,15 @@
             xlink:href="https://katzenpost.network/docs/">Katzenpost Documentation</link>. To learn
         more about <emphasis>why</emphasis> &program_name; works as it does, see <link
             xlink:href="sdsdsd">Frequently asked questions</link> .</para>
-    <?oxy_comment_start author="dwrob" timestamp="20251116T145113-0800" comment="Pending implementation of Docker image or whatever it will be."?>
     <section xml:id="installation">
         <info>
-            <title xml:id="installation.title">Installing and starting
-                &chat_client;<?oxy_comment_end?></title>
+            <title xml:id="installation.title">Installing and starting &chat_client; [Manual
+                method]</title>
         </info>
+        <important>
+            <para>These instructions currently work for &chat_client; branch
+                "message_box_index_length_validation".</para>
+        </important>
         <para>The &chat_client; client is available as Python code on GitHub. To run it, you need a
             computer that runs or emulates the Linux operating system. (We have tested &chat_client;
             on <link xlink:href="https://www.debian.org/">Debian </link> and <link
@@ -79,86 +82,259 @@
                 <programlisting><prompt># </prompt><command>apt update</command>
 <prompt># </prompt><command>apt install git python3 make python3-venv</command></programlisting>
             </step>
-            <step><title>Install the Namenlos Git repository</title>
-                <para>Namenlos is an experimental, volunteer-operated, public mix network. &chat_client;                
-                    depends on Namenlos to send and receive messages, and it requires configuration data                              
-                    that is contained by the Namenlos code repository. </para>
-                <para>Open a virtual terminal and clone the Namenlos repository at <link
-                     xlink:href="https://github.com/katzenpost/namenlos"/> as follows.</para>
-                <programlisting>~$ <command>git clone https://github.com/katzenpost/namenlos.git</command></programlisting>         
+            <step>
+                <title>Install the Katzenpost Git repository</title>
+                <para>Katzenpost is a free and open source software project dedicated to researching
+                    and developing mix network protocols.</para>
+                <para>Open a virtual terminal and clone the Katzenpost repository at <link
+                        xlink:href="https://github.com/katzenpost/namenlos"/> as follows.</para>
+                <programlisting>~$ <command>git clone https://github.com/katzenpost/katzenpost.git</command></programlisting>
             </step>
-            <step><title>Install the &chat_client_QT; Git repository</title>
+            <step>
+                <title>Install the Namenlos Git repository</title>
+                <para>Namenlos is an experimental, volunteer-operated, public mix network.
+                    &chat_client; depends on Namenlos to send and receive messages, and it requires
+                    configuration data that is contained by the Namenlos code repository. </para>
+                <para><link xlink:href="https://github.com/katzenpost/katzenqt/issues/5"/></para>
+                <para>Open a virtual terminal and clone the Namenlos repository at <link
+                        xlink:href="https://github.com/katzenpost/namenlos"/> as follows.</para>
+                <programlisting>~$ <command>git clone https://github.com/katzenpost/namenlos.git</command></programlisting>
+            </step>
+            <step>
+                <title>Install the &chat_client_QT; Git repository</title>
                 <substeps>
                     <step>
-                        <para>Open a virtual terminal and clone the &chat_client; code repository at <link
-                        xlink:href="https://github.com/katzenpost/katzenqt"/> as
-                        follows.<programlisting><prompt>~$ </prompt><command>git clone https://github.com/katzenpost/katzenqt.git</command></programlisting></para>                                     
+                        <para>Open a virtual terminal and clone the &chat_client; code repository at
+                                <link xlink:href="https://github.com/katzenpost/katzenqt"/> as
+                            follows.<programlisting><prompt>~$ </prompt><command>git clone https://github.com/katzenpost/katzenqt.git</command></programlisting></para>
                     </step>
-                                
+                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                </substeps>
+            </step><?oxy_custom_end?>
+            <step>
+                <title>Build client daemon and install configuration files</title>
+                <para>To connect to the mix network, &chat_client_QT; requires the &program_name;
+                    multiplexing client daemon to be present and configured. Complete the following
+                    steps to provide the daemon binary and the required configuration files. </para>
+                <substeps>
                     <step>
-                    
-                        <para>In the root directory of the repository, check out the currently required
-                        development branch as follows.</para>
-                    
-                        <para>
-                        <programlisting><prompt>~/katzenqt$ </prompt><command>git checkout message_box_index_length_validation</command></programlisting>
-                    
-                        </para>
+                        <para>In the &program_name; repository, build the daemon as
+                            follows.<programlisting><prompt>~/katzenpost/cmd/kpclientd$ </prompt><command>go build -v</command></programlisting></para>
                     </step>
-                </substeps>                
-            </step>
-            <step><title>Start the &program_name; client daemon</title>
-            
-                           <para>Before you start &chat_client_QT;, the &program_name; multiplexing client
-                    daemon must be running on your local system. A daemon binary is included in the
-                    repository &chat_client_QT;. Start it as
-                    follows:<programlisting><prompt>~/katzenqt$ </prompt><command>./kpclientd -c ~/namenlos/configs/client2.toml</command></programlisting></para>
+                    <step>
+                        <para>Copy the newly built <emphasis role="bold">kpclientd</emphasis> binary
+                            to the &chat_client_QT; repository as
+                            follows:<programlisting><prompt>~/katzenpost/cmd/kpclientd$ </prompt><command>cp kpclientd ~/katzenqt/</command></programlisting></para>
+                    </step>
+                    <step>
+                        <para>Copy the configuration file for <emphasis role="bold"
+                                >kpclientd</emphasis> from the Namenlos repository to the
+                            &chat_client_QT; repository as
+                            follows.<programlisting><prompt>~/namenlos/configs/$ </prompt><command>cp client2.toml ~/katzenqt/</command></programlisting></para>
+                    </step>
+                    <step>
+                        <para>Copy the configuration file for the thin-client shim from the Namenlos
+                            repository to the &chat_client_QT; repository as
+                            follows.<programlisting><prompt>~/namenlos/configs/$ </prompt><command>cp thinclient.toml ~/katzenqt/</command></programlisting></para>
+                    </step>
+                </substeps>
                 <note>
-                    <para>This command contains an argument referencing a configuration file located
-                        in the Namenlos repository. The path shown in the example may differ from
-                        what your system requires.</para>
+                    <para>This action replaces the thinclient.toml file that is already present in
+                        the repository. The default file is not configured to use the Namenlos
+                        network.</para>
                 </note>
-                    <para>This terminal must remain open while running <emphasis role="bold"
-                >kpclientd</emphasis>.</para>
-
             </step>
- 
-
-            <step><title>Build and start &chat_client_QT;</title>
-
-               
+            <step>
+                <para><emphasis role="bold">Start the client daemon</emphasis></para>
+                <para>One (and only one) instance of <emphasis role="bold">kpclientd</emphasis> must
+                    be running on your system before you start &chat_client_QT;. Start it with
+                    following
+                    command:<programlisting><prompt>~/katzenqt$ </prompt><command>./kpclientd</command></programlisting></para>
+                <para>The terminal where you ran <emphasis role="bold">kpclientd</emphasis> must
+                    remain open during operation, and provides mix network access logging.</para>
+            </step>
+            <step>
+                <title>Build and start &chat_client_QT;</title>
                 <para>In another terminal, in the root directory of the &chat_client_QT; repository,
-                    run the following commands to create a virtual Python environment, load
-                    additional required software, and start &chat_client_QT;.</para>
-                
-               
-                <programlisting><prompt>~$ </prompt><command>python3 -m venv myvenv</command>
-<prompt>~$ </prompt><command>source myvenv/bin/activate</command>
-<prompt>~$ </prompt><command>pip install --upgrade pip</command>
-<prompt>~$ </prompt><command>pip install 'git+https://github.com/katzenpost/thin_client@487d2b8e46440abba5bb4db95a168353de2d45d9'</command>
-<prompt>~$ </prompt><command>pip install -e .</command>
-<prompt>~$ </prompt><command>make</command></programlisting>
-
-        
-                <para>This terminal must remain open while running &chat_client_QT;. The terminal displays
-            information that you will need to cut and paste to complete the procedures described
-            below.</para>
-                <note>
-                    <para>For testing, you can open multiple &chat_client_QT; clients with discrete
-                        histories by invoking <emphasis role="bold">make</emphasis> with a variable
-                        as follows:</para>
-                    <programlisting><prompt>$ </prompt><command>KQT_STATE=A make</command>
+                    complete the following steps.</para>
+                <substeps>
+                    <step>
+                        <para>Check out the currently required development branch of the repository
+                            as follows.</para>
+                        <programlisting><prompt>~/katzenqt$ </prompt><command>git checkout message_box_index_length_validation</command></programlisting>
+                    </step>
+                    <step>
+                        <para>Create a virtual Python environment, load additional required
+                            software, and start &chat_client_QT; using the following
+                            commands.</para>
+                        <programlisting><prompt>~/katzenqt$ </prompt><command>python3 -m venv myvenv</command>
+<prompt>~/katzenqt$ </prompt><command>source myvenv/bin/activate</command>
+<prompt>~/katzenqt$ </prompt><command>pip install --upgrade pip</command>
+<prompt>~/katzenqt$ </prompt><command>pip install 'git+https://github.com/katzenpost/thin_client@487d2b8e46440abba5bb4db95a168353de2d45d9'</command>
+<prompt>~/katzenqt$ </prompt><command>pip install -e .</command>
+<prompt>~/katzenqt$ </prompt><command>make</command></programlisting>
+                        <para>This terminal must remain open while running &chat_client_QT;. The
+                            terminal displays information that you will need to cut and paste to
+                            complete the procedures described below.</para>
+                        <note>
+                            <para>For testing, you can open multiple &chat_client_QT; clients with
+                                discrete histories by invoking <emphasis role="bold">make</emphasis>
+                                with a variable as follows:</para>
+                            <programlisting><prompt>$ </prompt><command>KQT_STATE=A make</command>
 <prompt>$ </prompt><command>KQT_STATE=B make</command>   
-Etc.</programlisting>        
-                    <para>When you are done with these clients, you can remove them as
-                        follows.</para>
-                    
-                    <programlisting><prompt>$ </prompt><command>rm /home/&lt;username>/.local/share/katzenqt/*</command></programlisting>
-                    
-                    
-                </note>   
+        
+Etc.</programlisting>
+                            <para>When you are done with these clients, you can remove them all as
+                                follows.</para>
+                            <programlisting><prompt>$ </prompt><command>rm /home/&lt;username>/.local/share/katzenqt/*</command></programlisting>
+                        </note>
+                    </step>
+                </substeps>
             </step>
         </procedure>
+    </section>
+    <section>
+        <title>Installing and starting &chat_client; [Makefile method]</title>
+
+        <para>These instructions are adapted from <filename>README.setup.md</filename> in the
+            &chat_client; repository.</para>
+<!--        <procedure>
+            <step>
+                <title>Install required software packages</title>
+                <para>To prepare to access and build the &chat_client; code, run the following
+                    commands to be sure that you have the tools installed. You must have root
+                    privileges to do this.</para>
+                <programlisting><prompt># </prompt><command>apt update</command>
+<prompt># </prompt><command>apt install git python3 make python3-venv</command></programlisting>
+            </step>
+            <step>
+                <title>Install the Namenlos Git repository</title>
+                <para>Namenlos is an experimental, volunteer-operated, public mix network.
+                    &chat_client; depends on Namenlos to send and receive messages, and it requires
+                    configuration data that is contained by the Namenlos code repository. </para>
+                <para>Open a virtual terminal and clone the Namenlos repository at <link
+                        xlink:href="https://github.com/katzenpost/namenlos"/> as follows.</para>
+                <programlisting>~$ <command>git clone https://github.com/katzenpost/namenlos.git</command></programlisting>
+            </step>
+            <step>
+                <title>Install the &chat_client_QT; Git repository</title>
+                <substeps>
+                    <step>
+                        <para>Open a virtual terminal and clone the &chat_client; code repository at
+                                <link xlink:href="https://github.com/katzenpost/katzenqt"/> as
+                            follows.<programlisting><prompt>~$ </prompt><command>git clone https://github.com/katzenpost/katzenqt.git</command></programlisting></para>
+                    </step>
+                    <step>
+                        <para>In the root directory of the repository, check out the currently
+                            required development branch as follows.</para>
+                        <para>
+                            <programlisting><prompt>~/katzenqt$ </prompt><command>git checkout message_box_index_length_validation</command></programlisting>
+                        </para>
+                    </step>
+                </substeps>
+            </step>
+        </procedure>-->
+        <para/>
+
+
+        <!--        So you want to try the `katzenqt` program? These instructions should help
+        developers to start to run the software.
+        
+        To use the new `Makefile` targets please ensure that you have `git` and `make`
+        installed before proceeding:
+        ```
+        sudo apt install -y git make
+        ```
+        
+        First, git clone the `katzenqt` repo and `cd` into `katzenqt`:
+        ```
+        git clone https://www.github.com/katzenpost/katzenqt ~/katzenqt
+        cd ~/katzenqt/
+        ```
+        
+        Second, you will need configuration files for a real mixnet or you will need to
+        install configuration files for the local docker mixnet development
+        environment.
+        
+        For example, if you want to use `namenlos` then you'll need to install the
+        `namelos` configuration files. For example if you have checked out the `namenlos`
+        repo into `~/namenlos` then you would do the following to create and then put
+        the configuration files into `~/.local/katzenpost/`:
+        ```
+        mkdir -p ~/.local/katzenpost/
+        cp ~/namenlos/configs/client2.toml ~/.local/katzenpost/client2.toml
+        cp ~/namenlos/configs/thinclient.toml ~/.local/katzenpost/thinclient.toml
+        cp ~/namenlos/configs/thinclient.toml ~/katzenqt/configs/thinclient.toml
+        ```
+        
+        At this point your system should have all of the required tools to proceed.
+        Your user account should have `~/.local/katzenpost/client2.toml` and
+        `~/.local/katzenpost/thinclient.toml` ready for software that expects to find
+        the configuration files in those locations.
+        
+        Then run a series of make targets inside `katzenqt`:
+        ```
+        make system-setup
+        make setup-uv
+        make setup
+        make test
+        make kpclientd
+        make install-kpclient
+        make kpclientd.service
+        make status
+        ```
+        
+        If the `make status` shows the following then things are probably working:
+        ```
+        backend: uv
+        venv: .venv
+        kpclientd(bin): /home/user/.local/bin/kpclientd
+        kpclientd(service): active
+        kpclientd(path): found
+        ```
+        
+        It should then be possible to run `katzenqt` using your configured and prepared
+        virtual environment as shown by the `make status` command. There are several
+        ways to run `katzenqt` and one that is expected to work at this point is `make
+        run`:
+        ```
+        make run
+        ```
+        
+        These instructions are temporary and later the user story should include a
+        single command that will be well documented.       
+        -->
+
+
+
+
+
+
+
+
+        <!--       <para>Tested on katzenqt main, commit </para>
+        <para>First, git clone the katzenqt repo and cd into katzenqt</para>
+        <para>git clone <link xlink:href="https://www.github.com/katzenpost/katzenqt"
+                >https://www.github.com/katzenpost/katzenqt</link>
+        </para>
+        <para>cd katzenqt</para>
+        <para>Second, install the namenlos config files for using namenlos (use your namenlos and
+            katzenqt checkouts or check them out in the same place as my instructions):</para>
+        <para>mkdir -p ~/.local/katzenpost/ </para>
+        <para>cp ~/namenlos/configs/client2.toml ~/.local/katzenpost/client2.toml </para>
+        <para>cp ~/namenlos/configs/thinclient.toml ~/katzenqt/configs/thinclient.toml</para>
+        <para>Then run a series of make targets inside katzenqt:</para>
+        <para>make system-setup </para>
+        <para>make setup-uv </para>
+        <para>make setup </para>
+        <para>make test </para>
+        <para>make kpclientd </para>
+        <para>make install-kpclient </para>
+        <para>make kpclientd.service </para>
+        <para>make status</para>
+        <para>If the status shows kpclientd running and okay, then it should be possible to run
+            katzenqt:</para>
+        <para>make run </para>-->
     </section>
     <section xml:id="communicating">
         <title xml:id="communicating.title">Communicating through the &chat_client; client</title>
@@ -389,8 +565,6 @@ Etc.</programlisting>
                         </caption>
                     </mediaobject>
                 </informalfigure>
-                
-                
                 <important>
                     <para>We recommend writing the invitation string on a piece paper, and
                         presenting this physically to the person or persons you are inviting.
@@ -833,7 +1007,6 @@ Etc.</programlisting>
                 For more information, see <link
                     xlink:href="https://katzenpost.network/docs/specs/group_chat.html"
                     >&program_name; Group Chat Design</link>.</para>
-                        
             <informalfigure>
                 <mediaobject>
                     <imageobject>
