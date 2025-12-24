@@ -351,7 +351,7 @@ Etc.</programlisting>
             </info>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="pix/client-overview.jpg" scale="30"/>
+                    <imagedata fileref="pix/1-clip.jpg" scale="30"/>
                 </imageobject>
                 <caption>
                     <para><emphasis role="bold">Figure 1.</emphasis> This screen capture shows the
@@ -453,7 +453,7 @@ Etc.</programlisting>
                                 </info>
                                 <mediaobject>
                                     <imageobject>
-                                        <imagedata fileref="pix/client-convo-1.jpg" scale="30"/>
+                                        <imagedata fileref="pix/2-clip.jpg" scale="30"/>
                                     </imageobject>
                                     <caption>
                                         <para><emphasis role="bold">Figure 2.</emphasis> In this
@@ -478,7 +478,7 @@ Etc.</programlisting>
                                 </info>
                                 <mediaobject>
                                     <imageobject>
-                                        <imagedata fileref="pix/client-convo-2.jpg" scale="30"/>
+                                        <imagedata fileref="pix/3-clip.jpg" scale="30"/>
                                     </imageobject>
                                     <caption>
                                         <para><emphasis role="bold">Figure 3.</emphasis> The user
@@ -503,7 +503,7 @@ Etc.</programlisting>
                                 </info>
                                 <mediaobject>
                                     <imageobject>
-                                        <imagedata fileref="pix/client-convo-3.jpg" scale="30"/>
+                                        <imagedata fileref="pix/4-clip.jpg" scale="30"/>
                                     </imageobject>
                                     <caption>
                                         <para><emphasis role="bold">Figure 4.</emphasis> In the
@@ -605,7 +605,7 @@ Etc.</programlisting>
                                 </info>
                                 <mediaobject>
                                     <imageobject>
-                                        <imagedata fileref="pix/client-invite-1.jpg" scale="30"/>
+                                        <imagedata fileref="pix/5-clip.jpg" scale="30"/>
                                     </imageobject>
                                     <caption>
                                         <para><emphasis role="bold">Figure 5.</emphasis> The
@@ -627,6 +627,22 @@ Etc.</programlisting>
                         </step>
                     </procedure>
                 </para>
+                <para/>
+                <para><emphasis role="bold">New picture</emphasis></para>
+                <para/>
+                <figure>
+                    <info>
+                        <title/>
+                    </info>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="pix/6-clip.png" scale="30"/>
+                        </imageobject>
+                        <caption>
+                            <para><emphasis role="bold">Figure 5.</emphasis> blah blah</para>
+                        </caption>
+                    </mediaobject>
+                </figure>
                 <para><emphasis role="bold">To accept an invitation that you have
                         received</emphasis></para>
                 <procedure>
@@ -651,13 +667,33 @@ Etc.</programlisting>
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-accept-1.jpg" scale="30"/>
+                                    <imagedata fileref="pix/7-clip.jpg" scale="30"/>
                                 </imageobject>
                                 <caption>
                                     <para><emphasis role="bold">Figure 6.</emphasis> Bob has entered
                                         the invitation string into the <emphasis role="bold">Accept
                                             invitation</emphasis> window.</para>
-                                </caption>
+                                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                                </caption><?oxy_custom_end?>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                    <step>
+                        <para>New picture</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/8-clip.jpg" scale="30"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 6.</emphasis> Bob has entered
+                                        the invitation string into the <emphasis role="bold">Accept
+                                            invitation</emphasis> window.</para>
+                                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                                </caption><?oxy_custom_end?>
                             </mediaobject>
                         </figure>
                     </step>
@@ -699,7 +735,7 @@ Etc.</programlisting>
                     </info>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="pix/client-messages-1.jpg" scale="30"/>
+                            <imagedata fileref="pix/9-clip.png" scale="30"/>
                         </imageobject>
                         <caption>
                             <para><emphasis role="bold">Figure 7.</emphasis> Alice and Bob are shown
@@ -739,7 +775,7 @@ Etc.</programlisting>
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-messages-2.jpg" scale="30"/>
+                                    <imagedata fileref="pix/10-clip.png" scale="30"/>
                                 </imageobject>
                                 <caption>
                                     <para><emphasis role="bold">Figure 8.</emphasis> Alice can see
@@ -765,7 +801,7 @@ Etc.</programlisting>
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-messages-3.jpg" scale="30"/>
+                                    <imagedata fileref="pix/12-clip.png" scale="30"/>
                                 </imageobject>
                                 <caption>
                                     <para><emphasis role="bold">Figure 9.</emphasis> Alice's sent
@@ -786,7 +822,7 @@ Etc.</programlisting>
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-messages-4.jpg" scale="30"/>
+                                    <imagedata fileref="pix/13-clip.png" scale="30"/>
                                 </imageobject>
                                 <caption>
                                     <para><emphasis role="bold">Figure 10.</emphasis> Bob's
@@ -805,7 +841,7 @@ Etc.</programlisting>
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-messages-6.jpg" scale="30"/>
+                                    <imagedata fileref="pix/14-clip.png" scale="30"/>
                                 </imageobject>
                                 <caption>
                                     <para><emphasis role="bold">Figure 11.</emphasis> With Bob's
@@ -815,6 +851,37 @@ Etc.</programlisting>
                             </mediaobject>
                         </figure>
                         <para/>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/15-clip.png" scale="30"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 11.</emphasis> With Bob's
+                                        message sent, his <emphasis role="bold">Messages</emphasis>
+                                        pane shows the in-flight arrow pending delivery.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/16-clip.png" scale="30"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 11.</emphasis> With Bob's
+                                        message sent, his <emphasis role="bold">Messages</emphasis>
+                                        pane shows the in-flight arrow pending delivery.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                        
                     </step>
                     <step>
                         <para>In this last screen capture, Alice has received Bob's reply and they
@@ -825,7 +892,7 @@ Etc.</programlisting>
                             </info>
                             <mediaobject>
                                 <imageobject>
-                                    <imagedata fileref="pix/client-messages-8.jpg" scale="30"/>
+                                    <imagedata fileref="pix/17-clip.png" scale="30"/>
                                 </imageobject>
                                 <caption>
                                     <para><emphasis role="bold">Figure 12.</emphasis> Success!
