@@ -93,15 +93,11 @@
             </procedure></para>
         <para>Run <emphasis role="bold">make</emphasis> to display a full list of developer options. </para>
     </section>
-<!--    <section xml:id="installation">
+    <section xml:id="installation">
         <info>
             <title xml:id="installation.title">Installing and starting &chat_client; [Manual
                 method]</title>
         </info>
-        <important>
-            <para>These instructions currently work for &chat_client; branch
-                "message_box_index_length_validation".</para>
-        </important>
         <procedure>
             <step>
                 <title>Install required software packages</title>
@@ -189,7 +185,7 @@
                             commands.</para>
                         <programlisting><prompt>~/katzenqt$ </prompt><command>python3 -m venv myvenv</command>
 <prompt>~/katzenqt$ </prompt><command>source myvenv/bin/activate</command>
-<prompt>~/katzenqt$ </prompt><command>pip install -\-upgrade pip</command>
+<prompt>~/katzenqt$ </prompt><command>pip install --upgrade pip</command>
 <prompt>~/katzenqt$ </prompt><command>pip install 'git+https://github.com/katzenpost/thin_client@487d2b8e46440abba5bb4db95a168353de2d45d9'</command>
 <prompt>~/katzenqt$ </prompt><command>pip install -e .</command>
 <prompt>~/katzenqt$ </prompt><command>make</command></programlisting>
@@ -212,7 +208,7 @@ Etc.</programlisting>
                 </substeps>
             </step>
         </procedure>
-    </section>-->
+    </section>
     <section xml:id="communicating">
         <title xml:id="communicating.title">Communicating through the &chat_client; client</title>
         <para>This section describes how to configure and use &chat_client; for secure, anonymous
