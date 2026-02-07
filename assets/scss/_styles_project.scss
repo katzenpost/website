@@ -77,6 +77,7 @@
 
     .td-search__input {
         background-color: darken($primary, 5%);
+        color: $white !important;
     }
 }
 
@@ -340,6 +341,10 @@ pre {
     background-color: #f0f0f0 !important;
 
     .taxonomy-label {
+        color: #000000 !important;
+    }
+
+    .taxonomy-count {
         color: #000000 !important;
     }
 }
