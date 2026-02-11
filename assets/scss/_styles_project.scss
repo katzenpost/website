@@ -67,6 +67,10 @@
 }
 
 .td-navbar {
+    min-height: 100px !important;
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+
     .nav-link {
         font-weight: 400 !important;
 
@@ -78,6 +82,13 @@
     .td-search__input {
         background-color: darken($primary, 5%);
         color: $white !important;
+    }
+
+    .navbar-logo {
+        svg {
+            height: 80px !important;
+            width: 80px !important;
+        }
     }
 }
 

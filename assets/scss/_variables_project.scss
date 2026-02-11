@@ -8,7 +8,8 @@ $enable-rounded: false !default;
 $border-radius: 3px !default;
 
 // Theme colors
-$primary: #004b6b !default;
+// Primary color from lynx-big.png logo (#555555 - dark gray from the lynx fur)
+$primary: #555555 !default;
 $secondary: #ffcc4d !default;
 $success: #000584 !default;
 $info: #2b87c3 !default;

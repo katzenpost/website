@@ -5,8 +5,15 @@ description: "Katzenpost is a free and open source software project advancing an
 
 <!-- Hero -->
 {{< blocks/cover image_anchor="top" height="auto" color="black">}}
+<div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+<div style="flex: 0 0 auto;">
+<img src="/images/lynx-big.png" alt="Katzenpost Logo" style="max-width: 300px; width: 100%; height: auto;">
+</div>
+<div style="flex: 1 1 auto;">
 <h1>Katzenpost: Post Quantum Mix Network</h1>
 <p>Revolutionary post-quantum packet switching anonymous communication!</p>
+</div>
+</div>
 {{< /blocks/cover >}}
 
 <!-- Lead Section -->
