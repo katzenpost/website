@@ -323,7 +323,7 @@ For simplicity, the following diagrams omit replication while illustrating the P
 
 # Pigeonhole AllOrNothing protocol
 
-The AllOrNothing delivery mechanism ensures that a set of associated BACAP writes  either succeeds or fails atomically from the point of view of a replica or second-party client reader. This behavior prevents an adversary from detecting a correlation between (A) the sending client's failure to transmit multiple messages at once with (B) a network interruption on the sending client's side of the network. Regardless of the number of messages in the set, the adversary  gets to observe "at most once" that the sending client interacted with the
+The **All Or Nothing** delivery mechanism ensures that a set of associated BACAP writes either succeeds or fails atomically from the point of view of a replica or second-party client reader. This behavior prevents an adversary from detecting a correlation between (A) the sending client's failure to transmit multiple messages at once with (B) a network interruption on the sending client's side of the network. Regardless of the number of messages in the set, the adversary gets to observe "at most once" that the sending client interacted with the
 network.
 
 The protocol works as follows.
@@ -332,13 +332,20 @@ The protocol works as follows.
 
 The client uploads a BACAP stream to the storage replicas.
 
-The stream payloads consist of ```[]CourierEnvelope``` objects concatenated
+The stream payloads consist of four byte length prefixed ```CourierEnvelope``` blobs concatenated
 back-to-back. Because a ```CourierEnvelope``` is strictly larger than a BACAP
 payload, which itself contains BACAP payloads, multiple boxes must be used.
 
 ## Step 2
 
-The client sends the BACAP stream read capability to the courier service and tells it to decrypt and process the embedded ```CourierEnvelope``` structs.
+The client sends a random courier the "Copy" command which
+encapsulates the write capability to the Pigeonhole stream written in
+Step 1 above. When the courier receives this copy command it extracts
+the read cap from the given write cap and uses it to read the stream
+of data. The courier then reads a box at a time and tries to extract 0
+or 1 envelopes from each accumulation of stream segements.
+
+Each embedded ```CourierEnvelope``` structs is process as normal and results in a write transaction ciphertext being sent to the storage replicas.
 
 The courier does NOT need to keep track of the ```EnvelopeHash``` for each
 of the contained ```CourierEnvelope``` for the purpose of replying to the
@@ -346,10 +353,12 @@ client (which is in this case the courier itself), but it does need to
 keep resending them to the replicas until the intermediate replicas
 have ACK'ed them.
 
-On the other hand, the courier MUST keep track of the hash of the ```CourierAtMostOnce``` message and MUST NOT process a stream more than once.
+On the other hand, the courier MUST keep track of the hash of the ```CourierAllOrNothing``` message and MUST NOT process a stream more than once.
 
 
 **CourierAllOrNothing**
+
+**NOTE**: this is also known as "the Copy command", as it is in our paper and the implementation.
 
 Sent by the client to its courier. It MUST NOT be sent before the client has successfully uploaded each box in the stream to a courier.
 
