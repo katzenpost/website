@@ -39,7 +39,6 @@ All communication among users consists of
 user-generated read or write queries to Pigeonhole storage, never
 directly to other users.
 
-
 Many protocols are possible to compose using Pigeonhole communication channels,
 including group communications. This specification
 describes the protocols that are also detailed in our paper, in section entitled
@@ -177,7 +176,10 @@ type CourierEnvelope struct {
 
 Sent over the wire protocol from a courier to the replicas, one replica at a time.
 
-The courier service transforms one ```CourierEnvelope``` into two ```ReplicaMessage``` objects, one for each destination replica. The courier forwards those two ```ReplicaMessage``` objects to their respective replicas.
+The courier service transforms one ```CourierEnvelope``` into two
+```ReplicaMessage``` objects, one for each destination replica. The
+courier forwards those two ```ReplicaMessage``` objects to their
+respective replicas.
 
 
 ```
@@ -323,8 +325,15 @@ For simplicity, the following diagrams omit replication while illustrating the P
 
 # Pigeonhole AllOrNothing protocol
 
-The **All Or Nothing** delivery mechanism ensures that a set of associated BACAP writes either succeeds or fails atomically from the point of view of a replica or second-party client reader. This behavior prevents an adversary from detecting a correlation between (A) the sending client's failure to transmit multiple messages at once with (B) a network interruption on the sending client's side of the network. Regardless of the number of messages in the set, the adversary gets to observe "at most once" that the sending client interacted with the
-network.
+The **All Or Nothing** delivery mechanism ensures that a set of
+associated BACAP writes either succeeds or fails atomically from the
+point of view of a replica or second-party client reader. This
+behavior prevents an adversary from detecting a correlation between
+(A) the sending client's failure to transmit multiple messages at once
+with (B) a network interruption on the sending client's side of the
+network. Regardless of the number of messages in the set, the
+adversary gets to observe "at most once" that the sending client
+interacted with the network.
 
 The protocol works as follows.
 
@@ -343,9 +352,9 @@ encapsulates the write capability to the Pigeonhole stream written in
 Step 1 above. When the courier receives this copy command it extracts
 the read cap from the given write cap and uses it to read the stream
 of data. The courier then reads a box at a time and tries to extract 0
-or 1 envelopes from each accumulation of stream segements.
+or 1 envelopes from each accumulation of stream segments.
 
-Each embedded ```CourierEnvelope``` structs is process as normal and results in a write transaction ciphertext being sent to the storage replicas.
+Each embedded ```CourierEnvelope``` structs is processed as normal and results in a write transaction ciphertext being sent to the storage replicas.
 
 The courier does NOT need to keep track of the ```EnvelopeHash``` for each
 of the contained ```CourierEnvelope``` for the purpose of replying to the
@@ -366,9 +375,11 @@ Sent by the client to its courier. It MUST NOT be sent before the client has suc
 type CourierAllOrNothing struct {
     Version uint8 // == 0, reserved for future extensions to this spec.
     
-    StreamReadCap StreamReadCap
+    StreamWriteCap *StreamWriteCap
 }
 ```
+
+After processing the command, the courier then overwrites the temporary stream with tombstones.
 
 **CourierAllOrNothingACK**
 
