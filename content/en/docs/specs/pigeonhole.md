@@ -339,7 +339,7 @@ The protocol works as follows.
 
 ## Step 1
 
-The client uploads a BACAP stream to the storage replicas.
+The client uploads a "temporary Pigeonhole stream".
 
 The stream payloads consist of four byte length prefixed ```CourierEnvelope``` blobs concatenated
 back-to-back. Because a ```CourierEnvelope``` is strictly larger than a BACAP
@@ -348,11 +348,49 @@ payload, which itself contains BACAP payloads, multiple boxes must be used.
 ## Step 2
 
 The client sends a random courier the "Copy" command which
-encapsulates the write capability to the Pigeonhole stream written in
+encapsulates the write capability to the temporary Pigeonhole stream written in
 Step 1 above. When the courier receives this copy command it extracts
 the read cap from the given write cap and uses it to read the stream
 of data. The courier then reads a box at a time and tries to extract 0
 or 1 envelopes from each accumulation of stream segments.
+
+After processing the command, the courier then overwrites the
+temporary stream with tombstones.
+
+
+## Temporary Stream data format
+
+Each box in the temporary stream is a serialized `CopyStreamElement`.
+Defined in trunnel as:
+
+```
+// CopyStreamElement - wraps a CourierEnvelope chunk with stream position flags.
+// Overhead: 1 byte (flags) + 4 bytes (envelope_len) = 5 bytes
+struct copy_stream_element {
+    // Flags: bit 0 = isStart, bit 1 = isFinal
+    u8 flags;
+
+    // The CourierEnvelope serialized bytes
+    u32 envelope_len;
+    u8 envelope_data[envelope_len];
+}
+```
+
+Here it is in golang:
+
+```golang
+type CopyStreamElement struct {
+	Flags        uint8
+	EnvelopeLen  uint32
+	EnvelopeData []uint8
+}
+```
+
+The purpose of this specific format is to use the `isStart` and `isFinal`
+flags to tell the courier the first box and last box of the stream to
+process.  The payloads encapsulated within the `EnvelopeData` fields
+of many of these `CopyStreamElement`s is itself a stream of data which
+contains 4 byte length prefixed `CourierEnvelope`s.
 
 Each embedded ```CourierEnvelope``` structs is processed as normal and results in a write transaction ciphertext being sent to the storage replicas.
 
@@ -379,7 +417,6 @@ type CourierAllOrNothing struct {
 }
 ```
 
-After processing the command, the courier then overwrites the temporary stream with tombstones.
 
 **CourierAllOrNothingACK**
 
