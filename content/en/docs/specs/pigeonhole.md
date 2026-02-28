@@ -39,7 +39,6 @@ All communication among users consists of
 user-generated read or write queries to Pigeonhole storage, never
 directly to other users.
 
-
 Many protocols are possible to compose using Pigeonhole communication channels,
 including group communications. This specification
 describes the protocols that are also detailed in our paper, in section entitled
@@ -177,7 +176,10 @@ type CourierEnvelope struct {
 
 Sent over the wire protocol from a courier to the replicas, one replica at a time.
 
-The courier service transforms one ```CourierEnvelope``` into two ```ReplicaMessage``` objects, one for each destination replica. The courier forwards those two ```ReplicaMessage``` objects to their respective replicas.
+The courier service transforms one ```CourierEnvelope``` into two
+```ReplicaMessage``` objects, one for each destination replica. The
+courier forwards those two ```ReplicaMessage``` objects to their
+respective replicas.
 
 
 ```
@@ -323,22 +325,74 @@ For simplicity, the following diagrams omit replication while illustrating the P
 
 # Pigeonhole AllOrNothing protocol
 
-The AllOrNothing delivery mechanism ensures that a set of associated BACAP writes  either succeeds or fails atomically from the point of view of a replica or second-party client reader. This behavior prevents an adversary from detecting a correlation between (A) the sending client's failure to transmit multiple messages at once with (B) a network interruption on the sending client's side of the network. Regardless of the number of messages in the set, the adversary  gets to observe "at most once" that the sending client interacted with the
-network.
+The **All Or Nothing** delivery mechanism ensures that a set of
+associated BACAP writes either succeeds or fails atomically from the
+point of view of a replica or second-party client reader. This
+behavior prevents an adversary from detecting a correlation between
+(A) the sending client's failure to transmit multiple messages at once
+with (B) a network interruption on the sending client's side of the
+network. Regardless of the number of messages in the set, the
+adversary gets to observe "at most once" that the sending client
+interacted with the network.
 
 The protocol works as follows.
 
 ## Step 1
 
-The client uploads a BACAP stream to the storage replicas.
+The client uploads a "temporary Pigeonhole stream".
 
-The stream payloads consist of ```[]CourierEnvelope``` objects concatenated
+The stream payloads consist of four byte length prefixed ```CourierEnvelope``` blobs concatenated
 back-to-back. Because a ```CourierEnvelope``` is strictly larger than a BACAP
 payload, which itself contains BACAP payloads, multiple boxes must be used.
 
 ## Step 2
 
-The client sends the BACAP stream read capability to the courier service and tells it to decrypt and process the embedded ```CourierEnvelope``` structs.
+The client sends a random courier the "Copy" command which
+encapsulates the write capability to the temporary Pigeonhole stream written in
+Step 1 above. When the courier receives this copy command it extracts
+the read cap from the given write cap and uses it to read the stream
+of data. The courier then reads a box at a time and tries to extract 0
+or 1 envelopes from each accumulation of stream segments.
+
+After processing the command, the courier then overwrites the
+temporary stream with tombstones.
+
+
+## Temporary Stream data format
+
+Each box in the temporary stream is a serialized `CopyStreamElement`.
+Defined in trunnel as:
+
+```
+// CopyStreamElement - wraps a CourierEnvelope chunk with stream position flags.
+// Overhead: 1 byte (flags) + 4 bytes (envelope_len) = 5 bytes
+struct copy_stream_element {
+    // Flags: bit 0 = isStart, bit 1 = isFinal
+    u8 flags;
+
+    // The CourierEnvelope serialized bytes
+    u32 envelope_len;
+    u8 envelope_data[envelope_len];
+}
+```
+
+Here it is in golang:
+
+```golang
+type CopyStreamElement struct {
+	Flags        uint8
+	EnvelopeLen  uint32
+	EnvelopeData []uint8
+}
+```
+
+The purpose of this specific format is to use the `isStart` and `isFinal`
+flags to tell the courier the first box and last box of the stream to
+process.  The payloads encapsulated within the `EnvelopeData` fields
+of many of these `CopyStreamElement`s is itself a stream of data which
+contains 4 byte length prefixed `CourierEnvelope`s.
+
+Each embedded ```CourierEnvelope``` structs is processed as normal and results in a write transaction ciphertext being sent to the storage replicas.
 
 The courier does NOT need to keep track of the ```EnvelopeHash``` for each
 of the contained ```CourierEnvelope``` for the purpose of replying to the
@@ -346,10 +400,12 @@ client (which is in this case the courier itself), but it does need to
 keep resending them to the replicas until the intermediate replicas
 have ACK'ed them.
 
-On the other hand, the courier MUST keep track of the hash of the ```CourierAtMostOnce``` message and MUST NOT process a stream more than once.
+On the other hand, the courier MUST keep track of the hash of the ```CourierAllOrNothing``` message and MUST NOT process a stream more than once.
 
 
 **CourierAllOrNothing**
+
+**NOTE**: this is also known as "the Copy command", as it is in our paper and the implementation.
 
 Sent by the client to its courier. It MUST NOT be sent before the client has successfully uploaded each box in the stream to a courier.
 
@@ -357,9 +413,10 @@ Sent by the client to its courier. It MUST NOT be sent before the client has suc
 type CourierAllOrNothing struct {
     Version uint8 // == 0, reserved for future extensions to this spec.
     
-    StreamReadCap StreamReadCap
+    StreamWriteCap *StreamWriteCap
 }
 ```
+
 
 **CourierAllOrNothingACK**
 
