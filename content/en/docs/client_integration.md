@@ -358,25 +358,258 @@ thin_client.send_message(payload, dest_node, dest_queue)
 {{< /tabpane >}}
 
 
-
 ## Pigeonhole Channel API
 
-**NOTE: This section of the document specifies our new Pigeonhole Protocol API which does not exist yet.**
+**NOTE that each message in this API contains a query ID field so
+that the reply can be correlated with the request. If a client
+ever repeats one of these (for something we have in memory) and
+we are posed with the question of whether we should overwrite
+something or not, we send an event saying "protocol violation,
+you done fucked up" and disconnects the thinclient.**
 
-**Also NOTE: everything we send has a QueryID identifier like a 128bit random blob, that lets us uniquely identify the reply message(s).
-If a client ever repeats one of these (for something we have in memory) and we are posed with the question of whether we should overwrite something or not, we send an event saying "protocol violation, you done fucked up" and disconnects the thinclient.**
+Our new Pigeonhole API consists of these methods:
 
-The following function signatures represent the new thinclient API for the Pigeonhole protocol
-wherein the function arguments will be composed into a specific thinclient request type.
-And the return values will be composed into a specific reply (event) type.
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
 
+func (t *ThinClient) NewKeypair(ctx context.Context, seed []byte) (*bacap.WriteCap, *bacap.ReadCap, *bacap.MessageBoxIndex, error)
 
+func (t *ThinClient) EncryptRead(ctx context.Context, readCap *bacap.ReadCap, messageBoxIndex *bacap.MessageBoxIndex) ([]byte, []byte, []byte, *[32]byte, error)
+
+func (t *ThinClient) EncryptWrite(ctx context.Context, plaintext []byte, writeCap *bacap.WriteCap, messageBoxIndex *bacap.MessageBoxIndex) ([]byte, []byte, *[32]byte, error)
+
+func (t *ThinClient) StartResendingEncryptedMessage(ctx context.Context, readCap *bacap.ReadCap, writeCap *bacap.WriteCap, nextMessageIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) ([]byte, error)
+
+func (t *ThinClient) CancelResendingEncryptedMessage(ctx context.Context, envelopeHash *[32]byte) error
+
+func (t *ThinClient) StartResendingCopyCommand(ctx context.Context, writeCap *bacap.WriteCap) error
+
+func (t *ThinClient) StartResendingCopyCommandWithCourier(
+	ctx context.Context,
+	writeCap *bacap.WriteCap,
+	courierIdentityHash *[32]byte,
+	courierQueueID []byte,
+) error
+
+func (t *ThinClient) CancelResendingCopyCommand(ctx context.Context, writeCapHash *[32]byte) error
+
+func (t *ThinClient) NextMessageBoxIndex(ctx context.Context, messageBoxIndex *bacap.MessageBoxIndex) (*bacap.MessageBoxIndex, error)
+
+func (t *ThinClient) NewStreamID() *[StreamIDLength]byte
+
+func (t *ThinClient) CreateCourierEnvelopesFromPayload(ctx context.Context, streamID *[StreamIDLength]byte, payload []byte, destWriteCap *bacap.WriteCap, destStartIndex *bacap.MessageBoxIndex, isLast bool) ([][]byte, error)
+
+func (t *ThinClient) CreateCourierEnvelopesFromPayloads(ctx context.Context, streamID *[StreamIDLength]byte, destinations []DestinationPayload, isLast bool) ([][]byte, error)
+
+func (t *ThinClient) GetAllCouriers() ([]CourierDescriptor, error)
+
+func (t *ThinClient) GetDistinctCouriers(n int) ([]CourierDescriptor, error)
+
+func (t *ThinClient) SendNestedCopy(
+	ctx context.Context,
+	payload []byte,
+	destWriteCap *bacap.WriteCap,
+	destFirstIndex *bacap.MessageBoxIndex,
+	courierPath []CourierDescriptor,
+) error
+{{< /tab >}}
+
+{{< tab header="Python" lang="python" >}}
+
+async def new_keypair(self, seed: bytes) -> "Tuple[bytes, bytes, bytes]"
+
+async def encrypt_read(self, read_cap: bytes, message_box_index: bytes) -> "Tuple[bytes, bytes, bytes, bytes]"
+
+async def encrypt_write(self, plaintext: bytes, write_cap: bytes, message_box_index: bytes) -> "Tuple[bytes, bytes, bytes]"
+
+async def start_resending_encrypted_message(
+    self,
+    read_cap: "bytes|None",
+    write_cap: "bytes|None",
+    next_message_index: "bytes|None",
+    reply_index: "int|None",
+    envelope_descriptor: bytes,
+    message_ciphertext: bytes,
+    envelope_hash: bytes
+) -> bytes
+
+async def cancel_resending_encrypted_message(self, envelope_hash: bytes) -> None
+
+async def next_message_box_index(self, message_box_index: bytes) -> bytes
+
+async def start_resending_copy_command(
+    self,
+    write_cap: bytes,
+    courier_identity_hash: "bytes|None" = None,
+    courier_queue_id: "bytes|None" = None
+) -> None:
+
+async def cancel_resending_copy_command(self, write_cap_hash: bytes) -> None:
+
+async def create_courier_envelopes_from_payload(
+    self,
+    query_id: bytes,
+    stream_id: bytes,
+    payload: bytes,
+    dest_write_cap: bytes,
+    dest_start_index: bytes,
+    is_last: bool
+) -> "List[bytes]":
+
+async def create_courier_envelopes_from_payloads(
+    self,
+    stream_id: bytes,
+    destinations: "List[Dict[str, Any]]",
+    is_last: bool
+) -> "List[bytes]":
+
+async def tombstone_box(
+    self,
+    geometry: "PigeonholeGeometry",
+    write_cap: bytes,
+    box_index: bytes
+) -> None:
+
+async def tombstone_range(
+    self,
+    geometry: "PigeonholeGeometry",
+    write_cap: bytes,
+    start: bytes,
+    max_count: int
+) -> "Dict[str, Any]":
+{{< /tab >}}
+
+{{< tab header="Rust" lang="rust" >}}
+    pub async fn new_keypair(&self, seed: &[u8; 32]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), ThinClientError>
+
+    pub async fn encrypt_read(
+        &self,
+        read_cap: &[u8],
+        message_box_index: &[u8]
+    ) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>, [u8; 32]), ThinClientError>
+
+    pub async fn encrypt_write(
+        &self,
+        plaintext: &[u8],
+        write_cap: &[u8],
+        message_box_index: &[u8]
+    ) -> Result<(Vec<u8>, Vec<u8>, [u8; 32]), ThinClientError>
+
+    pub async fn start_resending_encrypted_message(
+        &self,
+        read_cap: Option<&[u8]>,
+        write_cap: Option<&[u8]>,
+        next_message_index: Option<&[u8]>,
+        reply_index: u8,
+        envelope_descriptor: &[u8],
+        message_ciphertext: &[u8],
+        envelope_hash: &[u8; 32]
+    ) -> Result<Vec<u8>, ThinClientError>
+
+    pub async fn cancel_resending_encrypted_message(&self, envelope_hash: &[u8; 32]) -> Result<(), ThinClientError>
+
+    pub async fn next_message_box_index(&self, message_box_index: &[u8]) -> Result<Vec<u8>, ThinClientError>
+
+    pub async fn start_resending_copy_command(
+        &self,
+        write_cap: &[u8],
+        courier_identity_hash: Option<&[u8]>,
+        courier_queue_id: Option<&[u8]>
+    ) -> Result<(), ThinClientError>
+
+    pub async fn cancel_resending_copy_command(&self, write_cap_hash: &[u8; 32]) -> Result<(), ThinClientError>
+
+    pub async fn create_courier_envelopes_from_payload(
+        &self,
+        stream_id: &[u8; 16],
+        payload: &[u8],
+        dest_write_cap: &[u8],
+        dest_start_index: &[u8],
+        is_last: bool
+    ) -> Result<Vec<Vec<u8>>, ThinClientError>
+
+    pub async fn create_courier_envelopes_from_payloads(
+        &self,
+        stream_id: &[u8; 16],
+        destinations: Vec<(&[u8], &[u8], &[u8])>,
+        is_last: bool
+    ) -> Result<Vec<Vec<u8>>, ThinClientError>
+
+   pub fn new_stream_id() -> [u8; 16]
+
+   pub async fn tombstone_box(
+        &self,
+        geometry: &PigeonholeGeometry,
+        write_cap: &[u8],
+        box_index: &[u8]
+    ) -> Result<(), ThinClientError>
+
+    pub async fn tombstone_range(
+        &self,
+        geometry: &PigeonholeGeometry,
+        write_cap: &[u8],
+        start: &[u8],
+        max_count: u32
+    ) -> TombstoneRangeResult
+{{< /tab >}}
+{{< /tabpane >}}
+
+<HR>
 <BR>
 
-* NewKeypair (queryID, seed)
-    return queryID, WriteCap, ReadCap, First MessageIndex
+Most of the methods in the new Pigeonhole API do NOT cause any network traffic.
+The only methods that cause network traffic are these four:
 
+* StartResendingEncryptedMessage
+* StartResendingCopyCommand
+* TombstoneBox
+* TombstoneRange
+
+<HR>
 <BR>
+
+## New Key Pair
+
+The `NewKeypair` method generates a new BACAP keypair which represents a
+new Pigeonhole channel. These Pigeonhole channels store a stream of data in
+a sequence of BACAP boxes. The `NewKeypair` method returns the write
+capability for the channel, the read capability for the channel, and the
+index of the first box in the channel. These can be used by the application
+at any time to read or write to the channel.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+seed := make([]byte, 32)
+_, err := rand.Reader.Read(seed)
+if err != nil {
+    return err
+}
+writeCap, readCap, firstIndex, err := thinClient.NewKeypair(ctx, seed)
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+seed = os.urandom(32)
+write_cap, read_cap, first_index = await thin_client.new_keypair(seed)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+let seed: [u8; 32] = rand::random();
+let (write_cap, read_cap, first_index) = thin_client.new_keypair(&seed).await?;
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+## Encrypt Read
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+thinClient.EncryptRead(ctx, readCap, messageBoxIndex)
+
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+{{< /tabpane >}}
+
 
 * EncryptRead(queryID, read cap, message box index) -> 
    - query ID
