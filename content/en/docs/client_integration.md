@@ -360,29 +360,58 @@ thin_client.send_message(payload, dest_node, dest_queue)
 
 ## Pigeonhole Channel API
 
-**NOTE that each message in this API contains a query ID field so
+This API is designed to allow applications to use the Pigeonhole
+protocol to send and receive messages to and from storage channels.
+These channels can be thought of as storing a stream of bytes however
+they are in fact composed as a sequence of encrypted BACAP Boxes.
+
+* BACAP, the Blinded and Capability protocol is described in our paper
+in section 4: https://arxiv.org/abs/2501.02933
+
+* Pigeonhole, the storage protocol is described in our paper
+in section 5: https://arxiv.org/abs/2501.02933
+
+* The Golang reference implementation of BACAP can be found here:<BR>
+https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go
+
+* The BACAP golang API documentation here:<BR>
+https://pkg.go.dev/github.com/katzenpost/hpqc/bacap
+
+Each of these Pigeonhole channels has a read capability often
+referred to as just "readcap" and a write capability often
+referred to as just "writecap" and a message index. A KDF is used
+to derive a sequence of message indexes from the first message index.
+
+This API endeavors to store a little state as possible in the client daemon.
+Instead we return enough information to the app so that it can
+keep track of the state itself.
+
+**NOTE that each of the API messages are implemented using a query message type and
+a reply message type. Therefore each message in this API contains a query ID field so
 that the reply can be correlated with the request. If a client
 ever repeats one of these (for something we have in memory) and
 we are posed with the question of whether we should overwrite
-something or not, we send an event saying "protocol violation,
-you done fucked up" and disconnects the thinclient.**
+something or not, we send an event saying "protocol violation"
+and disconnects the thinclient.**
 
 Our new Pigeonhole API consists of these methods:
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
 
-func (t *ThinClient) NewKeypair(ctx context.Context, seed []byte) (*bacap.WriteCap, *bacap.ReadCap, *bacap.MessageBoxIndex, error)
+func (t *ThinClient) NewKeypair(ctx context.Context, seed []byte)
+    (writeCap *bacap.WriteCap,
+    readCap *bacap.ReadCap,
+    firstMessageIndex *bacap.MessageBoxIndex,
+    err error)
 
-func (t *ThinClient) EncryptRead(ctx context.Context, readCap *bacap.ReadCap, messageBoxIndex *bacap.MessageBoxIndex) ([]byte, []byte, []byte, *[32]byte, error)
+func (t *ThinClient) EncryptRead(ctx context.Context, readCap *bacap.ReadCap, messageBoxIndex *bacap.MessageBoxIndex) (messageCiphertext []byte, nextMessageIndex []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, err error)
 
-func (t *ThinClient) EncryptWrite(ctx context.Context, plaintext []byte, writeCap *bacap.WriteCap, messageBoxIndex *bacap.MessageBoxIndex) ([]byte, []byte, *[32]byte, error)
+func (t *ThinClient) EncryptWrite(ctx context.Context, plaintext []byte, writeCap *bacap.WriteCap, messageBoxIndex *bacap.MessageBoxIndex) (messageCiphertext []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, err error)
 
-func (t *ThinClient) StartResendingEncryptedMessage(ctx context.Context, readCap *bacap.ReadCap, writeCap *bacap.WriteCap, nextMessageIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) ([]byte, error)
+func (t *ThinClient) StartResendingEncryptedMessage(ctx context.Context, readCap *bacap.ReadCap, writeCap *bacap.WriteCap, nextMessageIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) (plaintext []byte, err error)
 
 func (t *ThinClient) CancelResendingEncryptedMessage(ctx context.Context, envelopeHash *[32]byte) error
-
-func (t *ThinClient) StartResendingCopyCommand(ctx context.Context, writeCap *bacap.WriteCap) error
 
 func (t *ThinClient) StartResendingCopyCommandWithCourier(
 	ctx context.Context,
@@ -393,29 +422,31 @@ func (t *ThinClient) StartResendingCopyCommandWithCourier(
 
 func (t *ThinClient) CancelResendingCopyCommand(ctx context.Context, writeCapHash *[32]byte) error
 
-func (t *ThinClient) NextMessageBoxIndex(ctx context.Context, messageBoxIndex *bacap.MessageBoxIndex) (*bacap.MessageBoxIndex, error)
+func (t *ThinClient) NextMessageBoxIndex(ctx context.Context, messageBoxIndex *bacap.MessageBoxIndex) (nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
 
 func (t *ThinClient) NewStreamID() *[StreamIDLength]byte
 
-func (t *ThinClient) CreateCourierEnvelopesFromPayload(ctx context.Context, streamID *[StreamIDLength]byte, payload []byte, destWriteCap *bacap.WriteCap, destStartIndex *bacap.MessageBoxIndex, isLast bool) ([][]byte, error)
+func (t *ThinClient) CreateCourierEnvelopesFromPayload(ctx context.Context, streamID *[StreamIDLength]byte, payload []byte, destWriteCap *bacap.WriteCap, destStartIndex *bacap.MessageBoxIndex, isLast bool) (envelopes [][]byte, err error)
 
-func (t *ThinClient) CreateCourierEnvelopesFromPayloads(ctx context.Context, streamID *[StreamIDLength]byte, destinations []DestinationPayload, isLast bool) ([][]byte, error)
+func (t *ThinClient) CreateCourierEnvelopesFromPayloads(ctx context.Context, streamID *[StreamIDLength]byte, destinations []DestinationPayload, isLast bool) (envelopes [][]byte, err error)
 
-func (t *ThinClient) GetAllCouriers() ([]CourierDescriptor, error)
-
-func (t *ThinClient) GetDistinctCouriers(n int) ([]CourierDescriptor, error)
-
-func (t *ThinClient) SendNestedCopy(
+func (c *ThinClient) TombstoneBox(
 	ctx context.Context,
-	payload []byte,
-	destWriteCap *bacap.WriteCap,
-	destFirstIndex *bacap.MessageBoxIndex,
-	courierPath []CourierDescriptor,
+	g *phgeo.Geometry,
+	writeCap *bacap.WriteCap,
+	boxIndex *bacap.MessageBoxIndex,
 ) error
+
+func (c *ThinClient) TombstoneRange(
+	ctx context.Context,
+	g *phgeo.Geometry,
+	writeCap *bacap.WriteCap,
+	start *bacap.MessageBoxIndex,
+	maxCount uint32,
+) (*TombstoneRangeResult, error)
 {{< /tab >}}
 
 {{< tab header="Python" lang="python" >}}
-
 async def new_keypair(self, seed: bytes) -> "Tuple[bytes, bytes, bytes]"
 
 async def encrypt_read(self, read_cap: bytes, message_box_index: bytes) -> "Tuple[bytes, bytes, bytes, bytes]"
@@ -568,10 +599,42 @@ The only methods that cause network traffic are these four:
 <HR>
 <BR>
 
+### Experimental Nested Copy API
+
+The golang thin client has these additional experimental Pigeonhole API methods that are used to construct a "nested copy" command which is a kind of recursive copy that constructs a kind
+of route among a set of couriers.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) GetAllCouriers() ([]CourierDescriptor, error)
+
+func (t *ThinClient) GetDistinctCouriers(n int) ([]CourierDescriptor, error)
+
+func (t *ThinClient) StartResendingCopyCommandWithCourier(
+	ctx context.Context,
+	writeCap *bacap.WriteCap,
+	courierIdentityHash *[32]byte,
+	courierQueueID []byte,
+) error
+
+func (t *ThinClient) SendNestedCopy(
+	ctx context.Context,
+	payload []byte,
+	destWriteCap *bacap.WriteCap,
+	destFirstIndex *bacap.MessageBoxIndex,
+	courierPath []CourierDescriptor,
+) error
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+
 ## New Key Pair
 
-The `NewKeypair` method generates a new BACAP keypair which represents a
-new Pigeonhole channel. These Pigeonhole channels store a stream of data in
+The `NewKeypair` method generates a new BACAP keypair which are referred to as the writecap and readcap,
+it also returns a first message index which is used to derive a sequence of message indexes.
+
+These Pigeonhole channels store a stream of data in
 a sequence of BACAP boxes. The `NewKeypair` method returns the write
 capability for the channel, the read capability for the channel, and the
 index of the first box in the channel. These can be used by the application
@@ -599,10 +662,14 @@ let (write_cap, read_cap, first_index) = thin_client.new_keypair(&seed).await?;
 
 ## Encrypt Read
 
+This method returns an encrypted read request for a single Pigeonhoel/BACAP Box. This method does not cause any network traffic nor does it cause the client daemon to store any state. The encrypted read transaction blob returned must be sent to a courier using the `StartResendingEncryptedMessage` method.
+
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-thinClient.EncryptRead(ctx, readCap, messageBoxIndex)
-
+messageCiphertext, nextMessageIndex, envelopeDescriptor, envelopeHash, err := thinClient.EncryptRead(ctx, readCap, messageBoxIndex)
+reply, err := thinClient.StartResendingEncryptedMessage(ctx, readCap, nil, nextMessageIndex, 0, envelopeDescriptor, messageCiphertext, envelopeHash)
+// Save the state so we can resume if needed
+clientState.Save(writeCap, readCap, nextMessageIndex, envelopeHash)
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
 {{< /tab >}}
@@ -610,77 +677,89 @@ thinClient.EncryptRead(ctx, readCap, messageBoxIndex)
 {{< /tab >}}
 {{< /tabpane >}}
 
+## Encrypt Write
 
-* EncryptRead(queryID, read cap, message box index) -> 
-   - query ID
-   - MessageCiphertext
-   - next message index ( message box index + 1 // or advanced or whatever)
-   - envelope descriptor (private key for this read so we can read replies from SendEncryptedMessage later)
-   - envelope hash
-   - ReplicaEpoch this was encrypted in
-   - or: error
+This method returns an encrypted write request for a single Pigeonhoel/BACAP Box. This method does not cause any network traffic nor does it cause the client daemon to store any state. The encrypted write transaction blob returned must be sent to a courier using the `StartResendingEncryptedMessage` method.
 
-<BR>
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+messageCiphertext, envelopeDescriptor, envelopeHash, err := thinClient.EncryptWrite(ctx, plaintext, writeCap, messageBoxIndex)
+err := thinClient.StartResendingEncryptedMessage(ctx, nil, writeCap, nil, 0, envelopeDescriptor, messageCiphertext, envelopeHash)
+// Save the state so we can resume if needed
+clientState.Save(writeCap, readCap, nextMessageIndex, envelopeHash)
+{{< /tab >}}
 
-* EncryptWrite(
-   - plaintext,
-   -  write cap,
-   - message box index, // where to read/write
-    ) ->
-    - MessageCiphertext
-    - ReplicaEpoch this was encrypted in
-    - query ID
-    - envelope descriptor (private key for this read so we can read replies from SendEncryptedMessage later)
-    - envelope hash
-    - or: error
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+
+{{< /tabpane >}}
 
 <BR>
 
-* StartResendingEncryptedMessage
 
-Takes a MessageCiphertext destined for two intermediate replicas
+## Start Resending Encrypted Message
 
-Some notes on implementation:
-- kpclientd picks DestNode + DestQueue (courier)
-- kpclientd puts each SendEncryptedMessage in an in-memory queue and takes responsibility for resending, so the thin client only needs to send SendEncryptedMessage once per session.
-- In-memory queue: one per app
-- kpclientd samples from the collection of all the app queues and puts the "resending" into the egress queue
-- when an app disconnects we delete their queue
-- when does it stop resending?
-- we want to stop resending writes once the courier acks
-- kpclientd should stop resending the corresponding write.
-- kpclientd should emit an event to tell the app their write was successful
-- we want to keep a cache of EnvelopeHash->event so that if an app restarts it can get replies to stuff it just sent (that was answered successfully)
-- maybe rotate couriers every now and then
-- we want to stop resending reads once there is a successful read
-- we should emit an event on successful read
-- with our current bug we need to stop resending as soon as we get an error from a 
-- we should emit an event on "box not found"
+This method takes your message ciphertext and sends it off
+to a courier for delivery to the storage replicas. It does
+so using a basic ARQ - automatic repeat request - protocol
+which sends retransmissions if it doesn't get an ACK from
+the courier.
 
-```
-StartResendingEncryptedMessage(
+This method is designed to block until an ACK is received
+from the courier or until `CancelResendingEncryptedMessage` is called.
 
-      // Needed in order to decrypt the reply, if any:
-      ReadCap, WriteCap, // pass in either ReadCap or WriteCap, never both.
-      NextMessageIndex, //
-      ReplyIndex, // tells courier which reply we want
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+reply, err := thinClient.StartResendingEncryptedMessage(ctx, readCap, writeCap, nextMessageIndex, replyIndex, envelopeDescriptor, messageCiphertext, envelopeHash)
+{{< /tab >}}
 
-      // Needed for the intermediate replicas to understand the query:
-      EnvelopeDescriptor,
-      MessageCiphertext, // encrypted payload (to the intermediates)
-      EnvelopeHash, // persistent identifier
-      ReplicaEpoch, // used to see which replicas/keys were used
-      QueryID: 128 bit random thing // used by the client to match a reply to this message (kind of like the  ChannelID)
-    ) -> (
-       Plaintext stuff maybe,
-       Timestamp: If you don't have a courier reply by now, resend at this time,
-       error
-    )
-```
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
 
-* CancelResendingEncryptedMessage(EnvelopeHash, QueryID) -> error:
-  
-  Cancels a previous StartResendingEncryptedMessage (removes it from the in-memory queue at kpclientd)
+{{< /tabpane >}}
+
+**Some notes on implementation:**
+* kpclientd picks DestNode + DestQueue (courier)
+* kpclientd puts each SendEncryptedMessage in an in-memory queue and takes responsibility for resending, so the thin client only needs to send SendEncryptedMessage once per session.
+* In-memory queue: one per app
+* kpclientd samples from the collection of all the app queues and puts the "resending" into the egress queue
+* when an app disconnects we delete their queue
+* when does it stop resending?
+* we want to stop resending writes once the courier acks
+* kpclientd should stop resending the corresponding write.
+* kpclientd should emit an event to tell the app their write was successful
+* we want to keep a cache of EnvelopeHash->event so that if an app restarts it can get replies to stuff it just sent (that was answered successfully)
+* maybe rotate couriers every now and then
+* we want to stop resending reads once there is a successful read
+* we should emit an event on successful read
+* with our current bug we need to stop resending as soon as we get an error from a 
+* we should emit an event on "box not found"
+
+## Cancel Resending Encrypted Message
+
+This method is meant to be called from a different thread in order to cancel
+a previously called `StartResendingEncryptedMessage` call.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+reply, err := thinClient.StartResendingEncryptedMessage(ctx, readCap, writeCap, nextMessageIndex, replyIndex, envelopeDescriptor, messageCiphertext, envelopeHash)
+
+go func() {
+    thinClient.CancelResendingEncryptedMessage(ctx, envelopeHash)
+}()
+{{< /tab >}}
+
+{{< tab header="Python" lang="python" >}}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+{{< /tab >}}
+
+{{< /tabpane >}}
+
 
 ### Events:
     - There is a reply to your read: QueryID, EnvelopeHash
