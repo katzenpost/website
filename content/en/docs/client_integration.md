@@ -382,8 +382,7 @@ referred to as just "readcap" and a write capability often
 referred to as just "writecap" and a message index. A KDF is used
 to derive a sequence of message indexes from the first message index.
 
-This API endeavors to store a little state as possible in the client daemon.
-Instead we return enough information to the app so that it can
+This API endeavors to avoid storing state in the client daemon whenever possible. We instead prefer to return enough information to the app so that it can
 keep track of the state itself.
 
 **NOTE that each of the API messages are implemented using a query message type and
@@ -435,7 +434,7 @@ func (c *ThinClient) TombstoneBox(
 	g *phgeo.Geometry,
 	writeCap *bacap.WriteCap,
 	boxIndex *bacap.MessageBoxIndex,
-) error
+) (messageCiphertext []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, err error)
 
 func (c *ThinClient) TombstoneRange(
 	ctx context.Context,
@@ -444,6 +443,8 @@ func (c *ThinClient) TombstoneRange(
 	start *bacap.MessageBoxIndex,
 	maxCount uint32,
 ) (*TombstoneRangeResult, error)
+// TombstoneRangeResult contains Envelopes []*TombstoneEnvelope and Next *bacap.MessageBoxIndex
+// TombstoneEnvelope contains MessageCiphertext, EnvelopeDescriptor, EnvelopeHash, and BoxIndex
 {{< /tab >}}
 
 {{< tab header="Python" lang="python" >}}
@@ -499,7 +500,8 @@ async def tombstone_box(
     geometry: "PigeonholeGeometry",
     write_cap: bytes,
     box_index: bytes
-) -> None:
+) -> "Tuple[bytes, bytes, bytes]":
+# Returns (message_ciphertext, envelope_descriptor, envelope_hash)
 
 async def tombstone_range(
     self,
@@ -508,6 +510,8 @@ async def tombstone_range(
     start: bytes,
     max_count: int
 ) -> "Dict[str, Any]":
+# Returns {"envelopes": [...], "next": next_index}
+# Each envelope contains: message_ciphertext, envelope_descriptor, envelope_hash, box_index
 {{< /tab >}}
 
 {{< tab header="Rust" lang="rust" >}}
@@ -573,7 +577,8 @@ async def tombstone_range(
         geometry: &PigeonholeGeometry,
         write_cap: &[u8],
         box_index: &[u8]
-    ) -> Result<(), ThinClientError>
+    ) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), ThinClientError>
+    // Returns (ciphertext, envelope_descriptor, envelope_hash)
 
     pub async fn tombstone_range(
         &self,
@@ -582,6 +587,8 @@ async def tombstone_range(
         start: &[u8],
         max_count: u32
     ) -> TombstoneRangeResult
+    // TombstoneRangeResult contains: envelopes: Vec<TombstoneEnvelope>, next: Vec<u8>
+    // TombstoneEnvelope contains: message_ciphertext, envelope_descriptor, envelope_hash, box_index
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -591,10 +598,10 @@ async def tombstone_range(
 Most of the methods in the new Pigeonhole API do NOT cause any network traffic.
 The only methods that cause network traffic are these four:
 
-* StartResendingEncryptedMessage
-* StartResendingCopyCommand
-* TombstoneBox
-* TombstoneRange
+* Start Resending Encrypted Message
+* Start Resending Copy Command
+* Tombstone Box
+* Tombstone Range
 
 <HR>
 <BR>
@@ -602,7 +609,7 @@ The only methods that cause network traffic are these four:
 ## New Key Pair
 
 The `NewKeypair` method generates a new BACAP keypair which are referred to as the writecap and readcap,
-it also returns a first message index which is used to derive a sequence of message indexes.
+it also returns a first message index which is used to derive a sequence of message indexes using the `Next Message Box Index` method.
 
 These Pigeonhole channels store a stream of data in
 a sequence of BACAP boxes. The `NewKeypair` method returns the write
@@ -636,6 +643,20 @@ that will be used for the next message. This is useful for planning ahead and fo
 
 If you have a binary compatible BACAP implementation in your target language then of course you can use that instead of this method and avoid the round trip on the local socket to the client daemon.
 
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+nextIndex, err = thinClient.NextMessageBoxIndex(ctx, firstIndex)
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+next_index = await thin_client.next_message_box_index(first_index)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+let next_index = thin_client.next_message_box_index(&first_index).await?;
+{{< /tab >}}
+{{< /tabpane >}}
+
+
 ## Encrypt Read
 
 This method returns an encrypted read request for a single Pigeonhoel/BACAP Box. This method does not cause any network traffic nor does it cause the client daemon to store any state. The encrypted read transaction blob returned must be sent to a courier using the `StartResendingEncryptedMessage` method.
@@ -648,8 +669,31 @@ reply, err := thinClient.StartResendingEncryptedMessage(ctx, readCap, nil, nextM
 clientState.Save(writeCap, readCap, nextMessageIndex, envelopeHash)
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
+ciphertext, next_index, env_desc, env_hash = await thin_client.encrypt_read(
+    read_cap, message_box_index
+)
+plaintext = await thin_client.start_resending_encrypted_message(
+    read_cap=read_cap,
+    write_cap=None,
+    next_message_index=next_index,
+    reply_index=0,  
+    envelope_descriptor=env_desc,
+    message_ciphertext=ciphertext,
+    envelope_hash=env_hash
+)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
+let (ciphertext, next_index, env_desc, env_hash) = thin_client
+    .encrypt_read(&read_cap, &message_box_index).await?;
+let plaintext = thin_client.start_resending_encrypted_message(
+    Some(&read_cap),
+    None,
+    Some(&next_index),
+    0,
+    &env_desc,
+    &ciphertext,
+    &env_hash
+).await?;
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -666,8 +710,31 @@ clientState.Save(writeCap, readCap, nextMessageIndex, envelopeHash)
 {{< /tab >}}
 
 {{< tab header="Python" lang="python" >}}
+ciphertext, env_desc, env_hash = await thin_client.encrypt_write(
+    plaintext, write_cap, message_box_index
+)
+await thin_client.start_resending_encrypted_message(
+    read_cap=None,
+    write_cap=write_cap,
+    next_message_index=None,
+    reply_index=0,
+    envelope_descriptor=env_desc,
+    message_ciphertext=ciphertext,
+    envelope_hash=env_hash
+)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
+let (ciphertext, env_desc, env_hash) = thin_client
+    .encrypt_write(&plaintext, &write_cap, &message_box_index).await?;
+thin_client.start_resending_encrypted_message(
+    None,
+    Some(&write_cap),
+    None,
+    0,
+    &env_desc,
+    &ciphertext,
+    &env_hash
+).await?;
 {{< /tab >}}
 
 {{< /tabpane >}}
@@ -693,8 +760,28 @@ reply, err := thinClient.StartResendingEncryptedMessage(ctx, readCap, writeCap, 
 {{< /tab >}}
 
 {{< tab header="Python" lang="python" >}}
+# For writes (read_cap=None), for reads (write_cap=None)
+plaintext = await thin_client.start_resending_encrypted_message(
+    read_cap=read_cap,
+    write_cap=write_cap,
+    next_message_index=next_index,
+    reply_index=0,
+    envelope_descriptor=env_desc,
+    message_ciphertext=ciphertext,
+    envelope_hash=env_hash
+)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
+// For writes use None for read_cap, for reads use None for write_cap
+let plaintext = thin_client.start_resending_encrypted_message(
+    Some(&read_cap),  // None for writes
+    Some(&write_cap), // None for reads
+    Some(&next_index),
+    0,
+    &env_desc,
+    &ciphertext,
+    &env_hash
+).await?;
 {{< /tab >}}
 
 {{< /tabpane >}}
@@ -731,8 +818,12 @@ go func() {
 {{< /tab >}}
 
 {{< tab header="Python" lang="python" >}}
+# Cancel from another coroutine
+await thin_client.cancel_resending_encrypted_message(env_hash)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
+// Cancel from another task
+thin_client.cancel_resending_encrypted_message(&env_hash).await?;
 {{< /tab >}}
 
 {{< /tabpane >}}
@@ -740,11 +831,119 @@ go func() {
 
 ## Tombstone Box
 
-Overwrite a box with zeros. A tombstone is a BACAP message with a payload composed of all zeros. Tombstones are used to delete messages.
+Create an encrypted tombstone for a single box. A tombstone is a BACAP message with a payload composed of all zeros, used to delete messages.
+
+This method returns the encrypted envelope data without sending it. The caller must send the tombstone via `StartResendingEncryptedMessage`, which allows for cancellation using the returned envelope hash.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// Create the encrypted tombstone
+ciphertext, envDesc, envHash, err := alice.TombstoneBox(ctx, geo, writeCap, firstIndex)
+if err != nil {
+    return err
+}
+
+// Send the tombstone (can be cancelled with CancelResendingEncryptedMessage(envHash))
+_, err = alice.StartResendingEncryptedMessage(
+    ctx, nil, writeCap, nil, nil,
+    envDesc, ciphertext, envHash,
+)
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+# Create the encrypted tombstone
+ciphertext, env_desc, env_hash = await thin_client.tombstone_box(geometry, write_cap, first_index)
+
+# Send the tombstone (can be cancelled with cancel_resending_encrypted_message(env_hash))
+await thin_client.start_resending_encrypted_message(
+    read_cap=None,
+    write_cap=write_cap,
+    next_message_index=None,
+    reply_index=None,
+    envelope_descriptor=env_desc,
+    message_ciphertext=ciphertext,
+    envelope_hash=env_hash
+)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+// Create the encrypted tombstone
+let (ciphertext, env_desc, env_hash) = thin_client
+    .tombstone_box(&geometry, &write_cap, &first_index).await?;
+
+// Send the tombstone (can be cancelled with cancel_resending_encrypted_message(&env_hash))
+thin_client.start_resending_encrypted_message(
+    None,
+    Some(&write_cap),
+    None,
+    0,
+    &env_desc,
+    &ciphertext,
+    &env_hash
+).await?;
+{{< /tab >}}
+{{< /tabpane >}}
 
 ## Tombstone Range
 
-Overwrite a range of boxes with zeros. A tombstone is a BACAP message with a payload composed of all zeros. Tombstones are used to delete messages.
+Create encrypted tombstones for a range of consecutive boxes. Returns a list of envelope data that the caller must send individually via `StartResendingEncryptedMessage`.
+
+This design allows the caller to control when tombstones are sent, send them in parallel, or cancel any in-flight tombstone using its envelope hash.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// Create tombstone envelopes for 10 boxes
+result, err := thinClient.TombstoneRange(ctx, geo, writeCap, firstIndex, 10)
+if err != nil {
+    return err
+}
+
+// Send each tombstone envelope
+for _, envelope := range result.Envelopes {
+    _, err = thinClient.StartResendingEncryptedMessage(
+        ctx, nil, writeCap, nil, nil,
+        envelope.EnvelopeDescriptor, envelope.MessageCiphertext, envelope.EnvelopeHash,
+    )
+    if err != nil {
+        return err
+    }
+}
+// result.Next contains the next index after the last tombstoned box
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+# Create tombstone envelopes for 10 boxes
+result = await thin_client.tombstone_range(geometry, write_cap, first_index, 10)
+
+# Send each tombstone envelope
+for envelope in result["envelopes"]:
+    await thin_client.start_resending_encrypted_message(
+        read_cap=None,
+        write_cap=write_cap,
+        next_message_index=None,
+        reply_index=None,
+        envelope_descriptor=envelope["envelope_descriptor"],
+        message_ciphertext=envelope["message_ciphertext"],
+        envelope_hash=envelope["envelope_hash"]
+    )
+# result["next"] contains the next index after the last tombstoned box
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+// Create tombstone envelopes for 10 boxes
+let result = thin_client.tombstone_range(&geometry, &write_cap, &first_index, 10).await;
+
+// Send each tombstone envelope
+for envelope in &result.envelopes {
+    thin_client.start_resending_encrypted_message(
+        None,
+        Some(&write_cap),
+        None,
+        0,
+        &envelope.envelope_descriptor,
+        &envelope.message_ciphertext,
+        &envelope.envelope_hash
+    ).await?;
+}
+// result.next contains the next index after the last tombstoned box
+{{< /tab >}}
+{{< /tabpane >}}
 
 
 <HR>
@@ -844,8 +1043,67 @@ if err != nil {
 {{< /tab >}}
 
 {{< tab header="Python" lang="python" >}}
+# Create destination channel
+dest_seed = os.urandom(32)
+dest_write_cap, bob_read_cap, dest_first_index = await thin_client.new_keypair(dest_seed)
+
+# Create temporary copy stream channel
+temp_seed = os.urandom(32)
+temp_write_cap, _, temp_first_index = await thin_client.new_keypair(temp_seed)
+
+# Create courier envelopes from payload
+stream_id = thin_client.new_stream_id()
+query_id = thin_client.new_query_id()
+chunks = await thin_client.create_courier_envelopes_from_payload(
+    query_id, stream_id, payload, dest_write_cap, dest_first_index, True  # is_last
+)
+
+# Write chunks to temporary channel
+temp_index = temp_first_index
+for chunk in chunks:
+    ciphertext, env_desc, env_hash = await thin_client.encrypt_write(
+        chunk, temp_write_cap, temp_index
+    )
+    await thin_client.start_resending_encrypted_message(
+        read_cap=None, write_cap=temp_write_cap, next_message_index=None,
+        reply_index=0, envelope_descriptor=env_desc,
+        message_ciphertext=ciphertext, envelope_hash=env_hash
+    )
+    temp_index = await thin_client.next_message_box_index(temp_index)
+
+# Send copy command
+await thin_client.start_resending_copy_command(temp_write_cap)
+# Share bob_read_cap with Bob
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
+// Create destination channel
+let dest_seed: [u8; 32] = rand::random();
+let (dest_write_cap, bob_read_cap, dest_first_index) = thin_client.new_keypair(&dest_seed).await?;
+
+// Create temporary copy stream channel
+let temp_seed: [u8; 32] = rand::random();
+let (temp_write_cap, _, temp_first_index) = thin_client.new_keypair(&temp_seed).await?;
+
+// Create courier envelopes from payload
+let stream_id = ThinClient::new_stream_id();
+let chunks = thin_client.create_courier_envelopes_from_payload(
+    &stream_id, &payload, &dest_write_cap, &dest_first_index, true
+).await?;
+
+// Write chunks to temporary channel
+let mut temp_index = temp_first_index;
+for chunk in chunks {
+    let (ciphertext, env_desc, env_hash) = thin_client
+        .encrypt_write(&chunk, &temp_write_cap, &temp_index).await?;
+    thin_client.start_resending_encrypted_message(
+        None, Some(&temp_write_cap), None, 0, &env_desc, &ciphertext, &env_hash
+    ).await?;
+    temp_index = thin_client.next_message_box_index(&temp_index).await?;
+}
+
+// Send copy command
+thin_client.start_resending_copy_command(&temp_write_cap, None, None).await?;
+// Share bob_read_cap with Bob
 {{< /tab >}}
 
 {{< /tabpane >}}
@@ -869,6 +1127,7 @@ and write the parsed envelopes to their destination channels. The courier:
   3. Parses boxes into CourierEnvelopes
   4. Sends each envelope to intermediate replicas for replication
   5. Writes tombstones to clean up the temporary channel
+  6. Sends an ACK to the client
 
 Parameters:
    - ctx: Context for cancellation and timeout control
@@ -899,13 +1158,17 @@ if err != nil {
 destWriteCap, _, destFirstIndex, err := thinClient.NewKeypair(ctx, destSeed)
 
 // Send Copy command to courier
-
-
+reply, err := thinClient.StartResendingCopyCommand(ctx, tempWriteCap)
 {{< /tab >}}
 
 {{< tab header="Python" lang="python" >}}
+# Send copy command - blocks until ACK or cancel
+await thin_client.start_resending_copy_command(temp_write_cap)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
+// Send copy command - blocks until ACK or cancel
+// Optional courier_identity_hash and courier_queue_id for specific routing
+thin_client.start_resending_copy_command(&temp_write_cap, None, None).await?;
 {{< /tab >}}
 
 {{< /tabpane >}}
@@ -913,8 +1176,26 @@ destWriteCap, _, destFirstIndex, err := thinClient.NewKeypair(ctx, destSeed)
 
 ## Cancel Resending Copy Command
 
-This method is meant to be called from a different thread in order to cancel a previous call to `StartResendingCopyCommand`.
+This method is meant to be called from a different thread in order to cancel a previous call to `Start Resending Copy Command`.
 It's field is mandatory and is the write cap hash of the temporary copy stream channel.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+err := thinclient.CancelResendingCopyCommand(ctx, tempWriteCapHash)
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+from hashlib import blake2b
+write_cap_hash = blake2b(temp_write_cap, digest_size=32).digest()
+await thin_client.cancel_resending_copy_command(write_cap_hash)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+use blake2::{Blake2b, Digest};
+let mut hasher = Blake2b::<U32>::new();
+hasher.update(&temp_write_cap);
+let write_cap_hash: [u8; 32] = hasher.finalize().into();
+thin_client.cancel_resending_copy_command(&write_cap_hash).await?;
+{{< /tab >}}
+{{< /tabpane >}}
 
 ## Create Courier Envelopes FromPayload
 
