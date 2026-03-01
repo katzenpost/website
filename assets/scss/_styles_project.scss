@@ -92,6 +92,16 @@
     }
 }
 
+/* Fix blog content being covered by fixed navbar */
+.td-blog {
+    padding-top: 120px !important;
+}
+
+/* Also apply to main content areas without sidebar */
+.td-main main:first-child {
+    padding-top: 20px;
+}
+
 .td-sidebar-link {
     &:hover {
         color: $primary !important;
