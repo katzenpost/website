@@ -301,62 +301,6 @@ receive:
   services.
 
 
-# Legacy API
-
-The legacy API implements a message oriented send and receive protocol
-that mixnet clients can use to interact with specific mixnet services
-that they choose to interact with. This inevitably creates a non-uniform
-packet distribution on the service nodes which a clever adversary could
-use to try and deanonymize clients. Therefore for that and many other reasons
-we are encouraging the use of the pigeonhole channel API instead.
-
-## Legacy Events
-
-These are the events that are specific to sending and
-receiving messages using the legacy API:
-
-* `message_sent_event`: This event tells your app that it's message was
-  successfully sent to a gateway node on the mix network.
-
-* `message_reply_event`: This event encapsulates a reply from a service on
-  the mixnet.
-
-* `arq_garbage_collected_event`: This event is an ARQ garbage collecton
-  event which is used to notify clients so that they can clean up
-  their ARQ specific book keeping, if any.
-
-## Sending a message
-
-Each send operation that a thin client can do requires you to specify
-the payload to be sent and the destination mix node identity hash and
-the destination recipient queue identity.
-
-The API by design lets you specify either a SURB ID or a message ID
-for the sent message depending on if it's using an ARQ to send
-reliably or not. This implies that the application using the thin
-client must do it's own book keeping to keep track of which replies
-and their associated identities.
-
-The simplest way to send a message is using the `SendMessage` method:
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-// Send a message
-err := thin.SendMessage(payload, &serviceIdHash, serviceQueueID)
-if err != nil {
-    panic(err)
-}
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-// Send a message
-thin_client.send_message(payload, dest_node, dest_queue).await?;
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-# Send a message
-thin_client.send_message(payload, dest_node, dest_queue)
-{{< /tab >}}
-{{< /tabpane >}}
-
 
 ## Pigeonhole Channel API
 
@@ -596,15 +540,194 @@ async def tombstone_range(
 <BR>
 
 Most of the methods in the new Pigeonhole API do NOT cause any network traffic.
-The only methods that cause network traffic are these four:
+The only methods that cause network traffic and cause the client daemon to keep state are these two:
 
 * Start Resending Encrypted Message
 * Start Resending Copy Command
+
+Also note that this method is the only one that can cause the client daemon to keep state between calls:
+
+* Create Courier Envelopes From Payloads
+
+Therefore most of the API methods are very fast and do not require any network traffic
+or for the client daemon to keep state. They are cryptographic operations that are performed
+locally by the client daemon:
+
+* New Keypair
+* Encrypt Read
+* Encrypt Write
+* Next Message Box Index
 * Tombstone Box
 * Tombstone Range
 
 <HR>
 <BR>
+
+## Example Usage
+
+The following example shows how Alice can send a message to Bob using Pigeonhole channels.
+Alice shares the `read_cap` and `index` with Bob out-of-band via a secure channel.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// ==================== ALICE'S SIDE (Sender) ====================
+
+// SendMessage encrypts and sends a message to a Pigeonhole channel.
+// The writeCap and index should be created beforehand via NewKeypair.
+func SendMessage(ctx context.Context, client *ThinClient,
+    message []byte, writeCap *bacap.WriteCap, index *bacap.MessageBoxIndex) error {
+
+    // Encrypt the message for writing
+    ciphertext, envDesc, envHash, err := client.EncryptWrite(ctx, message, writeCap, index)
+    if err != nil {
+        return err
+    }
+
+    // Send the encrypted message via ARQ (automatic retransmission)
+    _, err = client.StartResendingEncryptedMessage(
+        ctx, nil, writeCap, nil, 0, envDesc, ciphertext, envHash)
+    return err
+}
+
+// ==================== BOB'S SIDE (Receiver) ====================
+
+// ReceiveMessage retrieves and decrypts a message from a Pigeonhole channel.
+// The readCap and index should be shared by Alice out-of-band.
+func ReceiveMessage(ctx context.Context, client *ThinClient,
+    readCap *bacap.ReadCap, index *bacap.MessageBoxIndex) ([]byte, error) {
+
+    // Encrypt a read request for the given index
+    ciphertext, nextIndex, envDesc, envHash, err := client.EncryptRead(ctx, readCap, index)
+    if err != nil {
+        return nil, err
+    }
+
+    // Retrieve the message via ARQ
+    plaintext, err := client.StartResendingEncryptedMessage(
+        ctx, readCap, nil, nextIndex, 0, envDesc, ciphertext, envHash)
+    if err != nil {
+        return nil, err
+    }
+
+    return plaintext, nil
+}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+# ==================== ALICE'S SIDE (Sender) ====================
+
+async def send_message(
+    client: ThinClient,
+    message: bytes,
+    write_cap: bytes,
+    index: bytes,
+) -> None:
+    """
+    Encrypts and sends a message to a Pigeonhole channel.
+    The write_cap and index should be created beforehand via new_keypair.
+    """
+    # Encrypt the message for writing
+    ciphertext, env_desc, env_hash = await client.encrypt_write(
+        message, write_cap, index
+    )
+
+    # Send the encrypted message via ARQ (automatic retransmission)
+    await client.start_resending_encrypted_message(
+        read_cap=None,
+        write_cap=write_cap,
+        next_message_index=None,
+        reply_index=0,
+        envelope_descriptor=env_desc,
+        message_ciphertext=ciphertext,
+        envelope_hash=env_hash
+    )
+
+
+# ==================== BOB'S SIDE (Receiver) ====================
+
+async def receive_message(
+    client: ThinClient,
+    read_cap: bytes,
+    index: bytes,
+) -> bytes:
+    """
+    Retrieves and decrypts a message from a Pigeonhole channel.
+    The read_cap and index should be shared by Alice out-of-band.
+    """
+    # Encrypt a read request for the given index
+    ciphertext, next_index, env_desc, env_hash = await client.encrypt_read(
+        read_cap, index
+    )
+
+    # Retrieve the message via ARQ
+    plaintext = await client.start_resending_encrypted_message(
+        read_cap=read_cap,
+        write_cap=None,
+        next_message_index=next_index,
+        reply_index=0,
+        envelope_descriptor=env_desc,
+        message_ciphertext=ciphertext,
+        envelope_hash=env_hash
+    )
+
+    return plaintext
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+// ==================== ALICE'S SIDE (Sender) ====================
+
+/// Encrypts and sends a message to a Pigeonhole channel.
+/// The write_cap and index should be created beforehand via new_keypair.
+async fn send_message(
+    client: &ThinClient,
+    message: &[u8],
+    write_cap: &[u8],
+    index: &[u8],
+) -> Result<(), ThinClientError> {
+    // Encrypt the message for writing
+    let (ciphertext, env_desc, env_hash) = client
+        .encrypt_write(message, write_cap, index).await?;
+
+    // Send the encrypted message via ARQ (automatic retransmission)
+    client.start_resending_encrypted_message(
+        None,
+        Some(write_cap),
+        None,
+        0,
+        &env_desc,
+        &ciphertext,
+        &env_hash
+    ).await?;
+
+    Ok(())
+}
+
+// ==================== BOB'S SIDE (Receiver) ====================
+
+/// Retrieves and decrypts a message from a Pigeonhole channel.
+/// The read_cap and index should be shared by Alice out-of-band.
+async fn receive_message(
+    client: &ThinClient,
+    read_cap: &[u8],
+    index: &[u8],
+) -> Result<Vec<u8>, ThinClientError> {
+    // Encrypt a read request for the given index
+    let (ciphertext, next_index, env_desc, env_hash) = client
+        .encrypt_read(read_cap, index).await?;
+
+    // Retrieve the message via ARQ
+    let plaintext = client.start_resending_encrypted_message(
+        Some(read_cap),
+        None,
+        Some(&next_index),
+        0,
+        &env_desc,
+        &ciphertext,
+        &env_hash
+    ).await?;
+
+    Ok(plaintext)
+}
+{{< /tab >}}
+{{< /tabpane >}}
 
 ## New Key Pair
 
@@ -964,11 +1087,31 @@ Below we present several methods that are of use when sending copy commands:
 * CreateCourierEnvelopesFromPayload
 * CreateCourierEnvelopesFromPayloads
 
-The idea here is that you have some data that you want 
-to send to one or more channels. You create a temporary 
-channel and a series of Courier Envelopes that describe 
-how to write that data. Each of these envelopes could be 
+The idea here is that you have some data that you want
+to send to one or more channels. You create a temporary
+channel and a series of Courier Envelopes that describe
+how to write that data. Each of these envelopes could be
 writing to a new channel or the same channel.
+
+```
+  A BACAP Box payload is N bytes max.
+  A Courier Envelope (contains a full box payload + metadata).
+  Total envelope size > N bytes, so a single envelope cannot fit in one box.
+  Therefore, envelopes are serialized and split across multiple boxes
+  in the temporary copy stream:
+
+  TEMPORARY COPY STREAM BOXES (each holds N bytes):
+  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+  │    Box 0    │ │    Box 1    │ │    Box 2    │ │    Box 3    │ │    Box 4    │
+  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
+
+  SERIALIZED ENVELOPE DATA (envelope boundaries don't align with box boundaries):
+  ┌─────────────────────────┐┌────────────────────┐┌──────────────────────────┐
+  │       Envelope 1        ││     Envelope 2     ││       Envelope 3         │
+  └─────────────────────────┘└────────────────────┘└──────────────────────────┘
+  |         |         |         |         |         |
+       Box 0     Box 1     Box 2     Box 3     Box 4
+```
 
 When we are done writing these envelopes to our
 temporary channel, we send a copy command to a courier
@@ -1199,15 +1342,122 @@ thin_client.cancel_resending_copy_command(&write_cap_hash).await?;
 
 ## Create Courier Envelopes FromPayload
 
-This method is used to create courier envelopes from a payload of any size smaller than 10 megabytes. The payload is automatically chunked and each chunk is wrapped in a CourierEnvelope. Each returned chunk is a serialized CopyStreamElement ready to be written to a box.
+**WARNING:** This method if used repeatedly will cause data to be store inefficiently in the
+temporary copy stream channel due to the BACAP Box payload padding. Use `CreateCourierEnvelopesFromPayloads`
+instead for larger data transfers. Note that unlike `Create Courier Envelopes From Payloads`,
+this method does not cause the client daemon to keep state between calls.
+
+This method is used to create courier envelopes from a payload of any size smaller than 10 megabytes.
+The payload is automatically chunked and each chunk is wrapped in a CourierEnvelope. Each returned chunk
+is a serialized CopyStreamElement ready to be written to a box.
 
 ## New Stream ID
 
-Returns a new random stream ID. This is used to correlate multiple calls to `CreateCourierEnvelopesFromPayloads` that belong to the same copy stream.
+Returns a new random stream ID. This is used to correlate multiple calls to `CreateCourierEnvelopesFromPayloads`
+that belong to the same copy stream.
 
 ## Create Courier Envelopes From Payloads
 
-This method is used to create courier envelopes from multiple payloads going to different destination channels. This is more space-efficient than calling `CreateCourierEnvelopesFromPayload` multiple times because envelopes from different destinations are packed together in the copy stream without wasting space. The maximum size of a payload is 10 megabytes.
+**WARNING:** This method causes the client daemont to keep state between calls. If the client daemon
+crashes after calling the method with isLast set to false then data will be lost. The application will need to create
+a new stream and start over sending the data.
+
+This method is used to create courier envelopes from multiple payloads going to different destination channels.
+This is more space-efficient than calling `CreateCourierEnvelopesFromPayload` multiple times because envelopes
+from different destinations are packed together in the copy stream without wasting space. The maximum size of a
+payload in a single call is 10 megabytes.
+
+This method is meant to be called multiple times with the same stream ID and the very last call must set isLast to true.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+allChunks, err := thinClient.CreateCourierEnvelopesFromPayloads(
+    ctx, streamID, destinations, true, // isLast
+)
+if err != nil {
+    panic(err)
+}
+
+tempIndex := tempFirstIndex
+for _, chunk := range allChunks {
+    ciphertext, envDesc, envHash, err := thinClient.EncryptWrite(
+        ctx, chunk, tempWriteCap, tempIndex,
+    )
+    if err != nil {
+        panic(err)
+    }
+
+    _, err = thinClient.StartResendingEncryptedMessage(
+        ctx, nil, tempWriteCap, nil, 0, envDesc, ciphertext, envHash,
+    )
+    if err != nil {
+        panic(err)
+    }
+
+    tempIndex, err = thinClient.NextMessageBoxIndex(ctx, tempIndex)
+    if err != nil {
+        panic(err)
+    }
+}
+{{< /tab >}}
+
+{{< tab header="Python" lang="python" >}}
+all_chunks = await thin_client.create_courier_envelopes_from_payloads(
+    stream_id, destinations, is_last=True
+)
+
+temp_index = temp_first_index
+for chunk in all_chunks:
+    ciphertext, env_desc, env_hash = await thin_client.encrypt_write(
+        chunk, temp_write_cap, temp_index
+    )
+
+    await thin_client.start_resending_encrypted_message(
+        read_cap=None,
+        write_cap=temp_write_cap,
+        next_message_index=None,
+        reply_index=0,
+        envelope_descriptor=env_desc,
+        message_ciphertext=ciphertext,
+        envelope_hash=env_hash
+    )
+
+    temp_index = await thin_client.next_message_box_index(temp_index)
+{{< /tab >}}
+
+{{< tab header="Rust" lang="rust" >}}
+let all_chunks = thin_client.create_courier_envelopes_from_payloads(
+    &stream_id,
+    destinations,
+    true // is_last
+).await.expect("Failed to create courier envelopes from payloads");
+
+let mut temp_index = temp_first_index.clone();
+
+for (i, chunk) in all_chunks.iter().enumerate() {
+    let (ciphertext, env_desc, env_hash) = thin_client
+        .encrypt_write(chunk, &temp_write_cap, &temp_index).await
+        .expect("Failed to encrypt chunk");
+
+    let _ = thin_client.start_resending_encrypted_message(
+        None,
+        Some(&temp_write_cap),
+        None,
+        Some(0),
+        &env_desc,
+        &ciphertext,
+        &env_hash
+    ).await.expect("Failed to send chunk via ARQ");
+
+    temp_index = thin_client.next_message_box_index(&temp_index).await
+        .expect("Failed to get next index");
+}
+{{< /tab >}}
+{{< /tabpane >}}
+
+
+<HR>
+<BR>
 
 ## Experimental Nested Copy API
 
