@@ -371,7 +371,9 @@ func (t *ThinClient) NewStreamID() *[StreamIDLength]byte
 
 func (t *ThinClient) CreateCourierEnvelopesFromPayload(ctx context.Context, streamID *[StreamIDLength]byte, payload []byte, destWriteCap *bacap.WriteCap, destStartIndex *bacap.MessageBoxIndex, isLast bool) (envelopes [][]byte, err error)
 
-func (t *ThinClient) CreateCourierEnvelopesFromPayloads(ctx context.Context, streamID *[StreamIDLength]byte, destinations []DestinationPayload, isLast bool) (envelopes [][]byte, err error)
+func (t *ThinClient) CreateCourierEnvelopesFromMultiPayload(ctx context.Context, streamID *[StreamIDLength]byte, destinations []DestinationPayload, isLast bool) (envelopes [][]byte, err error)
+
+func (t *ThinClient) SetStreamBuffer(ctx context.Context, streamID *[StreamIDLength]byte, buffer []byte, isFirstChunk bool) error
 
 func (c *ThinClient) TombstoneBox(
 	ctx context.Context,
@@ -430,14 +432,24 @@ async def create_courier_envelopes_from_payload(
     dest_write_cap: bytes,
     dest_start_index: bytes,
     is_last: bool
-) -> "List[bytes]":
+) -> "CreateEnvelopesResult":
+# Returns CreateEnvelopesResult with envelopes and buffer_state for crash recovery
 
 async def create_courier_envelopes_from_payloads(
     self,
     stream_id: bytes,
     destinations: "List[Dict[str, Any]]",
     is_last: bool
-) -> "List[bytes]":
+) -> "CreateEnvelopesResult":
+# Returns CreateEnvelopesResult with envelopes and buffer_state for crash recovery
+
+async def set_stream_buffer(
+    self,
+    stream_id: bytes,
+    buffer: bytes,
+    is_first_chunk: bool
+) -> None:
+# Restore stream buffer state after crash recovery
 
 async def tombstone_box(
     self,
@@ -505,14 +517,23 @@ async def tombstone_range(
         dest_write_cap: &[u8],
         dest_start_index: &[u8],
         is_last: bool
-    ) -> Result<Vec<Vec<u8>>, ThinClientError>
+    ) -> Result<CreateEnvelopesResult, ThinClientError>
+    // CreateEnvelopesResult contains: envelopes: Vec<Vec<u8>>, buffer_state: StreamBufferState
+    // StreamBufferState contains: buffer: Vec<u8>, is_first_chunk: bool
 
-    pub async fn create_courier_envelopes_from_payloads(
+    pub async fn create_courier_envelopes_from_multi_payload(
         &self,
         stream_id: &[u8; 16],
         destinations: Vec<(&[u8], &[u8], &[u8])>,
         is_last: bool
-    ) -> Result<Vec<Vec<u8>>, ThinClientError>
+    ) -> Result<CreateEnvelopesResult, ThinClientError>
+
+    pub async fn set_stream_buffer(
+        &self,
+        stream_id: &[u8; 16],
+        buffer: Vec<u8>,
+        is_first_chunk: bool
+    ) -> Result<(), ThinClientError>
 
    pub fn new_stream_id() -> [u8; 16]
 
@@ -1085,7 +1106,8 @@ Below we present several methods that are of use when sending copy commands:
 * CancelResendingCopyCommand
 * NewStreamID
 * CreateCourierEnvelopesFromPayload
-* CreateCourierEnvelopesFromPayloads
+* CreateCourierEnvelopesFromMultiPayload
+* SetStreamBuffer
 
 The idea here is that you have some data that you want
 to send to one or more channels. You create a temporary
@@ -1123,7 +1145,7 @@ our temporary copy stream by using the `isFinal` boolean
 flag in the `Create Courier Envelopes From Payload` and `Create Courier Envelopes From Payloads` methods.
 This results in the last box in the stream having the `isFinal` flag set to true. This is how the courier knows that it has reached the end of the stream and that there are no more boxes to read.
 
-We use `Create Courier Envelopes From Payload` and `Create Courier Envelopes From Payloads` to create these envelopes.
+We use `Create Courier Envelopes From Payload` and `Create Courier Envelopes From Multi Payload` to create these envelopes.
 The returned values are properly sized chunks that fit perfectly into a BACAP box. This means that our next step is to encrypt each of them with `Encrypt Write`
 and then send the resulting ciphertext to a courier using `Start Resending Encrypted Message`.
 
@@ -1353,14 +1375,12 @@ is a serialized CopyStreamElement ready to be written to a box.
 
 ## New Stream ID
 
-Returns a new random stream ID. This is used to correlate multiple calls to `CreateCourierEnvelopesFromPayloads`
+Returns a new random stream ID. This is used to correlate multiple calls to `CreateCourierEnvelopesFromMultiPayload`
 that belong to the same copy stream.
 
-## Create Courier Envelopes From Payloads
+## Create Courier Envelopes From Multi Payload
 
-**WARNING:** This method causes the client daemont to keep state between calls. If the client daemon
-crashes after calling the method with isLast set to false then data will be lost. The application will need to create
-a new stream and start over sending the data.
+**NOTE:** This method keeps state in the daemon between calls. Each reply includes the current buffer state (`buffer` and `is_first_chunk`) which the application can persist for crash recovery. Use `SetStreamBuffer` to restore state after a crash or restart.
 
 This method is used to create courier envelopes from multiple payloads going to different destination channels.
 This is more space-efficient than calling `CreateCourierEnvelopesFromPayload` multiple times because envelopes
@@ -1371,7 +1391,7 @@ This method is meant to be called multiple times with the same stream ID and the
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-allChunks, err := thinClient.CreateCourierEnvelopesFromPayloads(
+allChunks, err := thinClient.CreateCourierEnvelopesFromMultiPayload(
     ctx, streamID, destinations, true, // isLast
 )
 if err != nil {
@@ -1402,12 +1422,13 @@ for _, chunk := range allChunks {
 {{< /tab >}}
 
 {{< tab header="Python" lang="python" >}}
-all_chunks = await thin_client.create_courier_envelopes_from_payloads(
+result = await thin_client.create_courier_envelopes_from_payloads(
     stream_id, destinations, is_last=True
 )
+# Persist result.buffer_state for crash recovery if needed
 
 temp_index = temp_first_index
-for chunk in all_chunks:
+for chunk in result.envelopes:
     ciphertext, env_desc, env_hash = await thin_client.encrypt_write(
         chunk, temp_write_cap, temp_index
     )
@@ -1426,15 +1447,16 @@ for chunk in all_chunks:
 {{< /tab >}}
 
 {{< tab header="Rust" lang="rust" >}}
-let all_chunks = thin_client.create_courier_envelopes_from_payloads(
+let result = thin_client.create_courier_envelopes_from_multi_payload(
     &stream_id,
     destinations,
     true // is_last
-).await.expect("Failed to create courier envelopes from payloads");
+).await.expect("Failed to create courier envelopes from multi payload");
+// Persist result.buffer_state for crash recovery if needed
 
 let mut temp_index = temp_first_index.clone();
 
-for (i, chunk) in all_chunks.iter().enumerate() {
+for chunk in &result.envelopes {
     let (ciphertext, env_desc, env_hash) = thin_client
         .encrypt_write(chunk, &temp_write_cap, &temp_index).await
         .expect("Failed to encrypt chunk");
@@ -1455,6 +1477,56 @@ for (i, chunk) in all_chunks.iter().enumerate() {
 {{< /tab >}}
 {{< /tabpane >}}
 
+
+## Set Stream Buffer (Crash Recovery)
+
+The `SetStreamBuffer` method allows applications to restore a copy stream's encoder state after a crash or restart. Only `CreateCourierEnvelopesFromMultiPayload` keeps state in the daemon between calls, and each reply includes the current buffer state that can be persisted and later restored using `SetStreamBuffer`.
+
+**Crash Recovery Workflow:**
+1. Call `create_courier_envelopes_from_multi_payload` with `is_last=false`
+2. Persist the returned `buffer` and `is_first_chunk` to disk along with the `stream_id`
+3. On crash/restart, call `set_stream_buffer` with the saved state
+4. Continue streaming from where you left off
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// After creating envelopes, the daemon internally tracks buffer state
+// Use SetStreamBuffer to restore after a crash:
+err := thinClient.SetStreamBuffer(ctx, streamID, savedBuffer, savedIsFirstChunk)
+if err != nil {
+    panic(err)
+}
+// Now continue streaming from where we left off
+{{< /tab >}}
+
+{{< tab header="Python" lang="python" >}}
+# Save state after each call to create_courier_envelopes_from_payloads
+result = await thin_client.create_courier_envelopes_from_payloads(
+    stream_id, destinations, is_last=False
+)
+# Persist buffer_state to disk
+save_to_disk(stream_id, result.buffer_state.buffer, result.buffer_state.is_first_chunk)
+
+# On restart, restore state:
+buffer, is_first_chunk = load_from_disk(stream_id)
+await thin_client.set_stream_buffer(stream_id, buffer, is_first_chunk)
+# Continue streaming...
+{{< /tab >}}
+
+{{< tab header="Rust" lang="rust" >}}
+// Save state after each call to create_courier_envelopes_from_multi_payload
+let result = thin_client.create_courier_envelopes_from_multi_payload(
+    &stream_id, destinations, false
+).await?;
+// Persist buffer_state to disk
+save_to_disk(&stream_id, &result.buffer_state.buffer, result.buffer_state.is_first_chunk);
+
+// On restart, restore state:
+let (buffer, is_first_chunk) = load_from_disk(&stream_id)?;
+thin_client.set_stream_buffer(&stream_id, buffer, is_first_chunk).await?;
+// Continue streaming...
+{{< /tab >}}
+{{< /tabpane >}}
 
 <HR>
 <BR>
