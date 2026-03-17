@@ -88,6 +88,23 @@ The Python thin client is ideal for rapid prototyping and integration with exist
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Legacy Events](#legacy-events) | Events specific to the legacy message API |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Sending a message](#sending-a-message) | How to send messages using the legacy API |
 | **🔸 [Pigeonhole Channel API](#pigeonhole-channel-api)** | **Reliable, ordered, persistent, replicated communication channels** |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Example Usage](#example-usage) | End-to-end example of sending and receiving with Pigeonhole |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [New Key Pair](#new-key-pair) | Generating a BACAP keypair (writecap, readcap, first index) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Next Message Box Index](#next-message-box-index) | Deriving the next index in a channel sequence |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Encrypt Read](#encrypt-read) | Preparing an encrypted read request for a box |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Encrypt Write](#encrypt-write) | Preparing an encrypted write request for a box |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Start Resending Encrypted Message](#start-resending-encrypted-message) | Sending a read or write via ARQ until acknowledged |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Cancel Resending Encrypted Message](#cancel-resending-encrypted-message) | Cancelling an in-flight ARQ operation |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Tombstone Box](#tombstone-box) | Creating a tombstone to delete a single box |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Tombstone Range](#tombstone-range) | Creating tombstones for a range of consecutive boxes |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Copy Command Section](#copy-command-section) | Atomically writing to one or more channels via a courier |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ [Start Resending Copy Command](#start-resending-copy-command) | Sending a copy command via ARQ until acknowledged |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ [Cancel Resending Copy Command](#cancel-resending-copy-command) | Cancelling an in-flight copy command |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ [New Stream ID](#new-stream-id) | Generating a stream ID for a copy stream |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ [Create Courier Envelopes From Payload](#create-courier-envelopes-frompayload) | Building copy stream envelopes from a single payload |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ [Create Courier Envelopes From Multi Payload](#create-courier-envelopes-from-multi-payload) | Building copy stream envelopes from multiple payloads |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ [Set Stream Buffer](#set-stream-buffer-crash-recovery) | Restoring copy stream encoder state after a crash |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Experimental Nested Copy API](#experimental-nested-copy-api) | Recursive copy commands routed through multiple couriers |
 
 
 ## Core functionality
@@ -342,19 +359,49 @@ Our new Pigeonhole API consists of these methods:
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
 
-func (t *ThinClient) NewKeypair(ctx context.Context, seed []byte)
-    (writeCap *bacap.WriteCap,
-    readCap *bacap.ReadCap,
-    firstMessageIndex *bacap.MessageBoxIndex,
-    err error)
+func (t *ThinClient) NewKeypair(
+	ctx context.Context,
+	seed []byte,
+) (writeCap *bacap.WriteCap,
+	readCap *bacap.ReadCap,
+	firstMessageIndex *bacap.MessageBoxIndex,
+	err error)
 
-func (t *ThinClient) EncryptRead(ctx context.Context, readCap *bacap.ReadCap, messageBoxIndex *bacap.MessageBoxIndex) (messageCiphertext []byte, nextMessageIndex []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, err error)
+func (t *ThinClient) EncryptRead(
+	ctx context.Context,
+	readCap *bacap.ReadCap,
+	messageBoxIndex *bacap.MessageBoxIndex,
+) (messageCiphertext []byte,
+	nextMessageIndex []byte,
+	envelopeDescriptor []byte,
+	envelopeHash *[32]byte,
+	err error)
 
-func (t *ThinClient) EncryptWrite(ctx context.Context, plaintext []byte, writeCap *bacap.WriteCap, messageBoxIndex *bacap.MessageBoxIndex) (messageCiphertext []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, err error)
+func (t *ThinClient) EncryptWrite(
+	ctx context.Context,
+	plaintext []byte,
+	writeCap *bacap.WriteCap,
+	messageBoxIndex *bacap.MessageBoxIndex,
+) (messageCiphertext []byte,
+	envelopeDescriptor []byte,
+	envelopeHash *[32]byte,
+	err error)
 
-func (t *ThinClient) StartResendingEncryptedMessage(ctx context.Context, readCap *bacap.ReadCap, writeCap *bacap.WriteCap, nextMessageIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) (plaintext []byte, err error)
+func (t *ThinClient) StartResendingEncryptedMessage(
+	ctx context.Context,
+	readCap *bacap.ReadCap,
+	writeCap *bacap.WriteCap,
+	nextMessageIndex []byte,
+	replyIndex *uint8,
+	envelopeDescriptor []byte,
+	messageCiphertext []byte,
+	envelopeHash *[32]byte,
+) (plaintext []byte, err error)
 
-func (t *ThinClient) CancelResendingEncryptedMessage(ctx context.Context, envelopeHash *[32]byte) error
+func (t *ThinClient) CancelResendingEncryptedMessage(
+	ctx context.Context,
+	envelopeHash *[32]byte,
+) error
 
 func (t *ThinClient) StartResendingCopyCommandWithCourier(
 	ctx context.Context,
@@ -363,28 +410,49 @@ func (t *ThinClient) StartResendingCopyCommandWithCourier(
 	courierQueueID []byte,
 ) error
 
-func (t *ThinClient) CancelResendingCopyCommand(ctx context.Context, writeCapHash *[32]byte) error
+func (t *ThinClient) CancelResendingCopyCommand(
+	ctx context.Context,
+	writeCapHash *[32]byte,
+) error
 
-func (t *ThinClient) NextMessageBoxIndex(ctx context.Context, messageBoxIndex *bacap.MessageBoxIndex) (nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
+func (t *ThinClient) NextMessageBoxIndex(
+	ctx context.Context,
+	messageBoxIndex *bacap.MessageBoxIndex,
+) (nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
 
 func (t *ThinClient) NewStreamID() *[StreamIDLength]byte
 
-func (t *ThinClient) CreateCourierEnvelopesFromPayload(ctx context.Context, streamID *[StreamIDLength]byte, payload []byte, destWriteCap *bacap.WriteCap, destStartIndex *bacap.MessageBoxIndex, isLast bool) (envelopes [][]byte, err error)
+func (t *ThinClient) CreateCourierEnvelopesFromPayload(
+	ctx context.Context,
+	streamID *[StreamIDLength]byte,
+	payload []byte,
+	destWriteCap *bacap.WriteCap,
+	destStartIndex *bacap.MessageBoxIndex,
+	isLast bool,
+) (envelopes [][]byte, err error)
 
-func (t *ThinClient) CreateCourierEnvelopesFromMultiPayload(ctx context.Context, streamID *[StreamIDLength]byte, destinations []DestinationPayload, isLast bool) (envelopes [][]byte, err error)
+func (t *ThinClient) CreateCourierEnvelopesFromMultiPayload(
+	ctx context.Context,
+	streamID *[StreamIDLength]byte,
+	destinations []DestinationPayload,
+	isLast bool,
+) (*CreateEnvelopesResult, error)
+// CreateEnvelopesResult contains Envelopes [][]byte and Buffer []byte
 
-func (t *ThinClient) SetStreamBuffer(ctx context.Context, streamID *[StreamIDLength]byte, buffer []byte, isFirstChunk bool) error
+func (t *ThinClient) SetStreamBuffer(
+	ctx context.Context,
+	streamID *[StreamIDLength]byte,
+	buffer []byte,
+) error
 
 func (c *ThinClient) TombstoneBox(
 	ctx context.Context,
-	g *phgeo.Geometry,
 	writeCap *bacap.WriteCap,
 	boxIndex *bacap.MessageBoxIndex,
 ) (messageCiphertext []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, err error)
 
 func (c *ThinClient) TombstoneRange(
 	ctx context.Context,
-	g *phgeo.Geometry,
 	writeCap *bacap.WriteCap,
 	start *bacap.MessageBoxIndex,
 	maxCount uint32,
@@ -396,9 +464,22 @@ func (c *ThinClient) TombstoneRange(
 {{< tab header="Python" lang="python" >}}
 async def new_keypair(self, seed: bytes) -> "Tuple[bytes, bytes, bytes]"
 
-async def encrypt_read(self, read_cap: bytes, message_box_index: bytes) -> "Tuple[bytes, bytes, bytes, bytes]"
+async def encrypt_read(
+    self,
+    read_cap: bytes,
+    message_box_index: bytes
+) -> EncryptReadResult
+# EncryptReadResult contains: message_ciphertext, next_message_index,
+#     envelope_descriptor, envelope_hash
 
-async def encrypt_write(self, plaintext: bytes, write_cap: bytes, message_box_index: bytes) -> "Tuple[bytes, bytes, bytes]"
+async def encrypt_write(
+    self,
+    plaintext: bytes,
+    write_cap: bytes,
+    message_box_index: bytes
+) -> EncryptWriteResult
+# EncryptWriteResult contains: message_ciphertext, envelope_descriptor,
+#     envelope_hash
 
 async def start_resending_encrypted_message(
     self,
@@ -433,27 +514,25 @@ async def create_courier_envelopes_from_payload(
     dest_start_index: bytes,
     is_last: bool
 ) -> "CreateEnvelopesResult":
-# Returns CreateEnvelopesResult with envelopes and buffer_state for crash recovery
+# Returns CreateEnvelopesResult with envelopes and buffer for crash recovery
 
-async def create_courier_envelopes_from_payloads(
+async def create_courier_envelopes_from_multi_payload(
     self,
     stream_id: bytes,
     destinations: "List[Dict[str, Any]]",
     is_last: bool
 ) -> "CreateEnvelopesResult":
-# Returns CreateEnvelopesResult with envelopes and buffer_state for crash recovery
+# Returns CreateEnvelopesResult with envelopes and buffer for crash recovery
 
 async def set_stream_buffer(
     self,
     stream_id: bytes,
-    buffer: bytes,
-    is_first_chunk: bool
+    buffer: bytes
 ) -> None:
 # Restore stream buffer state after crash recovery
 
 async def tombstone_box(
     self,
-    geometry: "PigeonholeGeometry",
     write_cap: bytes,
     box_index: bytes
 ) -> "Tuple[bytes, bytes, bytes]":
@@ -461,7 +540,6 @@ async def tombstone_box(
 
 async def tombstone_range(
     self,
-    geometry: "PigeonholeGeometry",
     write_cap: bytes,
     start: bytes,
     max_count: int
@@ -471,7 +549,10 @@ async def tombstone_range(
 {{< /tab >}}
 
 {{< tab header="Rust" lang="rust" >}}
-    pub async fn new_keypair(&self, seed: &[u8; 32]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), ThinClientError>
+    pub async fn new_keypair(
+        &self,
+        seed: &[u8; 32]
+    ) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), ThinClientError>
 
     pub async fn encrypt_read(
         &self,
@@ -491,15 +572,21 @@ async def tombstone_range(
         read_cap: Option<&[u8]>,
         write_cap: Option<&[u8]>,
         next_message_index: Option<&[u8]>,
-        reply_index: u8,
+        reply_index: Option<u8>,
         envelope_descriptor: &[u8],
         message_ciphertext: &[u8],
         envelope_hash: &[u8; 32]
     ) -> Result<Vec<u8>, ThinClientError>
 
-    pub async fn cancel_resending_encrypted_message(&self, envelope_hash: &[u8; 32]) -> Result<(), ThinClientError>
+    pub async fn cancel_resending_encrypted_message(
+        &self,
+        envelope_hash: &[u8; 32]
+    ) -> Result<(), ThinClientError>
 
-    pub async fn next_message_box_index(&self, message_box_index: &[u8]) -> Result<Vec<u8>, ThinClientError>
+    pub async fn next_message_box_index(
+        &self,
+        message_box_index: &[u8]
+    ) -> Result<Vec<u8>, ThinClientError>
 
     pub async fn start_resending_copy_command(
         &self,
@@ -508,7 +595,10 @@ async def tombstone_range(
         courier_queue_id: Option<&[u8]>
     ) -> Result<(), ThinClientError>
 
-    pub async fn cancel_resending_copy_command(&self, write_cap_hash: &[u8; 32]) -> Result<(), ThinClientError>
+    pub async fn cancel_resending_copy_command(
+        &self,
+        write_cap_hash: &[u8; 32]
+    ) -> Result<(), ThinClientError>
 
     pub async fn create_courier_envelopes_from_payload(
         &self,
@@ -518,8 +608,7 @@ async def tombstone_range(
         dest_start_index: &[u8],
         is_last: bool
     ) -> Result<CreateEnvelopesResult, ThinClientError>
-    // CreateEnvelopesResult contains: envelopes: Vec<Vec<u8>>, buffer_state: StreamBufferState
-    // StreamBufferState contains: buffer: Vec<u8>, is_first_chunk: bool
+    // CreateEnvelopesResult contains: envelopes: Vec<Vec<u8>>, buffer: Vec<u8>
 
     pub async fn create_courier_envelopes_from_multi_payload(
         &self,
@@ -531,15 +620,13 @@ async def tombstone_range(
     pub async fn set_stream_buffer(
         &self,
         stream_id: &[u8; 16],
-        buffer: Vec<u8>,
-        is_first_chunk: bool
+        buffer: Vec<u8>
     ) -> Result<(), ThinClientError>
 
    pub fn new_stream_id() -> [u8; 16]
 
    pub async fn tombstone_box(
         &self,
-        geometry: &PigeonholeGeometry,
         write_cap: &[u8],
         box_index: &[u8]
     ) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), ThinClientError>
@@ -547,7 +634,6 @@ async def tombstone_range(
 
     pub async fn tombstone_range(
         &self,
-        geometry: &PigeonholeGeometry,
         write_cap: &[u8],
         start: &[u8],
         max_count: u32
@@ -803,7 +889,9 @@ let next_index = thin_client.next_message_box_index(&first_index).await?;
 
 ## Encrypt Read
 
-This method returns an encrypted read request for a single Pigeonhoel/BACAP Box. This method does not cause any network traffic nor does it cause the client daemon to store any state. The encrypted read transaction blob returned must be sent to a courier using the `StartResendingEncryptedMessage` method.
+This method returns an encrypted read request for a single Pigeonhole/BACAP Box. This method does not cause any network traffic nor does it cause the client daemon to store any state. The encrypted read transaction blob returned must be sent to a courier using the `StartResendingEncryptedMessage` method.
+
+**Note:** The `next_message_index` (or `nextMessageIndex`) field returned by this method is misnamed — it is actually the *current* index, not the next one. This field will be removed from the API in a future release. To advance to the next index after a read, call `NextMessageBoxIndex` explicitly.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -843,7 +931,9 @@ let plaintext = thin_client.start_resending_encrypted_message(
 
 ## Encrypt Write
 
-This method returns an encrypted write request for a single Pigeonhoel/BACAP Box. This method does not cause any network traffic nor does it cause the client daemon to store any state. The encrypted write transaction blob returned must be sent to a courier using the `StartResendingEncryptedMessage` method.
+This method returns an encrypted write request for a single Pigeonhole/BACAP Box. This method does not cause any network traffic nor does it cause the client daemon to store any state. The encrypted write transaction blob returned must be sent to a courier using the `StartResendingEncryptedMessage` method.
+
+**Note:** After a successful write, call `NextMessageBoxIndex` to advance the index before writing the next message.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -896,6 +986,33 @@ the courier.
 
 This method is designed to block until an ACK is received
 from the courier or until `CancelResendingEncryptedMessage` is called.
+
+**Errors returned by this method:**
+
+*Read-only errors (when `read_cap` is set):*
+
+* `ErrMKEMDecryptionFailed` — MKEM envelope decryption failed with all replica keys. Indicates corruption or key mismatch.
+* `ErrBACAPDecryptionFailed` — BACAP payload decryption or signature verification failed. Indicates invalid credentials or corrupted data.
+* `ErrBoxIDNotFound` — The requested box does not exist on the replica. By default, the operation retries up to 10 times to handle replication lag before returning this error. Use `StartResendingEncryptedMessageNoRetry` to get an immediate error without retries.
+
+*Write-only errors (when `write_cap` is set):*
+
+* `ErrBoxAlreadyExists` — The box already contains data. By default this is treated as idempotent success. Use `StartResendingEncryptedMessageReturnBoxExists` if you need to distinguish a new write from a repeated one.
+* `ErrStorageFull` — The replica's storage capacity has been exceeded.
+
+*Errors that apply to both reads and writes:*
+
+* `ErrStartResendingCancelled` — The operation was cancelled via `CancelResendingEncryptedMessage`.
+* `ErrInvalidBoxID` — The box ID format is invalid or malformed.
+* `ErrInvalidSignature` — Signature verification failed during envelope processing.
+* `ErrDatabaseFailure` — The replica encountered a database error.
+* `ErrInvalidPayload` — The payload data is invalid.
+* `ErrReplicaInternalError` — An internal error occurred on the replica.
+* `ErrInvalidEpoch` — The epoch is invalid or has expired.
+* `ErrReplicationFailed` — Replication to other replicas failed.
+* `ErrInvalidEnvelope` — The courier envelope format is invalid.
+* `ErrPropagationError` — The request could not be propagated to replicas.
+* `ErrInternalError` — An internal client daemon error occurred.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -978,6 +1095,8 @@ thin_client.cancel_resending_encrypted_message(&env_hash).await?;
 Create an encrypted tombstone for a single box. A tombstone is a BACAP message with a payload composed of all zeros, used to delete messages.
 
 This method returns the encrypted envelope data without sending it. The caller must send the tombstone via `StartResendingEncryptedMessage`, which allows for cancellation using the returned envelope hash.
+
+**Note:** After tombstoning a box, call `NextMessageBoxIndex` to advance the index before tombstoning the next box. If you need to tombstone a consecutive range of boxes, use `TombstoneRange` instead, which handles index advancement internally.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
