@@ -14,14 +14,28 @@ draft: false
 
 # Prerequisites
 
-This design specification is dependent on the BACAP system, Blinded and Capability system
-which is detailed in Section 4 of our paper: https://arxiv.org/abs/2501.02933
+This design specification is dependent on the BACAP and Pigeonhole protocol designs from our paper:<BR>
+`Echomix: a Strong Anonymity System with Messaging`
+https://arxiv.org/abs/2501.02933
 
-The source code to BACAP is found here: https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go
-The API docs for BACAP is found here: https://pkg.go.dev/github.com/katzenpost/hpqc@v0.0.55/bacap
+* The BACAP system, Blinded and Capability system is detailed in Section 4 of our paper 
+* The Pigeonhole protocol, is detailed in Section 5 of our paper
+
+
+The source code to BACAP is found here: https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go <BR>
+The API docs for BACAP is found here: https://pkg.go.dev/github.com/katzenpost/hpqc/bacap
 
 
 # Introduction
+
+Pigeonhole protocol establishes anonymous cryptographic communication channels
+which have a read capability (readcap) and a write capability (writecap). Therefore
+if for example Alice and Bob want to communicate they can each create their own
+Pigeonhole/BACAP channels and exchange readcaps. Bob writes to his own channel
+and Alice can now read those messages since she has the readcap. Likewise Alice
+writes to her own channel and Bob can read those message since he has the readcap.
+This is the most basic construction using BACAP and Pigeonhole protocol.
+Here we extend this design to work in the group chat context.
 
 This is a minimum design we need to make a working group chat
 protocol, without key rotation.
@@ -37,10 +51,10 @@ The group chat is completely decentralized. Each member must keep track of
 every other member:
 
 Group State:
-    * "MembershipCaps": For each member:
-        * BACAP read caps
-        * nick name
-    * MembershipHash (hash of "MembershipCaps")
+* "MembershipCaps": For each member:
+  * BACAP read caps
+  * nick name
+* MembershipHash (hash of "MembershipCaps")
 
 
 # Group Chat Message Types
