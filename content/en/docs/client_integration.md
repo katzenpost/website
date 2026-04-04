@@ -1043,8 +1043,13 @@ so using a basic ARQ - automatic repeat request - protocol
 which sends retransmissions if it doesn't get an ACK from
 the courier.
 
-This method is designed to block until an ACK is received
-from the courier or until `CancelResendingEncryptedMessage` is called.
+The number of mixnet round-trips depends on the operation type:
+
+* **Default writes** (`write_cap` set, `no_idempotent_box_already_exists` false): Returns success after a single round-trip. The courier ACK confirms the envelope was received and will be dispatched to both shard replicas.
+* **BoxAlreadyExists-aware writes** (`no_idempotent_box_already_exists` true): Requires two round-trips — one for the courier ACK, and a second to retrieve the replica's error code (e.g. `BoxAlreadyExists`).
+* **Reads** (`read_cap` set): Requires two round-trips — one for the courier ACK, and a second to retrieve the decrypted payload from the replica.
+
+This method blocks until the operation completes or until `CancelResendingEncryptedMessage` is called.
 
 **Errors returned by this method:**
 
