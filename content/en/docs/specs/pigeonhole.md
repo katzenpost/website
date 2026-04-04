@@ -392,6 +392,32 @@ process.  The payloads encapsulated within the `EnvelopeData` fields
 of many of these `CopyStreamElement`s is itself a stream of data which
 contains 4 byte length prefixed `CourierEnvelope`s.
 
+A key property of this encoding is that envelope boundaries do not
+align with box boundaries. Each BACAP box payload has a maximum size
+of N bytes, but a serialized `CourierEnvelope` (which contains a full
+box payload plus metadata) exceeds N bytes. Therefore envelopes are
+serialized into a continuous byte stream and split across multiple
+boxes in the temporary copy stream:
+
+```
+TEMPORARY COPY STREAM BOXES (each holds N bytes):
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│    Box 0    │ │    Box 1    │ │    Box 2    │ │    Box 3    │ │    Box 4    │
+└─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
+
+SERIALIZED ENVELOPE DATA (envelope boundaries don't align with box boundaries):
+┌─────────────────────────┐┌────────────────────┐┌──────────────────────────┐
+│       Envelope 1        ││     Envelope 2     ││       Envelope 3         │
+└─────────────────────────┘└────────────────────┘└──────────────────────────┘
+|         |         |         |         |         |
+     Box 0     Box 1     Box 2     Box 3     Box 4
+```
+
+The courier reads the stream box by box, accumulating data until it
+can extract complete envelopes. The `isStart` and `isFinal` flags on
+the `CopyStreamElement` wrappers tell the courier where the stream
+begins and ends.
+
 Each embedded ```CourierEnvelope``` structs is processed as normal and results in a write transaction ciphertext being sent to the storage replicas.
 
 The courier does NOT need to keep track of the ```EnvelopeHash``` for each
