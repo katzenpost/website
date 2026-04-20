@@ -69,6 +69,51 @@ All code snippets are in Golang.
   opposed to addressing the final replicas directly, is to avoid
   revealing to the courier which shard the box falls into.
 
+# Deployment requirements
+
+## Minimum number of storage replicas
+
+A conforming deployment MUST run at least **four** storage replicas
+(n ≥ 4). The reason is the intermediate-replica unlinkability property
+described in the Glossary and in §5.4.1 of the paper: for each
+`CourierEnvelope`, the client picks two *intermediate* replicas which
+MUST be disjoint from the two *final* (sharded) replicas that hold
+the Box. Disjointness is what prevents the courier from learning
+which shard the Box falls into.
+
+* **n = 2**: there is only one possible shard set, and the
+  intermediate set is necessarily identical to it.
+* **n = 3**: only one replica sits outside any given two-shard set,
+  so the client cannot pick two independent non-shard intermediates.
+  Implementations in this case fall back to an intermediate set that
+  includes at least one shard replica, which tells the courier that
+  replica is one of the two shards for the Box.
+* **n ≥ 4**: at least two non-shard replicas exist, so the
+  intermediate set can be drawn uniformly at random from the
+  non-shard subset, and disjointness is preserved.
+
+## Information exposure when n < 4
+
+When the disjointness invariant is broken (n = 3), the courier
+learns that at least one of its two intermediate replicas is in the
+Box's shard set. This exposure is bounded:
+
+* The courier does NOT learn the Box ID. The Box ID lives inside the
+  MKEM-encrypted inner message addressed to the intermediate
+  replicas; only the replicas can decrypt it.
+* The courier does NOT learn the other shard member. Knowing one
+  element of the two-element shard set does not constrain the
+  identity of the other among the remaining replicas.
+* The courier does NOT gain a way to link Boxes in the same
+  sequence. BACAP's unlinkability of consecutive Box IDs (paper §4)
+  is a property of the capability-derivation scheme and is
+  independent of sharding.
+
+Consequently, the main unlinkability properties of Pigeonhole are
+not lost at n = 3, but the defense-in-depth margin provided by
+disjoint intermediate replicas is. Operators SHOULD treat n ≥ 4 as
+the minimum supported configuration.
+
 # BACAP message parameters
 
 BACAP messages in Katzenpost are defined as follows.
