@@ -114,6 +114,56 @@ not lost at n = 3, but the defense-in-depth margin provided by
 disjoint intermediate replicas is. Operators SHOULD treat n ≥ 4 as
 the minimum supported configuration.
 
+# Epochs
+
+Katzenpost has two distinct notions of "epoch" that operate on very
+different timescales, and Pigeonhole touches both:
+
+* **Mixnet epoch** (a.k.a. *normal epoch*, *PKI epoch*): the short
+  cadence on which the directory authorities publish a new PKI
+  document. The default is 20 minutes. Mix nodes, gateways, service
+  nodes, and clients all synchronise on this epoch. Mix-node Sphinx
+  replay keys rotate once per mixnet epoch.
+* **Pigeonhole storage-replica epoch**: the long cadence on which
+  each storage replica rotates its MKEM envelope keypair. The default
+  is one week. A replica publishes, in every mixnet-epoch PKI
+  descriptor, *two* envelope public keys: the current replica-epoch
+  key and the next replica-epoch key.
+
+## Epoch tolerance for CourierEnvelope
+
+A `CourierEnvelope` carries an `epoch` field that identifies the
+replica-epoch whose envelope key the client used to encrypt the MKEM
+ciphertext. Conforming couriers and storage replicas MUST accept
+`epoch ∈ {current − 1, current, current + 1}` where `current` is the
+courier's / replica's own view of the current replica-epoch.
+
+The `current − 1` tolerance handles the grace window immediately
+after a replica-epoch boundary, when a client with a slightly stale
+PKI view still encrypts to the previous envelope public key.
+Combined with `current`, this gives a **two replica-epoch data TTL**
+— roughly two weeks — because the future replica-epoch key is by
+definition a key that hasn't started being used yet, so `current`
+and `current − 1` are the epochs where actual data flows.
+
+The `current + 1` tolerance handles the same boundary seen from the
+other side: a client whose clock or PKI view is slightly *ahead* of
+the courier / replica.
+
+Envelopes outside this three-epoch window MUST be rejected, because
+by definition no replica still holds the matching decapsulation key:
+
+* Older than `current − 1`: the envelope public key has been pruned
+  from replicas (see the replica's envelope-key GC worker). The
+  replica cannot decrypt and the courier can fail fast rather than
+  forward a doomed request.
+* Newer than `current + 1`: no replica has generated that envelope
+  key yet (replicas generate `current` and `current + 1` only).
+
+Couriers SHOULD reject with a dedicated envelope-level error code
+(`EnvelopeErrorInvalidEpoch`) so clients can distinguish "stale
+encryption" from other courier-side rejections.
+
 # BACAP message parameters
 
 BACAP messages in Katzenpost are defined as follows.
