@@ -48,7 +48,10 @@ Messaging", chapter 4: https://arxiv.org/abs/2501.02933. For an
 understanding of how the core BACAP primitives are implemented,see
 https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go.
 
-All code snippets are in Golang.
+Message-layout snippets in this specification are given in the
+trunnel binary-format description language (matching
+`pigeonhole/pigeonhole_messages.trunnel`); code snippets showing
+in-memory courier or replica state are given in Go.
 
 # Glossary
 
@@ -68,6 +71,24 @@ All code snippets are in Golang.
   scheme. The reason Alice designates intermediate replicas, as
   opposed to addressing the final replicas directly, is to avoid
   revealing to the courier which shard the box falls into.
+
+* **Designated replica** (a.k.a. *final replica*, *shard replica*):
+  One of the two replicas selected deterministically for a given Box
+  ID by the `Shard2` consistent-hash algorithm. The intermediate
+  replicas replicate writes through to the designated replicas.
+
+* **EnvelopeHash**: `BLAKE2b-256(CourierEnvelope.sender_pubkey ||
+  CourierEnvelope.ciphertext)`. Used by the courier for deduplication
+  of retransmissions and for demultiplexing replica replies.
+
+* **MKEM**: Multi-recipient KEM addressed to the pair of intermediate
+  replicas. One MKEM ciphertext carries, for each recipient, a
+  separate DEK encapsulation (`Dek1`, `Dek2`); either recipient may
+  decapsulate and recover the padded `ReplicaInnerMessage`.
+
+* **Replica-epoch**: A one-week period, distinct from the 20-minute
+  mixnet PKI epoch, during which a given replica-side MKEM envelope
+  keypair is valid. See "Epochs" below.
 
 # Deployment requirements
 
@@ -164,245 +185,458 @@ Couriers SHOULD reject with a dedicated envelope-level error code
 (`EnvelopeErrorInvalidEpoch`) so clients can distinguish "stale
 encryption" from other courier-side rejections.
 
-# BACAP message parameters
+# Pigeonhole message format and constants
 
-BACAP messages in Katzenpost are defined as follows.
+The Pigeonhole message types are defined in trunnel at
+[`pigeonhole/pigeonhole_messages.trunnel`](https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/pigeonhole_messages.trunnel);
+the Go bindings live in
+[`pigeonhole/trunnel_messages.go`](https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/trunnel_messages.go).
+All integer fields are big-endian and all variable-length fields carry
+an explicit length prefix. This trunnel encoding replaces the earlier
+CBOR encoding with a fixed-overhead binary format whose serialised
+size can be computed deterministically from the Sphinx geometry.
+
+Carriage of these messages differs by hop:
+
+* **Client → Courier:** a `CourierQuery` (see below) is carried inside
+  a Sphinx packet payload. The reverse direction uses a SURB supplied
+  by the client.
+* **Courier → Replica and Replica → Replica:** the courier and
+  replicas do not use Sphinx packets between themselves. They communicate
+  over the Katzenpost wire protocol defined in `core/wire` and
+  `core/wire/commands`; the relevant commands are `ReplicaMessage`,
+  `ReplicaMessageReply`, `ReplicaWrite`, and `ReplicaWriteReply`. Some of
+  these commands embed trunnel-serialised pigeonhole blobs as their
+  payload.
+
+## Fundamental size constants
+
+| Constant | Value | Source |
+|---|---|---|
+| `BACAP_BOX_ID_SIZE` | 32 bytes | Ed25519 public key |
+| `BACAP_SIGNATURE_SIZE` | 64 bytes | Ed25519 signature |
+| `HASH_SIZE` | 32 bytes | BLAKE2b-256 |
+| `MKEM_DEK_SIZE` | 60 bytes | `mkem.DEKSize` |
+| CTIDH-1024 public key | 160 bytes | `hpqc/nike/ctidh/ctidh1024` |
+| X25519 public key | 32 bytes | `hpqc/nike/x25519` |
+| Hybrid CTIDH-1024 × X25519 NIKE public key | 192 bytes | sum of the above |
+| BACAP payload encryption overhead | 16 bytes | ChaCha20-Poly1305 AEAD |
+| MKEM encapsulation overhead | 28 bytes | ChaCha20-Poly1305 nonce (12) + tag (16) |
+
+## Maximum BACAP payload
+
+The maximum plaintext BACAP payload a single Box can carry is derived
+*backwards* from the Sphinx `UserForwardPayloadLength` by subtracting
+every layer of framing and cryptographic overhead that sits between the
+Sphinx payload and the BACAP plaintext. The authoritative calculation
+is performed by `NewGeometryFromSphinx` in
+[`pigeonhole/geo/geometry.go`](https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/geo/geometry.go).
+
+Informally:
 
 ```
-Max BACAP payload = SphinxGeometry's UserForwardPayloadLength - CBOR overhead
+MaxPlaintextPayloadLength
+  = UserForwardPayloadLength
+    − CourierQuery framing (1 byte: query_type discriminator)
+    − CourierEnvelope header (intermediate_replicas[2] + Dek1 + Dek2
+                              + reply_index + epoch + sender_pubkey_len
+                              + sender_pubkey + ciphertext_len)
+    − MKEM AEAD overhead (28 bytes)
+    − ReplicaInnerMessage framing (1 byte: message_type discriminator)
+    − ReplicaWrite header (box_id + signature + payload_len = 100 bytes)
+    − BACAP AEAD overhead (16 bytes)
+    − BACAP length prefix (4 bytes)
 ```
 
-```  
-BACAP_PAYLOAD_SIZE (c_i^{ctx}) = UserForwardPayloadLength – COURIER_ENVELOPE_SIZE
-```
-```
-COURIER_ENVELOPE_SIZE = 32 bytes + CTIDH1024PKSIZE + 2*(32+1) bytes + REPLICA_ENVELOPE_SIZE
-```
-```
-REPLICA_ENVELOPE_SIZE = 32 bytes + CTIDH1024PKSIZE + 32 bytes + BACAP PAYLOAD SIZE 32 + 64 bytes
-```
-```
-CTIDH1024PKSIZE = ??? is this just 128 bytes ???
-```
+With a hybrid CTIDH-1024 × X25519 NIKE the fixed per-packet overhead
+between `UserForwardPayloadLength` and the BACAP plaintext is on the
+order of 560 bytes; the exact figure depends on the configured NIKE
+scheme and should always be obtained from
+`geometry.NewGeometryFromSphinx()` rather than computed by hand.
 
-Courier envelopes (seen by courier, coming in via SPHINX) have the following structure:
+## The CourierEnvelope as seen by the courier
+
+The courier, upon unwrapping the Sphinx payload of a client's packet,
+sees a `CourierQuery` whose `content` is a `CourierEnvelope` with the
+following layout:
 
 ```
-1) Sender’s ephemeral hybrid public key:
-    a) x25519 public key: 32 bytes
-    b) CTIDH-1024 public key
-2) For each designated replica:
-    Envelope DEK encrypted with shared secret between sender private key 
-    and replica public key: 32 bytes
-3) Replica/shard id designating each replica to contact: 1 byte
-4) ReplicaEnvelope: 32 bytes + CTIDH1024PKSIZE + 32 bytes + BACAP PAYLOAD SIZE 32 + 64 bytes  
+struct courier_envelope {
+    u8  intermediate_replicas[2];          // replica indices in the PKI
+    u8  dek1[MKEM_DEK_SIZE];               // DEK encapsulation for replica 0
+    u8  dek2[MKEM_DEK_SIZE];               // DEK encapsulation for replica 1
+    u8  reply_index;                       // which replica's reply to prefer
+    u64 epoch;                             // replica-epoch under which the
+                                           //   MKEM ciphertext was produced
+    u16 sender_pubkey_len;
+    u8  sender_pubkey[sender_pubkey_len];  // client's ephemeral hybrid NIKE pk
+    u32 ciphertext_len;
+    u8  ciphertext[ciphertext_len];        // MKEM-encrypted ReplicaInnerMessage
+}
 ```
 
-Replica envelopes (seen by storage replicas) have the following structure:
+Notable points:
+
+* The `ciphertext` is opaque to the courier. It is an MKEM envelope
+  addressed to the *pair* of intermediate replicas; either replica can
+  decapsulate using its own DEK (`dek1` or `dek2` respectively).
+* The `epoch` field names the *replica-epoch* whose envelope keys were
+  used to produce the MKEM ciphertext. See "Epochs" below for the
+  tolerance window.
+* Prior to encryption, the inner `ReplicaInnerMessage` is zero-padded
+  to `ReplicaInnerMessageWriteSize()` so that reads, writes and
+  tombstones produce MKEM ciphertexts of identical length.
+
+## The ReplicaInnerMessage as seen by a replica
+
+Once an intermediate replica decrypts the MKEM envelope, it obtains a
+`ReplicaInnerMessage` — a discriminated union over `message_type`:
 
 ```
-1) Sender’s ephemeral public key
-    a) x25519 public key: 32 bytes
-    b) CTIDH-1024 public key
-2) 256-bit DEK encrypted to the replica’s public key: 32 bytes
-3) Enveloped message, encrypted with DEK, containing a BACAP message:
-    a) BACAP box ID (M ctx i ): 32 bytes
-    b) BACAP payload (c ctx i )
-    c) BACAP signature (s ctx i ): 64 bytes
+struct replica_inner_message {
+    u8 message_type IN [0, 1];    // 0 = read, 1 = write
+    union content[message_type] {
+        0: struct replica_read  read_msg;   // { box_id[32] }
+        1: struct replica_write write_msg;  // { box_id[32], signature[64],
+                                            //   payload_len[u32], payload[] }
+    };
+}
 ```
+
+A `ReplicaWrite` with `payload_len == 0` is a **tombstone**; see
+"Tombstones" below.
 
 
 # Message types and interactions
 
-**Overview**
+## Overview
 
-* For each message passed to a courier, clients ask for a reply from either replica  
-  number 1 or number 2.
-* The courier returns the corresponding reply if it has that reply. If it doesn't  
-  have the requested reply, but it does have the other reply, it sends the reply  
-  that it *does* have to the client. The courier indicates in either case which 
-  replica the reply came from.
-* If the client doesn’t receive any reply, it will eventually resend the request.
+* A client sends a `CourierQuery` inside a Sphinx packet payload.
+  The courier's reply travels back to the client by means of a SURB
+  the client also supplied.
+* A client always designates **two** intermediate replicas per
+  `CourierEnvelope`. The courier dispatches the corresponding pair of
+  `ReplicaMessage` wire commands, one to each intermediate, and
+  collects up to two `ReplicaMessageReply` results.
+* The `reply_index` field is a *preference* indicating which of the two
+  replica replies the client would like forwarded first. It is not a
+  strict selector: should the preferred slot still be empty when the
+  courier is ready to respond, the courier falls back to whichever
+  reply it does hold, and indicates in the `CourierEnvelopeReply` the
+  actual index that was served (see
+  [`courier/server/plugin.go`](https://github.com/katzenpost/katzenpost/blob/main/courier/server/plugin.go)).
+* Clients MUST resend identical `CourierEnvelope` bodies — same
+  `sender_pubkey` and `ciphertext` — until they receive a reply. The
+  courier deduplicates resends by `EnvelopeHash`. Only the Sphinx-layer
+  SURB is rotated between retransmissions.
 
-**CourierEnvelope**
+## CourierQuery
 
-Sent from a client to its courier when the client is trying to either read or write a single BACAP box.
-
-```CourierEnvelope``` specifies intermediate replica IDs and NOT the final
-destination replica IDs. Saving bandwidth, only one ```CourierEnvelope``` needs to be sent to the courier, which then writes to each of the specified IDs.  
+A `CourierQuery` is the top-level discriminated union that a client
+places into a Sphinx packet payload for the courier:
 
 ```
-type CourierEnvelope struct {
-
-    // Messages are initially sent to IntermediateReplicas, and eventually
-    // replicated to their locations. This hides the real locations from the
-    // courier.
-
-    IntermediateReplicas      [2]uint8
-
-    // DEK is used for each replica: ReplicaMessage.DEK
-
-    DEK           [2]*[32]byte
-
-    // Explanation of ReplyIndex:
-    //
-    // The client resends its messages to the courier until it receives
-    // a reply. The courier is responsible for NOT sending each of those resent
-    // messages to the replicas. It can use the EnvelopeHash to deduplicate them.
-    // When the client sends a CourierEnvelope for which the courier already has   
-    // multiple ReplicaMessageReply objects, the courier needs to respond 
-    // with exactly one of those. ReplyIndex lets the client choose which one.  
-    // Could also be a bool.
-
-    ReplyIndex uint8 
-
-    // The next two fields are hashed to form the EnvelopeHash that is 
-    // later used in ReplicaMessageReply:
-
-    // SenderEPubKey 
-    SenderEPubKey []byte   // x25519 + ctidh1024 NIKE key of the client
-
-    // Ciphertext is encrypted and MACed
-    Ciphertext    []byte // ReplicaMessage.Ciphertext
+struct courier_query {
+    u8 query_type IN [0, 1];
+    union content[query_type] {
+        0: struct courier_envelope envelope;      // read or write a single box
+        1: struct copy_command     copy_command;  // AllOrNothing copy
+    };
 }
 ```
 
-**ReplicaMessage**
-
-Sent over the wire protocol from a courier to the replicas, one replica at a time.
-
-The courier service transforms one ```CourierEnvelope``` into two
-```ReplicaMessage``` objects, one for each destination replica. The
-courier forwards those two ```ReplicaMessage``` objects to their
-respective replicas.
-
+The symmetric reply is a `CourierQueryReply`:
 
 ```
+struct courier_query_reply {
+    u8 reply_type IN [0, 1];
+    union content[reply_type] {
+        0: struct courier_envelope_reply envelope_reply;
+        1: struct copy_command_reply     copy_command_reply;
+    };
+}
+```
+
+## CourierEnvelope
+
+The `CourierEnvelope` layout was given in the preceding section. The
+client constructs one per read or write. The courier:
+
+1. Computes `EnvelopeHash = BLAKE2b-256(sender_pubkey || ciphertext)`.
+2. Verifies `epoch ∈ {current − 1, current, current + 1}` per the
+   replica-epoch tolerance window, rejecting with
+   `EnvelopeErrorInvalidEpoch` otherwise.
+3. Looks `EnvelopeHash` up in its dedup cache. If present, the courier
+   returns the cached reply (or an ACK if no reply has yet arrived)
+   without re-dispatching to replicas.
+4. On a cache miss, the courier constructs two `ReplicaMessage` wire
+   commands — one bound for `intermediate_replicas[0]` carrying
+   `dek1`, the other for `intermediate_replicas[1]` carrying `dek2`
+   — and forwards them over the wire protocol.
+5. The courier immediately sends an ACK reply to the client so it may
+   stop retransmitting.
+
+## ReplicaMessage (wire command)
+
+`ReplicaMessage` is *not* a trunnel pigeonhole type; it is the
+`core/wire/commands` command sent from a courier to a replica. Its
+payload fields are copied verbatim from the matching `CourierEnvelope`:
+
+```go
+// core/wire/commands
 type ReplicaMessage struct {
-    Cmds   *Commands
-    Geo    *geo.Geometry
-    Scheme nike.Scheme
-
-    SenderEPubKey []byte
-    DEK           *[32]byte // copied from CourierEnvelope.DEK by the courier
-    
-    // Ciphertext decrypts to a ReplicaWrite or a ReplicaRead
-    Ciphertext    []byte    // copied from CourierEnvelope.Ciphertext
+    SenderEPubKey []byte     // copied from CourierEnvelope.sender_pubkey
+    DEK           *[MKEM_DEK_SIZE]byte  // dek1 or dek2, depending on destination
+    Ciphertext    []byte     // copied from CourierEnvelope.ciphertext
 }
 ```
 
-**ReplicaMessageReply**
+The recipient replica decapsulates the MKEM envelope using the
+replica-epoch key that corresponds to `CourierEnvelope.epoch` (trying
+each of the three keys in its tolerance window), yielding a padded
+`ReplicaInnerMessage`. The replica then dispatches on `message_type`
+to `ReplicaRead` or `ReplicaWrite` handling.
 
-In response to a ```ReplicaMessage```, the courier expects an asynchronous ```ReplicaMessageReply``` from each replica.
+## ReplicaMessageReply (wire command)
 
-```
+In response to a `ReplicaMessage`, the courier expects an asynchronous
+`ReplicaMessageReply` wire command from the replica:
+
+```go
+// core/wire/commands
 type ReplicaMessageReply struct {
-    Cmds *Commands
-
-    ErrorCode     uint8
-    EnvelopeHash  *[32]byte
-    EnvelopeReply []byte    // TODO we haven't defined this
+    ErrorCode     uint8                 // see the replica error-code table below
+    EnvelopeHash  *[HASH_SIZE]byte      // lets the courier demultiplex the reply
+    EnvelopeReply []byte                // MKEM-encrypted ReplicaMessageReplyInnerMessage
 }
 ```
 
-**CourierBookKeeping**
+The `EnvelopeReply` byte blob is produced by the replica via the MKEM
+scheme's `EnvelopeReply()` method (see
+[`replica/handlers.go`](https://github.com/katzenpost/katzenpost/blob/main/replica/handlers.go)).
+It carries a `ReplicaMessageReplyInnerMessage` — a discriminated union
+over either a `ReplicaReadReply` or a `ReplicaWriteReply` — padded to
+`ReplicaReplyInnerMessageReadSize()` so that read replies and write
+replies are indistinguishable in size, and encrypted to the client's
+ephemeral NIKE public key under the replica's envelope keypair.
 
-The courier MUST keep track of each each ```ReplicaMessage``` and each ```EnvelopeHash``` (in ```ReplicaMessageReply```) that it sends to the replicas, AND it must link each of the hashes to a client SURB so that it can send a reply.
+## CourierBookKeeping
 
-For each EnvelopeHash, the courier keeps a map to ```CourierBookKeeping```:
+For each outstanding `EnvelopeHash`, the courier maintains an in-memory
+dedup entry. Its actual structure is:
 
-```
+```go
+// courier/server/plugin.go
 type CourierBookKeeping struct {
-    SURB [2]*[]byte // maybe we only need one
-
-    SURBTimestamps [2]*time.Time // when we received SURB[i], so we can delete it when it's too old
-
-    EnvelopeReplies [2]*ReplicaMessageReply // from replicas to courier, eventually sent to client
+    Epoch                uint64        // replica-epoch at cache insertion
+    CreatedAt            time.Time     // for TTL eviction (~5 minutes)
+    QueryType            uint8         // the query_type that produced this entry
+    IntermediateReplicas [2]uint8
+    EnvelopeReplies      [2]*commands.ReplicaMessageReply
 }
 ```
 
-**CourierEnvelopeReply**
+Note that the courier does **not** cache SURBs or SURB timestamps. A
+client's SURB is consumed by the Sphinx-layer plugin infrastructure at
+the moment the courier emits a reply and is not retained by the
+courier's Pigeonhole state. Should the client not receive that reply,
+it is expected to retransmit a fresh Sphinx packet carrying a fresh
+SURB but the identical `CourierEnvelope` body; the courier, recognising
+the `EnvelopeHash`, replies using the new SURB.
 
-Sent by the courier to the client.
+The dedup cache has a TTL of 5 minutes
+(`DedupCacheTTL` in `courier/server/plugin.go`).
+
+## CourierEnvelopeReply
+
+The courier's reply to a `CourierEnvelope` has the following trunnel
+layout:
 
 ```
-type CourierEnvelopeReply struct {
-    EnvelopeHash EnvelopeHash // the EnvelopeHash that this reply corresponds to
-
-    // ReplyIndex is a copy of the CourierEnvelope.ReplyIndex field from the
-    // CourierEnvelope that this CourierEnvelopeReply corresponds to
-
-    ReplyIndex uint8
-
-    Payload ReplicaMessageReply
+struct courier_envelope_reply {
+    u8  envelope_hash[HASH_SIZE];       // identifies the originating envelope
+    u8  reply_index;                    // which intermediate replica's reply
+                                        //   is being returned (may differ
+                                        //   from the client's requested index)
+    u8  reply_type IN [0, 1];           // 0 = ACK, 1 = PAYLOAD
+    u32 payload_len;
+    u8  payload[payload_len];           // the MKEM-encrypted EnvelopeReply,
+                                        //   present iff reply_type == PAYLOAD
+    u8  error_code;                     // see envelope error codes below
 }
 ```
 
-# Embedded message types
+A `reply_type` of `ACK` (0) indicates the courier has received the
+envelope and dispatched it to the replicas but has not yet received a
+reply for the requested index. A `reply_type` of `PAYLOAD` (1)
+indicates the `payload` field carries the MKEM-encrypted
+`EnvelopeReply` produced by a replica.
 
-These message types are not used directly on the wire protocol, but are embedded in other message types.
+# Embedded pigeonhole types
 
-**ReplicaRead** 
+These trunnel structs are not carried on the wire in isolation; they
+are embedded inside MKEM envelopes and their replies.
 
-Embedded inside ```ReplicaMessage```, which is sent by couriers to replicas.
+## ReplicaRead
+
+Embedded inside the MKEM-encrypted `ReplicaInnerMessage` a client
+sends to a replica (via the courier) for a read operation.
 
 ```
-type ReplicaRead struct {
-    Cmds *Commands
-
-    BoxID *[32]byte
+struct replica_read {
+    u8 box_id[BACAP_BOX_ID_SIZE];
 }
 ```
 
-**ReplicaReadReply**
+## ReplicaReadReply
 
-Embedded inside ```ReplicaMessageReply```, which is sent by replicas to couriers. ```ReplicaReadReply``` needs no padding because ```ReplicaMessageReply``` has padding.
+Embedded inside the MKEM-encrypted `ReplicaMessageReplyInnerMessage` a
+replica returns for a successful read. Padding is applied at the outer
+`ReplicaMessageReplyInnerMessage` level; this struct carries no
+padding of its own.
 
 ```
-type ReplicaReadReply
- struct {
-    Cmds *Commands
-    Geo  *geo.Geometry
-
-    ErrorCode uint8
-    BoxID     *[32]byte
-    Signature *[32]byte
-    Payload   []byte
+struct replica_read_reply {
+    u8  error_code;
+    u8  box_id[BACAP_BOX_ID_SIZE];
+    u8  signature[BACAP_SIGNATURE_SIZE];
+    u32 payload_len;
+    u8  payload[payload_len];
 }
 ```
 
-# Internal message types
+## ReplicaWrite
 
-
-These message types are only used for storage node replication between replicas.
-
-
-**ReplicaWrite**
-
-Can be used directly on the wire for replication between replicas, or embedded inside a ```ReplicaMessage``` object which is sent from a courier to a replica.
+Used both (a) embedded inside the MKEM-encrypted `ReplicaInnerMessage`
+for a client write, and (b) carried directly as a `core/wire/commands`
+command between replicas during replication.
 
 ```
-type ReplicaWrite struct {
-    Cmds *Commands
-
-    BoxID     *[32]byte
-    Signature *[32]byte
-    Payload   []byte
+struct replica_write {
+    u8  box_id[BACAP_BOX_ID_SIZE];
+    u8  signature[BACAP_SIGNATURE_SIZE];
+    u32 payload_len;
+    u8  payload[payload_len];
 }
 ```
 
-**ReplicaWriteReply**
+A `ReplicaWrite` with `payload_len == 0` is a **tombstone**. Replicas
+treat tombstone writes as overwrites: an existing `Box` at the same
+`box_id` is replaced by the tombstone, and subsequent reads return
+`ReplicaErrorTombstone`.
 
-Facilitates replication between replicas as the reply to the ```ReplicaWrite``` command. It can also be embedded in a ```ReplicaMessageReply``` object sent from a replica to courier.
+## ReplicaWriteReply
+
+Embedded inside a `ReplicaMessageReplyInnerMessage` on the client
+reply path, and also used as the `core/wire/commands` reply to
+inter-replica replication.
 
 ```
-type ReplicaWriteReply struct {
-    Cmds *Commands
-
-    ErrorCode uint8
+struct replica_write_reply {
+    u8 error_code;
 }
+```
+
+# EnvelopeHash
+
+The `EnvelopeHash` uniquely identifies a `CourierEnvelope` for the
+purposes of deduplication and reply demultiplexing. It is computed as:
 
 ```
+EnvelopeHash = BLAKE2b-256(sender_pubkey || ciphertext)
+```
+
+where `sender_pubkey` and `ciphertext` are the corresponding fields of
+the `CourierEnvelope`. The implementation is
+[`CourierEnvelope.EnvelopeHash()`](https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/helpers.go)
+in `pigeonhole/helpers.go`.
+
+A retransmitted `CourierEnvelope` carries the identical
+`sender_pubkey` and `ciphertext` as the original, and therefore hashes
+to the same value; only the surrounding Sphinx packet (and its SURB)
+changes between attempts.
+
+# Error codes
+
+All error codes are defined in
+[`pigeonhole/errors.go`](https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/errors.go).
+
+## Replica error codes
+
+Returned by a replica in `ReplicaMessageReply.ErrorCode`,
+`ReplicaReadReply.error_code`, and `ReplicaWriteReply.error_code`.
+
+| Code | Name | Meaning |
+|---|---|---|
+| 0 | `ReplicaSuccess` | Operation completed successfully |
+| 1 | `ReplicaErrorBoxIDNotFound` | Read miss (expected outcome) |
+| 2 | `ReplicaErrorInvalidBoxID` | Malformed box ID |
+| 3 | `ReplicaErrorInvalidSignature` | BACAP signature verification failed |
+| 4 | `ReplicaErrorDatabaseFailure` | Transient RocksDB error |
+| 5 | `ReplicaErrorInvalidPayload` | Malformed payload |
+| 6 | `ReplicaErrorStorageFull` | Storage capacity exceeded |
+| 7 | `ReplicaErrorInternalError` | Internal server error |
+| 8 | `ReplicaErrorInvalidEpoch` | Replica-epoch envelope key unavailable |
+| 9 | `ReplicaErrorReplicationFailed` | Replication to shard peer failed |
+| 10 | `ReplicaErrorBoxAlreadyExists` | Idempotent-write outcome (expected) |
+| 11 | `ReplicaErrorTombstone` | Read returned a tombstone (expected) |
+
+Codes 1, 10 and 11 are "expected outcomes" — they correspond to
+normal protocol states rather than faults. The thin-client helper
+`thin.IsExpectedOutcome(err)` treats these three codes as non-errors.
+
+## Courier envelope error codes
+
+Returned by the courier in `CourierEnvelopeReply.error_code`.
+
+| Code | Name | Meaning |
+|---|---|---|
+| 0 | `EnvelopeErrorSuccess` | Operation completed |
+| 1 | `EnvelopeErrorInvalidEnvelope` | Malformed envelope (e.g. `reply_index > 1`) |
+| 2 | `EnvelopeErrorCacheCorruption` | Internal cache inconsistency |
+| 3 | `EnvelopeErrorPropagationError` | Failed to dispatch to replicas |
+| 4 | `EnvelopeErrorInvalidEpoch` | `CourierEnvelope.epoch` outside tolerance window |
+
+## Copy command status codes
+
+Returned by the courier in `CopyCommandReply.status` (see below).
+
+| Code | Name | Meaning |
+|---|---|---|
+| 0 | `CopyStatusSucceeded` | All destination writes completed |
+| 1 | `CopyStatusInProgress` | Courier has accepted the command; processing continues |
+| 2 | `CopyStatusFailed` | Aborted; see `error_code` + `failed_envelope_index` |
+
+# Sharding and replica selection
+
+For each Box, two *designated* (final) replicas are derived
+deterministically from the Box ID using the `Shard2` consistent-hash
+algorithm (see
+[`replica/common/shard.go`](https://github.com/katzenpost/katzenpost/blob/main/replica/common/shard.go)):
+
+```
+for each online replica r with identity key k_r:
+    h_r = BLAKE2b-256(k_r || box_id)
+return the two replicas whose h_r are smallest
+```
+
+The two *intermediate* replicas chosen by the client for a given
+`CourierEnvelope` are drawn independently of the designated replicas,
+per `pigeonhole.GetRandomIntermediateReplicas`:
+
+* **n ≥ 4 replicas:** two intermediates are drawn uniformly at random
+  from the replicas that are **not** in the designated (shard) set —
+  preserving the disjointness invariant described in "Deployment
+  requirements" above.
+* **n = 3:** fallback — at least one intermediate must coincide with
+  a designated replica; this weakens the intermediate/final
+  disjointness guarantee but does not compromise Box unlinkability.
+* **n < 3:** rejected.
+
+Intermediate replicas, upon accepting a `ReplicaWrite`, compute the
+designated replicas themselves and forward the `ReplicaWrite` to them
+via the `core/wire/commands` `ReplicaWrite` command (see
+[`replica/connector.go`](https://github.com/katzenpost/katzenpost/blob/main/replica/connector.go)).
 
 # Protocol sequence visualizations
 
@@ -513,41 +747,89 @@ can extract complete envelopes. The `isStart` and `isFinal` flags on
 the `CopyStreamElement` wrappers tell the courier where the stream
 begins and ends.
 
-Each embedded ```CourierEnvelope``` structs is processed as normal and results in a write transaction ciphertext being sent to the storage replicas.
+Each embedded `CourierEnvelope` is processed as a normal write and
+results in a `ReplicaMessage` being dispatched to the intermediate
+replicas over the wire protocol.
 
-The courier does NOT need to keep track of the ```EnvelopeHash``` for each
-of the contained ```CourierEnvelope``` for the purpose of replying to the
-client (which is in this case the courier itself), but it does need to
-keep resending them to the replicas until the intermediate replicas
-have ACK'ed them.
+The courier does NOT need to keep track of the `EnvelopeHash` for each
+contained `CourierEnvelope` for the purpose of replying to the client
+(the "client" of these envelopes is, in this case, the courier
+itself), but it does need to keep resending them until the
+intermediate replicas have ACKed them.
 
-On the other hand, the courier MUST keep track of the hash of the ```CourierAllOrNothing``` message and MUST NOT process a stream more than once.
+The courier MUST keep track of the hash of the `CopyCommand` (computed
+as `BLAKE2b-256(write_cap)`) and MUST NOT process a given command more
+than once. This dedup cache has a TTL of 30 minutes
+(`CopyDedupCacheTTL` in `courier/server/plugin.go`).
 
+## CopyCommand
 
-**CourierAllOrNothing**
-
-**NOTE**: this is also known as "the Copy command", as it is in our paper and the implementation.
-
-Sent by the client to its courier. It MUST NOT be sent before the client has successfully uploaded each box in the stream to a courier.
+Sent by a client to its chosen courier after the client has
+successfully uploaded every Box of the temporary stream. The trunnel
+layout is:
 
 ```
-type CourierAllOrNothing struct {
-    Version uint8 // == 0, reserved for future extensions to this spec.
-    
-    StreamWriteCap *StreamWriteCap
+struct copy_command {
+    u32 write_cap_len;
+    u8  write_cap[write_cap_len];   // serialised BACAP BoxOwnerCap
 }
 ```
 
+On receipt, the courier:
 
-**CourierAllOrNothingACK**
+1. Computes `copyKey = BLAKE2b-256(write_cap)`.
+2. Consults its copy dedup cache. If an in-progress entry is found,
+   the courier responds immediately with `CopyStatusInProgress`. If a
+   completed entry within its TTL is found, the courier returns the
+   cached terminal reply.
+3. Otherwise, the courier reconstructs the BACAP `WriteCap` from the
+   bytes, derives the corresponding `ReadCap`, and reads the
+   temporary stream Box by Box, feeding the decrypted BACAP payloads
+   into a `CopyStreamEnvelopeDecoder`.
+4. Each complete `CourierEnvelope` emitted by the decoder is
+   dispatched to its two intermediate replicas; the courier waits for
+   acknowledgements with bounded retries and exponential backoff.
+5. Upon processing the Box bearing the `isFinal` flag (or upon an
+   unrecoverable failure), the courier attempts — on a best-effort
+   basis — to overwrite every Box of the temporary stream with a
+   tombstone.
 
-Sent from the courier to the client. It means, "STOP RESENDING THIS ```CourierAllOrNothing```".
+Replica error handling during a `CopyCommand` is classified as
+**temporary** or **permanent** by
+[`courier/server/copy_errors.go`](https://github.com/katzenpost/katzenpost/blob/main/courier/server/copy_errors.go):
+transient errors (storage full, database failure, internal error,
+replication failed, box-ID not found) trigger bounded retries against
+the same shard before failover; permanent errors (invalid box ID,
+invalid signature, invalid payload, invalid epoch, box already
+exists, tombstone) cause immediate failover or abort.
+
+## CopyCommandReply
+
+The courier's reply to a `CopyCommand` has the following trunnel
+layout:
 
 ```
-type CourierAllOrNothingACK struct {
-    HashOfCourierAllOrNothing []byte
+struct copy_command_reply {
+    u8  status;                   // CopyStatus{Succeeded, InProgress, Failed}
+    u8  error_code;               // replica error code (meaningful iff status == Failed)
+    u64 failed_envelope_index;    // 1-based sequential position in the
+                                  //   CourierEnvelope stream at which processing
+                                  //   stopped (meaningful iff status == Failed)
 }
 ```
+
+The status codes are enumerated in "Copy command status codes"
+above. `failed_envelope_index` counts *envelopes* within the stream,
+not boxes: the first envelope in the first box of the temporary stream
+is index 1.
+
+A client receiving `CopyStatusInProgress` should continue polling —
+i.e. resend the same `CopyCommand` via a fresh SURB after a short
+interval (`CopyPollInterval`, currently 5 seconds) — until it receives
+either `CopyStatusSucceeded` or `CopyStatusFailed`. Because the
+courier's copy dedup cache keys on `BLAKE2b-256(write_cap)`, these
+repeated polls will not cause the `CopyCommand` to be processed more
+than once.
 
 ## Potential use cases of AllOrNothing
 
@@ -675,24 +957,39 @@ Bob now wants to check if Alice has written a message at box 12345
    for Bob's ```ReplicaMessage.EPubKey``` and puts it in its outgoing queue for the 
    Courier.
 
-9. The Courier receives two ```ReplicaMessageReply```.
-   
-   9.1. It matches ```ReplicaMessageReply.EnvelopeHash``` to its recorded state 
-   (step 2.1).
+9. The Courier receives two `ReplicaMessageReply` wire commands from
+   the two intermediate replicas.
 
-   9.2. If it has a SURB on file for Bob, it forwards a ```ReplicaMessageReply```   
-   to Alice.
+   9.1. It matches `ReplicaMessageReply.EnvelopeHash` to its recorded
+   bookkeeping state (step 2.1).
 
-   9.3. Either way it stores the ```ReplicaMessageReply``` "for a while".
+   9.2. It wraps the replica's `EnvelopeReply` blob (the MKEM-encrypted
+   `ReplicaMessageReplyInnerMessage`) into a `CourierEnvelopeReply`
+   with `reply_type = PAYLOAD`, and — if Bob's latest retransmission
+   arrived with a fresh Sphinx SURB — forwards the resulting
+   `CourierQueryReply` back through the mixnet to Bob.
+
+   9.3. Either way the courier retains the `ReplicaMessageReply` in
+   its dedup cache for the cache TTL (5 minutes), so that a
+   subsequently-arriving retransmission of the same envelope can be
+   served from cache without re-dispatching to replicas.
 
 
-10. Bob keeps resending his ```CourierEnvelope``` from step 5 until he receives a ```ReplicaMessageReply```.
-      
-    10.1. Bob decrypts it with the private key corresponding to his
-    ```CourierEnvelope.EpubKey```
+10. Bob keeps resending his `CourierEnvelope` from step 5 until he
+    receives a `CourierEnvelopeReply` with `reply_type = PAYLOAD`.
 
-    10.2. It's either a ```ReplicaWrite``` / BACAP tuple, or a NACK. If it's a 
-    NACK, GOTO step 10.
+    10.1. Bob decapsulates the MKEM `EnvelopeReply` with the private
+    key corresponding to the `sender_pubkey` he put in his
+    `CourierEnvelope`, obtaining the padded
+    `ReplicaMessageReplyInnerMessage`.
+
+    10.2. Once unpadded, the inner message is either a
+    `ReplicaReadReply` carrying the BACAP tuple (box ID, signature,
+    ciphertext) or a non-success `error_code`. If the code is
+    `ReplicaErrorBoxIDNotFound`, Bob waits and polls again (i.e.
+    returns to step 5). If it is `ReplicaErrorTombstone`, Alice has
+    deleted the message. Otherwise Bob BACAP-decrypts and verifies
+    the payload.
 
     10.3. Bob can now read Alice's message.
 
