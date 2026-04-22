@@ -17,44 +17,19 @@ thin client is an interface to the kpclientd daemon, which handles all
 cryptographic and network operations. The thin client communicates
 with the daemon over a local socket using CBOR-encoded messages.
 
+**This document is generated.** The canonical source is
+`website/tools/thin-client-api-gen/`; edit binding docstrings (in the
+source trees) or `groups.yaml` / `overlay/*.md` (in the generator) — do
+not edit this file directly, as local changes will be overwritten by
+the next generation pass.
+
 There are three implementations:
 
-| Language | Source | API Docs |
-|----------|--------|----------|
-| Go (reference) | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/main/client/thin) | [pkg.go.dev](https://pkg.go.dev/github.com/katzenpost/katzenpost/client/thin) |
-| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/main/src) | [docs.rs](https://docs.rs/katzenpost_thin_client) |
-| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/main/katzenpost_thinclient) | [katzenpost.network](https://katzenpost.network/docs/python_thin_client.html) |
-
-**NOTE** that this reference refers to unreleased software. Therefore
-the rust crate and the python and golang libraries will not have
-API documentation available at the expected locations until it is officially released.
-*HOWEVER* you can make use of this software *right now* if you use our
-release candidate tags:
-
-| Thinclient Language(s) | Git repo | Release Candidate Git Tag |
-|------------------------|----------|---------------------------|
-| golang   | [github.com/katzenpost/katzenpost](https://github.com/katzenpost/katzenpost) | **v0.0.73-rc1**  |
-| python & rust | [github.com/katzenpost/thinclient](https://github.com/katzenpost/thinclient) | **0.0.12-rc1** |
-
-
-Also note that our production mix network known as `namenlos` does not currently run this candidate release
-of katzenpost. Therefore in order to write new protocols and software against this candidate release you
-can simply use a local docker mixnet:
-
-In other words:
-
-```bash
-git clone https://github.com/katzenpost/katzenpost.git
-cd katzenpost
-git checkout v0.0.73-rc1
-cd docker
-make start wait run-ping
-...
-```
-
-Note the location of the `thinclient.toml` configuration in the docker mixnet:
-`katzenpost/docker/voting_mixnet/client/thinclient.toml`
-You will need this to properly configure you thinclient for use with the docker mixnet.
+| Language | Source | Release candidate |
+|----------|--------|-------------------|
+| Go (reference) | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/main/client/thin) | `v0.0.73-rc2` |
+| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/main/src) | `0.0.12-rc2` |
+| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/main/katzenpost_thinclient) | `0.0.12-rc2` |
 
 For conceptual background on Pigeonhole, see [Understanding Pigeonhole](/docs/pigeonhole_explained/).
 For task-oriented usage guides, see [Thin Client How-to Guide](/docs/thin_client_howto/).
@@ -87,13 +62,13 @@ client = ThinClient(config)
 {{< /tab >}}
 {{< /tabpane >}}
 
----
-
 ## Connection Management
 
 ### Dial / new / start
 
-Connect to the kpclientd daemon.
+Connect to the kpclientd daemon. The Rust binding connects during
+construction (`ThinClient::new`), whereas Go and Python construct the
+client first and then connect via `Dial()` / `start()`.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -101,10 +76,9 @@ func (t *ThinClient) Dial() error
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn new(config: Config) -> Result<Arc<Self>, Box<dyn std::error::Error>>
-// Note: Rust connects during construction
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def start(self, loop: asyncio.AbstractEventLoop) -> None
+async def start(self, loop: asyncio.AbstractEventLoop) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -121,7 +95,7 @@ func (t *ThinClient) Close() error
 pub async fn stop(&self)
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-def stop(self) -> None
+def stop(self) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -137,7 +111,7 @@ func (t *ThinClient) IsConnected() bool
 pub fn is_connected(&self) -> bool
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-def is_connected(self) -> bool
+def is_connected(self) -> bool:
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -154,22 +128,16 @@ func (t *ThinClient) Disconnect() error
 pub async fn disconnect(&self)
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-def disconnect(self) -> None
+def disconnect(self) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
-
----
 
 ## Events
 
 The thin client emits events for connection status changes, PKI
 document updates, and message replies. Go uses an event channel; Rust
-and Python use callbacks.
-
-### EventSink / event_sink
-
-Go and Rust use an event channel/receiver. Python uses async
-callbacks passed to the `Config` constructor.
+uses a broadcast receiver; Python uses async callbacks supplied to the
+`Config` constructor.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -189,12 +157,12 @@ for ev := range eventCh {
 }
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
-// Get a receiver that yields all events
+// Get a receiver that yields all events as CBOR BTreeMaps
 let mut event_rx = client.event_sink();
 
 tokio::spawn(async move {
     while let Some(event) = event_rx.recv().await {
-        // Process event
+        // Inspect event["type"] and dispatch
     }
 });
 {{< /tab >}}
@@ -204,34 +172,15 @@ tokio::spawn(async move {
 # All callbacks are optional — omitted events are ignored.
 
 async def on_connection_status(event):
-    # event keys: 'is_connected' (bool), 'err' (str)
     print(f"Connected: {event['is_connected']}")
 
-async def on_new_pki_document(event):
-    # event keys: 'payload' (bytes) — CBOR-encoded PKI document
-    pass
-
-async def on_message_sent(event):
-    # event keys: 'message_id' (bytes), 'surbid' (bytes|None),
-    #   'sent_at' (str), 'reply_eta' (float), 'err' (str)
-    pass
-
 async def on_message_reply(event):
-    # event keys: 'message_id' (bytes), 'surbid' (bytes|None),
-    #   'payload' (bytes), 'reply_index' (int|None), 'error_code' (int)
-    pass
-
-async def on_daemon_disconnected(event):
-    # Emitted when the connection to kpclientd is lost
-    pass
+    print(f"Reply for SURBID {event['surbid']!r}: {event['payload']!r}")
 
 config = Config(
     "thinclient.toml",
     on_connection_status=on_connection_status,
-    on_new_pki_document=on_new_pki_document,
-    on_message_sent=on_message_sent,
     on_message_reply=on_message_reply,
-    on_daemon_disconnected=on_daemon_disconnected,
 )
 client = ThinClient(config)
 {{< /tab >}}
@@ -239,24 +188,58 @@ client = ThinClient(config)
 
 ### Event types
 
-- **ConnectionStatusEvent** -- Emitted when the daemon's connection
-  to the mixnet changes. Includes an `instance_token` field that
-  uniquely identifies the daemon process.
+- **ConnectionStatusEvent** — emitted when the daemon's connection
+  to the mixnet changes. Fields (Go): `IsConnected bool`, `Err error`,
+  `InstanceToken [16]byte`. `InstanceToken` uniquely identifies the
+  daemon process and lets clients notice daemon restarts.
 
-- **NewPKIDocumentEvent** -- Emitted when a new PKI consensus
-  document is received from the directory authorities.
+- **NewDocumentEvent** — emitted when a new PKI consensus document
+  is received from the directory authorities. The Go binding exposes
+  the parsed document as `Document *cpki.Document`. (The lower-level
+  `NewPKIDocumentEvent` carrying a raw CBOR `Payload []byte` is used
+  internally between daemon and thin client; applications should
+  consume `NewDocumentEvent`.)
 
-- **MessageReplyEvent** -- Emitted when a reply to a `SendMessage`
-  call is received. Contains the SURB ID and reply payload.
+- **MessageSentEvent** — emitted when a `SendMessage` request has
+  been transmitted by the daemon. Fields (Go):
+  `MessageID *[MessageIDLength]byte`, `SURBID *[SURBIDLength]byte`,
+  `SentAt time.Time`, `ReplyETA time.Duration`, `Err string`.
 
-- **MessageSentEvent** -- Emitted when a `SendMessage` request has
-  been transmitted by the daemon.
+- **MessageReplyEvent** — emitted when a reply to a `SendMessage`
+  call is received. Fields (Go):
+  `MessageID *[MessageIDLength]byte`, `SURBID *[SURBIDLength]byte`,
+  `Payload []byte`, `ReplyIndex *uint8`, `ErrorCode uint8`.
 
-- **DaemonDisconnectedEvent** -- Emitted by the thin client (not the
-  daemon) when the connection to the daemon is lost. Indicates
-  whether the disconnect was graceful or unexpected.
+- **DaemonDisconnectedEvent** — emitted by the thin client (not the
+  daemon) when the local socket connection to the daemon is lost.
+  Fields (Go): `IsGraceful bool`, `Err error`.
 
----
+### EventSink / event_sink
+
+Returns a channel (Go) or receiver (Rust) that yields events from the
+daemon. Python uses async callbacks supplied via the `Config`
+constructor, so has no equivalent method.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) EventSink() chan Event
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub fn event_sink(&self) -> EventSinkReceiver
+{{< /tab >}}
+{{< /tabpane >}}
+
+### StopEventSink (Go only)
+
+Stops delivering events on the given channel. Rust receivers are
+dropped via their own lifetime; Python's callback model requires no
+teardown.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) StopEventSink(ch chan Event)
+{{< /tab >}}
+{{< /tabpane >}}
 
 ## PKI and Service Discovery
 
@@ -273,7 +256,7 @@ func (t *ThinClient) PKIDocument() *cpki.Document
 pub async fn pki_document(&self) -> Result<BTreeMap<Value, Value>, ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-def pki_document(self) -> "Dict[str, Any] | None"
+def pki_document(self) -> 'Dict[str,Any] | None':
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -288,37 +271,32 @@ sending messages to that service.
 func (t *ThinClient) GetService(serviceName string) (*common.ServiceDescriptor, error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
-pub async fn get_service(&self, service_name: &str) -> Result<ServiceDescriptor, ThinClientError>
+pub async fn get_service(
+    &self,
+    service_name: &str,
+) -> Result<ServiceDescriptor, ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-def get_service(self, service_name: str) -> ServiceDescriptor
+def get_service(self, service_name: str) -> ServiceDescriptor:
 {{< /tab >}}
 {{< /tabpane >}}
 
 ### GetServices / get_services
 
 Returns all instances of a service with the given capability name.
+The Rust binding exposes this as a standalone helper in `helpers.rs`,
+not a method on `ThinClient`.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
 func (t *ThinClient) GetServices(capability string) ([]*common.ServiceDescriptor, error)
 {{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-// Use the standalone function:
-pub fn find_services(capability: &str, doc: &BTreeMap<Value, Value>) -> Vec<ServiceDescriptor>
-{{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-def get_services(self, capability: str) -> "List[ServiceDescriptor]"
+def get_services(self, capability: str) -> 'List[ServiceDescriptor]':
 {{< /tab >}}
 {{< /tabpane >}}
 
----
-
 ## Direct Messaging
-
-These methods send messages directly to mixnet services (such as the
-echo service). They are not used with Pigeonhole -- for Pigeonhole
-communication, use the methods in the sections below.
 
 ### SendMessage / send_message
 
@@ -326,20 +304,12 @@ Sends a message with a SURB (Single Use Reply Block) that allows the
 destination service to reply. This method is asynchronous: it returns
 after the daemon accepts the request, not after the message is
 delivered. To receive the reply, monitor events for a
-`MessageReplyEvent` matching the SURB ID.
-
-Raises `ThinClientOfflineError` (Python) / returns error (Go) /
-`ThinClientError::OfflineMode` (Rust) if the daemon is not connected
-to the mixnet.
+`MessageReplyEvent` matching the SURB ID. See "Transport and
+Lifecycle Errors" below for the error raised when offline.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) SendMessage(
-    surbID *[SURBIDLength]byte,
-    payload []byte,
-    destNode *[32]byte,
-    destQueue []byte,
-) error
+func (t *ThinClient) SendMessage(surbID *[sConstants.SURBIDLength]byte, payload []byte, destNode *[32]byte, destQueue []byte) error
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn send_message(
@@ -351,32 +321,18 @@ pub async fn send_message(
 ) -> Result<(), ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def send_message(
-    self,
-    surb_id: bytes,
-    payload: bytes | str,
-    dest_node: bytes,
-    dest_queue: bytes,
-) -> None
+async def send_message(self, surb_id: bytes, payload: bytes | str, dest_node: bytes, dest_queue: bytes) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
 
 ### SendMessageWithoutReply / send_message_without_reply
 
 Sends a fire-and-forget message with no SURB. The destination cannot
-reply. Requires mixnet connectivity.
-
-Raises `ThinClientOfflineError` (Python) / returns error (Go) /
-`ThinClientError::OfflineMode` (Rust) if the daemon is not connected
-to the mixnet.
+reply.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) SendMessageWithoutReply(
-    payload []byte,
-    destNode *[32]byte,
-    destQueue []byte,
-) error
+func (t *ThinClient) SendMessageWithoutReply(payload []byte, destNode *[32]byte, destQueue []byte) error
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn send_message_without_reply(
@@ -387,12 +343,7 @@ pub async fn send_message_without_reply(
 ) -> Result<(), ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def send_message_without_reply(
-    self,
-    payload: bytes | str,
-    dest_node: bytes,
-    dest_queue: bytes,
-) -> None
+async def send_message_without_reply(self, payload: bytes | str, dest_node: bytes, dest_queue: bytes) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -402,19 +353,9 @@ Sends a message and blocks until a reply is received or the timeout
 expires. This is a convenience wrapper that generates a SURB ID,
 sends the message, and waits for the matching reply event.
 
-Raises `ThinClientOfflineError` (Python) / returns error (Go) /
-`ThinClientError::OfflineMode` (Rust) if the daemon is not connected.
-Raises `asyncio.TimeoutError` (Python) / `context.DeadlineExceeded`
-(Go) / `ThinClientError::Timeout` (Rust) if the timeout expires.
-
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) BlockingSendMessage(
-    ctx context.Context,
-    payload []byte,
-    destNode *[32]byte,
-    destQueue []byte,
-) ([]byte, error)
+func (t *ThinClient) BlockingSendMessage(ctx context.Context, payload []byte, destNode *[32]byte, destQueue []byte) ([]byte, error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn blocking_send_message(
@@ -426,17 +367,9 @@ pub async fn blocking_send_message(
 ) -> Result<Vec<u8>, ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def blocking_send_message(
-    self,
-    payload: bytes | str,
-    dest_node: bytes,
-    dest_queue: bytes,
-    timeout_seconds: float = 30.0,
-) -> bytes
+async def blocking_send_message(self, payload: bytes | str, dest_node: bytes, dest_queue: bytes, timeout_seconds: float = 30.0) -> bytes:
 {{< /tab >}}
 {{< /tabpane >}}
-
----
 
 ## Pigeonhole: Key Management
 
@@ -444,55 +377,35 @@ async def blocking_send_message(
 
 Generates a new BACAP keypair from a 32-byte seed. Returns the write
 capability, read capability, and first message index for a new
-Pigeonhole stream.
-
-Does not cause network traffic. Does not store state in the daemon.
-
-Raises `ValueError` (Python) / returns error (Go/Rust) if the seed
-is not exactly 32 bytes.
+Pigeonhole stream. Does not cause network traffic.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) NewKeypair(
-    seed []byte,
-) (writeCap *bacap.WriteCap,
-   readCap *bacap.ReadCap,
-   firstMessageIndex *bacap.MessageBoxIndex,
-   err error)
+func (t *ThinClient) NewKeypair(seed []byte) (writeCap *bacap.WriteCap, readCap *bacap.ReadCap, firstMessageIndex *bacap.MessageBoxIndex, err error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn new_keypair(
     &self,
     seed: &[u8; 32],
 ) -> Result<KeypairResult, ThinClientError>
-// KeypairResult { write_cap: Vec<u8>, read_cap: Vec<u8>, first_index: Vec<u8> }
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def new_keypair(
-    self,
-    seed: bytes,
-) -> KeypairResult
-# KeypairResult contains: write_cap, read_cap, first_index
+async def new_keypair(self, seed: bytes) -> KeypairResult:
 {{< /tab >}}
 {{< /tabpane >}}
-
----
 
 ## Pigeonhole: Index Management
 
 ### NextMessageBoxIndex / next_message_box_index
 
 Returns the next message box index in the sequence. This is a local
-KDF computation -- it does not cause network traffic or store state.
-
+KDF computation — it does not cause network traffic or store state.
 If you have a BACAP implementation in your language, you can compute
 this locally instead of making a round trip to the daemon.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) NextMessageBoxIndex(
-    messageBoxIndex *bacap.MessageBoxIndex,
-) (nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
+func (t *ThinClient) NextMessageBoxIndex(messageBoxIndex *bacap.MessageBoxIndex) (nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn next_message_box_index(
@@ -501,14 +414,9 @@ pub async fn next_message_box_index(
 ) -> Result<Vec<u8>, ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def next_message_box_index(
-    self,
-    message_box_index: bytes,
-) -> bytes
+async def next_message_box_index(self, message_box_index: bytes) -> bytes:
 {{< /tab >}}
 {{< /tabpane >}}
-
----
 
 ## Pigeonhole: Encryption
 
@@ -517,25 +425,11 @@ async def next_message_box_index(
 Creates an encrypted read request for a single Pigeonhole box. The
 returned ciphertext and envelope data must be sent via
 `StartResendingEncryptedMessage` to actually perform the read.
-
-Does not cause network traffic. Does not store state in the daemon.
-
-Returns the message ciphertext, envelope descriptor, envelope hash,
-and the next message box index.
-
-Raises `ValueError` (Python) / returns error (Go/Rust) if `readCap`
-or `messageBoxIndex` is nil/None.
+Does not cause network traffic.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) EncryptRead(
-    readCap *bacap.ReadCap,
-    messageBoxIndex *bacap.MessageBoxIndex,
-) (messageCiphertext []byte,
-   envelopeDescriptor []byte,
-   envelopeHash *[32]byte,
-   nextMessageBoxIndex *bacap.MessageBoxIndex,
-   err error)
+func (t *ThinClient) EncryptRead(readCap *bacap.ReadCap, messageBoxIndex *bacap.MessageBoxIndex) (messageCiphertext []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn encrypt_read(
@@ -543,16 +437,9 @@ pub async fn encrypt_read(
     read_cap: &[u8],
     message_box_index: &[u8],
 ) -> Result<EncryptReadResult, ThinClientError>
-// EncryptReadResult { message_ciphertext, envelope_descriptor, envelope_hash, next_message_box_index }
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def encrypt_read(
-    self,
-    read_cap: bytes,
-    message_box_index: bytes,
-) -> EncryptReadResult
-# EncryptReadResult contains: message_ciphertext, envelope_descriptor,
-#     envelope_hash, next_message_box_index
+async def encrypt_read(self, read_cap: bytes, message_box_index: bytes) -> EncryptReadResult:
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -561,29 +448,12 @@ async def encrypt_read(
 Creates an encrypted write request for a single Pigeonhole box. The
 returned ciphertext and envelope data must be sent via
 `StartResendingEncryptedMessage` to actually perform the write.
-
-Does not cause network traffic. Does not store state in the daemon.
-
 To create a tombstone (deletion marker), pass an empty byte slice as
 the plaintext.
 
-Returns the message ciphertext, envelope descriptor, envelope hash,
-and the next message box index.
-
-Raises `ValueError` (Python) / returns error (Go/Rust) if `writeCap`
-or `messageBoxIndex` is nil/None.
-
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) EncryptWrite(
-    plaintext []byte,
-    writeCap *bacap.WriteCap,
-    messageBoxIndex *bacap.MessageBoxIndex,
-) (messageCiphertext []byte,
-   envelopeDescriptor []byte,
-   envelopeHash *[32]byte,
-   nextMessageBoxIndex *bacap.MessageBoxIndex,
-   err error)
+func (t *ThinClient) EncryptWrite(plaintext []byte, writeCap *bacap.WriteCap, messageBoxIndex *bacap.MessageBoxIndex) (messageCiphertext []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn encrypt_write(
@@ -592,21 +462,11 @@ pub async fn encrypt_write(
     write_cap: &[u8],
     message_box_index: &[u8],
 ) -> Result<EncryptWriteResult, ThinClientError>
-// EncryptWriteResult { message_ciphertext, envelope_descriptor, envelope_hash, next_message_box_index }
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def encrypt_write(
-    self,
-    plaintext: bytes,
-    write_cap: bytes,
-    message_box_index: bytes,
-) -> EncryptWriteResult
-# EncryptWriteResult contains: message_ciphertext, envelope_descriptor,
-#     envelope_hash, next_message_box_index
+async def encrypt_write(self, plaintext: bytes, write_cap: bytes, message_box_index: bytes) -> EncryptWriteResult:
 {{< /tab >}}
 {{< /tabpane >}}
-
----
 
 ## Pigeonhole: ARQ Transport
 
@@ -614,32 +474,14 @@ async def encrypt_write(
 
 Sends an encrypted read or write request to a courier via the ARQ
 (Automatic Repeat reQuest) mechanism. **Blocks** until the operation
-completes or is cancelled.
-
-**This method causes network traffic and stores ARQ state in the
-daemon.** The daemon retransmits the request until it receives an
-acknowledgment from the courier.
-
-For writes, set `writeCap` and leave `readCap` as nil/None. For
-reads, set `readCap` and leave `writeCap` as nil/None.
-
-By default, writes treat `BoxAlreadyExists` as idempotent success,
-and reads retry indefinitely on `BoxIDNotFound` (to handle
-replication lag). Use the variant methods below for different
-behavior.
+completes or is cancelled. The daemon retransmits the request until
+it receives an acknowledgment from the courier. By default writes
+treat `BoxAlreadyExists` as idempotent success, and reads retry
+indefinitely on `BoxIDNotFound`.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) StartResendingEncryptedMessage(
-    readCap *bacap.ReadCap,
-    writeCap *bacap.WriteCap,
-    messageBoxIndex []byte,
-    replyIndex *uint8,
-    envelopeDescriptor []byte,
-    messageCiphertext []byte,
-    envelopeHash *[32]byte,
-) (*StartResendingResult, error)
-// StartResendingResult { Plaintext []byte }
+func (t *ThinClient) StartResendingEncryptedMessage(readCap *bacap.ReadCap, writeCap *bacap.WriteCap, messageBoxIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) (*StartResendingResult, error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn start_resending_encrypted_message(
@@ -652,129 +494,63 @@ pub async fn start_resending_encrypted_message(
     message_ciphertext: &[u8],
     envelope_hash: &[u8; 32],
 ) -> Result<StartResendingResult, ThinClientError>
-// StartResendingResult { plaintext: Vec<u8> }
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def start_resending_encrypted_message(
-    self,
-    read_cap: bytes | None,
-    write_cap: bytes | None,
-    next_message_index: bytes | None,
-    reply_index: int | None,
-    envelope_descriptor: bytes,
-    message_ciphertext: bytes,
-    envelope_hash: bytes,
-) -> bytes  # plaintext
+async def start_resending_encrypted_message(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes, no_retry_on_box_id_not_found: bool = False, no_idempotent_box_already_exists: bool = False) -> StartResendingResult:
 {{< /tab >}}
 {{< /tabpane >}}
 
-**Errors (reads -- `readCap` is set):**
-
-| Error | Go | Rust | Python |
-|-------|-----|------|--------|
-| Box not found (retries exhausted) | `ErrBoxIDNotFound` | `ThinClientError::BoxNotFound` | `BoxIDNotFoundError` |
-| MKEM decryption failed | `ErrMKEMDecryptionFailed` | `ThinClientError::MkemDecryptionFailed` | `MKEMDecryptionFailedError` |
-| BACAP decryption failed | `ErrBACAPDecryptionFailed` | `ThinClientError::BacapDecryptionFailed` | `BACAPDecryptionFailedError` |
-| Tombstone (box was deleted) | `ErrTombstone` | `ThinClientError::Tombstone` | `TombstoneError` |
-
-**Errors (writes -- `writeCap` is set):**
-
-| Error | Go | Rust | Python |
-|-------|-----|------|--------|
-| Storage full | `ErrStorageFull` | `ThinClientError::StorageFull` | `StorageFullError` |
-
-**Errors (both reads and writes):**
-
-| Error | Go | Rust | Python |
-|-------|-----|------|--------|
-| Operation cancelled | `ErrStartResendingCancelled` | `ThinClientError::StartResendingCancelled` | `StartResendingCancelledError` |
-| Invalid box ID | `ErrInvalidBoxID` | `ThinClientError::InvalidBoxId` | `InvalidBoxIDError` |
-| Invalid signature | `ErrInvalidSignature` | `ThinClientError::InvalidSignature` | `InvalidSignatureError` |
-| Database failure | `ErrDatabaseFailure` | `ThinClientError::DatabaseFailure` | `DatabaseFailureError` |
-| Invalid payload | `ErrInvalidPayload` | `ThinClientError::InvalidPayload` | `InvalidPayloadError` |
-| Invalid epoch | `ErrInvalidEpoch` | `ThinClientError::InvalidEpoch` | `InvalidEpochError` |
-| Replication failed | `ErrReplicationFailed` | `ThinClientError::ReplicationFailed` | `ReplicationFailedError` |
-| Replica internal error | `ErrReplicaInternalError` | `ThinClientError::ReplicaInternalError` | `ReplicaInternalError` |
-
-Note: `BoxAlreadyExists` is treated as success by default (idempotent write). Use `StartResendingEncryptedMessageReturnBoxExists` to get it as an error.
-Note: `BoxIDNotFound` retries indefinitely by default. Use `StartResendingEncryptedMessageNoRetry` for immediate failure.
-
 ### StartResendingEncryptedMessageReturnBoxExists
 
-Same as `StartResendingEncryptedMessage`, but returns
-`BoxAlreadyExists` as an error instead of treating it as success. Use
-this when you need to distinguish a new write from a repeated one.
-
-Same errors as `StartResendingEncryptedMessage`, plus:
-
-| Error | Go | Rust | Python |
-|-------|-----|------|--------|
-| Box already written | `ErrBoxAlreadyExists` | `ThinClientError::BoxAlreadyExists` | `BoxAlreadyExistsError` |
+Same as the default variant, but returns `BoxAlreadyExists` as an
+error instead of treating it as success. Use this when you need to
+distinguish a new write from a repeated one.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) StartResendingEncryptedMessageReturnBoxExists(
-    readCap *bacap.ReadCap, writeCap *bacap.WriteCap,
-    messageBoxIndex []byte, replyIndex *uint8,
-    envelopeDescriptor []byte, messageCiphertext []byte,
-    envelopeHash *[32]byte,
-) (*StartResendingResult, error)
+func (t *ThinClient) StartResendingEncryptedMessageReturnBoxExists(readCap *bacap.ReadCap, writeCap *bacap.WriteCap, messageBoxIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) (*StartResendingResult, error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn start_resending_encrypted_message_return_box_exists(
     &self,
-    read_cap: Option<&[u8]>, write_cap: Option<&[u8]>,
-    message_box_index: Option<&[u8]>, reply_index: Option<u8>,
-    envelope_descriptor: &[u8], message_ciphertext: &[u8],
+    read_cap: Option<&[u8]>,
+    write_cap: Option<&[u8]>,
+    message_box_index: Option<&[u8]>,
+    reply_index: Option<u8>,
+    envelope_descriptor: &[u8],
+    message_ciphertext: &[u8],
     envelope_hash: &[u8; 32],
 ) -> Result<StartResendingResult, ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def start_resending_encrypted_message_return_box_exists(
-    self,
-    read_cap: bytes | None, write_cap: bytes | None,
-    next_message_index: bytes | None, reply_index: int | None,
-    envelope_descriptor: bytes, message_ciphertext: bytes,
-    envelope_hash: bytes,
-) -> bytes
+async def start_resending_encrypted_message_return_box_exists(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes) -> StartResendingResult:
 {{< /tab >}}
 {{< /tabpane >}}
 
 ### StartResendingEncryptedMessageNoRetry
 
-Same as `StartResendingEncryptedMessage`, but returns
-`BoxIDNotFound` immediately instead of retrying indefinitely. Use
-this when polling for a message that may not exist yet.
-
-Same errors as `StartResendingEncryptedMessage`, but `BoxIDNotFound`
-is returned on the first occurrence instead of being retried.
+Same as the default variant, but returns `BoxIDNotFound` immediately
+instead of retrying indefinitely. Use this when polling for a message
+that may not exist yet.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) StartResendingEncryptedMessageNoRetry(
-    readCap *bacap.ReadCap, writeCap *bacap.WriteCap,
-    messageBoxIndex []byte, replyIndex *uint8,
-    envelopeDescriptor []byte, messageCiphertext []byte,
-    envelopeHash *[32]byte,
-) (*StartResendingResult, error)
+func (t *ThinClient) StartResendingEncryptedMessageNoRetry(readCap *bacap.ReadCap, writeCap *bacap.WriteCap, messageBoxIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) (*StartResendingResult, error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn start_resending_encrypted_message_no_retry(
     &self,
-    read_cap: Option<&[u8]>, write_cap: Option<&[u8]>,
-    message_box_index: Option<&[u8]>, reply_index: Option<u8>,
-    envelope_descriptor: &[u8], message_ciphertext: &[u8],
+    read_cap: Option<&[u8]>,
+    write_cap: Option<&[u8]>,
+    message_box_index: Option<&[u8]>,
+    reply_index: Option<u8>,
+    envelope_descriptor: &[u8],
+    message_ciphertext: &[u8],
     envelope_hash: &[u8; 32],
 ) -> Result<StartResendingResult, ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def start_resending_encrypted_message_no_retry(
-    self,
-    read_cap: bytes | None, write_cap: bytes | None,
-    next_message_index: bytes | None, reply_index: int | None,
-    envelope_descriptor: bytes, message_ciphertext: bytes,
-    envelope_hash: bytes,
-) -> bytes
+async def start_resending_encrypted_message_no_retry(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes) -> StartResendingResult:
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -787,9 +563,7 @@ replayed on reconnect.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) CancelResendingEncryptedMessage(
-    envelopeHash *[32]byte,
-) error
+func (t *ThinClient) CancelResendingEncryptedMessage(envelopeHash *[32]byte) error
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn cancel_resending_encrypted_message(
@@ -798,14 +572,9 @@ pub async fn cancel_resending_encrypted_message(
 ) -> Result<(), ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def cancel_resending_encrypted_message(
-    self,
-    envelope_hash: bytes,
-) -> None
+async def cancel_resending_encrypted_message(self, envelope_hash: bytes) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
-
----
 
 ## Pigeonhole: Tombstones
 
@@ -813,29 +582,16 @@ async def cancel_resending_encrypted_message(
 
 Creates encrypted tombstone envelopes for a range of consecutive
 boxes. Tombstones are writes with an empty payload that delete the
-box contents.
-
-Does not cause network traffic. The caller must send each envelope
-individually via `StartResendingEncryptedMessage`.
-
-To tombstone a single box, use `maxCount=1`.
-
-Returns a result containing the list of tombstone envelopes and the
-next index after the last tombstoned box.
-
-Raises `ValueError` (Python) / returns error (Go) if `writeCap` or
-`start` is nil/None. If an error occurs mid-range, returns a partial
-result with the envelopes created so far.
+box contents. Does not cause network traffic; the caller must send
+each envelope individually via `StartResendingEncryptedMessage`.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) TombstoneRange(
-    writeCap *bacap.WriteCap,
-    start *bacap.MessageBoxIndex,
-    maxCount uint32,
-) (*TombstoneRangeResult, error)
-// TombstoneRangeResult { Envelopes []*TombstoneEnvelope, Next *bacap.MessageBoxIndex }
-// TombstoneEnvelope { MessageCiphertext, EnvelopeDescriptor, EnvelopeHash, BoxIndex }
+func (c *ThinClient) TombstoneRange(
+	writeCap *bacap.WriteCap,
+	start *bacap.MessageBoxIndex,
+	maxCount uint32,
+) (result *TombstoneRangeResult, err error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn tombstone_range(
@@ -844,55 +600,23 @@ pub async fn tombstone_range(
     start: &[u8],
     max_count: u32,
 ) -> TombstoneRangeResult
-// TombstoneRangeResult { envelopes: Vec<TombstoneEnvelope>, next: Vec<u8> }
-// TombstoneEnvelope { message_ciphertext, envelope_descriptor, envelope_hash, box_index }
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def tombstone_range(
-    self,
-    write_cap: bytes,
-    start: bytes,
-    max_count: int,
-) -> TombstoneRangeResult
-# TombstoneRangeResult contains: envelopes (list of TombstoneEnvelope), next
-# TombstoneEnvelope contains: message_ciphertext, envelope_descriptor,
-#     envelope_hash, box_index
+async def tombstone_range(self, write_cap: bytes, start: bytes, max_count: int) -> TombstoneRangeResult:
 {{< /tab >}}
 {{< /tabpane >}}
 
----
-
 ## Pigeonhole: Copy Stream Construction
 
-These methods construct courier envelopes encoded as copy stream
-elements, ready to be written to a temporary copy stream channel.
-After writing all elements, send a copy command
-(`StartResendingCopyCommand`) to instruct a courier to process them.
-
-All three methods are stateless -- they do not cause network traffic
-or store state in the daemon.
-
-### CreateCourierEnvelopesFromPayload / create_courier_envelopes_from_payload
+### CreateCourierEnvelopesFromPayload
 
 Packs a single payload for one destination into copy stream elements.
-The payload can be up to 10 MB. Returns properly sized chunks ready
+The payload can be up to ~10 MB. Returns properly sized chunks ready
 to be written to boxes via `EncryptWrite`.
-
-Use `isStart=true` on the first call and `isLast=true` on the final
-call. For a single-call copy stream, set both to `true`.
-
-Raises `ValueError` (Python) / returns error (Go/Rust) if
-`destWriteCap` or `destStartIndex` is nil/None.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) CreateCourierEnvelopesFromPayload(
-    payload []byte,
-    destWriteCap *bacap.WriteCap,
-    destStartIndex *bacap.MessageBoxIndex,
-    isStart bool,
-    isLast bool,
-) (envelopes [][]byte, nextDestIndex *bacap.MessageBoxIndex, err error)
+func (t *ThinClient) CreateCourierEnvelopesFromPayload(payload []byte, destWriteCap *bacap.WriteCap, destStartIndex *bacap.MessageBoxIndex, isStart bool, isLast bool) (envelopes [][]byte, nextDestIndex *bacap.MessageBoxIndex, err error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn create_courier_envelopes_from_payload(
@@ -903,93 +627,53 @@ pub async fn create_courier_envelopes_from_payload(
     is_start: bool,
     is_last: bool,
 ) -> Result<CreateEnvelopesResult, ThinClientError>
-// CreateEnvelopesResult { envelopes: Vec<Vec<u8>>, next_dest_index: Vec<u8> }
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def create_courier_envelopes_from_payload(
-    self,
-    payload: bytes,
-    dest_write_cap: bytes,
-    dest_start_index: bytes,
-    is_start: bool,
-    is_last: bool,
-) -> CreateEnvelopesResult
-# CreateEnvelopesResult contains: envelopes, next_dest_index
+async def create_courier_envelopes_from_payload(self, payload: bytes, dest_write_cap: bytes, dest_start_index: bytes, is_start: bool, is_last: bool) -> 'CreateEnvelopesResult':
 {{< /tab >}}
 {{< /tabpane >}}
 
-### CreateCourierEnvelopesFromMultiPayload / create_courier_envelopes_from_multi_payload
+### CreateCourierEnvelopesFromMultiPayload
 
 Packs multiple payloads for different destinations into copy stream
-elements. More space-efficient than calling
-`CreateCourierEnvelopesFromPayload` multiple times because envelopes
-are packed together without wasted padding.
-
-This method supports multi-call usage via the `buffer` parameter.
-Pass `nil`/`None` on the first call, then pass the returned buffer
-to subsequent calls. The application is responsible for persisting
-the buffer for crash recovery.
-
-Raises `ValueError` (Python) / returns error (Go/Rust) if
-`destinations` is empty.
+elements. More space-efficient than calling the single-payload
+variant multiple times because envelopes are packed together without
+wasted padding.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) CreateCourierEnvelopesFromMultiPayload(
-    destinations []DestinationPayload,
-    isStart bool,
-    isLast bool,
-    buffer []byte,
-) (*CreateEnvelopesResult, error)
-// DestinationPayload { Payload []byte, WriteCap *bacap.WriteCap, StartIndex *bacap.MessageBoxIndex }
-// CreateEnvelopesResult { Envelopes [][]byte, Buffer []byte }
+func (t *ThinClient) CreateCourierEnvelopesFromMultiPayload(destinations []DestinationPayload, isStart bool, isLast bool, buffer []byte) (*CreateEnvelopesResult, error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn create_courier_envelopes_from_multi_payload(
     &self,
-    destinations: Vec<(&[u8], &[u8], &[u8])>,  // (payload, write_cap, start_index)
+    destinations: Vec<(&[u8], &[u8], &[u8])>,
     is_start: bool,
     is_last: bool,
     buffer: Option<Vec<u8>>,
 ) -> Result<CreateEnvelopesResult, ThinClientError>
-// CreateEnvelopesResult { envelopes: Vec<Vec<u8>>, buffer: Option<Vec<u8>> }
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def create_courier_envelopes_from_multi_payload(
-    self,
-    destinations: List[Dict[str, Any]],
-    # Each dict: {"payload": bytes, "write_cap": bytes, "start_index": bytes}
-    is_start: bool,
-    is_last: bool,
-    buffer: bytes | None = None,
-) -> CreateEnvelopesResult
-# CreateEnvelopesResult contains: envelopes, buffer
+async def create_courier_envelopes_from_multi_payload(self, destinations: 'List[Dict[str, Any]]', is_start: bool, is_last: bool, buffer: 'bytes | None' = None) -> 'CreateEnvelopesResult':
 {{< /tab >}}
 {{< /tabpane >}}
 
-### CreateCourierEnvelopesFromTombstoneRange / create_courier_envelopes_from_tombstone_range
+### CreateCourierEnvelopesFromTombstoneRange
 
 Packs tombstone envelopes for a range of consecutive destination
 boxes into copy stream elements. Use this to atomically tombstone
-boxes as part of a copy command (the courier performs the tombstoning).
-
-Like `CreateCourierEnvelopesFromMultiPayload`, this method supports
-multi-call usage via the `buffer` parameter.
-
-Raises `ValueError` (Python) / returns error (Go/Rust) if
-`destWriteCap` or `destStartIndex` is nil/None.
+boxes as part of a copy command.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
 func (t *ThinClient) CreateCourierEnvelopesFromTombstoneRange(
-    destWriteCap *bacap.WriteCap,
-    destStartIndex *bacap.MessageBoxIndex,
-    maxCount uint32,
-    isStart bool,
-    isLast bool,
-    buffer []byte,
-) (envelopes [][]byte, nextBuffer []byte,
-   nextDestIndex *bacap.MessageBoxIndex, err error)
+	destWriteCap *bacap.WriteCap,
+	destStartIndex *bacap.MessageBoxIndex,
+	maxCount uint32,
+	isStart bool,
+	isLast bool,
+	buffer []byte,
+) (envelopes [][]byte, nextBuffer []byte, nextDestIndex *bacap.MessageBoxIndex, err error)
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn create_courier_envelopes_from_tombstone_range(
@@ -1001,47 +685,27 @@ pub async fn create_courier_envelopes_from_tombstone_range(
     is_last: bool,
     buffer: Option<Vec<u8>>,
 ) -> Result<CreateEnvelopesResult, ThinClientError>
-// CreateEnvelopesResult { envelopes: Vec<Vec<u8>>, buffer: Option<Vec<u8>>, next_dest_index: Vec<u8> }
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def create_courier_envelopes_from_tombstone_range(
-    self,
-    dest_write_cap: bytes,
-    dest_start_index: bytes,
-    max_count: int,
-    is_start: bool,
-    is_last: bool,
-    buffer: bytes | None = None,
-) -> CreateEnvelopesResult
-# CreateEnvelopesResult contains: envelopes, buffer, next_dest_index
+async def create_courier_envelopes_from_tombstone_range(self, dest_write_cap: bytes, dest_start_index: bytes, max_count: int, is_start: bool, is_last: bool, buffer: 'bytes | None' = None) -> 'CreateEnvelopesResult':
 {{< /tab >}}
 {{< /tabpane >}}
-
----
 
 ## Pigeonhole: Copy Command Transport
 
 ### StartResendingCopyCommand / start_resending_copy_command
 
 Sends a copy command to a courier via ARQ and **blocks** until the
-courier acknowledges completion. The courier reads the temporary copy
-stream, executes each envelope, tombstones the temporary stream, and
-sends an ACK.
-
-**This method causes network traffic and stores ARQ state in the
-daemon.**
-
-Raises `ValueError` (Python) / returns error (Go/Rust) if `writeCap`
-is nil/None. Returns `StartResendingCancelledError` (Python) /
-`ErrStartResendingCancelled` (Go) /
-`ThinClientError::StartResendingCancelled` (Rust) if cancelled via
-`CancelResendingCopyCommand`.
+courier acknowledges completion. The courier reads the temporary
+copy stream, executes each envelope, tombstones the temporary
+stream, and sends an ACK. The Rust and Python bindings take
+optional courier-identity parameters to pin the command to a
+specific courier; the Go binding exposes this as a separate
+method (see below).
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) StartResendingCopyCommand(
-    writeCap *bacap.WriteCap,
-) error
+func (t *ThinClient) StartResendingCopyCommand(writeCap *bacap.WriteCap) error
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn start_resending_copy_command(
@@ -1052,35 +716,25 @@ pub async fn start_resending_copy_command(
 ) -> Result<(), ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def start_resending_copy_command(
-    self,
-    write_cap: bytes,
-    courier_identity_hash: bytes | None = None,
-    courier_queue_id: bytes | None = None,
-) -> None
+async def start_resending_copy_command(self, write_cap: bytes, courier_identity_hash: 'bytes|None' = None, courier_queue_id: 'bytes|None' = None) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
 
 ### StartResendingCopyCommandWithCourier (Go only)
 
 Like `StartResendingCopyCommand` but sends to a specific courier
-instead of a random one. Used for nested copy commands.
+instead of a random one. Used for nested copy commands. In Rust
+and Python this is achieved by supplying the optional
+`courier_identity_hash` and `courier_queue_id` arguments to
+`start_resending_copy_command`.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
 func (t *ThinClient) StartResendingCopyCommandWithCourier(
-    writeCap *bacap.WriteCap,
-    courierIdentityHash *[32]byte,
-    courierQueueID []byte,
+	writeCap *bacap.WriteCap,
+	courierIdentityHash *[32]byte,
+	courierQueueID []byte,
 ) error
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-// Use start_resending_copy_command with courier_identity_hash
-// and courier_queue_id parameters set
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-# Use start_resending_copy_command with courier_identity_hash
-# and courier_queue_id parameters set
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -1091,9 +745,7 @@ hash of the serialized write capability.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) CancelResendingCopyCommand(
-    writeCapHash *[32]byte,
-) error
+func (t *ThinClient) CancelResendingCopyCommand(writeCapHash *[32]byte) error
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub async fn cancel_resending_copy_command(
@@ -1102,63 +754,69 @@ pub async fn cancel_resending_copy_command(
 ) -> Result<(), ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def cancel_resending_copy_command(
-    self,
-    write_cap_hash: bytes,
-) -> None
+async def cancel_resending_copy_command(self, write_cap_hash: bytes) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
 
----
+## Pigeonhole: Courier Discovery
 
-## Pigeonhole: Courier Discovery (Go only)
+### GetAllCouriers / get_all_couriers
 
-### GetAllCouriers
+Returns every courier service advertised in the current PKI
+document. Not yet exposed in the Rust binding.
 
-Returns all courier services from the current PKI document.
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) GetAllCouriers() (couriers []CourierDescriptor, err error)
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+def get_all_couriers(self) -> 'List[Tuple[bytes, bytes]]':
+{{< /tab >}}
+{{< /tabpane >}}
 
-```go
-func (t *ThinClient) GetAllCouriers() ([]CourierDescriptor, error)
-```
+### GetDistinctCouriers / get_distinct_couriers
 
-### GetDistinctCouriers
+Returns `n` distinct couriers drawn at random from the current PKI
+document. Not yet exposed in the Rust binding.
 
-Returns N distinct random couriers. Returns an error if fewer than N
-are available.
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) GetDistinctCouriers(n int) (couriers []CourierDescriptor, err error)
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+def get_distinct_couriers(self, n: int) -> 'List[Tuple[bytes, bytes]]':
+{{< /tab >}}
+{{< /tabpane >}}
 
-```go
-func (t *ThinClient) GetDistinctCouriers(n int) ([]CourierDescriptor, error)
-```
+### get_courier_destination (Rust only)
 
-### CourierDescriptor
+Returns a single courier destination as a
+`(identity_hash, queue_id)` tuple, sparing the caller from
+handling a list. Go and Python callers achieve the same by
+calling `GetDistinctCouriers(1)` / `get_distinct_couriers(1)`
+and taking the first element.
 
-```go
-type CourierDescriptor struct {
-    IdentityHash *[32]byte
-    QueueID      []byte
-}
-```
+{{< tabpane >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn get_courier_destination(
+    &self,
+) -> Result<(Vec<u8>, Vec<u8>), ThinClientError>
+{{< /tab >}}
+{{< /tabpane >}}
 
----
+### pigeonhole_geometry (Rust only)
 
-## Pigeonhole: Nested Copy (Go only, experimental)
+Returns a reference to the negotiated Pigeonhole geometry, so that
+callers can size payloads to its `max_plaintext_payload_length`.
+Go callers obtain this via `GetConfig().PigeonholeGeometry`; the
+Python binding stores it internally but does not currently expose
+an accessor.
 
-### SendNestedCopy
-
-Sends a recursive copy command routed through a path of couriers.
-This constructs nested copy streams so that the payload traverses
-multiple couriers before reaching its final destination.
-
-```go
-func (t *ThinClient) SendNestedCopy(
-    payload []byte,
-    destWriteCap *bacap.WriteCap,
-    destFirstIndex *bacap.MessageBoxIndex,
-    courierPath []CourierDescriptor,
-) error
-```
-
----
+{{< tabpane >}}
+{{< tab header="Rust" lang="rust" >}}
+pub fn pigeonhole_geometry(&self) -> &PigeonholeGeometry
+{{< /tab >}}
+{{< /tabpane >}}
 
 ## Utility
 
@@ -1174,8 +832,7 @@ func (t *ThinClient) NewMessageID() *[MessageIDLength]byte
 pub fn new_message_id() -> Vec<u8>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-@staticmethod
-def new_message_id() -> bytes
+def new_message_id() -> bytes:
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -1185,13 +842,13 @@ Returns a new random SURB ID for correlating message replies.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
-func (t *ThinClient) NewSURBID() *[SURBIDLength]byte
+func (t *ThinClient) NewSURBID() *[sConstants.SURBIDLength]byte
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub fn new_surb_id() -> Vec<u8>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-def new_surb_id(self) -> bytes
+def new_surb_id(self) -> bytes:
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -1208,22 +865,89 @@ func (t *ThinClient) NewQueryID() *[QueryIDLength]byte
 pub fn new_query_id() -> Vec<u8>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-def new_query_id(self) -> bytes
+def new_query_id(self) -> bytes:
 {{< /tab >}}
 {{< /tabpane >}}
 
----
+## Transport and Lifecycle Errors
+
+These errors can in principle be raised by *any* method that performs
+I/O against the daemon or the mixnet.
+
+| Condition | Go | Rust | Python |
+|---|---|---|---|
+| Daemon not connected to mixnet | ad-hoc error with message "cannot send message in offline mode - daemon not connected to mixnet" (no sentinel — check `IsConnected()` first) | `ThinClientError::OfflineMode(String)` | `ThinClientOfflineError` |
+| Operation timed out | `context.DeadlineExceeded` (from `ctx.Err()`) | `ThinClientError::Timeout(String)` | `asyncio.TimeoutError` |
+| Operation cancelled by caller | `context.Canceled` (from `ctx.Err()`) | (no distinct variant — uses higher-level cancellation) | `asyncio.CancelledError` |
+| Local socket to kpclientd lost | returned on the next I/O; thin client attempts reconnect with exponential backoff | ditto (receive `DaemonDisconnectedEvent` on the event sink) | ditto |
+| CBOR (de)serialisation failure | wrapped error | `ThinClientError::CborError(serde_cbor::Error)` | `serde`-layer exception bubbles up |
+
+The Go binding does not provide a named sentinel for offline mode.
+Applications that must distinguish "daemon offline" from other errors
+should test `IsConnected()` *before* sending, not compare error values
+after the fact. The Rust and Python bindings provide proper sentinels
+testable with `matches!` / `isinstance`.
+
+## Replica and Courier Errors
+
+The errors below can be returned by `StartResendingEncryptedMessage`
+and its variants. They are defined in
+[`pigeonhole/errors.go`](https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/errors.go).
+
+### Errors specific to reads (when `readCap` is set)
+
+| Error | Go | Rust | Python |
+|-------|-----|------|--------|
+| Box not found (retries exhausted) | `ErrBoxIDNotFound` | `ThinClientError::BoxNotFound` | `BoxIDNotFoundError` |
+| MKEM decryption failed | `ErrMKEMDecryptionFailed` | `ThinClientError::MkemDecryptionFailed` | `MKEMDecryptionFailedError` |
+| BACAP decryption failed | `ErrBACAPDecryptionFailed` | `ThinClientError::BacapDecryptionFailed` | `BACAPDecryptionFailedError` |
+| Tombstone (box was deleted) | `ErrTombstone` | `ThinClientError::Tombstone` | `TombstoneError` |
+
+### Errors specific to writes (when `writeCap` is set)
+
+| Error | Go | Rust | Python |
+|-------|-----|------|--------|
+| Storage full | `ErrStorageFull` | `ThinClientError::StorageFull` | `StorageFullError` |
+
+### Errors on both reads and writes
+
+| Error | Go | Rust | Python |
+|-------|-----|------|--------|
+| Operation cancelled | `ErrStartResendingCancelled` | `ThinClientError::StartResendingCancelled` | `StartResendingCancelledError` |
+| Invalid box ID | `ErrInvalidBoxID` | `ThinClientError::InvalidBoxId` | `InvalidBoxIDError` |
+| Invalid signature | `ErrInvalidSignature` | `ThinClientError::InvalidSignature` | `InvalidSignatureError` |
+| Invalid tombstone signature | `ErrInvalidTombstoneSignature` | `ThinClientError::InvalidTombstoneSignature` | `InvalidTombstoneSignatureError` |
+| Database failure | `ErrDatabaseFailure` | `ThinClientError::DatabaseFailure` | `DatabaseFailureError` |
+| Invalid payload | `ErrInvalidPayload` | `ThinClientError::InvalidPayload` | `InvalidPayloadError` |
+| Invalid epoch | `ErrInvalidEpoch` | `ThinClientError::InvalidEpoch` | `InvalidEpochError` |
+| Replication failed | `ErrReplicationFailed` | `ThinClientError::ReplicationFailed` | `ReplicationFailedError` |
+| Replica internal error | `ErrReplicaInternalError` | `ThinClientError::ReplicaInternalError` | `ReplicaInternalError` |
+| Box already exists (writes only, when non-idempotent variant used) | `ErrBoxAlreadyExists` | `ThinClientError::BoxAlreadyExists` | `BoxAlreadyExistsError` |
+
+### Copy-command failure
+
+`StartResendingCopyCommand` can return a diagnostic error carrying the
+underlying replica error code and the 1-based sequential envelope
+index at which processing stopped:
+
+| Binding | Error |
+|---|---|
+| Go | `ErrCopyCommandFailed` (see `CopyCommandFailedError` struct for fields) |
+| Rust | `ThinClientError::CopyCommandFailed { replica_error_code, failed_envelope_index }` |
+| Python | `CopyCommandFailedError(replica_error_code, failed_envelope_index)` |
 
 ## Expected Outcomes vs Real Failures
 
 Some errors from `StartResendingEncryptedMessage` represent completed
-operations, not failures. Use `IsExpectedOutcome` (Go) /
-`is_expected_outcome()` (Rust/Python) to distinguish them:
+operations, not failures. Use `IsExpectedOutcome(err)` (Go),
+`err.is_expected_outcome()` (Rust), or `is_expected_outcome(exc)`
+(Python) to distinguish them:
 
 | Error | Why it may be expected |
-|-------|----------------------|
+|-------|------------------------|
 | `BoxIDNotFound` / `BoxNotFound` | Polling for a message that hasn't been written yet |
 | `BoxAlreadyExists` | Retrying an idempotent write that already succeeded |
 | `Tombstone` | Reading a box that was intentionally deleted |
 
 These should generally not trigger retries in your application.
+
