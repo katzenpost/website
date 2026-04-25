@@ -169,7 +169,7 @@ return PRF(ss1 || cct) XOR PRF(ss2 || cct) XOR PRF(ss3 || cct)
                 <para> One KEM ciphertext for use with the next hop </para>
             </listitem>
             <listitem>
-                <para> Encrypted per routing commands AND KEM ciphtertexts, one for each additional
+                <para> Encrypted per routing commands AND KEM ciphertexts, one for each additional
                     hop </para>
             </listitem>
             <listitem>

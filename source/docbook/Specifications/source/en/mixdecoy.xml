@@ -44,7 +44,7 @@
             </author>
         </authorgroup>
         <abstract>
-            <para> In the context of continuous time mixing stategies such as the memoryless mix
+            <para> In the context of continuous time mixing strategies such as the memoryless mix
                 used by Katzenpost, n-1 attacks may use strategic packetloss. Nodes can also fail
                 for benign reasons. Determining whether or not it’s an n-1 attack is outside the
                 scope of this work. </para>

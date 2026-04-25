@@ -196,7 +196,7 @@
                     <para>Clients are NOT considered nodes in the mix network. However note that
                         network protocols are often layered; in our design documents we describe
                         "mixnet hidden services" which can be operated by mixnet clients. Therefore
-                        if you are using node in some adherence to methematical termonology one
+                        if you are using node in some adherence to mathematical terminology one
                         could conceivably designate a client as a node. That having been said, it
                         would not be appropriate to the discussion of our core mixnet protocol to
                         refer to the clients as nodes.</para>
@@ -459,7 +459,7 @@ xlink:href="https://www.rfc-editor.org/info/rfc5322"/></para>'>
 <!ENTITY ED25519 '<para xml:id="ED25519"><emphasis role="bold">ED25519</emphasis></para>
 <para><link xlink:href="https://tools.ietf.org/html/rfc8032"/></para>'>
 <!ENTITY RFC7049 '<para xml:id="RFC7049"><emphasis role="bold">RFC7049</emphasis></para>
-<para>C. Bormannm, P. Hoffman, <quote>Concise Binary Object Representation (CBOR)</quote>, Internet Engineering Task Force (IETF), October 2013, 
+<para>C. Bormann, P. Hoffman, <quote>Concise Binary Object Representation (CBOR)</quote>, Internet Engineering Task Force (IETF), October 2013, 
 <link xlink:href="https://tools.ietf.org/html/rfc7049"/></para>'>
 <!ENTITY RFC7515 '<para xml:id="RFC7515"><emphasis role="bold">RFC7515</emphasis></para>
 <para>Jones, M., Bradley, J., Sakimura, N., <quote>JSON Web Signature (JWS)</quote>, May 2015, 
@@ -489,7 +489,7 @@ Anonymous Communication</quote>,
 <link xlink:href="https://www.freehaven.net/anonbib/cache/esorics05-Klonowski.pdf"/></para>'>
 <!ENTITY MIRANDA '<para xml:id="MIRANDA"><emphasis role="bold">MIRANDA</emphasis></para>
 <para>Leibowitz, H., Piotrowska, A., Danezis, G., Herzberg, A., <quote>No right
-to ramain silent: Isolating Malicious Mixes</quote>, 2017, 
+to remain silent: Isolating Malicious Mixes</quote>, 2017, 
 <link xlink:href="https://eprint.iacr.org/2017/1000.pdf"/></para>'>
 <!ENTITY MIXMINIONDIRAUTH '<para xml:id="MIXMINIONDIRAUTH"><emphasis role="bold">MIXMINIONDIRAUTH</emphasis></para>
 <para>Danezis, G., Dingledine, R., Mathewson, N., <quote>Type III (Mixminion) Mix

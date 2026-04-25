@@ -75,7 +75,7 @@
                     <para>Clients are NOT considered nodes in the mix network. However note that
                         network protocols are often layered; in our design documents we describe
                         "mixnet hidden services" which can be operated by mixnet clients. Therefore
-                        if you are using node in some adherence to methematical termonology one
+                        if you are using node in some adherence to mathematical terminology one
                         could conceivably designate a client as a node. That having been said, it
                         would not be appropriate to the discussion of our core mixnet protocol to
                         refer to the clients as nodes.</para>
