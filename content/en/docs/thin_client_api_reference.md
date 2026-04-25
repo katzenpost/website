@@ -27,9 +27,9 @@ There are three implementations:
 
 | Language | Source | Release candidate |
 |----------|--------|-------------------|
-| Go (reference) | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/main/client/thin) | `v0.0.73-rc2` |
-| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/main/src) | `0.0.12-rc2` |
-| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/main/katzenpost_thinclient) | `0.0.12-rc2` |
+| Go (reference) | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/main/client/thin) | `v0.0.73-rc3` |
+| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/main/src) | `0.0.12-rc3` |
+| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/main/katzenpost_thinclient) | `0.0.12-rc3` |
 
 For conceptual background on Pigeonhole, see [Understanding Pigeonhole](/docs/pigeonhole_explained/).
 For task-oriented usage guides, see [Thin Client How-to Guide](/docs/thin_client_howto/).
