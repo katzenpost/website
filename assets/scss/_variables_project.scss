@@ -34,23 +34,18 @@ $link-color: $primary !default;
 $link-decoration: none !default;
 $link-shade-percentage: 30% !default;
 
-// Fonts
+// Fonts. Self-hosted JetBrains Mono is declared via @font-face in
+// _styles_project.scss; we leave Google Fonts disabled and override the
+// Bootstrap font-family stack to put JetBrains Mono first.
 $td-enable-google-fonts: false !default;
-$google_font_name: "Fira Sans" !default;
-$google_font_family: "Fira+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,700" !default;
-$web-font-path: "https://fonts.googleapis.com/css?family=#{$google_font_family}&display=swap";
 $font-awesome-font-name: "Font Awesome 6 Free" !default;
 
-$td-fonts-serif: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$td-fonts-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-@if $td-enable-google-fonts {
-  $td-fonts-serif: prepend($td-fonts-serif, "#{$google_font_name}");
-}
-
-$font-family-sans: "Fira Sans" !default;
-$font-family-sans-serif: $td-fonts-serif !default;
-$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !default;
-$font-family-base: $font-family-sans-serif !default;
+$font-family-sans: "JetBrains Mono" !default;
+$font-family-sans-serif: $td-fonts-mono !default;
+$font-family-monospace: $td-fonts-mono !default;
+$font-family-base: $td-fonts-mono !default;
 
 // Font weights
 $font-weight-medium: 400 !default; // TODO: move into var forward file after upgrading BS to v5.3+

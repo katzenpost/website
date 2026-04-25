@@ -2,60 +2,54 @@
 
 /* Import Chroma monokai syntax highlighting */
 @import "chroma_monokai";
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: italic;
-  font-weight: 300;
-  font-display: swap;
-  src: url('/fonts/FiraSans-LightItalic.woff2') format('woff2');
-}
 
+/* JetBrains Mono — self-hosted woff2, SIL OFL 1.1. */
 @font-face {
-  font-family: 'Fira Sans';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: italic;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Bold.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
+  font-family: 'JetBrains Mono';
   font-style: normal;
   font-weight: 300;
   font-display: swap;
-  src: url('/fonts/FiraSans-Light.woff2') format('woff2');
+  src: url('/fonts/JetBrainsMono-Light.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Fira Sans';
+  font-family: 'JetBrains Mono';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('/fonts/FiraSans-Regular.woff2') format('woff2');
+  src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Fira Sans';
+  font-family: 'JetBrains Mono';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url('/fonts/FiraSans-Medium.woff2') format('woff2');
+  src: url('/fonts/JetBrainsMono-Medium.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Fira Sans';
+  font-family: 'JetBrains Mono';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('/fonts/FiraSans-Bold.woff2') format('woff2');
+  src: url('/fonts/JetBrainsMono-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-BoldItalic.woff2') format('woff2');
 }
 
 
@@ -144,7 +138,7 @@ header.article-meta {
     margin: 0 auto;
     padding: 20px;
     text-align: center;
-    font-family: 'Fira Sans', sans-serif;
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 1.25rem; /* Slightly larger font size (20px) */
     line-height: 1.6; /* Increase line height for better readability */
     font-weight: 400; /* Optional: Adjust weight for optimal readability */
