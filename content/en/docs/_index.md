@@ -18,7 +18,7 @@ You wish to use a Katzenpost client application to communicate.
   <div class="col">
     <div class="card h-100 doc-card doc-card--coming">
       <div class="card-body">
-        <h5 class="card-title"><span class="doc-card-icon">🐈</span> Namenlos public mixnet <span class="badge text-bg-secondary ms-2">coming soon</span></h5>
+        <h5 class="card-title"><span class="doc-card-icon">🐈</span> Namenlos public mixnet <span class="badge text-bg-dark ms-2">coming soon</span></h5>
         <p class="card-text">A public Katzenpost mix network that anyone may use, without the burden of operating their own. Documentation will appear here once the network is open to the public.</p>
       </div>
     </div>
