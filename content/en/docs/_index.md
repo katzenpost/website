@@ -8,6 +8,10 @@ no_list: true
 body_class: "td-no-sidebar"
 ---
 
+<div class="text-center mb-4">
+  <img src="/images/ZII-WIZ3.png" alt="ANSI wizard casting a spell, by Zeus" class="img-fluid" style="max-width: 640px;">
+</div>
+
 <p class="lead">Choose your audience.</p>
 
 ```text
