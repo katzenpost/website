@@ -472,3 +472,17 @@ pre {
     color: #ffffff !important;
     margin-bottom: 0 !important;
 }
+
+/* Suppress the left sidebar on pages that opt in via body_class: "td-no-sidebar".
+   The main column is widened to fill the freed space. The right-hand ToC sidebar
+   is left untouched so per-page anchors remain reachable where they exist. */
+.td-no-sidebar {
+    .td-sidebar { display: none; }
+    main.col-12.col-md-9.col-xl-8 {
+        @media (min-width: 768px) {
+            flex: 0 0 100%;
+            max-width: 100%;
+            padding-left: 1.5rem !important;
+        }
+    }
+}
