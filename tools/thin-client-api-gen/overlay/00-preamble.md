@@ -27,8 +27,8 @@ There are three implementations: a Go reference (`katzenpost/client/thin`), a
 Rust binding (`thin_client/src`), and a Python binding
 (`thin_client/katzenpost_thinclient`).
 
-For pinned versions of the full stack — including `kpclientd`, `katzenqt`, and
-the server-side components — see [Build from source](/docs/build_from_source/).
+For pinned versions of the full stack (including `kpclientd`, `katzenqt`, and
+the server-side components), see [Build from source](/docs/build_from_source/).
 
 For conceptual background on Pigeonhole, see [Understanding Pigeonhole](/docs/pigeonhole_explained/).
 For task-oriented usage guides, see [Thin Client How-to Guide](/docs/thin_client_howto/).
