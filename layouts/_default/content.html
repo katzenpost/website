@@ -20,7 +20,6 @@
 		{{ end -}}
 	</header>
 	{{ .Content }}
-	<pre class="phrack-eof" aria-hidden="true">|=[ EOF ]=---------------------------------------------------------------=|</pre>
 	{{ partial "feedback.html" . -}}
 	{{ if (.Site.Config.Services.Disqus.Shortname) -}}
 		<br />

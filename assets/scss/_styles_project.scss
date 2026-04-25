@@ -474,17 +474,4 @@ pre {
 .td-style-stars   .td-content h2::before { content: "*** "; }
 .td-style-plain   .td-content h2::before { content: ""; }
 
-/* Phrack-style EOF marker appended to every page. Width is 80 columns
-   to honour the magazine's terminal heritage. */
-.phrack-eof {
-    color: #ffcc4d;
-    background: transparent !important;
-    border: 0 !important;
-    padding: 1.25rem 0 0 0 !important;
-    margin: 3rem 0 0 0 !important;
-    opacity: 0.65;
-    font-size: 0.85em;
-    overflow-x: auto;
-    white-space: pre;
-}
 
