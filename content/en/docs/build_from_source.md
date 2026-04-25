@@ -30,7 +30,7 @@ should be built from the same tag.
 | Go thin client (reference) | [katzenpost](https://github.com/katzenpost/katzenpost) | `client/thin` | `v0.0.73-rc3` |
 | Rust thin client | [thin_client](https://github.com/katzenpost/thin_client) | `src` | `0.0.12-rc3` |
 | Python thin client | [thin_client](https://github.com/katzenpost/thin_client) | `katzenpost_thinclient` | `0.0.12-rc3` |
-| `katzenqt` (Qt GUI client) | [katzenqt](https://github.com/katzenpost/katzenqt) | (root) | *tag pending* |
+| `katzenqt` (Qt group chat client) | [katzenqt](https://github.com/katzenpost/katzenqt) | (root) | *tag pending* |
 | Server-side components (mix server, dirauth, courier, replica) | [katzenpost](https://github.com/katzenpost/katzenpost) | `server/`, `authority/`, `courier/`, `replica/` | `v0.0.73-rc3` |
 
 Server-side components are listed for completeness; for full deployment
@@ -117,11 +117,16 @@ The example programs under `thin_client/examples/` (`echo_ping.py`,
 `fetch_pki_doc.py`, `mixnet_status.py`, and others) demonstrate the
 API and are useful smoke tests once `kpclientd` is running.
 
-## katzenqt (Qt GUI client)
+## katzenqt (Qt group chat client)
 
-A Qt-based desktop client. As of this writing, `katzenqt` builds
-against a development branch of `katzenpost` and a tag has not yet
-been published; this section will be updated once a release is cut.
+A decentralised group chat client built atop Qt. It depends solely on
+the Katzenpost mix network and the Pigeonhole storage services — no
+central server is involved. The underlying design is set out in the
+[Echomix paper](https://arxiv.org/abs/2501.02933).
+
+A tag has not yet been published; at present, `katzenqt` builds
+against a development branch of `katzenpost`. This section will be
+updated once a release is cut.
 
 ```shell
 sudo apt install libxcb-cursor0 libegl1
