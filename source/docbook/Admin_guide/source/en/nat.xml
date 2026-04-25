@@ -185,7 +185,7 @@
     <section xml:id="dirauth-nat">
         <title xml:id="dirauth-nat.title">Hosting a directory authority behind NAT</title>
         <para>Directory authorities have no support for the <parameter>BindAddresses</parameter>
-            parameter. They also do not adverstise an address in the PKI document, because peers
+            parameter. They also do not advertise an address in the PKI document, because peers
             must already know the address in order to fetch the document, which means that addresses
             for dirauths must be provided out-of-band.</para>
         <para> Consequently, the <code>Addresses</code> parameter for dirauths performs the same
