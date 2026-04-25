@@ -5,7 +5,7 @@ draft: false
 menu: {main: {weight: 70}}
 type: "base"
 no_list: true
-body_class: "td-no-sidebar"
+body_class: "td-no-sidebar td-hacker"
 ---
 
 <div class="text-center mb-4">

@@ -485,3 +485,57 @@ pre {
     }
 }
 
+/* Hacker / phrack-style theme. Pages opt in via body_class: "td-hacker".
+   Black background, light terminal text, yellow headings rendered as
+   "--=[ heading ]=--" ribbons. */
+.td-hacker {
+    background-color: #000;
+    color: #c8c8c8;
+
+    a, a:visited {
+        color: #66ccff;
+    }
+    a:hover {
+        color: #ffcc4d;
+    }
+
+    h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5 {
+        color: #ffcc4d;
+    }
+
+    h2 {
+        text-transform: lowercase;
+        padding: 0.4rem 0;
+        border-top: 1px solid rgba(255, 204, 77, 0.5);
+        border-bottom: 1px solid rgba(255, 204, 77, 0.5);
+        margin-top: 2.5rem;
+        font-weight: 500;
+    }
+    h2::before { content: "--=[ "; opacity: 0.7; }
+    h2::after  { content: " ]=--"; opacity: 0.7; }
+
+    p.lead { color: #d0d0d0; }
+
+    table {
+        color: inherit;
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+    table th, table td {
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+    table thead th {
+        color: #ffcc4d;
+        border-bottom: 1px solid rgba(255, 204, 77, 0.5);
+    }
+
+    blockquote {
+        border-left-color: rgba(255, 204, 77, 0.5);
+        color: #c8c8c8;
+    }
+
+    code:not(pre code) {
+        color: #ffcc4d;
+        background-color: rgba(255, 204, 77, 0.08);
+    }
+}
+
