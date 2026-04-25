@@ -474,15 +474,50 @@ pre {
 }
 
 /* Suppress the left sidebar on pages that opt in via body_class: "td-no-sidebar".
-   The main column is widened to fill the freed space. The right-hand ToC sidebar
-   is left untouched so per-page anchors remain reachable where they exist. */
+   The main column is centred with a comfortable max-width so the content breathes
+   on wide displays. The right-hand ToC sidebar is left untouched so per-page
+   anchors remain reachable where they exist. */
 .td-no-sidebar {
     .td-sidebar { display: none; }
     main.col-12.col-md-9.col-xl-8 {
         @media (min-width: 768px) {
             flex: 0 0 100%;
-            max-width: 100%;
+            max-width: 1100px;
+            margin-left: auto !important;
+            margin-right: auto !important;
             padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
         }
     }
+}
+
+/* Documentation landing-page card grid. Each .doc-card is a clickable card
+   linking to a section of the docs. The hover state provides gentle feedback. */
+.doc-card {
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.doc-card:hover {
+    text-decoration: none;
+    color: inherit;
+    transform: translateY(-2px);
+    box-shadow: 0 0.35rem 0.9rem rgba(0, 0, 0, 0.12);
+    border-color: rgba(0, 0, 0, 0.18);
+}
+.doc-card .card-title {
+    color: $primary;
+    margin-bottom: 0.6rem;
+}
+.doc-card .card-text {
+    color: $body-color;
+}
+.doc-card-icon {
+    font-size: 1.3rem;
+    margin-right: 0.4rem;
+}
+.doc-card--coming {
+    background-color: rgba(0, 0, 0, 0.03);
+    cursor: default;
 }
