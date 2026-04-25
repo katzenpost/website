@@ -491,33 +491,3 @@ pre {
     }
 }
 
-/* Documentation landing-page card grid. Each .doc-card is a clickable card
-   linking to a section of the docs. The hover state provides gentle feedback. */
-.doc-card {
-    text-decoration: none;
-    color: inherit;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-}
-.doc-card:hover {
-    text-decoration: none;
-    color: inherit;
-    transform: translateY(-2px);
-    box-shadow: 0 0.35rem 0.9rem rgba(0, 0, 0, 0.12);
-    border-color: rgba(0, 0, 0, 0.18);
-}
-.doc-card .card-title {
-    color: $primary;
-    margin-bottom: 0.6rem;
-}
-.doc-card .card-text {
-    color: $body-color;
-}
-.doc-card-icon {
-    font-size: 1.3rem;
-    margin-right: 0.4rem;
-}
-.doc-card--coming {
-    background-color: rgba(0, 0, 0, 0.03);
-    cursor: default;
-}
