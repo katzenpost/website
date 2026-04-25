@@ -446,9 +446,8 @@ pre {
 }
 
 /* Phrack-style h2 ribbon, only on pages that opt in via body_class:
-   "td-hacker". Other pages keep plain headings. The textual decoration
-   "|=---=[ Title ]=---=|" is rendered in yellow with the title itself
-   in white, matching phrack's article banners. */
+   "td-hacker". The textual marker "|=---=[" precedes the title; no
+   closing decoration, matching phrack's asymmetric article banners. */
 .td-hacker h2 {
     color: #ffffff !important;
     margin-top: 2.5rem;
@@ -456,11 +455,6 @@ pre {
 }
 .td-hacker h2::before {
     content: "|=---=[ ";
-    color: #ffcc4d;
-    opacity: 0.85;
-}
-.td-hacker h2::after {
-    content: " ]=---=|";
     color: #ffcc4d;
     opacity: 0.85;
 }
