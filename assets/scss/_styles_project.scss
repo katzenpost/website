@@ -103,18 +103,18 @@ header.article-meta {
 .td-page-meta__issue  { display: none !important; }
 .td-page-meta__project-issue  { display: none !important; }
 
-/* Gray background theme with black code blocks */
+/* Black background theme with black code blocks */
 body {
-    background-color: #2d2d2d !important;
+    background-color: #000000 !important;
     color: #ffffff !important;
 }
 
 .td-main {
-    background-color: #2d2d2d !important;
+    background-color: #000000 !important;
 }
 
 .td-content {
-    background-color: #2d2d2d !important;
+    background-color: #000000 !important;
     color: #ffffff !important;
 }
 
@@ -445,74 +445,23 @@ pre {
     }
 }
 
-/* Site-wide dark theme: black background, terminal-gray body text,
-   yellow headings, cyan links. Bootstrap variables are overridden at
-   :root so utility classes (.bg-body, .text-body, etc.) follow suit.
-   The !important on body's bg defeats a Docsy rule that forces the
-   body transparent. */
-:root {
-    --bs-body-bg: #000000;
-    --bs-body-bg-rgb: 0, 0, 0;
-    --bs-body-color: #c8c8c8;
-    --bs-body-color-rgb: 200, 200, 200;
-}
-
-html, body {
-    background-color: #000 !important;
-    color: #c8c8c8;
-}
-
-body a, body a:visited {
-    color: #66ccff;
-}
-body a:hover {
-    color: #ffcc4d;
-}
-
-h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5 {
-    color: #ffcc4d;
-}
-
-p.lead { color: #d0d0d0; }
-
-.td-content table,
-.td-blog table,
-table {
-    color: inherit;
-    border-color: rgba(255, 255, 255, 0.15);
-}
-.td-content table th, .td-content table td,
-.td-blog table th, .td-blog table td,
-table th, table td {
-    border-color: rgba(255, 255, 255, 0.15);
-}
-.td-content table thead th,
-.td-blog table thead th,
-table thead th {
-    color: #ffcc4d;
-    border-bottom: 1px solid rgba(255, 204, 77, 0.5);
-}
-
-blockquote {
-    border-left-color: rgba(255, 204, 77, 0.5);
-    color: #c8c8c8;
-}
-
-code:not(pre code) {
-    color: #ffcc4d;
-    background-color: rgba(255, 204, 77, 0.08);
-}
-
 /* Phrack-style h2 ribbon, only on pages that opt in via body_class:
-   "td-hacker". Other pages keep plain headings. */
+   "td-hacker". Other pages keep plain headings. The textual decoration
+   "|=---=[ Title ]=---=|" is rendered in yellow with the title itself
+   in white, matching phrack's article banners. */
 .td-hacker h2 {
-    text-transform: lowercase;
-    padding: 0.4rem 0;
-    border-top: 1px solid rgba(255, 204, 77, 0.5);
-    border-bottom: 1px solid rgba(255, 204, 77, 0.5);
+    color: #ffffff !important;
     margin-top: 2.5rem;
     font-weight: 500;
 }
-.td-hacker h2::before { content: "--=[ "; opacity: 0.7; }
-.td-hacker h2::after  { content: " ]=--"; opacity: 0.7; }
+.td-hacker h2::before {
+    content: "|=---=[ ";
+    color: #ffcc4d;
+    opacity: 0.85;
+}
+.td-hacker h2::after {
+    content: " ]=---=|";
+    color: #ffcc4d;
+    opacity: 0.85;
+}
 
