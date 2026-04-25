@@ -34,15 +34,17 @@ $link-color: $primary !default;
 $link-decoration: none !default;
 $link-shade-percentage: 30% !default;
 
-// Fonts. Self-hosted JetBrains Mono is declared via @font-face in
-// _styles_project.scss; we leave Google Fonts disabled and override the
-// Bootstrap font-family stack to put JetBrains Mono first.
+// Fonts. Body and code use the generic monospace keyword so the user's
+// own OS-default monospace is honoured (this matches phrack.org's choice
+// and gives readers whatever they find most legible). The sidebar gets a
+// sans-serif stack since dense link columns scan better that way.
 $td-enable-google-fonts: false !default;
 $font-awesome-font-name: "Font Awesome 6 Free" !default;
 
-$td-fonts-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+$td-fonts-mono: monospace;
+$td-fonts-sans: "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
-$font-family-sans: "JetBrains Mono" !default;
+$font-family-sans: $td-fonts-sans !default;
 $font-family-sans-serif: $td-fonts-mono !default;
 $font-family-monospace: $td-fonts-mono !default;
 $font-family-base: $td-fonts-mono !default;
