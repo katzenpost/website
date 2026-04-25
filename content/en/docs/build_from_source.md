@@ -8,6 +8,7 @@ author: ["David Stainton"]
 version: 0
 draft: false
 slug: "/build_from_source/"
+body_class: "td-style-dashes"
 ---
 
 # Build Katzenpost from source
