@@ -4,7 +4,7 @@ linkTitle: "Thin Client How-to Guide"
 description: "Task-oriented guides for using the Katzenpost thin client API"
 categories: [""]
 tags: [""]
-author: []
+author: ["David Stainton"]
 version: 0
 draft: false
 slug: "/thin_client_howto/"
