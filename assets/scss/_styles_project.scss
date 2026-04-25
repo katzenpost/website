@@ -487,9 +487,17 @@ pre {
 
 /* Hacker / phrack-style theme. Pages opt in via body_class: "td-hacker".
    Black background, light terminal text, yellow headings rendered as
-   "--=[ heading ]=--" ribbons. */
-.td-hacker {
+   "--=[ heading ]=--" ribbons. The !important on body's bg defeats a
+   Docsy rule that would otherwise force the body transparent. */
+html:has(body.td-hacker) {
     background-color: #000;
+}
+
+body.td-hacker {
+    background-color: #000 !important;
+}
+
+.td-hacker {
     color: #c8c8c8;
 
     a, a:visited {
