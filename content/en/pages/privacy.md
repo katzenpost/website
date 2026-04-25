@@ -6,6 +6,10 @@ slug: "/privacy/"
 type: "pages"
 ---
 
+<div class="text-center mb-4">
+  <img src="/images/ZII-WIZ2.png" alt="ANSI triptych of three figures, by Zeus" class="img-fluid" style="max-width: 640px;">
+</div>
+
 Given that our team hails from various sects in the vanguard of online privacy
 and anonymity research and our mission is to create anonymizing mixnet technology,
 we want to know as little about the people interacting with our website as
