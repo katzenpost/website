@@ -123,7 +123,7 @@ typically a fair sized mixnet will have more than one gateway node:\\
     \item A Gateway node learns how many messages the client sends and receives.
     \item A Gateway node does NOT learn the sent message destinations or the received message origins.
     \item A Gateway node does NOT learn if a given sent or received message is a decoy or not.
-    \item A Gateway node can drop or correupt any sent or received message.
+    \item A Gateway node can drop or corrupt any sent or received message.
     \item A Gateway node can spam a user with invalid messages.
     \item A Gateway node can duplicate old messages. However duplicate outbound messages will be dropped by the first hop as per Sphinx packet deduplication cache.
 \end{itemize}
@@ -194,7 +194,7 @@ A random person can attempt to DoS the mix network or a specific service on the 
 The passive attack could happen via a zero day or design flaw. The efficacy of the active attack needs to be analyzed with respect to the specific design.\smallskip
 
 \\
-\hline Cryptographic Attacks & The adversary is able to forge a signature, generate a second hash preimage, decrypt cyphertext or do other damage assumed to be prevented by the use of cryptography. & The adversary can break the security of one or more cryptographic primitives through a cryptographic zero day or sufficient computational resources, or exploit a flaw in their implementation.  \\
+\hline Cryptographic Attacks & The adversary is able to forge a signature, generate a second hash preimage, decrypt ciphertext or do other damage assumed to be prevented by the use of cryptography. & The adversary can break the security of one or more cryptographic primitives through a cryptographic zero day or sufficient computational resources, or exploit a flaw in their implementation.  \\
 
 
 \hline Endpoint Security Attacks & The adversary breaches the security of a user's device via an attack not directly related to the mixnet. & The adversary is able to exploit a technical flaw in the user's device or compel the user to grant him access.\\
@@ -224,7 +224,7 @@ The passive attack could happen via a zero day or design flaw. The efficacy of t
 
 \hline Replay Confirmation Attack & If a Sphinx packet is able to be replayed then the adversary may send the packet many times concurrently in order to observe the traffic burst in another part of the network.  & The mix nodes maintain Sphinx replay caches in order to prevent replays; the attack is therefore only possible if there is a replay cache malfunction. \\
 
-\hline SURB Confirmation Attack & If a client sends many SURBs\footnote{Sphinx Single Use Reply Block is essentialy a one-time use privacy preserving delivery token} to another entity on the network, that entity may choose to send out ALL the SURBs at once in order to observe the traffic burst in another part of the network. & The adversary is a global passive observer of the network and participant in the network; additionally the adversary must be in possession of multiple SURBs created by another entity on the network. \\
+\hline SURB Confirmation Attack & If a client sends many SURBs\footnote{Sphinx Single Use Reply Block is essentially a one-time use privacy preserving delivery token} to another entity on the network, that entity may choose to send out ALL the SURBs at once in order to observe the traffic burst in another part of the network. & The adversary is a global passive observer of the network and participant in the network; additionally the adversary must be in possession of multiple SURBs created by another entity on the network. \\
 
 \hline ARQ Confirmation Attack & The adversary's goal is to find a specific ARQ\footnote{Automatic Repeat reQuest is a category network error correction strategies that uses retransmissions and acknowledgement packets} client who is currently interacting on the network by causing targeted outages of entry Providers after the target service receives a protocol message. To start, half of the entry Providers are allowed to receive messages. If the adversary observes a retransmission then it confirms the client is in the group of entry Providers that we blocked messages to. The adversary continues the binary search and finds the client's entry Provider in log(n) time. & The adversary must have access to a target mixnet service so as to distinguish a message transmission versus a retransmission. The adversary must also be able block messages from going to specific mixnet nodes, in this example, entry Providers. \\
 
@@ -351,7 +351,7 @@ malicious nodes, and is therefore able to glean partial or complete information 
 follow a message through the mix network.
 
 \paragraph{countermeasure:} We mitigate Sybil attacks by preventing mix nodes from automatically
-joining the network. A prerequesite for joining the network is to have all the directory
+joining the network. A prerequisite for joining the network is to have all the directory
 authorities add the new mix node's connection information and public cryptographic key material to their configuration. Please see the Future Countermeasures section below for a discussion
 of additional directory authority features including a reputation system.
 
@@ -480,7 +480,7 @@ Two communicating parties each exchange shared secrets which they use to determi
 a new "mailbox" for each message. To be clear, this new protocol is an improved revision of the previous Katzen protocol where
 each party chooses their own "mailbox" (queue Provider + queue ID); the difference here is
 that instead of the two parties exchanging mailbox locations they exchange seeds which are
-used to determinically generate mailbox locations for each message.
+used to deterministically generate mailbox locations for each message.
 
 This new protocol still uses all four previously mentioned mechanisms to achieve countermeasure against intersection attacks
 however the new "scatter queue" design drastically reduces the amount of metadata which can be collected by the operators
@@ -702,7 +702,7 @@ Expressed as a sequence diagram, pqXX looks like this:
 
 \paragraph{future improvement, option 1:}Remove the "retrieve message" command which client's use to poll for new messages. Instead the client - server Noise protocol should be designed such that clients periodically receive messages from the server without requesting or polling for them. If no message is present in the message queue on the server then the server will send the client a decoy message.
 
-\paragraph{future improvement, option 2:}Replace the "retrieve message" command with a "send and retrieve" command whereby everytime the client sends a message they also receive a message. As per usual, perhaps some of the messages send and received are decoy messages.
+\paragraph{future improvement, option 2:}Replace the "retrieve message" command with a "send and retrieve" command whereby every time the client sends a message they also receive a message. As per usual, perhaps some of the messages send and received are decoy messages.
 
 
 \pagebreak

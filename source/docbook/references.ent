@@ -59,7 +59,7 @@ Anonymous Communication</quote>,
 
 <!ENTITY MIRANDA '<para xml:id="MIRANDA"><emphasis role="bold">MIRANDA</emphasis></para>
 <para>Leibowitz, H., Piotrowska, A., Danezis, G., Herzberg, A., <quote>No right
-to ramain silent: Isolating Malicious Mixes</quote>, 2017, 
+to remain silent: Isolating Malicious Mixes</quote>, 2017, 
 <link xlink:href="https://eprint.iacr.org/2017/1000.pdf"/>.</para>'>
 
 <!ENTITY MIXMINION '<para xml:id="MIXMINION"><emphasis role="bold">MIXMINION</emphasis></para>
@@ -124,7 +124,7 @@ xlink:href="https://www.rfc-editor.org/info/rfc5322"/>.</para>'>
 <link xlink:href="https://www.rfc-editor.org/info/rfc6234"/>.</para>'>
 
 <!ENTITY RFC7049 '<para xml:id="RFC7049"><emphasis role="bold">RFC7049</emphasis></para>
-<para>C. Bormannm, P. Hoffman, <quote>Concise Binary Object Representation (CBOR)</quote>, Internet Engineering Task Force (IETF), October 2013, 
+<para>C. Bormann, P. Hoffman, <quote>Concise Binary Object Representation (CBOR)</quote>, Internet Engineering Task Force (IETF), October 2013, 
 <link xlink:href="https://www.rfc-editor.org/info/rfc7049"/>.</para>'>
 
 <!ENTITY RFC7515 '<para xml:id="RFC7515"><emphasis role="bold">RFC7515</emphasis></para>

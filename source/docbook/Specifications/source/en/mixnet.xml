@@ -124,7 +124,7 @@
             <title xml:id="threat-model.title">2.1 Threat Model</title>
             <para> Here we cannot present the threat model to the higher level mixnet protocols.
                 However this low level core mixnet protocol does have it’s own threat model which we
-                attempt to illucidate here. </para>
+                attempt to elucidate here. </para>
             <para> We assume that the clients only talk to mixnet services. These services make use
                 of a client provided delivery token known as a SURB (Single Use Reply Block) to send
                 their replies to the client without knowing the client’s entry mix. This system

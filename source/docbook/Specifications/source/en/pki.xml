@@ -215,7 +215,7 @@
         <para> Thus, at any time, keys for all Mixes for the Nth through N + 2nd epoch will be
             available, allowing for a maximum round trip (forward message + SURB) delay + transit
             time of 40 minutes. SURB lifetime is limited to a single epoch because of the key
-            rotation epoch, however this shouldn’t present any useability problems since SURBs are
+            rotation epoch, however this shouldn’t present any usability problems since SURBs are
             only used for sending ACK messages from the destination Provider to the sender. </para>
         <section xml:id="pki-protocol-schedule">
             <title>2.1 PKI protocol schedule</title>
@@ -330,7 +330,7 @@
                 Authority servers begin the voting process 1/8 of an epoch period after the start of
                 a new epoch. Each Authority exchanges vote directory messages with each other. </para>
             <para> Authorities archive votes from other authorities and make them available for
-                retreival. Upon receiving a new vote, the authority examines it for new descriptors
+                retrieval. Upon receiving a new vote, the authority examines it for new descriptors
                 and includes any valid descriptors in its view of the network. </para>
             <para> Each Authority includes in its vote a hashed value committing to a choice of a
                 random number for the vote. See section 4.3 for more details. </para>
@@ -392,7 +392,7 @@ This round of voting was missed. \*/
             <para> 3.3.1 Reveal Wire Protocol Commands </para>
             <para> The Katzenpost Wire Protocol as described in <link linkend="KATZMIXWIRE"
                     >KATZMIXWIRE</link> is used by Authorities to exchange reveal values previously
-                commited to in their votes. We define additional wire protocol commands for
+                committed to in their votes. We define additional wire protocol commands for
                 exchanging reveals: </para>
             <programlisting>enum {
 :   reveal(25), reveal_status(26),
@@ -449,7 +449,7 @@ missed. */
                 process, after Reveal messages have been exchanged, Authorities vote again,
                 including the Reveals seen by them. Authorities may not introduce new MixDescriptors
                 at this phase in the protocol. </para>
-            <para> Otherwise, a consensus partition can be obtained by witholding Reveal values from
+            <para> Otherwise, a consensus partition can be obtained by withholding Reveal values from
                 a threshold number of Peers. In the case of an even-number of Authorities, a denial
                 of service by a single Authority was observed. </para>
         </section>
@@ -929,7 +929,7 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
                     path selection. Therefore if the PKI as a whole becomes compromised then so will
                     the rest of the system in terms of providing the main security properties
                     described as traffic analysis resistance. Therefore a decentralized voting
-                    protocol is used so that the system is more resiliant when attacked, in
+                    protocol is used so that the system is more resilient when attacked, in
                     accordance with the principle of least authority. <link linkend="SECNOTSEP"
                         role="citation">SECNOTSEP</link>
                 </para>
