@@ -46,9 +46,8 @@ guidance, see the [Admin Guide](/docs/admin_guide/).
 ## kpclientd (the client daemon)
 
 The thin client libraries do not, by themselves, speak to the mix
-network — they communicate over a local socket with the
-`kpclientd` daemon, which performs all cryptographic and network
-operations.
+network. They communicate over a local socket with the `kpclientd`
+daemon, which performs all cryptographic and network operations.
 
 ```shell
 git clone https://github.com/katzenpost/katzenpost
@@ -120,7 +119,7 @@ API and are useful smoke tests once `kpclientd` is running.
 ## katzenqt (Qt group chat client)
 
 A decentralised group chat client built atop Qt. It depends solely on
-the Katzenpost mix network and the Pigeonhole storage services — no
+the Katzenpost mix network and the Pigeonhole storage services. No
 central server is involved. The underlying design is set out in the
 [Echomix paper](https://arxiv.org/abs/2501.02933).
 
