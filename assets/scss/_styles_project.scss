@@ -445,25 +445,46 @@ pre {
     }
 }
 
-/* Phrack-style h2 ribbon, only on pages that opt in via body_class:
-   "td-hacker". The textual marker "|=---=[" precedes the title; no
-   closing decoration, matching phrack's asymmetric article banners. */
-.td-hacker h2 {
+/* Phrack-style h2 banners. Every content h2 gets a marker by default.
+   The marker text varies per page based on body_class. Docsy uses
+   h2[id]::before for a navbar-offset trick (display:block,
+   margin-top:-5rem, visibility:hidden); we undo those so our markers
+   are visible and inline. The trade-off is that anchor-link offsets
+   are lost for h2s. */
+.td-content h2 {
     color: #ffffff !important;
     margin-top: 2.5rem;
     font-weight: 500;
 }
-.td-hacker h2::before {
-    content: "|=---=[ ";
+.td-content h2::before {
+    content: "|=---=[ ";        /* default = "equals" style */
     color: #ffcc4d;
     opacity: 0.85;
-    /* Docsy uses h2[id]::before for a navbar-offset trick (display:block,
-       margin-top:-5rem, visibility:hidden). Undo those so our marker is
-       visible and inline. The trade-off is that anchor-link offsets are
-       lost on td-hacker h2s, which is acceptable on the docs landing. */
     visibility: visible;
     display: inline;
     height: auto;
     margin-top: 0;
+}
+
+/* Per-page heading-style overrides. Pages opt in via
+   body_class: "td-style-dashes" (etc.). */
+.td-style-dashes  .td-content h2::before { content: "----[ "; }
+.td-style-emblem  .td-content h2::before { content: "<:=--=:>=[ "; }
+.td-style-arrows  .td-content h2::before { content: ">>>>>=-* "; }
+.td-style-stars   .td-content h2::before { content: "*** "; }
+.td-style-plain   .td-content h2::before { content: ""; }
+
+/* Phrack-style EOF marker appended to every page. Width is 80 columns
+   to honour the magazine's terminal heritage. */
+.phrack-eof {
+    color: #ffcc4d;
+    background: transparent !important;
+    border: 0 !important;
+    padding: 1.25rem 0 0 0 !important;
+    margin: 3rem 0 0 0 !important;
+    opacity: 0.65;
+    font-size: 0.85em;
+    overflow-x: auto;
+    white-space: pre;
 }
 
