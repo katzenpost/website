@@ -10,6 +10,15 @@ body_class: "td-no-sidebar"
 
 <p class="lead">Choose your audience.</p>
 
+```text
+            forward (Sphinx)                         return (SURB reply)
+    ──────────────────────────▶               ──────────────────────────▶
+
+    gateway ─▶ mix¹ ─▶ mix² ─▶ mix³ ─▶ service ─▶ mix¹ ─▶ mix² ─▶ mix³ ─▶ gateway
+```
+
+Every client interaction is a round-trip through the stratified mix topology — the forward half carries a Sphinx packet to a service node; the return half carries a Single-Use Reply Block back through the same three mix layers to the originating gateway. This symmetry is what blunts traffic analysis.
+
 ## For users
 
 You wish to use a Katzenpost client application to communicate.
@@ -28,7 +37,30 @@ You wish to run your own Katzenpost mix network with friends and collaborators.
 
 ## For application developers
 
-You wish to build software that integrates with Katzenpost — custom clients, services, or higher-level protocols layered atop the mixnet.
+You wish to build software that integrates with Katzenpost — custom clients, services, or higher-level protocols layered atop the mixnet. Pigeonhole is the storage primitive on which those higher protocols are built. Alice mints a channel, writes a message, and Bob reads it with the capability she gives him out of band:
+
+```python
+import asyncio, os
+from katzenpost_thinclient import ThinClient, Config
+
+async def alice_writes_to_bob():
+    alice = ThinClient(Config("/etc/namenlos/thinclient.toml"))
+    await alice.start(asyncio.get_event_loop())
+
+    # Mint a Pigeonhole channel: WriteCap for Alice, ReadCap to share with Bob.
+    chan = await alice.new_keypair(os.urandom(32))
+
+    # Encrypt and publish a message into the channel's first box.
+    enc = await alice.encrypt_write(b"the eagle has landed",
+                                    chan.write_cap, chan.first_message_index)
+    await alice.start_resending_encrypted_message(
+        write_cap=chan.write_cap, read_cap=None, message_box_index=None,
+        reply_index=0, envelope_descriptor=enc.envelope_descriptor,
+        message_ciphertext=enc.message_ciphertext, envelope_hash=enc.envelope_hash,
+    )
+    # Bob, given chan.read_cap out of band, calls encrypt_read +
+    # start_resending_encrypted_message and receives "the eagle has landed".
+```
 
 |     | Title | Description |
 |-----|-------|-------------|
