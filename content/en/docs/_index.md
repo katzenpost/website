@@ -25,6 +25,7 @@ You wish to use a Katzenpost client application to communicate.
 |-----|-------|-------------|
 | 🐈  | **Namenlos public mixnet** *(coming soon)* | A public Katzenpost mix network that anyone may use, without the burden of operating their own. |
 | 📦  | **`kpclientd` packages and binaries** *(coming soon)* | Pre-built distribution packages and binaries for the client daemon, so users will not need to build from source. |
+| 💬  | **katzenqt group chat** *(coming soon)* | A decentralised group chat application that runs over the Katzenpost mix network and the Pigeonhole storage services. Pre-built packages will be linked here once a release is cut. |
 
 ## For operators
 
