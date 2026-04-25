@@ -457,5 +457,13 @@ pre {
     content: "|=---=[ ";
     color: #ffcc4d;
     opacity: 0.85;
+    /* Docsy uses h2[id]::before for a navbar-offset trick (display:block,
+       margin-top:-5rem, visibility:hidden). Undo those so our marker is
+       visible and inline. The trade-off is that anchor-link offsets are
+       lost on td-hacker h2s, which is acceptable on the docs landing. */
+    visibility: visible;
+    display: inline;
+    height: auto;
+    margin-top: 0;
 }
 
