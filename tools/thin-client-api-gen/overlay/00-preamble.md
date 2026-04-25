@@ -4,7 +4,7 @@ linkTitle: "Thin Client API Reference"
 description: "Complete API reference for the Katzenpost thin client libraries (Go, Rust, Python)"
 categories: [""]
 tags: [""]
-author: []
+author: ["David Stainton"]
 version: 0
 draft: false
 slug: "/thin_client_api_reference/"
