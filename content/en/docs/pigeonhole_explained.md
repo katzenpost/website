@@ -18,6 +18,22 @@ append-only streams. From a passive network observer's perspective
 there is no consistent stream access and instead everything looks like
 randomly scattered queries across storage servers.
 
+```text
+   client      ┌───── via mix network ─────┐    courier        replicas
+                                                                   ┌────┐
+   kpclientd ──▶  Sphinx round-trip (×3 mix layers)  ──▶  service  │  1 │
+                                                         node      ├────┤
+                                                         (courier) │  2 │
+                                                            │      ├────┤
+                                                            └─────▶│ ...│
+                                                                   └────┘
+                                              fixed-throughput     K = 2
+                                              connections;          replicas
+                                              cannot read box IDs   per box
+                                                                   (consistent
+                                                                    hashing)
+```
+
 For protocol details, see the
 [Pigeonhole specification](/docs/specs/pigeonhole/) and sections
 4-5 of the [Echomix paper](https://arxiv.org/abs/2501.02933).

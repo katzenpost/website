@@ -8,7 +8,8 @@ draft: false
 slug: "" 
 layout: "" 
 type: "" 
-weight: 40 
+weight: 40
+author: ["David Stainton"]
 ---
 <!DOCTYPE HTML>
 <html xmlns:ng="http://docbook.org/docbook-ng">
@@ -320,7 +321,7 @@ replay_tag = H( shared_secret )
             </div>
             <p> It would be sufficient to use a key value store or hashmap to detect the presence
                of
-               a duplicate replay tag however we additionaly employ a bloom filter to increase
+               a duplicate replay tag however we additionally employ a bloom filter to increase
                performance. Sphinx keys must periodically be rotated and destroyed to mitigate
                compulsion attacks and therefore our replay caches must likewise be rotated. This
                kind

@@ -2,61 +2,6 @@
 
 /* Import Chroma monokai syntax highlighting */
 @import "chroma_monokai";
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: italic;
-  font-weight: 300;
-  font-display: swap;
-  src: url('/fonts/FiraSans-LightItalic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: italic;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Bold.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Light.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Medium.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Bold.woff2') format('woff2');
-}
 
 
 /* Stylez */
@@ -144,7 +89,7 @@ header.article-meta {
     margin: 0 auto;
     padding: 20px;
     text-align: center;
-    font-family: 'Fira Sans', sans-serif;
+    font-family: monospace;
     font-size: 1.25rem; /* Slightly larger font size (20px) */
     line-height: 1.6; /* Increase line height for better readability */
     font-weight: 400; /* Optional: Adjust weight for optimal readability */
@@ -158,18 +103,18 @@ header.article-meta {
 .td-page-meta__issue  { display: none !important; }
 .td-page-meta__project-issue  { display: none !important; }
 
-/* Gray background theme with black code blocks */
+/* Black background theme with black code blocks */
 body {
-    background-color: #2d2d2d !important;
+    background-color: #000000 !important;
     color: #ffffff !important;
 }
 
 .td-main {
-    background-color: #2d2d2d !important;
+    background-color: #000000 !important;
 }
 
 .td-content {
-    background-color: #2d2d2d !important;
+    background-color: #000000 !important;
     color: #ffffff !important;
 }
 
@@ -472,3 +417,61 @@ pre {
     color: #ffffff !important;
     margin-bottom: 0 !important;
 }
+
+/* The body stack is generic monospace, but dense navigation columns
+   read more easily in a sans-serif. Apply the sans stack to the left
+   and right Docsy sidebars. */
+.td-sidebar,
+.td-sidebar-toc,
+.td-sidebar-nav {
+    font-family: $td-fonts-sans;
+}
+
+/* Suppress the left sidebar on pages that opt in via body_class: "td-no-sidebar".
+   The main column is centred with a comfortable max-width so the content breathes
+   on wide displays. The right-hand ToC sidebar is left untouched so per-page
+   anchors remain reachable where they exist. */
+.td-no-sidebar {
+    .td-sidebar { display: none; }
+    main.col-12.col-md-9.col-xl-8 {
+        @media (min-width: 768px) {
+            flex: 0 0 100%;
+            max-width: 1100px;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
+        }
+    }
+}
+
+/* Phrack-style h2 banners. Every content h2 gets a marker by default.
+   The marker text varies per page based on body_class. Docsy uses
+   h2[id]::before for a navbar-offset trick (display:block,
+   margin-top:-5rem, visibility:hidden); we undo those so our markers
+   are visible and inline. The trade-off is that anchor-link offsets
+   are lost for h2s. */
+.td-content h2 {
+    color: #ffffff !important;
+    margin-top: 2.5rem;
+    font-weight: 500;
+}
+.td-content h2::before {
+    content: "|=---=[ ";        /* default = "equals" style */
+    color: #ffcc4d;
+    opacity: 0.85;
+    visibility: visible;
+    display: inline;
+    height: auto;
+    margin-top: 0;
+}
+
+/* Per-page heading-style overrides. Pages opt in via
+   body_class: "td-style-dashes" (etc.). */
+.td-style-dashes  .td-content h2::before { content: "----[ "; }
+.td-style-emblem  .td-content h2::before { content: "<:=--=:>=[ "; }
+.td-style-arrows  .td-content h2::before { content: ">>>>>=-* "; }
+.td-style-stars   .td-content h2::before { content: "*** "; }
+.td-style-plain   .td-content h2::before { content: ""; }
+
+

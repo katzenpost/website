@@ -9,6 +9,7 @@ slug: ""
 layout: "" 
 type: "" 
 weight: 35
+author: ["Yawning Angel", "Claudia Diaz", "Ania Piotrowska", "David Stainton"]
 ---
 <!DOCTYPE HTML>
 <html xmlns:ng="http://docbook.org/docbook-ng">
@@ -348,7 +349,7 @@ weight: 35
             <p> Thus, at any time, keys for all Mixes for the Nth through N + 2nd epoch will be
                available, allowing for a maximum round trip (forward message + SURB) delay + transit
                time of 40 minutes. SURB lifetime is limited to a single epoch because of the key
-               rotation epoch, however this shouldn&#x2019;t present any useability problems since SURBs
+               rotation epoch, however this shouldn&#x2019;t present any usability problems since SURBs
                are
                only used for sending ACK messages from the destination Provider to the sender. </p>
             <div class="section">
@@ -501,7 +502,7 @@ weight: 35
                   of
                   a new epoch. Each Authority exchanges vote directory messages with each other. </p>
                <p> Authorities archive votes from other authorities and make them available for
-                  retreival. Upon receiving a new vote, the authority examines it for new descriptors
+                  retrieval. Upon receiving a new vote, the authority examines it for new descriptors
                   and includes any valid descriptors in its view of the network. </p>
                <p> Each Authority includes in its vote a hashed value committing to a choice of a
                   random number for the vote. See section 4.3 for more details. </p>
@@ -563,7 +564,7 @@ This round of voting was missed. \*/
                   </p>
                <p> 3.3.1 Reveal Wire Protocol Commands </p>
                <p> The Katzenpost Wire Protocol as described in <a class="link" href="#KATZMIXWIRE">KATZMIXWIRE</a> is used by Authorities to exchange reveal values previously
-                  commited to in their votes. We define additional wire protocol commands for
+                  committed to in their votes. We define additional wire protocol commands for
                   exchanging reveals: </p>
                <pre class="programlisting">enum {
 :   reveal(25), reveal_status(26),
@@ -622,7 +623,7 @@ missed. */
                   process, after Reveal messages have been exchanged, Authorities vote again,
                   including the Reveals seen by them. Authorities may not introduce new MixDescriptors
                   at this phase in the protocol. </p>
-               <p> Otherwise, a consensus partition can be obtained by witholding Reveal values from
+               <p> Otherwise, a consensus partition can be obtained by withholding Reveal values from
                   a threshold number of Peers. In the case of an even-number of Authorities, a denial
                   of service by a single Authority was observed. </p>
             </div>
@@ -1276,7 +1277,7 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
                         path selection. Therefore if the PKI as a whole becomes compromised then so will
                         the rest of the system in terms of providing the main security properties
                         described as traffic analysis resistance. Therefore a decentralized voting
-                        protocol is used so that the system is more resiliant when attacked, in
+                        protocol is used so that the system is more resilient when attacked, in
                         accordance with the principle of least authority. <a class="link" href="#SECNOTSEP">SECNOTSEP</a></p>
                   </li>
                   <li class="listitem">
@@ -1335,7 +1336,7 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
                <a class="link" href="https://cs.pwr.edu.pl/kutylowski/articles/LocalView-WWW.pdf" target="_top">https://cs.pwr.edu.pl/kutylowski/articles/LocalView-WWW.pdf</a>.</p>
             <p><a name="MIRANDA"></a><span class="bold"><strong>MIRANDA</strong></span></p>
             <p>Leibowitz, H., Piotrowska, A., Danezis, G., Herzberg, A., <span class="quote">&#x201c;<span class="quote">No right
-                     to ramain silent: Isolating Malicious Mixes</span>&#x201d;</span>, 2017, 
+                     to remain silent: Isolating Malicious Mixes</span>&#x201d;</span>, 2017, 
                <a class="link" href="https://eprint.iacr.org/2017/1000.pdf" target="_top">https://eprint.iacr.org/2017/1000.pdf</a>.</p>
             <p><a name="MIXMINIONDIRAUTH"></a><span class="bold"><strong>MIXMINIONDIRAUTH</strong></span></p>
             <p>Danezis, G., Dingledine, R., Mathewson, N., <span class="quote">&#x201c;<span class="quote">Type III (Mixminion) Mix

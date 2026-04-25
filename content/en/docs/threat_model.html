@@ -3,6 +3,8 @@ title:
 linkTitle: "Threat Model"
 draft: false
 slug: "/threat_model/"
+author: ["David Stainton", "Eva Infeld"]
+body_class: "td-style-emblem"
 ---
 
 <h1>Threat Model</h1>
@@ -113,7 +115,7 @@ receives.</p></li>
 the received message origins.</p></li>
 <li><p>A Gateway node does NOT learn if a given sent or received message
 is a decoy or not.</p></li>
-<li><p>A Gateway node can drop or correupt any sent or received
+<li><p>A Gateway node can drop or corrupt any sent or received
 message.</p></li>
 <li><p>A Gateway node can spam a user with invalid messages.</p></li>
 <li><p>A Gateway node can duplicate old messages. However duplicate
@@ -245,7 +247,7 @@ analyzed with respect to the specific design.</td>
 <tr class="even">
 <td style="text-align: left;">Cryptographic Attacks</td>
 <td style="text-align: left;">The adversary is able to forge a
-signature, generate a second hash preimage, decrypt cyphertext or do
+signature, generate a second hash preimage, decrypt ciphertext or do
 other damage assumed to be prevented by the use of cryptography.</td>
 <td style="text-align: left;">The adversary can break the security of
 one or more cryptographic primitives through a cryptographic zero day or
@@ -487,7 +489,7 @@ therefore able to glean partial or complete information to follow a
 message through the mix network.</p>
 <h4 id="countermeasure-4">countermeasure:</h4>
 <p>We mitigate Sybil attacks by preventing mix nodes from automatically
-joining the network. A prerequesite for joining the network is to have
+joining the network. A prerequisite for joining the network is to have
 all the directory authorities add the new mix node’s connection
 information and public cryptographic key material to their
 configuration. Please see the Future Countermeasures section below for a
@@ -642,7 +644,7 @@ determine a new "mailbox" for each message. To be clear, this new
 protocol is an improved revision of the previous Katzen protocol where
 each party chooses their own "mailbox" (queue Provider + queue ID); the
 difference here is that instead of the two parties exchanging mailbox
-locations they exchange seeds which are used to determinically generate
+locations they exchange seeds which are used to deterministically generate
 mailbox locations for each message.</p>
 <p>This new protocol still uses all four previously mentioned mechanisms
 to achieve countermeasure against intersection attacks however the new
@@ -848,7 +850,7 @@ message queue on the server then the server will send the client a decoy
 message.</p>
 <h4 id="future-improvement-option-2">future improvement, option 2:</h4>
 <p>Replace the "retrieve message" command with a "send and retrieve"
-command whereby everytime the client sends a message they also receive a
+command whereby every time the client sends a message they also receive a
 message. As per usual, perhaps some of the messages send and received
 are decoy messages.</p>
 <h1 id="classical-sphinx-and-post-quantum-sphinx">Classical Sphinx and
@@ -919,7 +921,7 @@ goal of compromising the mix node.</p>
 role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Sphinx Single Use Reply Block is essentialy a one-time
+<li id="fn1"><p>Sphinx Single Use Reply Block is essentially a one-time
 use privacy preserving delivery token<a href="#fnref1"
 class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2"><p>Automatic Repeat reQuest is a category network error
