@@ -46,6 +46,14 @@ You wish to run your own Katzenpost mix network with friends and collaborators.
       </div>
     </a>
   </div>
+  <div class="col">
+    <a class="card h-100 doc-card" href="/docs/build_from_source/">
+      <div class="card-body">
+        <h5 class="card-title"><span class="doc-card-icon">🔧</span> Build from source</h5>
+        <p class="card-text">Pinned versions of the Katzenpost stack and brief instructions for building each component (kpclientd, thin clients, katzenqt, server-side) from source.</p>
+      </div>
+    </a>
+  </div>
 </div>
 
 ## For application developers
@@ -74,6 +82,14 @@ You wish to build software that integrates with Katzenpost — custom clients, s
       <div class="card-body">
         <h5 class="card-title"><span class="doc-card-icon">🕊️</span> Understanding Pigeonhole</h5>
         <p class="card-text">A high-level introduction to the Pigeonhole anonymous storage protocol for application developers.</p>
+      </div>
+    </a>
+  </div>
+  <div class="col">
+    <a class="card h-100 doc-card" href="/docs/build_from_source/">
+      <div class="card-body">
+        <h5 class="card-title"><span class="doc-card-icon">🔧</span> Build from source</h5>
+        <p class="card-text">Pinned versions of the Katzenpost stack and brief instructions for building each component (kpclientd, thin clients, katzenqt) from source.</p>
       </div>
     </a>
   </div>
