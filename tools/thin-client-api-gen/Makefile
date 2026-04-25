@@ -65,14 +65,24 @@ venv-refresh:
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
-$(GO_JSON): | $(BUILD_DIR)
-	cd extract-go && go run . "$(GO_SRC)" > ../$(GO_JSON)
+GO_SOURCES     := extract-go/main.go extract-go/go.mod \
+                  $(shell find $(GO_SRC) -name '*.go' 2>/dev/null)
+RUST_SOURCES   := extract-rust/src/main.rs extract-rust/Cargo.toml extract-rust/Cargo.lock \
+                  $(shell find $(RUST_SRC) -name '*.rs' 2>/dev/null)
+PYTHON_SOURCES := extract-python.py \
+                  $(shell find $(PYTHON_SRC) -name '*.py' 2>/dev/null)
 
-$(RUST_JSON): | $(BUILD_DIR)
-	cd extract-rust && cargo run --release --quiet -- "$(RUST_SRC)" > ../$(RUST_JSON)
+$(GO_JSON): $(GO_SOURCES) | $(BUILD_DIR)
+	cd extract-go && go run . "$(GO_SRC)" > ../$@.tmp
+	@mv $@.tmp $@
 
-$(PYTHON_JSON): $(VENV_STAMP) | $(BUILD_DIR)
-	$(PYTHON) extract-python.py "$(PYTHON_SRC)" > $(PYTHON_JSON)
+$(RUST_JSON): $(RUST_SOURCES) | $(BUILD_DIR)
+	cd extract-rust && cargo run --release --quiet -- "$(RUST_SRC)" > ../$@.tmp
+	@mv $@.tmp $@
+
+$(PYTHON_JSON): $(PYTHON_SOURCES) $(VENV_STAMP) | $(BUILD_DIR)
+	$(PYTHON) extract-python.py "$(PYTHON_SRC)" > $@.tmp
+	@mv $@.tmp $@
 
 build: check-versions $(VENV_STAMP) $(GO_JSON) $(RUST_JSON) $(PYTHON_JSON)
 	$(PYTHON) stitch.py \
