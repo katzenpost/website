@@ -282,8 +282,8 @@ pre {
     }
 }
 
-/* Blog post navigation and tag links */
-.blog-tags a, .td-blog-posts-list a {
+/* Tag pill links inside article tag rows */
+.blog-tags a {
     color: #66b3ff !important;
     background-color: #404040 !important;
     padding: 0.25rem 0.5rem !important;
@@ -292,6 +292,35 @@ pre {
     &:hover {
         color: #ffffff !important;
         background-color: #66b3ff !important;
+    }
+}
+
+/* Post title and "Read more" links on the /blog/ index — keep them on the
+   page's black background (high contrast) rather than pilled on grey. */
+.td-blog-posts-list a {
+    color: #66b3ff !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    text-decoration: none !important;
+
+    &:hover {
+        color: #ffffff !important;
+        background-color: transparent !important;
+        text-decoration: underline !important;
+    }
+}
+
+/* Tag chips that appear inside individual post entries on the list page
+   should keep the pill treatment. */
+.td-blog-posts-list .taxonomy-terms-article a,
+.td-blog-posts-list a.taxonomy-term {
+    background-color: #404040 !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 3px !important;
+
+    &:hover {
+        background-color: #66b3ff !important;
+        color: #ffffff !important;
     }
 }
 
