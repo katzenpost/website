@@ -10,11 +10,9 @@ body_class: "td-no-sidebar td-style-plain"
 
 <img src="/images/ZII-WIZ3.png" alt="ANSI wizard casting a spell, by Zeus" class="img-fluid mb-4" style="max-width: 640px;">
 
-<p class="lead">Choose your audience.</p>
-
 ## For users
 
-You wish to use a Katzenpost client application to communicate.
+Client applications, packages, and a public mixnet.
 
 |     | Title | Description |
 |-----|-------|-------------|
