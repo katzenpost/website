@@ -8,18 +8,9 @@ no_list: true
 body_class: "td-no-sidebar td-style-plain"
 ---
 
-<div class="text-center mb-4">
-  <img src="/images/ZII-WIZ3.png" alt="ANSI wizard casting a spell, by Zeus" class="img-fluid" style="max-width: 640px;">
-</div>
+<img src="/images/ZII-WIZ3.png" alt="ANSI wizard casting a spell, by Zeus" class="img-fluid mb-4" style="max-width: 640px;">
 
 <p class="lead">Choose your audience.</p>
-
-```text
-            forward (Sphinx)                         return (SURB reply)
-    ──────────────────────────▶               ──────────────────────────▶
-
-    gateway ─▶ mix¹ ─▶ mix² ─▶ mix³ ─▶ service ─▶ mix¹ ─▶ mix² ─▶ mix³ ─▶ gateway
-```
 
 ## For users
 
