@@ -134,7 +134,7 @@ a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/c
     text-decoration: none !important;
 
     &:hover {
-        color: #99ccff !important;
+        color: #ffffff !important;
         text-decoration: underline !important;
     }
 
@@ -276,8 +276,8 @@ pre {
         background-color: transparent !important;
 
         &:hover {
-            color: #99ccff !important;
-            background-color: rgba(102, 179, 255, 0.1) !important;
+            color: #ffffff !important;
+            background-color: transparent !important;
         }
     }
 }
