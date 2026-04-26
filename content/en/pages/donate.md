@@ -22,12 +22,6 @@ Donations through WHS are tax-deductible in Germany.
 - Protocol research
 - Project infrastructure and mixnet operations
 
-## Other ways to contribute
-
-- Run a mix server, once the public mixnet launches and operators are needed.
-- Use [katzenqt](/docs/build_katzenqt/), report defects, and tell others about the project.
-- Contribute code, issues, and discussion on [GitHub](https://github.com/katzenpost).
-
 ## Funders
 
 Past and present sponsors are listed on the [Funders](/pages/funders/) page.
