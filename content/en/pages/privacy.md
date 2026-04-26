@@ -4,7 +4,6 @@ linkTitle: "Privacy"
 draft: false
 slug: "/privacy/"
 type: "pages"
-body_class: "td-style-emblem"
 ---
 
 <div class="text-center mb-4">

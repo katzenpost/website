@@ -445,32 +445,8 @@ pre {
     }
 }
 
-/* Phrack-style h2 banners. Every content h2 gets a marker by default.
-   The marker text varies per page based on body_class. Docsy uses
-   h2[id]::before for a navbar-offset trick (display:block,
-   margin-top:-5rem, visibility:hidden); we undo those so our markers
-   are visible and inline. The trade-off is that anchor-link offsets
-   are lost for h2s. */
 .td-content h2 {
     color: #ffffff !important;
     margin-top: 2.5rem;
     font-weight: 500;
 }
-.td-content h2::before {
-    content: "|=---=[ ";        /* default = "equals" style */
-    color: inherit;
-    visibility: visible;
-    display: inline;
-    height: auto;
-    margin-top: 0;
-}
-
-/* Per-page heading-style overrides. Pages opt in via
-   body_class: "td-style-dashes" (etc.). */
-.td-style-dashes  .td-content h2::before { content: "----[ "; }
-.td-style-emblem  .td-content h2::before { content: "<:=--=:>=[ "; }
-.td-style-arrows  .td-content h2::before { content: ">>>>>=-* "; }
-.td-style-stars   .td-content h2::before { content: "*** "; }
-.td-style-plain   .td-content h2::before { content: ""; }
-
-

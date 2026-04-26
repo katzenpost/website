@@ -5,7 +5,7 @@ draft: false
 menu: {main: {weight: 70}}
 type: "base"
 no_list: true
-body_class: "td-no-sidebar td-style-plain"
+body_class: "td-no-sidebar"
 ---
 
 <img src="/images/ZII-WIZ3.png" alt="ANSI wizard casting a spell, by Zeus" class="img-fluid mb-4" style="max-width: 640px;">
