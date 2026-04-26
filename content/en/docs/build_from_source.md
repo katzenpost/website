@@ -30,7 +30,7 @@ should be built from the same tag.
 | Go thin client (reference) | [katzenpost](https://github.com/katzenpost/katzenpost) | `client/thin` | `v0.0.73-rc3` |
 | Rust thin client | [thin_client](https://github.com/katzenpost/thin_client) | `src` | `0.0.12-rc3` |
 | Python thin client | [thin_client](https://github.com/katzenpost/thin_client) | `katzenpost_thinclient` | `0.0.12-rc3` |
-| `katzenqt` (Qt group chat client) | [katzenqt](https://github.com/katzenpost/katzenqt) | (root) | *tag pending* |
+| `katzenqt` (Qt group chat client) | [katzenqt](https://github.com/katzenpost/katzenqt) | (root) | `0.0.2-rc3` |
 | Server-side components (mix server, dirauth, courier, replica) | [katzenpost](https://github.com/katzenpost/katzenpost) | `cmd/server`, `cmd/dirauth`, `cmd/courier`, `cmd/replica` | `v0.0.73-rc3` |
 
 Server-side components are listed for completeness; for full deployment
