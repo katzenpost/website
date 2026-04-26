@@ -5,25 +5,14 @@ draft: false
 menu: {main: {weight: 70}}
 type: "base"
 no_list: true
-body_class: "td-no-sidebar td-hacker"
+body_class: "td-no-sidebar"
 ---
 
-<div class="text-center mb-4">
-  <img src="/images/ZII-WIZ3.png" alt="ANSI wizard casting a spell, by Zeus" class="img-fluid" style="max-width: 640px;">
-</div>
-
-<p class="lead">Choose your audience.</p>
-
-```text
-            forward (Sphinx)                         return (SURB reply)
-    ──────────────────────────▶               ──────────────────────────▶
-
-    gateway ─▶ mix¹ ─▶ mix² ─▶ mix³ ─▶ service ─▶ mix¹ ─▶ mix² ─▶ mix³ ─▶ gateway
-```
+<img src="/images/ZII-WIZ3.png" alt="ANSI wizard casting a spell, by Zeus" class="img-fluid mb-4" style="max-width: 640px;">
 
 ## For users
 
-You wish to use a Katzenpost client application to communicate.
+Client applications, packages, and a public mixnet.
 
 |     | Title | Description |
 |-----|-------|-------------|

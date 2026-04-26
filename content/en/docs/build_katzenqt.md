@@ -8,7 +8,6 @@ author: ["David Stainton"]
 version: 0
 draft: false
 slug: "/build_katzenqt/"
-body_class: "td-style-dashes"
 ---
 
 # Build and run katzenqt from source

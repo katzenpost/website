@@ -134,7 +134,7 @@ a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/c
     text-decoration: none !important;
 
     &:hover {
-        color: #99ccff !important;
+        color: #ffffff !important;
         text-decoration: underline !important;
     }
 
@@ -276,14 +276,14 @@ pre {
         background-color: transparent !important;
 
         &:hover {
-            color: #99ccff !important;
-            background-color: rgba(102, 179, 255, 0.1) !important;
+            color: #ffffff !important;
+            background-color: transparent !important;
         }
     }
 }
 
-/* Blog post navigation and tag links */
-.blog-tags a, .td-blog-posts-list a {
+/* Tag pill links inside article tag rows */
+.blog-tags a {
     color: #66b3ff !important;
     background-color: #404040 !important;
     padding: 0.25rem 0.5rem !important;
@@ -292,6 +292,35 @@ pre {
     &:hover {
         color: #ffffff !important;
         background-color: #66b3ff !important;
+    }
+}
+
+/* Post title and "Read more" links on the /blog/ index — keep them on the
+   page's black background (high contrast) rather than pilled on grey. */
+.td-blog-posts-list a {
+    color: #66b3ff !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    text-decoration: none !important;
+
+    &:hover {
+        color: #ffffff !important;
+        background-color: transparent !important;
+        text-decoration: underline !important;
+    }
+}
+
+/* Tag chips that appear inside individual post entries on the list page
+   should keep the pill treatment. */
+.td-blog-posts-list .taxonomy-terms-article a,
+.td-blog-posts-list a.taxonomy-term {
+    background-color: #404040 !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 3px !important;
+
+    &:hover {
+        background-color: #66b3ff !important;
+        color: #ffffff !important;
     }
 }
 
@@ -445,33 +474,8 @@ pre {
     }
 }
 
-/* Phrack-style h2 banners. Every content h2 gets a marker by default.
-   The marker text varies per page based on body_class. Docsy uses
-   h2[id]::before for a navbar-offset trick (display:block,
-   margin-top:-5rem, visibility:hidden); we undo those so our markers
-   are visible and inline. The trade-off is that anchor-link offsets
-   are lost for h2s. */
 .td-content h2 {
     color: #ffffff !important;
     margin-top: 2.5rem;
     font-weight: 500;
 }
-.td-content h2::before {
-    content: "|=---=[ ";        /* default = "equals" style */
-    color: #ffcc4d;
-    opacity: 0.85;
-    visibility: visible;
-    display: inline;
-    height: auto;
-    margin-top: 0;
-}
-
-/* Per-page heading-style overrides. Pages opt in via
-   body_class: "td-style-dashes" (etc.). */
-.td-style-dashes  .td-content h2::before { content: "----[ "; }
-.td-style-emblem  .td-content h2::before { content: "<:=--=:>=[ "; }
-.td-style-arrows  .td-content h2::before { content: ">>>>>=-* "; }
-.td-style-stars   .td-content h2::before { content: "*** "; }
-.td-style-plain   .td-content h2::before { content: ""; }
-
-
