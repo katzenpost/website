@@ -458,8 +458,7 @@ pre {
 }
 .td-content h2::before {
     content: "|=---=[ ";        /* default = "equals" style */
-    color: #ffcc4d;
-    opacity: 0.85;
+    color: inherit;
     visibility: visible;
     display: inline;
     height: auto;
