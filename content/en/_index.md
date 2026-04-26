@@ -33,7 +33,6 @@ systems.
 - **kpclientd** — client daemon; buildable from source, packages forthcoming.
 - **Namenlos** — a public Katzenpost mix network anyone may use; coming.
 - **Pigeonhole** — anonymous storage protocol; implemented, with thin clients in Go, Rust, and Python.
-- **Tally**, **SituationRoom**, **Prometheus** and **NNCP** integrations — planned.
 
 ## Threat model
 
