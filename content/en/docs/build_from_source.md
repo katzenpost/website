@@ -131,6 +131,7 @@ updated once a release is cut.
 sudo apt install libxcb-cursor0 libegl1
 git clone https://github.com/katzenpost/katzenqt
 cd katzenqt
+git checkout 0.0.2-rc3
 make deps
 make run
 ```
