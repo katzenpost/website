@@ -479,3 +479,40 @@ pre {
     margin-top: 2.5rem;
     font-weight: 500;
 }
+
+/* Two-column framing tables on the moral-character page. Sized to content
+   rather than spanning the full column, with a visible vertical divider
+   between the two columns and grid lines between rows. */
+.framing-table {
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0.75rem 0 1.75rem 0;
+    border-collapse: collapse;
+    background-color: transparent !important;
+
+    caption {
+        caption-side: top;
+        text-align: left;
+        padding: 0.5rem 0;
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 1.05rem;
+
+        .caption-source {
+            display: block;
+            font-weight: 400;
+            font-style: italic;
+            font-size: 0.9rem;
+            color: #c0c0c0 !important;
+            margin-top: 0.15rem;
+        }
+    }
+
+    td {
+        padding: 0.75rem 1.25rem !important;
+        background-color: #1a1a1a !important;
+        color: #e0e0e0 !important;
+        border: 1px solid #444444 !important;
+        vertical-align: middle;
+    }
+}
