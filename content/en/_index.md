@@ -4,13 +4,14 @@ description: "A post-quantum mix network providing strong metadata privacy again
 ---
 
 {{< blocks/cover image_anchor="top" height="auto" color="black" >}}
-<div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
-<div style="flex: 0 0 auto;">
-<img src="/images/lynx-big.png" alt="Katzenpost lynx" style="max-width: 300px; width: 100%; height: auto;">
-</div>
-<div style="flex: 1 1 auto;">
-<h1>Katzenpost</h1>
-<p>A post-quantum mix network providing strong metadata privacy against global passive adversaries.</p>
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.25rem;">
+<img src="/images/lynx-big.png" alt="Katzenpost lynx" style="width: 100%; max-width: 320px; height: auto; image-rendering: pixelated;">
+<h1 style="margin: 0;">Katzenpost</h1>
+<p style="max-width: 640px; margin: 0;">A post-quantum mix network providing strong metadata privacy against global passive adversaries.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-top: 0.5rem;">
+<a class="btn btn-lg btn-primary" href="https://arxiv.org/abs/2501.02933">Read the paper</a>
+<a class="btn btn-lg btn-outline-light" href="/docs/">Documentation</a>
+<a class="btn btn-lg btn-outline-light" href="https://github.com/katzenpost">Source</a>
 </div>
 </div>
 {{< /blocks/cover >}}
@@ -27,12 +28,18 @@ that tolerate ephemeral storage and modest latency: group chat, voting,
 ephemeral collaborative state, and anonymous integration with existing
 systems.
 
-## Status
+## What we ship
 
-- **katzenqt** — Qt group chat client; buildable from source today, pre-built packages forthcoming.
-- **kpclientd** — client daemon; buildable from source, packages forthcoming.
-- **Namenlos** — a public Katzenpost mix network anyone may use; coming.
-- **Pigeonhole** — anonymous storage protocol; implemented, with thin clients in Go, Rust, and Python.
+### Available now
+
+- **Pigeonhole**: anonymous storage protocol with thin clients in Go, Rust, and Python.
+- **katzenqt**: Qt group chat client. Buildable from source today.
+- **kpclientd**: client daemon. Buildable from source today.
+
+### Coming next
+
+- Pre-built packages for **katzenqt** and **kpclientd**.
+- **Namenlos**: a public Katzenpost mix network anyone may use.
 
 ## Threat model
 
@@ -44,7 +51,7 @@ document must be read together.
 
 ## Where to go
 
-- **[Documentation](/docs/)** — start here. Entry points for users, operators, application developers, core developers, and academics.
-- **[Blog](/blog/)** — design notes and protocol explainers.
-- **[Source](https://github.com/katzenpost)** — the Katzenpost monorepo, the `hpqc` post-quantum cryptography library, thin clients, `katzenqt`, and this website.
+- **[Documentation](/docs/)**: start here. Entry points for users, operators, application developers, core developers, and academics.
+- **[Blog](/blog/)**: design notes and protocol explainers.
+- **[Source](https://github.com/katzenpost)**: the Katzenpost monorepo, the `hpqc` post-quantum cryptography library, thin clients, `katzenqt`, and this website.
 - **[Team](/pages/team/)** · **[Funders](/pages/funders/)** · **[Presentations](/pages/presentations/)**.
