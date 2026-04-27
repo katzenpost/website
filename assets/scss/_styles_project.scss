@@ -128,8 +128,10 @@ p:not(.chroma *), li:not(.chroma *), td:not(.chroma *), th:not(.chroma *), span:
     color: #e0e0e0 !important;
 }
 
-/* Readable links against gray background - but exclude tags */
-a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/categories/"]) {
+/* Readable links against gray background - but exclude tags and buttons.
+   .btn is excluded so Bootstrap's button styling (including its readable
+   hover states) is not overridden by the link rules below. */
+a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/categories/"]):not(.btn) {
     color: #66b3ff !important;
     text-decoration: none !important;
 
@@ -478,6 +480,17 @@ pre {
     color: #ffffff !important;
     margin-top: 2.5rem;
     font-weight: 500;
+}
+
+/* Constrain the home page's body prose to a comfortable reading width on
+   large monitors. The cover block (a <section> with the lynx and CTAs)
+   is excluded by :not(section) and continues to span the full viewport. */
+.td-home main.td-main > :not(section) {
+    max-width: 820px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
 }
 
 /* Two-column framing tables on the moral-character page. Sized to content
