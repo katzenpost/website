@@ -54,10 +54,17 @@ You wish to contribute code to Katzenpost itself.
 
 You are a mathematician, computer scientist, security researcher, or hacker investigating the design.
 
+Read in the order below. Seasoned mixnet researchers may skip ahead to the Echomix paper.
+
 |     | Title | Description |
 |-----|-------|-------------|
-| <img src="/iconx/arxiv.svg" alt="arXiv" height="14">  | **[Echomix paper](https://arxiv.org/abs/2501.02933)** | *Echomix: a Strong Anonymity System with Messaging.* The principal academic treatment of the Katzenpost design (arXiv). |
-| 🔒  | **[Threat Model](/docs/threat_model/)** ([PDF](/research/Threat_Model_Doc.pdf)) | An evolving treatment of Katzenpost's security assumptions, attack scenarios, and mitigation strategies. |
-| 📚  | **[Literature Review](/research/Literature_overview__website_version.pdf)** | A curated review of the academic literature underpinning Katzenpost's design decisions. |
+| 📚  | **1. [Literature Review](/research/Literature_overview__website_version.pdf)** *(last updated April 2024)* | Start here if you are new to mixnet research. Field context, attack taxonomy, and the conceptual positions the Echomix paper builds on. |
+| <img src="/iconx/arxiv.svg" alt="arXiv" height="14">  | **2. [Echomix paper](https://arxiv.org/abs/2501.02933)** | *Echomix: a Strong Anonymity System with Messaging.* Katzenpost's design, presented as research (arXiv). |
+| 🔒  | **3. [Threat Model](/docs/threat_model/)** ([PDF](/research/Threat_Model_Doc.pdf)) | Detailed security assumptions and mitigations specific to the deployed system. |
+
+Supplementary reading:
+
+|     | Title | Description |
+|-----|-------|-------------|
 | 🎧  | **[Audio Engineering Considerations](/docs/audio_eng/)** ([PDF](/research/Audio_Engineering_Considerations_for_a_Modern_Mixnet.pdf)) | A technical report on the challenges of carrying voice traffic through a modern mix network, with attention to usability and scalability. |
-| 🛠️  | **[Design Specifications](/docs/specs/)** | The full set of protocol specifications. Useful reading for anyone investigating the design in depth. |
+| 🛠️  | **[Design Specifications](/docs/specs/)** | The full set of protocol specifications (also linked from "For core developers"). |
