@@ -188,7 +188,6 @@ opaque plaintext[];
         </section>
         <section xml:id="appendix-a.-references">
             <title xml:id="appendix-a.-references.title">References</title>
-            &KATZMIXE2E;
             &KATZMIXPKI;
             &RFC2119;
             &RFC5322;
