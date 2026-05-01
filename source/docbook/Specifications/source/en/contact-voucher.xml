@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<?title ""?>
+<?linkTitle "Contact Voucher Design"?>
+<?url "docs/specs/voucher.html"?>
+<?description ""?>
+<?draft "false"?>
+<?slug ""?>
+<?layout ""?>
+<?type ""?>
+<?weight "5"?>
+
+<!DOCTYPE article [
+<!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
+%shared-content;
+<!ENTITY % terms SYSTEM "../../../terms.ent">
+%terms;
+<!ENTITY % references SYSTEM "../../../references.ent">
+%references;
+]>
+
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+  version="5.1" xml:id="voucher">
+  
+  <info>
+    <title xml:id="voucher.title">Contact Voucher Design</title>
+    <authorgroup>
+      <author>
+        <personname>
+          <firstname>Threebit</firstname>
+          <surname>Hacker</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>Leif</firstname>
+          <surname>Ryge</surname>
+        </personname>
+      </author>
+    </authorgroup>
+    <abstract>
+      <para></para>
+    </abstract>
+  </info>  
+  <section>
+  <title>Voucher Design</title>
+  <para>
+    In order to join or initiate a conversation, participants need to
+    exchange cryptographic key material. To address this problem we have
+    a slightly unusual design: Contact vouchers.
+  </para>
+  <para>
+    In many systems, invites to conversations flow from an existing
+    member of the conversation to the user being invited. In our
+    &quot;Contact Voucher&quot; protocol this flow is reversed: A member
+    wishing to join a conversation hands a &quot;Contact Voucher&quot;
+    (out of band) to the existing member, who then inducts the new
+    member into the group.
+  </para>
+  <para>
+    This design mitigates two potential problem with the former way of
+    doing it:
+  </para>
+  <orderedlist numeration="arabic" spacing="compact">
+    <listitem>
+      <para>
+        If the Contact Voucher is observed by a third-party, the
+        third-party does not get to read neither participants' actual
+        messages.
+      </para>
+      <itemizedlist spacing="compact">
+        <listitem>
+          <para>
+            <emphasis role="strong">Passive</emphasis> adversaries learn
+            that the voucher was spent, but do not get to observe
+            further interactions.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <emphasis role="strong">Active</emphasis> adversaries can
+            create a new fake group to induct the member into but does
+            not learn anything about the existing group.
+          </para>
+          <itemizedlist spacing="compact">
+            <listitem>
+              <para>
+                In the future to prevent this one-way impersonation we
+                could allow a &quot;both parties bring something on
+                paper to the meeting&quot;:
+              </para>
+              <itemizedlist spacing="compact">
+                <listitem>
+                  <para>
+                    Bob brings Contact Voucher
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    Alice brings fingerprint for the
+                    VoucherReplyPublicKey (thwarts the active attacker)
+                  </para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+    </listitem>
+    <listitem>
+      <para>
+        Only one thing needs to delivered out of band to achieve a
+        2-pass protocol (instead of a 3-pass protocol).
+      </para>
+    </listitem>
+  </orderedlist>
+  <itemizedlist spacing="compact">
+    <listitem>
+      <para>
+        Only one of the parties need to bring key material to a meeting
+        in order to establish contact.
+      </para>
+    </listitem>
+  </itemizedlist>
+
+<!--
+    
+IMPORTANT: This Mermaid script must be manually inserted into the markdown.    
+      
+```mermaid
+sequenceDiagram
+    actor Bob
+    participant VoucherSeq@{ "type" : "database" }
+    actor Alice
+    Bob-\->>+Bob: Generates VoucherKeypair. <br>Generates BACAP write/read cap.<br>VoucherPayload := read cap || VoucherPublicKey<br>Voucher := Hash(VoucherPayload)
+    Bob->>+VoucherSeq: Publish: VoucherPayload
+    Bob-\->>Alice: [Sent OOB] Voucher
+
+
+    Alice-\->>+Alice: Derive VoucherSeq read/write caps from Voucher.<br>Read the first box in VoucherSeq
+    VoucherSeq->>+Alice: VoucherPayload
+ 
+    Alice-\->>+Alice: VoucherReply := Encrypt(WhoReply + VoucherSalt)<br> to VoucherPublicKey<br><br>Derive Bob's ReadCap from<br>VoucherPayload + VoucherSalt
+    par_over All-Or-Nothing using COPY service
+    Alice->>+VoucherSeq: VoucherReply
+    Alice->>+Alice's Group: WhoReply<br>(incl. Bob's new ReadCap)
+    Alice->>+VoucherSeq: Tombstone VoucherPayload<br>to prevent Voucher reuse
+    end
+
+    Bob-\->>+Bob: Poll the second VoucherSeq box until Alice replies
+    VoucherSeq->>+Bob: VoucherReply
+```
+
+ -->   
+  <section>
+    <title>Self-authenticating BACAP payload</title>
+    <para>
+      The first message sent (The VoucherPayload) is authenticated in
+      the following manner:
+    </para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>
+          The VoucherPayload is computed (first).
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A cryptographic hash of the VoucherPayload is computed. This
+          hash <emphasis role="strong">is</emphasis> the
+          <emphasis>Voucher</emphasis>*.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The <emphasis role="strong">Voucher</emphasis> is then used to
+          derive a BACAP read/write capability set.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The VoucherPayload is uploaded to the sequence described by
+          the capability (at index 0).
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Anyone who intercepts the
+          <emphasis role="strong">Voucher</emphasis> can read
+          <emphasis role="strong">and</emphasis> write the sequence.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          But: Since the <emphasis role="strong">Voucher</emphasis> is a
+          hash over the VoucherPayload, writing the sequence with
+          anything but the VoucherPayload will be detectable by the
+          recipient.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          This means that the contents <emphasis>cannot</emphasis> be
+          undetectably be modified by the interceptor.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </section>
+</section></article>

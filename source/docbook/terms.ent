@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!ENTITY surb '<varlistentry>
-                <term>SURB</term>
+                <term><emphasis role="bold">SURB</emphasis></term>
                 <listitem>
                     <para>Single use reply block. SURBs are used to achieve recipient anonymity,
                         that is to say, SURBs function as a cryptographic delivery token that
@@ -11,13 +11,13 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY blocksphinxplaintext '<varlistentry>
-                <term>BlockSphinxPlaintext</term>
+                <term><emphasis role="bold">BlockSphinxPlaintext</emphasis></term>
                 <listitem>
                     <para>The payload structure which is encapsulated by the Sphinx body.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY wireprotocol '<varlistentry>
-                <term>wire protocol</term>
+                <term><emphasis role="bold">wire protocol</emphasis></term>
                 <listitem>
                     <para>Refers to our PQ Noise based protocol which currently uses TCP but in the
                         near future will optionally use QUIC. This protocol has messages known as
@@ -29,7 +29,7 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY providers '<varlistentry>
-                <term>providers</term>
+                <term><emphasis role="bold">providers</emphasis></term>
                 <listitem>
                     <para>A node on the edge of the network that has two roles,
                         handling incoming client connections and running mixnet services. Soon we should
@@ -39,7 +39,7 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY epoch '<varlistentry>
-                <term>epoch</term>
+                <term><emphasis role="bold">epoch</emphasis></term>
                 <listitem>
                     <para>A fixed time interval defined in section 4.2 Sphinx Mix and Provider Key
                         Rotation. The epoch is currently set to 20 minutes. 
@@ -48,20 +48,20 @@
                 </listitem>
             </varlistentry>'>          
 <!ENTITY kib '<varlistentry>
-                <term>KiB</term>
+                <term><emphasis role="bold">KiB</emphasis></term>
                 <listitem>
                     <para>Defined as 1024 8 bit octets.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY mixnet '<varlistentry>
-                <term>mixnet</term>
+                <term><emphasis role="bold">mixnet</emphasis></term>
                 <listitem>
                     <para>A mixnet also known as a mix network is a network of mixes that can be
                         used to build various privacy preserving protocols.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY mix '<varlistentry>
-                <term>mix</term>
+                <term><emphasis role="bold">mix</emphasis></term>
                 <listitem>
                     <para>A cryptographic router that is used to compose a mixnet. Mixes use a
                         cryptographic operation on messages being routed which provides bitwise
@@ -70,7 +70,7 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY node '<varlistentry>
-                <term>node</term>
+                <term><emphasis role="bold">node</emphasis></term>
                 <listitem>
                     <para>Clients are NOT considered nodes in the mix network. However note that
                         network protocols are often layered; in our design documents we describe
@@ -82,7 +82,7 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY entry '<varlistentry>
-                <term>entry mix, entry node</term>
+                <term><emphasis role="bold">entry mix, entry node</emphasis></term>
                 <listitem>
                     <para>A mix that has some additional features: </para>
                     <itemizedlist>
@@ -102,7 +102,7 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY servicemix '<varlistentry>
-                <term>service mix</term>
+                <term><emphasis role="bold">service mix</emphasis></term>
                 <listitem>
                     <para>A service mix is a mix that has some additional features:</para>
                     <itemizedlist>
@@ -118,13 +118,13 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY user '<varlistentry>
-                <term>user</term>
+                <term><emphasis role="bold">user</emphasis></term>
                 <listitem>
                     <para>An agent using the Katzenpost system.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY client '<varlistentry>
-                <term>client</term>
+                <term><emphasis role="bold">client</emphasis></term>
                 <listitem>
                     <para>Software run by the User on its local device to participate in the Mixnet.
                         Again let us reiterate that a client is not considered a "node in the
@@ -133,13 +133,13 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY katzenpost ' <varlistentry>
-                <term>&program_name;</term>
+                <term><emphasis role="bold">&program_name;</emphasis></term>
                 <listitem>
                     <para>A project to design many improved decryption mixnet protocols.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY classestraffic '<varlistentry>
-                <term>classes of traffic</term>
+                <term><emphasis role="bold">classes of traffic</emphasis></term>
                 <listitem>
                     <para>We distinguish the following classes of traffic:</para>
                     <itemizedlist>
@@ -153,52 +153,52 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY msl '<varlistentry>
-                <term>MSL</term>
+                <term><emphasis role="bold">MSL</emphasis></term>
                 <listitem>
                     <para>Maximum segment lifetime, currently set to 120 seconds.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY pki '<varlistentry>
-                <term>PKI</term>
+                <term><emphasis role="bold">PKI</emphasis></term>
                 <listitem>
                     <para>Public key infrastructure</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY dirauthsystem '<varlistentry>
-                <term>directory authority system</term>
+                <term><emphasis role="bold">directory authority system</emphasis></term>
                 <listitem>
                     <para>Refers to specific PKI schemes used by Mixminion and Tor.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY mixdescriptor '<varlistentry>
-                <term>mix descriptor</term>
+                <term><emphasis role="bold">mix descriptor</emphasis></term>
                 <listitem>
                     <para>A database record which describes a component mix.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY family '<varlistentry>
-                <term>family</term>
+                <term><emphasis role="bold">family</emphasis></term>
                 <listitem>
                     <para>Identifier of security domains or entities operating one or more mixes in
                         the network. This is used to inform the path selection algorithm.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY nickname '<varlistentry>
-                <term>nickname</term>
+                <term><emphasis role="bold">nickname</emphasis></term>
                 <listitem>
                     <para>A nickname string that is unique in the consensus document, see Katzenpost
                         Mix Network Specification section 2.2. Network Topology.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY layer '<varlistentry>
-                <term>layer</term>
+                <term><emphasis role="bold">layer</emphasis></term>
                 <listitem>
                     <para>The layer indicates which network topology layer a particular mix resides
                         in.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY provider '<varlistentry>
-                <term>provider</term>
+                <term><emphasis role="bold">provider</emphasis></term>
                 <listitem>
                     <para>A service operated by a third party that Clients communicate directly with
                         to communicate with the Mixnet. It is responsible for Client authentication,
@@ -209,7 +209,7 @@
             </varlistentry>'>
            
 <!ENTITY message '<varlistentry>
-                <term>message</term>
+                <term><emphasis role="bold">message</emphasis></term>
                 <listitem>
                     <para>A variable-length sequence of octets sent anonymously through the network.
                         Short messages are sent in a single packet; long messages are fragmented
@@ -217,7 +217,7 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY packet '<varlistentry>
-                <term>packet</term>
+                <term><emphasis role="bold">packet</emphasis></term>
                 <listitem>
                     <para>A Sphinx packet, of fixed
                     length for each class of traffic, carrying a message payload and metadata for routing. 
@@ -226,7 +226,7 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY header '<varlistentry>
-                <term>header</term>
+                <term><emphasis role="bold">header</emphasis></term>
                 <listitem>
                     <para>The packet header consisting of several components, which convey the
                         information necessary to verify packet integrity and correctly process the
@@ -234,14 +234,14 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY payload '<varlistentry>
-                <term>payload</term>
+                <term><emphasis role="bold">payload</emphasis></term>
                 <listitem>
                     <para>The fixed-length portion of a packet containing an encrypted message or
                         part of a message, to be delivered anonymously.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY group '<varlistentry>
-                <term>group</term>
+                <term><emphasis role="bold">group</emphasis></term>
                 <listitem>
                     <para>A finite set of elements and a binary operation that satisfy the
                         properties of closure, associativity, invertability, and the presence of an
@@ -249,20 +249,20 @@
                 </listitem>
             </varlistentry>'>
 <!ENTITY groupelement '<varlistentry>
-                <term>group element</term>
+                <term><emphasis role="bold">group element</emphasis></term>
                 <listitem>
                     <para>An individual element of the group.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY groupgenerator '<varlistentry>
-                <term>group generator</term>
+                <term><emphasis role="bold">group generator</emphasis></term>
                 <listitem>
                     <para>A group element capable of generating any other element of the group, via
                         repeated applications of the generator and the group operation.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY seda '<varlistentry>
-                <term>SEDA</term>
+                <term><emphasis role="bold">SEDA</emphasis></term>
                 <listitem>
                     <para>Staged Event Driven Architecture.<!-- <link linkend="SEDA">SEDA</link>--> 1. A
                         highly parallelizable computation model. 2. A computational pipeline
