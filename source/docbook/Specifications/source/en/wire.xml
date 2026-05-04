@@ -4,15 +4,15 @@
 
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
-<?title ?>
+<?title "" ?>
 <?linkTitle "Wire protocol" ?>  <!-- Section menu link text -->
 <?url "docs/specs/wire_protocol.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
-<?draft false ?> <!-- Optional -->
+<?draft "false" ?> <!-- Optional -->
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
-<?weight 60?> <!-- Optional -->
+<?weight "60"?> <!-- Optional -->
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">

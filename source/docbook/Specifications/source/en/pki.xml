@@ -4,15 +4,15 @@
 
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
-<?title ?>
+<?title "" ?>
 <?linkTitle "Public key infrastructure" ?>  <!-- Section menu link text -->
 <?url "docs/specs/pki.html" ?> <!-- Required to make image links work -->
 <?description "" ?> <!-- Optional -->
-<?draft false ?> <!-- Optional -->
+<?draft "false" ?> <!-- Optional -->
 <?slug "" ?> <!-- Optional -->
 <?layout "" ?> <!-- Optional -->
 <?type "" ?> <!-- Optional -->
-<?weight 35?> <!-- Optional -->
+<?weight "35"?> <!-- Optional -->
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
@@ -981,7 +981,6 @@ year = {2017}
 </programlisting>-->
             &BRIDGING;
             &FINGERPRINTING;
-            &KATZMIXE2E;
             &KATZMIXNET;
             &KATZMIXWIRE;
             &LOCALVIEW;

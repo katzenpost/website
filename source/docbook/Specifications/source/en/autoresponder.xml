@@ -1,14 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?title?>
-<?linkTitle "Provider-side autoresponder extension" ?>
-<?url "docs/admin_guide/kaetzchen.html" ?>
-<?description "" ?>
-<?draft false ?>
-<?slug "" ?>
-<?layout "" ?>
-<?type "" ?>
-<?weight 5?>
+
+<?title ""?>
+<?linkTitle "Provider-side autoresponder extension"?>
+<?url "docs/specs/autoresponder.html"?>
+<?description ""?>
+<?draft "false"?>
+<?slug ""?>
+<?layout ""?>
+<?type ""?>
+<?weight "5"?>
 
 <!DOCTYPE article [
 <!ENTITY % shared-content SYSTEM "../../../shared-content.ent">
@@ -20,9 +22,10 @@
 ]>
 
 <article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
-    version="5.1" xml:id="kaetzchen">
+    version="5.1" xml:id="autoresponder">
+    
     <info>
-        <title xml:id="kaetzchen.title">Provider-side autoresponder extension (Kaetzchen)</title>
+        <title xml:id="autoresponder.title">Provider-side autoresponder extension (Kaetzchen)</title>
         <authorgroup>
             <author>
                 <personname>
@@ -188,7 +191,6 @@ opaque plaintext[];
         </section>
         <section xml:id="appendix-a.-references">
             <title xml:id="appendix-a.-references.title">References</title>
-            &KATZMIXE2E;
             &KATZMIXPKI;
             &RFC2119;
             &RFC5322;
