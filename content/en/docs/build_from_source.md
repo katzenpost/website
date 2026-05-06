@@ -112,10 +112,6 @@ pip install --upgrade pip
 pip install .
 ```
 
-The example programs under `thin_client/examples/` (`echo_ping.py`,
-`fetch_pki_doc.py`, `mixnet_status.py`, and others) demonstrate the
-API and are useful smoke tests once `kpclientd` is running.
-
 ## katzenqt (Qt group chat client)
 
 A decentralised group chat client built atop Qt. It depends solely on
@@ -142,14 +138,19 @@ recommended fallback.
 
 ## Verifying the stack
 
-Once `kpclientd` is running with a valid configuration, the Python
-example `echo_ping.py` is the simplest end-to-end smoke test. It
-sends a packet through the mix network and waits for the SURB reply.
+Once `kpclientd` is running with a valid configuration, a single
+test from the Python integration suite is sufficient to exercise the
+full Pigeonhole round trip: Alice writes a message to the storage
+replicas via the courier, and Bob reads it back.
 
 ```shell
 source thin_client/.venv/bin/activate
-python3 thin_client/examples/echo_ping.py
+cd thin_client
+pytest tests/test_new_pigeonhole_api.py::test_alice_sends_bob_complete_workflow
 ```
 
 A successful run indicates that `kpclientd` is connected, the PKI
-document has been retrieved, and the network is producing consensus.
+document has been retrieved, the network is producing consensus, and
+the courier and replicas are reachable. The remainder of the suite
+(`pytest` with no arguments) covers tombstones, copy commands, and
+the various error paths.
