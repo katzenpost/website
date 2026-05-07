@@ -31,7 +31,7 @@ should be built from the same tag.
 | Go thin client (reference) | [katzenpost](https://github.com/katzenpost/katzenpost) | `client/thin` | main | `v0.0.73` |
 | Rust thin client | [thin_client](https://github.com/katzenpost/thin_client) | `src` | main | `0.0.13` |
 | Python thin client | [thin_client](https://github.com/katzenpost/thin_client) | `katzenpost_thinclient` | main | `0.0.13` |
-| `katzenqt` (Qt group chat client) | [katzenqt](https://github.com/katzenpost/katzenqt) | (root) | resending_api2026 | `0.0.2-rc4` |
+| `katzenqt` (Qt group chat client) | [katzenqt](https://github.com/katzenpost/katzenqt) | (root) | resending_api2026 | `0.0.2-rc5` |
 
 
 Server-side components are listed for completeness; for full deployment
