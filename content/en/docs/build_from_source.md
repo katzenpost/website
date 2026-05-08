@@ -24,14 +24,15 @@ The following git tags are the current recommended versions for
 running the stack. Components in the same row of the same repository
 should be built from the same tag.
 
-| Component | Repository | Path | Tag |
-|---|---|---|---|
-| `kpclientd` (client daemon) | [katzenpost](https://github.com/katzenpost/katzenpost) | `cmd/kpclientd` | `v0.0.73-rc3` |
-| Go thin client (reference) | [katzenpost](https://github.com/katzenpost/katzenpost) | `client/thin` | `v0.0.73-rc3` |
-| Rust thin client | [thin_client](https://github.com/katzenpost/thin_client) | `src` | `0.0.12-rc3` |
-| Python thin client | [thin_client](https://github.com/katzenpost/thin_client) | `katzenpost_thinclient` | `0.0.12-rc3` |
-| `katzenqt` (Qt group chat client) | [katzenqt](https://github.com/katzenpost/katzenqt) | (root) | `0.0.2-rc3` |
-| Server-side components (mix server, dirauth, courier, replica) | [katzenpost](https://github.com/katzenpost/katzenpost) | `cmd/server`, `cmd/dirauth`, `cmd/courier`, `cmd/replica` | `v0.0.73-rc3` |
+| Component | Repository | Path | Branch | Tag |
+|---|---|---|---|---|
+| Server-side components (mix server, dirauth, courier, replica) | [katzenpost](https://github.com/katzenpost/katzenpost) | `cmd/server`, `cmd/dirauth`, `cmd/courier`, `cmd/replica` | main | `v0.0.73` |
+| `kpclientd` (client daemon) | [katzenpost](https://github.com/katzenpost/katzenpost) | `cmd/kpclientd` | main | `v0.0.73` |
+| Go thin client (reference) | [katzenpost](https://github.com/katzenpost/katzenpost) | `client/thin` | main | `v0.0.73` |
+| Rust thin client | [thin_client](https://github.com/katzenpost/thin_client) | `src` | main | `0.0.13` |
+| Python thin client | [thin_client](https://github.com/katzenpost/thin_client) | `katzenpost_thinclient` | main | `0.0.13` |
+| `katzenqt` (Qt group chat client) | [katzenqt](https://github.com/katzenpost/katzenqt) | (root) | resending_api2026 | `0.0.2-rc5` |
+
 
 Server-side components are listed for completeness; for full deployment
 guidance, see the [Admin Guide](/docs/admin_guide/).
@@ -52,7 +53,7 @@ daemon, which performs all cryptographic and network operations.
 ```shell
 git clone https://github.com/katzenpost/katzenpost
 cd katzenpost
-git checkout v0.0.73-rc3
+git checkout v0.0.73
 cd cmd/kpclientd
 go build
 ```
@@ -77,7 +78,7 @@ The Go thin client is a library, imported as a Go module:
 import "github.com/katzenpost/katzenpost/client/thin"
 ```
 
-Pin to `v0.0.73-rc3` in your application's `go.mod`. There is no
+Pin to `v0.0.73` in your application's `go.mod`. There is no
 separate build step; the library is compiled with your application.
 
 ## Rust thin client
@@ -85,7 +86,7 @@ separate build step; the library is compiled with your application.
 ```shell
 git clone https://github.com/katzenpost/thin_client
 cd thin_client
-git checkout 0.0.12-rc3
+git checkout 0.0.13
 cargo build --release
 ```
 
@@ -93,7 +94,7 @@ Or, in another Rust project's `Cargo.toml`:
 
 ```toml
 [dependencies]
-katzenpost_thin_client = "0.0.12-rc3"
+katzenpost_thin_client = "0.0.13"
 ```
 
 ## Python thin client
@@ -105,16 +106,12 @@ Python.
 ```shell
 git clone https://github.com/katzenpost/thin_client
 cd thin_client
-git checkout 0.0.12-rc3
+git checkout 0.0.13
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install .
 ```
-
-The example programs under `thin_client/examples/` (`echo_ping.py`,
-`fetch_pki_doc.py`, `mixnet_status.py`, and others) demonstrate the
-API and are useful smoke tests once `kpclientd` is running.
 
 ## katzenqt (Qt group chat client)
 
@@ -131,7 +128,7 @@ updated once a release is cut.
 sudo apt install libxcb-cursor0 libegl1
 git clone https://github.com/katzenpost/katzenqt
 cd katzenqt
-git checkout 0.0.2-rc3
+git checkout 0.0.2-rc4
 make deps
 make run
 ```
@@ -142,14 +139,19 @@ recommended fallback.
 
 ## Verifying the stack
 
-Once `kpclientd` is running with a valid configuration, the Python
-example `echo_ping.py` is the simplest end-to-end smoke test. It
-sends a packet through the mix network and waits for the SURB reply.
+Once `kpclientd` is running with a valid configuration, a single
+test from the Python integration suite is sufficient to exercise the
+full Pigeonhole round trip: Alice writes a message to the storage
+replicas via the courier, and Bob reads it back.
 
 ```shell
 source thin_client/.venv/bin/activate
-python3 thin_client/examples/echo_ping.py
+cd thin_client
+pytest tests/test_new_pigeonhole_api.py::test_alice_sends_bob_complete_workflow
 ```
 
 A successful run indicates that `kpclientd` is connected, the PKI
-document has been retrieved, and the network is producing consensus.
+document has been retrieved, the network is producing consensus, and
+the courier and replicas are reachable. The remainder of the suite
+(`pytest` with no arguments) covers tombstones, copy commands, and
+the various error paths.
