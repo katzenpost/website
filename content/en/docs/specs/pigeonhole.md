@@ -645,7 +645,7 @@ replica-to-replica wires are fixed-throughput Poisson streams paced
 at `LambdaR`, the per-connection rate parameter published in the
 dirauth Parameters block. An external network observer who can see
 only encrypted wire timing must not be able to infer load from the
-wire: the wire fires at the same constant rate whether or not real
+wire; the wire fires at the same constant rate whether or not real
 user traffic is flowing, with the gaps filled by indistinguishable
 decoy traffic.
 
@@ -707,7 +707,7 @@ requirement. The reference implementation uses 50 ms, chosen to
 exceed typical per-message processing-time variance on a healthy
 replica while remaining small relative to the user-perceptible
 round-trip latency. There is no hard constraint that the value be
-identical across replicas in the same network: see "Wire-level
+identical across replicas in the same network. See "Wire-level
 indistinguishability" below.
 
 ## Wire-level indistinguishability
@@ -715,7 +715,7 @@ indistinguishability" below.
 A Poisson stream composed with independent random shifts, of any
 distribution, remains a Poisson stream at the same rate. This is the
 property that protects the courier-replica and replica-replica
-wires from a passive observer:
+wires from a passive observer, as follows.
 
 * The reply rate from a replica equals the inbound command rate,
   which is `LambdaR` Poisson.
