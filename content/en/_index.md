@@ -5,6 +5,7 @@ description: "A post-quantum mix network providing strong metadata privacy again
 
 {{< blocks/cover image_anchor="top" height="auto" color="black" >}}
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.25rem;">
+<img src="/images/logo-friendly-yellow.svg" alt="Katzenpost" style="width: 100%; max-width: 200px; height: auto;">
 <h1 style="margin: 0;">Katzenpost</h1>
 <p style="max-width: 640px; margin: 0;">A post-quantum mix network providing strong metadata privacy against global passive adversaries.</p>
 <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-top: 0.5rem;">
