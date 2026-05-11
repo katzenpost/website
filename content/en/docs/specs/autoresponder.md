@@ -1,7 +1,8 @@
-{ "title": "", "linkTitle": "Provider-side autoresponder extension",
-"description": "", "url": "docs/specs/autoresponder.html", "date":
-"2026-05-01T14:11:24.543410094-07:00", "draft": "false", "slug": "",
-"layout": "", "type": "", "weight": "5" }
+{ "title": "Provider-side autoresponder extension" , "linkTitle":
+"Autoresponder extension" , "description": "" , "author": "" , "url": ""
+, "date": "2026-05-10T13:27:14.984621043-07:00", "draft": "false" ,
+"slug": "autoresponder" , "layout": "" , "type": "" , "weight": "1" ,
+"version": "" }
 
 <div class="article">
 
@@ -70,7 +71,7 @@ cover traffic.
 **Table of Contents**
 
 <span class="section">[Conventions Used in This
-Document](#d58e35)</span>
+Document](#d58e50)</span>
 
 <span class="section">[Terminology](#terminology)</span>
 
@@ -105,7 +106,7 @@ Considerations](#security-considerations)</span>
 
 <div>
 
-## <span id="d58e35"></span>Conventions Used in This Document
+## <span id="d58e50"></span>Conventions Used in This Document
 
 </div>
 
@@ -149,14 +150,14 @@ The following terms are used in this specification.
 
 <div class="variablelist">
 
-<span class="term">SURB</span>  
+<span class="term"><span class="bold">**SURB**</span></span>  
 Single use reply block. SURBs are used to achieve recipient anonymity,
 that is to say, SURBs function as a cryptographic delivery token that
 you can give to another client entity so that they can send you a
 message without them knowing your identity or location on the network.
 See `SPHINXSPEC` and `SPHINX`.
 
-<span class="term">BlockSphinxPlaintext</span>  
+<span class="term"><span class="bold">**BlockSphinxPlaintext**</span></span>  
 The payload structure which is encapsulated by the Sphinx body.
 
 </div>
