@@ -9,9 +9,9 @@
 <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
 <?description "" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
-<?author "" ?>
+<?author "Threebit Hacker, David Stainton" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
-<?url "['Threebit Hacker', 'David Stainton']" ?>
+<?url "" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
 <?draft "false" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#draft] -->
@@ -25,17 +25,7 @@
 <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "0" ?>
 <!-- Optional [?] -->
-<!---\-\-
-title:
-linkTitle: "Group Chat"
-url: "docs/specs/group_chat.html"
-description: ""
-categories: [""]
-tags: [""]
-author: ["Threebit Hacker", "David Stainton"]
-version: 0
-draft: false
--\-\-\-->
+
 <!DOCTYPE article [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
@@ -68,6 +58,20 @@ draft: false
   version="5.1" xml:id="group_chat">
   <info>
     <title xml:id="group_chat.title">Katzenpost Group Chat Design</title>
+    <authorgroup>
+      <author>
+        <personname>
+          <firstname>Threebit</firstname>
+          <surname>Hacker</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>David</firstname>
+          <surname>Stainton</surname>
+        </personname>
+      </author>
+    </authorgroup>
     <!-- Match to title PI above. -->
   </info>
   <!--<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -105,34 +109,33 @@ draft: false
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Introduction</title>
     <para>The Pigeonhole protocol establishes anonymous cryptographic communication channels which
-      have a read capability (readcap) and a write capability (writecap). Therefore if, for example,
-      Alice and Bob want to communicate, they can each create their own Pigeonhole/BACAP channels
-      and exchange readcaps. Bob writes to his own channel and Alice can now read those messages
-      since she has the readcap. Likewise Alice writes to her own channel and Bob can read those
-      message since he has the readcap. This is the most basic construction using BACAP and
-      Pigeonhole. Here we extend this design to work in the group-chat context. </para>
-    <para>This is a minimal design for a working group-chat protocol, without key rotation. </para>
-    <para>BACAP primitives give us: </para>
+      have a <emphasis>readcap</emphasis> (read capability) and a <emphasis>writecap</emphasis>
+      (write capability). For example, if Alice and Bob want to communicate, they can each create
+      their own Pigeonhole/BACAP channels and exchange readcaps on those channels. Now when Bob
+      writes to his channel, Alice can read those messages because she has Bob's readcap. Likewise,
+      when Alice writes to her channel, Bob can read those messages because he has Alice's readcap.
+      This is the most basic construction using BACAP and Pigeonhole.</para>
+    <para>Here we extend this basic design to work as a minimal  group-chat protocol, without key
+      rotation. </para>
+    <para>BACAP primitives give us two message types:</para>
     <itemizedlist spacing="compact">
       <listitem>
-        <para><emphasis role="bold">SingleMessage</emphasis>
+        <para><code>SingleMessage</code>
         </para>
       </listitem>
       <listitem>
-        <para><emphasis role="bold">AllOrNothingMessage</emphasis> (For big messages: upload
-            <emphasis>n</emphasis> chunks to a temporary stream and then put a pointer to that in
-          your own stream as a single message.) </para>
+        <para><code>AllOrNothingMessage</code> (used for big messages: upload <emphasis>n</emphasis>
+          chunks to a temporary stream and then put a pointer to that in your own stream as a single
+          message.) </para>
       </listitem>
     </itemizedlist>
-    <para>The group chat is completely decentralized. Each member must keep track of every other
-      member.</para>
-    <para>Group state consists of:</para>
+    <para>The group state consists of:</para>
     <itemizedlist spacing="compact">
       <listitem>
-        <para><emphasis role="bold">MembershipCaps</emphasis> for each member, including</para>
+        <para>a <code>MembershipCap</code> for each member, containing:</para>
         <itemizedlist spacing="compact">
           <listitem>
-            <para> BACAP readcaps </para>
+            <para> a BACAP readcap</para>
           </listitem>
           <listitem>
             <para> a nickname </para>
@@ -140,19 +143,19 @@ draft: false
         </itemizedlist>
       </listitem>
       <listitem>
-        <para>A <emphasis role="bold">MembershipHash</emphasis> (a hash of the MembershipCaps)
-        </para>
+        <para>a <code>MembershipHash</code> (a hash over all of the MembershipCaps)</para>
       </listitem>
     </itemizedlist>
+    <para>The group chat is completely decentralized. Each member must keep track of every other
+      member.</para>
   </section>
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Group Chat Message Types</title>
-    <para>All messages are SingleMessage if they fit in one BACAP slot, or an AllOrNothingMessage if
-      they are too big. </para>
+    <para>All messages are <code>SingleMessage</code> if they fit in one BACAP slot, or an
+        <code>AllOrNothingMessage</code> if they are too big. </para>
     <itemizedlist spacing="compact">
       <listitem>
-        <para><emphasis role="bold">Text</emphasis> type payloads are normal chat text messages.
-        </para>
+        <para><code>Text</code> type payloads are normal chat text messages. </para>
       </listitem>
     </itemizedlist>
     <programlisting>// TextPayload encapsulates a normal text message.
@@ -162,8 +165,7 @@ type TextPayload struct {
 }</programlisting>
     <itemizedlist spacing="compact">
       <listitem>
-        <para><emphasis role="bold">Introduction</emphasis> type messages introduce new group
-          members.</para>
+        <para><code>Introduction</code> type messages introduce new group members.</para>
       </listitem>
     </itemizedlist>
     <programlisting>// Introduction introduces a new member to the group.
@@ -177,12 +179,12 @@ type Introduction struct {
 }</programlisting>
     <itemizedlist spacing="compact">
       <listitem>
-        <para><emphasis role="bold">FileUpload</emphasis> type</para>
+        <para><code>FileUpload</code> type</para>
       </listitem>
     </itemizedlist>
-    <para>A FileUpload can be used for various purposes such as uploading an image to be displayed
-      inline by the chat client. Likewise, a sound bite coukld be made visible in the chat along
-      with a play-button. Beyond that, we can support arbitrary file attachments. </para>
+    <para>A <code>FileUpload</code> can be used for various purposes such as uploading an image to
+      be displayed inline by the chat client. Likewise, a sound bite could be made visible in the
+      chat along with a play-button. Beyond that, we can support arbitrary file attachments. </para>
     <programlisting>// FileUpload encapsulates several file types
 // which result in different client behaviors.
 type FileUpload struct {
@@ -198,29 +200,30 @@ type FileUpload struct {
 }</programlisting>
     <itemizedlist spacing="compact">
       <listitem>
-        <para><emphasis role="bold">Who</emphasis> type</para>
+        <para><code>Who</code> type</para>
       </listitem>
     </itemizedlist>
-    <para>The Who message type is used to query who is currently in the group. </para>
+    <para>The <code>Who</code> message type is used to query who is currently in the group. </para>
     <programlisting>// Who is used to query the group chat to find out the member read capabilities.
 type Who struct {}</programlisting>
     <itemizedlist spacing="compact">
       <listitem>
-        <para><emphasis role="bold">ReplyWho</emphasis> type</para>
+        <para><code>ReplyWho</code> type</para>
       </listitem>
     </itemizedlist>
-    <para>The ReplyWho message answers the Who query with an AllOrNothingMessage BACAP stream
-      containing readcaps for all group chat members. </para>
+    <para>The <code>ReplyWho</code> message answers the Who query with an
+        <code>AllOrNothingMessage</code> BACAP stream containing readcaps for all group chat
+      members. </para>
     <programlisting>type ReplyWho struct {
     Payload *bacap.BacapStream
 }</programlisting>
     <itemizedlist spacing="compact">
       <listitem>
-        <para><emphasis role="bold">GroupChatMessage</emphasis> type </para>
+        <para><code>GroupChatMessage</code> type </para>
       </listitem>
     </itemizedlist>
-    <para>The GroupChatMessage message encapsulates all of the above-mentioned message types and is
-      serialized with CBOR.</para>
+    <para>The <code>GroupChatMessage</code> message encapsulates all of the above-mentioned message
+      types and is serialized with CBOR.</para>
     <programlisting>// GroupChatMessage encapsulates all chat message types.
 type GroupChatMessage struct {
     // Version is used to ensure we can change this message type in the future.
@@ -239,8 +242,7 @@ type GroupChatMessage struct {
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Protocol Flow</title>
     <para>The protocol flow for making a new group from scratch (using whatever authentication
-      protocol) is essentially everybody exchanging <emphasis role="bold">PleaseAdd</emphasis>
-      messages.</para>
+      protocol) is essentially for everybody to exchange <code>PleaseAdd</code> messages.</para>
     <programlisting>// PleaseAdd is a message used by a client to try and gain access to a chat group.
 type PleaseAdd struct {
     // DisplayName is the party's name to be displayed in chat clients.
@@ -258,58 +260,76 @@ type SignedPleaseAdd struct {
     // Signature contains the cryptographic signature over the PleaseAdd field.
     Signature []byte
 }</programlisting>
-    <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Or for introduction to
-      an existing group over an existing channel between an introducer member and new member:</para>
+    <para>For introduction to an existing group over an existing channel between an introducer
+      member and new member, an <code>Invitation</code> message is used.</para>
     <programlisting>type Invitation struct {
     GroupName string
 }</programlisting>
+    <para>The <code>Invitation</code> protocol flow works as follows.</para>
     <orderedlist numeration="arabic">
       <listitem>
-        <para>INVITATION: There exists a group called YoloGroup, do you wanna join? A member of the
-          group invites a new member with the <literal>Invitation</literal> message. </para>
+        <para>There exists a group called YoloGroup. A member of the group invites a potential new
+          member with an <code>Invitation</code> message. </para>
       </listitem>
       <listitem>
-        <para>If the invited party wants to join then they reply with a
-            <literal>SignedPleaseAdd</literal> message which essentially says &quot;I want to join
-          your group&quot; and it provides that new member's BACAP Universal Read Capability, their
-          display name and a cryptographic signature produced by their BACAP write capability.
-        </para>
+        <para>If the invited party wants to join, then they reply with a
+            <code>SignedPleaseAdd</code> message meaning "I want to join your group.&quot; This
+          provides the invited party's BACAP universal readcap, their display name, and a
+          cryptographic signature produced by their BACAP writecap. </para>
       </listitem>
       <listitem>
-        <para>The introducer receives the <literal>SignedPleaseAdd</literal> message 3.1 If the
-          introducer does not like the DisplayName, they reply to the invited party with a
-            <literal>PleaseReviseDisplayName</literal> message that contains the original
-          SignedPleaseAdd. Then they wait for a new <literal>SignedPleaseAdd</literal>. </para>
-      </listitem>
-      <listitem>
-        <para>If they like the Display Name, they: 4.a) existing members need the new member's read
-          cap: introducer publishes the <literal>SignedPleaseAdd</literal> to their own BACAP stream
-          for the rest of the group to read. 4.b) the new member needs existing members read caps:
-          reply to the new member: ReplyWho, containing read caps for all existing members. 4.c)
-          IMPORTANT: 4.a) and 4.b) MUST be sent in the same AllOrNothingMessage, despite 4.a) going
-          to the introducer's own BACAP stream for the group and 4.b) being writes to the BACAP
-          stream the introducer is using to communicate with the new member. </para>
-        <para>4.2 NOTE: We COULD send this as part of the initial INVITATION, but then we get these
-          silent members that can read stuff that nobody knows about, which is an anti-goal. </para>
+        <para>The introducer receives the <literal>SignedPleaseAdd</literal> message. </para>
+        <orderedlist numeration="loweralpha">
+          <listitem>
+            <para>If the introducer does not like the DisplayName, they reply to the invited party
+              with a <literal>PleaseReviseDisplayName</literal> message that contains the original
+                <code>SignedPleaseAdd</code>. Then they wait for a new
+                <literal>SignedPleaseAdd</literal>.</para>
+          </listitem>
+          <listitem>
+            <para>If the introducer approves of the <code>DisplayName</code>, then:</para>
+            <itemizedlist>
+              <listitem>
+                <para>Because existing members need the new member's readcap, the introducer
+                  publishes the <literal>SignedPleaseAdd</literal> to their own BACAP stream for the
+                  rest of the group to read. </para>
+              </listitem>
+              <listitem>
+                <para>Because the new member needs existing members' readcaps, the introducer
+                  replies to the new member with <code>ReplyWho</code> message containing readcaps
+                  for all existing members. </para>
+                <para><emphasis role="bold">IMPORTANT:</emphasis> The content of both replies must
+                  be sent in the same <code>AllOrNothingMessage</code>, despite the
+                    <literal>SignedPleaseAdd</literal> being written to the introducer's own BACAP
+                  stream for the group and the <code>ReplyWho</code> being written  to the BACAP
+                  stream the introducer is using to communicate with the new member. </para>
+                <para><emphasis role="bold">NOTE:</emphasis> We could send all of this information
+                  as part of the initial <code>Invitation</code>, but that would allow silent
+                  members to read other members' streams without them knowing it, which is an
+                  anti-goal. </para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </orderedlist>
       </listitem>
     </orderedlist>
-    <itemizedlist spacing="compact">
-      <listitem>
-        <para>Good question: What if we are adding a whole bunch of people at once; do we really
-          need to upload all the members <emphasis>n</emphasis> times? </para>
-      </listitem>
-    </itemizedlist>
-    <para>FUTURE WORK: - Forward secrecy: Can add two extensions that allow transmitting public keys
-      + stuff encrypted under those public keys - We also refer to the Reunion protocol which is a
-      n-way PAKE with strong anonymity properties. The reunion design is discussed in this PhD
-      thesis: </para>
-    <programlisting>https://research.tue.nl/en/publications/communication-in-a-world-of-pervasive-surveillance-sources-and-me
-
-
-Currently there is a python reference implementation which can be found here: https://codeberg.org/rendezvous/reunion/
-
-
-However the core cryptography of the Reunion protocol was ported to golang, here: https://github.com/katzenpost/reunion/</programlisting>
   </section>
+  <section>
+    <title>Addenda</title>
+    <para>GOOD QUESTION: If we are adding a lot of people at once,do we really need to upload all of
+      the members <emphasis>n</emphasis> times? </para>    
+    <para>FUTURE WORK: Forward secrecy. We can add two extensions that allow transmitting public
+      keys + stuff encrypted under those public keys. We can also refer to the Reunion protocol
+      which is a <emphasis>n</emphasis>-way PAKE with strong anonymity properties. Reunion is
+      described in <link
+        xlink:href="https://research.tue.nl/en/publications/communication-in-a-world-of-pervasive-surveillance-sources-and-me"
+        >Communication in a world of pervasive surveillance: Sources and methods: Counter-strategies
+        against pervasive surveillance architecture</link>.  Currently, <link
+        xlink:href="https://codeberg.org/rendezvous/reunion/">Python</link> and <link
+        xlink:href="https://github.com/katzenpost/reunion/">Go</link> implementations of Reunion are
+      available.</para>
+  </section>
+ 
+
+    
 </article>
-<?oxy_custom_end?>
