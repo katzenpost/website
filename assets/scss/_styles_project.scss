@@ -103,18 +103,21 @@ header.article-meta {
 .td-page-meta__issue  { display: none !important; }
 .td-page-meta__project-issue  { display: none !important; }
 
-/* Black background theme with black code blocks */
+/* Charcoal background theme with deeper-tone code blocks.
+   Palette: body #2c2f36 (medium charcoal), elevated surfaces #23262b,
+   code blocks #1a1d22. Pastel accents are periwinkle (#a8b3ff) for
+   links and peach (#ffd9a8) for body section headings. */
 body {
-    background-color: #000000 !important;
+    background-color: #2c2f36 !important;
     color: #ffffff !important;
 }
 
 .td-main {
-    background-color: #000000 !important;
+    background-color: #2c2f36 !important;
 }
 
 .td-content {
-    background-color: #000000 !important;
+    background-color: #2c2f36 !important;
     color: #ffffff !important;
 }
 
@@ -128,11 +131,11 @@ p:not(.chroma *), li:not(.chroma *), td:not(.chroma *), th:not(.chroma *), span:
     color: #e0e0e0 !important;
 }
 
-/* Readable links against gray background - but exclude tags and buttons.
-   .btn is excluded so Bootstrap's button styling (including its readable
-   hover states) is not overridden by the link rules below. */
+/* Readable links against the charcoal background. Periwinkle pastel for the
+   cool accent. Excludes tags and buttons so Bootstrap's button styling and
+   the tag-pill treatment further down stay intact. */
 a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/categories/"]):not(.btn) {
-    color: #66b3ff !important;
+    color: #a8b3ff !important;
     text-decoration: none !important;
 
     &:hover {
@@ -141,19 +144,19 @@ a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/c
     }
 
     &:visited {
-        color: #8db3ff !important;
+        color: #c0c8ff !important;
     }
 }
 
 /* Navigation styling */
 .td-navbar {
-    background-color: #1a1a1a !important;
+    background-color: #23262b !important;
 
     .navbar-nav .nav-link {
         color: #ffffff !important;
 
         &:hover {
-            color: #66b3ff !important;
+            color: #a8b3ff !important;
         }
     }
 
@@ -161,20 +164,20 @@ a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/c
         color: #ffffff !important;
 
         &:hover {
-            color: #66b3ff !important;
+            color: #a8b3ff !important;
         }
     }
 }
 
 .td-sidebar {
-    background-color: #333333 !important;
+    background-color: #23262b !important;
 
     .td-sidebar-nav .td-sidebar-link {
         color: #e0e0e0 !important;
 
         &:hover {
-            color: #66b3ff !important;
-            background-color: #404040 !important;
+            color: #a8b3ff !important;
+            background-color: #393d45 !important;
         }
 
         &.tree-root {
@@ -185,15 +188,15 @@ a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/c
 
 /* Code blocks - force black background */
 .highlight, .highlight pre, .chroma, .chroma pre, pre, pre code {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
     color: #f8f8f2 !important;
 }
 
 .highlight {
-    border: 1px solid #444444 !important;
+    border: 1px solid #3a3e46 !important;
     border-radius: 4px !important;
     margin: 1rem 0 !important;
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
 
     pre {
         margin: 0 !important;
@@ -201,24 +204,24 @@ a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/c
         border: none !important;
         border-radius: 4px !important;
         overflow-x: auto !important;
-        background-color: #000000 !important;
+        background-color: #1a1d22 !important;
     }
 }
 
 /* Force black background for all code-related elements */
 div.highlight, div.highlight pre, div.chroma, div.chroma pre {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
 }
 
 /* Tabbed panes code blocks */
 .tab-pane .highlight, .tab-pane .chroma, .tab-pane pre {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
 }
 
 /* Inline code styling */
 code:not(.chroma code) {
     color: #f8f8f2 !important;
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
     padding: 0.2rem 0.4rem !important;
     border-radius: 3px !important;
     font-size: 0.9em !important;
@@ -226,47 +229,47 @@ code:not(.chroma code) {
 
 /* Override any Bootstrap/Docsy code block styles */
 .td-content pre, .td-content code, .td-content .highlight {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
 }
 
 /* Ensure all pre elements have black background */
 pre {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
     color: #f8f8f2 !important;
-    border: 1px solid #444444 !important;
+    border: 1px solid #3a3e46 !important;
     border-radius: 4px !important;
     padding: 1rem !important;
 }
 
 /* Override any theme defaults */
 .td-content .highlight pre {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
     margin: 0 !important;
     border: none !important;
 }
 
 /* Tables with dark background */
 .table {
-    background-color: #1a1a1a !important;
+    background-color: #23262b !important;
     color: #e0e0e0 !important;
 
     th {
-        background-color: #2d2d2d !important;
+        background-color: #393d45 !important;
         color: #ffffff !important;
-        border-color: #444444 !important;
+        border-color: #3a3e46 !important;
     }
 
     td {
-        background-color: #1a1a1a !important;
+        background-color: #23262b !important;
         color: #e0e0e0 !important;
-        border-color: #444444 !important;
+        border-color: #3a3e46 !important;
     }
 
     &.table-striped tbody tr:nth-of-type(odd) {
-        background-color: #222222 !important;
+        background-color: #262a30 !important;
 
         td {
-            background-color: #222222 !important;
+            background-color: #262a30 !important;
         }
     }
 }
@@ -274,7 +277,7 @@ pre {
 /* Blog and content area link fixes */
 .td-content {
     a {
-        color: #66b3ff !important;
+        color: #a8b3ff !important;
         background-color: transparent !important;
 
         &:hover {
@@ -286,21 +289,21 @@ pre {
 
 /* Tag pill links inside article tag rows */
 .blog-tags a {
-    color: #66b3ff !important;
-    background-color: #404040 !important;
+    color: #a8b3ff !important;
+    background-color: #393d45 !important;
     padding: 0.25rem 0.5rem !important;
     border-radius: 3px !important;
 
     &:hover {
         color: #ffffff !important;
-        background-color: #66b3ff !important;
+        background-color: #a8b3ff !important;
     }
 }
 
 /* Post title and "Read more" links on the /blog/ index — keep them on the
    page's black background (high contrast) rather than pilled on grey. */
 .td-blog-posts-list a {
-    color: #66b3ff !important;
+    color: #a8b3ff !important;
     background-color: transparent !important;
     padding: 0 !important;
     text-decoration: none !important;
@@ -316,12 +319,12 @@ pre {
    should keep the pill treatment. */
 .td-blog-posts-list .taxonomy-terms-article a,
 .td-blog-posts-list a.taxonomy-term {
-    background-color: #404040 !important;
+    background-color: #393d45 !important;
     padding: 0.25rem 0.5rem !important;
     border-radius: 3px !important;
 
     &:hover {
-        background-color: #66b3ff !important;
+        background-color: #a8b3ff !important;
         color: #ffffff !important;
     }
 }
@@ -348,31 +351,31 @@ pre {
 
 /* Tabpane styling - black background */
 .tab-content, .tab-pane {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
     color: #ffffff !important;
-    border: 1px solid #444444 !important;
+    border: 1px solid #3a3e46 !important;
     border-radius: 4px !important;
     padding: 1rem !important;
 }
 
 .nav-tabs {
-    border-bottom: 1px solid #444444 !important;
+    border-bottom: 1px solid #3a3e46 !important;
 
     .nav-link {
-        background-color: #333333 !important;
+        background-color: #393d45 !important;
         color: #ffffff !important;
-        border: 1px solid #444444 !important;
+        border: 1px solid #3a3e46 !important;
         border-bottom: none !important;
 
         &:hover {
-            background-color: #555555 !important;
+            background-color: #4a4e57 !important;
             color: #ffffff !important;
         }
 
         &.active {
-            background-color: #000000 !important;
+            background-color: #1a1d22 !important;
             color: #ffffff !important;
-            border-bottom: 1px solid #000000 !important;
+            border-bottom: 1px solid #1a1d22 !important;
         }
     }
 }
@@ -412,36 +415,36 @@ pre {
 
 /* Pagination and navigation elements */
 .pagination .page-link {
-    background-color: #404040 !important;
+    background-color: #393d45 !important;
     color: #e0e0e0 !important;
-    border-color: #555555 !important;
+    border-color: #4a4e57 !important;
 
     &:hover {
-        background-color: #66b3ff !important;
+        background-color: #a8b3ff !important;
         color: #ffffff !important;
-        border-color: #66b3ff !important;
+        border-color: #a8b3ff !important;
     }
 
     &.active {
-        background-color: #66b3ff !important;
-        border-color: #66b3ff !important;
+        background-color: #a8b3ff !important;
+        border-color: #a8b3ff !important;
         color: #ffffff !important;
     }
 }
 
 /* Pageinfo styling - much darker background for better text readability */
 .pageinfo {
-    background-color: #1a1a1a !important;
+    background-color: #23262b !important;
     color: #ffffff !important;
-    border: 1px solid #444444 !important;
+    border: 1px solid #3a3e46 !important;
     border-radius: 4px !important;
     padding: 1rem !important;
     margin-bottom: 1rem !important;
 }
 
 .pageinfo-primary {
-    background-color: #1a1a1a !important;
-    border-color: #004b6b !important;
+    background-color: #23262b !important;
+    border-color: #a8b3ff !important;
 }
 
 .pageinfo p {
@@ -476,21 +479,33 @@ pre {
     }
 }
 
-.td-content h2 {
-    color: #ffffff !important;
-    margin-top: 2.5rem;
+.td-content h2,
+.td-content h3 {
+    color: #ffd9a8 !important;
     font-weight: 500;
 }
 
+.td-content h2 {
+    margin-top: 2.5rem;
+}
+
 /* Constrain the home page's body prose to a comfortable reading width on
-   large monitors. The cover block (a <section> with the lynx and CTAs)
-   is excluded by :not(section) and continues to span the full viewport. */
+   large monitors. The cover block (a <section> with the friendly logo and
+   CTAs) is excluded by :not(section) and continues to span the full viewport. */
 .td-home main.td-main > :not(section) {
     max-width: 820px;
     margin-left: auto;
     margin-right: auto;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+}
+
+/* A gentle warm wash on the home cover: a tinted dark at the top fading
+   into the body charcoal so the transition into the prose is invisible.
+   Bright enough to feel welcoming, dark enough that white type remains
+   legible without a secondary scrim. */
+section.td-cover-block {
+    background: linear-gradient(180deg, #4a3d33 0%, #38322e 45%, #2c2f36 100%) !important;
 }
 
 /* Two-column framing tables on the moral-character page. Sized to content
@@ -523,9 +538,9 @@ pre {
 
     td {
         padding: 0.75rem 1.25rem !important;
-        background-color: #1a1a1a !important;
+        background-color: #23262b !important;
         color: #e0e0e0 !important;
-        border: 1px solid #444444 !important;
+        border: 1px solid #3a3e46 !important;
         vertical-align: middle;
     }
 }
