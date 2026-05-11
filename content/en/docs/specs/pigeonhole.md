@@ -638,6 +638,120 @@ designated replicas themselves and forward the `ReplicaWrite` to them
 via the `core/wire/commands` `ReplicaWrite` command (see
 [`replica/connector.go`](https://github.com/katzenpost/katzenpost/blob/main/replica/connector.go)).
 
+# Fixed-throughput connections and decoy traffic
+
+Per §5.3 of the Echomix paper, the courier-to-replica and
+replica-to-replica wires are fixed-throughput Poisson streams paced
+at `LambdaR`, the per-connection rate parameter published in the
+dirauth Parameters block. An external network observer who can see
+only encrypted wire timing must not be able to infer load from the
+wire; the wire fires at the same constant rate whether or not real
+user traffic is flowing, with the gaps filled by indistinguishable
+decoy traffic.
+
+The implementation realises this in two pieces, one on each end of a
+connection.
+
+## Originator-side pacing with decoy fill
+
+Each courier holds one outgoing connection per replica; each
+replica holds one outgoing connection per peer replica. Each such
+connection has a sender goroutine driven by an exponential
+distribution at rate `LambdaR`. On every tick:
+
+* if the connection's outbound queue holds a real command (a
+  `ReplicaMessage` from the courier-side, or a `ReplicaWrite`
+  replication command from the replica-side), the sender drains one
+  and forwards it;
+* otherwise, the sender constructs a fresh `ReplicaDecoy` and
+  forwards that.
+
+The wire's outbound rate is therefore Poisson at rate `LambdaR` at
+all times, irrespective of how much real traffic the originator
+happens to be carrying. Real and decoy commands are uniformly padded
+and encrypted under the PQ Noise transport, so an observer cannot
+distinguish them by size or content.
+
+The relevant code is [`courier/server/sender.go`'s
+`sender.worker`](https://github.com/katzenpost/katzenpost/blob/main/courier/server/sender.go)
+and the analogous `outgoingSender.worker` in
+[`replica/sender.go`](https://github.com/katzenpost/katzenpost/blob/main/replica/sender.go).
+
+## Responder-side delay scheduler
+
+The receiving end of each connection does not use a separately
+paced sender. Each inbound command produces exactly one reply (a
+real `ReplicaWriteReply` or `ReplicaMessageReply` for envelopes,
+echoed `ReplicaDecoy` for decoys). The reply rate therefore equals
+the inbound rate by construction, which is `LambdaR` Poisson.
+
+Replies are NOT drained at a fixed rate. Instead, each reply is
+held for an independently sampled uniform random delay, drawn from
+`Uniform[0, replyJitterMax]`, and inserted into a per-connection
+min-heap keyed on its ready-at timestamp. A worker goroutine pops
+the next-due reply and forwards it to the wire.
+
+The per-reply random delay follows §5.4 of the paper:
+
+> Each reply is independently delayed, with delays sampled from a
+> uniform distribution to mitigate the courier's ability to infer
+> links between responses that pertain to the same box.
+
+The relevant type is `delayedReplyEmitter` in
+[`replica/sender.go`](https://github.com/katzenpost/katzenpost/blob/main/replica/sender.go).
+
+### Choice of `replyJitterMax`
+
+Any strictly positive value satisfies the §5.4 independence
+requirement. The reference implementation uses 50 ms, chosen to
+exceed typical per-message processing-time variance on a healthy
+replica while remaining small relative to the user-perceptible
+round-trip latency. There is no hard constraint that the value be
+identical across replicas in the same network. See "Wire-level
+indistinguishability" below.
+
+## Wire-level indistinguishability
+
+A Poisson stream composed with independent random shifts, of any
+distribution, remains a Poisson stream at the same rate. This is the
+property that protects the courier-replica and replica-replica
+wires from a passive observer, as follows.
+
+* The reply rate from a replica equals the inbound command rate,
+  which is `LambdaR` Poisson.
+* Each reply is shifted by an independent random delay (from
+  `Uniform[0, replyJitterMax]` on the responder side, or an
+  exponential interval on the originator side).
+* The composition is still Poisson at rate `LambdaR`.
+
+A passive observer who can see only encrypted wire timing therefore
+sees an indistinguishable Poisson stream regardless of the
+underlying shift distribution. Pairing a specific outbound event to
+a specific inbound event by timing alone is not possible: the
+shifts can arbitrarily reorder events relative to each other, so
+many distinct inbound predecessors are equally plausible for any
+given outbound.
+
+## Bounded responder queue depth
+
+The per-item delay scheduler avoids the M/M/1 boundary case that
+arose in earlier designs which paced the responder side at the same
+rate as its peer's command stream. By Little's Law, the steady-state
+heap depth on each inbound connection is the product of the arrival
+rate and the mean reply delay:
+
+```
+expected depth  =  LambdaR  ×  replyJitterMax / 2
+```
+
+For `LambdaR = 5/s` (one tick per ~200 ms) and `replyJitterMax =
+50 ms`, the expected per-connection depth is 0.125 entries, well
+below any operationally meaningful queue capacity. The heap depth
+remains bounded over arbitrary time horizons because, unlike a
+fixed-rate drainer, the per-item scheduler has no "consumer
+underrun" failure mode in which the queue can accumulate against a
+matched producer.
+
 # Protocol sequence visualizations
 
 For simplicity, the following diagrams omit replication while illustrating the Pigeonhole write and read operations.
