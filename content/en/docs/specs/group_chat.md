@@ -196,7 +196,7 @@ All messages are `SingleMessage` if they fit in one BACAP slot, or an
 
 </div>
 
-``` programlisting
+``` golang
 // TextPayload encapsulates a normal text message.
 type TextPayload struct {
     // Payload contains a normal UTF-8 text message to be displayed inline.
@@ -210,7 +210,7 @@ type TextPayload struct {
 
 </div>
 
-``` programlisting
+``` golang
 // Introduction introduces a new member to the group.
 type Introduction struct {
     // DisplayName is the party's name to be displayed in chat clients.
@@ -233,7 +233,7 @@ be displayed inline by the chat client. Likewise, a sound bite could be made vis
 in the
 chat along with a play-button. Beyond that, we can support arbitrary file attachments.
 
-``` programlisting
+``` goland
 // FileUpload encapsulates several file types
 // which result in different client behaviors.
 type FileUpload struct {
@@ -257,7 +257,7 @@ type FileUpload struct {
 
 The `Who` message type is used to query who is currently in the group.
 
-``` programlisting
+``` golang
 // Who is used to query the group chat to find out the member read capabilities.
 type Who struct {}
 ```
@@ -272,7 +272,7 @@ The `ReplyWho` message answers the Who query with an
 `AllOrNothingMessage` BACAP stream containing readcaps for all group chat
 members.
 
-``` programlisting
+``` golang
 type ReplyWho struct {
     Payload *bacap.BacapStream
 }
@@ -287,7 +287,7 @@ type ReplyWho struct {
 The `GroupChatMessage` message encapsulates all of the above-mentioned message
 types and is serialized with CBOR.
 
-``` programlisting
+``` pgolang
 // GroupChatMessage encapsulates all chat message types.
 type GroupChatMessage struct {
     // Version is used to ensure we can change this message type in the future.
@@ -325,7 +325,7 @@ type GroupChatMessage struct {
 The protocol flow for making a new group from scratch (using whatever authentication
 protocol) is essentially for everybody to exchange `PleaseAdd` messages.
 
-``` programlisting
+``` golang
 // PleaseAdd is a message used by a client to try and gain access to a chat group.
 type PleaseAdd struct {
     // DisplayName is the party's name to be displayed in chat clients.
@@ -348,7 +348,7 @@ type SignedPleaseAdd struct {
 For introduction to an existing group over an existing channel between an introducer
 member and new member, an `Invitation` message is used.
 
-``` programlisting
+``` golang
 type Invitation struct {
     GroupName string
 }

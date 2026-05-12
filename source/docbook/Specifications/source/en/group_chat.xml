@@ -158,7 +158,7 @@
         <para><code>Text</code> type payloads are normal chat text messages. </para>
       </listitem>
     </itemizedlist>
-    <programlisting>// TextPayload encapsulates a normal text message.
+    <programlisting language="go">// TextPayload encapsulates a normal text message.
 type TextPayload struct {
     // Payload contains a normal UTF-8 text message to be displayed inline.
     Payload []byte
@@ -168,7 +168,7 @@ type TextPayload struct {
         <para><code>Introduction</code> type messages introduce new group members.</para>
       </listitem>
     </itemizedlist>
-    <programlisting>// Introduction introduces a new member to the group.
+    <programlisting language="go">// Introduction introduces a new member to the group.
 type Introduction struct {
     // DisplayName is the party's name to be displayed in chat clients.
     DisplayName string
@@ -185,7 +185,7 @@ type Introduction struct {
     <para>A <code>FileUpload</code> can be used for various purposes such as uploading an image to
       be displayed inline by the chat client. Likewise, a sound bite could be made visible in the
       chat along with a play-button. Beyond that, we can support arbitrary file attachments. </para>
-    <programlisting>// FileUpload encapsulates several file types
+    <programlisting language="go">// FileUpload encapsulates several file types
 // which result in different client behaviors.
 type FileUpload struct {
     // Payload contains the file payload.
@@ -204,7 +204,7 @@ type FileUpload struct {
       </listitem>
     </itemizedlist>
     <para>The <code>Who</code> message type is used to query who is currently in the group. </para>
-    <programlisting>// Who is used to query the group chat to find out the member read capabilities.
+    <programlisting language="go">// Who is used to query the group chat to find out the member read capabilities.
 type Who struct {}</programlisting>
     <itemizedlist spacing="compact">
       <listitem>
@@ -214,7 +214,7 @@ type Who struct {}</programlisting>
     <para>The <code>ReplyWho</code> message answers the Who query with an
         <code>AllOrNothingMessage</code> BACAP stream containing readcaps for all group chat
       members. </para>
-    <programlisting>type ReplyWho struct {
+    <programlisting language="go">type ReplyWho struct {
     Payload *bacap.BacapStream
 }</programlisting>
     <itemizedlist spacing="compact">
@@ -224,7 +224,7 @@ type Who struct {}</programlisting>
     </itemizedlist>
     <para>The <code>GroupChatMessage</code> message encapsulates all of the above-mentioned message
       types and is serialized with CBOR.</para>
-    <programlisting>// GroupChatMessage encapsulates all chat message types.
+    <programlisting language="go">// GroupChatMessage encapsulates all chat message types.
 type GroupChatMessage struct {
     // Version is used to ensure we can change this message type in the future.
     Version int
@@ -243,7 +243,7 @@ type GroupChatMessage struct {
     <title>Protocol Flow</title>
     <para>The protocol flow for making a new group from scratch (using whatever authentication
       protocol) is essentially for everybody to exchange <code>PleaseAdd</code> messages.</para>
-    <programlisting>// PleaseAdd is a message used by a client to try and gain access to a chat group.
+    <programlisting language="go">// PleaseAdd is a message used by a client to try and gain access to a chat group.
 type PleaseAdd struct {
     // DisplayName is the party's name to be displayed in chat clients.
     DisplayName string
@@ -262,7 +262,7 @@ type SignedPleaseAdd struct {
 }</programlisting>
     <para>For introduction to an existing group over an existing channel between an introducer
       member and new member, an <code>Invitation</code> message is used.</para>
-    <programlisting>type Invitation struct {
+    <programlisting language="go">type Invitation struct {
     GroupName string
 }</programlisting>
     <para>The <code>Invitation</code> protocol flow works as follows.</para>

@@ -1,4 +1,17 @@
-{ "title":"Build Katzenpost from source" , "linkTitle":"Build from source" , "description":"Pinned versions of the Katzenpost stack and how to build each component from source." , "author":"David Stainton" , "url":"" , "date":"2026-05-10T15:44:07.365863523-07:00" , "draft":"false" , "slug":"build_from_source" , "layout":"" , "type":"" , "weight":"" , "version":"0" }
+---
+title: "Build Katzenpost from source"
+linkTitle: "Build from source"
+description: "Pinned versions of the Katzenpost stack and how to build each component from source."
+author: "David Stainton"
+url: ""
+date: "2026-05-11T21:31:32.650814427-07:00"
+draft: "false"
+slug: "build_from_source"
+layout: ""
+type: ""
+weight: ""
+version: "0"
+---
 
 <div class="article">
 
@@ -40,7 +53,11 @@
 
 </div>
 
-This page is the canonical reference for the <span class="strong">**pinned versions**</span> of the Katzenpost stack, together with brief instructions for building and running each component from source. It is intended for anyone who wishes to run the software ahead of binary packages becoming available.
+This page is the canonical reference for the
+<span class="strong">**pinned versions**</span> of the Katzenpost
+stack, together with brief instructions for building and running
+each component from source. It is intended for anyone who wishes to
+run the software ahead of binary packages becoming available.
 
 <div class="section">
 
@@ -58,7 +75,9 @@ This page is the canonical reference for the <span class="strong">**pinned versi
 
 </div>
 
-The following git tags are the current recommended versions for running the stack. Components in the same row of the same repository should be built from the same tag.
+The following git tags are the current recommended versions for
+running the stack. Components in the same row of the same
+repository should be built from the same tag.
 
 <div class="informaltable">
 
@@ -74,9 +93,13 @@ The following git tags are the current recommended versions for running the stac
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Server-side components (mix server, dirauth, courier, replica)</td>
+<td style="text-align: left;">Server-side components (mix server, dirauth, courier,
+replica)</td>
 <td style="text-align: left;"><a href="https://github.com/katzenpost/katzenpost" class="link" target="_top">katzenpost</a></td>
-<td style="text-align: left;"><code class="literal">cmd/server</code>, <code class="literal">cmd/dirauth</code>, <code class="literal">cmd/courier</code>, <code class="literal">cmd/replica</code></td>
+<td style="text-align: left;"><code class="literal">cmd/server</code>,
+<code class="literal">cmd/dirauth</code>,
+<code class="literal">cmd/courier</code>,
+<code class="literal">cmd/replica</code></td>
 <td style="text-align: left;">main</td>
 <td style="text-align: left;"><code class="literal">v0.0.73</code></td>
 </tr>
@@ -120,7 +143,9 @@ The following git tags are the current recommended versions for running the stac
 
 </div>
 
-Server-side components are listed for completeness; for full deployment guidance, see the <a href="/docs/admin_guide/" class="link" target="_top">Admin Guide</a>.
+Server-side components are listed for completeness; for full
+deployment guidance, see the
+<a href="/docs/admin_guide/" class="link" target="_top">Admin Guide</a>.
 
 </div>
 
@@ -144,11 +169,16 @@ Server-side components are listed for completeness; for full deployment guidance
 
 - <span class="strong">**Go**</span> 1.23 or newer.
 
-- <span class="strong">**Rust**</span> stable (with `cargo`).
+- <span class="strong">**Rust**</span> stable (with
+  `cargo`).
 
-- <span class="strong">**Python**</span> 3.9 or newer (the thin client supports 3.8+, but the venv tooling here assumes 3.9+).
+- <span class="strong">**Python**</span> 3.9 or newer (the
+  thin client supports 3.8+, but the venv tooling here assumes
+  3.9+).
 
-- <span class="strong">**Make**</span>, <span class="strong">**git**</span>, and a C toolchain (`gcc` or `clang`).
+- <span class="strong">**Make**</span>,
+  <span class="strong">**git**</span>, and a C toolchain
+  (`gcc` or `clang`).
 
 </div>
 
@@ -170,7 +200,10 @@ Server-side components are listed for completeness; for full deployment guidance
 
 </div>
 
-The thin client libraries do not, by themselves, speak to the mix network. They communicate over a local socket with the `kpclientd` daemon, which performs all cryptographic and network operations.
+The thin client libraries do not, by themselves, speak to the mix
+network. They communicate over a local socket with the
+`kpclientd` daemon, which performs all
+cryptographic and network operations.
 
 ``` programlisting
 git clone https://github.com/katzenpost/katzenpost
@@ -180,13 +213,18 @@ cd cmd/kpclientd
 go build
 ```
 
-The resulting `kpclientd` binary is run with a TOML configuration file:
+The resulting `kpclientd` binary is run with a
+TOML configuration file:
 
 ``` programlisting
 ./kpclientd -c /path/to/client.toml
 ```
 
-A configuration file is required. For testing, the <a href="/docs/admin_guide/docker.html" class="link" target="_top">Docker test mixnet</a> generates one automatically; for joining a public network, you would obtain the configuration from that network’s operators.
+A configuration file is required. For testing, the
+<a href="/docs/admin_guide/docker.html" class="link" target="_top">Docker test
+mixnet</a> generates one automatically; for joining a public
+network, you would obtain the configuration from that network’s
+operators.
 
 </div>
 
@@ -212,7 +250,9 @@ The Go thin client is a library, imported as a Go module:
 import "github.com/katzenpost/katzenpost/client/thin"
 ```
 
-Pin to `v0.0.73` in your application’s `go.mod`. There is no separate build step; the library is compiled with your application.
+Pin to `v0.0.73` in your application’s
+`go.mod`. There is no separate build step; the
+library is compiled with your application.
 
 </div>
 
@@ -264,7 +304,9 @@ katzenpost_thin_client = "0.0.13"
 
 </div>
 
-The Python thin client is best installed into a virtualenv, both to isolate its dependencies and to avoid any disturbance of the system Python.
+The Python thin client is best installed into a virtualenv, both
+to isolate its dependencies and to avoid any disturbance of the
+system Python.
 
 ``` programlisting
 git clone https://github.com/katzenpost/thin_client
@@ -294,9 +336,16 @@ pip install .
 
 </div>
 
-A decentralised group chat client built atop Qt. It depends solely on the Katzenpost mix network and the Pigeonhole storage services. No central server is involved. The underlying design is set out in the <a href="https://arxiv.org/abs/2501.02933" class="link" target="_top">Echomix paper</a>.
+A decentralised group chat client built atop Qt. It depends solely
+on the Katzenpost mix network and the Pigeonhole storage services.
+No central server is involved. The underlying design is set out in
+the <a href="https://arxiv.org/abs/2501.02933" class="link" target="_top">Echomix
+paper</a>.
 
-A tag has not yet been published; at present, `katzenqt` builds against a development branch of `katzenpost`. This section will be updated once a release is cut.
+A tag has not yet been published; at present,
+`katzenqt` builds against a development branch of
+`katzenpost`. This section will be updated once a
+release is cut.
 
 ``` programlisting
 sudo apt install libxcb-cursor0 libegl1
@@ -307,7 +356,10 @@ make deps
 make run
 ```
 
-If `make deps run` does not produce a running interface, the component-by-component sequence in `katzenqt`’s `README.md` is the recommended fallback.
+If `make deps run` does not produce a running
+interface, the component-by-component sequence in
+`katzenqt`’s `README.md` is the
+recommended fallback.
 
 </div>
 
@@ -327,7 +379,11 @@ If `make deps run` does not produce a running interface, the component-by-compon
 
 </div>
 
-Once `kpclientd` is running with a valid configuration, a single test from the Python integration suite is sufficient to exercise the full Pigeonhole round trip: Alice writes a message to the storage replicas via the courier, and Bob reads it back.
+Once `kpclientd` is running with a valid
+configuration, a single test from the Python integration suite is
+sufficient to exercise the full Pigeonhole round trip: Alice
+writes a message to the storage replicas via the courier, and Bob
+reads it back.
 
 ``` programlisting
 source thin_client/.venv/bin/activate
@@ -335,7 +391,12 @@ cd thin_client
 pytest tests/test_new_pigeonhole_api.py::test_alice_sends_bob_complete_workflow
 ```
 
-A successful run indicates that `kpclientd` is connected, the PKI document has been retrieved, the network is producing consensus, and the courier and replicas are reachable. The remainder of the suite (`pytest` with no arguments) covers tombstones, copy commands, and the various error paths.
+A successful run indicates that `kpclientd` is
+connected, the PKI document has been retrieved, the network is
+producing consensus, and the courier and replicas are reachable.
+The remainder of the suite (`pytest` with no
+arguments) covers tombstones, copy commands, and the various error
+paths.
 
 </div>
 

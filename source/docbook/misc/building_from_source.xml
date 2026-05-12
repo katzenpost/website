@@ -243,13 +243,11 @@
       <literal>kpclientd</literal> daemon, which performs all
       cryptographic and network operations.
     </para>
-    <programlisting>
-git clone https://github.com/katzenpost/katzenpost
+    <programlisting>git clone https://github.com/katzenpost/katzenpost
 cd katzenpost
 git checkout v0.0.73
 cd cmd/kpclientd
-go build
-</programlisting>
+go build</programlisting>
     <para>
       The resulting <literal>kpclientd</literal> binary is run with a
       TOML configuration file:
@@ -270,9 +268,7 @@ go build
     <para>
       The Go thin client is a library, imported as a Go module:
     </para>
-    <programlisting language="go">
-import &quot;github.com/katzenpost/katzenpost/client/thin&quot;
-</programlisting>
+    <programlisting language="go">import &quot;github.com/katzenpost/katzenpost/client/thin&quot;</programlisting>
     <para>
       Pin to <literal>v0.0.73</literal> in your application’s
       <literal>go.mod</literal>. There is no separate build step; the
@@ -281,19 +277,15 @@ import &quot;github.com/katzenpost/katzenpost/client/thin&quot;
   </section>
   <section xml:id="rust-thin-client">
     <title>Rust thin client</title>
-    <programlisting>
-git clone https://github.com/katzenpost/thin_client
+    <programlisting>git clone https://github.com/katzenpost/thin_client
 cd thin_client
 git checkout 0.0.13
-cargo build --release
-</programlisting>
+cargo build --release</programlisting>
     <para>
       Or, in another Rust project’s <literal>Cargo.toml</literal>:
     </para>
-    <programlisting language="toml">
-[dependencies]
-katzenpost_thin_client = &quot;0.0.13&quot;
-</programlisting>
+    <programlisting language="toml">[dependencies]
+katzenpost_thin_client = &quot;0.0.13&quot;</programlisting>
   </section>
   <section xml:id="python-thin-client">
     <title>Python thin client</title>
@@ -302,15 +294,13 @@ katzenpost_thin_client = &quot;0.0.13&quot;
       to isolate its dependencies and to avoid any disturbance of the
       system Python.
     </para>
-    <programlisting>
-git clone https://github.com/katzenpost/thin_client
+    <programlisting>git clone https://github.com/katzenpost/thin_client
 cd thin_client
 git checkout 0.0.13
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install .
-</programlisting>
+pip install .</programlisting>
   </section>
   <section xml:id="katzenqt-qt-group-chat-client">
     <title>katzenqt (Qt group chat client)</title>
@@ -327,14 +317,12 @@ pip install .
       <literal>katzenpost</literal>. This section will be updated once a
       release is cut.
     </para>
-    <programlisting>
-sudo apt install libxcb-cursor0 libegl1
+    <programlisting>sudo apt install libxcb-cursor0 libegl1
 git clone https://github.com/katzenpost/katzenqt
 cd katzenqt
 git checkout 0.0.2-rc4
 make deps
-make run
-</programlisting>
+make run</programlisting>
     <para>
       If <literal>make deps run</literal> does not produce a running
       interface, the component-by-component sequence in
@@ -351,11 +339,9 @@ make run
       writes a message to the storage replicas via the courier, and Bob
       reads it back.
     </para>
-    <programlisting>
-source thin_client/.venv/bin/activate
+    <programlisting>source thin_client/.venv/bin/activate
 cd thin_client
-pytest tests/test_new_pigeonhole_api.py::test_alice_sends_bob_complete_workflow
-</programlisting>
+pytest tests/test_new_pigeonhole_api.py::test_alice_sends_bob_complete_workflow</programlisting>
     <para>
       A successful run indicates that <literal>kpclientd</literal> is
       connected, the PKI document has been retrieved, the network is

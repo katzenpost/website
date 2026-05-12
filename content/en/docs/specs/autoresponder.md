@@ -1,8 +1,17 @@
-{ "title": "Provider-side autoresponder extension" , "linkTitle":
-"Autoresponder extension" , "description": "" , "author": "" , "url": ""
-, "date": "2026-05-10T13:27:14.984621043-07:00", "draft": "false" ,
-"slug": "autoresponder" , "layout": "" , "type": "" , "weight": "1" ,
-"version": "" }
+---
+title: "Provider-side autoresponder extension"
+linkTitle: "Autoresponder extension"
+description: ""
+author: ""
+url: ""
+date: "2026-05-11T21:09:52.058622671-07:00"
+draft: "false"
+slug: "autoresponder"
+layout: ""
+type: ""
+weight: "1"
+version: ""
+---
 
 <div class="article">
 
@@ -48,13 +57,12 @@
 
 **Abstract**
 
-This interface is meant to provide support for various autoresponder
-agents <span class="quote">“<span class="quote">Kaetzchen</span>”</span>
-that run on Katzenpost provider instances, thus bypassing the need to
-run a discrete client instance to provide functionality. The use-cases
-for such agents include, but are not limited to, user identity key
-lookup, a discard address, and a loop-back responder for the purpose of
-cover traffic.
+This interface is meant to provide support for various autoresponder agents
+<span class="quote">“<span class="quote">Kaetzchen</span>”</span> that run on Katzenpost provider instances, thus
+bypassing the need to run a discrete client instance to provide functionality. The
+use-cases for such agents include, but are not limited to, user identity key lookup,
+a discard address, and a loop-back responder for the purpose of cover
+traffic.
 
 </div>
 
@@ -70,27 +78,21 @@ cover traffic.
 
 **Table of Contents**
 
-<span class="section">[Conventions Used in This
-Document](#d58e50)</span>
+<span class="section">[Conventions Used in This Document](#d58e50)</span>
 
 <span class="section">[Terminology](#terminology)</span>
 
-<span class="section">[1. Extension
-Overview](#extension-overview)</span>
+<span class="section">[1. Extension Overview](#extension-overview)</span>
 
-<span class="section">[1.1 Agent
-Requirements](#agent-requirements)</span>
+<span class="section">[1.1 Agent Requirements](#agent-requirements)</span>
 
-<span class="section">[1.2 Mix Message
-Formats](#mix-message-formats)</span>
+<span class="section">[1.2 Mix Message Formats](#mix-message-formats)</span>
 
 <span class="section">[2. PKI Extensions](#pki-extensions)</span>
 
-<span class="section">[3. Anonymity
-Considerations](#anonymity-considerations)</span>
+<span class="section">[3. Anonymity Considerations](#anonymity-considerations)</span>
 
-<span class="section">[4. Security
-Considerations](#security-considerations)</span>
+<span class="section">[4. Security Considerations](#security-considerations)</span>
 
 <span class="section">[Acknowledgments](#acknowledgments)</span>
 
@@ -114,19 +116,10 @@ Considerations](#security-considerations)</span>
 
 </div>
 
-The key words
-<span class="quote">“<span class="quote">MUST</span>”</span>,
-<span class="quote">“<span class="quote">MUST NOT</span>”</span>,
-<span class="quote">“<span class="quote">REQUIRED</span>”</span>,
-<span class="quote">“<span class="quote">SHALL</span>”</span>,
-<span class="quote">“<span class="quote">SHALL NOT</span>”</span>,
-<span class="quote">“<span class="quote">SHOULD</span>”</span>,
-<span class="quote">“<span class="quote">SHOULD NOT</span>”</span>,
-<span class="quote">“<span class="quote">RECOMMENDED</span>”</span>,
-<span class="quote">“<span class="quote">MAY</span>”</span>, and
-<span class="quote">“<span class="quote">OPTIONAL</span>”</span> in this
-document are to be interpreted as described in
-<a href="#RFC2119" class="link">RFC2119</a>.
+The key words <span class="quote">“<span class="quote">MUST</span>”</span>, <span class="quote">“<span class="quote">MUST NOT</span>”</span>, <span class="quote">“<span class="quote">REQUIRED</span>”</span>,
+<span class="quote">“<span class="quote">SHALL</span>”</span>, <span class="quote">“<span class="quote">SHALL NOT</span>”</span>, <span class="quote">“<span class="quote">SHOULD</span>”</span>, <span class="quote">“<span class="quote">SHOULD
+NOT</span>”</span>, <span class="quote">“<span class="quote">RECOMMENDED</span>”</span>, <span class="quote">“<span class="quote">MAY</span>”</span>, and
+<span class="quote">“<span class="quote">OPTIONAL</span>”</span> in this document are to be interpreted as described in <a href="#RFC2119" class="link">RFC2119</a>.
 
 </div>
 
@@ -180,11 +173,10 @@ The payload structure which is encapsulated by the Sphinx body.
 
 </div>
 
-Each Kaetzchen agent will register as a potential recipient on its
-Provider. When the Provider receives a forward packet destined for a
-Kaetzchen instance, it will hand off the fully unwrapped packet along
-with its corresponding SURB to the agent, which will then act on the
-packet and optionally reply utilizing the SURB.
+Each Kaetzchen agent will register as a potential recipient on its Provider. When
+the Provider receives a forward packet destined for a Kaetzchen instance, it will
+hand off the fully unwrapped packet along with its corresponding SURB to the agent,
+which will then act on the packet and optionally reply utilizing the SURB.
 
 <div class="section">
 
@@ -209,16 +201,17 @@ packet and optionally reply utilizing the SURB.
 - Each agent operation request and response MUST fit within one Sphinx
   packet.
 
-- Each agent SHOULD register a recipient address that is prefixed with
-  (Or another standardized delimiter, agreed to by all participating
-  providers in a given mixnet).
+- Each agent SHOULD register a recipient address that is prefixed with (Or
+  another standardized delimiter, agreed to by all participating providers in
+  a given mixnet).
 
-- Each agent SHOULD register a recipient address that consists of an
-  RFC5322 dot-atom value, and MUST register recipient addresses that are
-  at most 64 octets in length.
+- Each agent SHOULD register a recipient address that consists of an RFC5322
+  dot-atom value, and MUST register recipient addresses that are at most 64
+  octets in length.
 
 - The first byte of the agent's response payload MUST be 0x01 to allow
-  clients to easily differentiate between SURB-ACKs and agent responses.
+  clients to easily differentiate between SURB-ACKs and agent
+  responses.
 
 </div>
 
@@ -240,8 +233,8 @@ packet and optionally reply utilizing the SURB.
 
 </div>
 
-Messages from clients to Kaetzchen use the following payload format in
-the forward Sphinx packet:
+Messages from clients to Kaetzchen use the following payload format in the forward
+Sphinx packet:
 
 ``` programlisting
 struct {
@@ -258,12 +251,12 @@ opaque plaintext[];
 ```
 
 The plaintext component of a `KaetzchenMessage` MUST be padded by
-appending <span class="quote">“<span class="quote">0x00</span>”</span>
-bytes to make the final total size of a `KaetzchenMessage` equal to that
-of a `BlockSphinxPlaintext`.
+appending <span class="quote">“<span class="quote">0x00</span>”</span> bytes to make the final total size of a
+`KaetzchenMessage` equal to that of a
+`BlockSphinxPlaintext`.
 
-Messages (replies) from the Kaetzchen to client use the following
-payload format in the SURB generated packet:
+Messages (replies) from the Kaetzchen to client use the following payload format
+in the SURB generated packet:
 
 ``` programlisting
 struct {
@@ -272,9 +265,9 @@ opaque plaintext[];
 ```
 
 The plaintext component of a `KaetzchenReply` MUST be padded by
-appending <span class="quote">“<span class="quote">0x00</span>”</span>
-bytes to make the final total size of a `KaetzchenReply` equal to that
-of a `BlockSphinxPlaintext`
+appending <span class="quote">“<span class="quote">0x00</span>”</span> bytes to make the final total size of a
+`KaetzchenReply` equal to that of a
+`BlockSphinxPlaintext`
 
 </div>
 
@@ -296,21 +289,21 @@ of a `BlockSphinxPlaintext`
 
 </div>
 
-Each provider SHOULD publish the list of publicly accessible Kaetzchen
-agent endpoints in its MixDescriptor, along with any other information
-required to utilize the agent.
+Each provider SHOULD publish the list of publicly accessible Kaetzchen agent
+endpoints in its MixDescriptor, along with any other information required to utilize
+the agent.
 
-Provider should make this information available in the form of a map in
-which the keys are the label used to identify a given service, and the
-value is a map with arbitrary keys.
+Provider should make this information available in the form of a map in which the
+keys are the label used to identify a given service, and the value is a map with
+arbitrary keys.
 
 Valid service names refer to the services defined in extensions to this
-specification. Every service MUST be implemented by one and only one
-Kaetzchen agent.
+specification. Every service MUST be implemented by one and only one Kaetzchen
+agent.
 
-For each service, the provider MUST advertise a field for the endpoint
-at which the Kaetzchen agent can be reached, as a key value pair where
-the key is `endpoint`, and the value is the provider side endpoint
+For each service, the provider MUST advertise a field for the endpoint at which
+the Kaetzchen agent can be reached, as a key value pair where the key is
+`endpoint`, and the value is the provider side endpoint
 identifier.
 
 ``` programlisting
@@ -344,16 +337,16 @@ identifier.
 
 </div>
 
-In the event that the mix keys for the entire return path are
-compromised, it is possible for adversaries to unwrap the SURB and
-determine the final recipient of the reply.
+In the event that the mix keys for the entire return path are compromised, it is
+possible for adversaries to unwrap the SURB and determine the final recipient of the
+reply.
 
-Depending on what sort of operations a given agent implements, there may
-be additional anonymity impact that requires separate consideration.
+Depending on what sort of operations a given agent implements, there may be
+additional anonymity impact that requires separate consideration.
 
-Clients MUST NOT have predictable retransmission otherwise this makes
-active confirmations attacks possible which could be used to discover
-the ingress Provider of the client.
+Clients MUST NOT have predictable retransmission otherwise this makes active
+confirmations attacks possible which could be used to discover the ingress Provider
+of the client.
 
 </div>
 
@@ -373,16 +366,16 @@ the ingress Provider of the client.
 
 </div>
 
-It is possible to use this mechanism to flood a victim with unwanted
-traffic by constructing a request with a SURB destined for the target.
+It is possible to use this mechanism to flood a victim with unwanted traffic by
+constructing a request with a SURB destined for the target.
 
-Depending on the operations implemented by each agent, the added
-functionality may end up being a vector for Denial of Service attacks in
-the form of CPU or network overload.
+Depending on the operations implemented by each agent, the added functionality may
+end up being a vector for Denial of Service attacks in the form of CPU or network
+overload.
 
-Unless the agent implements additional encryption, message integrity and
-privacy is limited to that which is provided by the base Sphinx packet
-format and parameterization.
+Unless the agent implements additional encryption, message integrity and privacy
+is limited to that which is provided by the base Sphinx packet format and
+parameterization.
 
 </div>
 
@@ -402,8 +395,8 @@ format and parameterization.
 
 </div>
 
-The inspiration for this extension comes primarily from a design by
-Vincent Breitmoser.
+The inspiration for this extension comes primarily from a design by Vincent
+Breitmoser.
 
 </div>
 
@@ -425,44 +418,26 @@ Vincent Breitmoser.
 
 <span id="KATZMIXPKI"></span><span class="bold">**KATZMIXPKI**</span>
 
-Angel, Y., Piotrowska, A., Stainton, D.,
-<span class="quote">“<span class="quote">Katzenpost Mix Network Public
-Key Infrastructure Specification</span>”</span>, December 2017,
-<a href="https://katzenpost.network/docs/specs/pdf/pki.pdf" class="link"
-target="_top">https://katzenpost.network/docs/specs/pdf/pki.pdf</a>.
+Angel, Y., Piotrowska, A., Stainton, D., <span class="quote">“<span class="quote">Katzenpost Mix Network Public Key Infrastructure Specification</span>”</span>, December 2017, <a href="https://katzenpost.network/docs/specs/pdf/pki.pdf" class="link" target="_top">https://katzenpost.network/docs/specs/pdf/pki.pdf</a>.
 
 <span id="RFC2119"></span><span class="bold">**RFC2119**</span>
 
-Bradner, S., <span class="quote">“<span class="quote">Key words for use
-in RFCs to Indicate Requirement Levels</span>”</span>, BCP 14, RFC 2119,
-DOI 10.17487/RFC2119, March 1997,
-<a href="http://www.rfc-editor.org/info/rfc2119" class="link"
-target="_top">http://www.rfc-editor.org/info/rfc2119</a>.
+Bradner, S., <span class="quote">“<span class="quote">Key words for use in RFCs to Indicate Requirement
+Levels</span>”</span>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a href="http://www.rfc-editor.org/info/rfc2119" class="link" target="_top">http://www.rfc-editor.org/info/rfc2119</a>.
 
 <span id="RFC5322"></span><span class="bold">**RFC5322**</span>
 
-Resnick, P., Ed., <span class="quote">“<span class="quote">Internet
-Message Format</span>”</span>, RFC 5322, DOI 10.17487/RFC5322, October
-2008, <a href="https://www.rfc-editor.org/info/rfc5322" class="link"
-target="_top">https://www.rfc-editor.org/info/rfc5322</a>.
+Resnick, P., Ed., <span class="quote">“<span class="quote">Internet Message Format</span>”</span>, RFC 5322, DOI 10.17487/RFC5322, October 2008, <a href="https://www.rfc-editor.org/info/rfc5322" class="link" target="_top">https://www.rfc-editor.org/info/rfc5322</a>.
 
 <span id="SPHINX09"></span><span class="bold">**SPHINX09**</span>
 
-Danezis, G., Goldberg, I.,
-<span class="quote">“<span class="quote">Sphinx: A Compact and Provably
-Secure Mix Format</span>”</span>, DOI 10.1109/SP.2009.15, May 2009,
-<a href="https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf"
-class="link"
-target="_top">https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</a>.
+Danezis, G., Goldberg, I., <span class="quote">“<span class="quote">Sphinx: A Compact and Provably Secure Mix
+Format</span>”</span>, DOI 10.1109/SP.2009.15, May 2009, <a href="https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf" class="link" target="_top">https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</a>.
 
 <span id="SPHINXSPEC"></span><span class="bold">**SPHINXSPEC**</span>
 
-Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D.,
-<span class="quote">“<span class="quote">Sphinx Mix Network
-Cryptographic Packet Format Specification</span>”</span>, July 2017,
-<a href="https://katzenpost.network/docs/specs/pdf/sphinx.pdf"
-class="link"
-target="_top">https://katzenpost.network/docs/specs/pdf/sphinx.pdf</a>.
+Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">“<span class="quote">Sphinx Mix Network Cryptographic Packet Format Specification</span>”</span>, July 2017,
+<a href="https://katzenpost.network/docs/specs/pdf/sphinx.pdf" class="link" target="_top">https://katzenpost.network/docs/specs/pdf/sphinx.pdf</a>.
 
 </div>
 
