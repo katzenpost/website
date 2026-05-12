@@ -49,8 +49,7 @@
   <info>  
     <title xml:id="building.title">Build &program_name; from source</title> <!-- Match to title PI above. -->          
   </info>
-  <para>
-    This page is the canonical reference for the
+  <para>This page is the canonical reference for the
     <emphasis role="strong">pinned versions</emphasis> of the Katzenpost
     stack, together with brief instructions for building and running
     each component from source. It is intended for anyone who wishes to
@@ -58,8 +57,7 @@
   </para>
   <section xml:id="pinned-versions">
     <title>Pinned versions</title>
-    <para>
-      The following git tags are the current recommended versions for
+    <para>The following git tags are the current recommended versions for
       running the stack. Components in the same row of the same
       repository should be built from the same tag.
     </para>
@@ -99,33 +97,33 @@
               <link xlink:href="https://github.com/katzenpost/katzenpost">katzenpost</link>
             </entry>
             <entry>
-              <literal>cmd/server</literal>,
-              <literal>cmd/dirauth</literal>,
-              <literal>cmd/courier</literal>,
-              <literal>cmd/replica</literal>
+              <code>cmd/server</code>,
+              <code>cmd/dirauth</code>,
+              <code>cmd/courier</code>,
+              <code>cmd/replica</code>
             </entry>
             <entry>
               main
             </entry>
             <entry>
-              <literal>v0.0.73</literal>
+              <code>v0.0.73</code>
             </entry>
           </row>
           <row>
             <entry>
-              <literal>kpclientd</literal> (client daemon)
+              <code>kpclientd</code> (client daemon)
             </entry>
             <entry>
               <link xlink:href="https://github.com/katzenpost/katzenpost">katzenpost</link>
             </entry>
             <entry>
-              <literal>cmd/kpclientd</literal>
+              <code>cmd/kpclientd</code>
             </entry>
             <entry>
               main
             </entry>
             <entry>
-              <literal>v0.0.73</literal>
+              <code>v0.0.73</code>
             </entry>
           </row>
           <row>
@@ -136,13 +134,13 @@
               <link xlink:href="https://github.com/katzenpost/katzenpost">katzenpost</link>
             </entry>
             <entry>
-              <literal>client/thin</literal>
+              <code>client/thin</code>
             </entry>
             <entry>
               main
             </entry>
             <entry>
-              <literal>v0.0.73</literal>
+              <code>v0.0.73</code>
             </entry>
           </row>
           <row>
@@ -153,13 +151,13 @@
               <link xlink:href="https://github.com/katzenpost/thin_client">thin_client</link>
             </entry>
             <entry>
-              <literal>src</literal>
+              <code>src</code>
             </entry>
             <entry>
               main
             </entry>
             <entry>
-              <literal>0.0.13</literal>
+              <code>0.0.13</code>
             </entry>
           </row>
           <row>
@@ -170,18 +168,18 @@
               <link xlink:href="https://github.com/katzenpost/thin_client">thin_client</link>
             </entry>
             <entry>
-              <literal>katzenpost_thinclient</literal>
+              <code>katzenpost_thinclient</code>
             </entry>
             <entry>
               main
             </entry>
             <entry>
-              <literal>0.0.13</literal>
+              <code>0.0.13</code>
             </entry>
           </row>
           <row>
             <entry>
-              <literal>katzenqt</literal> (Qt group chat client)
+              <code>katzenqt</code> (Qt group chat client)
             </entry>
             <entry>
               <link xlink:href="https://github.com/katzenpost/katzenqt">katzenqt</link>
@@ -193,14 +191,13 @@
               resending_api2026
             </entry>
             <entry>
-              <literal>0.0.2-rc5</literal>
+              <code>0.0.2-rc5</code>
             </entry>
           </row>
         </tbody>
       </tgroup>
     </informaltable>
-    <para>
-      Server-side components are listed for completeness; for full
+    <para>Server-side components are listed for completeness; for full
       deployment guidance, see the
       <link xlink:href="/docs/admin_guide/">Admin Guide</link>.
     </para>
@@ -209,38 +206,33 @@
     <title>Prerequisites</title>
     <itemizedlist spacing="compact">
       <listitem>
-        <para>
-          <emphasis role="strong">Go</emphasis> 1.23 or newer.
+        <para><emphasis role="strong">Go</emphasis> 1.23 or newer.
         </para>
       </listitem>
       <listitem>
-        <para>
-          <emphasis role="strong">Rust</emphasis> stable (with
-          <literal>cargo</literal>).
+        <para><emphasis role="strong">Rust</emphasis> stable (with
+          <code>cargo</code>).
         </para>
       </listitem>
       <listitem>
-        <para>
-          <emphasis role="strong">Python</emphasis> 3.9 or newer (the
+        <para><emphasis role="strong">Python</emphasis> 3.9 or newer (the
           thin client supports 3.8+, but the venv tooling here assumes
           3.9+).
         </para>
       </listitem>
       <listitem>
-        <para>
-          <emphasis role="strong">Make</emphasis>,
+        <para><emphasis role="strong">Make</emphasis>,
           <emphasis role="strong">git</emphasis>, and a C toolchain
-          (<literal>gcc</literal> or <literal>clang</literal>).
+          (<code>gcc</code> or <code>clang</code>).
         </para>
       </listitem>
     </itemizedlist>
   </section>
   <section xml:id="kpclientd-the-client-daemon">
     <title>kpclientd (the client daemon)</title>
-    <para>
-      The thin client libraries do not, by themselves, speak to the mix
+    <para>The thin client libraries do not, by themselves, speak to the mix
       network. They communicate over a local socket with the
-      <literal>kpclientd</literal> daemon, which performs all
+      <code>kpclientd</code> daemon, which performs all
       cryptographic and network operations.
     </para>
     <programlisting>git clone https://github.com/katzenpost/katzenpost
@@ -248,15 +240,11 @@ cd katzenpost
 git checkout v0.0.73
 cd cmd/kpclientd
 go build</programlisting>
-    <para>
-      The resulting <literal>kpclientd</literal> binary is run with a
+    <para>The resulting <code>kpclientd</code> binary is run with a
       TOML configuration file:
     </para>
-    <programlisting>
-./kpclientd -c /path/to/client.toml
-</programlisting>
-    <para>
-      A configuration file is required. For testing, the
+    <programlisting>./kpclientd -c /path/to/client.toml</programlisting>
+    <para>A configuration file is required. For testing, the
       <link xlink:href="/docs/admin_guide/docker.html">Docker test
       mixnet</link> generates one automatically; for joining a public
       network, you would obtain the configuration from that network’s
@@ -269,9 +257,8 @@ go build</programlisting>
       The Go thin client is a library, imported as a Go module:
     </para>
     <programlisting language="go">import &quot;github.com/katzenpost/katzenpost/client/thin&quot;</programlisting>
-    <para>
-      Pin to <literal>v0.0.73</literal> in your application’s
-      <literal>go.mod</literal>. There is no separate build step; the
+    <para>Pin to <code>v0.0.73</code> in your application’s
+      <code>go.mod</code>. There is no separate build step; the
       library is compiled with your application.
     </para>
   </section>
@@ -282,15 +269,14 @@ cd thin_client
 git checkout 0.0.13
 cargo build --release</programlisting>
     <para>
-      Or, in another Rust project’s <literal>Cargo.toml</literal>:
+      Or, in another Rust project’s <code>Cargo.toml</code>:
     </para>
     <programlisting language="toml">[dependencies]
 katzenpost_thin_client = &quot;0.0.13&quot;</programlisting>
   </section>
   <section xml:id="python-thin-client">
     <title>Python thin client</title>
-    <para>
-      The Python thin client is best installed into a virtualenv, both
+    <para>The Python thin client is best installed into a virtualenv, both
       to isolate its dependencies and to avoid any disturbance of the
       system Python.
     </para>
@@ -304,17 +290,15 @@ pip install .</programlisting>
   </section>
   <section xml:id="katzenqt-qt-group-chat-client">
     <title>katzenqt (Qt group chat client)</title>
-    <para>
-      A decentralised group chat client built atop Qt. It depends solely
+    <para>A decentralised group chat client built atop Qt. It depends solely
       on the Katzenpost mix network and the Pigeonhole storage services.
       No central server is involved. The underlying design is set out in
       the <link xlink:href="https://arxiv.org/abs/2501.02933">Echomix
       paper</link>.
     </para>
-    <para>
-      A tag has not yet been published; at present,
-      <literal>katzenqt</literal> builds against a development branch of
-      <literal>katzenpost</literal>. This section will be updated once a
+    <para>A tag has not yet been published; at present,
+      <code>katzenqt</code> builds against a development branch of
+      <code>katzenpost</code>. This section will be updated once a
       release is cut.
     </para>
     <programlisting>sudo apt install libxcb-cursor0 libegl1
@@ -323,17 +307,15 @@ cd katzenqt
 git checkout 0.0.2-rc4
 make deps
 make run</programlisting>
-    <para>
-      If <literal>make deps run</literal> does not produce a running
+    <para>If <code>make deps run</code> does not produce a running
       interface, the component-by-component sequence in
-      <literal>katzenqt</literal>’s <literal>README.md</literal> is the
+      <code>katzenqt</code>’s <code>README.md</code> is the
       recommended fallback.
     </para>
   </section>
   <section xml:id="verifying-the-stack">
     <title>Verifying the stack</title>
-    <para>
-      Once <literal>kpclientd</literal> is running with a valid
+    <para>Once <code>kpclientd</code> is running with a valid
       configuration, a single test from the Python integration suite is
       sufficient to exercise the full Pigeonhole round trip: Alice
       writes a message to the storage replicas via the courier, and Bob
@@ -342,11 +324,10 @@ make run</programlisting>
     <programlisting>source thin_client/.venv/bin/activate
 cd thin_client
 pytest tests/test_new_pigeonhole_api.py::test_alice_sends_bob_complete_workflow</programlisting>
-    <para>
-      A successful run indicates that <literal>kpclientd</literal> is
+    <para>A successful run indicates that <code>kpclientd</code> is
       connected, the PKI document has been retrieved, the network is
       producing consensus, and the courier and replicas are reachable.
-      The remainder of the suite (<literal>pytest</literal> with no
+      The remainder of the suite (<code>pytest</code> with no
       arguments) covers tombstones, copy commands, and the various error
       paths.
     </para>
