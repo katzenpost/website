@@ -8,8 +8,9 @@ $enable-rounded: false !default;
 $border-radius: 3px !default;
 
 // Theme colors
-// Primary color from lynx-big.png logo (#555555 - dark gray from the lynx fur)
-$primary: #555555 !default;
+// Primary is a warm peach pastel lifted from the friendly cat logo gradient,
+// so primary buttons read as a deliberate accent against the charcoal page.
+$primary: #ffb067 !default;
 $secondary: #ffcc4d !default;
 $success: #000584 !default;
 $info: #2b87c3 !default;
