@@ -27,6 +27,7 @@ For conceptual background on Pigeonhole, see
 |---------|-------------|
 | [Connect to the daemon and handle events](#how-to-connect-to-the-daemon-and-handle-events) | Establish a connection and process events |
 | [Discover network services](#how-to-discover-network-services-via-the-pki-document) | Find services in the PKI document |
+| [Verify the PKI document yourself](#how-to-verify-the-pki-document-yourself) | Check directory authority signatures against your own trust store |
 | [Send a message to a mixnet service](#how-to-send-a-message-to-a-mixnet-service) | Echo ping and other non-Pigeonhole services |
 | [Create a Pigeonhole channel](#how-to-create-a-pigeonhole-channel) | Generate a stream with write/read capabilities |
 | [Write a message](#how-to-write-a-message-to-a-pigeonhole-channel) | Encrypt and send a write to a stream |
@@ -166,6 +167,125 @@ desc = client.get_service("echo")
 dest_node, dest_queue = desc.to_destination()
 {{< /tab >}}
 {{< /tabpane >}}
+
+---
+
+## How to verify the PKI document yourself
+
+By default the thin client receives a *stripped* PKI document from
+`kpclientd`: the daemon nils the signature map before forwarding it
+through `NewPKIDocumentEvent`. Most applications trust the daemon
+to have verified the document on their behalf, but a thin client
+running in an adversarial environment, or one that wishes to anchor
+its own root of trust independently of the daemon, can ask for the
+signed document and verify the directory authority signatures itself.
+
+The method to call is `get_pki_document_raw`. It returns the
+`cert.Certificate`-wrapped signed document together with the epoch
+the daemon resolved to. Pass `0` for the requested epoch to mean
+"whatever the daemon currently believes is the latest".
+
+The example below is in Python and uses the
+[hpqc](https://pypi.org/project/hpqc/) signature schemes to verify
+the authorities' Ed25519 signatures over the certificate. The
+authority public keys must come from the application's own trust
+store, never from the daemon; if the daemon supplied them, the
+verification would establish only that the daemon was internally
+consistent, not that the document was signed by the real
+authorities.
+
+{{< tabpane >}}
+{{< tab header="Python" lang="python" >}}
+import struct
+from hashlib import blake2b
+
+import cbor2
+from hpqc.sign.ed25519 import Ed25519Scheme
+
+
+# The directory authority public keys; the application's root of
+# trust for the network's directory. These must be obtained out of
+# band, typically baked into the application or carried in a
+# separately signed bundle. The hex strings below are placeholders.
+AUTHORITY_PUBLIC_KEYS = [
+    bytes.fromhex("aa" * 32),  # auth1
+    bytes.fromhex("bb" * 32),  # auth2
+    bytes.fromhex("cc" * 32),  # auth3
+]
+THRESHOLD = len(AUTHORITY_PUBLIC_KEYS) // 2 + 1
+
+
+def _signed_message(cert: dict) -> bytes:
+    """Reconstruct the byte string the authorities signed.
+
+    The signed bytes are a deterministic little-endian concatenation
+    of the Certificate fields preceding Signatures; see
+    katzenpost/core/cert/cert.go for the canonical encoding.
+    """
+    return b"".join([
+        struct.pack("<I", cert["Version"]),
+        struct.pack("<Q", cert["Expiration"]),
+        cert["KeyType"].encode("utf-8"),
+        cert["Certified"],
+    ])
+
+
+async def fetch_and_verify_pki(client, epoch: int = 0) -> bytes:
+    """Fetch the signed PKI document and verify it against the trust root.
+
+    Returns the inner Certified payload (the CBOR-encoded Document)
+    once a sufficient threshold of authority signatures has verified;
+    raises ValueError otherwise.
+    """
+    payload, returned_epoch = await client.get_pki_document_raw(epoch)
+    cert = cbor2.loads(payload)
+
+    if cert["Version"] != 0:
+        raise ValueError(f"unknown certificate version: {cert['Version']}")
+    if cert["KeyType"] != "Ed25519":
+        raise ValueError(f"unexpected key type: {cert['KeyType']}")
+
+    msg = _signed_message(cert)
+    signatures = cert.get("Signatures") or {}
+
+    verified = 0
+    for pubkey in AUTHORITY_PUBLIC_KEYS:
+        key_hash = blake2b(pubkey, digest_size=32).digest()
+        sig = signatures.get(key_hash)
+        if sig is None:
+            continue
+        if Ed25519Scheme.verify(pubkey, msg, sig["Payload"]):
+            verified += 1
+
+    if verified < THRESHOLD:
+        raise ValueError(
+            f"only {verified} of {len(AUTHORITY_PUBLIC_KEYS)} authority "
+            f"signatures verified for epoch {returned_epoch}; "
+            f"threshold is {THRESHOLD}"
+        )
+
+    # cert["Certified"] is the CBOR-encoded Document. Use
+    # cbor2.loads(cert["Certified"]) if the application needs the
+    # contents themselves.
+    return cert["Certified"]
+{{< /tab >}}
+{{< /tabpane >}}
+
+Considerations:
+
+- `AUTHORITY_PUBLIC_KEYS` must come from a trust root external to the
+  daemon. If the daemon supplied them, verification would prove only
+  that the daemon was internally consistent.
+- The threshold above (a simple majority) matches the policy that the
+  authorities themselves enforce when they admit a consensus. An
+  application may apply a stricter policy, but should not relax it.
+- Production deployments configure `Ed25519` as the PKI signature
+  scheme. Should a different scheme ever be in use, swap
+  `Ed25519Scheme` for the corresponding hpqc verifier and `KeyType`
+  for the matching string.
+- The example is shown only in Python because `hpqc` is currently
+  published as a Python (and Go) library; a Rust application would
+  perform an analogous verification with the `ed25519-dalek` crate.
 
 ---
 
