@@ -95,6 +95,20 @@
   rust:   "ThinClient::pki_document"
   python: "ThinClient.pki_document"
 
+- group: get_pki_document_raw
+  section: "PKI and Service Discovery"
+  title: "GetPKIDocumentRaw / get_pki_document_raw"
+  summary: |
+    Returns the signed PKI document for a given epoch with every
+    directory authority signature intact, so callers may verify the
+    document themselves. The cached document received via the standard
+    push event has its signature map nulled by the daemon; use this
+    method when authority signatures must be checked. Pass `0` for the
+    epoch to request the document the daemon believes is current.
+  go:     "ThinClient.GetPKIDocumentRaw"
+  rust:   "ThinClient::get_pki_document_raw"
+  python: "ThinClient.get_pki_document_raw"
+
 - group: get_service
   section: "PKI and Service Discovery"
   title: "GetService / get_service"
