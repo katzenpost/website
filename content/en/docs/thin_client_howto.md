@@ -172,25 +172,42 @@ dest_node, dest_queue = desc.to_destination()
 
 ## How to verify the PKI document yourself
 
-By default the thin client receives a *stripped* PKI document from
-`kpclientd`: the daemon nils the signature map before forwarding it
-through `NewPKIDocumentEvent`. Most applications trust the daemon
-to have verified the document on their behalf, but a thin client
-running in an adversarial environment, or one that wishes to anchor
-its own root of trust independently of the daemon, can ask for the
-signed document and verify the directory authority signatures itself.
+In ordinary use you do not need this section. `kpclientd` already
+verifies every PKI document against the directory authorities listed
+in `client.toml`, and only after a sufficient threshold of authority
+signatures has passed does it push the document on to the thin
+client. The `pki_document()` method described above hands you the
+post-verification document, and you inherit the daemon's guarantee
+without further work. The signature map is stripped before that
+handoff precisely because the verification has already happened;
+carrying the signatures through would only invite confusion about
+whose trust root is in force.
 
-The method to call is `get_pki_document_raw`. It returns the
-`cert.Certificate`-wrapped signed document together with the epoch
-the daemon resolved to. Pass `0` for the requested epoch to mean
-"whatever the daemon currently believes is the latest".
+`get_pki_document_raw` is the trapdoor for special applications and
+integrations that want the *signed* document. The cases that come up
+in practice include:
 
-The example below is in Python and uses the
-[hpqc](https://pypi.org/project/hpqc/) signature schemes to verify
-the authorities' Ed25519 signatures over the certificate. The
-authority public keys must come from the application's own trust
-store, never from the daemon; if the daemon supplied them, the
-verification would establish only that the daemon was internally
+- An application that wishes to anchor its own root of trust,
+  independently of `kpclientd`'s configuration, for instance when
+  shipping a hardened build with the authority keys compiled in.
+- A relay that forwards the signed document to a separate consumer
+  (for archival, audit, or out-of-band verification) which does not
+  itself speak the thin-client protocol.
+- A diagnostic or monitoring tool that wishes to display which
+  authorities signed which consensus, across time.
+
+The method returns the `cert.Certificate`-wrapped signed document
+together with the epoch the daemon resolved to. Pass `0` for the
+requested epoch to mean "whatever the daemon currently believes is
+the latest".
+
+The examples below verify the document against the post-quantum
+hybrid signature scheme `Falcon-padded-512-Ed25519`, the recommended
+production scheme published by
+[hpqc](https://github.com/katzenpost/hpqc) in both its Python and Go
+forms. The authority public keys must come from the application's
+own trust store, never from the daemon: if the daemon supplied them,
+the verification would establish only that the daemon was internally
 consistent, not that the document was signed by the real
 authorities.
 
@@ -200,27 +217,30 @@ import struct
 from hashlib import blake2b
 
 import cbor2
-from hpqc.sign.ed25519 import Ed25519Scheme
+from hpqc.sign.hybrid import FalconPadded512Ed25519
 
 
-# The directory authority public keys; the application's root of
-# trust for the network's directory. These must be obtained out of
-# band, typically baked into the application or carried in a
-# separately signed bundle. The hex strings below are placeholders.
+# The directory authority public keys in the wire format expected by
+# hpqc's hybrid scheme: the byte concatenation
+# ``falcon_padded_512_pub || ed25519_pub`` (929 bytes per authority).
+# These must be obtained out of band, typically baked into the
+# application or carried in a separately signed bundle. The hex
+# strings below are placeholders.
 AUTHORITY_PUBLIC_KEYS = [
-    bytes.fromhex("aa" * 32),  # auth1
-    bytes.fromhex("bb" * 32),  # auth2
-    bytes.fromhex("cc" * 32),  # auth3
+    bytes.fromhex("ab" * 929),  # auth1
+    bytes.fromhex("cd" * 929),  # auth2
+    bytes.fromhex("ef" * 929),  # auth3
 ]
 THRESHOLD = len(AUTHORITY_PUBLIC_KEYS) // 2 + 1
+SCHEME_NAME = "Falcon-padded-512-Ed25519"
 
 
 def _signed_message(cert: dict) -> bytes:
     """Reconstruct the byte string the authorities signed.
 
-    The signed bytes are a deterministic little-endian concatenation
-    of the Certificate fields preceding Signatures; see
-    katzenpost/core/cert/cert.go for the canonical encoding.
+    A deterministic little-endian concatenation of the Certificate
+    fields preceding Signatures; see katzenpost/core/cert/cert.go for
+    the canonical encoding.
     """
     return b"".join([
         struct.pack("<I", cert["Version"]),
@@ -242,8 +262,11 @@ async def fetch_and_verify_pki(client, epoch: int = 0) -> bytes:
 
     if cert["Version"] != 0:
         raise ValueError(f"unknown certificate version: {cert['Version']}")
-    if cert["KeyType"] != "Ed25519":
-        raise ValueError(f"unexpected key type: {cert['KeyType']}")
+    if cert["KeyType"] != SCHEME_NAME:
+        raise ValueError(
+            f"unexpected key type {cert['KeyType']!r}, "
+            f"expected {SCHEME_NAME!r}"
+        )
 
     msg = _signed_message(cert)
     signatures = cert.get("Signatures") or {}
@@ -254,38 +277,103 @@ async def fetch_and_verify_pki(client, epoch: int = 0) -> bytes:
         sig = signatures.get(key_hash)
         if sig is None:
             continue
-        if Ed25519Scheme.verify(pubkey, msg, sig["Payload"]):
+        if FalconPadded512Ed25519.verify(pubkey, msg, sig["Payload"]):
             verified += 1
 
     if verified < THRESHOLD:
         raise ValueError(
             f"only {verified} of {len(AUTHORITY_PUBLIC_KEYS)} authority "
-            f"signatures verified for epoch {returned_epoch}; "
-            f"threshold is {THRESHOLD}"
+            f"signatures verified for epoch {returned_epoch}; threshold "
+            f"is {THRESHOLD}"
         )
 
-    # cert["Certified"] is the CBOR-encoded Document. Use
+    # cert["Certified"] is the CBOR-encoded Document. Decode it with
     # cbor2.loads(cert["Certified"]) if the application needs the
     # contents themselves.
     return cert["Certified"]
+{{< /tab >}}
+{{< tab header="Go" lang="go" >}}
+package main
+
+import (
+    "encoding/hex"
+    "fmt"
+    "log"
+
+    "github.com/katzenpost/hpqc/sign"
+    "github.com/katzenpost/hpqc/sign/hybrid"
+
+    "github.com/katzenpost/katzenpost/client/thin"
+    "github.com/katzenpost/katzenpost/core/cert"
+)
+
+// AuthorityPublicKeysHex is the application's root of trust for the
+// network's directory: the wire-format hybrid public keys of each
+// authority, hex-encoded. They must be obtained out of band and
+// never from the daemon. Replace these placeholders with your own.
+var AuthorityPublicKeysHex = []string{
+    "abab...", // auth1
+    "cdcd...", // auth2
+    "efef...", // auth3
+}
+
+// FetchAndVerifyPKI fetches the signed PKI document for the given
+// epoch (pass 0 for "current") and verifies it against the
+// authority public keys above using core/cert.VerifyThreshold.
+func FetchAndVerifyPKI(client *thin.ThinClient, epoch uint64) ([]byte, error) {
+    scheme := hybrid.FalconPadded512Ed25519
+    verifiers := make([]sign.PublicKey, 0, len(AuthorityPublicKeysHex))
+    for _, hexKey := range AuthorityPublicKeysHex {
+        raw, err := hex.DecodeString(hexKey)
+        if err != nil {
+            return nil, fmt.Errorf("decoding authority key: %w", err)
+        }
+        pub, err := scheme.UnmarshalBinaryPublicKey(raw)
+        if err != nil {
+            return nil, fmt.Errorf("parsing authority key: %w", err)
+        }
+        verifiers = append(verifiers, pub)
+    }
+
+    payload, returnedEpoch, err := client.GetPKIDocumentRaw(epoch)
+    if err != nil {
+        return nil, fmt.Errorf("fetching signed PKI doc: %w", err)
+    }
+
+    threshold := len(verifiers)/2 + 1
+    certified, good, _, err := cert.VerifyThreshold(verifiers, threshold, payload)
+    if err != nil {
+        return nil, fmt.Errorf(
+            "threshold verification failed for epoch %d: %w",
+            returnedEpoch, err,
+        )
+    }
+    log.Printf("verified %d of %d authority signatures for epoch %d",
+        len(good), len(verifiers), returnedEpoch)
+    return certified, nil
+}
 {{< /tab >}}
 {{< /tabpane >}}
 
 Considerations:
 
-- `AUTHORITY_PUBLIC_KEYS` must come from a trust root external to the
-  daemon. If the daemon supplied them, verification would prove only
-  that the daemon was internally consistent.
+- The authority public keys must come from a trust root external to
+  the daemon. If the daemon supplied them, verification would prove
+  only that the daemon was internally consistent.
 - The threshold above (a simple majority) matches the policy that the
   authorities themselves enforce when they admit a consensus. An
   application may apply a stricter policy, but should not relax it.
-- Production deployments configure `Ed25519` as the PKI signature
-  scheme. Should a different scheme ever be in use, swap
-  `Ed25519Scheme` for the corresponding hpqc verifier and `KeyType`
-  for the matching string.
-- The example is shown only in Python because `hpqc` is currently
-  published as a Python (and Go) library; a Rust application would
-  perform an analogous verification with the `ed25519-dalek` crate.
+- Should the network ever be reconfigured to use a different
+  signature scheme, swap the hybrid for the corresponding hpqc
+  verifier and adjust the expected `KeyType` (Python) or the
+  `hybrid.*` selector (Go) accordingly. The `KeyType` field of the
+  certificate is what the authorities signed under, and is the
+  authoritative indicator of the scheme in force.
+- A Rust binding is not shown because `hpqc` does not yet publish a
+  Rust port; a Rust application can compose the verification with
+  the `ed25519-dalek` and `falcon` crates by the same wire layout
+  (the public key and signature are simple concatenations of the
+  two component halves).
 
 ---
 
