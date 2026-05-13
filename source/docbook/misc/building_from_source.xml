@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title "Build Katzenpost from source" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
+<?linkTitle "Build from source" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
+<?description "Pinned versions of the Katzenpost stack and how to build each component from source." ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
+<?author "David Stainton" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
+<?url "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
+<?draft "false" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#draft] -->
+<?slug "build_from_source" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
+<?layout "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
+<?type "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
+<?weight "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
+<?version "0" ?> <!-- Optional [?] -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
+        %shared-content;
+    <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
+        %references;
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+
+<article    xmlns="http://docbook.org/ns/docbook"
+  xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
+  xml:id="building">
+  <info>  
+    <title xml:id="building.title">Build &program_name; from source</title> <!-- Match to title PI above. -->          
+  </info>
+  <para>This page is the canonical reference for the
+    <emphasis role="strong">pinned versions</emphasis> of the Katzenpost
+    stack, together with brief instructions for building and running
+    each component from source. It is intended for anyone who wishes to
+    run the software ahead of binary packages becoming available.
+  </para>
+  <section xml:id="pinned-versions">
+    <title>Pinned versions</title>
+    <para>The following git tags are the current recommended versions for
+      running the stack. Components in the same row of the same
+      repository should be built from the same tag.
+    </para>
+    <informaltable>
+      <tgroup cols="5">
+        <colspec colwidth="20*" align="left" />
+        <colspec colwidth="20*" align="left" />
+        <colspec colwidth="20*" align="left" />
+        <colspec colwidth="20*" align="left" />
+        <colspec colwidth="20*" align="left" />
+        <thead>
+          <row>
+            <entry>
+              Component
+            </entry>
+            <entry>
+              Repository
+            </entry>
+            <entry>
+              Path
+            </entry>
+            <entry>
+              Branch
+            </entry>
+            <entry>
+              Tag
+            </entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>
+              Server-side components (mix server, dirauth, courier,
+              replica)
+            </entry>
+            <entry>
+              <link xlink:href="https://github.com/katzenpost/katzenpost">katzenpost</link>
+            </entry>
+            <entry>
+              <code>cmd/server</code>,
+              <code>cmd/dirauth</code>,
+              <code>cmd/courier</code>,
+              <code>cmd/replica</code>
+            </entry>
+            <entry>
+              main
+            </entry>
+            <entry>
+              <code>v0.0.73</code>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <code>kpclientd</code> (client daemon)
+            </entry>
+            <entry>
+              <link xlink:href="https://github.com/katzenpost/katzenpost">katzenpost</link>
+            </entry>
+            <entry>
+              <code>cmd/kpclientd</code>
+            </entry>
+            <entry>
+              main
+            </entry>
+            <entry>
+              <code>v0.0.73</code>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              Go thin client (reference)
+            </entry>
+            <entry>
+              <link xlink:href="https://github.com/katzenpost/katzenpost">katzenpost</link>
+            </entry>
+            <entry>
+              <code>client/thin</code>
+            </entry>
+            <entry>
+              main
+            </entry>
+            <entry>
+              <code>v0.0.73</code>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              Rust thin client
+            </entry>
+            <entry>
+              <link xlink:href="https://github.com/katzenpost/thin_client">thin_client</link>
+            </entry>
+            <entry>
+              <code>src</code>
+            </entry>
+            <entry>
+              main
+            </entry>
+            <entry>
+              <code>0.0.13</code>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              Python thin client
+            </entry>
+            <entry>
+              <link xlink:href="https://github.com/katzenpost/thin_client">thin_client</link>
+            </entry>
+            <entry>
+              <code>katzenpost_thinclient</code>
+            </entry>
+            <entry>
+              main
+            </entry>
+            <entry>
+              <code>0.0.13</code>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <code>katzenqt</code> (Qt group chat client)
+            </entry>
+            <entry>
+              <link xlink:href="https://github.com/katzenpost/katzenqt">katzenqt</link>
+            </entry>
+            <entry>
+              (root)
+            </entry>
+            <entry>
+              resending_api2026
+            </entry>
+            <entry>
+              <code>0.0.2-rc5</code>
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+    <para>Server-side components are listed for completeness; for full
+      deployment guidance, see the
+      <link xlink:href="/docs/admin_guide/">Admin Guide</link>.
+    </para>
+  </section>
+  <section xml:id="prerequisites">
+    <title>Prerequisites</title>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para><emphasis role="strong">Go</emphasis> 1.23 or newer.
+        </para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="strong">Rust</emphasis> stable (with
+          <code>cargo</code>).
+        </para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="strong">Python</emphasis> 3.9 or newer (the
+          thin client supports 3.8+, but the venv tooling here assumes
+          3.9+).
+        </para>
+      </listitem>
+      <listitem>
+        <para><emphasis role="strong">Make</emphasis>,
+          <emphasis role="strong">git</emphasis>, and a C toolchain
+          (<code>gcc</code> or <code>clang</code>).
+        </para>
+      </listitem>
+    </itemizedlist>
+  </section>
+  <section xml:id="kpclientd-the-client-daemon">
+    <title>kpclientd (the client daemon)</title>
+    <para>The thin client libraries do not, by themselves, speak to the mix
+      network. They communicate over a local socket with the
+      <code>kpclientd</code> daemon, which performs all
+      cryptographic and network operations.
+    </para>
+    <programlisting>git clone https://github.com/katzenpost/katzenpost
+cd katzenpost
+git checkout v0.0.73
+cd cmd/kpclientd
+go build</programlisting>
+    <para>The resulting <code>kpclientd</code> binary is run with a
+      TOML configuration file:
+    </para>
+    <programlisting>./kpclientd -c /path/to/client.toml</programlisting>
+    <para>A configuration file is required. For testing, the
+      <link xlink:href="/docs/admin_guide/docker.html">Docker test
+      mixnet</link> generates one automatically; for joining a public
+      network, you would obtain the configuration from that network’s
+      operators.
+    </para>
+  </section>
+  <section xml:id="go-thin-client">
+    <title>Go thin client</title>
+    <para>
+      The Go thin client is a library, imported as a Go module:
+    </para>
+    <programlisting language="go">import &quot;github.com/katzenpost/katzenpost/client/thin&quot;</programlisting>
+    <para>Pin to <code>v0.0.73</code> in your application’s
+      <code>go.mod</code>. There is no separate build step; the
+      library is compiled with your application.
+    </para>
+  </section>
+  <section xml:id="rust-thin-client">
+    <title>Rust thin client</title>
+    <programlisting>git clone https://github.com/katzenpost/thin_client
+cd thin_client
+git checkout 0.0.13
+cargo build --release</programlisting>
+    <para>
+      Or, in another Rust project’s <code>Cargo.toml</code>:
+    </para>
+    <programlisting language="toml">[dependencies]
+katzenpost_thin_client = &quot;0.0.13&quot;</programlisting>
+  </section>
+  <section xml:id="python-thin-client">
+    <title>Python thin client</title>
+    <para>The Python thin client is best installed into a virtualenv, both
+      to isolate its dependencies and to avoid any disturbance of the
+      system Python.
+    </para>
+    <programlisting>git clone https://github.com/katzenpost/thin_client
+cd thin_client
+git checkout 0.0.13
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install .</programlisting>
+  </section>
+  <section xml:id="katzenqt-qt-group-chat-client">
+    <title>katzenqt (Qt group chat client)</title>
+    <para>A decentralised group chat client built atop Qt. It depends solely
+      on the Katzenpost mix network and the Pigeonhole storage services.
+      No central server is involved. The underlying design is set out in
+      the <link xlink:href="https://arxiv.org/abs/2501.02933">Echomix
+      paper</link>.
+    </para>
+    <para>A tag has not yet been published; at present,
+      <code>katzenqt</code> builds against a development branch of
+      <code>katzenpost</code>. This section will be updated once a
+      release is cut.
+    </para>
+    <programlisting>sudo apt install libxcb-cursor0 libegl1
+git clone https://github.com/katzenpost/katzenqt
+cd katzenqt
+git checkout 0.0.2-rc4
+make deps
+make run</programlisting>
+    <para>If <code>make deps run</code> does not produce a running
+      interface, the component-by-component sequence in
+      <code>katzenqt</code>’s <code>README.md</code> is the
+      recommended fallback.
+    </para>
+  </section>
+  <section xml:id="verifying-the-stack">
+    <title>Verifying the stack</title>
+    <para>Once <code>kpclientd</code> is running with a valid
+      configuration, a single test from the Python integration suite is
+      sufficient to exercise the full Pigeonhole round trip: Alice
+      writes a message to the storage replicas via the courier, and Bob
+      reads it back.
+    </para>
+    <programlisting>source thin_client/.venv/bin/activate
+cd thin_client
+pytest tests/test_new_pigeonhole_api.py::test_alice_sends_bob_complete_workflow</programlisting>
+    <para>A successful run indicates that <code>kpclientd</code> is
+      connected, the PKI document has been retrieved, the network is
+      producing consensus, and the courier and replicas are reachable.
+      The remainder of the suite (<code>pytest</code> with no
+      arguments) covers tombstones, copy commands, and the various error
+      paths.
+    </para>
+  </section>
+</article>
