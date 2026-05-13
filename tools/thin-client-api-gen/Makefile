@@ -67,7 +67,7 @@ $(BUILD_DIR):
 
 GO_SOURCES     := extract-go/main.go extract-go/go.mod \
                   $(shell find $(GO_SRC) -name '*.go' 2>/dev/null)
-RUST_SOURCES   := extract-rust/src/main.rs extract-rust/Cargo.toml extract-rust/Cargo.lock \
+RUST_SOURCES   := extract-rust/src/main.rs extract-rust/Cargo.toml \
                   $(shell find $(RUST_SRC) -name '*.rs' 2>/dev/null)
 PYTHON_SOURCES := extract-python.py \
                   $(shell find $(PYTHON_SRC) -name '*.py' 2>/dev/null)
