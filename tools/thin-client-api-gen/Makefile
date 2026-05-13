@@ -91,6 +91,8 @@ build: check-versions $(VENV_STAMP) $(GO_JSON) $(RUST_JSON) $(PYTHON_JSON)
 	    --python-json $(PYTHON_JSON) \
 	    --groups groups.yaml \
 	    --overlay overlay \
+	    --katzenpost-tag $(KATZENPOST_TAG) \
+	    --thinclient-tag $(THINCLIENT_TAG) \
 	    --output $(OUTPUT)
 
 check: check-versions $(VENV_STAMP) $(GO_JSON) $(RUST_JSON) $(PYTHON_JSON)
@@ -100,6 +102,8 @@ check: check-versions $(VENV_STAMP) $(GO_JSON) $(RUST_JSON) $(PYTHON_JSON)
 	    --python-json $(PYTHON_JSON) \
 	    --groups groups.yaml \
 	    --overlay overlay \
+	    --katzenpost-tag $(KATZENPOST_TAG) \
+	    --thinclient-tag $(THINCLIENT_TAG) \
 	    --output $(OUTPUT) \
 	    --strict
 

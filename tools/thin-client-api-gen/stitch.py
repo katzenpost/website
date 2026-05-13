@@ -20,6 +20,23 @@ import yaml
 BINDINGS = ("go", "rust", "python")
 TAB_LABEL = {"go": "Go", "rust": "Rust", "python": "Python"}
 
+PINNED_VERSIONS_PLACEHOLDER = "<!-- PINNED_VERSIONS_TABLE -->"
+
+
+def render_pinned_versions_table(katzenpost_tag: str, thinclient_tag: str) -> str:
+    kp = "https://github.com/katzenpost/katzenpost"
+    tc = "https://github.com/katzenpost/thin_client"
+    return (
+        "| Binding | Repository | Tag |\n"
+        "| --- | --- | --- |\n"
+        f"| Go reference | [katzenpost/client/thin]({kp}/tree/{katzenpost_tag}/client/thin) "
+        f"| [{katzenpost_tag}]({kp}/releases/tag/{katzenpost_tag}) |\n"
+        f"| Rust | [thin_client/src]({tc}/tree/{thinclient_tag}/src) "
+        f"| [{thinclient_tag}]({tc}/releases/tag/{thinclient_tag}) |\n"
+        f"| Python | [thin_client/katzenpost_thinclient]({tc}/tree/{thinclient_tag}/katzenpost_thinclient) "
+        f"| [{thinclient_tag}]({tc}/releases/tag/{thinclient_tag}) |"
+    )
+
 
 def load_symbols(path: Path) -> dict[str, dict]:
     """Return a dict keyed by 'Receiver.Name' (or just 'Name' if no receiver)."""
@@ -186,13 +203,27 @@ def render_document(
     rust_syms: dict[str, dict],
     py_syms: dict[str, dict],
     strict: bool,
+    katzenpost_tag: str,
+    thinclient_tag: str,
 ) -> tuple[str, list[str]]:
     unresolved: list[str] = []
     parts: list[str] = []
 
+    versions_table = render_pinned_versions_table(katzenpost_tag, thinclient_tag)
+    placeholder_seen = False
+
     # Emit the top overlay first (preamble, configuration, etc.).
     for frag in overlay["top"]:
+        if PINNED_VERSIONS_PLACEHOLDER in frag:
+            frag = frag.replace(PINNED_VERSIONS_PLACEHOLDER, versions_table)
+            placeholder_seen = True
         parts.append(frag.rstrip() + "\n\n")
+
+    if not placeholder_seen:
+        unresolved.append(
+            f"pinned versions placeholder {PINNED_VERSIONS_PLACEHOLDER!r} "
+            "not found in any top overlay fragment"
+        )
 
     # Group the groups list by section, preserving insertion order.
     sections_ordered: list[str] = []
@@ -232,6 +263,10 @@ def main() -> int:
     p.add_argument("--output", required=True, type=Path)
     p.add_argument("--strict", action="store_true",
                    help="exit non-zero if any groups.yaml symbol is unresolved")
+    p.add_argument("--katzenpost-tag", required=True,
+                   help="pinned katzenpost tag, rendered into the preamble table")
+    p.add_argument("--thinclient-tag", required=True,
+                   help="pinned thin_client tag, rendered into the preamble table")
     args = p.parse_args()
 
     go_syms = load_symbols(args.go_json)
@@ -246,7 +281,8 @@ def main() -> int:
     overlay = load_overlay(args.overlay)
 
     doc, unresolved = render_document(
-        groups_raw, overlay, go_syms, rust_syms, py_syms, args.strict
+        groups_raw, overlay, go_syms, rust_syms, py_syms, args.strict,
+        args.katzenpost_tag, args.thinclient_tag,
     )
 
     for msg in unresolved:
