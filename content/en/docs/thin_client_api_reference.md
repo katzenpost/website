@@ -259,6 +259,30 @@ def pki_document(self) -> 'Dict[str,Any] | None':
 {{< /tab >}}
 {{< /tabpane >}}
 
+### GetPKIDocumentRaw / get_pki_document_raw
+
+Returns the signed PKI document for a given epoch with every
+directory authority signature intact, so callers may verify the
+document themselves. The cached document received via the standard
+push event has its signature map nulled by the daemon; use this
+method when authority signatures must be checked. Pass `0` for the
+epoch to request the document the daemon believes is current.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) GetPKIDocumentRaw(epoch uint64) ([]byte, uint64, error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn get_pki_document_raw(
+    &self,
+    epoch: u64,
+) -> Result<(Vec<u8>, u64), ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def get_pki_document_raw(self, epoch: int = 0) -> 'Tuple[bytes,int]':
+{{< /tab >}}
+{{< /tabpane >}}
+
 ### GetService / get_service
 
 Returns a random instance of the named service from the PKI document.
