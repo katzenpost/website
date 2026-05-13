@@ -67,7 +67,7 @@ $(BUILD_DIR):
 
 GO_SOURCES     := extract-go/main.go extract-go/go.mod \
                   $(shell find $(GO_SRC) -name '*.go' 2>/dev/null)
-RUST_SOURCES   := extract-rust/src/main.rs extract-rust/Cargo.toml extract-rust/Cargo.lock \
+RUST_SOURCES   := extract-rust/src/main.rs extract-rust/Cargo.toml \
                   $(shell find $(RUST_SRC) -name '*.rs' 2>/dev/null)
 PYTHON_SOURCES := extract-python.py \
                   $(shell find $(PYTHON_SRC) -name '*.py' 2>/dev/null)
@@ -91,6 +91,8 @@ build: check-versions $(VENV_STAMP) $(GO_JSON) $(RUST_JSON) $(PYTHON_JSON)
 	    --python-json $(PYTHON_JSON) \
 	    --groups groups.yaml \
 	    --overlay overlay \
+	    --katzenpost-tag $(KATZENPOST_TAG) \
+	    --thinclient-tag $(THINCLIENT_TAG) \
 	    --output $(OUTPUT)
 
 check: check-versions $(VENV_STAMP) $(GO_JSON) $(RUST_JSON) $(PYTHON_JSON)
@@ -100,6 +102,8 @@ check: check-versions $(VENV_STAMP) $(GO_JSON) $(RUST_JSON) $(PYTHON_JSON)
 	    --python-json $(PYTHON_JSON) \
 	    --groups groups.yaml \
 	    --overlay overlay \
+	    --katzenpost-tag $(KATZENPOST_TAG) \
+	    --thinclient-tag $(THINCLIENT_TAG) \
 	    --output $(OUTPUT) \
 	    --strict
 

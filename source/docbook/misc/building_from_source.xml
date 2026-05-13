@@ -106,7 +106,7 @@
               main
             </entry>
             <entry>
-              <code>v0.0.73</code>
+              <code>v0.0.75</code>
             </entry>
           </row>
           <row>
@@ -123,7 +123,7 @@
               main
             </entry>
             <entry>
-              <code>v0.0.73</code>
+              <code>v0.0.75</code>
             </entry>
           </row>
           <row>
@@ -140,7 +140,7 @@
               main
             </entry>
             <entry>
-              <code>v0.0.73</code>
+              <code>v0.0.75</code>
             </entry>
           </row>
           <row>
@@ -157,7 +157,7 @@
               main
             </entry>
             <entry>
-              <code>0.0.13</code>
+              <code>0.0.14</code>
             </entry>
           </row>
           <row>
@@ -174,7 +174,7 @@
               main
             </entry>
             <entry>
-              <code>0.0.13</code>
+              <code>0.0.14</code>
             </entry>
           </row>
           <row>
@@ -191,7 +191,7 @@
               resending_api2026
             </entry>
             <entry>
-              <code>0.0.2-rc5</code>
+              <code>0.0.2-rc6</code>
             </entry>
           </row>
         </tbody>
@@ -237,7 +237,7 @@
     </para>
     <programlisting>git clone https://github.com/katzenpost/katzenpost
 cd katzenpost
-git checkout v0.0.73
+git checkout v0.0.75
 cd cmd/kpclientd
 go build</programlisting>
     <para>The resulting <code>kpclientd</code> binary is run with a
@@ -257,7 +257,7 @@ go build</programlisting>
       The Go thin client is a library, imported as a Go module:
     </para>
     <programlisting language="go">import &quot;github.com/katzenpost/katzenpost/client/thin&quot;</programlisting>
-    <para>Pin to <code>v0.0.73</code> in your application’s
+    <para>Pin to <code>v0.0.75</code> in your application’s
       <code>go.mod</code>. There is no separate build step; the
       library is compiled with your application.
     </para>
@@ -266,13 +266,13 @@ go build</programlisting>
     <title>Rust thin client</title>
     <programlisting>git clone https://github.com/katzenpost/thin_client
 cd thin_client
-git checkout 0.0.13
+git checkout 0.0.14
 cargo build --release</programlisting>
     <para>
       Or, in another Rust project’s <code>Cargo.toml</code>:
     </para>
     <programlisting language="toml">[dependencies]
-katzenpost_thin_client = &quot;0.0.13&quot;</programlisting>
+katzenpost_thin_client = &quot;0.0.14&quot;</programlisting>
   </section>
   <section xml:id="python-thin-client">
     <title>Python thin client</title>
@@ -282,7 +282,7 @@ katzenpost_thin_client = &quot;0.0.13&quot;</programlisting>
     </para>
     <programlisting>git clone https://github.com/katzenpost/thin_client
 cd thin_client
-git checkout 0.0.13
+git checkout 0.0.14
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -296,15 +296,10 @@ pip install .</programlisting>
       the <link xlink:href="https://arxiv.org/abs/2501.02933">Echomix
       paper</link>.
     </para>
-    <para>A tag has not yet been published; at present,
-      <code>katzenqt</code> builds against a development branch of
-      <code>katzenpost</code>. This section will be updated once a
-      release is cut.
-    </para>
     <programlisting>sudo apt install libxcb-cursor0 libegl1
 git clone https://github.com/katzenpost/katzenqt
 cd katzenqt
-git checkout 0.0.2-rc4
+git checkout 0.0.2-rc6
 make deps
 make run</programlisting>
     <para>If <code>make deps run</code> does not produce a running

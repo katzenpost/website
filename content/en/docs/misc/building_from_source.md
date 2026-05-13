@@ -101,42 +101,42 @@ replica)</td>
 <code class="literal">cmd/courier</code>,
 <code class="literal">cmd/replica</code></td>
 <td style="text-align: left;">main</td>
-<td style="text-align: left;"><code class="literal">v0.0.73</code></td>
+<td style="text-align: left;"><code class="literal">v0.0.75</code></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><code class="literal">kpclientd</code> (client daemon)</td>
 <td style="text-align: left;"><a href="https://github.com/katzenpost/katzenpost" class="link" target="_top">katzenpost</a></td>
 <td style="text-align: left;"><code class="literal">cmd/kpclientd</code></td>
 <td style="text-align: left;">main</td>
-<td style="text-align: left;"><code class="literal">v0.0.73</code></td>
+<td style="text-align: left;"><code class="literal">v0.0.75</code></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Go thin client (reference)</td>
 <td style="text-align: left;"><a href="https://github.com/katzenpost/katzenpost" class="link" target="_top">katzenpost</a></td>
 <td style="text-align: left;"><code class="literal">client/thin</code></td>
 <td style="text-align: left;">main</td>
-<td style="text-align: left;"><code class="literal">v0.0.73</code></td>
+<td style="text-align: left;"><code class="literal">v0.0.75</code></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Rust thin client</td>
 <td style="text-align: left;"><a href="https://github.com/katzenpost/thin_client" class="link" target="_top">thin_client</a></td>
 <td style="text-align: left;"><code class="literal">src</code></td>
 <td style="text-align: left;">main</td>
-<td style="text-align: left;"><code class="literal">0.0.13</code></td>
+<td style="text-align: left;"><code class="literal">0.0.14</code></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Python thin client</td>
 <td style="text-align: left;"><a href="https://github.com/katzenpost/thin_client" class="link" target="_top">thin_client</a></td>
 <td style="text-align: left;"><code class="literal">katzenpost_thinclient</code></td>
 <td style="text-align: left;">main</td>
-<td style="text-align: left;"><code class="literal">0.0.13</code></td>
+<td style="text-align: left;"><code class="literal">0.0.14</code></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><code class="literal">katzenqt</code> (Qt group chat client)</td>
 <td style="text-align: left;"><a href="https://github.com/katzenpost/katzenqt" class="link" target="_top">katzenqt</a></td>
 <td style="text-align: left;">(root)</td>
 <td style="text-align: left;">resending_api2026</td>
-<td style="text-align: left;"><code class="literal">0.0.2-rc5</code></td>
+<td style="text-align: left;"><code class="literal">0.0.2-rc6</code></td>
 </tr>
 </tbody>
 </table>
@@ -208,7 +208,7 @@ cryptographic and network operations.
 ``` programlisting
 git clone https://github.com/katzenpost/katzenpost
 cd katzenpost
-git checkout v0.0.73
+git checkout v0.0.75
 cd cmd/kpclientd
 go build
 ```
@@ -250,7 +250,7 @@ The Go thin client is a library, imported as a Go module:
 import "github.com/katzenpost/katzenpost/client/thin"
 ```
 
-Pin to `v0.0.73` in your application’s
+Pin to `v0.0.75` in your application’s
 `go.mod`. There is no separate build step; the
 library is compiled with your application.
 
@@ -275,7 +275,7 @@ library is compiled with your application.
 ``` programlisting
 git clone https://github.com/katzenpost/thin_client
 cd thin_client
-git checkout 0.0.13
+git checkout 0.0.14
 cargo build --release
 ```
 
@@ -283,7 +283,7 @@ Or, in another Rust project’s `Cargo.toml`:
 
 ``` programlisting
 [dependencies]
-katzenpost_thin_client = "0.0.13"
+katzenpost_thin_client = "0.0.14"
 ```
 
 </div>
@@ -311,7 +311,7 @@ system Python.
 ``` programlisting
 git clone https://github.com/katzenpost/thin_client
 cd thin_client
-git checkout 0.0.13
+git checkout 0.0.14
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -342,16 +342,11 @@ No central server is involved. The underlying design is set out in
 the <a href="https://arxiv.org/abs/2501.02933" class="link" target="_top">Echomix
 paper</a>.
 
-A tag has not yet been published; at present,
-`katzenqt` builds against a development branch of
-`katzenpost`. This section will be updated once a
-release is cut.
-
 ``` programlisting
 sudo apt install libxcb-cursor0 libegl1
 git clone https://github.com/katzenpost/katzenqt
 cd katzenqt
-git checkout 0.0.2-rc4
+git checkout 0.0.2-rc6
 make deps
 make run
 ```
