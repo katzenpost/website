@@ -1,0 +1,1123 @@
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>title: linkTitle: &quot;Thin Client How-to Guide&quot;
+  description: &quot;Task-oriented guides for using the Katzenpost thin
+  client API&quot; categories: [&quot;&quot;] tags: [&quot;&quot;]
+  author: [&quot;David Stainton&quot;] version: 0 draft: false slug:
+  &quot;/thin_client_howto/&quot;</title>
+  <para>
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Thin Client How-to Guide</title>
+  <para>
+    This guide shows how to accomplish specific tasks with the
+    Katzenpost thin client. Each section is self-contained: find the
+    task you need and follow the steps.
+  </para>
+  <para>
+    For the complete API reference, see
+    <link xlink:href="/docs/thin_client_api_reference/">Thin Client API
+    Reference</link>. For conceptual background on Pigeonhole, see
+    <link xlink:href="/docs/pigeonhole_explained/">Understanding
+    Pigeonhole</link>.
+  </para>
+  <section>
+    <title>Table of Contents</title>
+    <para>
+      | Section | Description | |---------|-------------| |
+      <link linkend="how-to-connect-to-the-daemon-and-handle-events">Connect
+      to the daemon and handle events</link> | Establish a connection
+      and process events | |
+      <link linkend="how-to-discover-network-services-via-the-pki-document">Discover
+      network services</link> | Find services in the PKI document | |
+      <link linkend="how-to-send-a-message-to-a-mixnet-service">Send a
+      message to a mixnet service</link> | Echo ping and other
+      non-Pigeonhole services | |
+      <link linkend="how-to-create-a-pigeonhole-channel">Create a
+      Pigeonhole channel</link> | Generate a stream with write/read
+      capabilities | |
+      <link linkend="how-to-write-a-message-to-a-pigeonhole-channel">Write
+      a message</link> | Encrypt and send a write to a stream | |
+      <link linkend="how-to-read-a-message-from-a-pigeonhole-channel">Read
+      a message</link> | Retrieve and decrypt a message from a stream |
+      | <link linkend="how-to-delete-messages-with-tombstones">Delete
+      messages with tombstones</link> | Tombstone one or more boxes | |
+      <link linkend="how-to-send-to-one-channel-atomically-via-copy-command">Send
+      to one channel atomically</link> | Single-destination copy command
+      | |
+      <link linkend="how-to-send-to-multiple-channels-atomically">Send
+      to multiple channels atomically</link> | Multi-destination copy
+      command | |
+      <link linkend="how-to-handle-multi-call-buffer-passing-for-large-copy-streams">Multi-call
+      buffer passing</link> | Incremental copy streams with crash
+      recovery | |
+      <link linkend="how-to-tombstone-a-range-via-copy-stream">Tombstone
+      a range via copy stream</link> | Atomic tombstoning through a
+      courier | |
+      <link linkend="how-to-cancel-in-flight-operations">Cancel
+      in-flight operations</link> | Cancel individual operations or stop
+      all at once | |
+      <link linkend="how-to-handle-daemon-disconnects-and-restarts">Handle
+      daemon disconnects</link> | Automatic reconnection and request
+      replay |
+    </para>
+  </section>
+  <section>
+    <title>How to connect to the daemon and handle events</title>
+    <para>
+      Connect to the kpclientd daemon and set up event handling:
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} cfg, err :=
+      thin.LoadFile(&quot;thinclient.toml&quot;) if err != nil {
+      log.Fatal(err) }
+    </para>
+    <para>
+      logging := &amp;config.Logging{Level: &quot;INFO&quot;} client :=
+      thin.NewThinClient(cfg, logging)
+    </para>
+    <para>
+      err = client.Dial() if err != nil { log.Fatal(err) } defer
+      client.Close()
+    </para>
+    <para>
+      // Listen for events eventCh := client.EventSink() defer
+      client.StopEventSink(eventCh)
+    </para>
+    <para>
+      for ev := range eventCh { switch v := ev.(type) { case
+      *thin.ConnectionStatusEvent: fmt.Printf(&quot;Connected:
+      %v\n&quot;, v.IsConnected) case *thin.NewDocumentEvent:
+      fmt.Println(&quot;New PKI document received&quot;) case
+      *thin.MessageReplyEvent: fmt.Printf(&quot;Reply received for SURB
+      %x\n&quot;, v.SURBID) } } {{&lt; /tab &gt;}} {{&lt; tab
+      header=&quot;Rust&quot; lang=&quot;rust&quot; &gt;}} let config =
+      Config::new(&quot;thinclient.toml&quot;)?; let client =
+      ThinClient::new(config).await?;
+    </para>
+    <para>
+      // Listen for events let mut event_rx = client.event_sink();
+      tokio::spawn(async move { while let Some(event) =
+      event_rx.recv().await { // Process events println!(&quot;Event:
+      {:?}&quot;, event); } });
+    </para>
+    <para>
+      // ... do work ...
+    </para>
+    <para>
+      client.stop().await; {{&lt; /tab &gt;}} {{&lt; tab
+      header=&quot;Python&quot; lang=&quot;python&quot; &gt;}} async def
+      on_connection_status(event): print(f&quot;Connected:
+      {event.get('is_connected')}&quot;)
+    </para>
+    <para>
+      async def on_new_document(event): print(&quot;New PKI document
+      received&quot;)
+    </para>
+    <para>
+      async def on_message_reply(event): print(f&quot;Reply
+      received&quot;)
+    </para>
+    <para>
+      config = Config(&quot;thinclient.toml&quot;)
+      config.on_connection_status = on_connection_status
+      config.on_new_pki_document = on_new_document
+      config.on_message_reply = on_message_reply
+    </para>
+    <para>
+      client = ThinClient(config) loop = asyncio.get_running_loop()
+      await client.start(loop)
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>... do work ...</title>
+  <para>
+    client.stop() {{&lt; /tab &gt;}} {{&lt; /tabpane &gt;}}
+  </para>
+  <section>
+    <title>How to discover network services via the PKI document</title>
+    <para>
+      <emphasis role="strong">NOTE</emphasis> that this isn't necessary
+      for using the Pigeonhole protocol because
+      <literal>kpclientd</literal> does <literal>courier</literal>
+      service discovery automatically.
+    </para>
+    <para>
+      The PKI document lists all available mixnet services. Use
+      <literal>GetService</literal> to get a random instance of a named
+      service:
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} doc := client.PKIDocument() if doc ==
+      nil { log.Fatal(&quot;No PKI document available&quot;) }
+    </para>
+    <para>
+      // Get a random echo service desc, err :=
+      client.GetService(&quot;echo&quot;) if err != nil { log.Fatal(err)
+      }
+    </para>
+    <para>
+      // Use desc.MixDescriptor.IdentityKey and desc.RecipientQueueID //
+      as the destination for SendMessage destNode, destQueue :=
+      desc.ToDestination() {{&lt; /tab &gt;}} {{&lt; tab
+      header=&quot;Rust&quot; lang=&quot;rust&quot; &gt;}} let doc =
+      client.pki_document().await?;
+    </para>
+    <para>
+      // Get a random echo service let desc =
+      client.get_service(&quot;echo&quot;).await?;
+    </para>
+    <para>
+      // Use the destination for send_message let (dest_node,
+      dest_queue) = desc.to_destination(); {{&lt; /tab &gt;}} {{&lt; tab
+      header=&quot;Python&quot; lang=&quot;python&quot; &gt;}} doc =
+      client.pki_document() if doc is None: raise Exception(&quot;No PKI
+      document available&quot;)
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Get a random echo service</title>
+  <para>
+    desc = client.get_service(&quot;echo&quot;)
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Use the destination for send_message</title>
+  <para>
+    dest_node, dest_queue = desc.to_destination() {{&lt; /tab &gt;}}
+    {{&lt; /tabpane &gt;}}
+  </para>
+  <section>
+    <title>How to send a message to a mixnet service</title>
+    <para>
+      <emphasis role="strong">NOTE</emphasis> that this API call is NOT
+      used with the Pigeonhole protocol. However it is still useful for
+      writing other protocols and proving the <literal>echo</literal>
+      service.
+    </para>
+    <para>
+      Use <literal>BlockingSendMessage</literal> for simple
+      request-response interactions with non-Pigeonhole services (like
+      the echo service):
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} desc, err :=
+      client.GetService(&quot;echo&quot;) if err != nil { log.Fatal(err)
+      }
+    </para>
+    <para>
+      destNode, destQueue := desc.ToDestination()
+    </para>
+    <para>
+      ctx, cancel := context.WithTimeout(context.Background(),
+      30*time.Second) defer cancel()
+    </para>
+    <para>
+      reply, err := client.BlockingSendMessage(ctx, []byte(&quot;hello
+      mixnet&quot;), destNode, destQueue) if err != nil { log.Fatal(err)
+      } fmt.Printf(&quot;Reply: %s\n&quot;, reply) {{&lt; /tab &gt;}}
+      {{&lt; tab header=&quot;Rust&quot; lang=&quot;rust&quot; &gt;}}
+      let desc = client.get_service(&quot;echo&quot;).await?; let
+      (dest_node, dest_queue) = desc.to_destination();
+    </para>
+    <para>
+      let reply = client.blocking_send_message( b&quot;hello
+      mixnet&quot;, dest_node, dest_queue,
+      std::time::Duration::from_secs(30), ).await?;
+      println!(&quot;Reply: {:?}&quot;, reply); {{&lt; /tab &gt;}}
+      {{&lt; tab header=&quot;Python&quot; lang=&quot;python&quot;
+      &gt;}} desc = client.get_service(&quot;echo&quot;) dest_node,
+      dest_queue = desc.to_destination()
+    </para>
+    <para>
+      reply = await client.blocking_send_message( b&quot;hello
+      mixnet&quot;, dest_node, dest_queue, timeout_seconds=30.0 )
+      print(f&quot;Reply: {reply}&quot;) {{&lt; /tab &gt;}} {{&lt;
+      /tabpane &gt;}}
+    </para>
+  </section>
+  <section>
+    <title>How to create a Pigeonhole channel</title>
+    <para>
+      <emphasis>NOTE</emphasis> that this does NOT produce any network
+      traffic. It's a local cryptographic operation only.
+    </para>
+    <para>
+      A Pigeonhole channel (stream) is created from a 32-byte random
+      seed. The writer keeps the write cap; the reader receives the read
+      cap and first index out-of-band.
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} seed := make([]byte, 32) _, err :=
+      rand.Reader.Read(seed) if err != nil { log.Fatal(err) }
+    </para>
+    <para>
+      writeCap, readCap, firstIndex, err := client.NewKeypair(seed) if
+      err != nil { log.Fatal(err) }
+    </para>
+    <para>
+      // Writer keeps: writeCap, firstIndex // Share with reader
+      out-of-band: readCap, firstIndex {{&lt; /tab &gt;}} {{&lt; tab
+      header=&quot;Rust&quot; lang=&quot;rust&quot; &gt;}} let seed:
+      [u8; 32] = rand::random(); let result =
+      client.new_keypair(&amp;seed).await?;
+    </para>
+    <para>
+      // Writer keeps: result.write_cap, result.first_index // Share
+      with reader out-of-band: result.read_cap, result.first_index
+      {{&lt; /tab &gt;}} {{&lt; tab header=&quot;Python&quot;
+      lang=&quot;python&quot; &gt;}} import os seed = os.urandom(32)
+      result = await client.new_keypair(seed)
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Writer keeps: result.write_cap, result.first_index</title>
+  <para>
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Share with reader out-of-band: result.read_cap,
+  result.first_index</title>
+  <para>
+    {{&lt; /tab &gt;}} {{&lt; /tabpane &gt;}}
+  </para>
+  <section>
+    <title>How to write a message to a Pigeonhole channel</title>
+    <para>
+      Writing is a two-step process: encrypt the message, then send it
+      via ARQ.
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} // Encrypt the message ciphertext,
+      envDesc, envHash, nextIndex, err := client.EncryptWrite(
+      []byte(&quot;hello&quot;), writeCap, currentIndex, ) if err != nil
+      { log.Fatal(err) }
+    </para>
+    <para>
+      // Send via ARQ (blocks until acknowledged) _, err =
+      client.StartResendingEncryptedMessage( nil, // readCap (nil for
+      writes) writeCap, nil, // messageBoxIndex (nil for writes) nil, //
+      replyIndex envDesc, ciphertext, envHash, ) if err != nil {
+      log.Fatal(err) }
+    </para>
+    <para>
+      // Advance the index for the next write currentIndex = nextIndex
+      {{&lt; /tab &gt;}} {{&lt; tab header=&quot;Rust&quot;
+      lang=&quot;rust&quot; &gt;}} // Encrypt the message let result =
+      client.encrypt_write( b&quot;hello&quot;, &amp;write_cap,
+      &amp;current_index, ).await?;
+    </para>
+    <para>
+      // Send via ARQ (blocks until acknowledged)
+      client.start_resending_encrypted_message( None, // read_cap (None
+      for writes) Some(&amp;write_cap), None, // message_box_index None,
+      // reply_index &amp;result.envelope_descriptor,
+      &amp;result.message_ciphertext, &amp;result.envelope_hash,
+      ).await?;
+    </para>
+    <para>
+      // Advance the index for the next write current_index =
+      result.next_message_box_index; {{&lt; /tab &gt;}} {{&lt; tab
+      header=&quot;Python&quot; lang=&quot;python&quot; &gt;}}
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Encrypt the message</title>
+  <para>
+    result = await client.encrypt_write(b&quot;hello&quot;, write_cap,
+    current_index)
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Send via ARQ (blocks until acknowledged)</title>
+  <para>
+    await client.start_resending_encrypted_message( read_cap=None,
+    write_cap=write_cap, next_message_index=None, reply_index=None,
+    envelope_descriptor=result.envelope_descriptor,
+    message_ciphertext=result.message_ciphertext,
+    envelope_hash=result.envelope_hash, )
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Advance the index for the next write</title>
+  <para>
+    current_index = result.next_message_box_index {{&lt; /tab &gt;}}
+    {{&lt; /tabpane &gt;}}
+  </para>
+  <section>
+    <title>How to read a message from a Pigeonhole channel</title>
+    <para>
+      Reading is also two steps: encrypt a read request, then send it
+      via ARQ. The reply contains the plaintext.
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} // Encrypt a read request ciphertext,
+      envDesc, envHash, nextIndex, err := client.EncryptRead( readCap,
+      currentIndex, ) if err != nil { log.Fatal(err) }
+    </para>
+    <para>
+      // Send via ARQ (blocks until the message is retrieved) result,
+      err := client.StartResendingEncryptedMessage( readCap, nil, //
+      writeCap (nil for reads) nil, // messageBoxIndex nil, //
+      replyIndex envDesc, ciphertext, envHash, ) if err != nil {
+      log.Fatal(err) }
+    </para>
+    <para>
+      plaintext := result.Plaintext // Advance the index for the next
+      read currentIndex = nextIndex {{&lt; /tab &gt;}} {{&lt; tab
+      header=&quot;Rust&quot; lang=&quot;rust&quot; &gt;}} // Encrypt a
+      read request let read_result = client.encrypt_read(&amp;read_cap,
+      &amp;current_index).await?;
+    </para>
+    <para>
+      // Send via ARQ (blocks until the message is retrieved) let result
+      = client.start_resending_encrypted_message( Some(&amp;read_cap),
+      None, // write_cap (None for reads) None, // message_box_index
+      None, // reply_index &amp;read_result.envelope_descriptor,
+      &amp;read_result.message_ciphertext,
+      &amp;read_result.envelope_hash, ).await?;
+    </para>
+    <para>
+      let plaintext = result.plaintext; // Advance the index for the
+      next read current_index = read_result.next_message_box_index;
+      {{&lt; /tab &gt;}} {{&lt; tab header=&quot;Python&quot;
+      lang=&quot;python&quot; &gt;}}
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Encrypt a read request</title>
+  <para>
+    read_result = await client.encrypt_read(read_cap, current_index)
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Send via ARQ (blocks until the message is retrieved)</title>
+  <para>
+    plaintext = await client.start_resending_encrypted_message(
+    read_cap=read_cap, write_cap=None, next_message_index=None,
+    reply_index=None,
+    envelope_descriptor=read_result.envelope_descriptor,
+    message_ciphertext=read_result.message_ciphertext,
+    envelope_hash=read_result.envelope_hash, )
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Advance the index for the next read</title>
+  <para>
+    current_index = read_result.next_message_box_index {{&lt; /tab
+    &gt;}} {{&lt; /tabpane &gt;}}
+  </para>
+  <section>
+    <title>How to delete messages with tombstones</title>
+    <para>
+      Use <literal>TombstoneRange</literal> to create tombstone
+      envelopes, then send each one via
+      <literal>StartResendingEncryptedMessage</literal>. To tombstone a
+      single box, use <literal>maxCount=1</literal>.
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} // Create tombstone envelopes for 5
+      boxes result, err := client.TombstoneRange(writeCap, startIndex,
+      5) if err != nil { log.Fatal(err) }
+    </para>
+    <para>
+      // Send each tombstone for _, envelope := range result.Envelopes {
+      _, err = client.StartResendingEncryptedMessage( nil, writeCap,
+      nil, nil, envelope.EnvelopeDescriptor, envelope.MessageCiphertext,
+      envelope.EnvelopeHash, ) if err != nil { log.Fatal(err) } } //
+      result.Next is the index after the last tombstoned box {{&lt; /tab
+      &gt;}} {{&lt; tab header=&quot;Rust&quot; lang=&quot;rust&quot;
+      &gt;}} // Create tombstone envelopes for 5 boxes let result =
+      client.tombstone_range(&amp;write_cap, &amp;start_index, 5).await;
+    </para>
+    <para>
+      // Send each tombstone for envelope in &amp;result.envelopes {
+      client.start_resending_encrypted_message( None,
+      Some(&amp;write_cap), None, None,
+      &amp;envelope.envelope_descriptor,
+      &amp;envelope.message_ciphertext, &amp;envelope.envelope_hash,
+      ).await?; } // result.next is the index after the last tombstoned
+      box {{&lt; /tab &gt;}} {{&lt; tab header=&quot;Python&quot;
+      lang=&quot;python&quot; &gt;}}
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Create tombstone envelopes for 5 boxes</title>
+  <para>
+    result = await client.tombstone_range(write_cap, start_index, 5)
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Send each tombstone</title>
+  <para>
+    for envelope in result.envelopes: await
+    client.start_resending_encrypted_message( read_cap=None,
+    write_cap=write_cap, next_message_index=None, reply_index=None,
+    envelope_descriptor=envelope.envelope_descriptor,
+    message_ciphertext=envelope.message_ciphertext,
+    envelope_hash=envelope.envelope_hash, )
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>result.next is the index after the last tombstoned box</title>
+  <para>
+    {{&lt; /tab &gt;}} {{&lt; /tabpane &gt;}}
+  </para>
+  <section>
+    <title>How to send to one channel atomically via copy
+    command</title>
+    <para>
+      A copy command writes data to a destination channel atomically via
+      a courier. The steps are:
+    </para>
+    <orderedlist numeration="arabic" spacing="compact">
+      <listitem>
+        <para>
+          Create a temporary channel and a destination channel.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Pack the payload into copy stream elements.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Write each element to the temporary channel.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Send a copy command referencing the temporary channel.
+        </para>
+      </listitem>
+    </orderedlist>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} // Create destination channel destSeed
+      := make([]byte, 32) rand.Reader.Read(destSeed) destWriteCap,
+      destReadCap, destFirstIndex, err := client.NewKeypair(destSeed) if
+      err != nil { log.Fatal(err) }
+    </para>
+    <para>
+      // Create temporary channel tempSeed := make([]byte, 32)
+      rand.Reader.Read(tempSeed) tempWriteCap, _, tempFirstIndex, err :=
+      client.NewKeypair(tempSeed) if err != nil { log.Fatal(err) }
+    </para>
+    <para>
+      // Pack payload into copy stream elements envelopes, _, err :=
+      client.CreateCourierEnvelopesFromPayload( payload, destWriteCap,
+      destFirstIndex, true, // isStart true, // isLast ) if err != nil {
+      log.Fatal(err) }
+    </para>
+    <para>
+      // Write each element to the temporary channel tempIndex :=
+      tempFirstIndex for _, chunk := range envelopes { ciphertext,
+      envDesc, envHash, nextIdx, err := client.EncryptWrite( chunk,
+      tempWriteCap, tempIndex, ) if err != nil { log.Fatal(err) } _, err
+      = client.StartResendingEncryptedMessage( nil, tempWriteCap, nil,
+      nil, envDesc, ciphertext, envHash, ) if err != nil {
+      log.Fatal(err) } tempIndex = nextIdx }
+    </para>
+    <para>
+      // Send the copy command (blocks until courier acknowledges) err =
+      client.StartResendingCopyCommand(tempWriteCap) if err != nil {
+      log.Fatal(err) }
+    </para>
+    <para>
+      // Share destReadCap and destFirstIndex with the reader {{&lt;
+      /tab &gt;}} {{&lt; tab header=&quot;Rust&quot;
+      lang=&quot;rust&quot; &gt;}} // Create destination channel let
+      dest_seed: [u8; 32] = rand::random(); let dest =
+      client.new_keypair(&amp;dest_seed).await?;
+    </para>
+    <para>
+      // Create temporary channel let temp_seed: [u8; 32] =
+      rand::random(); let temp =
+      client.new_keypair(&amp;temp_seed).await?;
+    </para>
+    <para>
+      // Pack payload into copy stream elements let envelopes_result =
+      client.create_courier_envelopes_from_payload( &amp;payload,
+      &amp;dest.write_cap, &amp;dest.first_index, true, // is_start
+      true, // is_last ).await?;
+    </para>
+    <para>
+      // Write each element to the temporary channel let mut temp_index
+      = temp.first_index.clone(); for chunk in
+      &amp;envelopes_result.envelopes { let write_result =
+      client.encrypt_write( chunk, &amp;temp.write_cap, &amp;temp_index,
+      ).await?; client.start_resending_encrypted_message( None,
+      Some(&amp;temp.write_cap), None, None,
+      &amp;write_result.envelope_descriptor,
+      &amp;write_result.message_ciphertext,
+      &amp;write_result.envelope_hash, ).await?; temp_index =
+      write_result.next_message_box_index; }
+    </para>
+    <para>
+      // Send the copy command (blocks until courier acknowledges)
+      client.start_resending_copy_command(&amp;temp.write_cap, None,
+      None).await?;
+    </para>
+    <para>
+      // Share dest.read_cap and dest.first_index with the reader {{&lt;
+      /tab &gt;}} {{&lt; tab header=&quot;Python&quot;
+      lang=&quot;python&quot; &gt;}} import os
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Create destination channel</title>
+  <para>
+    dest_seed = os.urandom(32) dest = await
+    client.new_keypair(dest_seed)
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Create temporary channel</title>
+  <para>
+    temp_seed = os.urandom(32) temp = await
+    client.new_keypair(temp_seed)
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Pack payload into copy stream elements</title>
+  <para>
+    envelopes_result = await
+    client.create_courier_envelopes_from_payload( payload,
+    dest.write_cap, dest.first_index, is_start=True, is_last=True, )
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Write each element to the temporary channel</title>
+  <para>
+    temp_index = temp.first_index for chunk in
+    envelopes_result.envelopes: write_result = await
+    client.encrypt_write(chunk, temp.write_cap, temp_index) await
+    client.start_resending_encrypted_message( read_cap=None,
+    write_cap=temp.write_cap, next_message_index=None, reply_index=None,
+    envelope_descriptor=write_result.envelope_descriptor,
+    message_ciphertext=write_result.message_ciphertext,
+    envelope_hash=write_result.envelope_hash, ) temp_index =
+    write_result.next_message_box_index
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Send the copy command (blocks until courier
+  acknowledges)</title>
+  <para>
+    await client.start_resending_copy_command(temp.write_cap)
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Share dest.read_cap and dest.first_index with the
+  reader</title>
+  <para>
+    {{&lt; /tab &gt;}} {{&lt; /tabpane &gt;}}
+  </para>
+  <section>
+    <title>How to send to multiple channels atomically</title>
+    <para>
+      Use <literal>CreateCourierEnvelopesFromMultiPayload</literal> to
+      pack payloads for different destinations into a single copy stream
+      efficiently:
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} // Create destination channels
+      dest1WriteCap, dest1ReadCap, dest1Index, _ :=
+      client.NewKeypair(seed1) dest2WriteCap, dest2ReadCap, dest2Index,
+      _ := client.NewKeypair(seed2)
+    </para>
+    <para>
+      // Create temporary channel tempWriteCap, _, tempFirstIndex, _ :=
+      client.NewKeypair(tempSeed)
+    </para>
+    <para>
+      // Pack multiple payloads destinations :=
+      []thin.DestinationPayload{ {Payload: payload1, WriteCap:
+      dest1WriteCap, StartIndex: dest1Index}, {Payload: payload2,
+      WriteCap: dest2WriteCap, StartIndex: dest2Index}, }
+    </para>
+    <para>
+      result, err := client.CreateCourierEnvelopesFromMultiPayload(
+      destinations, true, // isStart true, // isLast nil, // buffer (nil
+      for first call) ) if err != nil { log.Fatal(err) }
+    </para>
+    <para>
+      // Write envelopes to temporary channel tempIndex :=
+      tempFirstIndex for _, chunk := range result.Envelopes {
+      ciphertext, envDesc, envHash, nextIdx, err := client.EncryptWrite(
+      chunk, tempWriteCap, tempIndex, ) if err != nil { log.Fatal(err) }
+      _, err = client.StartResendingEncryptedMessage( nil, tempWriteCap,
+      nil, nil, envDesc, ciphertext, envHash, ) if err != nil {
+      log.Fatal(err) } tempIndex = nextIdx }
+    </para>
+    <para>
+      // Send copy command err =
+      client.StartResendingCopyCommand(tempWriteCap) {{&lt; /tab &gt;}}
+      {{&lt; tab header=&quot;Rust&quot; lang=&quot;rust&quot; &gt;}} //
+      Create destination channels let dest1 =
+      client.new_keypair(&amp;seed1).await?; let dest2 =
+      client.new_keypair(&amp;seed2).await?;
+    </para>
+    <para>
+      // Create temporary channel let temp =
+      client.new_keypair(&amp;temp_seed).await?;
+    </para>
+    <para>
+      // Pack multiple payloads let destinations = vec![
+      (&amp;payload1[..], &amp;dest1.write_cap[..],
+      &amp;dest1.first_index[..]), (&amp;payload2[..],
+      &amp;dest2.write_cap[..], &amp;dest2.first_index[..]), ];
+    </para>
+    <para>
+      let result = client.create_courier_envelopes_from_multi_payload(
+      destinations, true, // is_start true, // is_last None, // buffer
+      (None for first call) ).await?;
+    </para>
+    <para>
+      // Write envelopes to temporary channel let mut temp_index =
+      temp.first_index.clone(); for chunk in &amp;result.envelopes { let
+      write_result = client.encrypt_write( chunk, &amp;temp.write_cap,
+      &amp;temp_index, ).await?;
+      client.start_resending_encrypted_message( None,
+      Some(&amp;temp.write_cap), None, None,
+      &amp;write_result.envelope_descriptor,
+      &amp;write_result.message_ciphertext,
+      &amp;write_result.envelope_hash, ).await?; temp_index =
+      write_result.next_message_box_index; }
+    </para>
+    <para>
+      // Send copy command
+      client.start_resending_copy_command(&amp;temp.write_cap, None,
+      None).await?; {{&lt; /tab &gt;}} {{&lt; tab
+      header=&quot;Python&quot; lang=&quot;python&quot; &gt;}}
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Create destination channels</title>
+  <para>
+    dest1 = await client.new_keypair(seed1) dest2 = await
+    client.new_keypair(seed2)
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Create temporary channel</title>
+  <para>
+    temp = await client.new_keypair(temp_seed)
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Pack multiple payloads</title>
+  <para>
+    destinations = [ {&quot;payload&quot;: payload1,
+    &quot;write_cap&quot;: dest1.write_cap, &quot;start_index&quot;:
+    dest1.first_index}, {&quot;payload&quot;: payload2,
+    &quot;write_cap&quot;: dest2.write_cap, &quot;start_index&quot;:
+    dest2.first_index}, ]
+  </para>
+  <para>
+    result = await client.create_courier_envelopes_from_multi_payload(
+    destinations, is_start=True, is_last=True, buffer=None, )
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Write envelopes to temporary channel</title>
+  <para>
+    temp_index = temp.first_index for chunk in result.envelopes:
+    write_result = await client.encrypt_write(chunk, temp.write_cap,
+    temp_index) await client.start_resending_encrypted_message(
+    read_cap=None, write_cap=temp.write_cap, next_message_index=None,
+    reply_index=None,
+    envelope_descriptor=write_result.envelope_descriptor,
+    message_ciphertext=write_result.message_ciphertext,
+    envelope_hash=write_result.envelope_hash, ) temp_index =
+    write_result.next_message_box_index
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Send copy command</title>
+  <para>
+    await client.start_resending_copy_command(temp.write_cap) {{&lt;
+    /tab &gt;}} {{&lt; /tabpane &gt;}}
+  </para>
+  <section>
+    <title>How to handle multi-call buffer passing for large copy
+    streams</title>
+    <para>
+      When building a copy stream across multiple calls (because you
+      have more data than fits in a single call, or data arrives
+      incrementally), pass the buffer from each result to the next call:
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} var buffer []byte // nil on first call
+    </para>
+    <para>
+      // First batch of destinations result1, err :=
+      client.CreateCourierEnvelopesFromMultiPayload( batch1Destinations,
+      true, // isStart (first call) false, // isLast (more calls coming)
+      buffer, ) if err != nil { log.Fatal(err) } // Write
+      result1.Envelopes to temp channel... buffer = result1.Buffer //
+      save for next call
+    </para>
+    <para>
+      // Persist buffer to disk for crash recovery saveState(buffer)
+    </para>
+    <para>
+      // Second batch (final) result2, err :=
+      client.CreateCourierEnvelopesFromMultiPayload( batch2Destinations,
+      false, // isStart (not the first call) true, // isLast (final
+      call) buffer, ) if err != nil { log.Fatal(err) } // Write
+      result2.Envelopes to temp channel...
+    </para>
+    <para>
+      // On crash recovery, reload buffer from disk and continue // with
+      isStart=false {{&lt; /tab &gt;}} {{&lt; tab
+      header=&quot;Rust&quot; lang=&quot;rust&quot; &gt;}} let mut
+      buffer: Option&lt;Vec<u8>&gt; = None; // None on first call
+    </para>
+    <para>
+      // First batch let result1 =
+      client.create_courier_envelopes_from_multi_payload(
+      batch1_destinations, true, // is_start false, // is_last buffer,
+      ).await?; // Write result1.envelopes to temp channel... buffer =
+      result1.buffer; // save for next call
+    </para>
+    <para>
+      // Persist buffer to disk for crash recovery
+      save_state(&amp;buffer);
+    </para>
+    <para>
+      // Second batch (final) let result2 =
+      client.create_courier_envelopes_from_multi_payload(
+      batch2_destinations, false, // is_start true, // is_last buffer,
+      ).await?; // Write result2.envelopes to temp channel... {{&lt;
+      /tab &gt;}} {{&lt; tab header=&quot;Python&quot;
+      lang=&quot;python&quot; &gt;}} buffer = None # None on first call
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>First batch</title>
+  <para>
+    result1 = await client.create_courier_envelopes_from_multi_payload(
+    batch1_destinations, is_start=True, # first call is_last=False, #
+    more calls coming buffer=buffer, )
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Write result1.envelopes to temp channel...</title>
+  <para>
+    buffer = result1.buffer # save for next call
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Persist buffer to disk for crash recovery</title>
+  <para>
+    save_state(buffer)
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Second batch (final)</title>
+  <para>
+    result2 = await client.create_courier_envelopes_from_multi_payload(
+    batch2_destinations, is_start=False, # not the first call
+    is_last=True, # final call buffer=buffer, )
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Write result2.envelopes to temp channel...</title>
+  <para>
+    {{&lt; /tab &gt;}} {{&lt; /tabpane &gt;}}
+  </para>
+  <section>
+    <title>How to tombstone a range via copy stream</title>
+    <para>
+      Use <literal>CreateCourierEnvelopesFromTombstoneRange</literal> to
+      atomically tombstone boxes as part of a copy command. The courier
+      performs the tombstoning, so it either all succeeds or none of it
+      is visible.
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} tempWriteCap, _, tempFirstIndex, _ :=
+      client.NewKeypair(tempSeed)
+    </para>
+    <para>
+      // Create tombstone copy stream elements envelopes, nextBuffer,
+      nextDestIndex, err :=
+      client.CreateCourierEnvelopesFromTombstoneRange( destWriteCap,
+      destStartIndex, 10, // tombstone 10 boxes true, // isStart true,
+      // isLast nil, // buffer ) if err != nil { log.Fatal(err) }
+    </para>
+    <para>
+      // Write to temporary channel tempIndex := tempFirstIndex for _,
+      chunk := range envelopes { ciphertext, envDesc, envHash, nextIdx,
+      err := client.EncryptWrite( chunk, tempWriteCap, tempIndex, ) if
+      err != nil { log.Fatal(err) } _, err =
+      client.StartResendingEncryptedMessage( nil, tempWriteCap, nil,
+      nil, envDesc, ciphertext, envHash, ) if err != nil {
+      log.Fatal(err) } tempIndex = nextIdx }
+    </para>
+    <para>
+      // Send copy command err =
+      client.StartResendingCopyCommand(tempWriteCap) {{&lt; /tab &gt;}}
+      {{&lt; tab header=&quot;Rust&quot; lang=&quot;rust&quot; &gt;}}
+      let temp = client.new_keypair(&amp;temp_seed).await?;
+    </para>
+    <para>
+      // Create tombstone copy stream elements let result =
+      client.create_courier_envelopes_from_tombstone_range(
+      &amp;dest_write_cap, &amp;dest_start_index, 10, // tombstone 10
+      boxes true, // is_start true, // is_last None, // buffer ).await?;
+    </para>
+    <para>
+      // Write to temporary channel let mut temp_index =
+      temp.first_index.clone(); for chunk in &amp;result.envelopes { let
+      write_result = client.encrypt_write( chunk, &amp;temp.write_cap,
+      &amp;temp_index, ).await?;
+      client.start_resending_encrypted_message( None,
+      Some(&amp;temp.write_cap), None, None,
+      &amp;write_result.envelope_descriptor,
+      &amp;write_result.message_ciphertext,
+      &amp;write_result.envelope_hash, ).await?; temp_index =
+      write_result.next_message_box_index; }
+    </para>
+    <para>
+      // Send copy command
+      client.start_resending_copy_command(&amp;temp.write_cap, None,
+      None).await?; {{&lt; /tab &gt;}} {{&lt; tab
+      header=&quot;Python&quot; lang=&quot;python&quot; &gt;}} temp =
+      await client.new_keypair(temp_seed)
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Create tombstone copy stream elements</title>
+  <para>
+    result = await client.create_courier_envelopes_from_tombstone_range(
+    dest_write_cap, dest_start_index, 10, # tombstone 10 boxes
+    is_start=True, is_last=True, buffer=None, )
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Write to temporary channel</title>
+  <para>
+    temp_index = temp.first_index for chunk in result.envelopes:
+    write_result = await client.encrypt_write(chunk, temp.write_cap,
+    temp_index) await client.start_resending_encrypted_message(
+    read_cap=None, write_cap=temp.write_cap, next_message_index=None,
+    reply_index=None,
+    envelope_descriptor=write_result.envelope_descriptor,
+    message_ciphertext=write_result.message_ciphertext,
+    envelope_hash=write_result.envelope_hash, ) temp_index =
+    write_result.next_message_box_index
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Send copy command</title>
+  <para>
+    await client.start_resending_copy_command(temp.write_cap) {{&lt;
+    /tab &gt;}} {{&lt; /tabpane &gt;}}
+  </para>
+  <section>
+    <title>How to cancel in-flight operations</title>
+    <para>
+      Both <literal>StartResendingEncryptedMessage</literal> and
+      <literal>StartResendingCopyCommand</literal> block until
+      completion. You can cancel them individually, or stop everything
+      at once by closing the thin client.
+    </para>
+    <para>
+      <emphasis role="strong">To cancel a specific operation</emphasis>,
+      call the corresponding cancel method from another thread/task:
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} // Cancel an encrypted message
+      operation err :=
+      client.CancelResendingEncryptedMessage(envelopeHash)
+    </para>
+    <para>
+      // Cancel a copy command (needs blake2b-256 hash of the write cap)
+      writeCapBytes, _ := tempWriteCap.MarshalBinary() writeCapHash :=
+      blake2b.Sum256(writeCapBytes) err =
+      client.CancelResendingCopyCommand(&amp;writeCapHash) {{&lt; /tab
+      &gt;}} {{&lt; tab header=&quot;Rust&quot; lang=&quot;rust&quot;
+      &gt;}} // Cancel an encrypted message operation
+      client.cancel_resending_encrypted_message(&amp;envelope_hash).await?;
+    </para>
+    <para>
+      // Cancel a copy command use blake2::{Blake2b, Digest}; use
+      digest::consts::U32; let write_cap_hash: [u8; 32] =
+      Blake2b::<U32>::digest(&amp;temp_write_cap).into();
+      client.cancel_resending_copy_command(&amp;write_cap_hash).await?;
+      {{&lt; /tab &gt;}} {{&lt; tab header=&quot;Python&quot;
+      lang=&quot;python&quot; &gt;}}
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Cancel an encrypted message operation</title>
+  <para>
+    await client.cancel_resending_encrypted_message(envelope_hash)
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Cancel a copy command</title>
+  <para>
+    from hashlib import blake2b write_cap_hash = blake2b(temp_write_cap,
+    digest_size=32).digest() await
+    client.cancel_resending_copy_command(write_cap_hash) {{&lt; /tab
+    &gt;}} {{&lt; /tabpane &gt;}}
+  </para>
+  <para>
+    <emphasis role="strong">To stop all in-flight operations at
+    once</emphasis>, call <literal>Close()</literal> (Go),
+    <literal>stop()</literal> (Rust), or <literal>stop()</literal>
+    (Python). This shuts down the thin client entirely -- all blocked
+    callers receive an error, and the daemon stops all ARQ
+    retransmission loops for this client. This is useful when your
+    application is shutting down or when you want to abandon all pending
+    work without cancelling each operation individually.
+  </para>
+  <section>
+    <title>How to handle daemon disconnects and restarts</title>
+    <para>
+      The thin client automatically reconnects when the daemon
+      connection is lost. It uses an instance token to detect whether it
+      reconnected to the same daemon or a new one:
+    </para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          <emphasis role="strong">Same instance token</emphasis>: The
+          daemon still has its state. No action needed.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <emphasis role="strong">Different instance token</emphasis>:
+          The daemon is a new process. The thin client automatically
+          replays all in-flight
+          <literal>StartResendingEncryptedMessage</literal> and
+          <literal>StartResendingCopyCommand</literal> operations.
+          Callers blocked on these methods are unaware of the
+          disconnect.
+        </para>
+      </listitem>
+    </itemizedlist>
+    <para>
+      Applications do not need to manage reconnection or replay. You can
+      observe disconnect events to log or update UI state:
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} eventCh := client.EventSink() defer
+      client.StopEventSink(eventCh)
+    </para>
+    <para>
+      for ev := range eventCh { switch v := ev.(type) { case
+      *thin.DaemonDisconnectedEvent: if v.IsGraceful {
+      fmt.Println(&quot;Daemon shut down gracefully&quot;) } else {
+      fmt.Printf(&quot;Daemon connection lost: %v\n&quot;, v.Err) } //
+      No action needed -- thin client reconnects automatically // and
+      replays in-flight requests if the daemon instance changed. case
+      *thin.ConnectionStatusEvent: fmt.Printf(&quot;Connected:
+      %v\n&quot;, v.IsConnected) // v.InstanceToken identifies the
+      daemon process. // The thin client compares this internally on
+      reconnect. } } {{&lt; /tab &gt;}} {{&lt; tab
+      header=&quot;Rust&quot; lang=&quot;rust&quot; &gt;}} let config =
+      Config::new(&quot;thinclient.toml&quot;)?; // Set disconnect
+      callback during config config.on_daemon_disconnected =
+      Some(Box::new(|graceful, err_msg| { if graceful {
+      println!(&quot;Daemon shut down gracefully&quot;); } else {
+      println!(&quot;Daemon connection lost: {:?}&quot;, err_msg); } //
+      No action needed -- thin client reconnects automatically // and
+      replays in-flight requests if the daemon instance changed. }));
+      let client = ThinClient::new(config).await?; {{&lt; /tab &gt;}}
+      {{&lt; tab header=&quot;Python&quot; lang=&quot;python&quot;
+      &gt;}} async def on_daemon_disconnected(event): if
+      event.get(&quot;is_graceful&quot;): print(&quot;Daemon shut down
+      gracefully&quot;) else: print(f&quot;Daemon connection lost:
+      {event.get('error')}&quot;) # No action needed -- thin client
+      reconnects automatically # and replays in-flight requests if the
+      daemon instance changed.
+    </para>
+    <para>
+      async def on_connection_status(event): print(f&quot;Connected:
+      {event['is_connected']}&quot;) # event contains 'instance_token'
+      identifying the daemon process. # The thin client compares this
+      internally on reconnect.
+    </para>
+    <para>
+      config = Config( &quot;thinclient.toml&quot;,
+      on_daemon_disconnected=on_daemon_disconnected,
+      on_connection_status=on_connection_status, ) client =
+      ThinClient(config) {{&lt; /tab &gt;}} {{&lt; /tabpane &gt;}}
+    </para>
+    <para>
+      If the thin client is disconnected when you cancel an operation,
+      the cancel just removes it from in-flight tracking -- it will not
+      be replayed on reconnect:
+    </para>
+    <para>
+      {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+      lang=&quot;go&quot; &gt;}} // Safe to call while disconnected --
+      removes from tracking, // no message sent to daemon since there is
+      no connection. err :=
+      client.CancelResendingEncryptedMessage(envelopeHash) err =
+      client.CancelResendingCopyCommand(&amp;writeCapHash) {{&lt; /tab
+      &gt;}} {{&lt; tab header=&quot;Rust&quot; lang=&quot;rust&quot;
+      &gt;}} // Safe to call while disconnected -- removes from
+      tracking, // no message sent to daemon since there is no
+      connection.
+      client.cancel_resending_encrypted_message(&amp;envelope_hash).await?;
+      client.cancel_resending_copy_command(&amp;write_cap_hash).await?;
+      {{&lt; /tab &gt;}} {{&lt; tab header=&quot;Python&quot;
+      lang=&quot;python&quot; &gt;}}
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Safe to call while disconnected -- removes from
+  tracking,</title>
+  <para>
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>no message sent to daemon since there is no connection.</title>
+  <para>
+    await client.cancel_resending_encrypted_message(envelope_hash) await
+    client.cancel_resending_copy_command(write_cap_hash) {{&lt; /tab
+    &gt;}} {{&lt; /tabpane &gt;}}
+  </para>
+  <para>
+    To terminate the thin client entirely (all blocked callers receive
+    an error, daemon disconnects never kill the thin client):
+  </para>
+  <para>
+    {{&lt; tabpane &gt;}} {{&lt; tab header=&quot;Go&quot;
+    lang=&quot;go&quot; &gt;}} err := client.Close() {{&lt; /tab &gt;}}
+    {{&lt; tab header=&quot;Rust&quot; lang=&quot;rust&quot; &gt;}}
+    client.stop().await; {{&lt; /tab &gt;}} {{&lt; tab
+    header=&quot;Python&quot; lang=&quot;python&quot; &gt;}}
+    client.stop() {{&lt; /tab &gt;}} {{&lt; /tabpane &gt;}}
+  </para>
+</section>
