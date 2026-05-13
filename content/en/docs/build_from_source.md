@@ -26,12 +26,12 @@ should be built from the same tag.
 
 | Component | Repository | Path | Branch | Tag |
 |---|---|---|---|---|
-| Server-side components (mix server, dirauth, courier, replica) | [katzenpost](https://github.com/katzenpost/katzenpost) | `cmd/server`, `cmd/dirauth`, `cmd/courier`, `cmd/replica` | main | `v0.0.73` |
-| `kpclientd` (client daemon) | [katzenpost](https://github.com/katzenpost/katzenpost) | `cmd/kpclientd` | main | `v0.0.73` |
-| Go thin client (reference) | [katzenpost](https://github.com/katzenpost/katzenpost) | `client/thin` | main | `v0.0.73` |
-| Rust thin client | [thin_client](https://github.com/katzenpost/thin_client) | `src` | main | `0.0.13` |
-| Python thin client | [thin_client](https://github.com/katzenpost/thin_client) | `katzenpost_thinclient` | main | `0.0.13` |
-| `katzenqt` (Qt group chat client) | [katzenqt](https://github.com/katzenpost/katzenqt) | (root) | resending_api2026 | `0.0.2-rc5` |
+| Server-side components (mix server, dirauth, courier, replica) | [katzenpost](https://github.com/katzenpost/katzenpost) | `cmd/server`, `cmd/dirauth`, `cmd/courier`, `cmd/replica` | main | `v0.0.75` |
+| `kpclientd` (client daemon) | [katzenpost](https://github.com/katzenpost/katzenpost) | `cmd/kpclientd` | main | `v0.0.75` |
+| Go thin client (reference) | [katzenpost](https://github.com/katzenpost/katzenpost) | `client/thin` | main | `v0.0.75` |
+| Rust thin client | [thin_client](https://github.com/katzenpost/thin_client) | `src` | main | `0.0.14` |
+| Python thin client | [thin_client](https://github.com/katzenpost/thin_client) | `katzenpost_thinclient` | main | `0.0.14` |
+| `katzenqt` (Qt group chat client) | [katzenqt](https://github.com/katzenpost/katzenqt) | (root) | resending_api2026 | `0.0.2-rc6` |
 
 
 Server-side components are listed for completeness; for full deployment
@@ -53,7 +53,7 @@ daemon, which performs all cryptographic and network operations.
 ```shell
 git clone https://github.com/katzenpost/katzenpost
 cd katzenpost
-git checkout v0.0.73
+git checkout v0.0.75
 cd cmd/kpclientd
 go build
 ```
@@ -78,7 +78,7 @@ The Go thin client is a library, imported as a Go module:
 import "github.com/katzenpost/katzenpost/client/thin"
 ```
 
-Pin to `v0.0.73` in your application's `go.mod`. There is no
+Pin to `v0.0.75` in your application's `go.mod`. There is no
 separate build step; the library is compiled with your application.
 
 ## Rust thin client
@@ -86,7 +86,7 @@ separate build step; the library is compiled with your application.
 ```shell
 git clone https://github.com/katzenpost/thin_client
 cd thin_client
-git checkout 0.0.13
+git checkout 0.0.14
 cargo build --release
 ```
 
@@ -94,7 +94,7 @@ Or, in another Rust project's `Cargo.toml`:
 
 ```toml
 [dependencies]
-katzenpost_thin_client = "0.0.13"
+katzenpost_thin_client = "0.0.14"
 ```
 
 ## Python thin client
@@ -106,7 +106,7 @@ Python.
 ```shell
 git clone https://github.com/katzenpost/thin_client
 cd thin_client
-git checkout 0.0.13
+git checkout 0.0.14
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -128,7 +128,7 @@ updated once a release is cut.
 sudo apt install libxcb-cursor0 libegl1
 git clone https://github.com/katzenpost/katzenqt
 cd katzenqt
-git checkout 0.0.2-rc4
+git checkout 0.0.2-rc6
 make deps
 make run
 ```
