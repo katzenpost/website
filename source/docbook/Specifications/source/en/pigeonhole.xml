@@ -1,0 +1,1627 @@
+
+---
+title:
+linkTitle: "Pigeonhole Protocol Design Specification"
+url: "docs/specs/pigeonhole"
+description: ""
+categories: [""]
+tags: [""]
+author: ["Threebit Hacker", "David Stainton"]
+version: 0
+draft: false
+---
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+
+<?title "CHANGE_ME" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
+<?linkTitle "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
+<?description "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
+<?author "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
+<?url "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
+<?draft "false" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#draft] -->
+<?slug "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
+<?layout "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
+<?type "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
+<?weight "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
+<?version "" ?> <!-- Optional [?] -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
+        %shared-content;
+    <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
+        %references;
+    <!ENTITY % terms SYSTEM "/home/dwrob/git/website/source/docbook/terms.ent">
+        %terms;    
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+
+<article    xmlns="http://docbook.org/ns/docbook"
+  xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
+  xml:id="CHANGE_ME">
+  <info>  
+    <title xml:id="CHANGE_ME.title">CHANGE_ME_TITLE_CONTENT</title> <!-- Match to title PI above. -->          
+  </info>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>title: linkTitle: &quot;Pigeonhole Protocol Design
+  Specification&quot; url: &quot;docs/specs/pigeonhole&quot;
+  description: &quot;&quot; categories: [&quot;&quot;] tags:
+  [&quot;&quot;] author: [&quot;Threebit Hacker&quot;, &quot;David
+  Stainton&quot;] version: 0 draft: false</title>
+  <para>
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Pigeonhole Protocol Design Specification</title>
+  <para>
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Abstract</title>
+  <para>
+    In this specification we describe the components and protocols that
+    compose Pigeonhole scattered storage. We define the behavior of
+    communication clients that send and retrieve individual messages,
+    BACAP streams, and AllOrNothing streams. Client actions are mediated
+    through courier services that interact with storage replicas.
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Introduction</title>
+  <para>
+    Pigeonhole scattered storage enables persistent anonymous
+    communication in which participants experience a coherent sequence
+    of messages or a continuous data stream, but where user
+    relationships and relations between data blocks remain unlinkable
+    not only from the perspective of third-party observers, but also
+    from that of the mixnet components. This latter attribute provides
+    resilience against deanonymization by compromised mixnet nodes.
+  </para>
+  <para>
+    The data blocks that Pigeonhole stores are supplied by the BACAP
+    (Blinding-and-Capability) scheme. The Pigeonhole protocol scatters
+    messages around the many storage servers and among a space of BACAP
+    Box IDs. From a passive network observer's perspective all of this
+    is seemingly random. All communication among users consists of
+    user-generated read or write queries to Pigeonhole storage, never
+    directly to other users.
+  </para>
+  <para>
+    Many protocols are possible to compose using Pigeonhole
+    communication channels, including group communications. This
+    specification describes the protocols that are also detailed in our
+    paper, in section entitled &quot;5.6. End-to-end reliable group
+    channels&quot;. For more information about BACAP, see &quot;Echomix:
+    a Strong Anonymity System with Messaging&quot;, chapter 4:
+    https://arxiv.org/abs/2501.02933. For an understanding of how the
+    core BACAP primitives are implemented,see
+    https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go.
+  </para>
+  <para>
+    Message-layout snippets in this specification are given in the
+    trunnel binary-format description language (matching
+    <literal>pigeonhole/pigeonhole_messages.trunnel</literal>); code
+    snippets showing in-memory courier or replica state are given in Go.
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Glossary</title>
+  <itemizedlist>
+    <listitem>
+      <para>
+        <emphasis role="strong">Box</emphasis>: BACAP's unit of data
+        storage. Each box has a box ID (which also serves as its public
+        key), a signature, and a ciphertext signed payload.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis role="strong">Courier</emphasis>: Service that runs on
+        a service node and interacts with storage replicas. Proxies
+        requests from clients and routes replies back to clients (via
+        SURBs).
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis role="strong">Storage replica</emphasis>: The actual
+        storage nodes where message ciphertexts are stored and
+        retrieved.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis role="strong">Intermediate replica</emphasis>: See
+        &quot;5.4.1. Writing messages&quot;:
+      </para>
+      <para>
+        Intermediate replicas are chosen independently of the two final
+        replicas for that box ID, which they are derived using the
+        sharding scheme. The reason Alice designates intermediate
+        replicas, as opposed to addressing the final replicas directly,
+        is to avoid revealing to the courier which shard the box falls
+        into.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis role="strong">Designated replica</emphasis> (a.k.a.
+        <emphasis>final replica</emphasis>, <emphasis>shard
+        replica</emphasis>): One of the two replicas selected
+        deterministically for a given Box ID by the
+        <literal>Shard2</literal> consistent-hash algorithm. The
+        intermediate replicas replicate writes through to the designated
+        replicas.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis role="strong">EnvelopeHash</emphasis>:
+        <literal>BLAKE2b-256(CourierEnvelope.sender_pubkey || CourierEnvelope.ciphertext)</literal>.
+        Used by the courier for deduplication of retransmissions and for
+        demultiplexing replica replies.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis role="strong">MKEM</emphasis>: Multi-recipient KEM
+        addressed to the pair of intermediate replicas. One MKEM
+        ciphertext carries, for each recipient, a separate DEK
+        encapsulation (<literal>Dek1</literal>,
+        <literal>Dek2</literal>); either recipient may decapsulate and
+        recover the padded <literal>ReplicaInnerMessage</literal>.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis role="strong">Replica-epoch</emphasis>: A one-week
+        period, distinct from the 20-minute mixnet PKI epoch, during
+        which a given replica-side MKEM envelope keypair is valid. See
+        &quot;Epochs&quot; below.
+      </para>
+    </listitem>
+  </itemizedlist>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Deployment requirements</title>
+  <section>
+    <title>Minimum number of storage replicas</title>
+    <para>
+      A conforming deployment MUST run at least
+      <emphasis role="strong">four</emphasis> storage replicas (n ≥ 4).
+      The reason is the intermediate-replica unlinkability property
+      described in the Glossary and in §5.4.1 of the paper: for each
+      <literal>CourierEnvelope</literal>, the client picks two
+      <emphasis>intermediate</emphasis> replicas which MUST be disjoint
+      from the two <emphasis>final</emphasis> (sharded) replicas that
+      hold the Box. Disjointness is what prevents the courier from
+      learning which shard the Box falls into.
+    </para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>
+          <emphasis role="strong">n = 2</emphasis>: there is only one
+          possible shard set, and the intermediate set is necessarily
+          identical to it.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <emphasis role="strong">n = 3</emphasis>: only one replica
+          sits outside any given two-shard set, so the client cannot
+          pick two independent non-shard intermediates. Implementations
+          in this case fall back to an intermediate set that includes at
+          least one shard replica, which tells the courier that replica
+          is one of the two shards for the Box.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <emphasis role="strong">n ≥ 4</emphasis>: at least two
+          non-shard replicas exist, so the intermediate set can be drawn
+          uniformly at random from the non-shard subset, and
+          disjointness is preserved.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </section>
+  <section>
+    <title>Information exposure when n &lt; 4</title>
+    <para>
+      When the disjointness invariant is broken (n = 3), the courier
+      learns that at least one of its two intermediate replicas is in
+      the Box's shard set. This exposure is bounded:
+    </para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>
+          The courier does NOT learn the Box ID. The Box ID lives inside
+          the MKEM-encrypted inner message addressed to the intermediate
+          replicas; only the replicas can decrypt it.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The courier does NOT learn the other shard member. Knowing one
+          element of the two-element shard set does not constrain the
+          identity of the other among the remaining replicas.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The courier does NOT gain a way to link Boxes in the same
+          sequence. BACAP's unlinkability of consecutive Box IDs (paper
+          §4) is a property of the capability-derivation scheme and is
+          independent of sharding.
+        </para>
+      </listitem>
+    </itemizedlist>
+    <para>
+      Consequently, the main unlinkability properties of Pigeonhole are
+      not lost at n = 3, but the defense-in-depth margin provided by
+      disjoint intermediate replicas is. Operators SHOULD treat n ≥ 4 as
+      the minimum supported configuration.
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Epochs</title>
+  <para>
+    Katzenpost has two distinct notions of &quot;epoch&quot; that
+    operate on very different timescales, and Pigeonhole touches both:
+  </para>
+  <itemizedlist spacing="compact">
+    <listitem>
+      <para>
+        <emphasis role="strong">Mixnet epoch</emphasis> (a.k.a.
+        <emphasis>normal epoch</emphasis>, <emphasis>PKI
+        epoch</emphasis>): the short cadence on which the directory
+        authorities publish a new PKI document. The default is 20
+        minutes. Mix nodes, gateways, service nodes, and clients all
+        synchronise on this epoch. Mix-node Sphinx replay keys rotate
+        once per mixnet epoch.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis role="strong">Pigeonhole storage-replica
+        epoch</emphasis>: the long cadence on which each storage replica
+        rotates its MKEM envelope keypair. The default is one week. A
+        replica publishes, in every mixnet-epoch PKI descriptor,
+        <emphasis>two</emphasis> envelope public keys: the current
+        replica-epoch key and the next replica-epoch key.
+      </para>
+    </listitem>
+  </itemizedlist>
+  <section>
+    <title>Epoch tolerance for CourierEnvelope</title>
+    <para>
+      A <literal>CourierEnvelope</literal> carries an
+      <literal>epoch</literal> field that identifies the replica-epoch
+      whose envelope key the client used to encrypt the MKEM ciphertext.
+      Conforming couriers and storage replicas MUST accept
+      <literal>epoch ∈ {current − 1, current, current + 1}</literal>
+      where <literal>current</literal> is the courier's / replica's own
+      view of the current replica-epoch.
+    </para>
+    <para>
+      The <literal>current − 1</literal> tolerance handles the grace
+      window immediately after a replica-epoch boundary, when a client
+      with a slightly stale PKI view still encrypts to the previous
+      envelope public key. Combined with <literal>current</literal>,
+      this gives a <emphasis role="strong">two replica-epoch data
+      TTL</emphasis> — roughly two weeks — because the future
+      replica-epoch key is by definition a key that hasn't started being
+      used yet, so <literal>current</literal> and
+      <literal>current − 1</literal> are the epochs where actual data
+      flows.
+    </para>
+    <para>
+      The <literal>current + 1</literal> tolerance handles the same
+      boundary seen from the other side: a client whose clock or PKI
+      view is slightly <emphasis>ahead</emphasis> of the courier /
+      replica.
+    </para>
+    <para>
+      Envelopes outside this three-epoch window MUST be rejected,
+      because by definition no replica still holds the matching
+      decapsulation key:
+    </para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>
+          Older than <literal>current − 1</literal>: the envelope public
+          key has been pruned from replicas (see the replica's
+          envelope-key GC worker). The replica cannot decrypt and the
+          courier can fail fast rather than forward a doomed request.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Newer than <literal>current + 1</literal>: no replica has
+          generated that envelope key yet (replicas generate
+          <literal>current</literal> and <literal>current + 1</literal>
+          only).
+        </para>
+      </listitem>
+    </itemizedlist>
+    <para>
+      Couriers SHOULD reject with a dedicated envelope-level error code
+      (<literal>EnvelopeErrorInvalidEpoch</literal>) so clients can
+      distinguish &quot;stale encryption&quot; from other courier-side
+      rejections.
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Pigeonhole message format and constants</title>
+  <para>
+    The Pigeonhole message types are defined in trunnel at
+    <link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/pigeonhole_messages.trunnel"><literal>pigeonhole/pigeonhole_messages.trunnel</literal></link>;
+    the Go bindings live in
+    <link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/trunnel_messages.go"><literal>pigeonhole/trunnel_messages.go</literal></link>.
+    All integer fields are big-endian and all variable-length fields
+    carry an explicit length prefix. This trunnel encoding replaces the
+    earlier CBOR encoding with a fixed-overhead binary format whose
+    serialised size can be computed deterministically from the Sphinx
+    geometry.
+  </para>
+  <para>
+    Carriage of these messages differs by hop:
+  </para>
+  <itemizedlist spacing="compact">
+    <listitem>
+      <para>
+        <emphasis role="strong">Client → Courier:</emphasis> a
+        <literal>CourierQuery</literal> (see below) is carried inside a
+        Sphinx packet payload. The reverse direction uses a SURB
+        supplied by the client.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis role="strong">Courier → Replica and Replica →
+        Replica:</emphasis> the courier and replicas do not use Sphinx
+        packets between themselves. They communicate over the Katzenpost
+        wire protocol defined in <literal>core/wire</literal> and
+        <literal>core/wire/commands</literal>; the relevant commands are
+        <literal>ReplicaMessage</literal>,
+        <literal>ReplicaMessageReply</literal>,
+        <literal>ReplicaWrite</literal>, and
+        <literal>ReplicaWriteReply</literal>. Some of these commands
+        embed trunnel-serialised pigeonhole blobs as their payload.
+      </para>
+    </listitem>
+  </itemizedlist>
+  <section>
+    <title>Fundamental size constants</title>
+    <para>
+      | Constant | Value | Source | |---|---|---| |
+      <literal>BACAP_BOX_ID_SIZE</literal> | 32 bytes | Ed25519 public
+      key | | <literal>BACAP_SIGNATURE_SIZE</literal> | 64 bytes |
+      Ed25519 signature | | <literal>HASH_SIZE</literal> | 32 bytes |
+      BLAKE2b-256 | | <literal>MKEM_DEK_SIZE</literal> | 60 bytes |
+      <literal>mkem.DEKSize</literal> | | CTIDH-1024 public key | 160
+      bytes | <literal>hpqc/nike/ctidh/ctidh1024</literal> | | X25519
+      public key | 32 bytes | <literal>hpqc/nike/x25519</literal> | |
+      Hybrid CTIDH-1024 × X25519 NIKE public key | 192 bytes | sum of
+      the above | | BACAP payload encryption overhead | 16 bytes |
+      ChaCha20-Poly1305 AEAD | | MKEM encapsulation overhead | 28 bytes
+      | ChaCha20-Poly1305 nonce (12) + tag (16) |
+    </para>
+  </section>
+  <section>
+    <title>Maximum BACAP payload</title>
+    <para>
+      The maximum plaintext BACAP payload a single Box can carry is
+      derived <emphasis>backwards</emphasis> from the Sphinx
+      <literal>UserForwardPayloadLength</literal> by subtracting every
+      layer of framing and cryptographic overhead that sits between the
+      Sphinx payload and the BACAP plaintext. The authoritative
+      calculation is performed by
+      <literal>NewGeometryFromSphinx</literal> in
+      <link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/geo/geometry.go"><literal>pigeonhole/geo/geometry.go</literal></link>.
+    </para>
+    <para>
+      Informally:
+    </para>
+    <programlisting>
+MaxPlaintextPayloadLength
+  = UserForwardPayloadLength
+    − CourierQuery framing (1 byte: query_type discriminator)
+    − CourierEnvelope header (intermediate_replicas[2] + Dek1 + Dek2
+                              + reply_index + epoch + sender_pubkey_len
+                              + sender_pubkey + ciphertext_len)
+    − MKEM AEAD overhead (28 bytes)
+    − ReplicaInnerMessage framing (1 byte: message_type discriminator)
+    − ReplicaWrite header (box_id + signature + payload_len = 100 bytes)
+    − BACAP AEAD overhead (16 bytes)
+    − BACAP length prefix (4 bytes)
+</programlisting>
+    <para>
+      With a hybrid CTIDH-1024 × X25519 NIKE the fixed per-packet
+      overhead between <literal>UserForwardPayloadLength</literal> and
+      the BACAP plaintext is on the order of 560 bytes; the exact figure
+      depends on the configured NIKE scheme and should always be
+      obtained from <literal>geometry.NewGeometryFromSphinx()</literal>
+      rather than computed by hand.
+    </para>
+  </section>
+  <section>
+    <title>The CourierEnvelope as seen by the courier</title>
+    <para>
+      The courier, upon unwrapping the Sphinx payload of a client's
+      packet, sees a <literal>CourierQuery</literal> whose
+      <literal>content</literal> is a <literal>CourierEnvelope</literal>
+      with the following layout:
+    </para>
+    <programlisting>
+struct courier_envelope {
+    u8  intermediate_replicas[2];          // replica indices in the PKI
+    u8  dek1[MKEM_DEK_SIZE];               // DEK encapsulation for replica 0
+    u8  dek2[MKEM_DEK_SIZE];               // DEK encapsulation for replica 1
+    u8  reply_index;                       // which replica's reply to prefer
+    u64 epoch;                             // replica-epoch under which the
+                                           //   MKEM ciphertext was produced
+    u16 sender_pubkey_len;
+    u8  sender_pubkey[sender_pubkey_len];  // client's ephemeral hybrid NIKE pk
+    u32 ciphertext_len;
+    u8  ciphertext[ciphertext_len];        // MKEM-encrypted ReplicaInnerMessage
+}
+</programlisting>
+    <para>
+      Notable points:
+    </para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>
+          The <literal>ciphertext</literal> is opaque to the courier. It
+          is an MKEM envelope addressed to the <emphasis>pair</emphasis>
+          of intermediate replicas; either replica can decapsulate using
+          its own DEK (<literal>dek1</literal> or
+          <literal>dek2</literal> respectively).
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The <literal>epoch</literal> field names the
+          <emphasis>replica-epoch</emphasis> whose envelope keys were
+          used to produce the MKEM ciphertext. See &quot;Epochs&quot;
+          below for the tolerance window.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Prior to encryption, the inner
+          <literal>ReplicaInnerMessage</literal> is zero-padded to
+          <literal>ReplicaInnerMessageWriteSize()</literal> so that
+          reads, writes and tombstones produce MKEM ciphertexts of
+          identical length.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </section>
+  <section>
+    <title>The ReplicaInnerMessage as seen by a replica</title>
+    <para>
+      Once an intermediate replica decrypts the MKEM envelope, it
+      obtains a <literal>ReplicaInnerMessage</literal> — a discriminated
+      union over <literal>message_type</literal>:
+    </para>
+    <programlisting>
+struct replica_inner_message {
+    u8 message_type IN [0, 1];    // 0 = read, 1 = write
+    union content[message_type] {
+        0: struct replica_read  read_msg;   // { box_id[32] }
+        1: struct replica_write write_msg;  // { box_id[32], signature[64],
+                                            //   payload_len[u32], payload[] }
+    };
+}
+</programlisting>
+    <para>
+      A <literal>ReplicaWrite</literal> with
+      <literal>payload_len == 0</literal> is a
+      <emphasis role="strong">tombstone</emphasis>; see
+      &quot;Tombstones&quot; below.
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Message types and interactions</title>
+  <section>
+    <title>Overview</title>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>
+          A client sends a <literal>CourierQuery</literal> inside a
+          Sphinx packet payload. The courier's reply travels back to the
+          client by means of a SURB the client also supplied.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A client always designates
+          <emphasis role="strong">two</emphasis> intermediate replicas
+          per <literal>CourierEnvelope</literal>. The courier dispatches
+          the corresponding pair of <literal>ReplicaMessage</literal>
+          wire commands, one to each intermediate, and collects up to
+          two <literal>ReplicaMessageReply</literal> results.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The <literal>reply_index</literal> field is a
+          <emphasis>preference</emphasis> indicating which of the two
+          replica replies the client would like forwarded first. It is
+          not a strict selector: should the preferred slot still be
+          empty when the courier is ready to respond, the courier falls
+          back to whichever reply it does hold, and indicates in the
+          <literal>CourierEnvelopeReply</literal> the actual index that
+          was served (see
+          <link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/courier/server/plugin.go"><literal>courier/server/plugin.go</literal></link>).
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Clients MUST resend identical
+          <literal>CourierEnvelope</literal> bodies — same
+          <literal>sender_pubkey</literal> and
+          <literal>ciphertext</literal> — until they receive a reply.
+          The courier deduplicates resends by
+          <literal>EnvelopeHash</literal>. Only the Sphinx-layer SURB is
+          rotated between retransmissions.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </section>
+  <section>
+    <title>CourierQuery</title>
+    <para>
+      A <literal>CourierQuery</literal> is the top-level discriminated
+      union that a client places into a Sphinx packet payload for the
+      courier:
+    </para>
+    <programlisting>
+struct courier_query {
+    u8 query_type IN [0, 1];
+    union content[query_type] {
+        0: struct courier_envelope envelope;      // read or write a single box
+        1: struct copy_command     copy_command;  // AllOrNothing copy
+    };
+}
+</programlisting>
+    <para>
+      The symmetric reply is a <literal>CourierQueryReply</literal>:
+    </para>
+    <programlisting>
+struct courier_query_reply {
+    u8 reply_type IN [0, 1];
+    union content[reply_type] {
+        0: struct courier_envelope_reply envelope_reply;
+        1: struct copy_command_reply     copy_command_reply;
+    };
+}
+</programlisting>
+  </section>
+  <section>
+    <title>CourierEnvelope</title>
+    <para>
+      The <literal>CourierEnvelope</literal> layout was given in the
+      preceding section. The client constructs one per read or write.
+      The courier:
+    </para>
+    <orderedlist numeration="arabic" spacing="compact">
+      <listitem>
+        <para>
+          Computes
+          <literal>EnvelopeHash = BLAKE2b-256(sender_pubkey || ciphertext)</literal>.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Verifies
+          <literal>epoch ∈ {current − 1, current, current + 1}</literal>
+          per the replica-epoch tolerance window, rejecting with
+          <literal>EnvelopeErrorInvalidEpoch</literal> otherwise.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Looks <literal>EnvelopeHash</literal> up in its dedup cache.
+          If present, the courier returns the cached reply (or an ACK if
+          no reply has yet arrived) without re-dispatching to replicas.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          On a cache miss, the courier constructs two
+          <literal>ReplicaMessage</literal> wire commands — one bound
+          for <literal>intermediate_replicas[0]</literal> carrying
+          <literal>dek1</literal>, the other for
+          <literal>intermediate_replicas[1]</literal> carrying
+          <literal>dek2</literal> — and forwards them over the wire
+          protocol.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The courier immediately sends an ACK reply to the client so it
+          may stop retransmitting.
+        </para>
+      </listitem>
+    </orderedlist>
+  </section>
+  <section>
+    <title>ReplicaMessage (wire command)</title>
+    <para>
+      <literal>ReplicaMessage</literal> is <emphasis>not</emphasis> a
+      trunnel pigeonhole type; it is the
+      <literal>core/wire/commands</literal> command sent from a courier
+      to a replica. Its payload fields are copied verbatim from the
+      matching <literal>CourierEnvelope</literal>:
+    </para>
+    <programlisting language="go">
+// core/wire/commands
+type ReplicaMessage struct {
+    SenderEPubKey []byte     // copied from CourierEnvelope.sender_pubkey
+    DEK           *[MKEM_DEK_SIZE]byte  // dek1 or dek2, depending on destination
+    Ciphertext    []byte     // copied from CourierEnvelope.ciphertext
+}
+</programlisting>
+    <para>
+      The recipient replica decapsulates the MKEM envelope using the
+      replica-epoch key that corresponds to
+      <literal>CourierEnvelope.epoch</literal> (trying each of the three
+      keys in its tolerance window), yielding a padded
+      <literal>ReplicaInnerMessage</literal>. The replica then
+      dispatches on <literal>message_type</literal> to
+      <literal>ReplicaRead</literal> or <literal>ReplicaWrite</literal>
+      handling.
+    </para>
+  </section>
+  <section>
+    <title>ReplicaMessageReply (wire command)</title>
+    <para>
+      In response to a <literal>ReplicaMessage</literal>, the courier
+      expects an asynchronous <literal>ReplicaMessageReply</literal>
+      wire command from the replica:
+    </para>
+    <programlisting language="go">
+// core/wire/commands
+type ReplicaMessageReply struct {
+    ErrorCode     uint8                 // see the replica error-code table below
+    EnvelopeHash  *[HASH_SIZE]byte      // lets the courier demultiplex the reply
+    EnvelopeReply []byte                // MKEM-encrypted ReplicaMessageReplyInnerMessage
+}
+</programlisting>
+    <para>
+      The <literal>EnvelopeReply</literal> byte blob is produced by the
+      replica via the MKEM scheme's <literal>EnvelopeReply()</literal>
+      method (see
+      <link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/replica/handlers.go"><literal>replica/handlers.go</literal></link>).
+      It carries a <literal>ReplicaMessageReplyInnerMessage</literal> —
+      a discriminated union over either a
+      <literal>ReplicaReadReply</literal> or a
+      <literal>ReplicaWriteReply</literal> — padded to
+      <literal>ReplicaReplyInnerMessageReadSize()</literal> so that read
+      replies and write replies are indistinguishable in size, and
+      encrypted to the client's ephemeral NIKE public key under the
+      replica's envelope keypair.
+    </para>
+  </section>
+  <section>
+    <title>CourierBookKeeping</title>
+    <para>
+      For each outstanding <literal>EnvelopeHash</literal>, the courier
+      maintains an in-memory dedup entry. Its actual structure is:
+    </para>
+    <programlisting language="go">
+// courier/server/plugin.go
+type CourierBookKeeping struct {
+    Epoch                uint64        // replica-epoch at cache insertion
+    CreatedAt            time.Time     // for TTL eviction (~5 minutes)
+    QueryType            uint8         // the query_type that produced this entry
+    IntermediateReplicas [2]uint8
+    EnvelopeReplies      [2]*commands.ReplicaMessageReply
+}
+</programlisting>
+    <para>
+      Note that the courier does <emphasis role="strong">not</emphasis>
+      cache SURBs or SURB timestamps. A client's SURB is consumed by the
+      Sphinx-layer plugin infrastructure at the moment the courier emits
+      a reply and is not retained by the courier's Pigeonhole state.
+      Should the client not receive that reply, it is expected to
+      retransmit a fresh Sphinx packet carrying a fresh SURB but the
+      identical <literal>CourierEnvelope</literal> body; the courier,
+      recognising the <literal>EnvelopeHash</literal>, replies using the
+      new SURB.
+    </para>
+    <para>
+      The dedup cache has a TTL of 5 minutes
+      (<literal>DedupCacheTTL</literal> in
+      <literal>courier/server/plugin.go</literal>).
+    </para>
+  </section>
+  <section>
+    <title>CourierEnvelopeReply</title>
+    <para>
+      The courier's reply to a <literal>CourierEnvelope</literal> has
+      the following trunnel layout:
+    </para>
+    <programlisting>
+struct courier_envelope_reply {
+    u8  envelope_hash[HASH_SIZE];       // identifies the originating envelope
+    u8  reply_index;                    // which intermediate replica's reply
+                                        //   is being returned (may differ
+                                        //   from the client's requested index)
+    u8  reply_type IN [0, 1];           // 0 = ACK, 1 = PAYLOAD
+    u32 payload_len;
+    u8  payload[payload_len];           // the MKEM-encrypted EnvelopeReply,
+                                        //   present iff reply_type == PAYLOAD
+    u8  error_code;                     // see envelope error codes below
+}
+</programlisting>
+    <para>
+      A <literal>reply_type</literal> of <literal>ACK</literal> (0)
+      indicates the courier has received the envelope and dispatched it
+      to the replicas but has not yet received a reply for the requested
+      index. A <literal>reply_type</literal> of
+      <literal>PAYLOAD</literal> (1) indicates the
+      <literal>payload</literal> field carries the MKEM-encrypted
+      <literal>EnvelopeReply</literal> produced by a replica.
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Embedded pigeonhole types</title>
+  <para>
+    These trunnel structs are not carried on the wire in isolation; they
+    are embedded inside MKEM envelopes and their replies.
+  </para>
+  <section>
+    <title>ReplicaRead</title>
+    <para>
+      Embedded inside the MKEM-encrypted
+      <literal>ReplicaInnerMessage</literal> a client sends to a replica
+      (via the courier) for a read operation.
+    </para>
+    <programlisting>
+struct replica_read {
+    u8 box_id[BACAP_BOX_ID_SIZE];
+}
+</programlisting>
+  </section>
+  <section>
+    <title>ReplicaReadReply</title>
+    <para>
+      Embedded inside the MKEM-encrypted
+      <literal>ReplicaMessageReplyInnerMessage</literal> a replica
+      returns for a successful read. Padding is applied at the outer
+      <literal>ReplicaMessageReplyInnerMessage</literal> level; this
+      struct carries no padding of its own.
+    </para>
+    <programlisting>
+struct replica_read_reply {
+    u8  error_code;
+    u8  box_id[BACAP_BOX_ID_SIZE];
+    u8  signature[BACAP_SIGNATURE_SIZE];
+    u32 payload_len;
+    u8  payload[payload_len];
+}
+</programlisting>
+  </section>
+  <section>
+    <title>ReplicaWrite</title>
+    <para>
+      Used both (a) embedded inside the MKEM-encrypted
+      <literal>ReplicaInnerMessage</literal> for a client write, and (b)
+      carried directly as a <literal>core/wire/commands</literal>
+      command between replicas during replication.
+    </para>
+    <programlisting>
+struct replica_write {
+    u8  box_id[BACAP_BOX_ID_SIZE];
+    u8  signature[BACAP_SIGNATURE_SIZE];
+    u32 payload_len;
+    u8  payload[payload_len];
+}
+</programlisting>
+    <para>
+      A <literal>ReplicaWrite</literal> with
+      <literal>payload_len == 0</literal> is a
+      <emphasis role="strong">tombstone</emphasis>. Replicas treat
+      tombstone writes as overwrites: an existing <literal>Box</literal>
+      at the same <literal>box_id</literal> is replaced by the
+      tombstone, and subsequent reads return
+      <literal>ReplicaErrorTombstone</literal>.
+    </para>
+  </section>
+  <section>
+    <title>ReplicaWriteReply</title>
+    <para>
+      Embedded inside a
+      <literal>ReplicaMessageReplyInnerMessage</literal> on the client
+      reply path, and also used as the
+      <literal>core/wire/commands</literal> reply to inter-replica
+      replication.
+    </para>
+    <programlisting>
+struct replica_write_reply {
+    u8 error_code;
+}
+</programlisting>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>EnvelopeHash</title>
+  <para>
+    The <literal>EnvelopeHash</literal> uniquely identifies a
+    <literal>CourierEnvelope</literal> for the purposes of deduplication
+    and reply demultiplexing. It is computed as:
+  </para>
+  <programlisting>
+EnvelopeHash = BLAKE2b-256(sender_pubkey || ciphertext)
+</programlisting>
+  <para>
+    where <literal>sender_pubkey</literal> and
+    <literal>ciphertext</literal> are the corresponding fields of the
+    <literal>CourierEnvelope</literal>. The implementation is
+    <link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/helpers.go"><literal>CourierEnvelope.EnvelopeHash()</literal></link>
+    in <literal>pigeonhole/helpers.go</literal>.
+  </para>
+  <para>
+    A retransmitted <literal>CourierEnvelope</literal> carries the
+    identical <literal>sender_pubkey</literal> and
+    <literal>ciphertext</literal> as the original, and therefore hashes
+    to the same value; only the surrounding Sphinx packet (and its SURB)
+    changes between attempts.
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Error codes</title>
+  <para>
+    All error codes are defined in
+    <link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/errors.go"><literal>pigeonhole/errors.go</literal></link>.
+  </para>
+  <section>
+    <title>Replica error codes</title>
+    <para>
+      Returned by a replica in
+      <literal>ReplicaMessageReply.ErrorCode</literal>,
+      <literal>ReplicaReadReply.error_code</literal>, and
+      <literal>ReplicaWriteReply.error_code</literal>.
+    </para>
+    <para>
+      | Code | Name | Meaning | |---|---|---| | 0 |
+      <literal>ReplicaSuccess</literal> | Operation completed
+      successfully | | 1 | <literal>ReplicaErrorBoxIDNotFound</literal>
+      | Read miss (expected outcome) | | 2 |
+      <literal>ReplicaErrorInvalidBoxID</literal> | Malformed box ID | |
+      3 | <literal>ReplicaErrorInvalidSignature</literal> | BACAP
+      signature verification failed | | 4 |
+      <literal>ReplicaErrorDatabaseFailure</literal> | Transient RocksDB
+      error | | 5 | <literal>ReplicaErrorInvalidPayload</literal> |
+      Malformed payload | | 6 |
+      <literal>ReplicaErrorStorageFull</literal> | Storage capacity
+      exceeded | | 7 | <literal>ReplicaErrorInternalError</literal> |
+      Internal server error | | 8 |
+      <literal>ReplicaErrorInvalidEpoch</literal> | Replica-epoch
+      envelope key unavailable | | 9 |
+      <literal>ReplicaErrorReplicationFailed</literal> | Replication to
+      shard peer failed | | 10 |
+      <literal>ReplicaErrorBoxAlreadyExists</literal> | Idempotent-write
+      outcome (expected) | | 11 |
+      <literal>ReplicaErrorTombstone</literal> | Read returned a
+      tombstone (expected) |
+    </para>
+    <para>
+      Codes 1, 10 and 11 are &quot;expected outcomes&quot; — they
+      correspond to normal protocol states rather than faults. The
+      thin-client helper <literal>thin.IsExpectedOutcome(err)</literal>
+      treats these three codes as non-errors.
+    </para>
+  </section>
+  <section>
+    <title>Courier envelope error codes</title>
+    <para>
+      Returned by the courier in
+      <literal>CourierEnvelopeReply.error_code</literal>.
+    </para>
+    <para>
+      | Code | Name | Meaning | |---|---|---| | 0 |
+      <literal>EnvelopeErrorSuccess</literal> | Operation completed | |
+      1 | <literal>EnvelopeErrorInvalidEnvelope</literal> | Malformed
+      envelope (e.g. <literal>reply_index &gt; 1</literal>) | | 2 |
+      <literal>EnvelopeErrorCacheCorruption</literal> | Internal cache
+      inconsistency | | 3 |
+      <literal>EnvelopeErrorPropagationError</literal> | Failed to
+      dispatch to replicas | | 4 |
+      <literal>EnvelopeErrorInvalidEpoch</literal> |
+      <literal>CourierEnvelope.epoch</literal> outside tolerance window
+      |
+    </para>
+  </section>
+  <section>
+    <title>Copy command status codes</title>
+    <para>
+      Returned by the courier in
+      <literal>CopyCommandReply.status</literal> (see below).
+    </para>
+    <para>
+      | Code | Name | Meaning | |---|---|---| | 0 |
+      <literal>CopyStatusSucceeded</literal> | All destination writes
+      completed | | 1 | <literal>CopyStatusInProgress</literal> |
+      Courier has accepted the command; processing continues | | 2 |
+      <literal>CopyStatusFailed</literal> | Aborted; see
+      <literal>error_code</literal> +
+      <literal>failed_envelope_index</literal> |
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Sharding and replica selection</title>
+  <para>
+    For each Box, two <emphasis>designated</emphasis> (final) replicas
+    are derived deterministically from the Box ID using the
+    <literal>Shard2</literal> consistent-hash algorithm (see
+    <link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/replica/common/shard.go"><literal>replica/common/shard.go</literal></link>):
+  </para>
+  <programlisting>
+for each online replica r with identity key k_r:
+    h_r = BLAKE2b-256(k_r || box_id)
+return the two replicas whose h_r are smallest
+</programlisting>
+  <para>
+    The two <emphasis>intermediate</emphasis> replicas chosen by the
+    client for a given <literal>CourierEnvelope</literal> are drawn
+    independently of the designated replicas, per
+    <literal>pigeonhole.GetRandomIntermediateReplicas</literal>:
+  </para>
+  <itemizedlist spacing="compact">
+    <listitem>
+      <para>
+        <emphasis role="strong">n ≥ 4 replicas:</emphasis> two
+        intermediates are drawn uniformly at random from the replicas
+        that are <emphasis role="strong">not</emphasis> in the
+        designated (shard) set — preserving the disjointness invariant
+        described in &quot;Deployment requirements&quot; above.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis role="strong">n = 3:</emphasis> fallback — at least
+        one intermediate must coincide with a designated replica; this
+        weakens the intermediate/final disjointness guarantee but does
+        not compromise Box unlinkability.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis role="strong">n &lt; 3:</emphasis> rejected.
+      </para>
+    </listitem>
+  </itemizedlist>
+  <para>
+    Intermediate replicas, upon accepting a
+    <literal>ReplicaWrite</literal>, compute the designated replicas
+    themselves and forward the <literal>ReplicaWrite</literal> to them
+    via the <literal>core/wire/commands</literal>
+    <literal>ReplicaWrite</literal> command (see
+    <link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/replica/connector.go"><literal>replica/connector.go</literal></link>).
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Protocol sequence visualizations</title>
+  <para>
+    For simplicity, the following diagrams omit replication while
+    illustrating the Pigeonhole write and read operations.
+  </para>
+  <para>
+    <emphasis role="strong">Pigeonhole write operation</emphasis>
+  </para>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <objectinfo>
+          <title>Annotated Writes</title>
+        </objectinfo>
+        <imagedata fileref="/docs/specs/annotated_write.png" />
+      </imageobject>
+      <textobject>
+        <phrase>protocol annotatation image of writes</phrase>
+      </textobject>
+    </inlinemediaobject>
+  </para>
+  <para>
+    <emphasis role="strong">Pigeonhole read operation</emphasis>
+  </para>
+  <para>
+    <inlinemediaobject>
+      <imageobject>
+        <objectinfo>
+          <title>Annotated Reads</title>
+        </objectinfo>
+        <imagedata fileref="/docs/specs/annotated_read.png" />
+      </imageobject>
+      <textobject>
+        <phrase>protocol annotatation image of reads</phrase>
+      </textobject>
+    </inlinemediaobject>
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Pigeonhole AllOrNothing protocol</title>
+  <para>
+    The <emphasis role="strong">All Or Nothing</emphasis> delivery
+    mechanism ensures that a set of associated BACAP writes either
+    succeeds or fails atomically from the point of view of a replica or
+    second-party client reader. This behavior prevents an adversary from
+    detecting a correlation between (A) the sending client's failure to
+    transmit multiple messages at once with (B) a network interruption
+    on the sending client's side of the network. Regardless of the
+    number of messages in the set, the adversary gets to observe
+    &quot;at most once&quot; that the sending client interacted with the
+    network.
+  </para>
+  <para>
+    The protocol works as follows.
+  </para>
+  <section>
+    <title>Step 1</title>
+    <para>
+      The client uploads a &quot;temporary Pigeonhole stream&quot;.
+    </para>
+    <para>
+      The stream payloads consist of four byte length prefixed
+      <literal>CourierEnvelope</literal> blobs concatenated
+      back-to-back. Because a <literal>CourierEnvelope</literal> is
+      strictly larger than a BACAP payload, which itself contains BACAP
+      payloads, multiple boxes must be used.
+    </para>
+  </section>
+  <section>
+    <title>Step 2</title>
+    <para>
+      The client sends a random courier the &quot;Copy&quot; command
+      which encapsulates the write capability to the temporary
+      Pigeonhole stream written in Step 1 above. When the courier
+      receives this copy command it extracts the read cap from the given
+      write cap and uses it to read the stream of data. The courier then
+      reads a box at a time and tries to extract 0 or 1 envelopes from
+      each accumulation of stream segments.
+    </para>
+    <para>
+      After processing the command, the courier then overwrites the
+      temporary stream with tombstones.
+    </para>
+  </section>
+  <section>
+    <title>Temporary Stream data format</title>
+    <para>
+      Each box in the temporary stream is a serialized
+      <literal>CopyStreamElement</literal>. Defined in trunnel as:
+    </para>
+    <programlisting>
+// CopyStreamElement - wraps a CourierEnvelope chunk with stream position flags.
+// Overhead: 1 byte (flags) + 4 bytes (envelope_len) = 5 bytes
+struct copy_stream_element {
+    // Flags: bit 0 = isStart, bit 1 = isFinal
+    u8 flags;
+
+    // The CourierEnvelope serialized bytes
+    u32 envelope_len;
+    u8 envelope_data[envelope_len];
+}
+</programlisting>
+    <para>
+      Here it is in golang:
+    </para>
+    <programlisting>
+type CopyStreamElement struct {
+    Flags        uint8
+    EnvelopeLen  uint32
+    EnvelopeData []uint8
+}
+</programlisting>
+    <para>
+      The purpose of this specific format is to use the
+      <literal>isStart</literal> and <literal>isFinal</literal> flags to
+      tell the courier the first box and last box of the stream to
+      process. The payloads encapsulated within the
+      <literal>EnvelopeData</literal> fields of many of these
+      <literal>CopyStreamElement</literal>s is itself a stream of data
+      which contains 4 byte length prefixed
+      <literal>CourierEnvelope</literal>s.
+    </para>
+    <para>
+      A key property of this encoding is that envelope boundaries do not
+      align with box boundaries. Each BACAP box payload has a maximum
+      size of N bytes, but a serialized
+      <literal>CourierEnvelope</literal> (which contains a full box
+      payload plus metadata) exceeds N bytes. Therefore envelopes are
+      serialized into a continuous byte stream and split across multiple
+      boxes in the temporary copy stream:
+    </para>
+    <programlisting>
+TEMPORARY COPY STREAM BOXES (each holds N bytes):
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│    Box 0    │ │    Box 1    │ │    Box 2    │ │    Box 3    │ │    Box 4    │
+└─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
+
+SERIALIZED ENVELOPE DATA (envelope boundaries don't align with box boundaries):
+┌─────────────────────────┐┌────────────────────┐┌──────────────────────────┐
+│       Envelope 1        ││     Envelope 2     ││       Envelope 3         │
+└─────────────────────────┘└────────────────────┘└──────────────────────────┘
+|         |         |         |         |         |
+     Box 0     Box 1     Box 2     Box 3     Box 4
+</programlisting>
+    <para>
+      The courier reads the stream box by box, accumulating data until
+      it can extract complete envelopes. The <literal>isStart</literal>
+      and <literal>isFinal</literal> flags on the
+      <literal>CopyStreamElement</literal> wrappers tell the courier
+      where the stream begins and ends.
+    </para>
+    <para>
+      Each embedded <literal>CourierEnvelope</literal> is processed as a
+      normal write and results in a <literal>ReplicaMessage</literal>
+      being dispatched to the intermediate replicas over the wire
+      protocol.
+    </para>
+    <para>
+      The courier does NOT need to keep track of the
+      <literal>EnvelopeHash</literal> for each contained
+      <literal>CourierEnvelope</literal> for the purpose of replying to
+      the client (the &quot;client&quot; of these envelopes is, in this
+      case, the courier itself), but it does need to keep resending them
+      until the intermediate replicas have ACKed them.
+    </para>
+    <para>
+      The courier MUST keep track of the hash of the
+      <literal>CopyCommand</literal> (computed as
+      <literal>BLAKE2b-256(write_cap)</literal>) and MUST NOT process a
+      given command more than once. This dedup cache has a TTL of 30
+      minutes (<literal>CopyDedupCacheTTL</literal> in
+      <literal>courier/server/plugin.go</literal>).
+    </para>
+  </section>
+  <section>
+    <title>CopyCommand</title>
+    <para>
+      Sent by a client to its chosen courier after the client has
+      successfully uploaded every Box of the temporary stream. The
+      trunnel layout is:
+    </para>
+    <programlisting>
+struct copy_command {
+    u32 write_cap_len;
+    u8  write_cap[write_cap_len];   // serialised BACAP BoxOwnerCap
+}
+</programlisting>
+    <para>
+      On receipt, the courier:
+    </para>
+    <orderedlist numeration="arabic" spacing="compact">
+      <listitem>
+        <para>
+          Computes <literal>copyKey = BLAKE2b-256(write_cap)</literal>.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Consults its copy dedup cache. If an in-progress entry is
+          found, the courier responds immediately with
+          <literal>CopyStatusInProgress</literal>. If a completed entry
+          within its TTL is found, the courier returns the cached
+          terminal reply.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Otherwise, the courier reconstructs the BACAP
+          <literal>WriteCap</literal> from the bytes, derives the
+          corresponding <literal>ReadCap</literal>, and reads the
+          temporary stream Box by Box, feeding the decrypted BACAP
+          payloads into a <literal>CopyStreamEnvelopeDecoder</literal>.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Each complete <literal>CourierEnvelope</literal> emitted by
+          the decoder is dispatched to its two intermediate replicas;
+          the courier waits for acknowledgements with bounded retries
+          and exponential backoff.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Upon processing the Box bearing the <literal>isFinal</literal>
+          flag (or upon an unrecoverable failure), the courier attempts
+          — on a best-effort basis — to overwrite every Box of the
+          temporary stream with a tombstone.
+        </para>
+      </listitem>
+    </orderedlist>
+    <para>
+      Replica error handling during a <literal>CopyCommand</literal> is
+      classified as <emphasis role="strong">temporary</emphasis> or
+      <emphasis role="strong">permanent</emphasis> by
+      <link xlink:href="https://github.com/katzenpost/katzenpost/blob/main/courier/server/copy_errors.go"><literal>courier/server/copy_errors.go</literal></link>:
+      transient errors (storage full, database failure, internal error,
+      replication failed, box-ID not found) trigger bounded retries
+      against the same shard before failover; permanent errors (invalid
+      box ID, invalid signature, invalid payload, invalid epoch, box
+      already exists, tombstone) cause immediate failover or abort.
+    </para>
+  </section>
+  <section>
+    <title>CopyCommandReply</title>
+    <para>
+      The courier's reply to a <literal>CopyCommand</literal> has the
+      following trunnel layout:
+    </para>
+    <programlisting>
+struct copy_command_reply {
+    u8  status;                   // CopyStatus{Succeeded, InProgress, Failed}
+    u8  error_code;               // replica error code (meaningful iff status == Failed)
+    u64 failed_envelope_index;    // 1-based sequential position in the
+                                  //   CourierEnvelope stream at which processing
+                                  //   stopped (meaningful iff status == Failed)
+}
+</programlisting>
+    <para>
+      The status codes are enumerated in &quot;Copy command status
+      codes&quot; above. <literal>failed_envelope_index</literal> counts
+      <emphasis>envelopes</emphasis> within the stream, not boxes: the
+      first envelope in the first box of the temporary stream is index
+      1.
+    </para>
+    <para>
+      A client receiving <literal>CopyStatusInProgress</literal> should
+      continue polling — i.e. resend the same
+      <literal>CopyCommand</literal> via a fresh SURB after a short
+      interval (<literal>CopyPollInterval</literal>, currently 5
+      seconds) — until it receives either
+      <literal>CopyStatusSucceeded</literal> or
+      <literal>CopyStatusFailed</literal>. Because the courier's copy
+      dedup cache keys on <literal>BLAKE2b-256(write_cap)</literal>,
+      these repeated polls will not cause the
+      <literal>CopyCommand</literal> to be processed more than once.
+    </para>
+  </section>
+  <section>
+    <title>Potential use cases of AllOrNothing</title>
+    <para>
+      In no particular order:
+    </para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>
+          Atomically writing to two or more boxes.
+        </para>
+        <itemizedlist spacing="compact">
+          <listitem>
+            <para>
+              The boxes can reside on distinct streams (or not); the
+              courier doesn't know anything about streams of
+              <literal>CourierEnvelope</literal>.
+            </para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+      <listitem>
+        <para>
+          Sending long messages that span more than one BACAP payload,
+          like a file / document / picture.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Group chat join uses AllOrNothing when adding a new member to
+          the group:
+        </para>
+        <itemizedlist spacing="compact">
+          <listitem>
+            <para>
+              The person introducing a new member writes to their group
+              chat stream.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The person introducing a new member also writes to the
+              existing conversation stream that the new member can
+              already read.
+            </para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+      <listitem>
+        <para>
+          Group chat uses AllOrNothing in all cases where it needs to
+          send long messages -- files, pictures, audio, long
+          cryptographic keys such as the group membership list, and so
+          on.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Protocol narration example</title>
+  <para>
+    Alice wants to send a message to Bob, who is already connected to
+    Alice. That is, Alice will write to a box with ID 12345 that Bob is
+    trying to read from.
+  </para>
+  <orderedlist numeration="arabic">
+    <listitem>
+      <para>
+        Alice sends:
+      </para>
+      <para>
+        1.1. SPHINX packet containing:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            SPHINX header
+          </para>
+          <itemizedlist spacing="compact">
+            <listitem>
+              <para>
+                Routing commands to make it arrive at a courier (on a
+                service provider)
+              </para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para>
+            SPHINX payload
+          </para>
+          <itemizedlist>
+            <listitem>
+              <para>
+                Reply SURB
+              </para>
+            </listitem>
+            <listitem>
+<literallayout><literal>CourierEnvelope</literal> encrypted for a courier chosen at random. The
+envelope tells the courier about two randomly chosen replicas (&quot;intermediate replicas&quot;).</literallayout>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+<literallayout>1.2 Alice doesn't know if the packet makes it through the network. Until she
+receives a reply, she keeps resending the <literal>CourierEnvelope</literal> to the same courier.</literallayout>
+    </listitem>
+    <listitem>
+      <para>
+        The courier receives the <literal>CourierEnvelope</literal> from
+        Alice.
+      </para>
+      <para>
+        2.1. The courier records the <literal>EnvelopeHash</literal> of
+        the <literal>CourierEnvelope</literal> in its
+        <literal>CourierBookKeeping</literal> datastructure.
+      </para>
+      <para>
+        2.2. If the courier has already seen that hash, GOTO Step 4.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The courier sends an ACK to Alice using the SURB on file for
+        Alice, telling her to stop resending the
+        <literal>CourierEnvelope</literal>. If there's no SURB, the
+        Courier waits for the next re-sent
+        <literal>CourierEnvelope</literal> from Alice matching the
+        <literal>EnvelopeHash</literal>.
+      </para>
+<literallayout>3.1. The courier constructs two <literal>ReplicaMessage</literal> objects and puts them in its outgoing queue for the two intermediate replicas. (Note that each courier
+maintains constant-rate traffic with all replicas).</literallayout>
+      <para>
+        3.2. The courier keeps doing this for each intermediate replica
+        until it receives an ACK from that replica.
+      </para>
+    </listitem>
+  </orderedlist>
+  <para>
+    Alice’s actions are now complete.
+  </para>
+  <orderedlist numeration="arabic">
+    <listitem override="4">
+      <para>
+        The two intermediate replicas receive the two
+        <literal>ReplicaMessage</literal> objects.
+      </para>
+      <para>
+        4.1. They decrypt them and compute the &quot;designated
+        replicas&quot; based on the BACAP box ID.
+      </para>
+<literallayout>4.2. The replicas put ACKs in their outgoing queues for the courier saying &quot;we have received these messages” (see step 3.2), referencing the
+<literal>EnvelopeHash</literal>. This tells the courier to stop resending to the intermediate replicas.</literallayout>
+      <para>
+        4.3. They put the decrypted contents (a
+        <literal>ReplicaWrite</literal> BACAP tuple: box ID 12345;
+        signature; encrypted payload) in their outgoing queues for the
+        &quot;designated replicas&quot;.
+      </para>
+      <para>
+        4.4. Each replica waits for a reply from its designated replica.
+      </para>
+<literallayout>4.5. When an intermediate replica receives its ACK from the designated replica,
+the intermediate replica has no more tasks.</literallayout>
+    </listitem>
+  </orderedlist>
+  <para>
+    Bob now wants to check if Alice has written a message at box 12345
+  </para>
+  <orderedlist numeration="arabic">
+    <listitem override="5">
+      <para>
+        Similar to step 1, Bob sends a SPHINX packet to a courier chosen
+        at random.
+      </para>
+      <para>
+        5.1. SPHINX packet containing:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            SPHINX header
+          </para>
+          <itemizedlist spacing="compact">
+            <listitem>
+              <para>
+                Routing commands to make it arrive at a courier (on a
+                service provider).
+              </para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para>
+            SPHINX payload
+          </para>
+          <itemizedlist>
+            <listitem>
+<literallayout>The envelope tells the courier about two randomly chosen replicas
+(“intermediate replicas”).</literallayout>
+            </listitem>
+            <listitem>
+              <para>
+                <literal>CourierEnvelope</literal> encrypted for a
+                courier chosen at random. Its encrypted payload is a
+                <literal>ReplicaRead</literal> command (reference box ID
+                12345).
+              </para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+<literallayout>5.2. Bob doesn't know if the packet makes it through the network. Until he
+receives a reply, he keeps resending the <literal>CourierEnvelope</literal> to the same courier.</literallayout>
+    </listitem>
+    <listitem>
+      <para>
+        The courier receives Bob's <literal>CourierEnvelope</literal>
+        (see step 2),
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        See step 3.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The two intermediate replicas receive the two
+        <literal>ReplicaMessage</literal> objects containing Bob's
+        <literal>ReplicaRead</literal>
+      </para>
+      <para>
+        8.1. (See 4.1.)
+      </para>
+      <para>
+        8.2. (See 4.2.)
+      </para>
+      <para>
+        8.3. (See 4.3.)
+      </para>
+      <para>
+        8.4. (See 4.4.)
+      </para>
+<literallayout>8.5. When the intermediate replica receives its ACK from the designated replica,
+it will include the (perhaps confusingly named) <literal>ReplicaWrite</literal> (BACAP tuple).</literallayout>
+      <para>
+        8.6. The intermediate replica wraps it in a
+        <literal>ReplicaMessageReply</literal> encrypted for Bob's
+        <literal>ReplicaMessage.EPubKey</literal> and puts it in its
+        outgoing queue for the Courier.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The Courier receives two <literal>ReplicaMessageReply</literal>
+        wire commands from the two intermediate replicas.
+      </para>
+      <para>
+        9.1. It matches
+        <literal>ReplicaMessageReply.EnvelopeHash</literal> to its
+        recorded bookkeeping state (step 2.1).
+      </para>
+      <para>
+        9.2. It wraps the replica's <literal>EnvelopeReply</literal>
+        blob (the MKEM-encrypted
+        <literal>ReplicaMessageReplyInnerMessage</literal>) into a
+        <literal>CourierEnvelopeReply</literal> with
+        <literal>reply_type = PAYLOAD</literal>, and — if Bob's latest
+        retransmission arrived with a fresh Sphinx SURB — forwards the
+        resulting <literal>CourierQueryReply</literal> back through the
+        mixnet to Bob.
+      </para>
+      <para>
+        9.3. Either way the courier retains the
+        <literal>ReplicaMessageReply</literal> in its dedup cache for
+        the cache TTL (5 minutes), so that a subsequently-arriving
+        retransmission of the same envelope can be served from cache
+        without re-dispatching to replicas.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Bob keeps resending his <literal>CourierEnvelope</literal> from
+        step 5 until he receives a
+        <literal>CourierEnvelopeReply</literal> with
+        <literal>reply_type = PAYLOAD</literal>.
+      </para>
+      <para>
+        10.1. Bob decapsulates the MKEM <literal>EnvelopeReply</literal>
+        with the private key corresponding to the
+        <literal>sender_pubkey</literal> he put in his
+        <literal>CourierEnvelope</literal>, obtaining the padded
+        <literal>ReplicaMessageReplyInnerMessage</literal>.
+      </para>
+      <para>
+        10.2. Once unpadded, the inner message is either a
+        <literal>ReplicaReadReply</literal> carrying the BACAP tuple
+        (box ID, signature, ciphertext) or a non-success
+        <literal>error_code</literal>. If the code is
+        <literal>ReplicaErrorBoxIDNotFound</literal>, Bob waits and
+        polls again (i.e. returns to step 5). If it is
+        <literal>ReplicaErrorTombstone</literal>, Alice has deleted the
+        message. Otherwise Bob BACAP-decrypts and verifies the payload.
+      </para>
+      <para>
+        10.3. Bob can now read Alice's message.
+      </para>
+    </listitem>
+  </orderedlist>
+</section>

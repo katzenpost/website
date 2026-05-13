@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title "Group chat" ?>
+<!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
+<?linkTitle "Group chat" ?>
+<!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
+<?description "" ?>
+<!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
+<?author "Threebit Hacker, David Stainton" ?>
+<!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
+<?url "" ?>
+<!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
+<?draft "false" ?>
+<!-- Optional [https://gohugo.io/content-management/front-matter/#draft] -->
+<?slug "group_chat" ?>
+<!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
+<?layout "" ?>
+<!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
+<?type "" ?>
+<!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
+<?weight "" ?>
+<!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
+<?version "0" ?>
+<!-- Optional [?] -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
+        %shared-content;
+    <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
+        %references;
+    <!ENTITY % terms SYSTEM "/home/dwrob/git/website/source/docbook/terms.ent">
+        %terms;    
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+  version="5.1" xml:id="group_chat">
+  <info>
+    <title xml:id="group_chat.title">Katzenpost Group Chat Design</title>
+    <authorgroup>
+      <author>
+        <personname>
+          <firstname>Threebit</firstname>
+          <surname>Hacker</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>David</firstname>
+          <surname>Stainton</surname>
+        </personname>
+      </author>
+    </authorgroup>
+    <!-- Match to title PI above. -->
+  </info>
+  <!--<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>title: linkTitle: &quot;Group Chat&quot; url:
+  &quot;docs/specs/group_chat.html&quot; description: &quot;&quot;
+  categories: [&quot;&quot;] tags: [&quot;&quot;] author:
+  [&quot;Threebit Hacker&quot;, &quot;David Stainton&quot;] version: 0
+  draft: false</title>
+  <para>
+  </para>
+</section>-->
+  <!--<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Katzenpost Group Chat Design</title>
+  <para>
+  </para>
+</section>-->
+  <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Prerequisites</title>
+    <para>This design specification is dependent on the BACAP and Pigeonhole protocol designs from
+      our paper <link xlink:href="https://arxiv.org/abs/2501.02933">Echomix: A Strong Anonymity
+        System with Messaging</link>, which describes</para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para> the BACAP (blinded and capability) in section 4 and</para>
+      </listitem>
+      <listitem>
+        <para> the Pigeonhole protocol in section 5. </para>
+      </listitem>
+    </itemizedlist>
+    <para>The <link xlink:href="https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go">source
+        code</link> and <link
+        xlink:href="https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go">API docs</link> for
+      BACAP are available on pkg.go.dev.</para>
+  </section>
+  <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Introduction</title>
+    <para>The Pigeonhole protocol establishes anonymous cryptographic communication channels which
+      have a <emphasis>readcap</emphasis> (read capability) and a <emphasis>writecap</emphasis>
+      (write capability). For example, if Alice and Bob want to communicate, they can each create
+      their own Pigeonhole/BACAP channels and exchange readcaps on those channels. Now when Bob
+      writes to his channel, Alice can read those messages because she has Bob's readcap. Likewise,
+      when Alice writes to her channel, Bob can read those messages because he has Alice's readcap.
+      This is the most basic construction using BACAP and Pigeonhole.</para>
+    <para>Here we extend this basic design to work as a minimal  group-chat protocol, without key
+      rotation. </para>
+    <para>BACAP primitives give us two message types:</para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para><code>SingleMessage</code>
+        </para>
+      </listitem>
+      <listitem>
+        <para><code>AllOrNothingMessage</code> (used for big messages: upload <emphasis>n</emphasis>
+          chunks to a temporary stream and then put a pointer to that in your own stream as a single
+          message.) </para>
+      </listitem>
+    </itemizedlist>
+    <para>The group state consists of:</para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>a <code>MembershipCap</code> for each member, containing:</para>
+        <itemizedlist spacing="compact">
+          <listitem>
+            <para> a BACAP readcap</para>
+          </listitem>
+          <listitem>
+            <para> a nickname </para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+      <listitem>
+        <para>a <code>MembershipHash</code> (a hash over all of the MembershipCaps)</para>
+      </listitem>
+    </itemizedlist>
+    <para>The group chat is completely decentralized. Each member must keep track of every other
+      member.</para>
+  </section>
+  <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group Chat Message Types</title>
+    <para>All messages are <code>SingleMessage</code> if they fit in one BACAP slot, or an
+        <code>AllOrNothingMessage</code> if they are too big. </para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para><code>Text</code> type payloads are normal chat text messages. </para>
+      </listitem>
+    </itemizedlist>
+    <programlisting language="go">// TextPayload encapsulates a normal text message.
+type TextPayload struct {
+    // Payload contains a normal UTF-8 text message to be displayed inline.
+    Payload []byte
+}</programlisting>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para><code>Introduction</code> type messages introduce new group members.</para>
+      </listitem>
+    </itemizedlist>
+    <programlisting language="go">// Introduction introduces a new member to the group.
+type Introduction struct {
+    // DisplayName is the party's name to be displayed in chat clients.
+    DisplayName string
+    
+    // UniversalReadCap is the BACAP UniversalReadCap
+    // which lets you read all messages posted by this user.
+    UniversalReadCap *bacap.UniversalReadCap
+}</programlisting>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para><code>FileUpload</code> type</para>
+      </listitem>
+    </itemizedlist>
+    <para>A <code>FileUpload</code> can be used for various purposes such as uploading an image to
+      be displayed inline by the chat client. Likewise, a sound bite could be made visible in the
+      chat along with a play-button. Beyond that, we can support arbitrary file attachments. </para>
+    <programlisting language="go">// FileUpload encapsulates several file types
+// which result in different client behaviors.
+type FileUpload struct {
+    // Payload contains the file payload.
+    Payload []byte
+    
+    // FileType is the identifier for each file type.
+    // Valid file types are:
+    // &quot;image&quot;
+    // &quot;sound&quot;
+    // &quot;arbitrary&quot;
+    FileType string
+}</programlisting>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para><code>Who</code> type</para>
+      </listitem>
+    </itemizedlist>
+    <para>The <code>Who</code> message type is used to query who is currently in the group. </para>
+    <programlisting language="go">// Who is used to query the group chat to find out the member read capabilities.
+type Who struct {}</programlisting>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para><code>ReplyWho</code> type</para>
+      </listitem>
+    </itemizedlist>
+    <para>The <code>ReplyWho</code> message answers the Who query with an
+        <code>AllOrNothingMessage</code> BACAP stream containing readcaps for all group chat
+      members. </para>
+    <programlisting language="go">type ReplyWho struct {
+    Payload *bacap.BacapStream
+}</programlisting>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para><code>GroupChatMessage</code> type </para>
+      </listitem>
+    </itemizedlist>
+    <para>The <code>GroupChatMessage</code> message encapsulates all of the above-mentioned message
+      types and is serialized with CBOR.</para>
+    <programlisting language="go">// GroupChatMessage encapsulates all chat message types.
+type GroupChatMessage struct {
+    // Version is used to ensure we can change this message type in the future.
+    Version int
+
+    // MembershipHash is the hash of the user's PleaseAdd message.
+    MembershipHash *[32]byte
+    
+    TextPayload *TextPayload
+    Introduction *Introduction
+    FileUpload *FileUpload
+    Who *Who
+    ReplyWho *ReplyWho
+}</programlisting>
+  </section>
+  <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Protocol Flow</title>
+    <para>The protocol flow for making a new group from scratch (using whatever authentication
+      protocol) is essentially for everybody to exchange <code>PleaseAdd</code> messages.</para>
+    <programlisting language="go">// PleaseAdd is a message used by a client to try and gain access to a chat group.
+type PleaseAdd struct {
+    // DisplayName is the party's name to be displayed in chat clients.
+    DisplayName string
+    
+    // UniversalReadCap is the BACAP UniversalReadCap
+    // which lets you read all messages posted by this user.
+    UniversalReadCap *bacap.UniversalReadCap
+}
+
+type SignedPleaseAdd struct {
+    // PleaseAdd contains the CBOR serialized PleaseAdd struct.
+    PleaseAdd []byte
+    
+    // Signature contains the cryptographic signature over the PleaseAdd field.
+    Signature []byte
+}</programlisting>
+    <para>For introduction to an existing group over an existing channel between an introducer
+      member and new member, an <code>Invitation</code> message is used.</para>
+    <programlisting language="go">type Invitation struct {
+    GroupName string
+}</programlisting>
+    <para>The <code>Invitation</code> protocol flow works as follows.</para>
+    <orderedlist numeration="arabic">
+      <listitem>
+        <para>There exists a group called YoloGroup. A member of the group invites a potential new
+          member with an <code>Invitation</code> message. </para>
+      </listitem>
+      <listitem>
+        <para>If the invited party wants to join, then they reply with a
+            <code>SignedPleaseAdd</code> message meaning "I want to join your group.&quot; This
+          provides the invited party's BACAP universal readcap, their display name, and a
+          cryptographic signature produced by their BACAP writecap. </para>
+      </listitem>
+      <listitem>
+        <para>The introducer receives the <literal>SignedPleaseAdd</literal> message. </para>
+        <orderedlist numeration="loweralpha">
+          <listitem>
+            <para>If the introducer does not like the DisplayName, they reply to the invited party
+              with a <literal>PleaseReviseDisplayName</literal> message that contains the original
+                <code>SignedPleaseAdd</code>. Then they wait for a new
+                <literal>SignedPleaseAdd</literal>.</para>
+          </listitem>
+          <listitem>
+            <para>If the introducer approves of the <code>DisplayName</code>, then:</para>
+            <itemizedlist>
+              <listitem>
+                <para>Because existing members need the new member's readcap, the introducer
+                  publishes the <literal>SignedPleaseAdd</literal> to their own BACAP stream for the
+                  rest of the group to read. </para>
+              </listitem>
+              <listitem>
+                <para>Because the new member needs existing members' readcaps, the introducer
+                  replies to the new member with <code>ReplyWho</code> message containing readcaps
+                  for all existing members. </para>
+                <para><emphasis role="bold">IMPORTANT:</emphasis> The content of both replies must
+                  be sent in the same <code>AllOrNothingMessage</code>, despite the
+                    <literal>SignedPleaseAdd</literal> being written to the introducer's own BACAP
+                  stream for the group and the <code>ReplyWho</code> being written  to the BACAP
+                  stream the introducer is using to communicate with the new member. </para>
+                <para><emphasis role="bold">NOTE:</emphasis> We could send all of this information
+                  as part of the initial <code>Invitation</code>, but that would allow silent
+                  members to read other members' streams without them knowing it, which is an
+                  anti-goal. </para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </orderedlist>
+      </listitem>
+    </orderedlist>
+  </section>
+  <section>
+    <title>Addenda</title>
+    <para>GOOD QUESTION: If we are adding a lot of people at once,do we really need to upload all of
+      the members <emphasis>n</emphasis> times? </para>    
+    <para>FUTURE WORK: Forward secrecy. We can add two extensions that allow transmitting public
+      keys + stuff encrypted under those public keys. We can also refer to the Reunion protocol
+      which is a <emphasis>n</emphasis>-way PAKE with strong anonymity properties. Reunion is
+      described in <link
+        xlink:href="https://research.tue.nl/en/publications/communication-in-a-world-of-pervasive-surveillance-sources-and-me"
+        >Communication in a world of pervasive surveillance: Sources and methods: Counter-strategies
+        against pervasive surveillance architecture</link>.  Currently, <link
+        xlink:href="https://codeberg.org/rendezvous/reunion/">Python</link> and <link
+        xlink:href="https://github.com/katzenpost/reunion/">Go</link> implementations of Reunion are
+      available.</para>
+  </section>
+ 
+
+    
+</article>
