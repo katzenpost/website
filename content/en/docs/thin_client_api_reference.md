@@ -27,6 +27,14 @@ There are three implementations: a Go reference (`katzenpost/client/thin`), a
 Rust binding (`thin_client/src`), and a Python binding
 (`thin_client/katzenpost_thinclient`).
 
+This reference describes the following pinned binding versions:
+
+| Binding | Repository | Tag |
+| --- | --- | --- |
+| Go reference | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/v0.0.75/client/thin) | [v0.0.75](https://github.com/katzenpost/katzenpost/releases/tag/v0.0.75) |
+| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/0.0.14/src) | [0.0.14](https://github.com/katzenpost/thin_client/releases/tag/0.0.14) |
+| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/0.0.14/katzenpost_thinclient) | [0.0.14](https://github.com/katzenpost/thin_client/releases/tag/0.0.14) |
+
 For pinned versions of the full stack (including `kpclientd`, `katzenqt`, and
 the server-side components), see [Build from source](/docs/build_from_source/).
 
