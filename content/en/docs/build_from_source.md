@@ -120,10 +120,6 @@ the Katzenpost mix network and the Pigeonhole storage services. No
 central server is involved. The underlying design is set out in the
 [Echomix paper](https://arxiv.org/abs/2501.02933).
 
-A tag has not yet been published; at present, `katzenqt` builds
-against a development branch of `katzenpost`. This section will be
-updated once a release is cut.
-
 ```shell
 sudo apt install libxcb-cursor0 libegl1
 git clone https://github.com/katzenpost/katzenqt
