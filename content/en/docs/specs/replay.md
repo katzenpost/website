@@ -439,7 +439,7 @@ Our bloomfilter with hashmap replay detection cache looks like this:
 
 <div class="mediaobject">
 
-![replay cache](../../diagrams/replay1.png)
+![replay cache](replay1.png)
 
 </div>
 

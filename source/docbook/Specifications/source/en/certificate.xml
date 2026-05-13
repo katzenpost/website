@@ -17,7 +17,7 @@
 <?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
-<!DOCTYPE article [
+<!DOCTYPE section [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -47,7 +47,7 @@
 ]>
 
 <?xml-stylesheet type="text/css" href="/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/docbook.css"?>
-<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="certificate">
 
     <info>
@@ -223,4 +223,4 @@ year = {2018}
         &ED25519;
         &SPHINCS256;
     </section>
-</article>
+</section>
