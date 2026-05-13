@@ -78,35 +78,23 @@
   </section>
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Introduction</title>
-    <para>
-      Pigeonhole scattered storage enables persistent anonymous
-      communication in which participants experience a coherent sequence
-      of messages or a continuous data stream, but where user
-      relationships and relations between data blocks remain unlinkable
-      not only from the perspective of third-party observers, but also
-      from that of the mixnet components. This latter attribute provides
-      resilience against deanonymization by compromised mixnet nodes.
-    </para>
-    <para>
-      The data blocks that Pigeonhole stores are supplied by the BACAP
-      (Blinding-and-Capability) scheme. The Pigeonhole protocol scatters
-      messages around the many storage servers and among a space of BACAP
-      Box IDs. From a passive network observer's perspective all of this
-      is seemingly random. All communication among users consists of
-      user-generated read or write queries to Pigeonhole storage, never
-      directly to other users.
-    </para>
-    <para>
-      Many protocols are possible to compose using Pigeonhole
-      communication channels, including group communications. This
-      specification describes the protocols that are also detailed in our
-      paper, in section entitled &quot;5.6. End-to-end reliable group
-      channels&quot;. For more information about BACAP, see &quot;Echomix:
-      a Strong Anonymity System with Messaging&quot;, chapter 4:
-      https://arxiv.org/abs/2501.02933. For an understanding of how the
-      core BACAP primitives are implemented,see
-      https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go.
-    </para>
+    <para> Pigeonhole scattered storage enables persistent anonymous communication in which
+      participants experience a coherent sequence of messages or a continuous data stream, but where
+      user relationships and relations between data blocks are unlinkable not only from the
+      perspective of third-party observers, but also from that of the mixnet components. This latter
+      attribute provides resilience against deanonymization by compromised mixnet nodes. </para>
+    <para> The data blocks that Pigeonhole stores are supplied by the BACAP
+      (Blinding-and-Capability) scheme. The Pigeonhole protocol scatters messages around many
+      storage servers and among a space of BACAP box IDs. From a passive network observer's
+      perspective, all of this is seemingly random. All communication among users consists of
+      user-generated read or write queries to Pigeonhole storage, never directly to other users. </para>
+    <para> Many derivative protocols can be composed using Pigeonhole communication channels,
+      including group communications. This specification describes the protocols that are also
+      detailed in our paper, in section entitled &quot;5.6. End-to-end reliable group
+      channels&quot;. For more information about BACAP, see &quot;Echomix: a Strong Anonymity System
+      with Messaging&quot;, chapter 4: https://arxiv.org/abs/2501.02933. For an understanding of how
+      the core BACAP primitives are implemented,see
+      https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go. </para>
     <para>
       Message-layout snippets in this specification are given in the
       trunnel binary-format description language (matching
