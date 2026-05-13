@@ -25,6 +25,12 @@
     Connect to the kpclientd daemon. The Rust binding connects during
     construction (`ThinClient::new`), whereas Go and Python construct the
     client first and then connect via `Dial()` / `start()`.
+  notes: |
+    The Rust binding folds the connect step into its constructor:
+    `ThinClient::new` returns an already-connected handle. Go and
+    Python construct the client first and connect afterwards via
+    `Dial()` / `start()`, allowing the application to set up event
+    sinks (in Go) or callbacks (in Python) before any traffic flows.
   go:     "ThinClient.Dial"
   rust:   "ThinClient::new"
   python: "ThinClient.start"
@@ -69,6 +75,11 @@
     Returns a channel (Go) or receiver (Rust) that yields events from the
     daemon. Python uses async callbacks supplied via the `Config`
     constructor, so has no equivalent method.
+  notes: |
+    The Rust binding returns an `mpsc::Receiver` carrying the same
+    event stream. The Python binding has no equivalent method:
+    Python applications instead register async callbacks on the
+    `Config` constructor and receive events through those.
   go:     "ThinClient.EventSink"
   rust:   "ThinClient::event_sink"
 
@@ -79,6 +90,11 @@
     Stops delivering events on the given channel. Rust receivers are
     dropped via their own lifetime; Python's callback model requires no
     teardown.
+  notes: |
+    Rust subscribers are released by dropping the
+    `mpsc::Receiver`, so the binding exposes no explicit teardown
+    method. Python's callback model owns no per-subscriber
+    resources either, and so likewise needs no equivalent.
   go:     "ThinClient.StopEventSink"
 
 # ---------------------------------------------------------------------------
@@ -127,6 +143,10 @@
     Returns all instances of a service with the given capability name.
     The Rust binding exposes this as a standalone helper in `helpers.rs`,
     not a method on `ThinClient`.
+  notes: |
+    The Rust binding exposes the same lookup as the free function
+    `find_services` in `helpers.rs`, rather than as a method on
+    `ThinClient`.
   go:     "ThinClient.GetServices"
   python: "ThinClient.get_services"
 
@@ -350,6 +370,11 @@
     optional courier-identity parameters to pin the command to a
     specific courier; the Go binding exposes this as a separate
     method (see below).
+  notes: |
+    The Rust and Python bindings accept optional `courier_identity_hash`
+    and `courier_queue_id` arguments to pin the command to a particular
+    courier; the Go binding exposes that same behaviour through a
+    distinct method, `StartResendingCopyCommandWithCourier`.
   go:     "ThinClient.StartResendingCopyCommand"
   rust:   "ThinClient::start_resending_copy_command"
   python: "ThinClient.start_resending_copy_command"
@@ -361,6 +386,11 @@
     Like `StartResendingCopyCommand` but sends to a specific courier
     instead of a random one. Used for nested copy commands. In Rust
     and Python this is achieved by supplying the optional
+    `courier_identity_hash` and `courier_queue_id` arguments to
+    `start_resending_copy_command`.
+  notes: |
+    In Rust and Python the same behaviour is reached not through a
+    separate method but by supplying the optional
     `courier_identity_hash` and `courier_queue_id` arguments to
     `start_resending_copy_command`.
   go:     "ThinClient.StartResendingCopyCommandWithCourier"
@@ -406,6 +436,10 @@
     handling a list. Go and Python callers achieve the same by
     calling `GetDistinctCouriers(1)` / `get_distinct_couriers(1)`
     and taking the first element.
+  notes: |
+    Go and Python callers reach the same result by calling
+    `GetDistinctCouriers(1)` / `get_distinct_couriers(1)` and taking
+    the first element of the returned slice.
   rust: "ThinClient::get_courier_destination"
 
 - group: pigeonhole_geometry
@@ -417,6 +451,11 @@
     Go callers obtain this via `GetConfig().PigeonholeGeometry`; the
     Python binding stores it internally but does not currently expose
     an accessor.
+  notes: |
+    Go callers retrieve the same value through
+    `GetConfig().PigeonholeGeometry`. The Python binding stores the
+    geometry internally but does not at present expose a public
+    accessor.
   rust: "ThinClient::pigeonhole_geometry"
 
 # ---------------------------------------------------------------------------

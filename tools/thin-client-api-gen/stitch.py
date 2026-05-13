@@ -110,17 +110,54 @@ def resolve_symbol(
     return symbols.get(normalised)
 
 
-def resolve_fallback_doc(
+DOCSTRING_SECTION_HEADERS = (
+    "Parameters:",
+    "Returns:",
+    "Arguments:",
+    "Args:",
+    "Errors:",
+    "Raises:",
+    "Throws:",
+    "Example:",
+    "Examples:",
+    "Panics:",
+    "Requirements:",
+)
+
+
+def strip_structured_sections(doc: str) -> str:
+    """Truncate a docstring at the first structured trailing section.
+
+    Looks for any of the conventional Go / Rust / Python doc section
+    headers (case-sensitive, optionally preceded by whitespace) and
+    drops everything from that line onwards. The narrative paragraphs
+    that precede the first header are preserved verbatim. Type and
+    error information conveyed by those sections is already shown in
+    the signature pane immediately below the prose, so removing it
+    here avoids restating it.
+    """
+    lines = doc.splitlines()
+    for i, line in enumerate(lines):
+        stripped = line.lstrip()
+        for header in DOCSTRING_SECTION_HEADERS:
+            if stripped.startswith(header):
+                return "\n".join(lines[:i]).rstrip()
+    return doc.rstrip()
+
+
+def resolve_prose(
     group: dict,
     go_syms: dict[str, dict],
     rust_syms: dict[str, dict],
     py_syms: dict[str, dict],
 ) -> str:
-    """Pick a docstring to use as prose when the group has no explicit summary.
+    """Choose the prose paragraph that introduces a group's method.
 
-    Preference order: Go (richest by survey), then Rust, then Python. Empty
-    docstrings are skipped. The returned text is lightly cleaned of stray
-    leading/trailing whitespace but is otherwise the extractor's `doc` field.
+    Preference order: the Go docstring, then Rust, then Python; trailing
+    structured sections (Parameters:, Returns:, Example:, etc.) are
+    stripped before returning. If no binding has a non-empty docstring,
+    the curated `summary:` field of the group entry is used as a last
+    resort.
     """
     for syms, key_field in (
         (go_syms, "go"),
@@ -135,8 +172,8 @@ def resolve_fallback_doc(
             continue
         doc = (sym.get("doc") or "").strip()
         if doc:
-            return doc
-    return ""
+            return strip_structured_sections(doc)
+    return (group.get("summary") or "").strip()
 
 
 def render_group(
@@ -150,11 +187,9 @@ def render_group(
     title = group.get("title") or group.get("group")
     lines.append(f"### {title}\n")
 
-    summary = group.get("summary")
-    if not summary:
-        summary = resolve_fallback_doc(group, go_syms, rust_syms, py_syms)
-    if summary:
-        lines.append(summary.rstrip() + "\n")
+    prose = resolve_prose(group, go_syms, rust_syms, py_syms)
+    if prose:
+        lines.append(prose.rstrip() + "\n")
 
     notes = group.get("notes")
     if notes:
