@@ -8,6 +8,7 @@ author: ["David Stainton"]
 version: 0
 draft: false
 slug: "/thin_client_howto/"
+url: "docs/thin_client_howto/"
 ---
 
 # Thin Client How-to Guide

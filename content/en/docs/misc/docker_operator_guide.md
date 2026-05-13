@@ -7,7 +7,8 @@ tags: [""]
 author: []
 version: 0
 draft: false
-slug: "/run_katzenpost_mixnode_docker/"
+slug: ""
+url: "docs/run_katzenpost_mixnode_docker"
 ---
 
 # Run a Katzenpost Mix server in a Docker container

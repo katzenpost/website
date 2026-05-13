@@ -7,7 +7,8 @@ tags: [""]
 author: ["David Stainton"]
 version: 0
 draft: false
-slug: "/pigeonhole_explained/"
+slug: ""
+url: "docs/pigeonhole_explained"
 ---
 
 # Understanding Pigeonhole
