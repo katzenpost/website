@@ -35,12 +35,22 @@ randomly scattered queries across storage servers.
                                                                     hashing)
 ```
 
-For protocol details, see the
+This is the document to read first. Having understood the concepts
+here, proceed to the [how-to guide](/docs/thin_client_howto/) for
+task-oriented recipes, and consult the
+[API reference](/docs/thin_client_api_reference/) for the precise
+signatures.
+
+For the privacy properties and the adversary they are designed to
+withstand, see the [threat model](/docs/threat_model/) and the
+[Echomix paper](https://arxiv.org/abs/2501.02933); a passive network
+observer learns only that scattered, unlinkable queries traverse the
+storage servers, never which messages belong to one stream nor who
+reads them. For protocol details, see the
 [Pigeonhole specification](/docs/specs/pigeonhole/) and sections
-4-5 of the [Echomix paper](https://arxiv.org/abs/2501.02933).
-For code, see the
-[API reference](/docs/thin_client_api_reference/) and
-[how-to guide](/docs/thin_client_howto/).
+4-5 of the paper. Note that the published threat model is an evolving
+work in progress and does not yet incorporate the newer designs the
+paper introduces.
 
 
 ## Terminology
@@ -52,7 +62,9 @@ elaborated in its own section below.
   ciphertext addressed by a pseudorandom identifier. Once written, a
   box's contents are immutable except by tombstoning.
 - **Stream.** An ordered, append-only sequence of boxes addressed by a
-  pair of capabilities; the analogue of a single-writer log.
+  pair of capabilities; the analogue of a single-writer log. The terms
+  **stream** and **channel** are used interchangeably throughout these
+  documents and the API: they denote one and the same thing.
 - **Write cap.** The capability that grants the right to sign and write
   messages to a stream and to derive the read cap from itself.
 - **Read cap.** The capability that grants the right to read and verify
@@ -91,17 +103,19 @@ elaborated in its own section below.
 
 ## Pigeonhole Streams
 
-All communication happens through Pigeonhole streams. A stream is an ordered,
-append-only sequence of encrypted messages, known as Boxes. These Boxes are
-stored in the storage servers using a hash based sharding scheme. Boxes have
-a fixed size maximum payload and are padded.
+All communication happens through Pigeonhole streams (also called
+channels). A stream is an ordered, append-only sequence of encrypted
+messages, known as boxes. These boxes are stored in the storage servers
+using a hash based sharding scheme. Boxes have a fixed-size maximum
+payload and are padded; the exact size is governed by the configurable
+pigeonhole geometry, described below.
 
 - **Append-only and immutable.** Once a message is written to a
-  Box, it cannot be overwritten by another write -- the replica
+  box, it cannot be overwritten by another write -- the replica
   rejects the second write with `BoxAlreadyExists`. New messages
   are appended at the next index. The only exception is tombstones:
-  a tombstone unconditionally replaces the Box contents with an
-  empty signed payload, regardless of whether the Box previously
+  a tombstone unconditionally replaces the box contents with an
+  empty signed payload, regardless of whether the box previously
   held data.
 - **Single-writer, multi-reader.** One writer, any number of readers.
   Nothing in the protocol inherently forbids multiple writers; the
@@ -133,6 +147,28 @@ a fixed size maximum payload and are padded.
   to the same stream.
 
 
+## Box size and the pigeonhole geometry
+
+Every box carries a fixed-size payload, and a message is padded up to
+that size before storage so that all boxes on the wire are
+indistinguishable by length. A message larger than one box's payload
+must be split across several boxes; one smaller is padded.
+
+The exact size is not a hard-coded constant but a field of the
+**pigeonhole geometry**, a configuration object the network operator
+chooses and the daemon reads from `thinclient.toml`. The pigeonhole
+geometry is derived from, and must be consistent with, the Sphinx
+geometry: a Pigeonhole request travels inside a Sphinx packet, so the
+usable box payload is sized to fit whatever the deployed Sphinx
+geometry allows once the envelope and protocol overheads are
+subtracted. An operator who enlarges the Sphinx packet may enlarge the
+box payload to match; one who runs a smaller Sphinx geometry will have
+a correspondingly smaller box payload. An application should therefore
+treat the box payload size as a deployment parameter to be read from
+configuration, not a fixed number to hard-code. The fields are
+enumerated in the [API reference](/docs/thin_client_api_reference/).
+
+
 ## Cryptographic Capabilities
 
 Pigeonhole is a cryptographic capability system. Access to a stream
@@ -150,6 +186,14 @@ share the read cap and index with them out-of-band. That is the
 fundamental operation: **create a stream, share the read cap.**
 
 Multiple readers can hold the same read cap independently.
+
+A capability, once shared, cannot be revoked. There is no mechanism to
+withdraw a read cap from someone who holds it: anyone in possession of
+it can read every box the stream has produced and will produce, for as
+long as that data survives. If a reader must lose access, the only
+remedy is to abandon the stream entirely, create a fresh one, and
+redistribute the new read cap to the readers who remain. Plan key
+distribution with this permanence in mind.
 
 
 ## A first interaction: Alice writes, Bob reads
@@ -201,10 +245,46 @@ Only `StartResendingEncryptedMessage` and `StartResendingCopyCommand`
 touch the network.
 
 
+## Consistency and timing
+
+Pigeonhole offers no read-after-write ordering guarantee across
+participants, and an application that assumes one will misbehave.
+
+- **Reading ahead of the writer.** A reader who reads an index the
+  writer has not yet written to receives `BoxIDNotFound`. This is not
+  an error but the expected answer to "has anything been written here
+  yet?": it simply means "not yet." The reader should wait and ask
+  again rather than abandon the stream. The thin client exposes
+  `IsExpectedOutcome` precisely so that an application can tell this
+  benign outcome apart from a genuine failure; the
+  [how-to guide](/docs/thin_client_howto/) gives the polling pattern.
+
+- **Replication lag.** Each box is written to both of its K=2
+  replicas, but the two are not updated in the same instant. A read
+  dispatched in the brief interval after a write reaches one replica
+  but before its peer has caught up may transiently return
+  `BoxIDNotFound` even though the write has in fact succeeded. The
+  remedy is the same: retry. A handful of retries spaced over a few
+  seconds is normally ample.
+
+- **Read-delay randomisation.** The courier maintains a
+  fixed-throughput connection to the replicas, decoupled from the
+  rate at which clients submit requests. A read therefore returns
+  after a delay that bears no exploitable relation to when the data
+  was written or requested. This randomised latency is a deliberate
+  privacy property, not a defect: do not design protocols that depend
+  on a read completing within a tight deadline.
+
+The practical consequence is that every read should be written as a
+poll with bounded retry, treating `BoxIDNotFound` as "try again
+shortly" until either the data appears or an application-level timeout
+elapses.
+
+
 ## Copy commands
 
 Copy commands exist for when you need to atomically write more than
-one Box to one or more streams that already exist and are already
+one box to one or more streams that already exist and are already
 known to other entities. The writer creates a temporary stream,
 packs all the destination writes into it, then sends a single copy
 command to a courier. The courier reads the temporary stream,
@@ -218,9 +298,9 @@ reader, atomically tombstoning old messages while writing new ones.
 
 ## Tombstones
 
-A tombstone is a Pigeonhole Box which is signed with an empty
-ciphertext.  Unlike normal writes, which are rejected if the Box
-already exists, a tombstone unconditionally replaces the Box
+A tombstone is a Pigeonhole box which is signed with an empty
+ciphertext. Unlike normal writes, which are rejected if the box
+already exists, a tombstone unconditionally replaces the box
 contents. Only the write cap holder can create tombstones. Tombstones
 can be sent directly or bundled into a copy command for atomic
 deletion.
