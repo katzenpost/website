@@ -198,7 +198,8 @@ size can be computed deterministically from the Sphinx geometry.
 
 Carriage of these messages differs by hop:
 
-* **Client → Courier:** a `CourierQuery` (see below) is carried inside
+* **Client → Courier:** a `CourierQuery` (its layout is given in the
+  "CourierQuery" section) is carried inside
   a Sphinx packet payload. The reverse direction uses a SURB supplied
   by the client.
 * **Courier → Replica and Replica → Replica:** the courier and
@@ -281,8 +282,8 @@ Notable points:
   addressed to the *pair* of intermediate replicas; either replica can
   decapsulate using its own DEK (`dek1` or `dek2` respectively).
 * The `epoch` field names the *replica-epoch* whose envelope keys were
-  used to produce the MKEM ciphertext. See "Epochs" below for the
-  tolerance window.
+  used to produce the MKEM ciphertext. See the "Epochs" section above
+  for the tolerance window.
 * Prior to encryption, the inner `ReplicaInnerMessage` is zero-padded
   to `ReplicaInnerMessageWriteSize()` so that reads, writes and
   tombstones produce MKEM ciphertexts of identical length.
@@ -520,10 +521,8 @@ struct replica_write {
 }
 ```
 
-A `ReplicaWrite` with `payload_len == 0` is a **tombstone**. Replicas
-treat tombstone writes as overwrites: an existing `Box` at the same
-`box_id` is replaced by the tombstone, and subsequent reads return
-`ReplicaErrorTombstone`.
+A `ReplicaWrite` with `payload_len == 0` is a **tombstone**; see the
+"Tombstones" section below.
 
 ## ReplicaWriteReply
 
@@ -536,6 +535,30 @@ struct replica_write_reply {
     u8 error_code;
 }
 ```
+
+## Tombstones
+
+A `ReplicaWrite` whose `payload_len == 0` is a **tombstone**: it marks
+a Box as deleted without revealing that fact to the courier.
+
+* Replicas treat a tombstone write as an ordinary overwrite. An
+  existing `Box` at the same `box_id` is replaced by the tombstone,
+  and subsequent reads of that `box_id` return
+  `ReplicaErrorTombstone` (see "Replica error codes").
+* `ReplicaErrorTombstone` is an *expected* outcome rather than a
+  failure: it positively confirms that the Box was deleted, as
+  distinct from `ReplicaErrorBoxNotFound`.
+* Because the inner `ReplicaInnerMessage` is zero-padded to
+  `ReplicaInnerMessageWriteSize()` before MKEM encryption (see "The
+  CourierEnvelope as seen by the courier"), a tombstone write produces
+  an MKEM ciphertext of exactly the same length as a non-empty write
+  or a read. A passive observer therefore cannot distinguish deletion
+  from any other operation.
+
+Tombstones are also used by the AllOrNothing copy protocol: after
+processing a `CopyCommand`, the courier overwrites every Box of the
+temporary stream with tombstones (see "Pigeonhole AllOrNothing
+protocol").
 
 # EnvelopeHash
 
@@ -599,7 +622,8 @@ Returned by the courier in `CourierEnvelopeReply.error_code`.
 
 ## Copy command status codes
 
-Returned by the courier in `CopyCommandReply.status` (see below).
+Returned by the courier in the `status` field of a `CopyCommandReply`
+(its layout is given in the "CopyCommandReply" section).
 
 | Code | Name | Meaning |
 |---|---|---|
@@ -784,9 +808,19 @@ The protocol works as follows.
 
 The client uploads a "temporary Pigeonhole stream".
 
-The stream payloads consist of four byte length prefixed ```CourierEnvelope``` blobs concatenated
-back-to-back. Because a ```CourierEnvelope``` is strictly larger than a BACAP
-payload, which itself contains BACAP payloads, multiple boxes must be used.
+The stream conveys a sequence of `CourierEnvelope`s. Each
+`CourierEnvelope` is serialised and prefixed with a single 4-byte
+(`u32`) length field giving the size of that one envelope; the
+resulting length-prefixed blobs are concatenated back-to-back into one
+continuous byte stream.
+
+That byte stream is then split across the BACAP Boxes of the temporary
+stream. A serialised `CourierEnvelope` is strictly larger than the
+maximum BACAP Box payload (it wraps a full Box payload plus its own
+metadata), so a single envelope does not fit in one Box and the
+concatenated stream necessarily spans several Boxes. Envelope
+boundaries therefore do not align with Box boundaries; the precise
+framing is given in the "Temporary Stream data format" section below.
 
 ## Step 2
 
