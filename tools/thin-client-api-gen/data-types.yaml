@@ -1,0 +1,38 @@
+# Curated Go return/parameter structs rendered as a field reference at
+# the <!-- DATA_TYPES_TABLE --> placeholder (see overlay/82-data-types.md).
+#
+# The Go reference structs in katzenpost/client/thin are authoritative.
+# The Rust and Python bindings return the same data under their own
+# result types with snake_case field names (e.g. WriteCap -> write_cap).
+#
+# Each entry is a struct name, optionally with a friendlier title and a
+# clarifying note. Only structs that live in client/thin can be resolved
+# (that is the only tree the Go extractor walks).
+
+- struct: NewKeypairReply
+  title: "NewKeypair result (Rust/Python: KeypairResult)"
+- struct: EncryptWriteReply
+  title: "EncryptWrite result (Rust/Python: EncryptWriteResult)"
+- struct: EncryptReadReply
+  title: "EncryptRead result (Rust/Python: EncryptReadResult)"
+- struct: StartResendingEncryptedMessageReply
+  title: "StartResendingEncryptedMessage result (Rust/Python: StartResendingResult)"
+- struct: StartResendingCopyCommandReply
+  title: "StartResendingCopyCommand result"
+- struct: NextMessageBoxIndexReply
+  title: "NextMessageBoxIndex result"
+- struct: GetMessageBoxIndexCounterReply
+  title: "GetMessageBoxIndexCounter result"
+- struct: GetPKIDocumentReply
+  title: "GetPKIDocumentRaw result"
+- struct: CreateCourierEnvelopesFromPayloadReply
+  title: "CreateCourierEnvelopesFromPayload result"
+- struct: CreateCourierEnvelopesFromPayloadsReply
+  title: "CreateCourierEnvelopesFromMultiPayload result"
+- struct: CreateCourierEnvelopesFromTombstoneRangeReply
+  title: "CreateCourierEnvelopesFromTombstoneRange result"
+- struct: DestinationPayload
+  title: "DestinationPayload (parameter)"
+  note: >
+    Passed *into* CreateCourierEnvelopesFromMultiPayload, one per
+    destination channel.
