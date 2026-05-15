@@ -8,7 +8,6 @@ author: ["David Stainton"]
 version: 0
 draft: false
 slug: "/thin_client_api_reference/"
-url: "docs/thin_client_api_reference/"
 ---
 
 # Thin Client API Reference
@@ -69,6 +68,102 @@ config = Config("thinclient.toml")
 client = ThinClient(config)
 {{< /tab >}}
 {{< /tabpane >}}
+
+### The `thinclient.toml` file
+
+The file has three tables. `[SphinxGeometry]` and
+`[PigeonholeGeometry]` describe the network the daemon is part of and
+**must match the values the operator's network was configured with**;
+they are not free parameters a client invents. `[Dial]` tells the thin
+client where the local daemon socket is and is the only table most
+applications set by hand. The geometry values are normally obtained
+from the operator (or copied from the daemon's own configuration).
+
+A representative file:
+
+```toml
+[SphinxGeometry]
+  PacketLength = 3082
+  NrHops = 5
+  HeaderLength = 476
+  RoutingInfoLength = 410
+  PerHopRoutingInfoLength = 82
+  SURBLength = 572
+  SphinxPlaintextHeaderLength = 2
+  PayloadTagLength = 32
+  ForwardPayloadLength = 2574
+  UserForwardPayloadLength = 2000
+  NextNodeHopLength = 65
+  SPRPKeyMaterialLength = 64
+  NIKEName = "x25519"
+  KEMName = ""
+
+[PigeonholeGeometry]
+  MaxPlaintextPayloadLength = 1553
+  CourierQueryReadLength = 359
+  CourierQueryWriteLength = 2000
+  CourierQueryReplyReadLength = 1698
+  CourierQueryReplyWriteLength = 50
+  NIKEName = "CTIDH1024-X25519"
+  SignatureSchemeName = "Ed25519"
+
+[Dial]
+  [Dial.Tcp]
+    Address = "localhost:64331"
+    Network = "tcp"
+```
+
+**`[SphinxGeometry]`** describes the Sphinx packet format:
+
+| Key | Type | Meaning |
+|---|---|---|
+| `PacketLength` | int | Total Sphinx packet size in bytes. |
+| `NrHops` | int | Number of mix hops a packet traverses. |
+| `HeaderLength` | int | Sphinx header size. |
+| `RoutingInfoLength` | int | Total routing-information size. |
+| `PerHopRoutingInfoLength` | int | Routing information per hop. |
+| `SURBLength` | int | Single-Use Reply Block size. |
+| `SphinxPlaintextHeaderLength` | int | Plaintext header size. |
+| `PayloadTagLength` | int | SPRP authentication tag size. |
+| `ForwardPayloadLength` | int | Total payload carrier size. |
+| `UserForwardPayloadLength` | int | Usable payload size before Pigeonhole overhead. |
+| `NextNodeHopLength` | int | Size of the largest routing block. |
+| `SPRPKeyMaterialLength` | int | SPRP key material size. |
+| `NIKEName` | string | NIKE scheme name (e.g. `"x25519"`); empty if a KEM is used. |
+| `KEMName` | string | KEM scheme name; empty if a NIKE is used. |
+
+**`[PigeonholeGeometry]`** sizes the Pigeonhole protocol, and is
+derived from, and consistent with, the Sphinx geometry above:
+
+| Key | Type | Meaning |
+|---|---|---|
+| `MaxPlaintextPayloadLength` | int | Largest application payload that fits in one box; larger messages must be split. |
+| `CourierQueryReadLength` | int | Size of a read query to the courier. |
+| `CourierQueryWriteLength` | int | Size of a write query to the courier. |
+| `CourierQueryReplyReadLength` | int | Size of a courier reply to a read. |
+| `CourierQueryReplyWriteLength` | int | Size of a courier reply to a write. |
+| `NIKEName` | string | NIKE scheme used for MKEM envelope encryption. |
+| `SignatureSchemeName` | string | Signature scheme used for box signing. |
+
+**`[Dial]`** selects the daemon transport. Set exactly one of the two
+sub-tables:
+
+| Key | Type | Meaning |
+|---|---|---|
+| `[Dial.Unix]` `Address` | string | Filesystem path of the daemon's Unix socket. |
+| `[Dial.Tcp]` `Address` | string | `host:port` of the daemon's TCP listener. |
+| `[Dial.Tcp]` `Network` | string | Optional: `"tcp"`, `"tcp4"`, or `"tcp6"` (default `"tcp"`). |
+
+### Concurrency
+
+The Go `ThinClient` is safe for concurrent use by multiple goroutines:
+its connection state, current PKI document, and in-flight request
+tracking are guarded internally, so the cancel-from-another-goroutine
+patterns shown in the [how-to guide](/docs/thin_client_howto/) are
+sound. The Rust and Python bindings are `async`: an instance is driven
+from its runtime (a Tokio task or an asyncio event loop) and follows
+that runtime's ordinary conventions rather than offering an
+independent thread-safety guarantee.
 
 ## Connection Management
 
@@ -249,10 +344,26 @@ client = ThinClient(config)
   call is received. Fields (Go):
   `MessageID *[MessageIDLength]byte`, `SURBID *[SURBIDLength]byte`,
   `Payload []byte`, `ReplyIndex *uint8`, `ErrorCode uint8`.
+  `ReplyIndex` identifies **which of the box's two replicas answered**:
+  each box is sharded across K=2 replicas, and the value (0 or 1) is
+  the position within that pair of the replica whose response was
+  used. It is chiefly of interest for Pigeonhole channel reads and may
+  be `nil` when not applicable. The same value is accepted as the
+  `reply_index` parameter of `StartResendingEncryptedMessage`, where
+  it likewise selects the replica of the pair to address.
+
+- **ShutdownEvent**: emitted when the daemon signals that it is
+  shutting down. It carries no fields. It precedes the loss of the
+  local socket and is what causes the following
+  **DaemonDisconnectedEvent** to report `IsGraceful = true`. Treat it
+  as advance notice of the disconnect; no action is required, since
+  the thin client reconnects and replays in-flight requests on its
+  own.
 
 - **DaemonDisconnectedEvent** — emitted by the thin client (not the
   daemon) when the local socket connection to the daemon is lost.
-  Fields (Go): `IsGraceful bool`, `Err error`.
+  Fields (Go): `IsGraceful bool`, `Err error`. `IsGraceful` is true
+  precisely when a `ShutdownEvent` preceded the disconnect.
 
 ### EventSink / event_sink
 
@@ -659,10 +770,23 @@ async def start_resending_encrypted_message(self, read_cap: 'bytes|None', write_
 
 ### StartResendingEncryptedMessageReturnBoxExists
 
-StartResendingEncryptedMessageReturnBoxExists is like StartResendingEncryptedMessage but returns
-BoxAlreadyExists errors instead of treating them as idempotent success. Use this when you want
-to detect whether a write was actually performed or if the box already existed.
-The CancelResendingEncryptedMessage method can cancel operations started with this method.
+StartResendingEncryptedMessageReturnBoxExists behaves exactly like
+StartResendingEncryptedMessage save that it returns
+ErrBoxAlreadyExists when the replica reports that the destination
+box has already been written, rather than swallowing the condition
+as idempotent success. Use it when one needs to distinguish a
+fresh write from a repeat: for instance, when implementing
+optimistic concurrency on top of the channel, or when establishing
+whether a particular call actually caused a state change at the
+replica.
+
+Note that this variant costs an additional mixnet round trip: the
+BoxAlreadyExists code is carried by the replica's reply rather than
+the courier's ACK, so the daemon must dispatch a second SURB before
+it can return the answer.
+
+As with StartResendingEncryptedMessage, an in-flight call may be
+cancelled from another goroutine via CancelResendingEncryptedMessage.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -687,10 +811,18 @@ async def start_resending_encrypted_message_return_box_exists(self, read_cap: 'b
 
 ### StartResendingEncryptedMessageNoRetry
 
-StartResendingEncryptedMessageNoRetry is like StartResendingEncryptedMessage but disables
-automatic retries on BoxIDNotFound errors. Use this when you want immediate error feedback
-rather than waiting for potential replication lag to resolve.
-The CancelResendingEncryptedMessage method can cancel operations started with either method.
+StartResendingEncryptedMessageNoRetry behaves exactly like
+StartResendingEncryptedMessage save that it disables the daemon's
+automatic retry of ErrBoxIDNotFound. The caller learns at once that
+the box is absent rather than waiting for replication to settle.
+
+Use it when polling a box that may not yet have been written, for
+instance when a reader peeks ahead at a peer's next message before
+that peer has produced it; the regular variant would block until
+the box appeared, which can be many round trips.
+
+As with StartResendingEncryptedMessage, an in-flight call may be
+cancelled from another goroutine via CancelResendingEncryptedMessage.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -742,12 +874,17 @@ async def cancel_resending_encrypted_message(self, envelope_hash: bytes) -> None
 
 ### TombstoneRange / tombstone_range
 
-TombstoneRange creates tombstones for a range of pigeonhole boxes.
-Tombstones are created by calling EncryptWrite with an empty plaintext.
-The daemon detects this and signs empty payloads instead of encrypting,
-which the replica recognizes as deletion requests.
+TombstoneRange prepares the encrypted envelopes needed to
+tombstone a consecutive range of pigeonhole boxes beginning at the
+supplied MessageBoxIndex. A tombstone is a signed empty payload
+that the replica recognises as a deletion marker; the daemon
+constructs one by signing rather than encrypting whenever
+EncryptWrite is invoked with an empty plaintext.
 
-To tombstone a single box, use maxCount=1.
+This method does not itself touch the network: it returns the
+envelopes for the caller to dispatch one by one, typically via
+StartResendingEncryptedMessage. To tombstone a single box, pass
+maxCount=1.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -774,18 +911,22 @@ async def tombstone_range(self, write_cap: bytes, start: bytes, max_count: int) 
 
 ### CreateCourierEnvelopesFromPayload
 
-CreateCourierEnvelopesFromPayload creates multiple CourierEnvelopes from a payload of any size.
+CreateCourierEnvelopesFromPayload packs a payload of arbitrary
+size (up to 10 MB) into properly sized CopyStreamElement chunks
+for one destination channel. Each chunk is a serialised
+CopyStreamElement, ready to be written to a box via EncryptWrite
+followed by StartResendingEncryptedMessage; the caller marks the
+boundaries of the stream with the isStart and isLast flags.
 
-This method is stateless — no daemon state is kept between calls. Each call creates
-a fresh encoder, encodes all envelopes, flushes, and returns. The payload is limited
-to 10MB to prevent accidental memory exhaustion.
+This method is stateless: no daemon state is kept between calls,
+each invocation runs a fresh encoder and flushes before returning.
+The 10 MB cap guards against accidental memory exhaustion.
 
-Each returned chunk is a serialized CopyStreamElement ready to be written to a box.
-The caller controls the copy stream boundaries via isStart and isLast flags.
-
-The returned chunks must be written to a temporary copy stream channel using
-EncryptWrite + StartResendingEncryptedMessage. After the stream is complete,
-send a Copy command to the courier with the write capability for the temp stream.
+Once the chunks have been written to a temporary copy stream, a
+copy command (StartResendingCopyCommand) is despatched to a
+courier with the WriteCap for that temporary stream; the courier
+reads the chunks back and dispatches each envelope to its
+destination box.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -808,15 +949,18 @@ async def create_courier_envelopes_from_payload(self, payload: bytes, dest_write
 
 ### CreateCourierEnvelopesFromMultiPayload
 
-CreateCourierEnvelopesFromMultiPayload creates CourierEnvelopes from multiple payloads
-going to different destination channels. This is more space-efficient than calling
-CreateCourierEnvelopesFromPayload multiple times because all envelopes from all
-destinations are packed together in the same encoder without wasting space.
+CreateCourierEnvelopesFromMultiPayload packs payloads bound for
+several destination channels into a single stream of
+CopyStreamElement chunks. This is more space-efficient than
+calling CreateCourierEnvelopesFromPayload once per destination,
+because the shared encoder runs all envelopes together rather than
+padding the final box of each destination independently.
 
-This method is stateless — the buffer parameter enables continuation across multiple
-calls without daemon-side state. Pass the Buffer from the previous call's result
-to avoid wasting space in the last box of each call. On the first call, buffer
-should be nil.
+This method is stateless: the buffer argument carries any residual
+encoder state across calls in place of daemon-side bookkeeping.
+Pass nil for buffer on the first call and the Buffer returned by
+the previous call thereafter; set isLast on the final call so that
+the encoder flushes its tail.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -918,11 +1062,19 @@ async def start_resending_copy_command(self, write_cap: bytes, courier_identity_
 
 ### StartResendingCopyCommandWithCourier (Go only)
 
-StartResendingCopyCommandWithCourier sends a copy command to a specific courier.
+StartResendingCopyCommandWithCourier behaves exactly like
+StartResendingCopyCommand save that it dispatches the copy command
+to a courier the caller has chosen, rather than to one selected at
+random from the current PKI document. The courier is identified by
+the (identity-hash, queue-id) pair returned by GetAllCouriers or
+GetDistinctCouriers.
 
-This method is like StartResendingCopyCommand but allows specifying which courier
-should process the copy command. This is useful for nested copy commands where
-different couriers should handle different layers for improved privacy.
+This is the building block for nested copy commands, in which the
+outer command is sent to one courier and the inner commands carried
+inside it reference a different courier. Staggering the two layers
+across distinct couriers reduces the chance that any single
+compromised courier observes both halves of the copy transaction
+and can therefore link them.
 
 In Rust and Python the same behaviour is reached not through a
 separate method but by supplying the optional
@@ -968,8 +1120,16 @@ async def cancel_resending_copy_command(self, write_cap_hash: bytes) -> None:
 
 ### GetAllCouriers / get_all_couriers
 
-GetAllCouriers returns all available courier services from the current PKI document.
-Use this to select specific couriers for nested copy commands.
+GetAllCouriers returns every courier service advertised in the
+current PKI document, each described by an (identity-hash,
+queue-id) pair. The list reflects only the couriers that the
+current consensus regards as serving.
+
+The principal caller is the nested-copy-command machinery, which
+needs to choose particular couriers rather than accept the random
+draw made on the caller's behalf by StartResendingCopyCommand; for
+simple cases where any courier will do, the default routing path
+is usually preferable.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -982,8 +1142,14 @@ def get_all_couriers(self) -> 'List[Tuple[bytes, bytes]]':
 
 ### GetDistinctCouriers / get_distinct_couriers
 
-GetDistinctCouriers returns N distinct random couriers.
-Returns an error if fewer than N couriers are available.
+GetDistinctCouriers draws n couriers uniformly at random from the
+list returned by GetAllCouriers, without replacement, so that no
+two entries in the returned slice refer to the same courier. This
+is the usual building block for a nested copy command, every layer
+of which must be carried by a different courier.
+
+Returns an error if the current PKI document advertises fewer than
+n couriers.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -1089,6 +1255,174 @@ pub fn new_query_id() -> Vec<u8>
 def new_query_id(self) -> bytes:
 {{< /tab >}}
 {{< /tabpane >}}
+
+## Data Types
+
+The Pigeonhole methods return structured results whose fields are
+enumerated below. These are the **Go reference structs** from
+`katzenpost/client/thin`; they are authoritative. The Rust and Python
+bindings return the equivalent data through their own result types,
+with the same fields rendered in `snake_case` (for example `WriteCap`
+becomes `write_cap`, `NextMessageBoxIndex` becomes
+`next_message_box_index`).
+
+Two fields recur throughout and are protocol plumbing rather than
+application data:
+
+- `QueryID` correlates a reply with the request that produced it; the
+  bindings manage it for you.
+- `ErrorCode` is zero on success and otherwise names the failure. The
+  bindings translate a non-zero code into the language-native error
+  documented under [Replica and Courier
+  Errors](#replica-and-courier-errors); application code inspects the
+  raised error or returned sentinel rather than this byte directly.
+
+### NewKeypair result (Rust/Python: KeypairResult)
+
+NewKeypairReply is the reply to a NewKeypair request.
+
+| Field | Type | Description |
+|---|---|---|
+| `QueryID` | `*[QueryIDLength]byte` | QueryID is used for correlating this reply with the NewKeypair request |
+| `WriteCap` | `*bacap.WriteCap` | WriteCap is the write capability that should be stored for channel |
+| `ReadCap` | `*bacap.ReadCap` | ReadCap is the read capability that can be shared with others to allow them to read messages from this channel. |
+| `FirstMessageIndex` | `*bacap.MessageBoxIndex` | FirstMessageIndex is the first message index that should be used when writing messages to the channel. |
+| `ErrorCode` | `uint8` | ErrorCode indicates the reason for a failure to create a new keypair if any. Otherwise it is set to zero for success. |
+
+### EncryptWrite result (Rust/Python: EncryptWriteResult)
+
+EncryptWriteReply is the reply to an EncryptWrite request.
+
+| Field | Type | Description |
+|---|---|---|
+| `QueryID` | `*[QueryIDLength]byte` | QueryID is used for correlating this reply with the EncryptWrite request |
+| `MessageCiphertext` | `[]byte` | MessageCiphertext is the encrypted message ciphertext that should be sent to the Courier service. |
+| `EnvelopeDescriptor` | `[]byte` | EnvelopeDescriptor contains the serialized EnvelopeDescriptor that contains the private key material needed to decrypt the envelope reply. |
+| `EnvelopeHash` | `*[32]byte` | EnvelopeHash is the hash of the CourierEnvelope that was sent to the mixnet and is used to resume the write operation. |
+| `NextMessageBoxIndex` | `*bacap.MessageBoxIndex` | NextMessageBoxIndex is the next message box index to use for subsequent write operations. This is computed by the daemon using BACAP's NextIndex. |
+| `ErrorCode` | `uint8` | ErrorCode indicates the reason for a failure to encrypt the write if any. Otherwise it is set to zero for success. |
+
+### EncryptRead result (Rust/Python: EncryptReadResult)
+
+EncryptReadReply is the reply to an EncryptRead request.
+
+| Field | Type | Description |
+|---|---|---|
+| `QueryID` | `*[QueryIDLength]byte` | QueryID is used for correlating this reply with the EncryptRead request |
+| `MessageCiphertext` | `[]byte` | MessageCiphertext is the encrypted message ciphertext that should be sent to the Courier service. |
+| `EnvelopeDescriptor` | `[]byte` | EnvelopeDescriptor contains the serialized EnvelopeDescriptor that contains the private key material needed to decrypt the envelope reply. |
+| `EnvelopeHash` | `*[32]byte` | EnvelopeHash is the hash of the CourierEnvelope that was sent to the mixnet and is used to resume the read operation. |
+| `NextMessageBoxIndex` | `*bacap.MessageBoxIndex` | NextMessageBoxIndex is the next message box index to use for subsequent read operations. This is computed by the daemon using BACAP's NextIndex. |
+| `ErrorCode` | `uint8` | ErrorCode indicates the reason for a failure to encrypt the read if any. Otherwise it is set to zero for success. |
+
+### StartResendingEncryptedMessage result (Rust/Python: StartResendingResult)
+
+StartResendingEncryptedMessageReply is the reply to a StartResendingEncryptedMessage request.
+
+| Field | Type | Description |
+|---|---|---|
+| `QueryID` | `*[QueryIDLength]byte` | QueryID is used for correlating this reply with the StartResendingEncryptedMessage request |
+| `Plaintext` | `[]byte` | Plaintext is the plaintext message that was read from the channel. |
+| `ErrorCode` | `uint8` | ErrorCode indicates the reason for a failure to start resending the encrypted message if any. Otherwise it is set to zero for success. |
+| `CourierIdentityHash` | `*[32]byte` | CourierIdentityHash is the 32-byte hash of the identity key of the courier that was selected to handle this message. Callers can watch PKI document updates for this courier disappearing from consensus and cancel+re-encrypt if it does. |
+| `CourierQueueID` | `[]byte` | CourierQueueID is the queue ID of the courier that was selected. |
+
+### StartResendingCopyCommand result
+
+StartResendingCopyCommandReply is the reply to a StartResendingCopyCommand request.
+
+| Field | Type | Description |
+|---|---|---|
+| `QueryID` | `*[QueryIDLength]byte` | QueryID is used for correlating this reply with the StartResendingCopyCommand request |
+| `ErrorCode` | `uint8` | ErrorCode indicates the reason for a failure to execute the copy command if any. Otherwise it is set to zero for success. |
+| `ReplicaErrorCode` | `uint8` | ReplicaErrorCode is the pigeonhole replica ErrorCode that caused the Copy command to abort on the courier. Meaningful only when ErrorCode indicates a Copy failure and the courier identified a specific replica-side reason (e.g. ReplicaErrorBoxAlreadyExists). |
+| `FailedEnvelopeIndex` | `uint64` | FailedEnvelopeIndex is the 1-based sequential position in the copy stream of the envelope whose write triggered the abort. 0 if not applicable. Not a BACAP message index. |
+
+### NextMessageBoxIndex result
+
+NextMessageBoxIndexReply is the reply to a NextMessageBoxIndex request.
+
+| Field | Type | Description |
+|---|---|---|
+| `QueryID` | `*[QueryIDLength]byte` | QueryID is used for correlating this reply with the NextMessageBoxIndex request |
+| `NextMessageBoxIndex` | `*bacap.MessageBoxIndex` | NextMessageBoxIndex is the incremented message box index. |
+| `ErrorCode` | `uint8` | ErrorCode indicates the reason for a failure to increment the index if any. Otherwise it is set to zero for success. |
+
+### GetMessageBoxIndexCounter result
+
+GetMessageBoxIndexCounterReply is the reply to a GetMessageBoxIndexCounter request.
+
+| Field | Type | Description |
+|---|---|---|
+| `QueryID` | `*[QueryIDLength]byte` | QueryID is used for correlating this reply with the GetMessageBoxIndexCounter request. |
+| `Counter` | `uint64` | Counter is the BACAP Idx64 value read out of the requested MessageBoxIndex. |
+| `ErrorCode` | `uint8` | ErrorCode indicates the reason for a failure to read the counter if any. Otherwise it is set to zero for success. |
+
+### GetPKIDocumentRaw result
+
+GetPKIDocumentReply is the reply to a GetPKIDocument request. The
+Payload field carries the cert.Certificate-wrapped signed PKI document
+exactly as the daemon received it from the gateway, retaining every
+directory authority signature so that callers may verify it
+themselves.
+
+| Field | Type | Description |
+|---|---|---|
+| `QueryID` | `*[QueryIDLength]byte` | QueryID is used for correlating this reply with the GetPKIDocument request. |
+| `Payload` | `[]byte` | Payload is the cert.Certificate-wrapped signed PKI document, or nil on failure. Use core/pki.FromPayload to deserialize and verify it against the directory authorities' public keys. |
+| `Epoch` | `uint64` | Epoch is the epoch of the returned document. When the request asked for the current epoch this echoes the epoch the daemon believes is current. |
+| `ErrorCode` | `uint8` | ErrorCode indicates the reason for a failure to return a signed PKI document if any. Otherwise it is set to zero for success. |
+
+### CreateCourierEnvelopesFromPayload result
+
+CreateCourierEnvelopesFromPayloadReply is sent in response to a CreateCourierEnvelopesFromPayload request.
+It provides multiple serialized CopyStreamElements, one for each chunk of the payload.
+
+| Field | Type | Description |
+|---|---|---|
+| `QueryID` | `*[QueryIDLength]byte` | QueryID is used for correlating this reply with the CreateCourierEnvelopesFromPayload request that created it. |
+| `Envelopes` | `[][]byte` | Envelopes is a slice of serialized CopyStreamElements, one per chunk. |
+| `NextDestIndex` | `*bacap.MessageBoxIndex` | NextDestIndex is the next destination message box index after all boxes consumed by this call. Use this as DestStartIndex in subsequent calls to continue writing to the same destination stream. |
+| `ErrorCode` | `uint8` | ErrorCode indicates the success or failure of the envelope creation. A value of ThinClientSuccess indicates successful creation. |
+
+### CreateCourierEnvelopesFromMultiPayload result
+
+CreateCourierEnvelopesFromPayloadsReply is sent in response to a CreateCourierEnvelopesFromPayloads request.
+It provides multiple serialized CopyStreamElements packed efficiently from multiple destination payloads.
+
+| Field | Type | Description |
+|---|---|---|
+| `QueryID` | `*[QueryIDLength]byte` | QueryID is used for correlating this reply with the CreateCourierEnvelopesFromPayloads request that created it. |
+| `Envelopes` | `[][]byte` | Envelopes is a slice of serialized CopyStreamElements containing all the courier envelopes from all destinations packed efficiently together. |
+| `Buffer` | `[]byte` | Buffer contains any data buffered by the encoder that hasn't been output yet. This can be persisted for crash recovery and restored via SetStreamBuffer. |
+| `NextDestIndices` | `[]*bacap.MessageBoxIndex` | NextDestIndices contains the next destination message box index for each destination, in the same order as the destinations in the request. Use these as StartIndex in subsequent calls to continue writing to the same destination streams. |
+| `ErrorCode` | `uint8` | ErrorCode indicates the success or failure of the envelope creation. A value of ThinClientSuccess indicates successful creation. |
+
+### CreateCourierEnvelopesFromTombstoneRange result
+
+CreateCourierEnvelopesFromTombstoneRangeReply is sent in response to a
+CreateCourierEnvelopesFromTombstoneRange request. It provides serialized
+CopyStreamElements containing tombstone courier envelopes.
+
+| Field | Type | Description |
+|---|---|---|
+| `QueryID` | `*[QueryIDLength]byte` | QueryID is used for correlating this reply with the request. |
+| `Envelopes` | `[][]byte` | Envelopes is a slice of serialized CopyStreamElements. |
+| `Buffer` | `[]byte` | Buffer is the residual encoder buffer to pass to the next call. Nil when IsLast was true in the request. |
+| `NextDestIndex` | `*bacap.MessageBoxIndex` | NextDestIndex is the next destination message box index after all tombstones created by this call. |
+| `ErrorCode` | `uint8` | ErrorCode indicates the success or failure of the operation. |
+
+### DestinationPayload (parameter)
+
+DestinationPayload specifies a payload and its destination channel for multi-channel writes.
+
+Passed *into* CreateCourierEnvelopesFromMultiPayload, one per destination channel.
+
+| Field | Type | Description |
+|---|---|---|
+| `Payload` | `[]byte` | Payload is the data to be written to this destination. |
+| `WriteCap` | `*bacap.WriteCap` | WriteCap is the write capability for the destination channel. |
+| `StartIndex` | `*bacap.MessageBoxIndex` | StartIndex is the starting index in the destination channel. |
 
 ## Transport and Lifecycle Errors
 
