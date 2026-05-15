@@ -104,7 +104,15 @@ a fixed size maximum payload and are padded.
   empty signed payload, regardless of whether the Box previously
   held data.
 - **Single-writer, multi-reader.** One writer, any number of readers.
-  Two-way communication requires two streams.
+  Nothing in the protocol inherently forbids multiple writers; the
+  constraint arises because each index addresses a box that may be
+  written only once (tombstones aside). Two writers therefore have no
+  agreed answer to the question of which index each should write to: were
+  they both to target the same index it would be a race, and whoever
+  writes first wins while the other's write is rejected with
+  `BoxAlreadyExists`. Avoiding that requires out-of-band coordination, so
+  in practice a stream has a single writer. Two-way communication is
+  arranged as two streams, one in each direction.
 - **Durable.** Each message is replicated across multiple storage
   nodes. Currently, set to 2 storage nodes per shard.
 - **Ephemeral.** Storage is keyed to the **replica epoch**, which lasts
