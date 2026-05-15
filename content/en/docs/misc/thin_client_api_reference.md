@@ -72,78 +72,28 @@ client = ThinClient(config)
 ### The `thinclient.toml` file
 
 The file has three tables. `[SphinxGeometry]` and
-`[PigeonholeGeometry]` describe the network the daemon is part of and
-**must match the values the operator's network was configured with**;
-they are not free parameters a client invents. `[Dial]` tells the thin
-client where the local daemon socket is and is the only table most
-applications set by hand. The geometry values are normally obtained
-from the operator (or copied from the daemon's own configuration).
+`[PigeonholeGeometry]` are **not written by hand**. They are
+programmatically generated to be internally consistent (the pigeonhole
+geometry is derived from the Sphinx geometry, which is in turn derived
+from the chosen cryptographic primitives), and a hand-edited or
+mismatched value will not interoperate with the network. Obtain these
+two tables from the operator of the network you are joining, or from
+the daemon's own configuration; treat them as an opaque block to be
+copied verbatim, not parameters to tune. They are documented in full
+with the server configuration, not here.
 
-A representative file:
+`[Dial]` is the only table an application sets itself: it tells the
+thin client where to reach the local daemon. A typical file therefore
+prepends the generated geometry block (elided here) and adds:
 
 ```toml
-[SphinxGeometry]
-  PacketLength = 3082
-  NrHops = 5
-  HeaderLength = 476
-  RoutingInfoLength = 410
-  PerHopRoutingInfoLength = 82
-  SURBLength = 572
-  SphinxPlaintextHeaderLength = 2
-  PayloadTagLength = 32
-  ForwardPayloadLength = 2574
-  UserForwardPayloadLength = 2000
-  NextNodeHopLength = 65
-  SPRPKeyMaterialLength = 64
-  NIKEName = "x25519"
-  KEMName = ""
-
-[PigeonholeGeometry]
-  MaxPlaintextPayloadLength = 1553
-  CourierQueryReadLength = 359
-  CourierQueryWriteLength = 2000
-  CourierQueryReplyReadLength = 1698
-  CourierQueryReplyWriteLength = 50
-  NIKEName = "CTIDH1024-X25519"
-  SignatureSchemeName = "Ed25519"
+# [SphinxGeometry] and [PigeonholeGeometry] generated blocks omitted
 
 [Dial]
   [Dial.Tcp]
     Address = "localhost:64331"
     Network = "tcp"
 ```
-
-**`[SphinxGeometry]`** describes the Sphinx packet format:
-
-| Key | Type | Meaning |
-|---|---|---|
-| `PacketLength` | int | Total Sphinx packet size in bytes. |
-| `NrHops` | int | Number of mix hops a packet traverses. |
-| `HeaderLength` | int | Sphinx header size. |
-| `RoutingInfoLength` | int | Total routing-information size. |
-| `PerHopRoutingInfoLength` | int | Routing information per hop. |
-| `SURBLength` | int | Single-Use Reply Block size. |
-| `SphinxPlaintextHeaderLength` | int | Plaintext header size. |
-| `PayloadTagLength` | int | SPRP authentication tag size. |
-| `ForwardPayloadLength` | int | Total payload carrier size. |
-| `UserForwardPayloadLength` | int | Usable payload size before Pigeonhole overhead. |
-| `NextNodeHopLength` | int | Size of the largest routing block. |
-| `SPRPKeyMaterialLength` | int | SPRP key material size. |
-| `NIKEName` | string | NIKE scheme name (e.g. `"x25519"`); empty if a KEM is used. |
-| `KEMName` | string | KEM scheme name; empty if a NIKE is used. |
-
-**`[PigeonholeGeometry]`** sizes the Pigeonhole protocol, and is
-derived from, and consistent with, the Sphinx geometry above:
-
-| Key | Type | Meaning |
-|---|---|---|
-| `MaxPlaintextPayloadLength` | int | Largest application payload that fits in one box; larger messages must be split. |
-| `CourierQueryReadLength` | int | Size of a read query to the courier. |
-| `CourierQueryWriteLength` | int | Size of a write query to the courier. |
-| `CourierQueryReplyReadLength` | int | Size of a courier reply to a read. |
-| `CourierQueryReplyWriteLength` | int | Size of a courier reply to a write. |
-| `NIKEName` | string | NIKE scheme used for MKEM envelope encryption. |
-| `SignatureSchemeName` | string | Signature scheme used for box signing. |
 
 **`[Dial]`** selects the daemon transport. Set exactly one of the two
 sub-tables:
