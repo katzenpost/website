@@ -77,6 +77,16 @@ elaborated in its own section below.
 - **Replica.** A storage server. Each box is sharded across K=2 replicas
   via consistent hashing; replicas mirror writes to their shard peer to
   maintain redundancy.
+- **Katzenpost epoch.** The network's wire-protocol epoch, lasting
+  **20 minutes by default** (the duration is a deployment parameter and a
+  given network operator may configure it otherwise). It governs the
+  directory authority consensus, mix key rotation, and Sphinx routing. It
+  does **not** govern how long a box's contents survive, and a reader need
+  not concern themselves with it.
+- **Replica epoch.** A separate, much longer epoch lasting **one week**,
+  used solely by the storage replicas. Replicas rotate and garbage-collect
+  their storage keys on this weekly schedule; it is this epoch, not the
+  20-minute network epoch, that determines the lifetime of stored data.
 
 
 ## Pigeonhole Streams
@@ -97,14 +107,18 @@ a fixed size maximum payload and are padded.
   Two-way communication requires two streams.
 - **Durable.** Each message is replicated across multiple storage
   nodes. Currently, set to 2 storage nodes per shard.
-- **Ephemeral.** Storage is garbage-collected after approximately two
-  weeks; nothing written to a box outlives that window.
-- **Per-epoch storage.** Capabilities are cryptographic credentials
-  independent of the network's epoch schedule and continue to work
-  indefinitely, but the data at any given box location does not
-  carry across an epoch transition: at the start of a new epoch the
-  box reads as empty, even though the capability that addresses it
-  is unchanged. Workflows that need data to outlive the epoch in
+- **Ephemeral.** Storage is keyed to the **replica epoch**, which lasts
+  **one week** (not to be confused with the 20-minute Katzenpost network
+  epoch). Replicas retain the current and the preceding replica epoch and
+  garbage-collect anything older, so a box's contents survive for roughly
+  one to two weeks; nothing written to a box outlives that window.
+- **Per-replica-epoch storage.** Capabilities are cryptographic
+  credentials independent of any epoch schedule and continue to work
+  indefinitely, but the data at any given box location does not carry
+  across a **replica epoch** transition (the weekly schedule, not the
+  20-minute network epoch): at the start of a new replica epoch the box
+  reads as empty, even though the capability that addresses it is
+  unchanged. Workflows that need data to outlive the replica epoch in
   which it was written must arrange to re-emit it (the copy command,
   described below, is the usual instrument for doing so atomically).
 - **Unlinkable.** Storage servers cannot tell which messages belong
@@ -155,8 +169,8 @@ interaction: one writer (Alice) and one reader (Bob).
 5. **Alice writes again.** She repeats step 3 with the next index. Bob
    reads in step 4 at his own pace, advancing his own index. The two
    indices are independent: Alice never blocks on Bob, and Bob can fall
-   behind without losing messages until the two-week garbage collection
-   window expires.
+   behind without losing messages until the replica-epoch garbage
+   collection window (roughly one to two weeks) expires.
 
 A two-way conversation is therefore two streams, one in each direction,
 because every stream has exactly one writer. The
