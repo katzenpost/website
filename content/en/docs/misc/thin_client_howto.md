@@ -22,6 +22,31 @@ For the complete API reference, see
 For conceptual background on Pigeonhole, see
 [Understanding Pigeonhole](/docs/pigeonhole_explained/).
 
+## Authoritative working examples
+
+A word of caution before you proceed. The code fragments in this guide
+are illustrative: they are written to teach one task at a time, and to
+keep the reader's eye on the matter at hand they omit imports, error
+handling, and surrounding context. They are **not** compiled or run by
+our continuous integration, and so, as the API evolves, an individual
+snippet may fall out of step with it.
+
+The integration tests below carry no such caveat. They are exercised on
+every change by CI, so they are guaranteed to compile and to pass
+against the code they accompany. When a fragment in this guide and a
+test disagree, **the test is correct.** Treat these files as the
+canonical, runnable companion to the prose:
+
+| Language | Test file | Repository |
+|----------|-----------|------------|
+| Go | [`client/pigeonhole_docker_test.go`](https://github.com/katzenpost/katzenpost/blob/main/client/pigeonhole_docker_test.go) | katzenpost |
+| Python | [`tests/test_new_pigeonhole_api.py`](https://github.com/katzenpost/thin_client/blob/main/tests/test_new_pigeonhole_api.py), [`tests/test_new_methods.py`](https://github.com/katzenpost/thin_client/blob/main/tests/test_new_methods.py) | thin_client |
+| Rust | [`tests/channel_api_test.rs`](https://github.com/katzenpost/thin_client/blob/main/tests/channel_api_test.rs), [`tests/high_level_api_test.rs`](https://github.com/katzenpost/thin_client/blob/main/tests/high_level_api_test.rs) | thin_client |
+
+These links track the `main` branch of each repository; should you be
+working against a pinned release, consult the corresponding files at
+that tag instead.
+
 ### Table of Contents
 
 | Section | Description |
