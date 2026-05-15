@@ -520,10 +520,8 @@ struct replica_write {
 }
 ```
 
-A `ReplicaWrite` with `payload_len == 0` is a **tombstone**. Replicas
-treat tombstone writes as overwrites: an existing `Box` at the same
-`box_id` is replaced by the tombstone, and subsequent reads return
-`ReplicaErrorTombstone`.
+A `ReplicaWrite` with `payload_len == 0` is a **tombstone**; see the
+"Tombstones" section below.
 
 ## ReplicaWriteReply
 
@@ -536,6 +534,30 @@ struct replica_write_reply {
     u8 error_code;
 }
 ```
+
+## Tombstones
+
+A `ReplicaWrite` whose `payload_len == 0` is a **tombstone**: it marks
+a Box as deleted without revealing that fact to the courier.
+
+* Replicas treat a tombstone write as an ordinary overwrite. An
+  existing `Box` at the same `box_id` is replaced by the tombstone,
+  and subsequent reads of that `box_id` return
+  `ReplicaErrorTombstone` (see "Replica error codes").
+* `ReplicaErrorTombstone` is an *expected* outcome rather than a
+  failure: it positively confirms that the Box was deleted, as
+  distinct from `ReplicaErrorBoxNotFound`.
+* Because the inner `ReplicaInnerMessage` is zero-padded to
+  `ReplicaInnerMessageWriteSize()` before MKEM encryption (see "The
+  CourierEnvelope as seen by the courier"), a tombstone write produces
+  an MKEM ciphertext of exactly the same length as a non-empty write
+  or a read. A passive observer therefore cannot distinguish deletion
+  from any other operation.
+
+Tombstones are also used by the AllOrNothing copy protocol: after
+processing a `CopyCommand`, the courier overwrites every Box of the
+temporary stream with tombstones (see "Pigeonhole AllOrNothing
+protocol").
 
 # EnvelopeHash
 
