@@ -45,7 +45,7 @@ canonical, runnable companion to the prose:
 |----------|-----------|------------|
 | Go | [`client/pigeonhole_docker_test.go`](https://github.com/katzenpost/katzenpost/blob/main/client/pigeonhole_docker_test.go) | katzenpost |
 | Python | [`tests/test_new_pigeonhole_api.py`](https://github.com/katzenpost/thin_client/blob/main/tests/test_new_pigeonhole_api.py), [`tests/test_new_methods.py`](https://github.com/katzenpost/thin_client/blob/main/tests/test_new_methods.py) | thin_client |
-| Rust | [`tests/channel_api_test.rs`](https://github.com/katzenpost/thin_client/blob/main/tests/channel_api_test.rs), [`tests/high_level_api_test.rs`](https://github.com/katzenpost/thin_client/blob/main/tests/high_level_api_test.rs) | thin_client |
+| Rust | [`tests/channel_api_test.rs`](https://github.com/katzenpost/thin_client/blob/main/tests/channel_api_test.rs) | thin_client |
 
 These links track the `main` branch of each repository; should you be
 working against a pinned release, consult the corresponding files at
