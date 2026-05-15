@@ -198,7 +198,8 @@ size can be computed deterministically from the Sphinx geometry.
 
 Carriage of these messages differs by hop:
 
-* **Client → Courier:** a `CourierQuery` (see below) is carried inside
+* **Client → Courier:** a `CourierQuery` (its layout is given in the
+  "CourierQuery" section) is carried inside
   a Sphinx packet payload. The reverse direction uses a SURB supplied
   by the client.
 * **Courier → Replica and Replica → Replica:** the courier and
@@ -281,8 +282,8 @@ Notable points:
   addressed to the *pair* of intermediate replicas; either replica can
   decapsulate using its own DEK (`dek1` or `dek2` respectively).
 * The `epoch` field names the *replica-epoch* whose envelope keys were
-  used to produce the MKEM ciphertext. See "Epochs" below for the
-  tolerance window.
+  used to produce the MKEM ciphertext. See the "Epochs" section above
+  for the tolerance window.
 * Prior to encryption, the inner `ReplicaInnerMessage` is zero-padded
   to `ReplicaInnerMessageWriteSize()` so that reads, writes and
   tombstones produce MKEM ciphertexts of identical length.
@@ -621,7 +622,8 @@ Returned by the courier in `CourierEnvelopeReply.error_code`.
 
 ## Copy command status codes
 
-Returned by the courier in `CopyCommandReply.status` (see below).
+Returned by the courier in the `status` field of a `CopyCommandReply`
+(its layout is given in the "CopyCommandReply" section).
 
 | Code | Name | Meaning |
 |---|---|---|
