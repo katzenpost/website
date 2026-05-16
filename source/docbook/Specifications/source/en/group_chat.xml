@@ -26,7 +26,7 @@
 <?version "0" ?>
 <!-- Optional [?] -->
 
-<!DOCTYPE article [
+<!DOCTYPE section [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -54,7 +54,7 @@
     <!ENTITY % local.info.class "| xi:include"> 
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
-<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
   version="5.1" xml:id="group_chat">
   <info>
     <title xml:id="group_chat.title">Katzenpost Group Chat Design</title>
@@ -332,4 +332,4 @@ type SignedPleaseAdd struct {
  
 
     
-</article>
+</section>

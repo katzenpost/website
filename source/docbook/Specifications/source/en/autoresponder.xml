@@ -17,7 +17,7 @@
 <?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
-<!DOCTYPE article [
+<!DOCTYPE section [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -46,7 +46,7 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="autoresponder">
     
     <info>
@@ -223,4 +223,4 @@ opaque plaintext[];
             &SPHINXSPEC;
         </section>
 
-</article>
+</section>
