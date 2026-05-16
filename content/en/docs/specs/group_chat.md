@@ -233,7 +233,7 @@ be displayed inline by the chat client. Likewise, a sound bite could be made vis
 in the
 chat along with a play-button. Beyond that, we can support arbitrary file attachments.
 
-``` goland
+``` golang
 // FileUpload encapsulates several file types
 // which result in different client behaviors.
 type FileUpload struct {
@@ -287,7 +287,7 @@ type ReplyWho struct {
 The `GroupChatMessage` message encapsulates all of the above-mentioned message
 types and is serialized with CBOR.
 
-``` pgolang
+``` golang
 // GroupChatMessage encapsulates all chat message types.
 type GroupChatMessage struct {
     // Version is used to ensure we can change this message type in the future.
