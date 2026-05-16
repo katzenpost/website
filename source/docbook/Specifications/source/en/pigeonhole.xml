@@ -511,7 +511,7 @@
         the <code>core/wire/commands</code> command sent from a courier to a replica. Its payload
         fields are copied verbatim from the matching <code>CourierEnvelope</code>: </para>
       <programlisting language="go">// core/wire/commands
-  pe ReplicaMessage struct {
+type ReplicaMessage struct {
     SenderEPubKey []byte     // copied from CourierEnvelope.sender_pubkey
     DEK           *[MKEM_DEK_SIZE]byte  // dek1 or dek2, depending on destination
     Ciphertext    []byte     // copied from CourierEnvelope.ciphertext
@@ -924,7 +924,7 @@ return the two replicas whose h_r are smallest</programlisting>
             <imagedata fileref="pix/annotated_write.png" />
           </imageobject>                  
           <textobject>
-          <phrase>Protocol annotatation image of writes.</phrase>
+          <phrase>Protocol annotation image of writes.</phrase>
         </textobject>
         </mediaobject>
       </figure>
@@ -940,7 +940,7 @@ return the two replicas whose h_r are smallest</programlisting>
             <imagedata fileref="pix/annotated_read.png" />
           </imageobject>                  
           <textobject>
-          <phrase>Protocol annotatation image of reads.</phrase>
+          <phrase>Protocol annotation image of reads.</phrase>
         </textobject>
         </mediaobject>
       </figure>   
