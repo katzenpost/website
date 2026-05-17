@@ -40,9 +40,9 @@ This reference describes the following pinned binding versions:
 
 | Binding | Repository | Tag |
 | --- | --- | --- |
-| Go reference | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/v0.0.75/client/thin) | [v0.0.75](https://github.com/katzenpost/katzenpost/releases/tag/v0.0.75) |
-| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/0.0.14/src) | [0.0.14](https://github.com/katzenpost/thin_client/releases/tag/0.0.14) |
-| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/0.0.14/katzenpost_thinclient) | [0.0.14](https://github.com/katzenpost/thin_client/releases/tag/0.0.14) |
+| Go reference | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/v0.0.76/client/thin) | [v0.0.76](https://github.com/katzenpost/katzenpost/releases/tag/v0.0.76) |
+| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/0.0.15/src) | [0.0.15](https://github.com/katzenpost/thin_client/releases/tag/0.0.15) |
+| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/0.0.15/katzenpost_thinclient) | [0.0.15](https://github.com/katzenpost/thin_client/releases/tag/0.0.15) |
 
 For pinned versions of the full stack (including `kpclientd`, `katzenqt`, and
 the server-side components), see [Build from source](/docs/build_from_source/).
@@ -1107,11 +1107,16 @@ def get_distinct_couriers(self, n: int) -> 'List[Tuple[bytes, bytes]]':
 
 ### get_courier_destination (Rust only)
 
-Returns a courier service destination for the current epoch.
-This method finds and randomly selects a courier service from the current
-PKI document. The returned destination information is used with SendChannelQuery
-and SendChannelQueryAwaitReply to transmit prepared channel operations.
-Returns (dest_node, dest_queue) on success.
+Returns one courier destination, drawn uniformly at random from
+the couriers advertised in the current PKI document, as the
+`(identity_hash, queue_id)` pair the rest of the API expects. This
+spares the caller from handling a list when one courier will do.
+
+The principal use is the routine "pick a courier, send a copy
+command to it" pattern; for the nested-copy-command case where two
+distinct couriers are required, draw them with a single call to
+the underlying service helpers in `helpers.rs` rather than calling
+this method twice and risking the same draw.
 
 Go and Python callers reach the same result by calling
 `GetDistinctCouriers(1)` / `get_distinct_couriers(1)` and taking
@@ -1127,8 +1132,13 @@ pub async fn get_courier_destination(
 
 ### pigeonhole_geometry (Rust only)
 
-Returns the pigeonhole geometry from the config.
-This geometry defines the payload sizes and envelope formats for the pigeonhole protocol.
+Returns the pigeonhole geometry the daemon supplied during the
+connection handshake. This geometry defines the payload sizes and
+envelope formats for the pigeonhole protocol.
+
+Panics if called before the daemon's first ConnectionStatusEvent
+has been processed, or if the daemon did not supply the geometry
+(an incompatible daemon).
 
 Go callers retrieve the same value through
 `GetConfig().PigeonholeGeometry`. The Python binding stores the
@@ -1137,7 +1147,7 @@ accessor.
 
 {{< tabpane >}}
 {{< tab header="Rust" lang="rust" >}}
-pub fn pigeonhole_geometry(&self) -> &PigeonholeGeometry
+pub fn pigeonhole_geometry(&self) -> PigeonholeGeometry
 {{< /tab >}}
 {{< /tabpane >}}
 
