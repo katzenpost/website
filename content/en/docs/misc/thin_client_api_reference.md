@@ -8,6 +8,7 @@ author: ["David Stainton"]
 version: 0
 draft: false
 slug: "/thin_client_api_reference/"
+url: "docs/thin_client_api_reference/"
 ---
 
 # Thin Client API Reference
