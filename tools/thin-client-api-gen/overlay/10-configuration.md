@@ -36,12 +36,6 @@ daemon. The complete file is simply:
     Network = "tcp"
 ```
 
-The geometries the daemon supplied are available after connecting:
-`GetSphinxGeometry()` / `GetPigeonholeGeometry()` on the Go
-`ThinClient`, `sphinx_geometry()` / `pigeonhole_geometry()` on the
-Rust client, and the `geometry` / `pigeonhole_geometry` attributes of
-the Python client.
-
 **`[Dial]`** selects the daemon transport. Set exactly one of the two
 forms:
 
