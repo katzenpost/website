@@ -45,9 +45,12 @@ For task-oriented usage guides, see [Thin Client How-to Guide](/docs/thin_client
 
 ## Configuration and Construction
 
-The thin client is configured via a TOML file that specifies the
-daemon socket path and network geometry. We usually name this
-configuration file `thinclient.toml`.
+The thin client is configured via a TOML file that specifies only how
+to reach the local daemon. We usually name this configuration file
+`thinclient.toml`. The Sphinx and Pigeonhole geometries are supplied
+by the daemon over the socket during the connection handshake, so the
+client never configures them and they cannot drift out of step with
+the daemon.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -71,32 +74,24 @@ client = ThinClient(config)
 
 ### The `thinclient.toml` file
 
-The file has three tables. `[SphinxGeometry]` and
-`[PigeonholeGeometry]` are **not written by hand**. They are
-programmatically generated to be internally consistent (the pigeonhole
-geometry is derived from the Sphinx geometry, which is in turn derived
-from the chosen cryptographic primitives), and a hand-edited or
-mismatched value will not interoperate with the network. Obtain these
-two tables from the operator of the network you are joining, or from
-the daemon's own configuration; treat them as an opaque block to be
-copied verbatim, not parameters to tune. They are documented in full
-with the server configuration, not here.
-
-`[Dial]` is the only table an application sets itself: it tells the
-thin client where to reach the local daemon. A typical file therefore
-prepends the generated geometry block (elided here) and adds:
+`thinclient.toml` tells the thin client only where to reach the local
+daemon. The complete file is simply:
 
 ```toml
-# [SphinxGeometry] and [PigeonholeGeometry] generated blocks omitted
-
 [Dial]
   [Dial.Tcp]
     Address = "localhost:64331"
     Network = "tcp"
 ```
 
+The geometries the daemon supplied are available after connecting:
+`GetSphinxGeometry()` / `GetPigeonholeGeometry()` on the Go
+`ThinClient`, `sphinx_geometry()` / `pigeonhole_geometry()` on the
+Rust client, and the `geometry` / `pigeonhole_geometry` attributes of
+the Python client.
+
 **`[Dial]`** selects the daemon transport. Set exactly one of the two
-sub-tables:
+forms:
 
 | Key | Type | Meaning |
 |---|---|---|
