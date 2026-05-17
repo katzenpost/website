@@ -9,6 +9,8 @@ version: 0
 draft: false
 slug: "/thin_client_api_reference/"
 url: "docs/thin_client_api_reference/"
+aliases:
+  - "/docs/python_thin_client.html"
 ---
 
 # Thin Client API Reference
