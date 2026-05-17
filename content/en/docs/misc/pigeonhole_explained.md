@@ -179,8 +179,13 @@ for how each binding exposes it.
 
 ## Cryptographic Capabilities
 
-Pigeonhole is a cryptographic capability system. Access to a stream
-is controlled by two capabilities:
+Pigeonhole is a messaging system built from couriers and storage
+replicas. The capabilities described here come from **BACAP**, the
+Blinding-And-Capability scheme it relies upon. (In the
+[Echomix paper](https://arxiv.org/abs/2501.02933), BACAP is the
+subject of section 4 and Pigeonhole of section 5.)
+
+Access to a stream is controlled by two BACAP capabilities:
 
 - The **write cap** can write messages, create tombstones, and derive
   the read cap. Only the write cap holder can sign and encrypt messages, and
