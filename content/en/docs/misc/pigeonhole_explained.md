@@ -156,21 +156,25 @@ must be split across several boxes; one smaller is padded.
 
 The exact size is not a hard-coded constant but a property of the
 **pigeonhole geometry**, a deployment parameter rather than something
-the application chooses. It is not configured directly: it is derived
-from, and must be consistent with, the Sphinx geometry the network
-publishes in its PKI consensus. A Pigeonhole request travels inside a
-Sphinx packet, so the usable box payload is whatever the deployed
-Sphinx geometry allows once the envelope and protocol overheads are
-subtracted. A network running a larger Sphinx packet has a
-correspondingly larger box payload; one running a smaller Sphinx
-geometry has a smaller one. The thin client does not read this from a
-configuration file of its own; the `kpclientd` daemon computes the
-pigeonhole geometry and supplies it to the thin client over the local
-socket during the connection handshake. An application should
-therefore treat the box payload size as a value obtained at runtime
-from the daemon, not a fixed number to hard-code. See the
-[API reference](/docs/thin_client_api_reference/) for how each binding
-exposes it.
+the application chooses. It is the operators of the mix network who
+set the geometries: they choose the network's Sphinx geometry, and the
+pigeonhole geometry is derived from, and must be consistent with, it.
+A Pigeonhole request travels inside a Sphinx packet, so the usable box
+payload is whatever the deployed Sphinx geometry allows once the
+envelope and protocol overheads are subtracted. A network running a
+larger Sphinx packet has a correspondingly larger box payload; one
+running a smaller Sphinx geometry has a smaller one.
+
+The `kpclientd` daemon's configuration file must carry these same
+correct Sphinx and pigeonhole geometries, matching the network it is
+to connect to; a daemon configured with the wrong geometries cannot
+speak to that network. The thin client itself holds no such
+configuration. When a thin client connects to `kpclientd`, the daemon
+sends it the geometries over the local socket during the connection
+handshake. An application should therefore treat the box payload size
+as a value obtained at runtime from the daemon, not a fixed number to
+hard-code. See the [API reference](/docs/thin_client_api_reference/)
+for how each binding exposes it.
 
 
 ## Cryptographic Capabilities
