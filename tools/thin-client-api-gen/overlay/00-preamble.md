@@ -8,6 +8,9 @@ author: ["David Stainton"]
 version: 0
 draft: false
 slug: "/thin_client_api_reference/"
+url: "docs/thin_client_api_reference/"
+aliases:
+  - "/docs/python_thin_client.html"
 ---
 
 # Thin Client API Reference
@@ -26,6 +29,14 @@ the next generation pass.
 There are three implementations: a Go reference (`katzenpost/client/thin`), a
 Rust binding (`thin_client/src`), and a Python binding
 (`thin_client/katzenpost_thinclient`).
+
+The official API documentation for each binding:
+
+| Language | Official API documentation |
+| --- | --- |
+| Go | [pkg.go.dev](https://pkg.go.dev/github.com/katzenpost/katzenpost/client/thin) |
+| Rust | [docs.rs](https://docs.rs/katzenpost_thin_client/latest/katzenpost_thin_client/) |
+| Python | [PyPI: katzenpost_thinclient](https://pypi.org/project/katzenpost_thinclient/) |
 
 This reference describes the following pinned binding versions:
 

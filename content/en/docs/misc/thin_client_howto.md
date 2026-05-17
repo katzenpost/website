@@ -17,10 +17,39 @@ This guide shows how to accomplish specific tasks with the Katzenpost
 thin client. Each section is self-contained: find the task you need
 and follow the steps.
 
-For the complete API reference, see
-[Thin Client API Reference](/docs/thin_client_api_reference/).
-For conceptual background on Pigeonhole, see
-[Understanding Pigeonhole](/docs/pigeonhole_explained/).
+If you are new to Pigeonhole, read
+[Understanding Pigeonhole](/docs/pigeonhole_explained/) first for the
+concepts, then return here for the recipes, and consult the
+[Thin Client API Reference](/docs/thin_client_api_reference/) for the
+precise signatures.
+
+Throughout this guide and the API the words **channel** and **stream**
+are used interchangeably: they denote one and the same thing.
+
+## Authoritative working examples
+
+A word of caution before you proceed. The code fragments in this guide
+are illustrative: they are written to teach one task at a time, and to
+keep the reader's eye on the matter at hand they omit imports, error
+handling, and surrounding context. They are **not** compiled or run by
+our continuous integration, and so, as the API evolves, an individual
+snippet may fall out of step with it.
+
+The integration tests below carry no such caveat. They are exercised on
+every change by CI, so they are guaranteed to compile and to pass
+against the code they accompany. When a fragment in this guide and a
+test disagree, **the test is correct.** Treat these files as the
+canonical, runnable companion to the prose:
+
+| Language | Test file | Repository |
+|----------|-----------|------------|
+| Go | [`client/pigeonhole_docker_test.go`](https://github.com/katzenpost/katzenpost/blob/main/client/pigeonhole_docker_test.go) | katzenpost |
+| Python | [`tests/test_new_pigeonhole_api.py`](https://github.com/katzenpost/thin_client/blob/main/tests/test_new_pigeonhole_api.py), [`tests/test_new_methods.py`](https://github.com/katzenpost/thin_client/blob/main/tests/test_new_methods.py) | thin_client |
+| Rust | [`tests/channel_api_test.rs`](https://github.com/katzenpost/thin_client/blob/main/tests/channel_api_test.rs) | thin_client |
+
+These links track the `main` branch of each repository; should you be
+working against a pinned release, consult the corresponding files at
+that tag instead.
 
 ### Table of Contents
 
@@ -33,6 +62,11 @@ For conceptual background on Pigeonhole, see
 | [Create a Pigeonhole channel](#how-to-create-a-pigeonhole-channel) | Generate a stream with write/read capabilities |
 | [Write a message](#how-to-write-a-message-to-a-pigeonhole-channel) | Encrypt and send a write to a stream |
 | [Read a message](#how-to-read-a-message-from-a-pigeonhole-channel) | Retrieve and decrypt a message from a stream |
+| [Wait for a message not yet written](#how-to-wait-for-a-message-that-has-not-been-written-yet) | Poll with bounded retry around BoxIDNotFound |
+| [Persist and restore channel state](#how-to-persist-and-restore-channel-state) | Survive a process restart without losing your place |
+| [Hold a two-way conversation](#how-to-hold-a-two-way-conversation) | Wire two streams into a bidirectional channel |
+| [Prepare operations offline](#how-to-prepare-operations-offline) | Do the local crypto now, transmit when connected |
+| [A complete end-to-end example](#a-complete-end-to-end-example) | One runnable Alice-writes, Bob-reads program |
 | [Delete messages with tombstones](#how-to-delete-messages-with-tombstones) | Tombstone one or more boxes |
 | [Send to one channel atomically](#how-to-send-to-one-channel-atomically-via-copy-command) | Single-destination copy command |
 | [Send to multiple channels atomically](#how-to-send-to-multiple-channels-atomically) | Multi-destination copy command |
@@ -618,6 +652,478 @@ plaintext = await client.start_resending_encrypted_message(
 
 # Advance the index for the next read
 current_index = read_result.next_message_box_index
+{{< /tab >}}
+{{< /tabpane >}}
+
+---
+
+## How to wait for a message that has not been written yet
+
+Reads and writes are not coordinated: a reader routinely asks for an
+index before the writer has filled it, and replication lag can briefly
+hide a box that was in fact written. In both cases the daemon reports
+`BoxIDNotFound`. This is the expected answer to "anything here yet?",
+not a failure. The correct pattern is a bounded poll: retry on the
+expected outcome, with a short delay between attempts, until the data
+appears or an application deadline elapses. Use `IsExpectedOutcome` to
+tell a benign "not yet" apart from a real error, so that genuine
+failures are not silently retried forever.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+deadline := time.Now().Add(2 * time.Minute)
+var plaintext []byte
+for {
+    ciphertext, envDesc, envHash, nextIndex, err := client.EncryptRead(
+        readCap, currentIndex,
+    )
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    result, err := client.StartResendingEncryptedMessage(
+        readCap, nil, nil, nil, envDesc, ciphertext, envHash,
+    )
+    if err == nil {
+        plaintext = result.Plaintext
+        currentIndex = nextIndex
+        break
+    }
+
+    // BoxIDNotFound here just means "not written yet". Anything that
+    // is not an expected outcome is a real failure worth surfacing.
+    if !thin.IsExpectedOutcome(err) {
+        log.Fatal(err)
+    }
+    if time.Now().After(deadline) {
+        log.Fatal("gave up waiting for the message")
+    }
+    time.Sleep(3 * time.Second)
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+let deadline = std::time::Instant::now()
+    + std::time::Duration::from_secs(120);
+let plaintext = loop {
+    let read = client.encrypt_read(&read_cap, &current_index).await?;
+    match client.start_resending_encrypted_message(
+        Some(&read_cap), None, None, None,
+        &read.envelope_descriptor,
+        &read.message_ciphertext,
+        &read.envelope_hash,
+    ).await {
+        Ok(result) => {
+            current_index = read.next_message_box_index;
+            break result.plaintext;
+        }
+        Err(e) if e.is_expected_outcome() => {
+            if std::time::Instant::now() > deadline {
+                return Err(e);
+            }
+            tokio::time::sleep(
+                std::time::Duration::from_secs(3)).await;
+        }
+        Err(e) => return Err(e),
+    }
+};
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+import asyncio, time
+from katzenpost_thinclient import is_expected_outcome
+
+deadline = time.monotonic() + 120
+while True:
+    read = await client.encrypt_read(read_cap, current_index)
+    try:
+        plaintext = await client.start_resending_encrypted_message(
+            read_cap=read_cap, write_cap=None,
+            next_message_index=None, reply_index=None,
+            envelope_descriptor=read.envelope_descriptor,
+            message_ciphertext=read.message_ciphertext,
+            envelope_hash=read.envelope_hash,
+        )
+        current_index = read.next_message_box_index
+        break
+    except Exception as exc:
+        # "not written yet" is expected; anything else is a real error.
+        if not is_expected_outcome(exc):
+            raise
+        if time.monotonic() > deadline:
+            raise
+        await asyncio.sleep(3)
+{{< /tab >}}
+{{< /tabpane >}}
+
+---
+
+## How to persist and restore channel state
+
+The daemon keeps no per-application channel state. The write cap, the
+read cap, and above all the **current index** belong to your
+application, and if you lose the index across a restart you no longer
+know where to append next (re-using a filled index earns
+`BoxAlreadyExists`). Persist the index every time you advance it,
+durably, before you treat the write as done.
+
+In Go the capabilities and the index are typed; serialise them with
+`MarshalBinary` and restore them with the `bacap` constructors. In
+Rust and Python `new_keypair` already hands you the caps and index as
+byte strings, so persistence is simply storing and reloading those
+bytes.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+import "github.com/katzenpost/hpqc/bacap"
+
+// Save: marshal each artefact to bytes and write atomically to disk.
+wcBytes, _ := writeCap.MarshalBinary()
+rcBytes, _ := readCap.MarshalBinary()
+idxBytes, _ := currentIndex.MarshalBinary()
+saveState(wcBytes, rcBytes, idxBytes) // your durable, atomic write
+
+// Restore after a restart:
+writeCap, err := bacap.NewWriteCapFromBytes(wcBytes)
+if err != nil {
+    log.Fatal(err)
+}
+readCap, err := bacap.ReadCapFromBytes(rcBytes)
+if err != nil {
+    log.Fatal(err)
+}
+currentIndex, err := bacap.NewEmptyMessageBoxIndexFromBytes(idxBytes)
+if err != nil {
+    log.Fatal(err)
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+// new_keypair already returns Vec<u8> for each artefact.
+let kp = client.new_keypair(&seed).await?;
+save_state(&kp.write_cap, &kp.read_cap, &kp.first_index);
+let mut current_index = kp.first_index.clone();
+
+// ... each time you advance, persist the new index bytes ...
+save_index(&current_index);
+
+// After a restart, the stored bytes are passed straight back into
+// the API; no deserialisation step is required.
+let (write_cap, read_cap, current_index) = load_state();
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+# new_keypair already returns bytes for each artefact.
+kp = await client.new_keypair(seed)
+save_state(kp.write_cap, kp.read_cap, kp.first_index)
+current_index = kp.first_index
+
+# ... each time you advance, persist the new index bytes ...
+save_index(current_index)
+
+# After a restart, the stored bytes are passed straight back into
+# the API; no deserialisation step is required.
+write_cap, read_cap, current_index = load_state()
+{{< /tab >}}
+{{< /tabpane >}}
+
+The writer must persist `currentIndex` after every successful write,
+the reader after every successful read. Persist the index *before*
+acknowledging the message to the rest of your application, so that a
+crash cannot leave you having processed a message whose index you
+never recorded.
+
+---
+
+## How to hold a two-way conversation
+
+A stream has exactly one writer, so a conversation between two parties
+is two streams: each party writes to its own and reads from the
+other's. The setup is symmetric: each creates a stream and shares its
+read cap (and first index) with the other out-of-band. Thereafter each
+party writes with its own write cap and polls the peer's stream with
+the peer's read cap, advancing two independent indices.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// Alice's side. (Bob's is the mirror image.)
+aliceWrite, aliceRead, aliceIdx, err := client.NewKeypair(aliceSeed)
+if err != nil {
+    log.Fatal(err)
+}
+
+// Exchange read caps out-of-band: Alice sends aliceRead+aliceIdx to
+// Bob and receives bobRead+bobIdx from Bob.
+sendOutOfBand(aliceRead, aliceIdx)
+bobRead, bobIdx := receiveOutOfBand()
+
+// Send on Alice's own stream.
+ct, ed, eh, nextOut, _ := client.EncryptWrite(
+    []byte("hello Bob"), aliceWrite, aliceIdx)
+_, err = client.StartResendingEncryptedMessage(
+    nil, aliceWrite, nil, nil, ed, ct, eh)
+if err != nil {
+    log.Fatal(err)
+}
+aliceIdx = nextOut // persist this
+
+// Receive on Bob's stream, using the polling pattern shown above,
+// reading with bobRead and advancing bobIdx.
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+// Alice's side. (Bob's is the mirror image.)
+let alice = client.new_keypair(&alice_seed).await?;
+
+// Exchange read caps out-of-band.
+send_out_of_band(&alice.read_cap, &alice.first_index);
+let (bob_read, mut bob_idx) = receive_out_of_band();
+let mut alice_idx = alice.first_index.clone();
+
+// Send on Alice's own stream.
+let w = client.encrypt_write(b"hello Bob",
+    &alice.write_cap, &alice_idx).await?;
+client.start_resending_encrypted_message(
+    None, Some(&alice.write_cap), None, None,
+    &w.envelope_descriptor, &w.message_ciphertext,
+    &w.envelope_hash).await?;
+alice_idx = w.next_message_box_index; // persist this
+
+// Receive on Bob's stream with the polling pattern, reading with
+// bob_read and advancing bob_idx.
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+# Alice's side. (Bob's is the mirror image.)
+alice = await client.new_keypair(alice_seed)
+
+# Exchange read caps out-of-band.
+send_out_of_band(alice.read_cap, alice.first_index)
+bob_read, bob_idx = receive_out_of_band()
+alice_idx = alice.first_index
+
+# Send on Alice's own stream.
+w = await client.encrypt_write(b"hello Bob",
+    alice.write_cap, alice_idx)
+await client.start_resending_encrypted_message(
+    read_cap=None, write_cap=alice.write_cap,
+    next_message_index=None, reply_index=None,
+    envelope_descriptor=w.envelope_descriptor,
+    message_ciphertext=w.message_ciphertext,
+    envelope_hash=w.envelope_hash)
+alice_idx = w.next_message_box_index  # persist this
+
+# Receive on Bob's stream with the polling pattern, reading with
+# bob_read and advancing bob_idx.
+{{< /tab >}}
+{{< /tabpane >}}
+
+---
+
+## How to prepare operations offline
+
+The daemon distinguishes two kinds of work. Key generation and
+envelope encryption (`NewKeypair`, `EncryptWrite`, `EncryptRead`,
+`TombstoneRange`, and the copy-stream constructors) are local
+cryptography and succeed even when the daemon is not connected to the
+mixnet. Only `StartResendingEncryptedMessage` and
+`StartResendingCopyCommand` require connectivity; called offline they
+fail rather than block.
+
+You can therefore prepare envelopes while offline, persist them, and
+transmit once connectivity returns. Test `IsConnected` before
+transmitting, or watch the connection event and flush a queue when it
+turns true.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// Offline: this is pure local crypto and works regardless.
+ciphertext, envDesc, envHash, nextIndex, err := client.EncryptWrite(
+    []byte("written while offline"), writeCap, currentIndex,
+)
+if err != nil {
+    log.Fatal(err)
+}
+enqueue(envDesc, ciphertext, envHash) // persist for later
+
+// Later, only transmit once the daemon is connected.
+if client.IsConnected() {
+    for _, e := range drainQueue() {
+        _, err = client.StartResendingEncryptedMessage(
+            nil, writeCap, nil, nil, e.desc, e.ct, e.hash)
+        if err != nil {
+            log.Fatal(err)
+        }
+    }
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+// Offline: pure local crypto, works regardless.
+let w = client.encrypt_write(
+    b"written while offline", &write_cap, &current_index).await?;
+enqueue(&w); // persist for later
+
+// Later, only transmit once connected.
+if client.is_connected() {
+    for e in drain_queue() {
+        client.start_resending_encrypted_message(
+            None, Some(&write_cap), None, None,
+            &e.envelope_descriptor, &e.message_ciphertext,
+            &e.envelope_hash).await?;
+    }
+}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+# Offline: pure local crypto, works regardless.
+w = await client.encrypt_write(
+    b"written while offline", write_cap, current_index)
+enqueue(w)  # persist for later
+
+# Later, only transmit once connected.
+if client.is_connected():
+    for e in drain_queue():
+        await client.start_resending_encrypted_message(
+            read_cap=None, write_cap=write_cap,
+            next_message_index=None, reply_index=None,
+            envelope_descriptor=e.envelope_descriptor,
+            message_ciphertext=e.message_ciphertext,
+            envelope_hash=e.envelope_hash)
+{{< /tab >}}
+{{< /tabpane >}}
+
+---
+
+## A complete end-to-end example
+
+The fragments above each show one task. Here they are assembled into a
+single runnable program: Alice creates a stream, writes one message,
+and Bob reads it back. This is the smallest complete program that
+exercises the Pigeonhole path. As with every example in this guide it
+omits production concerns (durable persistence, structured logging),
+but it compiles into the shape of a real application; the
+[CI-verified tests](#authoritative-working-examples) are the
+authority on exact, current usage.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+package main
+
+import (
+    "log"
+
+    "github.com/katzenpost/hpqc/rand"
+
+    "github.com/katzenpost/katzenpost/client/thin"
+    "github.com/katzenpost/katzenpost/core/config"
+)
+
+func main() {
+    cfg, err := thin.LoadFile("thinclient.toml")
+    if err != nil {
+        log.Fatal(err)
+    }
+    client := thin.NewThinClient(cfg, &config.Logging{Level: "INFO"})
+    if err := client.Dial(); err != nil {
+        log.Fatal(err)
+    }
+    defer client.Close()
+
+    // Alice creates a stream.
+    seed := make([]byte, 32)
+    if _, err := rand.Reader.Read(seed); err != nil {
+        log.Fatal(err)
+    }
+    writeCap, readCap, idx, err := client.NewKeypair(seed)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // Alice writes one message.
+    ct, ed, eh, _, err := client.EncryptWrite(
+        []byte("hello from Alice"), writeCap, idx)
+    if err != nil {
+        log.Fatal(err)
+    }
+    if _, err := client.StartResendingEncryptedMessage(
+        nil, writeCap, nil, nil, ed, ct, eh); err != nil {
+        log.Fatal(err)
+    }
+
+    // Bob reads it back (readCap would normally be shared out-of-band).
+    rct, red, reh, _, err := client.EncryptRead(readCap, idx)
+    if err != nil {
+        log.Fatal(err)
+    }
+    result, err := client.StartResendingEncryptedMessage(
+        readCap, nil, nil, nil, red, rct, reh)
+    if err != nil {
+        log.Fatal(err)
+    }
+    log.Printf("Bob read: %s", result.Plaintext)
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+use katzenpost_thin_client::{Config, ThinClient};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let config = Config::new("thinclient.toml")?;
+    let client = ThinClient::new(config).await?;
+
+    // Alice creates a stream.
+    let seed: [u8; 32] = rand::random();
+    let kp = client.new_keypair(&seed).await?;
+
+    // Alice writes one message.
+    let w = client.encrypt_write(
+        b"hello from Alice", &kp.write_cap, &kp.first_index).await?;
+    client.start_resending_encrypted_message(
+        None, Some(&kp.write_cap), None, None,
+        &w.envelope_descriptor, &w.message_ciphertext,
+        &w.envelope_hash).await?;
+
+    // Bob reads it back (read_cap would normally be shared out-of-band).
+    let r = client.encrypt_read(&kp.read_cap, &kp.first_index).await?;
+    let result = client.start_resending_encrypted_message(
+        Some(&kp.read_cap), None, None, None,
+        &r.envelope_descriptor, &r.message_ciphertext,
+        &r.envelope_hash).await?;
+    println!("Bob read: {:?}", result.plaintext);
+
+    client.stop().await;
+    Ok(())
+}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+import asyncio, os
+from katzenpost_thinclient import ThinClient, Config
+
+async def main():
+    config = Config("thinclient.toml")
+    client = ThinClient(config)
+    await client.start(asyncio.get_running_loop())
+
+    # Alice creates a stream.
+    seed = os.urandom(32)
+    kp = await client.new_keypair(seed)
+
+    # Alice writes one message.
+    w = await client.encrypt_write(
+        b"hello from Alice", kp.write_cap, kp.first_index)
+    await client.start_resending_encrypted_message(
+        read_cap=None, write_cap=kp.write_cap,
+        next_message_index=None, reply_index=None,
+        envelope_descriptor=w.envelope_descriptor,
+        message_ciphertext=w.message_ciphertext,
+        envelope_hash=w.envelope_hash)
+
+    # Bob reads it back (read_cap would normally be shared out-of-band).
+    r = await client.encrypt_read(kp.read_cap, kp.first_index)
+    plaintext = await client.start_resending_encrypted_message(
+        read_cap=kp.read_cap, write_cap=None,
+        next_message_index=None, reply_index=None,
+        envelope_descriptor=r.envelope_descriptor,
+        message_ciphertext=r.message_ciphertext,
+        envelope_hash=r.envelope_hash)
+    print("Bob read:", plaintext)
+
+    client.stop()
+
+asyncio.run(main())
 {{< /tab >}}
 {{< /tabpane >}}
 

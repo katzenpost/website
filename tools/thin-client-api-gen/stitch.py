@@ -22,6 +22,55 @@ TAB_LABEL = {"go": "Go", "rust": "Rust", "python": "Python"}
 
 PINNED_VERSIONS_PLACEHOLDER = "<!-- PINNED_VERSIONS_TABLE -->"
 
+DATA_TYPES_PLACEHOLDER = "<!-- DATA_TYPES_TABLE -->"
+
+
+def _one_line(text: str) -> str:
+    """Collapse a multi-line doc comment to a single table-cell line."""
+    return " ".join(part.strip() for part in text.split()) if text else ""
+
+
+def render_data_types(go_syms: dict[str, dict], spec: list) -> str:
+    """Render a field reference for the curated Go return/parameter structs.
+
+    `spec` is the parsed data-types.yaml: a list of entries, each either
+    a bare struct name or a mapping with `struct:` and optional `title:`
+    and `note:`. The Go reference structs are authoritative; the Rust
+    and Python bindings carry the same data under snake_case names.
+    """
+    blocks: list[str] = []
+    for entry in spec:
+        if isinstance(entry, str):
+            name, title, note = entry, entry, ""
+        else:
+            name = entry["struct"]
+            title = entry.get("title") or name
+            note = entry.get("note") or ""
+        sym = go_syms.get(name)
+        if sym is None:
+            blocks.append(f"### {title}\n\n_(unresolved: Go struct "
+                          f"`{name}` not found)_")
+            continue
+        lines = [f"### {title}"]
+        doc = strip_structured_sections((sym.get("doc") or "").strip())
+        if doc:
+            lines.append("")
+            lines.append(doc.rstrip())
+        if note:
+            lines.append("")
+            lines.append(note.rstrip())
+        fields = sym.get("fields") or []
+        if fields:
+            lines.append("")
+            lines.append("| Field | Type | Description |")
+            lines.append("|---|---|---|")
+            for f in fields:
+                desc = _one_line(f.get("doc") or "")
+                ftype = f.get("type", "").replace("|", "\\|")
+                lines.append(f"| `{f['name']}` | `{ftype}` | {desc} |")
+        blocks.append("\n".join(lines))
+    return "\n\n".join(blocks)
+
 
 def render_pinned_versions_table(katzenpost_tag: str, thinclient_tag: str) -> str:
     kp = "https://github.com/katzenpost/katzenpost"
@@ -240,19 +289,31 @@ def render_document(
     strict: bool,
     katzenpost_tag: str,
     thinclient_tag: str,
+    data_types_spec: list,
 ) -> tuple[str, list[str]]:
     unresolved: list[str] = []
     parts: list[str] = []
 
     versions_table = render_pinned_versions_table(katzenpost_tag, thinclient_tag)
+    data_types_block = (
+        render_data_types(go_syms, data_types_spec) if data_types_spec else ""
+    )
     placeholder_seen = False
+    data_types_seen = False
 
-    # Emit the top overlay first (preamble, configuration, etc.).
-    for frag in overlay["top"]:
+    def fill(frag: str) -> str:
+        nonlocal placeholder_seen, data_types_seen
         if PINNED_VERSIONS_PLACEHOLDER in frag:
             frag = frag.replace(PINNED_VERSIONS_PLACEHOLDER, versions_table)
             placeholder_seen = True
-        parts.append(frag.rstrip() + "\n\n")
+        if DATA_TYPES_PLACEHOLDER in frag:
+            frag = frag.replace(DATA_TYPES_PLACEHOLDER, data_types_block)
+            data_types_seen = True
+        return frag
+
+    # Emit the top overlay first (preamble, configuration, etc.).
+    for frag in overlay["top"]:
+        parts.append(fill(frag).rstrip() + "\n\n")
 
     if not placeholder_seen:
         unresolved.append(
@@ -282,7 +343,13 @@ def render_document(
             parts.append(frag.rstrip() + "\n\n")
 
     for frag in overlay["post"]:
-        parts.append(frag.rstrip() + "\n\n")
+        parts.append(fill(frag).rstrip() + "\n\n")
+
+    if data_types_spec and not data_types_seen:
+        unresolved.append(
+            f"data types placeholder {DATA_TYPES_PLACEHOLDER!r} "
+            "not found in any overlay fragment"
+        )
 
     doc = "".join(parts)
     return doc, unresolved
@@ -294,6 +361,9 @@ def main() -> int:
     p.add_argument("--rust-json", required=True, type=Path)
     p.add_argument("--python-json", required=True, type=Path)
     p.add_argument("--groups", required=True, type=Path)
+    p.add_argument("--data-types", type=Path, default=None,
+                   help="optional YAML list of Go structs to render as a "
+                        "field reference at the DATA_TYPES placeholder")
     p.add_argument("--overlay", required=True, type=Path)
     p.add_argument("--output", required=True, type=Path)
     p.add_argument("--strict", action="store_true",
@@ -315,9 +385,18 @@ def main() -> int:
 
     overlay = load_overlay(args.overlay)
 
+    data_types_spec: list = []
+    if args.data_types is not None:
+        data_types_spec = yaml.safe_load(
+            args.data_types.read_text(encoding="utf-8")) or []
+        if not isinstance(data_types_spec, list):
+            print("error: data-types file must be a YAML list at the top level",
+                  file=sys.stderr)
+            return 2
+
     doc, unresolved = render_document(
         groups_raw, overlay, go_syms, rust_syms, py_syms, args.strict,
-        args.katzenpost_tag, args.thinclient_tag,
+        args.katzenpost_tag, args.thinclient_tag, data_types_spec,
     )
 
     for msg in unresolved:
