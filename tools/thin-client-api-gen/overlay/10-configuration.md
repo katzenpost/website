@@ -2,10 +2,7 @@
 
 The thin client is configured via a TOML file that specifies only how
 to reach the local daemon. We usually name this configuration file
-`thinclient.toml`. The Sphinx and Pigeonhole geometries are supplied
-by the daemon over the socket during the connection handshake, so the
-client never configures them and they cannot drift out of step with
-the daemon.
+`thinclient.toml`.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
