@@ -107,8 +107,8 @@ All communication happens through Pigeonhole streams (also called
 channels). A stream is an ordered, append-only sequence of encrypted
 messages, known as boxes. These boxes are stored in the storage servers
 using a hash based sharding scheme. Boxes have a fixed-size maximum
-payload and are padded; the exact size is governed by the configurable
-pigeonhole geometry, described below.
+payload and are padded; the exact size is set by the pigeonhole
+geometry, described below.
 
 - **Append-only and immutable.** Once a message is written to a
   box, it cannot be overwritten by another write -- the replica
@@ -154,19 +154,23 @@ that size before storage so that all boxes on the wire are
 indistinguishable by length. A message larger than one box's payload
 must be split across several boxes; one smaller is padded.
 
-The exact size is not a hard-coded constant but a field of the
-**pigeonhole geometry**, a configuration object the network operator
-chooses and the daemon reads from `thinclient.toml`. The pigeonhole
-geometry is derived from, and must be consistent with, the Sphinx
-geometry: a Pigeonhole request travels inside a Sphinx packet, so the
-usable box payload is sized to fit whatever the deployed Sphinx
-geometry allows once the envelope and protocol overheads are
-subtracted. An operator who enlarges the Sphinx packet may enlarge the
-box payload to match; one who runs a smaller Sphinx geometry will have
-a correspondingly smaller box payload. An application should therefore
-treat the box payload size as a deployment parameter to be read from
-configuration, not a fixed number to hard-code. The fields are
-enumerated in the [API reference](/docs/thin_client_api_reference/).
+The exact size is not a hard-coded constant but a property of the
+**pigeonhole geometry**, a deployment parameter rather than something
+the application chooses. It is not configured directly: it is derived
+from, and must be consistent with, the Sphinx geometry the network
+publishes in its PKI consensus. A Pigeonhole request travels inside a
+Sphinx packet, so the usable box payload is whatever the deployed
+Sphinx geometry allows once the envelope and protocol overheads are
+subtracted. A network running a larger Sphinx packet has a
+correspondingly larger box payload; one running a smaller Sphinx
+geometry has a smaller one. The thin client does not read this from a
+configuration file of its own; the `kpclientd` daemon computes the
+pigeonhole geometry and supplies it to the thin client over the local
+socket during the connection handshake. An application should
+therefore treat the box payload size as a value obtained at runtime
+from the daemon, not a fixed number to hard-code. See the
+[API reference](/docs/thin_client_api_reference/) for how each binding
+exposes it.
 
 
 ## Cryptographic Capabilities
