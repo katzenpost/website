@@ -82,7 +82,63 @@ def render_api() -> str:
     body = result.stdout.strip()
     if not body:
         sys.exit("error: pydoc-markdown produced no output")
-    return space_sections(flatten_setext(fence_doctests(body)))
+    return space_sections(
+        group_exceptions(flatten_setext(fence_doctests(body))))
+
+
+_HEADING = re.compile(r"^(#{2,4}) +(.*)$")
+_EXC_NAME = re.compile(r"(Error|Exception)$")
+
+
+def group_exceptions(body: str) -> str:
+    """Fold the exception subclasses under one "Exceptions" heading.
+
+    The binding declares a long run of thin exception classes. As H3
+    headings they swamped Docsy's right-hand table of contents. We
+    insert a single `### Exceptions` heading before the first of them
+    and demote each exception class (H3 to H4) and its members (H4 to
+    H5), so the whole taxonomy collapses to one TOC entry while still
+    rendering in full on the page.
+    """
+    out: list[str] = []
+    in_fence = False
+    in_group = False
+    inserted = False
+    for line in body.split("\n"):
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        m = _HEADING.match(line) if not in_fence else None
+        if m:
+            level = len(m.group(1))
+            name = m.group(2).replace("\\", "").strip()
+            if level == 2:
+                in_group = False
+            elif level == 3:
+                if _EXC_NAME.search(name):
+                    if not inserted:
+                        j = len(out)
+                        while j > 0 and out[j - 1].strip() == "":
+                            j -= 1
+                        if j > 0 and _ANCHOR.match(out[j - 1]):
+                            j -= 1
+                        out[j:j] = [
+                            '<a id="exceptions"></a>', "",
+                            "### Exceptions", "",
+                            "Error types raised by the thin client; each "
+                            "derives from the standard library `Exception`.",
+                            "",
+                        ]
+                        inserted = True
+                    in_group = True
+                    line = "#" + line
+                else:
+                    in_group = False
+            elif level == 4 and in_group:
+                line = "#" + line
+        out.append(line)
+    return "\n".join(out)
 
 
 _PROMPT = re.compile(r"^(>>>|\.\.\.)( |$)")
