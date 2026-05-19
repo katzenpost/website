@@ -1,7 +1,7 @@
 include pinned-versions.env
 export
 
-OUTPUT := ../../content/en/docs/thin_client_api_reference.md
+OUTPUT := ../../content/en/docs/misc/thin_client_api_reference.md
 
 GO_SRC     := $(KATZENPOST_PATH)/client/thin
 RUST_SRC   := $(THINCLIENT_PATH)/src
@@ -90,6 +90,7 @@ build: check-versions $(VENV_STAMP) $(GO_JSON) $(RUST_JSON) $(PYTHON_JSON)
 	    --rust-json $(RUST_JSON) \
 	    --python-json $(PYTHON_JSON) \
 	    --groups groups.yaml \
+	    --data-types data-types.yaml \
 	    --overlay overlay \
 	    --katzenpost-tag $(KATZENPOST_TAG) \
 	    --thinclient-tag $(THINCLIENT_TAG) \
@@ -101,6 +102,7 @@ check: check-versions $(VENV_STAMP) $(GO_JSON) $(RUST_JSON) $(PYTHON_JSON)
 	    --rust-json $(RUST_JSON) \
 	    --python-json $(PYTHON_JSON) \
 	    --groups groups.yaml \
+	    --data-types data-types.yaml \
 	    --overlay overlay \
 	    --katzenpost-tag $(KATZENPOST_TAG) \
 	    --thinclient-tag $(THINCLIENT_TAG) \

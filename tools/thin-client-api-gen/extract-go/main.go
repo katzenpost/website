@@ -17,14 +17,21 @@ import (
 	"unicode"
 )
 
+type Field struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+	Doc  string `json:"doc,omitempty"`
+}
+
 type Symbol struct {
-	Name      string `json:"name"`
-	Kind      string `json:"kind"`
-	Receiver  string `json:"receiver,omitempty"`
-	Signature string `json:"signature"`
-	Doc       string `json:"doc"`
-	File      string `json:"file"`
-	Line      int    `json:"line"`
+	Name      string  `json:"name"`
+	Kind      string  `json:"kind"`
+	Receiver  string  `json:"receiver,omitempty"`
+	Signature string  `json:"signature"`
+	Doc       string  `json:"doc"`
+	Fields    []Field `json:"fields,omitempty"`
+	File      string  `json:"file"`
+	Line      int     `json:"line"`
 }
 
 type Output struct {
@@ -108,6 +115,35 @@ func docText(cg *ast.CommentGroup) string {
 	return strings.TrimRight(cg.Text(), "\n")
 }
 
+// structFields extracts the exported fields of a struct type together
+// with their type and doc comment (the comment preceding the field, or
+// the trailing line comment if there is no preceding one). Embedded
+// fields are reported under their type name.
+func structFields(fset *token.FileSet, st *ast.StructType) []Field {
+	if st.Fields == nil {
+		return nil
+	}
+	var fields []Field
+	for _, f := range st.Fields.List {
+		typ := strings.TrimRight(printNode(fset, f.Type), " \t\n")
+		doc := docText(f.Doc)
+		if doc == "" {
+			doc = docText(f.Comment)
+		}
+		if len(f.Names) == 0 {
+			fields = append(fields, Field{Name: typ, Type: typ, Doc: doc})
+			continue
+		}
+		for _, n := range f.Names {
+			if !isExported(n.Name) {
+				continue
+			}
+			fields = append(fields, Field{Name: n.Name, Type: typ, Doc: doc})
+		}
+	}
+	return fields
+}
+
 func walk(srcdir string) ([]Symbol, error) {
 	var out []Symbol
 	fset := token.NewFileSet()
@@ -172,8 +208,10 @@ func walk(srcdir string) ([]Symbol, error) {
 							continue
 						}
 						kind := "type"
-						if _, ok := s.Type.(*ast.StructType); ok {
+						var fields []Field
+						if st, ok := s.Type.(*ast.StructType); ok {
 							kind = "struct"
+							fields = structFields(fset, st)
 						} else if _, ok := s.Type.(*ast.InterfaceType); ok {
 							kind = "interface"
 						}
@@ -186,6 +224,7 @@ func walk(srcdir string) ([]Symbol, error) {
 							Kind:      kind,
 							Signature: genDeclSignature(fset, d, s),
 							Doc:       doc,
+							Fields:    fields,
 							File:      rel,
 							Line:      fset.Position(s.Pos()).Line,
 						})

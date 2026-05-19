@@ -73,7 +73,23 @@ client = ThinClient(config)
   call is received. Fields (Go):
   `MessageID *[MessageIDLength]byte`, `SURBID *[SURBIDLength]byte`,
   `Payload []byte`, `ReplyIndex *uint8`, `ErrorCode uint8`.
+  `ReplyIndex` identifies **which of the box's two replicas answered**:
+  each box is sharded across K=2 replicas, and the value (0 or 1) is
+  the position within that pair of the replica whose response was
+  used. It is chiefly of interest for Pigeonhole channel reads and may
+  be `nil` when not applicable. The same value is accepted as the
+  `reply_index` parameter of `StartResendingEncryptedMessage`, where
+  it likewise selects the replica of the pair to address.
+
+- **ShutdownEvent**: emitted when the daemon signals that it is
+  shutting down. It carries no fields. It precedes the loss of the
+  local socket and is what causes the following
+  **DaemonDisconnectedEvent** to report `IsGraceful = true`. Treat it
+  as advance notice of the disconnect; no action is required, since
+  the thin client reconnects and replays in-flight requests on its
+  own.
 
 - **DaemonDisconnectedEvent** — emitted by the thin client (not the
   daemon) when the local socket connection to the daemon is lost.
-  Fields (Go): `IsGraceful bool`, `Err error`.
+  Fields (Go): `IsGraceful bool`, `Err error`. `IsGraceful` is true
+  precisely when a `ShutdownEvent` preceded the disconnect.
