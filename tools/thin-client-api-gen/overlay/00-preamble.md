@@ -36,7 +36,7 @@ The official API documentation for each binding:
 | --- | --- |
 | Go | [pkg.go.dev](https://pkg.go.dev/github.com/katzenpost/katzenpost/client/thin) |
 | Rust | [docs.rs](https://docs.rs/katzenpost_thin_client/latest/katzenpost_thin_client/) |
-| Python | [PyPI: katzenpost_thinclient](https://pypi.org/project/katzenpost_thinclient/) |
+| Python | [Python Thin Client API](/docs/python_thin_client_api/) |
 
 This reference describes the following pinned binding versions:
 
