@@ -921,7 +921,7 @@ type CourierBookKeeping struct {
         <title>Annotated writes</title>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="pix/annotated_write.png" />
+            <imagedata fileref="annotated_write.png" />
           </imageobject>                  
           <textobject>
           <phrase>Protocol annotation image of writes.</phrase>
@@ -937,7 +937,7 @@ type CourierBookKeeping struct {
         <title>Annotated reads</title>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="pix/annotated_read.png" />
+            <imagedata fileref="annotated_read.png" />
           </imageobject>                  
           <textobject>
           <phrase>Protocol annotation image of reads.</phrase>
