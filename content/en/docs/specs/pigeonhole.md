@@ -4,7 +4,7 @@ linkTitle: "Pigeonhole Protocol"
 description: ""
 author: "Threebit Hacker, David Stainton"
 url: ""
-date: "2026-05-15T17:04:40.537338377-07:00"
+date: "2026-05-19T14:27:50.949359757-07:00"
 draft: "false"
 slug: "pigeonhole"
 layout: ""
@@ -366,7 +366,7 @@ encryption" from other courier-side rejections.
 The Pigeonhole message types are defined in trunnel at <a href="https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/pigeonhole_messages.trunnel" class="link" target="_top"><code class="code">pigeonhole/pigeonhole_messages.trunnel</code></a>; the Go bindings live in <a href="https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/trunnel_messages.go" class="link" target="_top"><code class="code">pigeonhole/trunnel_messages.go</code></a>. All integer fields are big-endian and
 all variable-length fields carry an explicit length prefix. This trunnel encoding
 replaces the
-earlier CBOR encoding with a fixed-overhead binary format whose serialised size can
+earlier CBOR encoding with a fixed-overhead binary format whose serialized size can
 be
 computed deterministically from the Sphinx geometry.
 
@@ -384,7 +384,7 @@ Carriage of these messages differs by hop:
   the Katzenpost wire protocol defined in `core/wire` and
   `core/wire/commands`; the relevant commands are `ReplicaMessage`,
   `ReplicaMessageReply`, `ReplicaWrite`, and
-  `ReplicaWriteReply`. Some of these commands embed trunnel-serialised
+  `ReplicaWriteReply`. Some of these commands embed trunnel-serialized
   pigeonhole blobs as their payload.
 
 </div>
@@ -545,7 +545,7 @@ The courier, upon unwrapping the Sphinx payload of a client's packet, sees a
 `CourierQuery` whose `content` is a `CourierEnvelope`
 with the following layout:
 
-``` go 
+``` programlisting
 struct courier_envelope {
     u8  intermediate_replicas[2];          // replica indices in the PKI
     u8  dek1[MKEM_DEK_SIZE];               // DEK encapsulation for replica 0
@@ -573,8 +573,7 @@ Notable points:
   the tolerance window.
 
 - Prior to encryption, the inner `ReplicaInnerMessage` is zero-padded to
-  `ReplicaInnerMessageWriteSize()` so that reads, writes and tombstones
-  produce MKEM ciphertexts of identical length.
+  `ReplicaInnerMessageWriteSize()` so that reads, writes and <a href="#tombstones" class="link" title="Tombstones">tombstones</a> produce MKEM ciphertexts of identical length.
 
 </div>
 
@@ -588,7 +587,7 @@ Notable points:
 
 <div>
 
-#### <span id="d58e399"></span>The ReplicaInnerMessage as seen by a replica
+#### <span id="d58e402"></span>The ReplicaInnerMessage as seen by a replica
 
 </div>
 
@@ -599,7 +598,7 @@ Notable points:
 Once an intermediate replica decrypts the MKEM envelope, it obtains a
 `ReplicaInnerMessage` — a discriminated union over `message_type`:
 
-``` go
+``` programlisting
 struct replica_inner_message {
     u8 message_type IN [0, 1];    // 0 = read, 1 = write
     union content[message_type] {
@@ -624,7 +623,7 @@ A `ReplicaWrite` with `payload_len == 0` is a <a href="#tombstones" class="link"
 
 <div>
 
-### <span id="d58e417"></span>Message types and interactions
+### <span id="d58e420"></span>M\<essage types and interactions
 
 </div>
 
@@ -640,7 +639,7 @@ A `ReplicaWrite` with `payload_len == 0` is a <a href="#tombstones" class="link"
 
 <div>
 
-#### <span id="d58e419"></span>Overview
+#### <span id="d58e422"></span>Overview
 
 </div>
 
@@ -695,7 +694,7 @@ A `ReplicaWrite` with `payload_len == 0` is a <a href="#tombstones" class="link"
 A `CourierQuery` is the top-level discriminated union that a client places
 into a Sphinx packet payload for the courier:
 
-``` go
+``` programlisting
 struct courier_query {
     u8 query_type IN [0, 1];
     union content[query_type] {
@@ -707,7 +706,7 @@ struct courier_query {
 
 The symmetric reply is a `CourierQueryReply`:
 
-``` go
+``` programlisting
 struct courier_query_reply {
     u8 reply_type IN [0, 1];
     union content[reply_type] {
@@ -727,7 +726,7 @@ struct courier_query_reply {
 
 <div>
 
-#### <span id="d58e475"></span>CourierEnvelope
+#### <span id="d58e478"></span>CourierEnvelope
 
 </div>
 
@@ -771,7 +770,7 @@ performs the following actions.
 
 <div>
 
-#### <span id="d58e523"></span>ReplicaMessage (wire command)
+#### <span id="d58e526"></span>ReplicaMessage (wire command)
 
 </div>
 
@@ -783,7 +782,7 @@ performs the following actions.
 the `core/wire/commands` command sent from a courier to a replica. Its payload
 fields are copied verbatim from the matching `CourierEnvelope`:
 
-``` go
+``` programlisting
 // core/wire/commands
 type ReplicaMessage struct {
     SenderEPubKey []byte     // copied from CourierEnvelope.sender_pubkey
@@ -808,7 +807,7 @@ dispatches on `message_type` to `ReplicaRead` or
 
 <div>
 
-#### <span id="d58e548"></span>ReplicaMessageReply (wire command)
+#### <span id="d58e551"></span>ReplicaMessageReply (wire command)
 
 </div>
 
@@ -819,7 +818,7 @@ dispatches on `message_type` to `ReplicaRead` or
 In response to a `ReplicaMessage`, the courier expects an asynchronous
 `ReplicaMessageReply` wire command from the replica:
 
-``` go
+``` programlisting
 // core/wire/commands
 type ReplicaMessageReply struct {
     ErrorCode     uint8                 // see the replica error-code table below
@@ -847,7 +846,7 @@ replica's envelope keypair.
 
 <div>
 
-#### <span id="d58e576"></span>CourierBookKeeping
+#### <span id="d58e579"></span>CourierBookKeeping
 
 </div>
 
@@ -858,7 +857,7 @@ replica's envelope keypair.
 For each outstanding `EnvelopeHash`, the courier maintains an in-memory dedup
 entry. Its actual structure is:
 
-``` go
+``` programlisting
 // courier/server/plugin.go
 type CourierBookKeeping struct {
     Epoch                uint64        // replica-epoch at cache insertion
@@ -890,7 +889,7 @@ The dedup cache has a TTL of 5 minutes (`DedupCacheTTL` in <a href="https://gith
 
 <div>
 
-#### <span id="d58e600"></span>CourierEnvelopeReply
+#### <span id="d58e603"></span>CourierEnvelopeReply
 
 </div>
 
@@ -900,7 +899,7 @@ The dedup cache has a TTL of 5 minutes (`DedupCacheTTL` in <a href="https://gith
 
 The courier's reply to a `CourierEnvelope` has the following trunnel layout:
 
-``` go
+``` programlisting
 struct courier_envelope_reply {
     u8  envelope_hash[HASH_SIZE];       // identifies the originating envelope
     u8  reply_index;                    // which intermediate replica's reply
@@ -932,7 +931,7 @@ by a replica.
 
 <div>
 
-### <span id="d58e622"></span>Embedded pigeonhole types
+### <span id="d58e625"></span>Embedded pigeonhole types
 
 </div>
 
@@ -952,7 +951,7 @@ MKEM envelopes and their replies.
 
 <div>
 
-#### <span id="d58e625"></span>ReplicaRead
+#### <span id="d58e628"></span>ReplicaRead
 
 </div>
 
@@ -963,7 +962,7 @@ MKEM envelopes and their replies.
 Embedded inside the MKEM-encrypted `ReplicaInnerMessage` a client sends to a
 replica (via the courier) for a read operation.
 
-``` go
+``` programlisting
 struct replica_read {
     u8 box_id[BACAP_BOX_ID_SIZE];
 }  
@@ -979,7 +978,7 @@ struct replica_read {
 
 <div>
 
-#### <span id="d58e632"></span>ReplicaReadReply
+#### <span id="d58e635"></span>ReplicaReadReply
 
 </div>
 
@@ -992,7 +991,7 @@ replica returns for a successful read. Padding is applied at the outer
 `ReplicaMessageReplyInnerMessage` level; this struct carries no padding of its
 own.
 
-``` go
+``` programlisting
 struct replica_read_reply {
     u8  error_code;
     u8  box_id[BACAP_BOX_ID_SIZE];
@@ -1012,7 +1011,7 @@ struct replica_read_reply {
 
 <div>
 
-#### <span id="d58e641"></span>ReplicaWrite
+#### <span id="d58e644"></span>ReplicaWrite
 
 </div>
 
@@ -1024,7 +1023,7 @@ Used both (a) embedded inside the MKEM-encrypted `ReplicaInnerMessage` for a
 client write, and (b) carried directly as a `core/wire/commands` command between
 replicas during replication.
 
-``` go
+``` programlisting
 struct replica_write {
     u8  box_id[BACAP_BOX_ID_SIZE];
     u8  signature[BACAP_SIGNATURE_SIZE];
@@ -1047,11 +1046,12 @@ reads return `ReplicaErrorTombstone`.
 
 <div>
 
-#### <span id="d58e663"></span>ReplicaWriteReply
+#### <span id="d58e666"></span>ReplicaWriteReply
 
 </div>
 
 </div>
+
 </div>
 
 Embedded inside a
@@ -1060,7 +1060,7 @@ reply path, and also used as the
 `core/wire/commands` reply to inter-replica
 replication.
 
-``` go
+``` programlisting
 struct replica_write_reply {
     u8 error_code;
 }
@@ -1123,7 +1123,7 @@ box of the temporary stream with tombstones.
 
 <div>
 
-### <span id="d58e722"></span>EnvelopeHash
+### <span id="d58e725"></span>EnvelopeHash
 
 </div>
 
@@ -1135,7 +1135,7 @@ The `EnvelopeHash` uniquely identifies a
 `CourierEnvelope` for the purposes of deduplication
 and reply demultiplexing. It is computed as:
 
-``` go
+``` programlisting
 EnvelopeHash = BLAKE2b-256(sender_pubkey || ciphertext)
 ```
 
@@ -1156,7 +1156,7 @@ surrounding Sphinx packet (and its SURB) changes between attempts.
 
 <div>
 
-### <span id="d58e753"></span>Error codes
+### <span id="d58e756"></span>Error codes
 
 </div>
 
@@ -1187,7 +1187,7 @@ Returned by a replica in `ReplicaMessageReply.ErrorCode`,
 
 <div class="table">
 
-<span id="d58e771"></span>
+<span id="d58e774"></span>
 
 **Table 2. **
 
@@ -1285,7 +1285,7 @@ protocol states rather than faults. The thin-client helper
 
 <div>
 
-#### <span id="d58e848"></span>Courier envelope error codes
+#### <span id="d58e851"></span>Courier envelope error codes
 
 </div>
 
@@ -1297,7 +1297,7 @@ Returned by the courier in `CourierEnvelopeReply.error_code`.
 
 <div class="table">
 
-<span id="d58e854"></span>
+<span id="d58e857"></span>
 
 **Table 3. **
 
@@ -1356,7 +1356,7 @@ Returned by the courier in `CourierEnvelopeReply.error_code`.
 
 <div>
 
-#### <span id="d58e896"></span>Copy command status codes
+#### <span id="d58e899"></span>Copy command status codes
 
 </div>
 
@@ -1372,7 +1372,7 @@ information.)
 
 <div class="table">
 
-<span id="d58e910"></span>
+<span id="d58e913"></span>
 
 **Table 4. **
 
@@ -1424,7 +1424,7 @@ information.)
 
 <div>
 
-### <span id="d58e943"></span>Sharding and replica selection
+### <span id="d58e946"></span>Sharding and replica selection
 
 </div>
 
@@ -1436,10 +1436,10 @@ For each box, two <span class="emphasis">*designated*</span> (final) replicas ar
 deterministically from the box ID using the `Shard2` consistent-hash algorithm.
 (See <a href="https://github.com/katzenpost/katzenpost/blob/main/replica/common/shard.go" class="link" target="_top"><code class="code">replica/common/shard.go</code></a>.):
 
-``` go
+``` programlisting
 for each online replica r with identity key k_r:
     h_r = BLAKE2b-256(k_r || box_id)
-return the two replicas whose h_r are smallest
+// return the two replicas whose h_r values are smallest
 ```
 
 The two <span class="emphasis">*intermediate*</span> replicas chosen by the client for a given
@@ -1474,7 +1474,7 @@ replicas themselves and forward the `ReplicaWrite` to them via the
 
 <div>
 
-### <span id="d58e998"></span>Protocol sequence visualizations
+### <span id="d58e1001"></span>Protocol sequence visualizations
 
 </div>
 
@@ -1489,7 +1489,7 @@ write and read operations.
 
 <div class="figure">
 
-<span id="d58e1005"></span>
+<span id="d58e1008"></span>
 
 **Figure 1. Annotated writes**
 
@@ -1497,7 +1497,7 @@ write and read operations.
 
 <div class="mediaobject">
 
-![Protocol annotation image of writes.](pix/annotated_write.png)
+![Protocol annotation image of writes.](/docs/specs/pix/annotated_write.png)
 
 </div>
 
@@ -1511,7 +1511,7 @@ write and read operations.
 
 <div class="figure">
 
-<span id="d58e1018"></span>
+<span id="d58e1021"></span>
 
 **Figure 2. Annotated reads**
 
@@ -1519,7 +1519,7 @@ write and read operations.
 
 <div class="mediaobject">
 
-![Protocol annotation image of reads.](pix/annotated_read.png)
+![Protocol annotation image of reads.](/docs/specs/pix/annotated_read.png)
 
 </div>
 
@@ -1569,7 +1569,7 @@ The protocol works as follows.
 
 <div>
 
-#### <span id="d58e1032"></span>Step 1
+#### <span id="d58e1035"></span>Step 1
 
 </div>
 
@@ -1579,13 +1579,13 @@ The protocol works as follows.
 
 The client uploads a <span class="emphasis">*temporary Pigeonhole stream*</span>.
 
-The stream conveys a sequence of `CourierEnvelope`s. Each
-`CourierEnvelope` is serialised and prefixed with a single 4-byte
+The stream is sequence of `CourierEnvelope`s. Each
+`CourierEnvelope` is serialized and prefixed with a single 4-byte
 (`u32`) length field giving the size of that one envelope; the resulting
 length-prefixed blobs are concatenated back-to-back into one continuous byte stream.
 
 That byte stream is then split across the BACAP Boxes of the temporary stream. A
-serialised `CourierEnvelope` is strictly larger than the maximum BACAP box
+serialized `CourierEnvelope` is strictly larger than the maximum BACAP box
 payload (it wraps a full box payload plus its own metadata), so a single envelope
 does not
 fit in one box and the concatenated stream necessarily spans several boxes. Envelope
@@ -1602,7 +1602,7 @@ in <a href="#temp_stream" class="xref" title="Temporary stream data format">the 
 
 <div>
 
-#### <span id="d58e1052"></span>Step 2
+#### <span id="d58e1055"></span>Step 2
 
 </div>
 
@@ -1640,7 +1640,7 @@ tombstones.
 Each box in the temporary stream is a serialized `CopyStreamElement`.
 Defined in trunnel as:
 
-``` go
+``` programlisting
 // CopyStreamElement - wraps a CourierEnvelope chunk with stream position flags.
 // Overhead: 1 byte (flags) + 4 bytes (envelope_len) = 5 bytes
 struct copy_stream_element {
@@ -1655,7 +1655,7 @@ struct copy_stream_element {
 
 Here it is in golang:
 
-``` go
+``` programlisting
 type CopyStreamElement struct {
     Flags        uint8
     EnvelopeLen  uint32
@@ -1665,7 +1665,7 @@ type CopyStreamElement struct {
 
 The purpose of this specific format is to use the `isStart` and
 `isFinal` flags to tell the courier the first box and last box of the stream to
-process. The payloads encapsulated within the `EnvelopeData` fields of many of
+process. The payload encapsulated within the `EnvelopeData` fields of many of
 these `CopyStreamElement`s is itself a stream of data which contains
 `CourierEnvelope`s with four-byte prefixes.
 
@@ -1716,7 +1716,7 @@ This dedup cache has a TTL of 30 minutes (`CopyDedupCacheTTL` in <a href="https:
 
 <div>
 
-#### <span id="d58e1120"></span>CopyCommand
+#### <span id="d58e1123"></span>CopyCommand
 
 </div>
 
@@ -1727,10 +1727,10 @@ This dedup cache has a TTL of 30 minutes (`CopyDedupCacheTTL` in <a href="https:
 `CopyCommand` is sent by a client to its chosen courier after the client has
 successfully uploaded every box of the temporary stream. The trunnel layout is:
 
-``` go
+``` programlisting
 struct copy_command {
     u32 write_cap_len;
-    u8  write_cap[write_cap_len];   // serialised BACAP BoxOwnerCap
+    u8  write_cap[write_cap_len];   // serialized BACAP BoxOwnerCap
 }
 ```
 
@@ -1786,7 +1786,7 @@ failover or abort.
 
 The courier's reply to a `CopyCommand` has the following trunnel layout:
 
-``` go
+``` programlisting
 struct copy_command_reply {
     u8  status;                   // CopyStatus{Succeeded, InProgress, Failed}
     u8  error_code;               // replica error code (meaningful iff status == Failed)
@@ -1818,7 +1818,7 @@ cause the `CopyCommand` to be processed more than once.
 
 <div>
 
-#### <span id="d58e1201"></span>Potential use cases of AllOrNothing
+#### <span id="d58e1204"></span>Potential use cases of AllOrNothing
 
 </div>
 
@@ -1872,7 +1872,7 @@ In no particular order:
 
 <div>
 
-### <span id="d58e1224"></span>Protocol narration example
+### <span id="d58e1227"></span>Protocol narration example
 
 </div>
 
