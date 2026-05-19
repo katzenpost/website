@@ -1,0 +1,32 @@
+# Native pydoc-markdown configuration for the Katzenpost Python thin
+# client API page.
+#
+# This is the real, wired configuration (the lone pydoc-markdown.yml in
+# the thin_client repository is an inert scaffold and is not used).
+#
+# `@SRC@` is a placeholder: generate.py substitutes it with the
+# absolute path of a `git archive` export of the pinned thin_client
+# tag, so the user's working checkout is never disturbed. The rest of
+# this file is plain pydoc-markdown and may be edited as such.
+
+loaders:
+  - type: python
+    search_path: ["@SRC@"]
+    packages: ["katzenpost_thinclient"]
+
+processors:
+  - type: filter
+    documented_only: false
+    skip_empty_modules: true
+  - type: smart
+  - type: crossref
+
+renderer:
+  type: markdown
+  render_toc: true
+  render_toc_title: "Contents"
+  render_module_header: true
+  descriptive_class_title: false
+  add_method_class_prefix: true
+  add_member_class_prefix: true
+  signature_in_header: false
