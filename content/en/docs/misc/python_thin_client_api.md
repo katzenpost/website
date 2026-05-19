@@ -67,212 +67,6 @@ Convert a thin client error code to a human-readable string.
 
 ---
 
-<a id="exceptions"></a>
-
-### Exceptions
-
-Error types raised by the thin client; each derives from the standard library `Exception`.
-
-<a id="katzenpost_thinclient.core.ConfigError"></a>
-
-#### ConfigError
-
-```python
-class ConfigError(Exception)
-```
-
-Raised when the thin-client TOML config is missing required sections,
-contains unknown keys, or otherwise fails structural validation.
-
-Every caller of ConfigFile.load / Config(...) should expect this
-exception. It is raised eagerly at startup so that a stale or
-drifted config produces a loud, early failure instead of surfacing
-later as a mysterious runtime error during mixnet operations.
-
-<a id="katzenpost_thinclient.core.ReplicaError"></a>
-
-#### ReplicaError
-
-```python
-class ReplicaError(Exception)
-```
-
-Base class for all replica errors.
-
-<a id="katzenpost_thinclient.core.BoxIDNotFoundError"></a>
-
-#### BoxIDNotFoundError
-
-```python
-class BoxIDNotFoundError(ReplicaError)
-```
-
-Box ID not found on the replica. Occurs when reading from a non-existent mailbox.
-
-<a id="katzenpost_thinclient.core.InvalidBoxIDError"></a>
-
-#### InvalidBoxIDError
-
-```python
-class InvalidBoxIDError(ReplicaError)
-```
-
-Invalid box ID format.
-
-<a id="katzenpost_thinclient.core.InvalidSignatureError"></a>
-
-#### InvalidSignatureError
-
-```python
-class InvalidSignatureError(ReplicaError)
-```
-
-Signature verification failed.
-
-<a id="katzenpost_thinclient.core.DatabaseFailureError"></a>
-
-#### DatabaseFailureError
-
-```python
-class DatabaseFailureError(ReplicaError)
-```
-
-Replica encountered a database error.
-
-<a id="katzenpost_thinclient.core.InvalidPayloadError"></a>
-
-#### InvalidPayloadError
-
-```python
-class InvalidPayloadError(ReplicaError)
-```
-
-Payload data is invalid.
-
-<a id="katzenpost_thinclient.core.StorageFullError"></a>
-
-#### StorageFullError
-
-```python
-class StorageFullError(ReplicaError)
-```
-
-Replica's storage capacity has been exceeded.
-
-<a id="katzenpost_thinclient.core.ReplicaInternalError"></a>
-
-#### ReplicaInternalError
-
-```python
-class ReplicaInternalError(ReplicaError)
-```
-
-Internal error on the replica.
-
-<a id="katzenpost_thinclient.core.InvalidEpochError"></a>
-
-#### InvalidEpochError
-
-```python
-class InvalidEpochError(ReplicaError)
-```
-
-Epoch is invalid or expired.
-
-<a id="katzenpost_thinclient.core.ReplicationFailedError"></a>
-
-#### ReplicationFailedError
-
-```python
-class ReplicationFailedError(ReplicaError)
-```
-
-Replication to other replicas failed.
-
-<a id="katzenpost_thinclient.core.BoxAlreadyExistsError"></a>
-
-#### BoxAlreadyExistsError
-
-```python
-class BoxAlreadyExistsError(ReplicaError)
-```
-
-Box already contains data. Pigeonhole writes are immutable.
-
-<a id="katzenpost_thinclient.core.TombstoneError"></a>
-
-#### TombstoneError
-
-```python
-class TombstoneError(ReplicaError)
-```
-
-Box contains a tombstone (intentional deletion). This is not a failure.
-
-<a id="katzenpost_thinclient.core.InvalidTombstoneSignatureError"></a>
-
-#### InvalidTombstoneSignatureError
-
-```python
-class InvalidTombstoneSignatureError(Exception)
-```
-
-Tombstone signature verification failed (forgery or corruption).
-
-<a id="katzenpost_thinclient.core.MKEMDecryptionFailedError"></a>
-
-#### MKEMDecryptionFailedError
-
-```python
-class MKEMDecryptionFailedError(Exception)
-```
-
-MKEM envelope decryption failed with all replica keys.
-
-<a id="katzenpost_thinclient.core.BACAPDecryptionFailedError"></a>
-
-#### BACAPDecryptionFailedError
-
-```python
-class BACAPDecryptionFailedError(Exception)
-```
-
-BACAP payload decryption or signature verification failed.
-
-<a id="katzenpost_thinclient.core.StartResendingCancelledError"></a>
-
-#### StartResendingCancelledError
-
-```python
-class StartResendingCancelledError(Exception)
-```
-
-StartResendingEncryptedMessage operation was cancelled.
-
-<a id="katzenpost_thinclient.core.CopyCommandFailedError"></a>
-
-#### CopyCommandFailedError
-
-```python
-class CopyCommandFailedError(Exception)
-```
-
-StartResendingCopyCommand operation failed on the courier.
-
-The courier aborted the Copy command because a replica rejected one of the
-embedded writes. Inspect the diagnostic attributes to determine the cause:
-
-**Attributes**:
-
-- `replica_error_code` _int_ - The pigeonhole replica ErrorCode that triggered
-  the abort (e.g. REPLICA_ERROR_BOX_ALREADY_EXISTS). 0 if not reported.
-- `failed_envelope_index` _int_ - 1-based sequential position in the copy
-  stream of the envelope whose write triggered the abort. 0 if not
-  applicable. This is NOT a BACAP message index.
-
-
----
-
 <a id="katzenpost_thinclient.core.error_code_to_exception"></a>
 
 ### error\_code\_to\_exception
@@ -2300,3 +2094,211 @@ class UnixDialConfig()
 ```
 
 Configures a unix-domain-socket dialer.
+
+
+
+---
+
+<a id="exceptions"></a>
+
+## Exceptions
+
+Error types raised by the thin client; each derives from the standard library `Exception`.
+
+<a id="katzenpost_thinclient.core.ConfigError"></a>
+
+#### ConfigError
+
+```python
+class ConfigError(Exception)
+```
+
+Raised when the thin-client TOML config is missing required sections,
+contains unknown keys, or otherwise fails structural validation.
+
+Every caller of ConfigFile.load / Config(...) should expect this
+exception. It is raised eagerly at startup so that a stale or
+drifted config produces a loud, early failure instead of surfacing
+later as a mysterious runtime error during mixnet operations.
+
+<a id="katzenpost_thinclient.core.ReplicaError"></a>
+
+#### ReplicaError
+
+```python
+class ReplicaError(Exception)
+```
+
+Base class for all replica errors.
+
+<a id="katzenpost_thinclient.core.BoxIDNotFoundError"></a>
+
+#### BoxIDNotFoundError
+
+```python
+class BoxIDNotFoundError(ReplicaError)
+```
+
+Box ID not found on the replica. Occurs when reading from a non-existent mailbox.
+
+<a id="katzenpost_thinclient.core.InvalidBoxIDError"></a>
+
+#### InvalidBoxIDError
+
+```python
+class InvalidBoxIDError(ReplicaError)
+```
+
+Invalid box ID format.
+
+<a id="katzenpost_thinclient.core.InvalidSignatureError"></a>
+
+#### InvalidSignatureError
+
+```python
+class InvalidSignatureError(ReplicaError)
+```
+
+Signature verification failed.
+
+<a id="katzenpost_thinclient.core.DatabaseFailureError"></a>
+
+#### DatabaseFailureError
+
+```python
+class DatabaseFailureError(ReplicaError)
+```
+
+Replica encountered a database error.
+
+<a id="katzenpost_thinclient.core.InvalidPayloadError"></a>
+
+#### InvalidPayloadError
+
+```python
+class InvalidPayloadError(ReplicaError)
+```
+
+Payload data is invalid.
+
+<a id="katzenpost_thinclient.core.StorageFullError"></a>
+
+#### StorageFullError
+
+```python
+class StorageFullError(ReplicaError)
+```
+
+Replica's storage capacity has been exceeded.
+
+<a id="katzenpost_thinclient.core.ReplicaInternalError"></a>
+
+#### ReplicaInternalError
+
+```python
+class ReplicaInternalError(ReplicaError)
+```
+
+Internal error on the replica.
+
+<a id="katzenpost_thinclient.core.InvalidEpochError"></a>
+
+#### InvalidEpochError
+
+```python
+class InvalidEpochError(ReplicaError)
+```
+
+Epoch is invalid or expired.
+
+<a id="katzenpost_thinclient.core.ReplicationFailedError"></a>
+
+#### ReplicationFailedError
+
+```python
+class ReplicationFailedError(ReplicaError)
+```
+
+Replication to other replicas failed.
+
+<a id="katzenpost_thinclient.core.BoxAlreadyExistsError"></a>
+
+#### BoxAlreadyExistsError
+
+```python
+class BoxAlreadyExistsError(ReplicaError)
+```
+
+Box already contains data. Pigeonhole writes are immutable.
+
+<a id="katzenpost_thinclient.core.TombstoneError"></a>
+
+#### TombstoneError
+
+```python
+class TombstoneError(ReplicaError)
+```
+
+Box contains a tombstone (intentional deletion). This is not a failure.
+
+<a id="katzenpost_thinclient.core.InvalidTombstoneSignatureError"></a>
+
+#### InvalidTombstoneSignatureError
+
+```python
+class InvalidTombstoneSignatureError(Exception)
+```
+
+Tombstone signature verification failed (forgery or corruption).
+
+<a id="katzenpost_thinclient.core.MKEMDecryptionFailedError"></a>
+
+#### MKEMDecryptionFailedError
+
+```python
+class MKEMDecryptionFailedError(Exception)
+```
+
+MKEM envelope decryption failed with all replica keys.
+
+<a id="katzenpost_thinclient.core.BACAPDecryptionFailedError"></a>
+
+#### BACAPDecryptionFailedError
+
+```python
+class BACAPDecryptionFailedError(Exception)
+```
+
+BACAP payload decryption or signature verification failed.
+
+<a id="katzenpost_thinclient.core.StartResendingCancelledError"></a>
+
+#### StartResendingCancelledError
+
+```python
+class StartResendingCancelledError(Exception)
+```
+
+StartResendingEncryptedMessage operation was cancelled.
+
+<a id="katzenpost_thinclient.core.CopyCommandFailedError"></a>
+
+#### CopyCommandFailedError
+
+```python
+class CopyCommandFailedError(Exception)
+```
+
+StartResendingCopyCommand operation failed on the courier.
+
+The courier aborted the Copy command because a replica rejected one of the
+embedded writes. Inspect the diagnostic attributes to determine the cause:
+
+**Attributes**:
+
+- `replica_error_code` _int_ - The pigeonhole replica ErrorCode that triggered
+  the abort (e.g. REPLICA_ERROR_BOX_ALREADY_EXISTS). 0 if not reported.
+- `failed_envelope_index` _int_ - 1-based sequential position in the copy
+  stream of the envelope whose write triggered the abort. 0 if not
+  applicable. This is NOT a BACAP message index.
+
