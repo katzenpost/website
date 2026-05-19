@@ -260,7 +260,7 @@
         xlink:href="https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/trunnel_messages.go"
           ><code>pigeonhole/trunnel_messages.go</code></link>. All integer fields are big-endian and
       all variable-length fields carry an explicit length prefix. This trunnel encoding replaces the
-      earlier CBOR encoding with a fixed-overhead binary format whose serialised size can be
+      earlier CBOR encoding with a fixed-overhead binary format whose serialized size can be
       computed deterministically from the Sphinx geometry. </para>
     <para>Carriage of these messages differs by hop: </para>
     <itemizedlist spacing="compact">
@@ -275,7 +275,7 @@
           the Katzenpost wire protocol defined in <code>core/wire</code> and
             <code>core/wire/commands</code>; the relevant commands are <code>ReplicaMessage</code>,
             <code>ReplicaMessageReply</code>, <code>ReplicaWrite</code>, and
-            <code>ReplicaWriteReply</code>. Some of these commands embed trunnel-serialised
+            <code>ReplicaWriteReply</code>. Some of these commands embed trunnel-serialized
           pigeonhole blobs as their payload. </para>
       </listitem>
     </itemizedlist>
@@ -401,8 +401,8 @@
         </listitem>
         <listitem>
           <para>Prior to encryption, the inner <code>ReplicaInnerMessage</code> is zero-padded to
-              <code>ReplicaInnerMessageWriteSize()</code> so that reads, writes and tombstones
-            produce MKEM ciphertexts of identical length. </para>
+            <code>ReplicaInnerMessageWriteSize()</code> so that reads, writes and <link
+              linkend="tombstones">tombstones</link> produce MKEM ciphertexts of identical length. </para>
         </listitem>
       </itemizedlist>
     </section>
@@ -423,7 +423,7 @@
     </section>
   </section>
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>Message types and interactions</title>
+    <title>M&lt;essage types and interactions</title>
     <section>
       <title>Overview</title>
       <itemizedlist spacing="compact">
@@ -882,7 +882,7 @@ type CourierBookKeeping struct {
           ><code>replica/common/shard.go</code></link>.): </para>
     <programlisting>for each online replica r with identity key k_r:
     h_r = BLAKE2b-256(k_r || box_id)
-return the two replicas whose h_r are smallest</programlisting>
+// return the two replicas whose h_r values are smallest</programlisting>
     <para>The two <emphasis>intermediate</emphasis> replicas chosen by the client for a given
         <code>CourierEnvelope</code> are drawn independently of the designated replicas, per
         <code>pigeonhole.GetRandomIntermediateReplicas</code>: </para>
@@ -960,12 +960,12 @@ return the two replicas whose h_r are smallest</programlisting>
     <section>
       <title>Step 1</title>
       <para>The client uploads a <emphasis>temporary Pigeonhole stream</emphasis>. </para>
-      <para>The stream conveys a sequence of <code>CourierEnvelope</code>s. Each
-          <code>CourierEnvelope</code> is serialised and prefixed with a single 4-byte
+      <para>The stream is sequence of <code>CourierEnvelope</code>s. Each
+          <code>CourierEnvelope</code> is serialized and prefixed with a single 4-byte
           (<code>u32</code>) length field giving the size of that one envelope; the resulting
         length-prefixed blobs are concatenated back-to-back into one continuous byte stream.</para>
       <para>That byte stream is then split across the BACAP Boxes of the temporary stream. A
-        serialised <code>CourierEnvelope</code> is strictly larger than the maximum BACAP box
+        serialized <code>CourierEnvelope</code> is strictly larger than the maximum BACAP box
         payload (it wraps a full box payload plus its own metadata), so a single envelope does not
         fit in one box and the concatenated stream necessarily spans several boxes. Envelope
         boundaries therefore do not align with box boundaries. The precise framing is given in <xref
@@ -1004,7 +1004,7 @@ struct copy_stream_element {
 }</programlisting>
       <para>The purpose of this specific format is to use the <code>isStart</code> and
           <code>isFinal</code> flags to tell the courier the first box and last box of the stream to
-        process. The payloads encapsulated within the <code>EnvelopeData</code> fields of many of
+        process. The payload encapsulated within the <code>EnvelopeData</code> fields of many of
         these <code>CopyStreamElement</code>s is itself a stream of data which contains
           <code>CourierEnvelope</code>s with four-byte prefixes. </para>
       <para>A key property of this encoding is that envelope boundaries do not align with box
@@ -1044,7 +1044,7 @@ SERIALIZED ENVELOPE DATA (envelope boundaries don't align with box boundaries):
         successfully uploaded every box of the temporary stream. The trunnel layout is: </para>
       <programlisting>struct copy_command {
     u32 write_cap_len;
-    u8  write_cap[write_cap_len];   // serialised BACAP BoxOwnerCap
+    u8  write_cap[write_cap_len];   // serialized BACAP BoxOwnerCap
 }</programlisting>
       <para>On receipt, the courier: </para>
       <orderedlist numeration="arabic" spacing="compact">
