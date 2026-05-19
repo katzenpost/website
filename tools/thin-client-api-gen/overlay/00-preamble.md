@@ -32,11 +32,11 @@ Rust binding (`thin_client/src`), and a Python binding
 
 The official API documentation for each binding:
 
-| Language | Official API documentation |
-| --- | --- |
-| Go | [pkg.go.dev](https://pkg.go.dev/github.com/katzenpost/katzenpost/client/thin) |
-| Rust | [docs.rs](https://docs.rs/katzenpost_thin_client/latest/katzenpost_thin_client/) |
-| Python | [Python Thin Client API](/docs/python_thin_client_api/) |
+| Language | Official API documentation | Official API release |
+| --- | --- | --- |
+| Go | [pkg.go.dev](https://pkg.go.dev/github.com/katzenpost/katzenpost/client/thin) | [git tags](https://github.com/katzenpost/katzenpost/tags) |
+| Rust | [docs.rs](https://docs.rs/katzenpost_thin_client/latest/katzenpost_thin_client/) | [crates.io](https://crates.io/crates/katzenpost_thin_client) |
+| Python | [Python Thin Client API](/docs/python_thin_client_api/) | [PyPI](https://pypi.org/project/katzenpost_thinclient/) |
 
 This reference describes the following pinned binding versions:
 
