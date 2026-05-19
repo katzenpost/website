@@ -82,7 +82,109 @@ def render_api() -> str:
     body = result.stdout.strip()
     if not body:
         sys.exit("error: pydoc-markdown produced no output")
-    return body
+    return space_sections(flatten_setext(fence_doctests(body)))
+
+
+_PROMPT = re.compile(r"^(>>>|\.\.\.)( |$)")
+
+
+def fence_doctests(body: str) -> str:
+    """Wrap doctest example lines in a python code fence.
+
+    Method docstrings give examples as two-space-indented `>>>`
+    doctest lines. Goldmark reads the leading `>>>` as three nested
+    blockquotes (the "three vertical lines"), and any `#` comment
+    within becomes a heading. Collecting each run of prompt lines,
+    stripping the prompts, and fencing the result as Python removes
+    both hazards and yields a proper code block.
+    """
+    out: list[str] = []
+    in_fence = False
+    lines = body.split("\n")
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            out.append(line)
+            i += 1
+            continue
+        if not in_fence and _PROMPT.match(line.strip()):
+            code: list[str] = []
+            while i < len(lines) and _PROMPT.match(lines[i].strip()):
+                stripped = lines[i].strip()
+                code.append(stripped[3:].lstrip() if len(stripped) > 3 else "")
+                i += 1
+            out += ["", "```python", *code, "```", ""]
+            continue
+        out.append(line)
+        i += 1
+    return "\n".join(out)
+
+
+_SETEXT = re.compile(r"^(=|-){2,}\s*$")
+
+
+def flatten_setext(body: str) -> str:
+    """Demote RST underline titles in docstrings to bold text.
+
+    Several module and class docstrings decorate section titles with
+    `=====` / `-----` underlines. Goldmark reads those as setext H1/H2
+    headings, so they hijacked the page hierarchy (a dozen stray H1s)
+    and Docsy's TOC. Rewriting `Title` + underline to `**Title**`
+    keeps the emphasis without minting a heading. Fenced code and our
+    own thematic rules (a lone rule on a blank-flanked line) are left
+    alone.
+    """
+    out: list[str] = []
+    in_fence = False
+    for line in body.split("\n"):
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        if (not in_fence and _SETEXT.match(line) and out
+                and out[-1].strip()
+                and out[-1].lstrip()[:1] not in "#`-*<|>"):
+            out[-1] = f"**{out[-1].strip()}**"
+            continue
+        out.append(line)
+    return "\n".join(out)
+
+
+_SECTION = re.compile(r"^#{2,3} \S")
+_ANCHOR = re.compile(r'^<a id="[^"]*"></a>\s*$')
+
+
+def space_sections(body: str) -> str:
+    """Set a thematic rule before each module and top-level member.
+
+    pydoc-markdown leaves only a single blank line between adjacent
+    classes and functions, so they read as one squished column. A
+    horizontal rule before every H2 (module) and H3 (class/function)
+    section, placed above its anchor, gives each entry room to
+    breathe. Methods (H4) keep no rule, so they stay grouped beneath
+    their class. Fenced code is left untouched.
+    """
+    out: list[str] = []
+    in_fence = False
+    seen = False
+    for line in body.split("\n"):
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        if not in_fence and _SECTION.match(line):
+            if seen:
+                j = len(out)
+                while j > 0 and out[j - 1].strip() == "":
+                    j -= 1
+                if j > 0 and _ANCHOR.match(out[j - 1]):
+                    j -= 1
+                out[j:j] = ["", "---", ""]
+            seen = True
+        out.append(line)
+    return "\n".join(out)
 
 
 def main() -> None:

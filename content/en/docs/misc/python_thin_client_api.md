@@ -42,1006 +42,21 @@ and for task-oriented guidance see the
 
 ---
 
-# Contents
-
-* [katzenpost\_thinclient](#katzenpost_thinclient)
-  * [REPLICA\_SUCCESS](#katzenpost_thinclient.REPLICA_SUCCESS)
-  * [REPLICA\_ERROR\_BOX\_ID\_NOT\_FOUND](#katzenpost_thinclient.REPLICA_ERROR_BOX_ID_NOT_FOUND)
-  * [REPLICA\_ERROR\_INVALID\_BOX\_ID](#katzenpost_thinclient.REPLICA_ERROR_INVALID_BOX_ID)
-  * [REPLICA\_ERROR\_INVALID\_SIGNATURE](#katzenpost_thinclient.REPLICA_ERROR_INVALID_SIGNATURE)
-  * [REPLICA\_ERROR\_DATABASE\_FAILURE](#katzenpost_thinclient.REPLICA_ERROR_DATABASE_FAILURE)
-  * [REPLICA\_ERROR\_INVALID\_PAYLOAD](#katzenpost_thinclient.REPLICA_ERROR_INVALID_PAYLOAD)
-  * [REPLICA\_ERROR\_STORAGE\_FULL](#katzenpost_thinclient.REPLICA_ERROR_STORAGE_FULL)
-  * [REPLICA\_ERROR\_INTERNAL\_ERROR](#katzenpost_thinclient.REPLICA_ERROR_INTERNAL_ERROR)
-  * [REPLICA\_ERROR\_INVALID\_EPOCH](#katzenpost_thinclient.REPLICA_ERROR_INVALID_EPOCH)
-  * [REPLICA\_ERROR\_REPLICATION\_FAILED](#katzenpost_thinclient.REPLICA_ERROR_REPLICATION_FAILED)
-  * [REPLICA\_ERROR\_BOX\_ALREADY\_EXISTS](#katzenpost_thinclient.REPLICA_ERROR_BOX_ALREADY_EXISTS)
-  * [THIN\_CLIENT\_SUCCESS](#katzenpost_thinclient.THIN_CLIENT_SUCCESS)
-  * [THIN\_CLIENT\_ERROR\_CONNECTION\_LOST](#katzenpost_thinclient.THIN_CLIENT_ERROR_CONNECTION_LOST)
-  * [THIN\_CLIENT\_ERROR\_TIMEOUT](#katzenpost_thinclient.THIN_CLIENT_ERROR_TIMEOUT)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_REQUEST](#katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_REQUEST)
-  * [THIN\_CLIENT\_ERROR\_INTERNAL\_ERROR](#katzenpost_thinclient.THIN_CLIENT_ERROR_INTERNAL_ERROR)
-  * [THIN\_CLIENT\_ERROR\_MAX\_RETRIES](#katzenpost_thinclient.THIN_CLIENT_ERROR_MAX_RETRIES)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_CHANNEL](#katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_CHANNEL)
-  * [THIN\_CLIENT\_ERROR\_CHANNEL\_NOT\_FOUND](#katzenpost_thinclient.THIN_CLIENT_ERROR_CHANNEL_NOT_FOUND)
-  * [THIN\_CLIENT\_ERROR\_PERMISSION\_DENIED](#katzenpost_thinclient.THIN_CLIENT_ERROR_PERMISSION_DENIED)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_PAYLOAD](#katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_PAYLOAD)
-  * [THIN\_CLIENT\_ERROR\_SERVICE\_UNAVAILABLE](#katzenpost_thinclient.THIN_CLIENT_ERROR_SERVICE_UNAVAILABLE)
-  * [THIN\_CLIENT\_ERROR\_DUPLICATE\_CAPABILITY](#katzenpost_thinclient.THIN_CLIENT_ERROR_DUPLICATE_CAPABILITY)
-  * [THIN\_CLIENT\_ERROR\_COURIER\_CACHE\_CORRUPTION](#katzenpost_thinclient.THIN_CLIENT_ERROR_COURIER_CACHE_CORRUPTION)
-  * [THIN\_CLIENT\_PROPAGATION\_ERROR](#katzenpost_thinclient.THIN_CLIENT_PROPAGATION_ERROR)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_WRITE\_CAPABILITY](#katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_WRITE_CAPABILITY)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_READ\_CAPABILITY](#katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_READ_CAPABILITY)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_RESUME\_WRITE\_CHANNEL\_REQUEST](#katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_RESUME_WRITE_CHANNEL_REQUEST)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_RESUME\_READ\_CHANNEL\_REQUEST](#katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_RESUME_READ_CHANNEL_REQUEST)
-  * [THIN\_CLIENT\_IMPOSSIBLE\_HASH\_ERROR](#katzenpost_thinclient.THIN_CLIENT_IMPOSSIBLE_HASH_ERROR)
-  * [THIN\_CLIENT\_IMPOSSIBLE\_NEW\_WRITE\_CAP\_ERROR](#katzenpost_thinclient.THIN_CLIENT_IMPOSSIBLE_NEW_WRITE_CAP_ERROR)
-  * [THIN\_CLIENT\_IMPOSSIBLE\_NEW\_STATEFUL\_WRITER\_ERROR](#katzenpost_thinclient.THIN_CLIENT_IMPOSSIBLE_NEW_STATEFUL_WRITER_ERROR)
-  * [THIN\_CLIENT\_CAPABILITY\_ALREADY\_IN\_USE](#katzenpost_thinclient.THIN_CLIENT_CAPABILITY_ALREADY_IN_USE)
-  * [THIN\_CLIENT\_ERROR\_MKEM\_DECRYPTION\_FAILED](#katzenpost_thinclient.THIN_CLIENT_ERROR_MKEM_DECRYPTION_FAILED)
-  * [THIN\_CLIENT\_ERROR\_BACAP\_DECRYPTION\_FAILED](#katzenpost_thinclient.THIN_CLIENT_ERROR_BACAP_DECRYPTION_FAILED)
-  * [THIN\_CLIENT\_ERROR\_START\_RESENDING\_CANCELLED](#katzenpost_thinclient.THIN_CLIENT_ERROR_START_RESENDING_CANCELLED)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_TOMBSTONE\_SIG](#katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_TOMBSTONE_SIG)
-  * [THIN\_CLIENT\_ERROR\_COPY\_COMMAND\_FAILED](#katzenpost_thinclient.THIN_CLIENT_ERROR_COPY_COMMAND_FAILED)
-  * [thin\_client\_error\_to\_string](#katzenpost_thinclient.thin_client_error_to_string)
-  * [error\_code\_to\_exception](#katzenpost_thinclient.error_code_to_exception)
-  * [copy\_reply\_to\_exception](#katzenpost_thinclient.copy_reply_to_exception)
-  * [ReplicaError](#katzenpost_thinclient.ReplicaError)
-  * [BoxIDNotFoundError](#katzenpost_thinclient.BoxIDNotFoundError)
-  * [InvalidBoxIDError](#katzenpost_thinclient.InvalidBoxIDError)
-  * [InvalidSignatureError](#katzenpost_thinclient.InvalidSignatureError)
-  * [DatabaseFailureError](#katzenpost_thinclient.DatabaseFailureError)
-  * [InvalidPayloadError](#katzenpost_thinclient.InvalidPayloadError)
-  * [StorageFullError](#katzenpost_thinclient.StorageFullError)
-  * [ReplicaInternalError](#katzenpost_thinclient.ReplicaInternalError)
-  * [InvalidEpochError](#katzenpost_thinclient.InvalidEpochError)
-  * [ReplicationFailedError](#katzenpost_thinclient.ReplicationFailedError)
-  * [BoxAlreadyExistsError](#katzenpost_thinclient.BoxAlreadyExistsError)
-  * [TombstoneError](#katzenpost_thinclient.TombstoneError)
-  * [InvalidTombstoneSignatureError](#katzenpost_thinclient.InvalidTombstoneSignatureError)
-  * [is\_expected\_outcome](#katzenpost_thinclient.is_expected_outcome)
-  * [MKEMDecryptionFailedError](#katzenpost_thinclient.MKEMDecryptionFailedError)
-  * [BACAPDecryptionFailedError](#katzenpost_thinclient.BACAPDecryptionFailedError)
-  * [StartResendingCancelledError](#katzenpost_thinclient.StartResendingCancelledError)
-  * [CopyCommandFailedError](#katzenpost_thinclient.CopyCommandFailedError)
-  * [ThinClientOfflineError](#katzenpost_thinclient.ThinClientOfflineError)
-  * [ConfigError](#katzenpost_thinclient.ConfigError)
-  * [SURB\_ID\_SIZE](#katzenpost_thinclient.SURB_ID_SIZE)
-  * [MESSAGE\_ID\_SIZE](#katzenpost_thinclient.MESSAGE_ID_SIZE)
-  * [ThinClient](#katzenpost_thinclient.ThinClient)
-  * [Config](#katzenpost_thinclient.Config)
-  * [ConfigFile](#katzenpost_thinclient.ConfigFile)
-  * [Geometry](#katzenpost_thinclient.Geometry)
-  * [PigeonholeGeometry](#katzenpost_thinclient.PigeonholeGeometry)
-  * [ServiceDescriptor](#katzenpost_thinclient.ServiceDescriptor)
-  * [find\_services](#katzenpost_thinclient.find_services)
-  * [pretty\_print\_obj](#katzenpost_thinclient.pretty_print_obj)
-  * [blake2\_256\_sum](#katzenpost_thinclient.blake2_256_sum)
-  * [new\_keypair](#katzenpost_thinclient.new_keypair)
-  * [encrypt\_read](#katzenpost_thinclient.encrypt_read)
-  * [encrypt\_write](#katzenpost_thinclient.encrypt_write)
-  * [start\_resending\_encrypted\_message](#katzenpost_thinclient.start_resending_encrypted_message)
-  * [start\_resending\_encrypted\_message\_return\_box\_exists](#katzenpost_thinclient.start_resending_encrypted_message_return_box_exists)
-  * [start\_resending\_encrypted\_message\_no\_retry](#katzenpost_thinclient.start_resending_encrypted_message_no_retry)
-  * [cancel\_resending\_encrypted\_message](#katzenpost_thinclient.cancel_resending_encrypted_message)
-  * [next\_message\_box\_index](#katzenpost_thinclient.next_message_box_index)
-  * [get\_message\_box\_index\_counter](#katzenpost_thinclient.get_message_box_index_counter)
-  * [start\_resending\_copy\_command](#katzenpost_thinclient.start_resending_copy_command)
-  * [cancel\_resending\_copy\_command](#katzenpost_thinclient.cancel_resending_copy_command)
-  * [create\_courier\_envelopes\_from\_payload](#katzenpost_thinclient.create_courier_envelopes_from_payload)
-  * [create\_courier\_envelopes\_from\_multi\_payload](#katzenpost_thinclient.create_courier_envelopes_from_multi_payload)
-  * [create\_courier\_envelopes\_from\_tombstone\_range](#katzenpost_thinclient.create_courier_envelopes_from_tombstone_range)
-  * [tombstone\_range](#katzenpost_thinclient.tombstone_range)
-  * [KeypairResult](#katzenpost_thinclient.KeypairResult)
-  * [EncryptReadResult](#katzenpost_thinclient.EncryptReadResult)
-  * [EncryptWriteResult](#katzenpost_thinclient.EncryptWriteResult)
-  * [CreateEnvelopesResult](#katzenpost_thinclient.CreateEnvelopesResult)
-  * [StartResendingResult](#katzenpost_thinclient.StartResendingResult)
-  * [TombstoneEnvelope](#katzenpost_thinclient.TombstoneEnvelope)
-  * [TombstoneRangeResult](#katzenpost_thinclient.TombstoneRangeResult)
-* [katzenpost\_thinclient.core](#katzenpost_thinclient.core)
-  * [socket](#katzenpost_thinclient.core.socket)
-  * [struct](#katzenpost_thinclient.core.struct)
-  * [random](#katzenpost_thinclient.core.random)
-  * [coloredlogs](#katzenpost_thinclient.core.coloredlogs)
-  * [logging](#katzenpost_thinclient.core.logging)
-  * [sys](#katzenpost_thinclient.core.sys)
-  * [io](#katzenpost_thinclient.core.io)
-  * [os](#katzenpost_thinclient.core.os)
-  * [asyncio](#katzenpost_thinclient.core.asyncio)
-  * [cbor2](#katzenpost_thinclient.core.cbor2)
-  * [pprintpp](#katzenpost_thinclient.core.pprintpp)
-  * [toml](#katzenpost_thinclient.core.toml)
-  * [hashlib](#katzenpost_thinclient.core.hashlib)
-  * [Tuple](#katzenpost_thinclient.core.Tuple)
-  * [Any](#katzenpost_thinclient.core.Any)
-  * [Dict](#katzenpost_thinclient.core.Dict)
-  * [List](#katzenpost_thinclient.core.List)
-  * [Callable](#katzenpost_thinclient.core.Callable)
-  * [DialConfig](#katzenpost_thinclient.core.DialConfig)
-  * [TcpDialConfig](#katzenpost_thinclient.core.TcpDialConfig)
-  * [UnixDialConfig](#katzenpost_thinclient.core.UnixDialConfig)
-  * [REPLICA\_SUCCESS](#katzenpost_thinclient.core.REPLICA_SUCCESS)
-  * [REPLICA\_ERROR\_BOX\_ID\_NOT\_FOUND](#katzenpost_thinclient.core.REPLICA_ERROR_BOX_ID_NOT_FOUND)
-  * [REPLICA\_ERROR\_INVALID\_BOX\_ID](#katzenpost_thinclient.core.REPLICA_ERROR_INVALID_BOX_ID)
-  * [REPLICA\_ERROR\_INVALID\_SIGNATURE](#katzenpost_thinclient.core.REPLICA_ERROR_INVALID_SIGNATURE)
-  * [REPLICA\_ERROR\_DATABASE\_FAILURE](#katzenpost_thinclient.core.REPLICA_ERROR_DATABASE_FAILURE)
-  * [REPLICA\_ERROR\_INVALID\_PAYLOAD](#katzenpost_thinclient.core.REPLICA_ERROR_INVALID_PAYLOAD)
-  * [REPLICA\_ERROR\_STORAGE\_FULL](#katzenpost_thinclient.core.REPLICA_ERROR_STORAGE_FULL)
-  * [REPLICA\_ERROR\_INTERNAL\_ERROR](#katzenpost_thinclient.core.REPLICA_ERROR_INTERNAL_ERROR)
-  * [REPLICA\_ERROR\_INVALID\_EPOCH](#katzenpost_thinclient.core.REPLICA_ERROR_INVALID_EPOCH)
-  * [REPLICA\_ERROR\_REPLICATION\_FAILED](#katzenpost_thinclient.core.REPLICA_ERROR_REPLICATION_FAILED)
-  * [REPLICA\_ERROR\_BOX\_ALREADY\_EXISTS](#katzenpost_thinclient.core.REPLICA_ERROR_BOX_ALREADY_EXISTS)
-  * [REPLICA\_ERROR\_TOMBSTONE](#katzenpost_thinclient.core.REPLICA_ERROR_TOMBSTONE)
-  * [THIN\_CLIENT\_SUCCESS](#katzenpost_thinclient.core.THIN_CLIENT_SUCCESS)
-  * [THIN\_CLIENT\_ERROR\_CONNECTION\_LOST](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_CONNECTION_LOST)
-  * [THIN\_CLIENT\_ERROR\_TIMEOUT](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_TIMEOUT)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_REQUEST](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_REQUEST)
-  * [THIN\_CLIENT\_ERROR\_INTERNAL\_ERROR](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_INTERNAL_ERROR)
-  * [THIN\_CLIENT\_ERROR\_MAX\_RETRIES](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_MAX_RETRIES)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_CHANNEL](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_CHANNEL)
-  * [THIN\_CLIENT\_ERROR\_CHANNEL\_NOT\_FOUND](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_CHANNEL_NOT_FOUND)
-  * [THIN\_CLIENT\_ERROR\_PERMISSION\_DENIED](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_PERMISSION_DENIED)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_PAYLOAD](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_PAYLOAD)
-  * [THIN\_CLIENT\_ERROR\_SERVICE\_UNAVAILABLE](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_SERVICE_UNAVAILABLE)
-  * [THIN\_CLIENT\_ERROR\_DUPLICATE\_CAPABILITY](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_DUPLICATE_CAPABILITY)
-  * [THIN\_CLIENT\_ERROR\_COURIER\_CACHE\_CORRUPTION](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_COURIER_CACHE_CORRUPTION)
-  * [THIN\_CLIENT\_PROPAGATION\_ERROR](#katzenpost_thinclient.core.THIN_CLIENT_PROPAGATION_ERROR)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_WRITE\_CAPABILITY](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_WRITE_CAPABILITY)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_READ\_CAPABILITY](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_READ_CAPABILITY)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_RESUME\_WRITE\_CHANNEL\_REQUEST](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_RESUME_WRITE_CHANNEL_REQUEST)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_RESUME\_READ\_CHANNEL\_REQUEST](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_RESUME_READ_CHANNEL_REQUEST)
-  * [THIN\_CLIENT\_IMPOSSIBLE\_HASH\_ERROR](#katzenpost_thinclient.core.THIN_CLIENT_IMPOSSIBLE_HASH_ERROR)
-  * [THIN\_CLIENT\_IMPOSSIBLE\_NEW\_WRITE\_CAP\_ERROR](#katzenpost_thinclient.core.THIN_CLIENT_IMPOSSIBLE_NEW_WRITE_CAP_ERROR)
-  * [THIN\_CLIENT\_IMPOSSIBLE\_NEW\_STATEFUL\_WRITER\_ERROR](#katzenpost_thinclient.core.THIN_CLIENT_IMPOSSIBLE_NEW_STATEFUL_WRITER_ERROR)
-  * [THIN\_CLIENT\_CAPABILITY\_ALREADY\_IN\_USE](#katzenpost_thinclient.core.THIN_CLIENT_CAPABILITY_ALREADY_IN_USE)
-  * [THIN\_CLIENT\_ERROR\_MKEM\_DECRYPTION\_FAILED](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_MKEM_DECRYPTION_FAILED)
-  * [THIN\_CLIENT\_ERROR\_BACAP\_DECRYPTION\_FAILED](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_BACAP_DECRYPTION_FAILED)
-  * [THIN\_CLIENT\_ERROR\_START\_RESENDING\_CANCELLED](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_START_RESENDING_CANCELLED)
-  * [THIN\_CLIENT\_ERROR\_INVALID\_TOMBSTONE\_SIG](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_TOMBSTONE_SIG)
-  * [THIN\_CLIENT\_ERROR\_COPY\_COMMAND\_FAILED](#katzenpost_thinclient.core.THIN_CLIENT_ERROR_COPY_COMMAND_FAILED)
-  * [thin\_client\_error\_to\_string](#katzenpost_thinclient.core.thin_client_error_to_string)
-  * [ConfigError](#katzenpost_thinclient.core.ConfigError)
-  * [ReplicaError](#katzenpost_thinclient.core.ReplicaError)
-  * [BoxIDNotFoundError](#katzenpost_thinclient.core.BoxIDNotFoundError)
-  * [InvalidBoxIDError](#katzenpost_thinclient.core.InvalidBoxIDError)
-  * [InvalidSignatureError](#katzenpost_thinclient.core.InvalidSignatureError)
-  * [DatabaseFailureError](#katzenpost_thinclient.core.DatabaseFailureError)
-  * [InvalidPayloadError](#katzenpost_thinclient.core.InvalidPayloadError)
-  * [StorageFullError](#katzenpost_thinclient.core.StorageFullError)
-  * [ReplicaInternalError](#katzenpost_thinclient.core.ReplicaInternalError)
-  * [InvalidEpochError](#katzenpost_thinclient.core.InvalidEpochError)
-  * [ReplicationFailedError](#katzenpost_thinclient.core.ReplicationFailedError)
-  * [BoxAlreadyExistsError](#katzenpost_thinclient.core.BoxAlreadyExistsError)
-  * [TombstoneError](#katzenpost_thinclient.core.TombstoneError)
-  * [InvalidTombstoneSignatureError](#katzenpost_thinclient.core.InvalidTombstoneSignatureError)
-  * [MKEMDecryptionFailedError](#katzenpost_thinclient.core.MKEMDecryptionFailedError)
-  * [BACAPDecryptionFailedError](#katzenpost_thinclient.core.BACAPDecryptionFailedError)
-  * [StartResendingCancelledError](#katzenpost_thinclient.core.StartResendingCancelledError)
-  * [CopyCommandFailedError](#katzenpost_thinclient.core.CopyCommandFailedError)
-    * [\_\_init\_\_](#katzenpost_thinclient.core.CopyCommandFailedError.__init__)
-  * [error\_code\_to\_exception](#katzenpost_thinclient.core.error_code_to_exception)
-  * [copy\_reply\_to\_exception](#katzenpost_thinclient.core.copy_reply_to_exception)
-  * [is\_expected\_outcome](#katzenpost_thinclient.core.is_expected_outcome)
-  * [ThinClientOfflineError](#katzenpost_thinclient.core.ThinClientOfflineError)
-  * [SURB\_ID\_SIZE](#katzenpost_thinclient.core.SURB_ID_SIZE)
-  * [MESSAGE\_ID\_SIZE](#katzenpost_thinclient.core.MESSAGE_ID_SIZE)
-  * [Geometry](#katzenpost_thinclient.core.Geometry)
-    * [\_\_init\_\_](#katzenpost_thinclient.core.Geometry.__init__)
-    * [\_\_str\_\_](#katzenpost_thinclient.core.Geometry.__str__)
-  * [PigeonholeGeometry](#katzenpost_thinclient.core.PigeonholeGeometry)
-    * [LENGTH\_PREFIX\_SIZE](#katzenpost_thinclient.core.PigeonholeGeometry.LENGTH_PREFIX_SIZE)
-    * [\_\_init\_\_](#katzenpost_thinclient.core.PigeonholeGeometry.__init__)
-    * [validate](#katzenpost_thinclient.core.PigeonholeGeometry.validate)
-    * [padded\_payload\_length](#katzenpost_thinclient.core.PigeonholeGeometry.padded_payload_length)
-    * [\_\_str\_\_](#katzenpost_thinclient.core.PigeonholeGeometry.__str__)
-  * [ConfigFile](#katzenpost_thinclient.core.ConfigFile)
-    * [\_\_init\_\_](#katzenpost_thinclient.core.ConfigFile.__init__)
-    * [load](#katzenpost_thinclient.core.ConfigFile.load)
-    * [\_\_str\_\_](#katzenpost_thinclient.core.ConfigFile.__str__)
-  * [pretty\_print\_obj](#katzenpost_thinclient.core.pretty_print_obj)
-  * [blake2\_256\_sum](#katzenpost_thinclient.core.blake2_256_sum)
-  * [ServiceDescriptor](#katzenpost_thinclient.core.ServiceDescriptor)
-    * [\_\_init\_\_](#katzenpost_thinclient.core.ServiceDescriptor.__init__)
-    * [to\_destination](#katzenpost_thinclient.core.ServiceDescriptor.to_destination)
-  * [find\_services](#katzenpost_thinclient.core.find_services)
-  * [Config](#katzenpost_thinclient.core.Config)
-    * [\_\_init\_\_](#katzenpost_thinclient.core.Config.__init__)
-    * [handle\_connection\_status\_event](#katzenpost_thinclient.core.Config.handle_connection_status_event)
-    * [handle\_new\_pki\_document\_event](#katzenpost_thinclient.core.Config.handle_new_pki_document_event)
-    * [handle\_message\_sent\_event](#katzenpost_thinclient.core.Config.handle_message_sent_event)
-    * [handle\_message\_reply\_event](#katzenpost_thinclient.core.Config.handle_message_reply_event)
-    * [handle\_daemon\_disconnected\_event](#katzenpost_thinclient.core.Config.handle_daemon_disconnected_event)
-  * [ThinClient](#katzenpost_thinclient.core.ThinClient)
-    * [\_\_init\_\_](#katzenpost_thinclient.core.ThinClient.__init__)
-    * [start](#katzenpost_thinclient.core.ThinClient.start)
-    * [get\_config](#katzenpost_thinclient.core.ThinClient.get_config)
-    * [is\_connected](#katzenpost_thinclient.core.ThinClient.is_connected)
-    * [stop](#katzenpost_thinclient.core.ThinClient.stop)
-    * [disconnect](#katzenpost_thinclient.core.ThinClient.disconnect)
-    * [recv](#katzenpost_thinclient.core.ThinClient.recv)
-    * [worker\_loop](#katzenpost_thinclient.core.ThinClient.worker_loop)
-    * [parse\_status](#katzenpost_thinclient.core.ThinClient.parse_status)
-    * [pki\_document](#katzenpost_thinclient.core.ThinClient.pki_document)
-    * [pki\_document\_for\_epoch](#katzenpost_thinclient.core.ThinClient.pki_document_for_epoch)
-    * [get\_pki\_document\_raw](#katzenpost_thinclient.core.ThinClient.get_pki_document_raw)
-    * [parse\_pki\_doc](#katzenpost_thinclient.core.ThinClient.parse_pki_doc)
-    * [get\_services](#katzenpost_thinclient.core.ThinClient.get_services)
-    * [get\_service](#katzenpost_thinclient.core.ThinClient.get_service)
-    * [get\_all\_couriers](#katzenpost_thinclient.core.ThinClient.get_all_couriers)
-    * [get\_distinct\_couriers](#katzenpost_thinclient.core.ThinClient.get_distinct_couriers)
-    * [blocking\_send\_message](#katzenpost_thinclient.core.ThinClient.blocking_send_message)
-    * [new\_message\_id](#katzenpost_thinclient.core.ThinClient.new_message_id)
-    * [new\_surb\_id](#katzenpost_thinclient.core.ThinClient.new_surb_id)
-    * [new\_query\_id](#katzenpost_thinclient.core.ThinClient.new_query_id)
-    * [handle\_response](#katzenpost_thinclient.core.ThinClient.handle_response)
-    * [send\_message\_without\_reply](#katzenpost_thinclient.core.ThinClient.send_message_without_reply)
-    * [send\_message](#katzenpost_thinclient.core.ThinClient.send_message)
-    * [pretty\_print\_pki\_doc](#katzenpost_thinclient.core.ThinClient.pretty_print_pki_doc)
-* [katzenpost\_thinclient.pigeonhole](#katzenpost_thinclient.pigeonhole)
-  * [hashlib](#katzenpost_thinclient.pigeonhole.hashlib)
-  * [os](#katzenpost_thinclient.pigeonhole.os)
-  * [dataclass](#katzenpost_thinclient.pigeonhole.dataclass)
-  * [Any](#katzenpost_thinclient.pigeonhole.Any)
-  * [Dict](#katzenpost_thinclient.pigeonhole.Dict)
-  * [List](#katzenpost_thinclient.pigeonhole.List)
-  * [THIN\_CLIENT\_SUCCESS](#katzenpost_thinclient.pigeonhole.THIN_CLIENT_SUCCESS)
-  * [thin\_client\_error\_to\_string](#katzenpost_thinclient.pigeonhole.thin_client_error_to_string)
-  * [error\_code\_to\_exception](#katzenpost_thinclient.pigeonhole.error_code_to_exception)
-  * [copy\_reply\_to\_exception](#katzenpost_thinclient.pigeonhole.copy_reply_to_exception)
-  * [PigeonholeGeometry](#katzenpost_thinclient.pigeonhole.PigeonholeGeometry)
-  * [KeypairResult](#katzenpost_thinclient.pigeonhole.KeypairResult)
-    * [write\_cap](#katzenpost_thinclient.pigeonhole.KeypairResult.write_cap)
-    * [read\_cap](#katzenpost_thinclient.pigeonhole.KeypairResult.read_cap)
-    * [first\_message\_index](#katzenpost_thinclient.pigeonhole.KeypairResult.first_message_index)
-  * [EncryptReadResult](#katzenpost_thinclient.pigeonhole.EncryptReadResult)
-    * [message\_ciphertext](#katzenpost_thinclient.pigeonhole.EncryptReadResult.message_ciphertext)
-    * [envelope\_descriptor](#katzenpost_thinclient.pigeonhole.EncryptReadResult.envelope_descriptor)
-    * [envelope\_hash](#katzenpost_thinclient.pigeonhole.EncryptReadResult.envelope_hash)
-    * [next\_message\_box\_index](#katzenpost_thinclient.pigeonhole.EncryptReadResult.next_message_box_index)
-  * [EncryptWriteResult](#katzenpost_thinclient.pigeonhole.EncryptWriteResult)
-    * [message\_ciphertext](#katzenpost_thinclient.pigeonhole.EncryptWriteResult.message_ciphertext)
-    * [envelope\_descriptor](#katzenpost_thinclient.pigeonhole.EncryptWriteResult.envelope_descriptor)
-    * [envelope\_hash](#katzenpost_thinclient.pigeonhole.EncryptWriteResult.envelope_hash)
-    * [next\_message\_box\_index](#katzenpost_thinclient.pigeonhole.EncryptWriteResult.next_message_box_index)
-  * [StartResendingResult](#katzenpost_thinclient.pigeonhole.StartResendingResult)
-    * [plaintext](#katzenpost_thinclient.pigeonhole.StartResendingResult.plaintext)
-    * [courier\_identity\_hash](#katzenpost_thinclient.pigeonhole.StartResendingResult.courier_identity_hash)
-    * [courier\_queue\_id](#katzenpost_thinclient.pigeonhole.StartResendingResult.courier_queue_id)
-  * [new\_keypair](#katzenpost_thinclient.pigeonhole.new_keypair)
-  * [encrypt\_read](#katzenpost_thinclient.pigeonhole.encrypt_read)
-  * [encrypt\_write](#katzenpost_thinclient.pigeonhole.encrypt_write)
-  * [start\_resending\_encrypted\_message](#katzenpost_thinclient.pigeonhole.start_resending_encrypted_message)
-  * [start\_resending\_encrypted\_message\_return\_box\_exists](#katzenpost_thinclient.pigeonhole.start_resending_encrypted_message_return_box_exists)
-  * [start\_resending\_encrypted\_message\_no\_retry](#katzenpost_thinclient.pigeonhole.start_resending_encrypted_message_no_retry)
-  * [cancel\_resending\_encrypted\_message](#katzenpost_thinclient.pigeonhole.cancel_resending_encrypted_message)
-  * [next\_message\_box\_index](#katzenpost_thinclient.pigeonhole.next_message_box_index)
-  * [get\_message\_box\_index\_counter](#katzenpost_thinclient.pigeonhole.get_message_box_index_counter)
-  * [start\_resending\_copy\_command](#katzenpost_thinclient.pigeonhole.start_resending_copy_command)
-  * [cancel\_resending\_copy\_command](#katzenpost_thinclient.pigeonhole.cancel_resending_copy_command)
-  * [create\_courier\_envelopes\_from\_payload](#katzenpost_thinclient.pigeonhole.create_courier_envelopes_from_payload)
-  * [create\_courier\_envelopes\_from\_multi\_payload](#katzenpost_thinclient.pigeonhole.create_courier_envelopes_from_multi_payload)
-  * [CreateEnvelopesResult](#katzenpost_thinclient.pigeonhole.CreateEnvelopesResult)
-    * [envelopes](#katzenpost_thinclient.pigeonhole.CreateEnvelopesResult.envelopes)
-    * [buffer](#katzenpost_thinclient.pigeonhole.CreateEnvelopesResult.buffer)
-    * [next\_dest\_index](#katzenpost_thinclient.pigeonhole.CreateEnvelopesResult.next_dest_index)
-    * [next\_dest\_indices](#katzenpost_thinclient.pigeonhole.CreateEnvelopesResult.next_dest_indices)
-  * [TombstoneEnvelope](#katzenpost_thinclient.pigeonhole.TombstoneEnvelope)
-    * [message\_ciphertext](#katzenpost_thinclient.pigeonhole.TombstoneEnvelope.message_ciphertext)
-    * [envelope\_descriptor](#katzenpost_thinclient.pigeonhole.TombstoneEnvelope.envelope_descriptor)
-    * [envelope\_hash](#katzenpost_thinclient.pigeonhole.TombstoneEnvelope.envelope_hash)
-    * [box\_index](#katzenpost_thinclient.pigeonhole.TombstoneEnvelope.box_index)
-  * [TombstoneRangeResult](#katzenpost_thinclient.pigeonhole.TombstoneRangeResult)
-    * [envelopes](#katzenpost_thinclient.pigeonhole.TombstoneRangeResult.envelopes)
-    * [next](#katzenpost_thinclient.pigeonhole.TombstoneRangeResult.next)
-  * [tombstone\_range](#katzenpost_thinclient.pigeonhole.tombstone_range)
-  * [create\_courier\_envelopes\_from\_tombstone\_range](#katzenpost_thinclient.pigeonhole.create_courier_envelopes_from_tombstone_range)
-* [katzenpost\_thinclient.transport.tcp](#katzenpost_thinclient.transport.tcp)
-  * [socket](#katzenpost_thinclient.transport.tcp.socket)
-  * [dataclass](#katzenpost_thinclient.transport.tcp.dataclass)
-  * [Tuple](#katzenpost_thinclient.transport.tcp.Tuple)
-  * [TcpDialConfig](#katzenpost_thinclient.transport.tcp.TcpDialConfig)
-    * [address](#katzenpost_thinclient.transport.tcp.TcpDialConfig.address)
-    * [network](#katzenpost_thinclient.transport.tcp.TcpDialConfig.network)
-    * [setup\_socket](#katzenpost_thinclient.transport.tcp.TcpDialConfig.setup_socket)
-* [katzenpost\_thinclient.transport](#katzenpost_thinclient.transport)
-  * [dataclass](#katzenpost_thinclient.transport.dataclass)
-  * [Any](#katzenpost_thinclient.transport.Any)
-  * [Optional](#katzenpost_thinclient.transport.Optional)
-  * [Tuple](#katzenpost_thinclient.transport.Tuple)
-  * [TcpDialConfig](#katzenpost_thinclient.transport.TcpDialConfig)
-  * [UnixDialConfig](#katzenpost_thinclient.transport.UnixDialConfig)
-  * [DialConfig](#katzenpost_thinclient.transport.DialConfig)
-    * [unix](#katzenpost_thinclient.transport.DialConfig.unix)
-    * [tcp](#katzenpost_thinclient.transport.DialConfig.tcp)
-    * [validate](#katzenpost_thinclient.transport.DialConfig.validate)
-    * [resolve](#katzenpost_thinclient.transport.DialConfig.resolve)
-    * [from\_toml\_dict](#katzenpost_thinclient.transport.DialConfig.from_toml_dict)
-* [katzenpost\_thinclient.transport.unix](#katzenpost_thinclient.transport.unix)
-  * [random](#katzenpost_thinclient.transport.unix.random)
-  * [socket](#katzenpost_thinclient.transport.unix.socket)
-  * [dataclass](#katzenpost_thinclient.transport.unix.dataclass)
-  * [Tuple](#katzenpost_thinclient.transport.unix.Tuple)
-  * [UnixDialConfig](#katzenpost_thinclient.transport.unix.UnixDialConfig)
-    * [address](#katzenpost_thinclient.transport.unix.UnixDialConfig.address)
-    * [setup\_socket](#katzenpost_thinclient.transport.unix.UnixDialConfig.setup_socket)
-
-<a id="katzenpost_thinclient"></a>
-
-# katzenpost\_thinclient
-
-Katzenpost Python Thin Client
-=============================
-
-This module provides a minimal async Python client for communicating with the
-Katzenpost client daemon over an abstract Unix domain socket. It allows
-applications to send and receive messages via the mix network by interacting
-with the daemon.
-
-The thin client handles:
-- Connecting to the local daemon
-- Sending messages
-- Receiving events and responses from the daemon
-- Accessing the current PKI document and service descriptors
-
-All cryptographic operations, including PQ Noise transport, Sphinx
-packet construction, and retransmission mechanisms are handled by the
-client daemon, and not this thin client library.
-
-For more information, see our thin client documentation:
-https://katzenpost.network/docs/thin_client_howto/
-https://katzenpost.network/docs/thin_client_api_reference/
-
-
-Usage Example
--------------
-
-```python
-import asyncio
-from thinclient import ThinClient, Config
-
-async def main():
-    cfg = Config("./thinclient.toml")
-    client = ThinClient(cfg)
-    loop = asyncio.get_running_loop()
-    await client.start(loop)
-
-    service = client.get_service("echo")
-    surb_id = client.new_surb_id()
-    await client.send_message(surb_id, "hello mixnet", *service.to_destination())
-
-asyncio.run(main())
-```
-
-<a id="katzenpost_thinclient.REPLICA_SUCCESS"></a>
-
-## REPLICA\_SUCCESS
-
-<a id="katzenpost_thinclient.REPLICA_ERROR_BOX_ID_NOT_FOUND"></a>
-
-## REPLICA\_ERROR\_BOX\_ID\_NOT\_FOUND
-
-<a id="katzenpost_thinclient.REPLICA_ERROR_INVALID_BOX_ID"></a>
-
-## REPLICA\_ERROR\_INVALID\_BOX\_ID
-
-<a id="katzenpost_thinclient.REPLICA_ERROR_INVALID_SIGNATURE"></a>
-
-## REPLICA\_ERROR\_INVALID\_SIGNATURE
-
-<a id="katzenpost_thinclient.REPLICA_ERROR_DATABASE_FAILURE"></a>
-
-## REPLICA\_ERROR\_DATABASE\_FAILURE
-
-<a id="katzenpost_thinclient.REPLICA_ERROR_INVALID_PAYLOAD"></a>
-
-## REPLICA\_ERROR\_INVALID\_PAYLOAD
-
-<a id="katzenpost_thinclient.REPLICA_ERROR_STORAGE_FULL"></a>
-
-## REPLICA\_ERROR\_STORAGE\_FULL
-
-<a id="katzenpost_thinclient.REPLICA_ERROR_INTERNAL_ERROR"></a>
-
-## REPLICA\_ERROR\_INTERNAL\_ERROR
-
-<a id="katzenpost_thinclient.REPLICA_ERROR_INVALID_EPOCH"></a>
-
-## REPLICA\_ERROR\_INVALID\_EPOCH
-
-<a id="katzenpost_thinclient.REPLICA_ERROR_REPLICATION_FAILED"></a>
-
-## REPLICA\_ERROR\_REPLICATION\_FAILED
-
-<a id="katzenpost_thinclient.REPLICA_ERROR_BOX_ALREADY_EXISTS"></a>
-
-## REPLICA\_ERROR\_BOX\_ALREADY\_EXISTS
-
-<a id="katzenpost_thinclient.THIN_CLIENT_SUCCESS"></a>
-
-## THIN\_CLIENT\_SUCCESS
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_CONNECTION_LOST"></a>
-
-## THIN\_CLIENT\_ERROR\_CONNECTION\_LOST
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_TIMEOUT"></a>
-
-## THIN\_CLIENT\_ERROR\_TIMEOUT
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_REQUEST"></a>
-
-## THIN\_CLIENT\_ERROR\_INVALID\_REQUEST
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_INTERNAL_ERROR"></a>
-
-## THIN\_CLIENT\_ERROR\_INTERNAL\_ERROR
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_MAX_RETRIES"></a>
-
-## THIN\_CLIENT\_ERROR\_MAX\_RETRIES
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_CHANNEL"></a>
-
-## THIN\_CLIENT\_ERROR\_INVALID\_CHANNEL
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_CHANNEL_NOT_FOUND"></a>
-
-## THIN\_CLIENT\_ERROR\_CHANNEL\_NOT\_FOUND
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_PERMISSION_DENIED"></a>
-
-## THIN\_CLIENT\_ERROR\_PERMISSION\_DENIED
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_PAYLOAD"></a>
-
-## THIN\_CLIENT\_ERROR\_INVALID\_PAYLOAD
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_SERVICE_UNAVAILABLE"></a>
-
-## THIN\_CLIENT\_ERROR\_SERVICE\_UNAVAILABLE
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_DUPLICATE_CAPABILITY"></a>
-
-## THIN\_CLIENT\_ERROR\_DUPLICATE\_CAPABILITY
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_COURIER_CACHE_CORRUPTION"></a>
-
-## THIN\_CLIENT\_ERROR\_COURIER\_CACHE\_CORRUPTION
-
-<a id="katzenpost_thinclient.THIN_CLIENT_PROPAGATION_ERROR"></a>
-
-## THIN\_CLIENT\_PROPAGATION\_ERROR
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_WRITE_CAPABILITY"></a>
-
-## THIN\_CLIENT\_ERROR\_INVALID\_WRITE\_CAPABILITY
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_READ_CAPABILITY"></a>
-
-## THIN\_CLIENT\_ERROR\_INVALID\_READ\_CAPABILITY
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_RESUME_WRITE_CHANNEL_REQUEST"></a>
-
-## THIN\_CLIENT\_ERROR\_INVALID\_RESUME\_WRITE\_CHANNEL\_REQUEST
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_RESUME_READ_CHANNEL_REQUEST"></a>
-
-## THIN\_CLIENT\_ERROR\_INVALID\_RESUME\_READ\_CHANNEL\_REQUEST
-
-<a id="katzenpost_thinclient.THIN_CLIENT_IMPOSSIBLE_HASH_ERROR"></a>
-
-## THIN\_CLIENT\_IMPOSSIBLE\_HASH\_ERROR
-
-<a id="katzenpost_thinclient.THIN_CLIENT_IMPOSSIBLE_NEW_WRITE_CAP_ERROR"></a>
-
-## THIN\_CLIENT\_IMPOSSIBLE\_NEW\_WRITE\_CAP\_ERROR
-
-<a id="katzenpost_thinclient.THIN_CLIENT_IMPOSSIBLE_NEW_STATEFUL_WRITER_ERROR"></a>
-
-## THIN\_CLIENT\_IMPOSSIBLE\_NEW\_STATEFUL\_WRITER\_ERROR
-
-<a id="katzenpost_thinclient.THIN_CLIENT_CAPABILITY_ALREADY_IN_USE"></a>
-
-## THIN\_CLIENT\_CAPABILITY\_ALREADY\_IN\_USE
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_MKEM_DECRYPTION_FAILED"></a>
-
-## THIN\_CLIENT\_ERROR\_MKEM\_DECRYPTION\_FAILED
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_BACAP_DECRYPTION_FAILED"></a>
-
-## THIN\_CLIENT\_ERROR\_BACAP\_DECRYPTION\_FAILED
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_START_RESENDING_CANCELLED"></a>
-
-## THIN\_CLIENT\_ERROR\_START\_RESENDING\_CANCELLED
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_INVALID_TOMBSTONE_SIG"></a>
-
-## THIN\_CLIENT\_ERROR\_INVALID\_TOMBSTONE\_SIG
-
-<a id="katzenpost_thinclient.THIN_CLIENT_ERROR_COPY_COMMAND_FAILED"></a>
-
-## THIN\_CLIENT\_ERROR\_COPY\_COMMAND\_FAILED
-
-<a id="katzenpost_thinclient.thin_client_error_to_string"></a>
-
-## thin\_client\_error\_to\_string
-
-<a id="katzenpost_thinclient.error_code_to_exception"></a>
-
-## error\_code\_to\_exception
-
-<a id="katzenpost_thinclient.copy_reply_to_exception"></a>
-
-## copy\_reply\_to\_exception
-
-<a id="katzenpost_thinclient.ReplicaError"></a>
-
-## ReplicaError
-
-<a id="katzenpost_thinclient.BoxIDNotFoundError"></a>
-
-## BoxIDNotFoundError
-
-<a id="katzenpost_thinclient.InvalidBoxIDError"></a>
-
-## InvalidBoxIDError
-
-<a id="katzenpost_thinclient.InvalidSignatureError"></a>
-
-## InvalidSignatureError
-
-<a id="katzenpost_thinclient.DatabaseFailureError"></a>
-
-## DatabaseFailureError
-
-<a id="katzenpost_thinclient.InvalidPayloadError"></a>
-
-## InvalidPayloadError
-
-<a id="katzenpost_thinclient.StorageFullError"></a>
-
-## StorageFullError
-
-<a id="katzenpost_thinclient.ReplicaInternalError"></a>
-
-## ReplicaInternalError
-
-<a id="katzenpost_thinclient.InvalidEpochError"></a>
-
-## InvalidEpochError
-
-<a id="katzenpost_thinclient.ReplicationFailedError"></a>
-
-## ReplicationFailedError
-
-<a id="katzenpost_thinclient.BoxAlreadyExistsError"></a>
-
-## BoxAlreadyExistsError
-
-<a id="katzenpost_thinclient.TombstoneError"></a>
-
-## TombstoneError
-
-<a id="katzenpost_thinclient.InvalidTombstoneSignatureError"></a>
-
-## InvalidTombstoneSignatureError
-
-<a id="katzenpost_thinclient.is_expected_outcome"></a>
-
-## is\_expected\_outcome
-
-<a id="katzenpost_thinclient.MKEMDecryptionFailedError"></a>
-
-## MKEMDecryptionFailedError
-
-<a id="katzenpost_thinclient.BACAPDecryptionFailedError"></a>
-
-## BACAPDecryptionFailedError
-
-<a id="katzenpost_thinclient.StartResendingCancelledError"></a>
-
-## StartResendingCancelledError
-
-<a id="katzenpost_thinclient.CopyCommandFailedError"></a>
-
-## CopyCommandFailedError
-
-<a id="katzenpost_thinclient.ThinClientOfflineError"></a>
-
-## ThinClientOfflineError
-
-<a id="katzenpost_thinclient.ConfigError"></a>
-
-## ConfigError
-
-<a id="katzenpost_thinclient.SURB_ID_SIZE"></a>
-
-## SURB\_ID\_SIZE
-
-<a id="katzenpost_thinclient.MESSAGE_ID_SIZE"></a>
-
-## MESSAGE\_ID\_SIZE
-
-<a id="katzenpost_thinclient.ThinClient"></a>
-
-## ThinClient
-
-<a id="katzenpost_thinclient.Config"></a>
-
-## Config
-
-<a id="katzenpost_thinclient.ConfigFile"></a>
-
-## ConfigFile
-
-<a id="katzenpost_thinclient.Geometry"></a>
-
-## Geometry
-
-<a id="katzenpost_thinclient.PigeonholeGeometry"></a>
-
-## PigeonholeGeometry
-
-<a id="katzenpost_thinclient.ServiceDescriptor"></a>
-
-## ServiceDescriptor
-
-<a id="katzenpost_thinclient.find_services"></a>
-
-## find\_services
-
-<a id="katzenpost_thinclient.pretty_print_obj"></a>
-
-## pretty\_print\_obj
-
-<a id="katzenpost_thinclient.blake2_256_sum"></a>
-
-## blake2\_256\_sum
-
-<a id="katzenpost_thinclient.new_keypair"></a>
-
-## new\_keypair
-
-<a id="katzenpost_thinclient.encrypt_read"></a>
-
-## encrypt\_read
-
-<a id="katzenpost_thinclient.encrypt_write"></a>
-
-## encrypt\_write
-
-<a id="katzenpost_thinclient.start_resending_encrypted_message"></a>
-
-## start\_resending\_encrypted\_message
-
-<a id="katzenpost_thinclient.start_resending_encrypted_message_return_box_exists"></a>
-
-## start\_resending\_encrypted\_message\_return\_box\_exists
-
-<a id="katzenpost_thinclient.start_resending_encrypted_message_no_retry"></a>
-
-## start\_resending\_encrypted\_message\_no\_retry
-
-<a id="katzenpost_thinclient.cancel_resending_encrypted_message"></a>
-
-## cancel\_resending\_encrypted\_message
-
-<a id="katzenpost_thinclient.next_message_box_index"></a>
-
-## next\_message\_box\_index
-
-<a id="katzenpost_thinclient.get_message_box_index_counter"></a>
-
-## get\_message\_box\_index\_counter
-
-<a id="katzenpost_thinclient.start_resending_copy_command"></a>
-
-## start\_resending\_copy\_command
-
-<a id="katzenpost_thinclient.cancel_resending_copy_command"></a>
-
-## cancel\_resending\_copy\_command
-
-<a id="katzenpost_thinclient.create_courier_envelopes_from_payload"></a>
-
-## create\_courier\_envelopes\_from\_payload
-
-<a id="katzenpost_thinclient.create_courier_envelopes_from_multi_payload"></a>
-
-## create\_courier\_envelopes\_from\_multi\_payload
-
-<a id="katzenpost_thinclient.create_courier_envelopes_from_tombstone_range"></a>
-
-## create\_courier\_envelopes\_from\_tombstone\_range
-
-<a id="katzenpost_thinclient.tombstone_range"></a>
-
-## tombstone\_range
-
-<a id="katzenpost_thinclient.KeypairResult"></a>
-
-## KeypairResult
-
-<a id="katzenpost_thinclient.EncryptReadResult"></a>
-
-## EncryptReadResult
-
-<a id="katzenpost_thinclient.EncryptWriteResult"></a>
-
-## EncryptWriteResult
-
-<a id="katzenpost_thinclient.CreateEnvelopesResult"></a>
-
-## CreateEnvelopesResult
-
-<a id="katzenpost_thinclient.StartResendingResult"></a>
-
-## StartResendingResult
-
-<a id="katzenpost_thinclient.TombstoneEnvelope"></a>
-
-## TombstoneEnvelope
-
-<a id="katzenpost_thinclient.TombstoneRangeResult"></a>
-
-## TombstoneRangeResult
-
 <a id="katzenpost_thinclient.core"></a>
 
-# katzenpost\_thinclient.core
+## katzenpost\_thinclient.core
 
-Katzenpost Python Thin Client - Core Module
-============================================
+**Katzenpost Python Thin Client - Core Module**
 
 This module provides the core functionality for the Katzenpost thin client,
 including the ThinClient class, configuration, and helper utilities.
 
-<a id="katzenpost_thinclient.core.socket"></a>
 
-## socket
-
-<a id="katzenpost_thinclient.core.struct"></a>
-
-## struct
-
-<a id="katzenpost_thinclient.core.random"></a>
-
-## random
-
-<a id="katzenpost_thinclient.core.coloredlogs"></a>
-
-## coloredlogs
-
-<a id="katzenpost_thinclient.core.logging"></a>
-
-## logging
-
-<a id="katzenpost_thinclient.core.sys"></a>
-
-## sys
-
-<a id="katzenpost_thinclient.core.io"></a>
-
-## io
-
-<a id="katzenpost_thinclient.core.os"></a>
-
-## os
-
-<a id="katzenpost_thinclient.core.asyncio"></a>
-
-## asyncio
-
-<a id="katzenpost_thinclient.core.cbor2"></a>
-
-## cbor2
-
-<a id="katzenpost_thinclient.core.pprintpp"></a>
-
-## pprintpp
-
-<a id="katzenpost_thinclient.core.toml"></a>
-
-## toml
-
-<a id="katzenpost_thinclient.core.hashlib"></a>
-
-## hashlib
-
-<a id="katzenpost_thinclient.core.Tuple"></a>
-
-## Tuple
-
-<a id="katzenpost_thinclient.core.Any"></a>
-
-## Any
-
-<a id="katzenpost_thinclient.core.Dict"></a>
-
-## Dict
-
-<a id="katzenpost_thinclient.core.List"></a>
-
-## List
-
-<a id="katzenpost_thinclient.core.Callable"></a>
-
-## Callable
-
-<a id="katzenpost_thinclient.core.DialConfig"></a>
-
-## DialConfig
-
-<a id="katzenpost_thinclient.core.TcpDialConfig"></a>
-
-## TcpDialConfig
-
-<a id="katzenpost_thinclient.core.UnixDialConfig"></a>
-
-## UnixDialConfig
-
-<a id="katzenpost_thinclient.core.REPLICA_SUCCESS"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_SUCCESS
-
-<a id="katzenpost_thinclient.core.REPLICA_ERROR_BOX_ID_NOT_FOUND"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_ERROR\_BOX\_ID\_NOT\_FOUND
-
-<a id="katzenpost_thinclient.core.REPLICA_ERROR_INVALID_BOX_ID"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_ERROR\_INVALID\_BOX\_ID
-
-<a id="katzenpost_thinclient.core.REPLICA_ERROR_INVALID_SIGNATURE"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_ERROR\_INVALID\_SIGNATURE
-
-<a id="katzenpost_thinclient.core.REPLICA_ERROR_DATABASE_FAILURE"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_ERROR\_DATABASE\_FAILURE
-
-<a id="katzenpost_thinclient.core.REPLICA_ERROR_INVALID_PAYLOAD"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_ERROR\_INVALID\_PAYLOAD
-
-<a id="katzenpost_thinclient.core.REPLICA_ERROR_STORAGE_FULL"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_ERROR\_STORAGE\_FULL
-
-<a id="katzenpost_thinclient.core.REPLICA_ERROR_INTERNAL_ERROR"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_ERROR\_INTERNAL\_ERROR
-
-<a id="katzenpost_thinclient.core.REPLICA_ERROR_INVALID_EPOCH"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_ERROR\_INVALID\_EPOCH
-
-<a id="katzenpost_thinclient.core.REPLICA_ERROR_REPLICATION_FAILED"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_ERROR\_REPLICATION\_FAILED
-
-<a id="katzenpost_thinclient.core.REPLICA_ERROR_BOX_ALREADY_EXISTS"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_ERROR\_BOX\_ALREADY\_EXISTS
-
-<a id="katzenpost_thinclient.core.REPLICA_ERROR_TOMBSTONE"></a>
-
-#### katzenpost\_thinclient.core.REPLICA\_ERROR\_TOMBSTONE
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_SUCCESS"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_SUCCESS
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_CONNECTION_LOST"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_CONNECTION\_LOST
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_TIMEOUT"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_TIMEOUT
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_REQUEST"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_INVALID\_REQUEST
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_INTERNAL_ERROR"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_INTERNAL\_ERROR
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_MAX_RETRIES"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_MAX\_RETRIES
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_CHANNEL"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_INVALID\_CHANNEL
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_CHANNEL_NOT_FOUND"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_CHANNEL\_NOT\_FOUND
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_PERMISSION_DENIED"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_PERMISSION\_DENIED
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_PAYLOAD"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_INVALID\_PAYLOAD
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_SERVICE_UNAVAILABLE"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_SERVICE\_UNAVAILABLE
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_DUPLICATE_CAPABILITY"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_DUPLICATE\_CAPABILITY
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_COURIER_CACHE_CORRUPTION"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_COURIER\_CACHE\_CORRUPTION
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_PROPAGATION_ERROR"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_PROPAGATION\_ERROR
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_WRITE_CAPABILITY"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_INVALID\_WRITE\_CAPABILITY
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_READ_CAPABILITY"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_INVALID\_READ\_CAPABILITY
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_RESUME_WRITE_CHANNEL_REQUEST"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_INVALID\_RESUME\_WRITE\_CHANNEL\_REQUEST
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_RESUME_READ_CHANNEL_REQUEST"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_INVALID\_RESUME\_READ\_CHANNEL\_REQUEST
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_IMPOSSIBLE_HASH_ERROR"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_IMPOSSIBLE\_HASH\_ERROR
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_IMPOSSIBLE_NEW_WRITE_CAP_ERROR"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_IMPOSSIBLE\_NEW\_WRITE\_CAP\_ERROR
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_IMPOSSIBLE_NEW_STATEFUL_WRITER_ERROR"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_IMPOSSIBLE\_NEW\_STATEFUL\_WRITER\_ERROR
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_CAPABILITY_ALREADY_IN_USE"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_CAPABILITY\_ALREADY\_IN\_USE
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_MKEM_DECRYPTION_FAILED"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_MKEM\_DECRYPTION\_FAILED
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_BACAP_DECRYPTION_FAILED"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_BACAP\_DECRYPTION\_FAILED
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_START_RESENDING_CANCELLED"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_START\_RESENDING\_CANCELLED
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_INVALID_TOMBSTONE_SIG"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_INVALID\_TOMBSTONE\_SIG
-
-<a id="katzenpost_thinclient.core.THIN_CLIENT_ERROR_COPY_COMMAND_FAILED"></a>
-
-#### katzenpost\_thinclient.core.THIN\_CLIENT\_ERROR\_COPY\_COMMAND\_FAILED
+---
 
 <a id="katzenpost_thinclient.core.thin_client_error_to_string"></a>
 
-#### thin\_client\_error\_to\_string
+### thin\_client\_error\_to\_string
 
 ```python
 def thin_client_error_to_string(error_code: int) -> str
@@ -1049,9 +64,12 @@ def thin_client_error_to_string(error_code: int) -> str
 
 Convert a thin client error code to a human-readable string.
 
+
+---
+
 <a id="katzenpost_thinclient.core.ConfigError"></a>
 
-## ConfigError
+### ConfigError
 
 ```python
 class ConfigError(Exception)
@@ -1065,9 +83,12 @@ exception. It is raised eagerly at startup so that a stale or
 drifted config produces a loud, early failure instead of surfacing
 later as a mysterious runtime error during mixnet operations.
 
+
+---
+
 <a id="katzenpost_thinclient.core.ReplicaError"></a>
 
-## ReplicaError
+### ReplicaError
 
 ```python
 class ReplicaError(Exception)
@@ -1075,9 +96,12 @@ class ReplicaError(Exception)
 
 Base class for all replica errors.
 
+
+---
+
 <a id="katzenpost_thinclient.core.BoxIDNotFoundError"></a>
 
-## BoxIDNotFoundError
+### BoxIDNotFoundError
 
 ```python
 class BoxIDNotFoundError(ReplicaError)
@@ -1085,9 +109,12 @@ class BoxIDNotFoundError(ReplicaError)
 
 Box ID not found on the replica. Occurs when reading from a non-existent mailbox.
 
+
+---
+
 <a id="katzenpost_thinclient.core.InvalidBoxIDError"></a>
 
-## InvalidBoxIDError
+### InvalidBoxIDError
 
 ```python
 class InvalidBoxIDError(ReplicaError)
@@ -1095,9 +122,12 @@ class InvalidBoxIDError(ReplicaError)
 
 Invalid box ID format.
 
+
+---
+
 <a id="katzenpost_thinclient.core.InvalidSignatureError"></a>
 
-## InvalidSignatureError
+### InvalidSignatureError
 
 ```python
 class InvalidSignatureError(ReplicaError)
@@ -1105,9 +135,12 @@ class InvalidSignatureError(ReplicaError)
 
 Signature verification failed.
 
+
+---
+
 <a id="katzenpost_thinclient.core.DatabaseFailureError"></a>
 
-## DatabaseFailureError
+### DatabaseFailureError
 
 ```python
 class DatabaseFailureError(ReplicaError)
@@ -1115,9 +148,12 @@ class DatabaseFailureError(ReplicaError)
 
 Replica encountered a database error.
 
+
+---
+
 <a id="katzenpost_thinclient.core.InvalidPayloadError"></a>
 
-## InvalidPayloadError
+### InvalidPayloadError
 
 ```python
 class InvalidPayloadError(ReplicaError)
@@ -1125,9 +161,12 @@ class InvalidPayloadError(ReplicaError)
 
 Payload data is invalid.
 
+
+---
+
 <a id="katzenpost_thinclient.core.StorageFullError"></a>
 
-## StorageFullError
+### StorageFullError
 
 ```python
 class StorageFullError(ReplicaError)
@@ -1135,9 +174,12 @@ class StorageFullError(ReplicaError)
 
 Replica's storage capacity has been exceeded.
 
+
+---
+
 <a id="katzenpost_thinclient.core.ReplicaInternalError"></a>
 
-## ReplicaInternalError
+### ReplicaInternalError
 
 ```python
 class ReplicaInternalError(ReplicaError)
@@ -1145,9 +187,12 @@ class ReplicaInternalError(ReplicaError)
 
 Internal error on the replica.
 
+
+---
+
 <a id="katzenpost_thinclient.core.InvalidEpochError"></a>
 
-## InvalidEpochError
+### InvalidEpochError
 
 ```python
 class InvalidEpochError(ReplicaError)
@@ -1155,9 +200,12 @@ class InvalidEpochError(ReplicaError)
 
 Epoch is invalid or expired.
 
+
+---
+
 <a id="katzenpost_thinclient.core.ReplicationFailedError"></a>
 
-## ReplicationFailedError
+### ReplicationFailedError
 
 ```python
 class ReplicationFailedError(ReplicaError)
@@ -1165,9 +213,12 @@ class ReplicationFailedError(ReplicaError)
 
 Replication to other replicas failed.
 
+
+---
+
 <a id="katzenpost_thinclient.core.BoxAlreadyExistsError"></a>
 
-## BoxAlreadyExistsError
+### BoxAlreadyExistsError
 
 ```python
 class BoxAlreadyExistsError(ReplicaError)
@@ -1175,9 +226,12 @@ class BoxAlreadyExistsError(ReplicaError)
 
 Box already contains data. Pigeonhole writes are immutable.
 
+
+---
+
 <a id="katzenpost_thinclient.core.TombstoneError"></a>
 
-## TombstoneError
+### TombstoneError
 
 ```python
 class TombstoneError(ReplicaError)
@@ -1185,9 +239,12 @@ class TombstoneError(ReplicaError)
 
 Box contains a tombstone (intentional deletion). This is not a failure.
 
+
+---
+
 <a id="katzenpost_thinclient.core.InvalidTombstoneSignatureError"></a>
 
-## InvalidTombstoneSignatureError
+### InvalidTombstoneSignatureError
 
 ```python
 class InvalidTombstoneSignatureError(Exception)
@@ -1195,9 +252,12 @@ class InvalidTombstoneSignatureError(Exception)
 
 Tombstone signature verification failed (forgery or corruption).
 
+
+---
+
 <a id="katzenpost_thinclient.core.MKEMDecryptionFailedError"></a>
 
-## MKEMDecryptionFailedError
+### MKEMDecryptionFailedError
 
 ```python
 class MKEMDecryptionFailedError(Exception)
@@ -1205,9 +265,12 @@ class MKEMDecryptionFailedError(Exception)
 
 MKEM envelope decryption failed with all replica keys.
 
+
+---
+
 <a id="katzenpost_thinclient.core.BACAPDecryptionFailedError"></a>
 
-## BACAPDecryptionFailedError
+### BACAPDecryptionFailedError
 
 ```python
 class BACAPDecryptionFailedError(Exception)
@@ -1215,9 +278,12 @@ class BACAPDecryptionFailedError(Exception)
 
 BACAP payload decryption or signature verification failed.
 
+
+---
+
 <a id="katzenpost_thinclient.core.StartResendingCancelledError"></a>
 
-## StartResendingCancelledError
+### StartResendingCancelledError
 
 ```python
 class StartResendingCancelledError(Exception)
@@ -1225,9 +291,12 @@ class StartResendingCancelledError(Exception)
 
 StartResendingEncryptedMessage operation was cancelled.
 
+
+---
+
 <a id="katzenpost_thinclient.core.CopyCommandFailedError"></a>
 
-## CopyCommandFailedError
+### CopyCommandFailedError
 
 ```python
 class CopyCommandFailedError(Exception)
@@ -1246,18 +315,12 @@ embedded writes. Inspect the diagnostic attributes to determine the cause:
   stream of the envelope whose write triggered the abort. 0 if not
   applicable. This is NOT a BACAP message index.
 
-<a id="katzenpost_thinclient.core.CopyCommandFailedError.__init__"></a>
 
-#### CopyCommandFailedError.\_\_init\_\_
-
-```python
-def __init__(replica_error_code: int = 0,
-             failed_envelope_index: int = 0) -> None
-```
+---
 
 <a id="katzenpost_thinclient.core.error_code_to_exception"></a>
 
-#### error\_code\_to\_exception
+### error\_code\_to\_exception
 
 ```python
 def error_code_to_exception(error_code: int) -> Exception
@@ -1269,9 +332,12 @@ This matches Go's errorCodeToSentinel function in thin/pigeonhole.go.
 The daemon passes through pigeonhole replica error codes (1-9) for replica-level errors.
 For other errors (thin client errors like decryption failures), specific exceptions are raised.
 
+
+---
+
 <a id="katzenpost_thinclient.core.copy_reply_to_exception"></a>
 
-#### copy\_reply\_to\_exception
+### copy\_reply\_to\_exception
 
 ```python
 def copy_reply_to_exception(reply: "Dict[str, Any]") -> "Exception | None"
@@ -1293,9 +359,12 @@ THIN_CLIENT_ERROR_COPY_COMMAND_FAILED.
 
   None if error_code is 0 (success); otherwise an Exception instance.
 
+
+---
+
 <a id="katzenpost_thinclient.core.is_expected_outcome"></a>
 
-#### is\_expected\_outcome
+### is\_expected\_outcome
 
 ```python
 def is_expected_outcome(exc: Exception) -> bool
@@ -1304,25 +373,12 @@ def is_expected_outcome(exc: Exception) -> bool
 Returns True for exceptions that represent completed operations rather than failures.
 These errors should not trigger retries.
 
-<a id="katzenpost_thinclient.core.ThinClientOfflineError"></a>
 
-## ThinClientOfflineError
-
-```python
-class ThinClientOfflineError(Exception)
-```
-
-<a id="katzenpost_thinclient.core.SURB_ID_SIZE"></a>
-
-#### katzenpost\_thinclient.core.SURB\_ID\_SIZE
-
-<a id="katzenpost_thinclient.core.MESSAGE_ID_SIZE"></a>
-
-#### katzenpost\_thinclient.core.MESSAGE\_ID\_SIZE
+---
 
 <a id="katzenpost_thinclient.core.Geometry"></a>
 
-## Geometry
+### Geometry
 
 ```python
 class Geometry()
@@ -1357,39 +413,12 @@ a single packet.
 - `NIKEName` _str_ - Name of the NIKE scheme (if used). Mutually exclusive with KEMName.
 - `KEMName` _str_ - Name of the KEM scheme (if used). Mutually exclusive with NIKEName.
 
-<a id="katzenpost_thinclient.core.Geometry.__init__"></a>
 
-#### Geometry.\_\_init\_\_
-
-```python
-def __init__(*,
-             PacketLength: int,
-             NrHops: int,
-             HeaderLength: int,
-             RoutingInfoLength: int,
-             PerHopRoutingInfoLength: int,
-             SURBLength: int,
-             SphinxPlaintextHeaderLength: int,
-             PayloadTagLength: int,
-             ForwardPayloadLength: int,
-             UserForwardPayloadLength: int,
-             NextNodeHopLength: int,
-             SPRPKeyMaterialLength: int,
-             NIKEName: str = '',
-             KEMName: str = '') -> None
-```
-
-<a id="katzenpost_thinclient.core.Geometry.__str__"></a>
-
-#### Geometry.\_\_str\_\_
-
-```python
-def __str__() -> str
-```
+---
 
 <a id="katzenpost_thinclient.core.PigeonholeGeometry"></a>
 
-## PigeonholeGeometry
+### PigeonholeGeometry
 
 ```python
 class PigeonholeGeometry()
@@ -1414,25 +443,6 @@ It supports 3 distinct use cases:
 - `courier_query_reply_write_length` _int_ - The size of a CourierQueryReply containing a ReplicaWriteReply.
 - `nike_name` _str_ - The NIKE scheme name used in MKEM for encrypting to multiple storage replicas.
 - `signature_scheme_name` _str_ - The signature scheme used for BACAP (always "Ed25519").
-
-<a id="katzenpost_thinclient.core.PigeonholeGeometry.LENGTH_PREFIX_SIZE"></a>
-
-#### PigeonholeGeometry.LENGTH\_PREFIX\_SIZE
-
-<a id="katzenpost_thinclient.core.PigeonholeGeometry.__init__"></a>
-
-#### PigeonholeGeometry.\_\_init\_\_
-
-```python
-def __init__(*,
-             max_plaintext_payload_length: int,
-             courier_query_read_length: int = 0,
-             courier_query_write_length: int = 0,
-             courier_query_reply_read_length: int = 0,
-             courier_query_reply_write_length: int = 0,
-             nike_name: str = "",
-             signature_scheme_name: str = "Ed25519") -> None
-```
 
 <a id="katzenpost_thinclient.core.PigeonholeGeometry.validate"></a>
 
@@ -1462,17 +472,12 @@ Returns the payload size after adding length prefix.
 
 - `int` - The padded payload length (max_plaintext_payload_length + 4).
 
-<a id="katzenpost_thinclient.core.PigeonholeGeometry.__str__"></a>
 
-#### PigeonholeGeometry.\_\_str\_\_
-
-```python
-def __str__() -> str
-```
+---
 
 <a id="katzenpost_thinclient.core.ConfigFile"></a>
 
-## ConfigFile
+### ConfigFile
 
 ```python
 class ConfigFile()
@@ -1481,14 +486,6 @@ class ConfigFile()
 ConfigFile represents everything loaded from a TOML file: only the
 subtable-discriminated Dial transport config. The geometries are
 supplied by the daemon over the handshake, not configured here.
-
-<a id="katzenpost_thinclient.core.ConfigFile.__init__"></a>
-
-#### ConfigFile.\_\_init\_\_
-
-```python
-def __init__(dial: "DialConfig") -> None
-```
 
 <a id="katzenpost_thinclient.core.ConfigFile.load"></a>
 
@@ -1509,17 +506,12 @@ Dial subtable. The intent is that a stale or drifted config
 fails here at startup rather than producing a mysterious
 runtime failure later.
 
-<a id="katzenpost_thinclient.core.ConfigFile.__str__"></a>
 
-#### ConfigFile.\_\_str\_\_
-
-```python
-def __str__() -> str
-```
+---
 
 <a id="katzenpost_thinclient.core.pretty_print_obj"></a>
 
-#### pretty\_print\_obj
+### pretty\_print\_obj
 
 ```python
 def pretty_print_obj(obj: "Any") -> str
@@ -1539,17 +531,12 @@ This function uses `pprintpp` to format complex data structures
 
 - `str` - The pretty-printed representation of the object.
 
-<a id="katzenpost_thinclient.core.blake2_256_sum"></a>
 
-#### blake2\_256\_sum
-
-```python
-def blake2_256_sum(data: bytes) -> bytes
-```
+---
 
 <a id="katzenpost_thinclient.core.ServiceDescriptor"></a>
 
-## ServiceDescriptor
+### ServiceDescriptor
 
 ```python
 class ServiceDescriptor()
@@ -1573,15 +560,6 @@ is used as the destination address along with the service's queue ID.
 - `to_destination()` - Returns a tuple of (provider_id_hash, recipient_queue_id),
   where the provider ID is a 32-byte BLAKE2b hash of the IdentityKey.
 
-<a id="katzenpost_thinclient.core.ServiceDescriptor.__init__"></a>
-
-#### ServiceDescriptor.\_\_init\_\_
-
-```python
-def __init__(recipient_queue_id: bytes,
-             mix_descriptor: "Dict[Any,Any]") -> None
-```
-
 <a id="katzenpost_thinclient.core.ServiceDescriptor.to_destination"></a>
 
 #### ServiceDescriptor.to\_destination
@@ -1592,9 +570,12 @@ def to_destination() -> "Tuple[bytes,bytes]"
 
 provider identity key hash and queue id
 
+
+---
+
 <a id="katzenpost_thinclient.core.find_services"></a>
 
-#### find\_services
+### find\_services
 
 ```python
 def find_services(capability: str,
@@ -1624,9 +605,12 @@ If a service provides the requested capability, it is returned as a
 
 - `KeyError` - If the 'ServiceNodes' field is missing from the PKI document.
 
+
+---
+
 <a id="katzenpost_thinclient.core.Config"></a>
 
-## Config
+### Config
 
 ```python
 class Config()
@@ -1650,12 +634,16 @@ callback functions that are invoked when specific events occur during client ope
 
 **Example**:
 
-  >>> def handle_reply(event):
-  ...     # Process the received reply
-  ...     payload = event['payload']
-  >>>
-  >>> config = Config("client.toml", on_message_reply=handle_reply)
-  >>> client = ThinClient(config)
+
+```python
+def handle_reply(event):
+# Process the received reply
+payload = event['payload']
+
+config = Config("client.toml", on_message_reply=handle_reply)
+client = ThinClient(config)
+```
+
 
 <a id="katzenpost_thinclient.core.Config.__init__"></a>
 
@@ -1724,49 +712,12 @@ Initialize the Config object.
   Callbacks should be lightweight and non-blocking as they are called from the client's
   event processing loop.
 
-<a id="katzenpost_thinclient.core.Config.handle_connection_status_event"></a>
 
-#### Config.handle\_connection\_status\_event
-
-```python
-async def handle_connection_status_event(event: asyncio.Event) -> None
-```
-
-<a id="katzenpost_thinclient.core.Config.handle_new_pki_document_event"></a>
-
-#### Config.handle\_new\_pki\_document\_event
-
-```python
-async def handle_new_pki_document_event(event: asyncio.Event) -> None
-```
-
-<a id="katzenpost_thinclient.core.Config.handle_message_sent_event"></a>
-
-#### Config.handle\_message\_sent\_event
-
-```python
-async def handle_message_sent_event(event: asyncio.Event) -> None
-```
-
-<a id="katzenpost_thinclient.core.Config.handle_message_reply_event"></a>
-
-#### Config.handle\_message\_reply\_event
-
-```python
-async def handle_message_reply_event(event: asyncio.Event) -> None
-```
-
-<a id="katzenpost_thinclient.core.Config.handle_daemon_disconnected_event"></a>
-
-#### Config.handle\_daemon\_disconnected\_event
-
-```python
-async def handle_daemon_disconnected_event(event: dict) -> None
-```
+---
 
 <a id="katzenpost_thinclient.core.ThinClient"></a>
 
-## ThinClient
+### ThinClient
 
 ```python
 class ThinClient()
@@ -2306,64 +1257,25 @@ Pretty-print a parsed PKI document with fully decoded CBOR nodes.
 
 - `doc` _dict_ - Raw PKI document from the daemon.
 
+
+---
+
 <a id="katzenpost_thinclient.pigeonhole"></a>
 
-# katzenpost\_thinclient.pigeonhole
+## katzenpost\_thinclient.pigeonhole
 
-Katzenpost Python Thin Client - New Pigeonhole API
-===================================================
+**Katzenpost Python Thin Client - New Pigeonhole API**
 
 This module provides the new capability-based Pigeonhole API methods.
 These methods use WriteCap/ReadCap keypairs and provide direct
 control over the Pigeonhole protocol.
 
-<a id="katzenpost_thinclient.pigeonhole.hashlib"></a>
 
-## hashlib
-
-<a id="katzenpost_thinclient.pigeonhole.os"></a>
-
-## os
-
-<a id="katzenpost_thinclient.pigeonhole.dataclass"></a>
-
-## dataclass
-
-<a id="katzenpost_thinclient.pigeonhole.Any"></a>
-
-## Any
-
-<a id="katzenpost_thinclient.pigeonhole.Dict"></a>
-
-## Dict
-
-<a id="katzenpost_thinclient.pigeonhole.List"></a>
-
-## List
-
-<a id="katzenpost_thinclient.pigeonhole.THIN_CLIENT_SUCCESS"></a>
-
-## THIN\_CLIENT\_SUCCESS
-
-<a id="katzenpost_thinclient.pigeonhole.thin_client_error_to_string"></a>
-
-## thin\_client\_error\_to\_string
-
-<a id="katzenpost_thinclient.pigeonhole.error_code_to_exception"></a>
-
-## error\_code\_to\_exception
-
-<a id="katzenpost_thinclient.pigeonhole.copy_reply_to_exception"></a>
-
-## copy\_reply\_to\_exception
-
-<a id="katzenpost_thinclient.pigeonhole.PigeonholeGeometry"></a>
-
-## PigeonholeGeometry
+---
 
 <a id="katzenpost_thinclient.pigeonhole.KeypairResult"></a>
 
-## KeypairResult
+### KeypairResult
 
 ```python
 @dataclass
@@ -2372,21 +1284,12 @@ class KeypairResult()
 
 Result from new_keypair containing the generated capabilities.
 
-<a id="katzenpost_thinclient.pigeonhole.KeypairResult.write_cap"></a>
 
-#### KeypairResult.write\_cap
-
-<a id="katzenpost_thinclient.pigeonhole.KeypairResult.read_cap"></a>
-
-#### KeypairResult.read\_cap
-
-<a id="katzenpost_thinclient.pigeonhole.KeypairResult.first_message_index"></a>
-
-#### KeypairResult.first\_message\_index
+---
 
 <a id="katzenpost_thinclient.pigeonhole.EncryptReadResult"></a>
 
-## EncryptReadResult
+### EncryptReadResult
 
 ```python
 @dataclass
@@ -2395,25 +1298,12 @@ class EncryptReadResult()
 
 Result from encrypt_read containing the encrypted read request.
 
-<a id="katzenpost_thinclient.pigeonhole.EncryptReadResult.message_ciphertext"></a>
 
-#### EncryptReadResult.message\_ciphertext
-
-<a id="katzenpost_thinclient.pigeonhole.EncryptReadResult.envelope_descriptor"></a>
-
-#### EncryptReadResult.envelope\_descriptor
-
-<a id="katzenpost_thinclient.pigeonhole.EncryptReadResult.envelope_hash"></a>
-
-#### EncryptReadResult.envelope\_hash
-
-<a id="katzenpost_thinclient.pigeonhole.EncryptReadResult.next_message_box_index"></a>
-
-#### EncryptReadResult.next\_message\_box\_index
+---
 
 <a id="katzenpost_thinclient.pigeonhole.EncryptWriteResult"></a>
 
-## EncryptWriteResult
+### EncryptWriteResult
 
 ```python
 @dataclass
@@ -2422,25 +1312,12 @@ class EncryptWriteResult()
 
 Result from encrypt_write containing the encrypted write request.
 
-<a id="katzenpost_thinclient.pigeonhole.EncryptWriteResult.message_ciphertext"></a>
 
-#### EncryptWriteResult.message\_ciphertext
-
-<a id="katzenpost_thinclient.pigeonhole.EncryptWriteResult.envelope_descriptor"></a>
-
-#### EncryptWriteResult.envelope\_descriptor
-
-<a id="katzenpost_thinclient.pigeonhole.EncryptWriteResult.envelope_hash"></a>
-
-#### EncryptWriteResult.envelope\_hash
-
-<a id="katzenpost_thinclient.pigeonhole.EncryptWriteResult.next_message_box_index"></a>
-
-#### EncryptWriteResult.next\_message\_box\_index
+---
 
 <a id="katzenpost_thinclient.pigeonhole.StartResendingResult"></a>
 
-## StartResendingResult
+### StartResendingResult
 
 ```python
 @dataclass
@@ -2469,9 +1346,12 @@ consensus and cancel+re-encrypt if needed.
 
 Queue ID of the courier that handled this message.
 
+
+---
+
 <a id="katzenpost_thinclient.pigeonhole.new_keypair"></a>
 
-#### new\_keypair
+### new\_keypair
 
 ```python
 async def new_keypair(self, seed: bytes) -> KeypairResult
@@ -2502,15 +1382,22 @@ to allow them to read messages.
 
 **Example**:
 
-  >>> import os
-  >>> seed = os.urandom(32)
-  >>> result = await client.new_keypair(seed)
-  >>> # Share result.read_cap with Bob so he can read messages
-  >>> # Store result.write_cap for sending messages
+
+```python
+import os
+seed = os.urandom(32)
+result = await client.new_keypair(seed)
+# Share result.read_cap with Bob so he can read messages
+# Store result.write_cap for sending messages
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.encrypt_read"></a>
 
-#### encrypt\_read
+### encrypt\_read
 
 ```python
 async def encrypt_read(self, read_cap: bytes,
@@ -2542,12 +1429,19 @@ ciphertext should be sent via start_resending_encrypted_message.
 
 **Example**:
 
-  >>> result = await client.encrypt_read(read_cap, message_box_index)
-  >>> # Send result.message_ciphertext via start_resending_encrypted_message
+
+```python
+result = await client.encrypt_read(read_cap, message_box_index)
+# Send result.message_ciphertext via start_resending_encrypted_message
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.encrypt_write"></a>
 
-#### encrypt\_write
+### encrypt\_write
 
 ```python
 async def encrypt_write(self, plaintext: bytes, write_cap: bytes,
@@ -2590,13 +1484,20 @@ ThinClientErrorInvalidRequest.
 
 **Example**:
 
-  >>> plaintext = b"Hello, Bob!"
-  >>> result = await client.encrypt_write(plaintext, write_cap, message_box_index)
-  >>> # Send result.message_ciphertext via start_resending_encrypted_message
+
+```python
+plaintext = b"Hello, Bob!"
+result = await client.encrypt_write(plaintext, write_cap, message_box_index)
+# Send result.message_ciphertext via start_resending_encrypted_message
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.start_resending_encrypted_message"></a>
 
-#### start\_resending\_encrypted\_message
+### start\_resending\_encrypted\_message
 
 ```python
 async def start_resending_encrypted_message(
@@ -2676,13 +1577,20 @@ the fully decrypted plaintext.
 
 **Example**:
 
-  >>> result = await client.start_resending_encrypted_message(
-  ...     read_cap, None, message_box_index, reply_idx, env_desc, ciphertext, env_hash)
-  >>> print(f"Received: {result.plaintext}")
+
+```python
+result = await client.start_resending_encrypted_message(
+read_cap, None, message_box_index, reply_idx, env_desc, ciphertext, env_hash)
+print(f"Received: {result.plaintext}")
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.start_resending_encrypted_message_return_box_exists"></a>
 
-#### start\_resending\_encrypted\_message\_return\_box\_exists
+### start\_resending\_encrypted\_message\_return\_box\_exists
 
 ```python
 async def start_resending_encrypted_message_return_box_exists(
@@ -2734,15 +1642,22 @@ can be cancelled from another task via
 
 **Example**:
 
-  >>> try:
-  ...     await client.start_resending_encrypted_message_return_box_exists(
-  ...         None, write_cap, None, None, env_desc, ciphertext, env_hash)
-  ... except BoxAlreadyExistsError:
-  ...     print("Box already has data; write was idempotent")
+
+```python
+try:
+await client.start_resending_encrypted_message_return_box_exists(
+None, write_cap, None, None, env_desc, ciphertext, env_hash)
+except BoxAlreadyExistsError:
+print("Box already has data; write was idempotent")
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.start_resending_encrypted_message_no_retry"></a>
 
-#### start\_resending\_encrypted\_message\_no\_retry
+### start\_resending\_encrypted\_message\_no\_retry
 
 ```python
 async def start_resending_encrypted_message_no_retry(
@@ -2790,15 +1705,22 @@ can be cancelled from another task via
 
 **Example**:
 
-  >>> try:
-  ...     result = await client.start_resending_encrypted_message_no_retry(
-  ...         read_cap, None, message_box_index, reply_idx, env_desc, ciphertext, env_hash)
-  ... except BoxIDNotFoundError:
-  ...     print("Box not found; message not yet written")
+
+```python
+try:
+result = await client.start_resending_encrypted_message_no_retry(
+read_cap, None, message_box_index, reply_idx, env_desc, ciphertext, env_hash)
+except BoxIDNotFoundError:
+print("Box not found; message not yet written")
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.cancel_resending_encrypted_message"></a>
 
-#### cancel\_resending\_encrypted\_message
+### cancel\_resending\_encrypted\_message
 
 ```python
 async def cancel_resending_encrypted_message(self,
@@ -2825,11 +1747,18 @@ encrypted message transmission. This is useful when:
 
 **Example**:
 
-  >>> await client.cancel_resending_encrypted_message(env_hash)
+
+```python
+await client.cancel_resending_encrypted_message(env_hash)
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.next_message_box_index"></a>
 
-#### next\_message\_box\_index
+### next\_message\_box\_index
 
 ```python
 async def next_message_box_index(self, message_box_index: bytes) -> bytes
@@ -2863,13 +1792,20 @@ BACAP protocol implementation.
 
 **Example**:
 
-  >>> current_index = first_message_index
-  >>> next_index = await client.next_message_box_index(current_index)
-  >>> # Use next_index for the next message
+
+```python
+current_index = first_message_index
+next_index = await client.next_message_box_index(current_index)
+# Use next_index for the next message
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.get_message_box_index_counter"></a>
 
-#### get\_message\_box\_index\_counter
+### get\_message\_box\_index\_counter
 
 ```python
 async def get_message_box_index_counter(self, message_box_index: bytes) -> int
@@ -2902,14 +1838,21 @@ daemon.
 
 **Example**:
 
-  >>> current_idx = await client.get_message_box_index_counter(mbi_a)
-  >>> next_idx = await client.get_message_box_index_counter(mbi_b)
-  >>> if next_idx <= current_idx:
-  ...     print("skipping stale ACK")
+
+```python
+current_idx = await client.get_message_box_index_counter(mbi_a)
+next_idx = await client.get_message_box_index_counter(mbi_b)
+if next_idx <= current_idx:
+print("skipping stale ACK")
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.start_resending_copy_command"></a>
 
-#### start\_resending\_copy\_command
+### start\_resending\_copy\_command
 
 ```python
 async def start_resending_copy_command(
@@ -2944,15 +1887,22 @@ random courier is selected.
 
 **Example**:
 
-  >>> # Send copy command to a random courier
-  >>> await client.start_resending_copy_command(temp_write_cap)
-  >>> # Send copy command to a specific courier
-  >>> await client.start_resending_copy_command(
-  ...     temp_write_cap, courier_identity_hash, courier_queue_id)
+
+```python
+# Send copy command to a random courier
+await client.start_resending_copy_command(temp_write_cap)
+# Send copy command to a specific courier
+await client.start_resending_copy_command(
+temp_write_cap, courier_identity_hash, courier_queue_id)
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.cancel_resending_copy_command"></a>
 
-#### cancel\_resending\_copy\_command
+### cancel\_resending\_copy\_command
 
 ```python
 async def cancel_resending_copy_command(self, write_cap_hash: bytes) -> None
@@ -2978,11 +1928,18 @@ copy command. Use this when:
 
 **Example**:
 
-  >>> await client.cancel_resending_copy_command(write_cap_hash)
+
+```python
+await client.cancel_resending_copy_command(write_cap_hash)
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.create_courier_envelopes_from_payload"></a>
 
-#### create\_courier\_envelopes\_from\_payload
+### create\_courier\_envelopes\_from\_payload
 
 ```python
 async def create_courier_envelopes_from_payload(
@@ -3028,9 +1985,12 @@ Multiple calls can target the same destination stream by passing
 
 - `Exception` - If the envelope creation fails.
 
+
+---
+
 <a id="katzenpost_thinclient.pigeonhole.create_courier_envelopes_from_multi_payload"></a>
 
-#### create\_courier\_envelopes\_from\_multi\_payload
+### create\_courier\_envelopes\_from\_multi\_payload
 
 ```python
 async def create_courier_envelopes_from_multi_payload(
@@ -3078,19 +2038,26 @@ the encoder flushes its tail.
 
 **Example**:
 
-  >>> destinations = [
-  ...     {"payload": data1, "write_cap": cap1, "start_index": idx1},
-  ...     {"payload": data2, "write_cap": cap2, "start_index": idx2},
-  ... ]
-  >>> result = await client.create_courier_envelopes_from_multi_payload(
-  ...     destinations, is_start=True, is_last=False)
-  >>> # Pass buffer to next call
-  >>> result2 = await client.create_courier_envelopes_from_multi_payload(
-  ...     more_destinations, is_start=False, is_last=True, buffer=result.buffer)
+
+```python
+destinations = [
+{"payload": data1, "write_cap": cap1, "start_index": idx1},
+{"payload": data2, "write_cap": cap2, "start_index": idx2},
+]
+result = await client.create_courier_envelopes_from_multi_payload(
+destinations, is_start=True, is_last=False)
+# Pass buffer to next call
+result2 = await client.create_courier_envelopes_from_multi_payload(
+more_destinations, is_start=False, is_last=True, buffer=result.buffer)
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.CreateEnvelopesResult"></a>
 
-## CreateEnvelopesResult
+### CreateEnvelopesResult
 
 ```python
 @dataclass
@@ -3126,9 +2093,12 @@ Only populated by create_courier_envelopes_from_payload.
 The next destination indices for each destination, in request order.
 Only populated by create_courier_envelopes_from_multi_payload.
 
+
+---
+
 <a id="katzenpost_thinclient.pigeonhole.TombstoneEnvelope"></a>
 
-## TombstoneEnvelope
+### TombstoneEnvelope
 
 ```python
 @dataclass
@@ -3137,25 +2107,12 @@ class TombstoneEnvelope()
 
 A single tombstone envelope ready to be sent.
 
-<a id="katzenpost_thinclient.pigeonhole.TombstoneEnvelope.message_ciphertext"></a>
 
-#### TombstoneEnvelope.message\_ciphertext
-
-<a id="katzenpost_thinclient.pigeonhole.TombstoneEnvelope.envelope_descriptor"></a>
-
-#### TombstoneEnvelope.envelope\_descriptor
-
-<a id="katzenpost_thinclient.pigeonhole.TombstoneEnvelope.envelope_hash"></a>
-
-#### TombstoneEnvelope.envelope\_hash
-
-<a id="katzenpost_thinclient.pigeonhole.TombstoneEnvelope.box_index"></a>
-
-#### TombstoneEnvelope.box\_index
+---
 
 <a id="katzenpost_thinclient.pigeonhole.TombstoneRangeResult"></a>
 
-## TombstoneRangeResult
+### TombstoneRangeResult
 
 ```python
 @dataclass
@@ -3164,17 +2121,12 @@ class TombstoneRangeResult()
 
 Result of a tombstone_range operation.
 
-<a id="katzenpost_thinclient.pigeonhole.TombstoneRangeResult.envelopes"></a>
 
-#### TombstoneRangeResult.envelopes
-
-<a id="katzenpost_thinclient.pigeonhole.TombstoneRangeResult.next"></a>
-
-#### TombstoneRangeResult.next
+---
 
 <a id="katzenpost_thinclient.pigeonhole.tombstone_range"></a>
 
-#### tombstone\_range
+### tombstone\_range
 
 ```python
 async def tombstone_range(self, write_cap: bytes, start: bytes,
@@ -3213,17 +2165,24 @@ pass ``max_count=1``.
 
 **Example**:
 
-  >>> result = await client.tombstone_range(write_cap, start_index, 10)
-  >>> for envelope in result.envelopes:
-  ...     await client.start_resending_encrypted_message(
-  ...         None, write_cap, None, None,
-  ...         envelope.envelope_descriptor,
-  ...         envelope.message_ciphertext,
-  ...         envelope.envelope_hash)
+
+```python
+result = await client.tombstone_range(write_cap, start_index, 10)
+for envelope in result.envelopes:
+await client.start_resending_encrypted_message(
+None, write_cap, None, None,
+envelope.envelope_descriptor,
+envelope.message_ciphertext,
+envelope.envelope_hash)
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.pigeonhole.create_courier_envelopes_from_tombstone_range"></a>
 
-#### create\_courier\_envelopes\_from\_tombstone\_range
+### create\_courier\_envelopes\_from\_tombstone\_range
 
 ```python
 async def create_courier_envelopes_from_tombstone_range(
@@ -3271,33 +2230,31 @@ the encoder flushes its tail.
 
 **Example**:
 
-  >>> result = await client.create_courier_envelopes_from_tombstone_range(
-  ...     write_cap, start_index, 10, is_start=True, is_last=True)
-  >>> for envelope in result.envelopes:
-  ...     # write envelope to temp copy stream channel
-  ...     pass
+
+```python
+result = await client.create_courier_envelopes_from_tombstone_range(
+write_cap, start_index, 10, is_start=True, is_last=True)
+for envelope in result.envelopes:
+# write envelope to temp copy stream channel
+pass
+```
+
+
+
+---
 
 <a id="katzenpost_thinclient.transport.tcp"></a>
 
-# katzenpost\_thinclient.transport.tcp
+## katzenpost\_thinclient.transport.tcp
 
 TCP transport for the thin-client.
 
-<a id="katzenpost_thinclient.transport.tcp.socket"></a>
 
-## socket
-
-<a id="katzenpost_thinclient.transport.tcp.dataclass"></a>
-
-## dataclass
-
-<a id="katzenpost_thinclient.transport.tcp.Tuple"></a>
-
-## Tuple
+---
 
 <a id="katzenpost_thinclient.transport.tcp.TcpDialConfig"></a>
 
-## TcpDialConfig
+### TcpDialConfig
 
 ```python
 @dataclass
@@ -3309,25 +2266,12 @@ Configures a TCP dialer.
 address is in host:port form, e.g. "localhost:64331" or "[::1]:64331".
 network is one of "tcp", "tcp4", "tcp6"; defaults to "tcp".
 
-<a id="katzenpost_thinclient.transport.tcp.TcpDialConfig.address"></a>
 
-#### TcpDialConfig.address
-
-<a id="katzenpost_thinclient.transport.tcp.TcpDialConfig.network"></a>
-
-#### TcpDialConfig.network
-
-<a id="katzenpost_thinclient.transport.tcp.TcpDialConfig.setup_socket"></a>
-
-#### TcpDialConfig.setup\_socket
-
-```python
-def setup_socket() -> "Tuple[socket.socket, Tuple[str, int]]"
-```
+---
 
 <a id="katzenpost_thinclient.transport"></a>
 
-# katzenpost\_thinclient.transport
+## katzenpost\_thinclient.transport
 
 Transport abstraction for the Python thin-client.
 
@@ -3340,33 +2284,12 @@ DialConfig is a discriminated-union container: exactly one of its
 inner variants must be populated. Zero or multiple populated variants
 is a configuration error.
 
-<a id="katzenpost_thinclient.transport.dataclass"></a>
 
-## dataclass
-
-<a id="katzenpost_thinclient.transport.Any"></a>
-
-## Any
-
-<a id="katzenpost_thinclient.transport.Optional"></a>
-
-## Optional
-
-<a id="katzenpost_thinclient.transport.Tuple"></a>
-
-## Tuple
-
-<a id="katzenpost_thinclient.transport.TcpDialConfig"></a>
-
-## TcpDialConfig
-
-<a id="katzenpost_thinclient.transport.UnixDialConfig"></a>
-
-## UnixDialConfig
+---
 
 <a id="katzenpost_thinclient.transport.DialConfig"></a>
 
-## DialConfig
+### DialConfig
 
 ```python
 @dataclass
@@ -3374,22 +2297,6 @@ class DialConfig()
 ```
 
 Discriminated-union of dial transports. Exactly one subtable must be populated.
-
-<a id="katzenpost_thinclient.transport.DialConfig.unix"></a>
-
-#### DialConfig.unix
-
-<a id="katzenpost_thinclient.transport.DialConfig.tcp"></a>
-
-#### DialConfig.tcp
-
-<a id="katzenpost_thinclient.transport.DialConfig.validate"></a>
-
-#### DialConfig.validate
-
-```python
-def validate() -> None
-```
 
 <a id="katzenpost_thinclient.transport.DialConfig.resolve"></a>
 
@@ -3416,31 +2323,21 @@ Rejects unknown subtables (typos, removed variants, future
 names) and unknown keys inside a recognised subtable. Exactly
 one of [Dial.Unix] / [Dial.Tcp] must be populated.
 
+
+---
+
 <a id="katzenpost_thinclient.transport.unix"></a>
 
-# katzenpost\_thinclient.transport.unix
+## katzenpost\_thinclient.transport.unix
 
 Unix-domain-socket transport for the thin-client.
 
-<a id="katzenpost_thinclient.transport.unix.random"></a>
 
-## random
-
-<a id="katzenpost_thinclient.transport.unix.socket"></a>
-
-## socket
-
-<a id="katzenpost_thinclient.transport.unix.dataclass"></a>
-
-## dataclass
-
-<a id="katzenpost_thinclient.transport.unix.Tuple"></a>
-
-## Tuple
+---
 
 <a id="katzenpost_thinclient.transport.unix.UnixDialConfig"></a>
 
-## UnixDialConfig
+### UnixDialConfig
 
 ```python
 @dataclass
@@ -3448,15 +2345,3 @@ class UnixDialConfig()
 ```
 
 Configures a unix-domain-socket dialer.
-
-<a id="katzenpost_thinclient.transport.unix.UnixDialConfig.address"></a>
-
-#### UnixDialConfig.address
-
-<a id="katzenpost_thinclient.transport.unix.UnixDialConfig.setup_socket"></a>
-
-#### UnixDialConfig.setup\_socket
-
-```python
-def setup_socket() -> "Tuple[socket.socket, str]"
-```
