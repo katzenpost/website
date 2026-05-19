@@ -82,8 +82,8 @@ def render_api() -> str:
     body = result.stdout.strip()
     if not body:
         sys.exit("error: pydoc-markdown produced no output")
-    return space_sections(
-        group_exceptions(flatten_setext(fence_doctests(body))))
+    return space_sections(move_exceptions_to_end(
+        group_exceptions(flatten_setext(fence_doctests(body)))))
 
 
 _HEADING = re.compile(r"^(#{2,4}) +(.*)$")
@@ -139,6 +139,56 @@ def group_exceptions(body: str) -> str:
                 line = "#" + line
         out.append(line)
     return "\n".join(out)
+
+
+def move_exceptions_to_end(body: str) -> str:
+    """Relocate the grouped Exceptions section to the page foot.
+
+    group_exceptions leaves the taxonomy where the binding declares
+    it, near the head of the core module. Error types are reference
+    matter, not the first thing a reader wants, so the whole
+    contiguous block (its anchor, heading, intro and every demoted
+    class) is excised and reattached at the very end, promoted to a
+    top-level `## Exceptions` so it reads as the page's closing
+    section and still occupies but a single contents entry.
+    """
+    lines = body.split("\n")
+    try:
+        start = next(i for i, l in enumerate(lines)
+                     if l.strip() == '<a id="exceptions"></a>')
+    except StopIteration:
+        return body
+
+    in_fence = False
+    end = len(lines)
+    for i in range(start + 3, len(lines)):
+        if lines[i].lstrip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        if not in_fence and re.match(r"^(### |## )\S", lines[i]):
+            end = i
+            break
+
+    # The terminating heading is preceded by its own anchor (and a
+    # blank line); those belong to the next section, not to ours, so
+    # rewind the cut past them and leave them with `rest`.
+    cut = end
+    while cut > start and lines[cut - 1].strip() == "":
+        cut -= 1
+    if cut > start and _ANCHOR.match(lines[cut - 1]):
+        cut -= 1
+
+    region = lines[start:cut]
+    while region and region[-1].strip() == "":
+        region.pop()
+    region = ["## Exceptions" if l == "### Exceptions" else l
+              for l in region]
+
+    rest = lines[:start] + lines[cut:]
+    while rest and rest[-1].strip() == "":
+        rest.pop()
+
+    return "\n".join(rest + ["", ""] + region) + "\n"
 
 
 _PROMPT = re.compile(r"^(>>>|\.\.\.)( |$)")
