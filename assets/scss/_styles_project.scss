@@ -544,3 +544,24 @@ section.td-cover-block {
         vertical-align: middle;
     }
 }
+
+/* Right-hand table of contents: make a long list scrollable.
+
+   Docsy positions .td-sidebar-toc with `top: 4rem; height: calc(100vh
+   - 4rem)`, presuming the stock 4rem (64px) navbar. This site enlarges
+   the navbar to min-height 100px with an 80px logo (~120px tall, as
+   the .td-blog padding-top: 120px rule already attests). With Docsy's
+   smaller offset the TOC's head hid behind the navbar and its scroll
+   region ran off the foot of the viewport, so on a long page (this
+   one, and the cross-language reference) the lower entries could not
+   be reached. Re-anchoring the sticky box to the true navbar height
+   and bounding it to the remaining viewport restores the scroll;
+   overflow-y is re-asserted for older engines. */
+@supports (position: sticky) {
+    .td-sidebar-toc {
+        top: 7.5rem !important;
+        height: calc(100vh - 8.5rem) !important;
+        overflow-y: auto !important;
+        padding-bottom: 1rem !important;
+    }
+}
