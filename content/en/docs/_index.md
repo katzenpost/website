@@ -4,16 +4,66 @@ linkTitle: "Documentation"
 draft: false
 menu: {main: {weight: 70}}
 type: "base"
+no_list: true
+body_class: "td-no-sidebar"
 ---
 
+<img src="/images/ZII-WIZ3.png" alt="ANSI wizard casting a spell, by Zeus" class="img-fluid mb-4" style="max-width: 640px;">
 
-|      | Title                                                                                | Description                                                                                                                      | Link(s)                                                                                                |
-|------|--------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
-| 📖   | **[Admin Guide](/docs/admin_guide)**                                                 | Detailed guide for deploying and managing Katzenpost servers, including setting up a local Docker-based mixnet.                  | [HTML](/docs/admin_guide) / [PDF](/admin_guide/admin_guide.pdf)                                        |
-| 📖   | **[Design specifications](/docs/specs)**                                             | Documentation of the mixnet design.                                                                                              | [HTML](/docs/specs)                                                                                    |
-| 🔒   | **[Threat Model](/docs/threat_model)**                                               | An evolving document defining Katzenpost's security assumptions, attack scenarios, and mitigation strategies.                    | [HTML](/docs/threat_model) / [PDF](/research/Threat_Model_Doc.pdf)                                     |
-| 📚   | **[Literature Review](/research/Literature_overview__website_version.pdf)**          | A curated review of academic literature, explaining the theoretical foundations behind Katzenpost's design decisions.            | [PDF](/research/Literature_overview__website_version.pdf)                                              |
-| 🎧   | **[Audio Engineering Considerations for a Modern Mixnet](/docs/audio_eng)**          | Technical analysis of audio transmission challenges and solutions for modern mixnets, with a focus on usability and scalability. | [HTML](/docs/audio_eng) / [PDF](/research/Audio_Engineering_Considerations_for_a_Modern_Mixnet.pdf)    |
-| 🔥 | **[Client Integration Guide](/docs/client_integration)**                             | Guide to integrating your application with thin client libraries | [HTML](/docs/client_integration)
-| 📝  | **[How to Use the Namenlos Mixnet](/docs/howto_use_namenlos_mixnet)**                 | Guide to using the Namenlos mixnet | [HTML](/docs/howto_use_namenlos_mixnet)]
-| 🐳  | **[Run a Katzenpost Mix server in a Docker container](/docs/run_katzenpost_mixnode_docker)** | Guide to running a Katzenpost mix server in a Docker container | [HTML](/docs/run_katzenpost_mixnode_docker)
+## For users
+
+Client applications, packages, and a public mixnet.
+
+|     | Title | Description |
+|-----|-------|-------------|
+| 🐈  | **Namenlos public mixnet** *(coming soon)* | A public Katzenpost mix network that anyone may use, without the burden of operating their own. |
+| 📦  | **`kpclientd` packages and binaries** *(coming soon)* | Pre-built distribution packages and binaries for the client daemon, so users will not need to build from source. |
+| 💬  | **katzenqt group chat** | A decentralised group chat application running over the Katzenpost mix network and the Pigeonhole storage services. Pre-built packages forthcoming. [Build and run from source](/docs/build_katzenqt/) in the meantime. |
+
+## For operators
+
+You wish to run your own Katzenpost mix network with friends and collaborators.
+
+|     | Title | Description |
+|-----|-------|-------------|
+| 📖  | **[Admin Guide](/docs/admin_guide/)** | Deploying and operating Katzenpost servers: installation, configuration, the Docker test mixnet, NAT considerations, and a full configuration appendix. |
+| 🐳  | **[Run a Mix Server in Docker](/docs/misc/run_katzenpost_mixnode_docker/)** | A focused recipe for running a single Katzenpost mix server inside a Docker container, intended for operators who wish to participate in an existing mix network. |
+| 🔧  | **[Build from source](/docs/misc/build_from_source/)** | Pinned versions of the Katzenpost stack and brief instructions for building each component (kpclientd, thin clients, katzenqt, server-side) from source. |
+
+## For application developers
+
+You wish to build software that integrates with Katzenpost.
+
+|     | Title | Description |
+|-----|-------|-------------|
+| 📘  | **[Thin Client API Reference](/docs/misc/thin_client_api_reference/)** | Complete API reference for the Go, Rust, and Python thin client libraries. |
+| 📗  | **[Thin Client How-to Guide](/docs/misc/thin_client_howto/)** | Task-oriented guides for accomplishing common operations with the thin client API. |
+| 🕊️  | **[Understanding Pigeonhole](/docs/misc/pigeonhole_explained/)** | A high-level introduction to the Pigeonhole anonymous storage protocol for application developers. |
+| 🔧  | **[Build from source](/docs/misc/build_from_source/)** | Pinned versions of the Katzenpost stack and brief instructions for building each component from source. |
+
+## For core developers
+
+You wish to contribute code to Katzenpost itself.
+
+|     | Title | Description |
+|-----|-------|-------------|
+| 🛠️  | **[Design Specifications](/docs/specs/)** | The protocol specifications that the implementation must honour: Sphinx, KEMSphinx, the wire protocol, the directory authority, replay detection, and more. |
+| <i class="fab fa-github"></i>  | **[Source Repository](https://github.com/katzenpost/katzenpost)** | The Katzenpost monorepo on GitHub: server, dirauth, client, courier, replica, and core. Issues, pull requests, and discussions live here. |
+
+## For academics
+
+You are a mathematician, computer scientist, security researcher, or hacker investigating the design.
+
+Read in the order below. Seasoned mixnet researchers may skip ahead to the Echomix paper.
+
+|     | Title | Description |
+|-----|-------|-------------|
+| 📚  | **1. [Literature Review](/research/Literature_overview__website_version.pdf)** *(last updated April 2024)* | Start here if you are new to mixnet research. Field context, attack taxonomy, and the conceptual positions the Echomix paper builds on. |
+| <img src="/iconx/arxiv.svg" alt="arXiv" height="14">  | **2. [Echomix paper](https://arxiv.org/abs/2501.02933)** | *Echomix: a Strong Anonymity System with Messaging.* Katzenpost's design, presented as research (arXiv). |
+| 🔒  | **3. [Threat Model](/docs/misc/threat_model/)** ([PDF](/research/Threat_Model_Doc.pdf)) | Detailed security assumptions and mitigations specific to the deployed system. |
+
+Supplementary reading:
+
+|     | Title | Description |
+|-----|-------|-------------|
+| 🎧  | **Audio Engineering Considerations** ([PDF](/research/Audio_Engineering_Considerations_for_a_Modern_Mixnet.pdf)) | A technical report on the challenges of carrying voice traffic through a modern mix network, with attention to usability and scalability. |

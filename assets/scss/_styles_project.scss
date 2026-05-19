@@ -2,61 +2,6 @@
 
 /* Import Chroma monokai syntax highlighting */
 @import "chroma_monokai";
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: italic;
-  font-weight: 300;
-  font-display: swap;
-  src: url('/fonts/FiraSans-LightItalic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: italic;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Bold.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Light.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Medium.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/FiraSans-Bold.woff2') format('woff2');
-}
 
 
 /* Stylez */
@@ -67,6 +12,10 @@
 }
 
 .td-navbar {
+    min-height: 100px !important;
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+
     .nav-link {
         font-weight: 400 !important;
 
@@ -79,6 +28,23 @@
         background-color: darken($primary, 5%);
         color: $white !important;
     }
+
+    .navbar-logo {
+        svg {
+            height: 80px !important;
+            width: 80px !important;
+        }
+    }
+}
+
+/* Fix blog content being covered by fixed navbar */
+.td-blog {
+    padding-top: 120px !important;
+}
+
+/* Also apply to main content areas without sidebar */
+.td-main main:first-child {
+    padding-top: 20px;
 }
 
 .td-sidebar-link {
@@ -123,7 +89,7 @@ header.article-meta {
     margin: 0 auto;
     padding: 20px;
     text-align: center;
-    font-family: 'Fira Sans', sans-serif;
+    font-family: monospace;
     font-size: 1.25rem; /* Slightly larger font size (20px) */
     line-height: 1.6; /* Increase line height for better readability */
     font-weight: 400; /* Optional: Adjust weight for optimal readability */
@@ -137,18 +103,21 @@ header.article-meta {
 .td-page-meta__issue  { display: none !important; }
 .td-page-meta__project-issue  { display: none !important; }
 
-/* Gray background theme with black code blocks */
+/* Charcoal background theme with deeper-tone code blocks.
+   Palette: body #2c2f36 (medium charcoal), elevated surfaces #23262b,
+   code blocks #1a1d22. Pastel accents are periwinkle (#a8b3ff) for
+   links and peach (#ffd9a8) for body section headings. */
 body {
-    background-color: #2d2d2d !important;
+    background-color: #2c2f36 !important;
     color: #ffffff !important;
 }
 
 .td-main {
-    background-color: #2d2d2d !important;
+    background-color: #2c2f36 !important;
 }
 
 .td-content {
-    background-color: #2d2d2d !important;
+    background-color: #2c2f36 !important;
     color: #ffffff !important;
 }
 
@@ -162,30 +131,32 @@ p:not(.chroma *), li:not(.chroma *), td:not(.chroma *), th:not(.chroma *), span:
     color: #e0e0e0 !important;
 }
 
-/* Readable links against gray background - but exclude tags */
-a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/categories/"]) {
-    color: #66b3ff !important;
+/* Readable links against the charcoal background. Periwinkle pastel for the
+   cool accent. Excludes tags and buttons so Bootstrap's button styling and
+   the tag-pill treatment further down stay intact. */
+a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/categories/"]):not(.btn) {
+    color: #a8b3ff !important;
     text-decoration: none !important;
 
     &:hover {
-        color: #99ccff !important;
+        color: #ffffff !important;
         text-decoration: underline !important;
     }
 
     &:visited {
-        color: #8db3ff !important;
+        color: #c0c8ff !important;
     }
 }
 
 /* Navigation styling */
 .td-navbar {
-    background-color: #1a1a1a !important;
+    background-color: #23262b !important;
 
     .navbar-nav .nav-link {
         color: #ffffff !important;
 
         &:hover {
-            color: #66b3ff !important;
+            color: #a8b3ff !important;
         }
     }
 
@@ -193,20 +164,20 @@ a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/c
         color: #ffffff !important;
 
         &:hover {
-            color: #66b3ff !important;
+            color: #a8b3ff !important;
         }
     }
 }
 
 .td-sidebar {
-    background-color: #333333 !important;
+    background-color: #23262b !important;
 
     .td-sidebar-nav .td-sidebar-link {
         color: #e0e0e0 !important;
 
         &:hover {
-            color: #66b3ff !important;
-            background-color: #404040 !important;
+            color: #a8b3ff !important;
+            background-color: #393d45 !important;
         }
 
         &.tree-root {
@@ -217,15 +188,15 @@ a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/c
 
 /* Code blocks - force black background */
 .highlight, .highlight pre, .chroma, .chroma pre, pre, pre code {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
     color: #f8f8f2 !important;
 }
 
 .highlight {
-    border: 1px solid #444444 !important;
+    border: 1px solid #3a3e46 !important;
     border-radius: 4px !important;
     margin: 1rem 0 !important;
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
 
     pre {
         margin: 0 !important;
@@ -233,24 +204,24 @@ a:not([class*="tag"]):not([class*="badge"]):not([href*="/tags/"]):not([href*="/c
         border: none !important;
         border-radius: 4px !important;
         overflow-x: auto !important;
-        background-color: #000000 !important;
+        background-color: #1a1d22 !important;
     }
 }
 
 /* Force black background for all code-related elements */
 div.highlight, div.highlight pre, div.chroma, div.chroma pre {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
 }
 
 /* Tabbed panes code blocks */
 .tab-pane .highlight, .tab-pane .chroma, .tab-pane pre {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
 }
 
 /* Inline code styling */
 code:not(.chroma code) {
     color: #f8f8f2 !important;
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
     padding: 0.2rem 0.4rem !important;
     border-radius: 3px !important;
     font-size: 0.9em !important;
@@ -258,47 +229,47 @@ code:not(.chroma code) {
 
 /* Override any Bootstrap/Docsy code block styles */
 .td-content pre, .td-content code, .td-content .highlight {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
 }
 
 /* Ensure all pre elements have black background */
 pre {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
     color: #f8f8f2 !important;
-    border: 1px solid #444444 !important;
+    border: 1px solid #3a3e46 !important;
     border-radius: 4px !important;
     padding: 1rem !important;
 }
 
 /* Override any theme defaults */
 .td-content .highlight pre {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
     margin: 0 !important;
     border: none !important;
 }
 
 /* Tables with dark background */
 .table {
-    background-color: #1a1a1a !important;
+    background-color: #23262b !important;
     color: #e0e0e0 !important;
 
     th {
-        background-color: #0d0d0d !important;
+        background-color: #393d45 !important;
         color: #ffffff !important;
-        border-color: #444444 !important;
+        border-color: #3a3e46 !important;
     }
 
     td {
-        background-color: #1a1a1a !important;
+        background-color: #23262b !important;
         color: #e0e0e0 !important;
-        border-color: #444444 !important;
+        border-color: #3a3e46 !important;
     }
 
     &.table-striped tbody tr:nth-of-type(odd) {
-        background-color: #222222 !important;
+        background-color: #262a30 !important;
 
         td {
-            background-color: #222222 !important;
+            background-color: #262a30 !important;
         }
     }
 }
@@ -306,26 +277,55 @@ pre {
 /* Blog and content area link fixes */
 .td-content {
     a {
-        color: #66b3ff !important;
+        color: #a8b3ff !important;
         background-color: transparent !important;
 
         &:hover {
-            color: #99ccff !important;
-            background-color: rgba(102, 179, 255, 0.1) !important;
+            color: #ffffff !important;
+            background-color: transparent !important;
         }
     }
 }
 
-/* Blog post navigation and tag links */
-.blog-tags a, .td-blog-posts-list a {
-    color: #66b3ff !important;
-    background-color: #404040 !important;
+/* Tag pill links inside article tag rows */
+.blog-tags a {
+    color: #a8b3ff !important;
+    background-color: #393d45 !important;
     padding: 0.25rem 0.5rem !important;
     border-radius: 3px !important;
 
     &:hover {
         color: #ffffff !important;
-        background-color: #66b3ff !important;
+        background-color: #a8b3ff !important;
+    }
+}
+
+/* Post title and "Read more" links on the /blog/ index — keep them on the
+   page's black background (high contrast) rather than pilled on grey. */
+.td-blog-posts-list a {
+    color: #a8b3ff !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    text-decoration: none !important;
+
+    &:hover {
+        color: #ffffff !important;
+        background-color: transparent !important;
+        text-decoration: underline !important;
+    }
+}
+
+/* Tag chips that appear inside individual post entries on the list page
+   should keep the pill treatment. */
+.td-blog-posts-list .taxonomy-terms-article a,
+.td-blog-posts-list a.taxonomy-term {
+    background-color: #393d45 !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 3px !important;
+
+    &:hover {
+        background-color: #a8b3ff !important;
+        color: #ffffff !important;
     }
 }
 
@@ -351,31 +351,31 @@ pre {
 
 /* Tabpane styling - black background */
 .tab-content, .tab-pane {
-    background-color: #000000 !important;
+    background-color: #1a1d22 !important;
     color: #ffffff !important;
-    border: 1px solid #444444 !important;
+    border: 1px solid #3a3e46 !important;
     border-radius: 4px !important;
     padding: 1rem !important;
 }
 
 .nav-tabs {
-    border-bottom: 1px solid #444444 !important;
+    border-bottom: 1px solid #3a3e46 !important;
 
     .nav-link {
-        background-color: #333333 !important;
+        background-color: #393d45 !important;
         color: #ffffff !important;
-        border: 1px solid #444444 !important;
+        border: 1px solid #3a3e46 !important;
         border-bottom: none !important;
 
         &:hover {
-            background-color: #555555 !important;
+            background-color: #4a4e57 !important;
             color: #ffffff !important;
         }
 
         &.active {
-            background-color: #000000 !important;
+            background-color: #1a1d22 !important;
             color: #ffffff !important;
-            border-bottom: 1px solid #000000 !important;
+            border-bottom: 1px solid #1a1d22 !important;
         }
     }
 }
@@ -415,39 +415,153 @@ pre {
 
 /* Pagination and navigation elements */
 .pagination .page-link {
-    background-color: #404040 !important;
+    background-color: #393d45 !important;
     color: #e0e0e0 !important;
-    border-color: #555555 !important;
+    border-color: #4a4e57 !important;
 
     &:hover {
-        background-color: #66b3ff !important;
+        background-color: #a8b3ff !important;
         color: #ffffff !important;
-        border-color: #66b3ff !important;
+        border-color: #a8b3ff !important;
     }
 
     &.active {
-        background-color: #66b3ff !important;
-        border-color: #66b3ff !important;
+        background-color: #a8b3ff !important;
+        border-color: #a8b3ff !important;
         color: #ffffff !important;
     }
 }
 
 /* Pageinfo styling - much darker background for better text readability */
 .pageinfo {
-    background-color: #1a1a1a !important;
+    background-color: #23262b !important;
     color: #ffffff !important;
-    border: 1px solid #444444 !important;
+    border: 1px solid #3a3e46 !important;
     border-radius: 4px !important;
     padding: 1rem !important;
     margin-bottom: 1rem !important;
 }
 
 .pageinfo-primary {
-    background-color: #1a1a1a !important;
-    border-color: #004b6b !important;
+    background-color: #23262b !important;
+    border-color: #a8b3ff !important;
 }
 
 .pageinfo p {
     color: #ffffff !important;
     margin-bottom: 0 !important;
+}
+
+/* The body stack is generic monospace, but dense navigation columns
+   read more easily in a sans-serif. Apply the sans stack to the left
+   and right Docsy sidebars. */
+.td-sidebar,
+.td-sidebar-toc,
+.td-sidebar-nav {
+    font-family: $td-fonts-sans;
+}
+
+/* Suppress the left sidebar on pages that opt in via body_class: "td-no-sidebar".
+   The main column is centred with a comfortable max-width so the content breathes
+   on wide displays. The right-hand ToC sidebar is left untouched so per-page
+   anchors remain reachable where they exist. */
+.td-no-sidebar {
+    .td-sidebar { display: none; }
+    main.col-12.col-md-9.col-xl-8 {
+        @media (min-width: 768px) {
+            flex: 0 0 100%;
+            max-width: 1100px;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
+        }
+    }
+}
+
+.td-content h2,
+.td-content h3 {
+    color: #ffd9a8 !important;
+    font-weight: 500;
+}
+
+.td-content h2 {
+    margin-top: 2.5rem;
+}
+
+/* Constrain the home page's body prose to a comfortable reading width on
+   large monitors. The cover block (a <section> with the friendly logo and
+   CTAs) is excluded by :not(section) and continues to span the full viewport. */
+.td-home main.td-main > :not(section) {
+    max-width: 820px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+/* A gentle warm wash on the home cover: a tinted dark at the top fading
+   into the body charcoal so the transition into the prose is invisible.
+   Bright enough to feel welcoming, dark enough that white type remains
+   legible without a secondary scrim. */
+section.td-cover-block {
+    background: linear-gradient(180deg, #4a3d33 0%, #38322e 45%, #2c2f36 100%) !important;
+}
+
+/* Two-column framing tables on the moral-character page. Sized to content
+   rather than spanning the full column, with a visible vertical divider
+   between the two columns and grid lines between rows. */
+.framing-table {
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0.75rem 0 1.75rem 0;
+    border-collapse: collapse;
+    background-color: transparent !important;
+
+    caption {
+        caption-side: top;
+        text-align: left;
+        padding: 0.5rem 0;
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 1.05rem;
+
+        .caption-source {
+            display: block;
+            font-weight: 400;
+            font-style: italic;
+            font-size: 0.9rem;
+            color: #c0c0c0 !important;
+            margin-top: 0.15rem;
+        }
+    }
+
+    td {
+        padding: 0.75rem 1.25rem !important;
+        background-color: #23262b !important;
+        color: #e0e0e0 !important;
+        border: 1px solid #3a3e46 !important;
+        vertical-align: middle;
+    }
+}
+
+/* Right-hand table of contents: make a long list scrollable.
+
+   Docsy positions .td-sidebar-toc with `top: 4rem; height: calc(100vh
+   - 4rem)`, presuming the stock 4rem (64px) navbar. This site enlarges
+   the navbar to min-height 100px with an 80px logo (~120px tall, as
+   the .td-blog padding-top: 120px rule already attests). With Docsy's
+   smaller offset the TOC's head hid behind the navbar and its scroll
+   region ran off the foot of the viewport, so on a long page (this
+   one, and the cross-language reference) the lower entries could not
+   be reached. Re-anchoring the sticky box to the true navbar height
+   and bounding it to the remaining viewport restores the scroll;
+   overflow-y is re-asserted for older engines. */
+@supports (position: sticky) {
+    .td-sidebar-toc {
+        top: 7.5rem !important;
+        height: calc(100vh - 8.5rem) !important;
+        overflow-y: auto !important;
+        padding-bottom: 1rem !important;
+    }
 }

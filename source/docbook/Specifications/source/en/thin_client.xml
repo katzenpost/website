@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+
+<?title "Katzenpost thin client" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
+<?linkTitle "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
+<?description "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
+<?author "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
+<?url "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
+<?draft "false" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#draft] -->
+<?slug "thin_client" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
+<?layout "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
+<?type "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
+<?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
+<?version "" ?> <!-- Optional [?] -->
+
+<!DOCTYPE article [
+    <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
+        %shared-content;
+    <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
+        %references;
+    <!ENTITY % terms SYSTEM "/home/dwrob/git/website/source/docbook/terms.ent">
+        %terms;    
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+  version="5.1" xml:id="thin_client">
+  <info>
+    <title xml:id="thin_client.title">Katzenpost thin client</title>
+    <!-- Match to title PI above. -->
+  </info>
+  <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>1. Introduction</title>
+    <para>A Katzenpost mixnet client has several responsibilities at minimum: </para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>compose Sphinx packets </para>
+      </listitem>
+      <listitem>
+        <para>decrypt SURB replies </para>
+      </listitem>
+      <listitem>
+        <para>send and receive Noise protocol messages </para>
+      </listitem>
+      <listitem>
+        <para>keep up to date with the latest PKI document </para>
+      </listitem>
+    </itemizedlist>
+    <para>This document describes the design of the new Katzenpost mix network client known as
+      client2. In particular we discuss it's multiplexing and privilege separation design elements
+      as well as the protocol used by the thin client library. </para>
+    <para>Therefore applications will be integrated with Katzenpost using the connector library
+      known as a thin client library which gives them the capability to talk with the connector
+      daemon and in that way interact with the mix network. The library itself does not do any
+      mixnet-related cryptography since that is already handled by the connector daemon. In
+      particular, the PKI document is stripped by the daemon before it's passed on to clients using
+      the connector library. Likewise, the library doesn't decrypt SURB replies or compose Sphinx
+      packets, with Noise, Sphinx, and PKI related cryptography being handled by the daemon. </para>
+  </section>
+  <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>2. Connector library and daemon protocol {#thin-client-and-daemon-protocol}</title>
+    <para>The thin client daemon protocol uses a local network socket, either Unix domain socket or
+      TCP. </para>
+    <section>
+      <title>2.3 Protocol messages</title>
+      <para>Note that there are two protocol message types and they are always CBOR encoded. We
+        send over length prefixed CBOR blobs. That is to say, a length prefix encoded as a big
+        endian unsigned four byte integer (uint32). </para>
+      <para>The client sends the <code>Request</code> messages and the daemon sends the
+          <code>Response</code> messages. </para>
+    </section>
+    <section>
+      <title>2.4 Protocol description</title>
+      <para>Upon connecting to the daemon socket the client must wait for two messages. The first
+        message received must have its <code>is_status</code> field set to <emphasis
+          role="strong">true</emphasis> and its <code>is_connected</code> field indicating
+        whether or not the daemon has a mixnet PQ Noise protocol connection to an entry node. </para>
+      <para>The client then awaits the second message, which contains the PKI document in its
+          <code>payload</code> field. This marks the end of the initial connection sequence.
+        Note that this PKI document is stripped of all cryptographic signatures. </para>
+      <para>In the next protocol phase, the client may send <code>Request</code> messages to
+        the daemon in order to cause the daemon to encapsulate the given payload in a Sphinx packet
+        and send it to the gateway node. Likewise the daemon my send the client
+          <code>Response</code> messages at any time during this protocol phase. These
+          <code>Response</code> messages may indicate a connection status change, a new PKI
+        document, or a message-sent or reply event. </para>
+    </section>
+  </section>
+</article>

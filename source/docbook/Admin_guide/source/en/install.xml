@@ -276,7 +276,7 @@
                 >component parameters</link>, combined with attention to the latest state of the
             code tree. Bear in mind that the IP <emphasis>address:port</emphasis> scheme used in the
             Docker image is specific to that container environment, and is not transferable to a
-            production network without modifcation.</para>
+            production network without modification.</para>
         <para>&program_name; currently has no configuration automation tool that is ready for
             general use. </para>
     </section>

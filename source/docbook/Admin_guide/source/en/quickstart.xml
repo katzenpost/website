@@ -85,7 +85,7 @@
                     </row>
                     <row>
                         <entry>
-                            <para>Start a diectory authority node.</para>
+                            <para>Start a directory authority node.</para>
                         </entry>
                         <entry>
                             <para><command>systemctl start &dirauth_binary;</command></para>
@@ -93,7 +93,7 @@
                     </row>
                     <row>
                         <entry>
-                            <para>Stop a diectory authority node.</para>
+                            <para>Stop a directory authority node.</para>
                         </entry>
                         <entry>
                             <para><command>systemctl stop &dirauth_binary;</command></para>
@@ -101,7 +101,7 @@
                     </row>
                     <row>
                         <entry>
-                            <para>Restart a diectory authority node.</para>
+                            <para>Restart a directory authority node.</para>
                         </entry>
                         <entry>
                             <para><command>systemctl restart &dirauth_binary;</command></para>

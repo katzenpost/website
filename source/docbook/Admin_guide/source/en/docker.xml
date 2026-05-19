@@ -395,7 +395,7 @@
                 </listitem>
                 <listitem>
                     <para><command>clean-local-dryrun</command></para>
-                    <para>To diplay a preview of what <command>clean-local</command> would remove,
+                    <para>To display a preview of what <command>clean-local</command> would remove,
                         without actually deleting anything, run the following command:</para>
                     <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make clean-local-dryrun</command></programlisting>
                 </listitem>
