@@ -6,7 +6,7 @@
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 <?title?> 
 <?linkTitle "Katzen chat user guide" ?>  <!-- Section menu link text -->
-<?url "docs/chat_client/user-guide.html" ?> <!-- Required to make image links work -->
+<?url "docs/clients/user-guide.html" ?> <!-- Required to make image links work -->
 <?description?> <!-- Optional -->
 <?draft "false" ?> <!-- Optional -->
 <?slug "chat" ?> <!-- Optional -->

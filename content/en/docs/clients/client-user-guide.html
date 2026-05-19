@@ -1,0 +1,979 @@
+---
+title: 
+linkTitle: "Katzen chat user guide" 
+description: 
+author:  
+url: "docs/clients/client-user-guide.html" 
+date: "2026-05-18T09:44:02.279010818-07:00"
+draft: "false" 
+slug: "chat" 
+layout: "" 
+type: "" 
+weight: "1" 
+version: 
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>KatzenQT chat client guide [Pre-release]</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+   </head>
+   <body>
+      <div class="section">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="client_guide"></a>KatzenQT chat client guide [Pre-release]</h2>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <p>This guide introduces the KatzenQT chat client. With KatzenQT you can securely
+            share one-to-one and group messages with other KatzenQT users. KatzenQT relies on
+            Katzenpost, an advanced mixnet system designed for people who have something to say,
+            but
+            who also value their anonymity. Anonymity is not the same thing as encryption, which
+            protects the <span class="emphasis"><em>content</em></span> of communication over the Internet. Anonymity is
+            about protecting <span class="emphasis"><em>people</em></span>. </p>
+         <p>For technical information about how Katzenpost and mixnets in general work, see <a class="link" href="https://web.archive.org/web/20240813022824/https://github.com/katzenpost/docs/blob/master/mixnet_academy/syllabus.rst#mix-network-fundamentals" target="_top">Learn Mix Networks for Great Good</a> and <a class="link" href="https://katzenpost.network/docs/" target="_top">Katzenpost Documentation</a>. To learn
+            more about <span class="emphasis"><em>why</em></span> Katzenpost works as it does, see <a class="link" href="sdsdsd" target="_top">Frequently asked questions</a> .</p>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d58e47"></a>Installing and starting KatzenQT</h3>
+                  </div>
+               </div>
+            </div>
+            <p>The KatzenQT client is available as Python code on <a class="link" href="https://github.com/katzenpost/katzenqt" target="_top">GitHub</a>. To run it, you
+               need a computer that supports the Linux operating system. (We have tested KatzenQT
+               on <a class="link" href="https://www.debian.org/" target="_top">Debian GNU/Linux</a> 13 and <a class="link" href="https://ubuntu.com/" target="_top">Ubuntu</a> 25.04 and 25.10.) </p>
+            <p><span class="bold"><strong>Prerequisites</strong></span></p>
+            <div class="itemizedlist">
+               <ul class="itemizedlist" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p>Ensure that <span class="bold"><strong>sudo</strong></span> is properly configured for
+                        your normal user. Ubuntu systems generally do this by default. Debian systems do
+                        not. For more information, see <a class="link" href="https://wiki.debian.org/sudo" target="_top">sudo</a> in the Debian wiki.</p>
+                  </li>
+                  <li class="listitem">
+                     <p>Add ~/.local/bin/ to your normal user $PATH and open a new terminal to perform
+                        the installation.</p>
+                  </li>
+                  <li class="listitem">
+                     <p>Intall <span class="bold"><strong>pip</strong></span> and <span class="bold"><strong>uv</strong></span>.</p>
+                  </li>
+               </ul>
+            </div>
+            <p><span class="bold"><strong>To install KatzenQT using </strong></span>make<span class="bold"><strong>
+                     targets</strong></span></p>
+            <p>From the root directory of the KatzenQT repository, complete the following procedure
+               as a normal user.
+               <div class="procedure">
+                  <ol class="procedure" type="1">
+                     <li class="step">
+                        <p>Run <span class="bold"><strong>make dep</strong></span>.</p>
+                     </li>
+                     <li class="step">
+                        <p>Run <span class="bold"><strong>make run</strong></span>.</p>
+                     </li>
+                  </ol>
+               </div>
+            </p>
+            <p>Run <span class="bold"><strong>make</strong></span> to display a full list of developer options. </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="installation"></a>Installing and starting KatzenQT [Manual
+                        method]</h3>
+                  </div>
+               </div>
+            </div>
+            <div class="procedure">
+               <ol class="procedure" type="1">
+                  <li class="step">
+                     <p class="title"><b>Install required software packages</b></p>
+                     <p>To prepare to access and build the KatzenQT code, run the following
+                        commands to be sure that you have the tools installed. You must have root
+                        privileges to do this.</p>
+                     <pre class="programlisting"><code class="prompt"># </code><span class="command"><strong>apt update</strong></span><code class="prompt"># </code><span class="command"><strong>apt install git python3 make python3-venv</strong></span></pre>
+                  </li>
+                  <li class="step">
+                     <p class="title"><b>Install the Katzenpost Git repository</b></p>
+                     <p>Katzenpost is a free and open source software project dedicated to researching
+                        and developing mix network protocols.</p>
+                     <p>Open a virtual terminal and clone the Katzenpost repository at <a class="link" href="https://github.com/katzenpost/namenlos" target="_top">https://github.com/katzenpost/namenlos</a> as follows.</p>
+                     <pre class="programlisting">~$ <span class="command"><strong>git clone https://github.com/katzenpost/katzenpost.git</strong></span></pre>
+                  </li>
+                  <li class="step">
+                     <p class="title"><b>Install the KatzenQT Git repository</b></p>
+                     <ol type="a" class="substeps">
+                        <li class="step">
+                           <p>Open a virtual terminal and clone the KatzenQT code repository at
+                              <a class="link" href="https://github.com/katzenpost/katzenqt" target="_top">https://github.com/katzenpost/katzenqt</a> as
+                              follows.
+                              <pre class="programlisting"><code class="prompt">~$ </code><span class="command"><strong>git clone https://github.com/katzenpost/katzenqt.git</strong></span></pre>
+                           </p>
+                        </li>
+                     </ol>
+                  </li>
+                  <li class="step">
+                     <p class="title"><b>Build client daemon and install configuration files</b></p>
+                     <p>To connect to the mix network, KatzenQT requires the Katzenpost
+                        multiplexing client daemon to be present and configured. Complete the following
+                        steps to provide the daemon binary and the required configuration files. </p>
+                     <ol type="a" class="substeps">
+                        <li class="step">
+                           <p>In the Katzenpost repository, build the daemon as
+                              follows.
+                              <pre class="programlisting"><code class="prompt">~/katzenpost/cmd/kpclientd$ </code><span class="command"><strong>go build -v</strong></span></pre>
+                           </p>
+                        </li>
+                        <li class="step">
+                           <p>Copy the newly built <span class="bold"><strong>kpclientd</strong></span> binary
+                              to the KatzenQT repository as
+                              follows:
+                              <pre class="programlisting"><code class="prompt">~/katzenpost/cmd/kpclientd$ </code><span class="command"><strong>cp kpclientd ~/katzenqt/</strong></span></pre>
+                           </p>
+                        </li>
+                        <li class="step">
+                           <p>Copy the configuration file for <span class="bold"><strong>kpclientd</strong></span> from the Namenlos repository to the
+                              KatzenQT repository as
+                              follows.
+                              <pre class="programlisting"><code class="prompt">~/namenlos/configs/$ </code><span class="command"><strong>cp client2.toml ~/katzenqt/</strong></span></pre>
+                           </p>
+                        </li>
+                        <li class="step">
+                           <p>Copy the configuration file for the thin-client shim from the Namenlos
+                              repository to the KatzenQT repository as
+                              follows.
+                              <pre class="programlisting"><code class="prompt">~/namenlos/configs/$ </code><span class="command"><strong>cp thinclient.toml ~/katzenqt/</strong></span></pre>
+                           </p>
+                        </li>
+                     </ol>
+                     <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                        <table border="0" summary="Note">
+                           <tr>
+                              <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen_XML_Editor_28/frameworks/docbook/css/img/note.png"></td>
+                              <th align="left">Note</th>
+                           </tr>
+                           <tr>
+                              <td align="left" valign="top">
+                                 <p>This action replaces the thinclient.toml file that is already present in
+                                    the repository. The default file is not configured to use the Namenlos
+                                    network.</p>
+                              </td>
+                           </tr>
+                        </table>
+                     </div>
+                  </li>
+                  <li class="step">
+                     <p><span class="bold"><strong>Start the client daemon</strong></span></p>
+                     <p>One (and only one) instance of <span class="bold"><strong>kpclientd</strong></span> must
+                        be running on your system before you start KatzenQT. Start it with
+                        following
+                        command:
+                        <pre class="programlisting"><code class="prompt">~/katzenqt$ </code><span class="command"><strong>././kpclientd -c config/client2.toml</strong></span></pre>
+                     </p>
+                     <p>The terminal from which you ran <span class="bold"><strong>kpclientd</strong></span>
+                        must remain open during operation, and provides mix-network access
+                        logging.</p>
+                  </li>
+                  <li class="step">
+                     <p class="title"><b>Build and start KatzenQT</b></p>
+                     <p>In another terminal, in the root directory of the KatzenQT repository,
+                        complete the following steps.</p>
+                     <ol type="a" class="substeps">
+                        <li class="step">
+                           <p>Check out the currently required development branch of the repository
+                              as follows.</p>
+                           <pre class="programlisting"><code class="prompt">~/katzenqt$ </code><span class="command"><strong>git checkout message_box_index_length_validation</strong></span></pre>
+                        </li>
+                        <li class="step">
+                           <p>Create a virtual Python environment, load additional required
+                              software, and start KatzenQT using the following
+                              commands.</p>
+                           <pre class="programlisting"><code class="prompt">~/katzenqt$ </code><span class="command"><strong>python3 -m venv myvenv</strong></span><code class="prompt">~/katzenqt$ </code><span class="command"><strong>source myvenv/bin/activate</strong></span><code class="prompt">~/katzenqt$ </code><span class="command"><strong>pip install --upgrade pip</strong></span><code class="prompt">~/katzenqt$ </code><span class="command"><strong>pip install 'git+https://github.com/katzenpost/thin_client@487d2b8e46440abba5bb4db95a168353de2d45d9'</strong></span><code class="prompt">~/katzenqt$ </code><span class="command"><strong>pip install -e .</strong></span><code class="prompt">~/katzenqt$ </code><span class="command"><strong>make</strong></span></pre>
+                           <p>This terminal must remain open while running KatzenQT. The
+                              terminal displays information that you will need to cut and paste to
+                              complete the procedures described below.</p>
+                           <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                              <table border="0" summary="Note">
+                                 <tr>
+                                    <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen_XML_Editor_28/frameworks/docbook/css/img/note.png"></td>
+                                    <th align="left">Note</th>
+                                 </tr>
+                                 <tr>
+                                    <td align="left" valign="top">
+                                       <p>For testing, you can open multiple KatzenQT clients with
+                                          discrete histories by invoking <span class="bold"><strong>make</strong></span>
+                                          with a variable as follows:</p>
+                                       <pre class="programlisting"><code class="prompt">$ </code><span class="command"><strong>KQT_STATE=A make</strong></span><code class="prompt">$ </code><span class="command"><strong>KQT_STATE=B make</strong></span>   
+        
+Etc.</pre>
+                                       <p>When you are done with these clients, you can remove them all as
+                                          follows.</p>
+                                       <pre class="programlisting"><code class="prompt">$ </code><span class="command"><strong>rm /home/&lt;username&gt;/.local/share/katzenqt/*</strong></span></pre>
+                                    </td>
+                                 </tr>
+                              </table>
+                           </div>
+                        </li>
+                     </ol>
+                  </li>
+               </ol>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="communicating"></a>Communicating through the KatzenQT client</h3>
+                  </div>
+               </div>
+            </div>
+            <p>This section describes how to configure and use KatzenQT for secure, anonymous
+               communication. </p>
+            <p>Like many other chat clients, KatzenQT exhibits two panes, one for contacts and
+               one for messages, and a number of communication modes such as text chat, file transfer,
+               and voice. </p>
+            <p>The following screen capture shows KatzenQT as it appears when opened for the
+               first time.</p>
+            <div class="figure"><a name="d58e247"></a><p class="title"><b>Figure&nbsp;1.&nbsp;</b></p>
+               <div class="figure-contents">
+                  <div class="mediaobject"><img src="pix/1-clip.jpg" width="324"><div class="caption">
+                        <p><span class="bold"><strong>Figure 1.</strong></span> This screen capture shows the
+                           elements of the KatzenQT client interface prior to configuration or
+                           use.</p>
+                     </div>
+                  </div>
+               </div>
+            </div><br class="figure-break"><p>KatzenQT consists of a menu bar, a toolbar, two panes, and a status bar (not
+               visible). 
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p>The <span class="bold"><strong>Conversations and contacts</strong></span> pane
+                           displays existing conversations and the contacts specific to them. </p>
+                     </li>
+                     <li class="listitem">
+                        <p>The <span class="bold"><strong>Messages</strong></span> pane displays the title of
+                           the selected conversation (if any), its message log, an <span class="bold"><strong>Invite a contact</strong></span> button for adding new
+                           participants, and a text box near the bottom for typing new messages.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Buttons in the toolbar include <span class="bold"><strong>New
+                                 conversation</strong></span> (opening a dialog to configure a conversation),
+                           <span class="bold"><strong>Accept invitation</strong></span> (opening a dialog to
+                           accept or refuse an invitation from another user), <span class="bold"><strong>Documentation</strong></span> (activating, once implemented, the internal
+                           help system), and <span class="bold"><strong>Quit</strong></span> (which shuts down
+                           the client).</p>
+                     </li>
+                     <li class="listitem">
+                        <p>The tabs at the bottom of the <span class="bold"><strong>Messages</strong></span>
+                           pane allow selection of a communication mode.</p>
+                     </li>
+                  </ul>
+               </div>
+            </p>
+            <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+               <table border="0" summary="Note">
+                  <tr>
+                     <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen_XML_Editor_28/frameworks/docbook/css/img/note.png"></td>
+                     <th align="left">Note</th>
+                  </tr>
+                  <tr>
+                     <td align="left" valign="top">
+                        <p>At present, only text chat works. Grayed out elements in the KatzenQT
+                           interface are not yet implemented.</p>
+                     </td>
+                  </tr>
+               </table>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="contacts"></a>About contacts</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Despite appearances, KatzenQT's emphasis on anonymity means that familiar
+                  terms take on new meanings, particularly the idea of a "contact."</p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p>Contact names are arbitrary. Contacts in one conversation are unconnected
+                           with contacts in other conversations. Each chat participant can choose a
+                           unique name for each conversation.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>KatzenQT and Katzenpost operate with no information about the
+                           real-world identities behind contacts. There are no e-mail addresses,
+                           telephone numbers, postal addresses, or anything similar. </p>
+                     </li>
+                     <li class="listitem">
+                        <p>Without phone numbers or email as anchors for identity, KatzenQT
+                           users require a real-world encounter to verify who they are and to share
+                           cryptographic secrets. This kind of contact bootstrapping occurs out-of-band
+                           (OOB), that is, without reliance on the primary communication channel, which
+                           is KatzenQT. The concept is similar to the practice of PGP email users
+                           who hold in-person key-signing parties to build a <a class="link" href="https://en.wikipedia.org/wiki/Web_of_trust" target="_top">web of
+                              trust</a>. </p>
+                     </li>
+                  </ul>
+               </div>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h5 class="title"><a name="conversations"></a>Creating conversations</h5>
+                        </div>
+                     </div>
+                  </div>
+                  <p>The first thing that a new user of KatzenQT must do is create a
+                     conversation. This must happen before you can invite contacts or accept
+                     invitations.</p>
+                  <p><span class="bold"><strong>To create a conversation</strong></span></p>
+                  <p>
+                     <div class="procedure">
+                        <ol class="procedure" type="1">
+                           <li class="step">
+                              <p>Open KatzenQT. Until a conversation has been created, the
+                                 <span class="bold"><strong>Messages</strong></span> pane prompts you to
+                                 create one.</p>
+                           </li>
+                           <li class="step">
+                              <p>In the toolbar, click the <span class="bold"><strong>New
+                                       conversation</strong></span> button.</p>
+                           </li>
+                           <li class="step">
+                              <p>In the <span class="bold"><strong>New conversation</strong></span> window,
+                                 type a name in the <span class="bold"><strong>Choose conversation
+                                       name</strong></span> field. This name is how you identify the
+                                 conversation in your own KatzenQT client. It may differ from
+                                 what your contact calls their corresponding conversation. Click
+                                 <span class="bold"><strong>OK</strong></span> when finished.</p>
+                              <p>In the following screen capture, the <span class="bold"><strong>New
+                                       conversation</strong></span> field is being filled out.</p>
+                              <div class="figure"><a name="d58e354"></a><p class="title"><b>Figure&nbsp;2.&nbsp;</b></p>
+                                 <div class="figure-contents">
+                                    <div class="mediaobject"><img src="pix/2-clip.jpg" width="324"><div class="caption">
+                                          <p><span class="bold"><strong>Figure 2.</strong></span> In this
+                                             example, a user creates a first conversation called
+                                             <span class="bold"><strong>My first
+                                                   conversation</strong></span>.</p>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div><br class="figure-break"></li>
+                           <li class="step">
+                              <p>Type a name for yourself in the field labeled <span class="bold"><strong>Choose (your) name displayed to the other
+                                       user(s)</strong></span>. Your contacts will see this name when they
+                                 accept your invitation.</p>
+                              <p>The following screen capture shows a name that was typed in by the
+                                 user.</p>
+                              <div class="figure"><a name="d58e375"></a><p class="title"><b>Figure&nbsp;3.&nbsp;</b></p>
+                                 <div class="figure-contents">
+                                    <div class="mediaobject"><img src="pix/3-clip.jpg" width="324"><div class="caption">
+                                          <p><span class="bold"><strong>Figure 3.</strong></span> The user
+                                             types in "Max" as his name in the context of this
+                                             conversation.</p>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div><br class="figure-break"></li>
+                           <li class="step">
+                              <p>Click <span class="bold"><strong>OK</strong></span> when finished.</p>
+                              <p>Now, in the <span class="bold"><strong>Conversations and
+                                       contacts</strong></span> pane, the name of your new conversation is
+                                 displayed along with your display name. In the <span class="bold"><strong>Messages</strong></span> pane, KatzenQT prints a greeting
+                                 message.</p>
+                              <p>The final result resembles the following:</p>
+                              <div class="figure"><a name="d58e401"></a><p class="title"><b>Figure&nbsp;4.&nbsp;</b></p>
+                                 <div class="figure-contents">
+                                    <div class="mediaobject"><img src="pix/4-clip.jpg" width="324"><div class="caption">
+                                          <p><span class="bold"><strong>Figure 4.</strong></span> In the
+                                             <span class="bold"><strong>Conversations and
+                                                   contacts</strong></span> pane, you can select a
+                                             conversation. The selected conversation will be
+                                             displayed in the <span class="bold"><strong>Messages</strong></span> pane. You can use the <span class="bold"><strong>Type to filter contacts</strong></span> text
+                                             box to find a specific contact name and the
+                                             conversations that contain it.</p>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div><br class="figure-break"></li>
+                        </ol>
+                     </div>
+                  </p>
+                  <p>You can create any number of conversations, each one separated completely from
+                     other conversations. </p>
+               </div>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h5 class="title"><a name="adding_contacts"></a>Establishing contacts</h5>
+                        </div>
+                     </div>
+                  </div>
+                  <p>Once you have a created a conversation, you can begin adding contacts to it.
+                     As a user of KatzenQT, you have no fixed user name or password; instead,
+                     you assign a name of your choosing for each conversation and potentially for
+                     each contact.</p>
+                  <p>A user setting up a contact generates an authentication token called a
+                     <span class="emphasis"><em>voucher</em></span>. The voucher is a Base64-encoded string with
+                     the following contents:
+                     <div class="itemizedlist">
+                        <ul class="itemizedlist" style="list-style-type: disc; ">
+                           <li class="listitem">
+                              <p>a display name </p>
+                           </li>
+                           <li class="listitem">
+                              <p>a mixnet storage address that doubles as read permission </p>
+                           </li>
+                        </ul>
+                     </div>
+                  </p>
+                  <p>A user who makes a request for a new contact delivers the voucher out-of-band
+                     to one or more recipients, who enter the invitation string into KatzenQT
+                     and, by accepting it, send their own addresses and signed read permissions to
+                     the first user, who publishes the shared read permissions for all group members
+                     to see. When the process is complete, the new contact names display in the list
+                     of contacts for each participant in the conversation. </p>
+                  <div class="informalfigure">
+                     <div class="mediaobject"><img src="pix/simple-voucher-handshake.png" width="324"><div class="caption">
+                           <p><span class="bold"><strong>Figure 5.</strong></span> The diagram illustrates
+                              two important aspects of Katzenpost and KatzenQT security.
+                              First, the initial authentication of a contact is done in a
+                              face-to-face meeting rather than electronically. Second, all
+                              messaging consists of queries to the mixnet, which operates somewhat
+                              as a dead-drop. Max and Moritz post materials there, and authorize
+                              each other to read those materials, but there is no direct contact
+                              between them after the initial real-world meeting. </p>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="important" style="margin-left: 0.5in; margin-right: 0.5in;">
+                     <table border="0" summary="Important">
+                        <tr>
+                           <td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="file:/home/usr/local/Oxygen_XML_Editor_28/frameworks/docbook/css/img/important.png"></td>
+                           <th align="left">Important</th>
+                        </tr>
+                        <tr>
+                           <td align="left" valign="top">
+                              <p>We recommend writing the invitation string on a piece paper, and
+                                 presenting this physically to the person or persons you are inviting. The
+                                 paper bearing the string should be guarded carefully and destroyed after
+                                 use.</p>
+                           </td>
+                        </tr>
+                     </table>
+                  </div>
+                  <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
+                     <table border="0" summary="Warning">
+                        <tr>
+                           <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="file:/home/usr/local/Oxygen_XML_Editor_28/frameworks/docbook/css/img/warning.png"></td>
+                           <th align="left">Warning</th>
+                        </tr>
+                        <tr>
+                           <td align="left" valign="top">
+                              <p>It is possible to simply send your invitation through an alternative
+                                 electronic channel. However, doing this permanently degrades the
+                                 Katzenpost anonymity protections to the level of anonymity offered by
+                                 the channel that you used.</p>
+                           </td>
+                        </tr>
+                     </table>
+                  </div>
+                  <p><span class="bold"><strong>To request a new contact</strong></span></p>
+                  <p>
+                     <div class="procedure">
+                        <ol class="procedure" type="1">
+                           <li class="step">
+                              <p>Open KatzenQT as described above.</p>
+                           </li>
+                           <li class="step">
+                              <p>With the desired conversation selected, click <span class="bold"><strong>Invite a contact</strong></span> in the <span class="bold"><strong>Messages</strong></span> pane.</p>
+                           </li>
+                           <li class="step">
+                              <p>In the <span class="bold"><strong>Invite contact</strong></span> window,
+                                 type your desired display name in the field labeled <span class="bold"><strong>Choose (your) name displayed to the other
+                                       user</strong></span>, then click <span class="bold"><strong>OK</strong></span>.</p>
+                              <p>The following screen capture shows the <span class="bold"><strong>Invite contact</strong></span> window with "Max" specified as the
+                                 issuer. </p>
+                              <div class="figure"><a name="d58e483"></a><p class="title"><b>Figure&nbsp;5.&nbsp;</b></p>
+                                 <div class="figure-contents">
+                                    <div class="mediaobject"><img src="pix/5-clip.jpg" width="324"><div class="caption">
+                                          <p><span class="bold"><strong>Figure 6.</strong></span> The
+                                             invitation string has "Max" embedded as its creator,
+                                             which is helpful to the recipient in the next
+                                             steps.</p>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div><br class="figure-break"></li>
+                           <li class="step">
+                              <p>A pop-up window displays the Base64 string that was created. Save
+                                 this string long enough to copy it to paper or save electronically.
+                                 <div class="figure"><a name="d58e497"></a><p class="title"><b>Figure&nbsp;6.&nbsp;</b></p>
+                                    <div class="figure-contents">
+                                       <div class="mediaobject"><img src="pix/6-clip.png" width="324"><div class="caption">
+                                             <p><span class="bold"><strong>Figure 7.</strong></span> The
+                                                voucher's Base64 string is highlighted in the
+                                                illustration. Record it before closing the
+                                                window.</p>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div><br class="figure-break"></p>
+                           </li>
+                           <li class="step">
+                              <p>Complete the invitation process by providing the invitation string
+                                 out-of-band to your intended contact.</p>
+                           </li>
+                        </ol>
+                     </div>
+                  </p>
+                  <p><span class="bold"><strong>To accept an invitation that you have
+                           received</strong></span></p>
+                  <div class="procedure">
+                     <ol class="procedure" type="1">
+                        <li class="step">
+                           <p>Open KatzenQT. (In the following example, our perspective shifts
+                              to Moritz, who is the user receiving Max's invitation.)</p>
+                        </li>
+                        <li class="step">
+                           <p>In the toolbar, click <span class="bold"><strong>Accept
+                                    invitation</strong></span>.</p>
+                        </li>
+                        <li class="step">
+                           <p>In the <span class="bold"><strong>Accept invitation</strong></span> window, type
+                              or paste the invitation string into the field labeled <span class="bold"><strong>Enter an invitation you received</strong></span>. Your client
+                              should resemble the following:</p>
+                           <div class="figure"><a name="d58e531"></a><p class="title"><b>Figure&nbsp;7.&nbsp;</b></p>
+                              <div class="figure-contents">
+                                 <div class="mediaobject"><img src="pix/7-clip.jpg" width="324"><div class="caption">
+                                       <p><span class="bold"><strong>Figure 8.</strong></span> Moritz has
+                                          entered the invitation string into the <span class="bold"><strong>Accept invitation</strong></span> window.</p>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div><br class="figure-break"></li>
+                        <li class="step">
+                           <p>To approve the display name of the new contact, click <span class="bold"><strong>Yes</strong></span>. To cancel the acceptance process, click
+                              <span class="bold"><strong>No</strong></span>.</p>
+                           <div class="figure"><a name="d58e556"></a><p class="title"><b>Figure&nbsp;8.&nbsp;</b></p>
+                              <div class="figure-contents">
+                                 <div class="mediaobject"><img src="pix/8-clip.jpg" width="324"><div class="caption">
+                                       <p><span class="bold"><strong>Figure 9.</strong></span> Moritz can
+                                          either accept or reject Max's display name. Rejecting it
+                                          cancels the acceptance.</p>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div><br class="figure-break"></li>
+                        <li class="step">
+                           <p>Moritz must start the same procedure in reverse. In his selected
+                              conversation, he clicks <span class="bold"><strong>Invite contact</strong></span>,
+                              generates a Base64 string, and conveys it to Max. Max clicks <span class="bold"><strong>Accept invitation</strong></span>, types the Base64 string
+                              into his client, and clicks <span class="bold"><strong>OK</strong></span>
+                              twice.</p>
+                        </li>
+                     </ol>
+                  </div>
+                  <p>As shown below, Max and Moritz now appear in each other's contact lists, and
+                     they can begin exchanging messages. The procedures described here can be
+                     generalized to groups of any size.</p>
+                  <p>
+                     <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                        <table border="0" summary="Note">
+                           <tr>
+                              <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="file:/home/usr/local/Oxygen_XML_Editor_28/frameworks/docbook/css/img/note.png"></td>
+                              <th align="left">Note</th>
+                           </tr>
+                           <tr>
+                              <td align="left" valign="top">
+                                 <p>When you look at the perspectives of Max and Moritz side-by-side, as
+                                    in <span class="bold"><strong>Figure 10</strong></span> below, something strange
+                                    pops out: Their (shared?) conversation has two different names. This
+                                    provides a glimpse into the anonymity architecture behind KatzenQT,
+                                    and is explained in the FAQ:<a class="xref" href="#faq_conversations_and_contacts" title="How do conversations and contacts actually work?">the section called &#x201c;How do conversations and contacts
+                                       actually work? &#x201d;</a></p>
+                              </td>
+                           </tr>
+                        </table>
+                     </div>
+                  </p>
+                  <div class="figure"><a name="d58e591"></a><p class="title"><b>Figure&nbsp;9.&nbsp;</b></p>
+                     <div class="figure-contents">
+                        <div class="mediaobject"><img src="pix/9-clip.png" width="324"><div class="caption">
+                              <p><span class="bold"><strong>Figure 10.</strong></span> Max and Moritz are
+                                 shown with their respective conversations and contact lists. </p>
+                           </div>
+                        </div>
+                     </div>
+                  </div><br class="figure-break"></div>
+               <div class="section">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h5 class="title"><a name="messaging"></a>Exchanging messages in a conversation</h5>
+                        </div>
+                     </div>
+                  </div>
+                  <p>KatzenQT resembles other chat programs in its procedure for exchanging
+                     messages. This section provides an example of a conversation between two
+                     participants. </p>
+                  <div class="procedure"><a name="d58e606"></a><p class="title"><b>Procedure&nbsp;1.&nbsp;To exchange messages between two contacts</b></p>
+                     <p>This procedure picks up where the previous section, <a class="xref" href="#adding_contacts" title="Establishing contacts">the section called &#x201c;Establishing contacts&#x201d;</a>, left off. The examples show both sides of
+                        the Max/Moritz conversation.</p>
+                     <ol class="procedure" type="1">
+                        <li class="step">
+                           <p>Max composes a message to Moritz by typing it in the <span class="bold"><strong>Single-line message</strong></span> box at the bottom of the
+                              <span class="bold"><strong>Messages</strong></span> pane, as shown in the
+                              following screen capture.</p>
+                           <div class="figure"><a name="d58e621"></a><p class="title"><b>Figure&nbsp;10.&nbsp;</b></p>
+                              <div class="figure-contents">
+                                 <div class="mediaobject"><img src="pix/10-clip.png" width="324"><div class="caption">
+                                       <p><span class="bold"><strong>Figure 11.</strong></span> Max can see
+                                          what conversation he is in by looking at the highlighted
+                                          conversation name in <span class="bold"><strong>Conversations and
+                                                contacts</strong></span> pane, and at the heading in the
+                                          <span class="bold"><strong>Messages</strong></span> pane. </p>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div><br class="figure-break"></li>
+                        <li class="step">
+                           <p>When Max is done typing the message, he presses Enter to send
+                              it.</p>
+                           <div class="figure"><a name="d58e640"></a><p class="title"><b>Figure&nbsp;11.&nbsp;</b></p>
+                              <div class="figure-contents">
+                                 <div class="mediaobject"><img src="pix/12-clip.png" width="324"><div class="caption">
+                                       <p><span class="bold"><strong>Figure 12.</strong></span> Max's sent
+                                          message is visible in his <span class="bold"><strong>Messages</strong></span> pane. The in-flight arrow next to
+                                          his name indicates that Moritz has not yet received the
+                                          message, as is apparent in his KatzenQT window.</p>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div><br class="figure-break"></li>
+                        <li class="step">
+                           <p>In the following screen capture, Moritz has received Max's
+                              message.</p>
+                           <div class="figure"><a name="d58e656"></a><p class="title"><b>Figure&nbsp;12.&nbsp;</b></p>
+                              <div class="figure-contents">
+                                 <div class="mediaobject"><img src="pix/13-clip.png" width="324"><div class="caption">
+                                       <p><span class="bold"><strong>Figure 13.</strong></span> Moritz's
+                                          KatzenQT window now displays Max's message, and the
+                                          in-flight arrow has disappeared from Max's window.</p>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div><br class="figure-break"></li>
+                        <li class="step">
+                           <p>In the next screen capture, Moritz types and sends a reply to
+                              Max.</p>
+                           <div class="figure"><a name="d58e669"></a><p class="title"><b>Figure&nbsp;13.&nbsp;</b></p>
+                              <div class="figure-contents">
+                                 <div class="mediaobject"><img src="pix/15-clip.png" width="324"><div class="caption">
+                                       <p><span class="bold"><strong>Figure 14.</strong></span> With Moritz's
+                                          message sent, his <span class="bold"><strong>Messages</strong></span>
+                                          pane shows the in-flight arrow pending delivery.</p>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div><br class="figure-break"></li>
+                        <li class="step">
+                           <p>In this last screen capture, Max has received Moritz's reply and they
+                              continued to converse.</p>
+                           <div class="figure"><a name="d58e685"></a><p class="title"><b>Figure&nbsp;14.&nbsp;</b></p>
+                              <div class="figure-contents">
+                                 <div class="mediaobject"><img src="pix/17-clip.png" width="324"><div class="caption">
+                                       <p><span class="bold"><strong>Figure 15.</strong></span> Success!
+                                          Several messages have been exchanged and the absence of
+                                          in-flight arrows indicates that no messages are pending at
+                                          the moment.</p>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div><br class="figure-break"></li>
+                     </ol>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="faq"></a>Frequently asked questions</h3>
+                  </div>
+               </div>
+            </div>
+            <p></p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_anonymity"></a>What kind of user needs anonymity
+                           protection?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Here are some examples of users who require anonymity.</p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p>People and groups who are likely to be under surveillance by government
+                           entities, whether dishonest bureaucrats, corrupt police forces, or
+                           intelligence agencies.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>People facing business or government censorship.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Businesses aware of the dangers of leaking internal information to their
+                           local and global competitors or to their own or other governments.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Journalists, and anyone who communicates with a journalist.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Whistle-blowers.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Non-profit organizations engaging in advocacy that earns them enemies with
+                           powerful surveillance capabilities.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>People worried about the utter insecurity of personal data stored in both
+                           cloud and on-premises databases that are accessible from the
+                           Internet.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>People who want to use the Internet but dislike being the raw material
+                           that feeds <a class="link" href="https://en.wikipedia.org/wiki/Surveillance_capitalism" target="_top">surveillance capitalism</a>.</p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_metadata"></a>I use an end-to-end encrypted chat service. Is that
+                           good enough?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Not necessarily. Your identity and other <span class="emphasis"><em>metadata</em></span> may be more
+                  interesting to snoops than your <span class="emphasis"><em>data</em></span> (what you say). Your
+                  network of contacts &#x2013; who is talking to whom &#x2013; is often the most valuable
+                  information about you. Legal protections for metadata are weaker than for
+                  communication content. Here are some examples:</p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p>Internet businesses routinely harvest and sell sensitive identity data to
+                           profit from invasively personalized ads and other sources.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Governments, especially law enforcement, will collect and store any data
+                           about your identity, movements, employment, and political views that they
+                           can get their hands on, sacrificing the privacy of millions of innocent
+                           people to catch a tiny number of suspected criminals.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Actual criminals make daily use of the data they steal from these same
+                           businesses and governments, enabling identity theft, credit-card fraud, and
+                           extortion.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>While the <span class="emphasis"><em>content</em></span> of telephone communication is
+                           shielded by strong limitations on wire-tapping, far weaker rules restrict
+                           the use of <a class="link" href="https://en.wikipedia.org/wiki/Pen_register" target="_top">pen
+                              register / trap and trace devices</a> to capture the identities of
+                           people engaged in private conversations. </p>
+                     </li>
+                     <li class="listitem">
+                        <p>The United States Postal Service routinely photographs and stores the
+                           address information of mail passing through its system. The USPS <a class="link" href="https://www.washingtonpost.com/news/federal-eye/wp/2014/11/20/postal-service-almost-never-denies-mail-surveillance-requests/" target="_top">almost never</a> denies requests for this information. from <a class="link" href="https://www.nytimes.com/2013/07/04/us/monitoring-of-snail-mail.html" target="_top">law enforcement and others</a>.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Most dramatically, US intelligence agencies use cell phone metadata
+                           (account data and geolocation) to target suspected terrorists for drone and
+                           missile attacks. As National Security Agency Director Gen. Michael Hayden
+                           famously <a class="link" href="https://abcnews.go.com/blogs/headlines/2014/05/ex-nsa-chief-we-kill-people-based-on-metadata" target="_top">stated</a>, "We kill people based on metadata."</p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_nothingtohide"></a>I am just an ordinary person with nothing to
+                           hide. Why should I worry about being anonymous?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p><span class="emphasis"><em>You</em></span> do not decide if you have something to hide. The
+                  businesses, governments, and individuals snooping into your data decide that.</p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_conversations_and_contacts"></a>How do conversations and contacts
+                           actually work? </h4>
+                     </div>
+                  </div>
+               </div>
+               <p>The KatzenQT and the Katzenpost system devote a great deal of engineering
+                  effort to prevent surveillance adversaries from discovering who you are and whom you
+                  are talking with. Importantly, after your initial meeting to hand off an invitation,
+                  you have no actual contact with your contacts. Instead, users communicate solely
+                  with the Katzenpost mixnet, which serves as a dead-drop for each user's
+                  messages. </p>
+               <p>Here is a very sparse summary of how the pieces fit together to provide usable
+                  communication despite all of the anonymization and indirection.</p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p>Conversations are the main organizing principle in KatzenQT. </p>
+                     </li>
+                     <li class="listitem">
+                        <p>Contacts are members of a conversation, and they exist only in the context
+                           of a particular conversation. Contacts must have no discoverable relation to
+                           real-world identities, or even to repeated instances of themselves. All
+                           names are display names. All display names are arbitrary.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Conversations may have any number of contacts, that is, all conversations
+                           are <span class="emphasis"><em>groups</em></span>. One-to-one conversations are groups with
+                           exactly two members.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>The conversations that you see listed in <span class="bold"><strong>Conversations and contacts</strong></span> are ones that you created and
+                           named. Your contacts see their own conversations that they created and
+                           named. </p>
+                     </li>
+                     <li class="listitem">
+                        <p>When you create a conversation, you are also creating a <span class="emphasis"><em>message
+                                 stream</em></span>. A message stream is an address in the distributed
+                           internal storage of the mixnet. It can contain any number of linked, ordered
+                           messages posted there by its owner.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>You have <span class="emphasis"><em>write permissions</em></span> to message streams that
+                           you created; nobody else does.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>You can share <span class="emphasis"><em>read permissions</em></span> to a message stream
+                           that you created with other users. (And vice versa.)</p>
+                     </li>
+                     <li class="listitem">
+                        <p>The view of a conversation that you see in your <span class="bold"><strong>Messages</strong></span> pane is a <span class="emphasis"><em>virtual</em></span> message log
+                           collated by KatzenQT. It is based on read permissions that you and your
+                           contacts have mutually shared in this specific context. This is how you can
+                           all see the same virtual log of messages when you are each looking at a
+                           different conversation. </p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_oob"></a>What is this out-of-band (OOB) secret-sharing
+                           stuff?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>The OOB invitation is the first step in guaranteeing anonymity in the face of
+                  electronic surveillance. It is explicitly <span class="emphasis"><em>not</em></span> electronic. OOB
+                  is a solution to a difficult and fundamental problem of encrypted communications:
+                  <a class="link" href="https://en.wikipedia.org/wiki/Key_exchange" target="_top">key
+                     exchange</a>. A real-world solution recommends itself because almost no
+                  electronic solution protects anonymity. </p>
+               <p>The following diagram details the data exchanges involved in setting up contacts.
+                  For more information, see <a class="link" href="https://katzenpost.network/docs/specs/group_chat.html" target="_top">Katzenpost Group Chat Design</a>.</p>
+               <div class="informalfigure">
+                  <div class="mediaobject"><img src="pix/kp-ladders-vouchers.png" width="270"><div class="caption">
+                        <p><span class="bold"><strong>Figure 16.</strong></span> This diagram illustrates
+                           how KatzenQT (and its operators, Max and Moritz) interact with
+                           the Katzenpost mix network. The most distinctive features of this
+                           architecture are the initial out-of-band step to authenticate a user and
+                           the dead-drop structure that allows subsequent electronic communication
+                           that is neither direct nor persistent.</p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_audio_video"></a>Will KatzenQT ever have audio chat, or video
+                           chat?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Mixnet-based communications have high latency by design. This has little impact on
+                  low-bandwidth text communications, but it is very likely disqualifying for video.
+                  Therefore we do not plan to offer video chat. Audio, however, can be more readily
+                  compressed and optimized than video, and we do plan to offer video chat in the
+                  future. For more information see <a class="link" href="https://katzenpost.network/docs/audio_eng/" target="_top">Audio Engineering
+                     Considerations for a Modern Mixnet</a>.</p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_legal"></a>Is this legal?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Let's take "this" as meaning end-to-end encryption and metadata minimization. The
+                  answer depends on the jurisdiction and the political weather. Countries such as
+                  China and Iran that attempt to exert complete and ruthless control over citizens'
+                  communication would probably forbid and block KatzenQT just as they do Signal
+                  and Tor, with a full range of possible punishments for offenders. However, Western
+                  democracies also enforce comprehensive surveillance over their citizens,
+                  particularly as a tool for law enforcement or flexibly defined "national security."
+                  The United States, the United Kingdom, and members of the European Union try
+                  constantly to expand legal surveillance and to pass laws mandating backdoors in
+                  encrypted devices, so far being thwarted either by public advocacy or by the
+                  commercial self-interest of technology vendors. Users of surveillance-resistant
+                  communication tools must understand the laws that apply to them, keep in mind the
+                  ways that those laws are stretched and broken by corrupt police, and protect
+                  themselves appropriately. If you plan to violate your local laws while trusting in
+                  clever technology to keep you safe, remember that you must make excellent technology
+                  choices, use the tools perfectly, maintain operational security worthy of a
+                  clandestine agent, and have very good luck. In a genuinely threatening environment,
+                  the wisest path is often to avoid technological solutions altogether.</p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_whois"></a>Who made Katzenpost and KatzenQT?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Katzenpost was created by a team of programmers, cryptographers,
+                  mathematicians, academics, tech industry veterans, and privacy advocates. Our
+                  current core contributors and past contributors are listed at <a class="link" href="https://katzenpost.network/pages/team/" target="_top">Katzenpost Team</a>,
+                  and you can see who has been doing what by visiting our <a class="link" href="https://github.com/katzenpost" target="_top">GitHub site</a>. </p>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>
