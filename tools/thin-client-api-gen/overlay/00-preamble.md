@@ -15,22 +15,22 @@ aliases:
 
 # Thin Client API Reference
 
-This is the complete API reference for the Katzenpost thin client. The
-thin client is an interface to the kpclientd daemon, which handles all
+his is the complete API reference for the Katzenpost thin client. The
+thin client is an interface to the `kpclientd` daemon, which handles all
 cryptographic and network operations. The thin client communicates
 with the daemon over a local socket using CBOR-encoded messages.
 
-**This document is generated.** The canonical source is
+**This document is generated.** Do
+not edit this file directly, as local changes will be overwritten the file is rebuilt. The canonical source is
 `website/tools/thin-client-api-gen/`; edit binding docstrings (in the
-source trees) or `groups.yaml` / `overlay/*.md` (in the generator) — do
-not edit this file directly, as local changes will be overwritten by
-the next generation pass.
+source trees) or `groups.yaml` / `overlay/*.md` (in the generator).
 
-There are three implementations: a Go reference (`katzenpost/client/thin`), a
-Rust binding (`thin_client/src`), and a Python binding
-(`thin_client/katzenpost_thinclient`).
+There are three implementations:
+- A Go reference, `katzenpost/client/thin` 
+- A Rust binding, thin_client/src
+- Python binding `thin_client/katzenpost_thinclient`
 
-The official API documentation for each binding:
+The following table lists the official API documentation for each binding.
 
 | Language | Official API documentation | Official API release |
 | --- | --- | --- |
@@ -38,14 +38,14 @@ The official API documentation for each binding:
 | Rust | [docs.rs](https://docs.rs/katzenpost_thin_client/latest/katzenpost_thin_client/) | [crates.io](https://crates.io/crates/katzenpost_thin_client) |
 | Python | [Python Thin Client API](/docs/python_thin_client_api/) | [PyPI](https://pypi.org/project/katzenpost_thinclient/) |
 
-This reference describes the following pinned binding versions:
+This reference describes the following pinned binding versions.
 
 <!-- PINNED_VERSIONS_TABLE -->
 
-For pinned versions of the full stack (including `kpclientd`, `katzenqt`, and
+- For pinned versions of the full stack (including `kpclientd`, `katzenqt`, and
 the server-side components), see [Build from source](/docs/build_from_source/).
 
-For conceptual background on Pigeonhole, see [Understanding Pigeonhole](/docs/pigeonhole_explained/).
+- For conceptual background on Pigeonhole, see [Understanding Pigeonhole](/docs/pigeonhole_explained/).
 For task-oriented usage guides, see [Thin Client How-to Guide](/docs/thin_client_howto/).
 
 ---
