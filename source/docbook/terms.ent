@@ -41,10 +41,11 @@
 <!ENTITY epoch '<varlistentry>
                 <term><emphasis role="bold">epoch</emphasis></term>
                 <listitem>
-                    <para>A fixed time interval defined in section 4.2 Sphinx Mix and Provider Key
-                        Rotation. The epoch is currently set to 20 minutes. 
+                    <para>A fixed time interval with a current default value of 20 minutes. 
                         A new PKI document containing public key material
-                        is published for each epoch and is valid only for that epoch.</para>
+                        is published for each epoch and is valid only for that epoch. For more information see 
+                        <link xlink:href="https://katzenpost.network/docs/specs/mix_network/#sphinx-mix-and-provider-key-rotation">Sphinx 
+                        mix and provider key rotation</link>.</para>
                 </listitem>
             </varlistentry>'>          
 <!ENTITY kib '<varlistentry>
@@ -72,13 +73,13 @@
 <!ENTITY node '<varlistentry>
                 <term><emphasis role="bold">node</emphasis></term>
                 <listitem>
-                    <para>Clients are NOT considered nodes in the mix network. However note that
-                        network protocols are often layered; in our design documents we describe
+                    <para>Clients are NOT considered nodes in the mix network. However,
+                        network protocols are often layered. In our design documents we describe
                         "mixnet hidden services" which can be operated by mixnet clients. Therefore
-                        if you are using node in some adherence to mathematical terminology one
+                        if you are using the term "node" in some adherence to mathematical terminology, one
                         could conceivably designate a client as a node. That having been said, it
                         would not be appropriate to the discussion of our core mixnet protocol to
-                        refer to the clients as nodes.</para>
+                        refer to clients as nodes.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY entry '<varlistentry>
@@ -104,7 +105,7 @@
 <!ENTITY servicemix '<varlistentry>
                 <term><emphasis role="bold">service mix</emphasis></term>
                 <listitem>
-                    <para>A service mix is a mix that has some additional features:</para>
+                    <para>A service mix is a mix server that has some additional features:</para>
                     <itemizedlist>
                         <listitem>
                             <para> A service mix is always the last hop in routes where the message
@@ -126,18 +127,21 @@
 <!ENTITY client '<varlistentry>
                 <term><emphasis role="bold">client</emphasis></term>
                 <listitem>
-                    <para>Software run by the User on its local device to participate in the Mixnet.
-                        Again let us reiterate that a client is not considered a "node in the
-                        network" at the level of analysis where we are discussing the core mixnet
-                        protocol in this here document.</para>
+                    <para>Software run by the user on their local device to participate in the mixnet.
+                        A client is not considered a "node in the
+                        network" for purposes of analyhsis of the core mnixnet protocols.</para>
                 </listitem>
             </varlistentry>'>
-<!ENTITY katzenpost ' <varlistentry>
+<!--<!ENTITY 
+
+inadequate definition
+
+katzenpost ' <varlistentry>
                 <term><emphasis role="bold">&program_name;</emphasis></term>
                 <listitem>
                     <para>A project to design many improved decryption mixnet protocols.</para>
                 </listitem>
-            </varlistentry>'>
+            </varlistentry>'>-->
 <!ENTITY classestraffic '<varlistentry>
                 <term><emphasis role="bold">classes of traffic</emphasis></term>
                 <listitem>
@@ -271,5 +275,63 @@
                         time or other criteria where each stage is a thread pool. 3. The only
                         correct way to efficiently implement a software based router on general
                         purpose computing hardware.</para>
+                </listitem>
+            </varlistentry>'>     
+            
+<!ENTITY box '<varlistentry>
+                <term><emphasis role="bold">box</emphasis></term>
+                <listitem>
+                    <para>BACAP&#39;s unit of data storage. Each box has a box ID (which also serves as its 
+                    public key), a signature, and a ciphertext signed payload.</para>
+                </listitem>
+            </varlistentry>'>            
+
+<!ENTITY courier '<varlistentry>
+                <term><emphasis role="bold">courier</emphasis></term>
+                <listitem>
+                    <para>Service that runs on a service node and interacts with storage replicas. Proxies 
+                    requests from clients and routes replies back to clients (via SURBs). </para>
+                </listitem>
+            </varlistentry>'>            
+
+<!ENTITY replica '<varlistentry>
+                <term><emphasis role="bold">storage replica</emphasis></term>
+                <listitem>
+                    <para>"Intermediate replicas are chosen independently of the two final replicas for that 
+                    box ID which are derived using the sharding scheme. The reason Alice designates 
+                    intermediate replicas, as opposed to addressing the final replicas directly, is to avoid 
+                    revealing to the courier which shard the box falls into." (From "§5.4.1. Writing messages" 
+                    in the paper.) Designated replica (a.k.a. final replica, shard replica): One of the two 
+                    replicas selected deterministically for a given box ID by the Shard2 consistent-hash 
+                    algorithm. The intermediate replicas replicate writes through to the designated replicas.</para>
+                </listitem>
+            </varlistentry>'>            
+
+<!ENTITY envelope_hash '<varlistentry>
+                <term><emphasis role="bold">envelope hash</emphasis></term>
+                <listitem>
+                    <para><code xmlns="http://docbook.org/ns/docbook">BLAKE2b-256(CourierEnvelope.sender_pubkey ||
+                    CourierEnvelope.ciphertext)</code>. Used by the courier for deduplication of retransmissions
+                    and for demultiplexing replica replies.</para>
+                </listitem>
+            </varlistentry>'>            
+
+<!ENTITY mkem '<varlistentry>
+                <term><emphasis role="bold">MKEM</emphasis></term>
+                <listitem>
+                    <para>Multi-recipient KEM addressed to the pair of intermediate replicas. One MKEM ciphertext
+                        carries, for each recipient, a separate DEK encapsulation (<code
+                        xmlns="http://docbook.org/ns/docbook">Dek1</code>, <code
+                        xmlns="http://docbook.org/ns/docbook">Dek2</code>); either recipient may decapsulate and
+                        recover the padded <code xmlns="http://docbook.org/ns/docbook">ReplicaInnerMessage</code></para>
+                </listitem>
+            </varlistentry>'>            
+
+<!ENTITY replica_epoch '<varlistentry>
+                <term><emphasis role="bold">replica epoch</emphasis></term>
+                <listitem>
+                    <para>A one-week period, distinct from the 20-minute mixnet PKI epoch, during which a given
+                        replica-side MKEM envelope keypair is valid. For more information, see 
+                        <link xlink:href="https://katzenpost.network/docs/specs/pigeonhole/#epochs">Epochs</link>.</para>
                 </listitem>
             </varlistentry>'>            

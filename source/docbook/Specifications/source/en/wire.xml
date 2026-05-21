@@ -17,7 +17,7 @@
 <?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
-<!DOCTYPE section [
+<!DOCTYPE chapter [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -46,10 +46,10 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="wire_protocol">
 
-    <title xml:id="wire_protocol.title">&program_name; mix network wire protocol</title>
+    <title xml:id="wire_protocol.title">Mix network wire protocol specification</title>
     <info>
         <authorgroup>
             <author>
@@ -71,7 +71,7 @@
         </abstract>
     </info>
     <section xml:id="conventions-used-in-this-document">
-        <title>1.1 Conventions Used in This Document</title>
+        <title>1.1 Conventions used in this document</title>
         <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
                 <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
                 NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
@@ -91,14 +91,14 @@
             provides mutual authentication, and an additional layer of cryptographic security and
             forward secrecy. </para>
         <section xml:id="key-encapsulation-mechanism">
-            <title>1.2 Key Encapsulation Mechanism</title>
+            <title>1.2 Key encapsulation mechanism</title>
             <para> This protocol uses ANY Key Encapsulation Mechanism. However it’s recommended that
                 most users select a hybrid post quantum KEM such as Xwing. <xref linkend="XWING"/>
             </para>
         </section>
     </section>
     <section xml:id="core-protocol">
-        <title>2. Core Protocol</title>
+        <title>2. Core protocol</title>
         <para> The protocol is based on Kyber and Trevor Perrin’s Noise Protocol Framework <xref
                 linkend="NOISE"/> along with <quote>Post Quantum Noise</quote> paper <link
                 linkend="PQNOISE">PQNOISE</link>. Older previous versions of our transport were
@@ -107,14 +107,10 @@
             of Noise Transport messages in a minimal framing layer, over a TCP/IP connection. </para>
         <para> Our Noise protocol is configurable via the KEM selection in the TOML configuration
             files, here’s an example PQ Noise protocol string: </para>
-        <programlisting>
-Noise_pqXX_Xwing_ChaChaPoly_BLAKE2b
-</programlisting>
+        <programlisting>Noise_pqXX_Xwing_ChaChaPoly_BLAKE2b</programlisting>
         <para> The protocol string is a very condensed description of our protocol. We use the pqXX
             two way Noise pattern which is described as follows: </para>
-        <programlisting>
-pqXX: -&gt; e &lt;- ekem, s -&gt; skem, s &lt;- skem
-</programlisting>
+        <programlisting>pqXX: -&gt; e &lt;- ekem, s -&gt; skem, s &lt;- skem</programlisting>
         <para> The next part of the protocol string specifies the KEM, <literal>Xwing</literal>
             which is a hybrid KEM where the share secret outputs of both X25519 and MLKEM768 are
             combined. </para>
@@ -129,7 +125,7 @@ pqXX: -&gt; e &lt;- ekem, s -&gt; skem, s &lt;- skem
             component of which is known to the other party in advance. How such keys are distributed
             is beyond the scope of this document. </para>
         <section xml:id="handshake-phase">
-            <title>2.1 Handshake Phase</title>
+            <title>2.1 Handshake phase</title>
             <para> All sessions start in the Handshake Phase, in which an anonymous authenticated
                 handshake is conducted. </para>
             <para> The handshake is a unmodified Noise handshake, with a fixed prologue prefacing
@@ -137,11 +133,9 @@ pqXX: -&gt; e &lt;- ekem, s -&gt; skem, s &lt;- skem
                     <literal>prologue</literal> input to the Noise HandshakeState
                     <literal>Initialize()</literal> operation for both the initiator and responder. </para>
             <para> The prologue is defined to be the following structure: </para>
-            <programlisting>
-struct {
+            <programlisting>struct {
 uint8_t protocol_version; /* 0x03 */
-} Prologue;
-</programlisting>
+} Prologue;</programlisting>
             <para> As all Noise handshake messages are fixed sizes, no additional framing is
                 required for the handshake. </para>
             <para> Implementations MUST preserve the Noise handshake hash <literal>[h]</literal> for
@@ -153,17 +147,15 @@ uint8_t protocol_version; /* 0x03 */
                 SHOULD terminate sessions that are taking too long to handshake. </para>
         </section>
         <section xml:id="handshake-authentication">
-            <title>2.1.1 Handshake Authentication</title>
+            <title>2.1.1 Handshake authentication</title>
             <para> Mutual authentication is done via exchanging fixed sized payloads as part of the
                     <literal>pqXX</literal> handshake consisting of the following structure: </para>
-            <programlisting>
-struct {
+            <programlisting>struct {
 uint8_t ad_len;
 opaque additional_data[ad_len];
 opaque padding[255 - ad_len];
 uint32_t unix_time;
-} AuthenticateMessage;
-</programlisting>
+} AuthenticateMessage;</programlisting>
             <para> Where: </para>
             <itemizedlist spacing="compact">
                 <listitem>
@@ -201,7 +193,7 @@ uint32_t unix_time;
             </para>
         </section>
         <section xml:id="data-transfer-phase">
-            <title>2.2 Data Transfer Phase</title>
+            <title>2.2 Data transfer phase</title>
             <para> Upon successfully concluding the handshake the session enters the Data Transfer
                 Phase, where the initiator and responder can exchange KMNWP messages. </para>
             <para> A KMNWP message is defined to be the following structure: </para>
@@ -265,9 +257,9 @@ uint32_t message[ciphertext_length-16];
         </section>
     </section>
     <section xml:id="predefined-commands">
-        <title>3. Predefined Commands</title>
+        <title>3. Predefined commands</title>
         <section xml:id="the-no_op-command">
-            <title>3.1 The no_op Command</title>
+            <title>3.1 The <emphasis>no_op</emphasis> command</title>
             <para> The <literal>no_op</literal> command is a command that explicitly is a No
                 Operation, to be used to implement functionality such as keep-alives and or
                 application layer padding. </para>
@@ -275,7 +267,7 @@ uint32_t message[ciphertext_length-16];
                 all received command data MUST be discarded without interpretation. </para>
         </section>
         <section xml:id="the-disconnect-command">
-            <title>3.2 The disconnect Command</title>
+            <title>3.2 The <emphasis>disconnect</emphasis> command</title>
             <para> The <literal>disconnect</literal> command is a command that is used to signal
                 explicit session termination. Upon receiving a disconnect command, implementations
                 MUST interpret the command as a signal from the peer that no additional commands
@@ -287,7 +279,7 @@ uint32_t message[ciphertext_length-16];
                 MUST not send any further traffic after sending a disconnect command. </para>
         </section>
         <section xml:id="the-send_packet-command">
-            <title>3.3 The send_packet Command</title>
+            <title>3.3 The <emphasis>send_packet</emphasis> command</title>
             <para> The <literal>send_packet</literal> command is the command that is used by the
                 initiator to transmit a Sphinx Packet over the network. The command’s message is the
                 Sphinx Packet destined for the responder. </para>
@@ -296,7 +288,7 @@ uint32_t message[ciphertext_length-16];
         </section>
     </section>
     <section xml:id="command-padding">
-        <title>4. Command Padding</title>
+        <title>4. Command padding</title>
         <para> We use traffic padding to hide from a passive network observer which command has been
             sent or received. </para>
         <para> Among the set of padded commands we exclude the <literal>Consensus</literal> command
@@ -318,14 +310,14 @@ uint32_t message[ciphertext_length-16];
         </para>
     </section>
     <section xml:id="anonymity-considerations">
-        <title>5. Anonymity Considerations</title>
+        <title>5. Anonymity considerations</title>
         <para> Adversaries being able to determine that two parties are communicating via KMNWP is
             beyond the threat model of this protocol. At a minimum, it is trivial to determine that
             a KMNWP handshake is being performed, due to the length of each handshake message, and
             the fixed positions of the various public keys. </para>
     </section>
     <section xml:id="security-considerations">
-        <title>6. Security Considerations</title>
+        <title>6. Security considerations</title>
         <para> It is imperative that implementations use ephemeral keys for every handshake as the
             security properties of the Kyber KEM are totally lost if keys are ever reused. </para>
         <para> Kyber was chosen as the KEM algorithm due to it’s conservative parameterization,
@@ -339,41 +331,13 @@ uint32_t message[ciphertext_length-16];
             protocol, and answering questions regarding Noise. </para>
     </section>
     <section xml:id="appendix-a.-references">
-        <title>References</title>
-        <!--    <section xml:id="appendix-a.1-normative-references">
-<title>Appendix A.1 Normative References</title>
-<para>
-</para>
-</section>
-<section xml:id="appendix-a.2-informative-references">
-<title>Appendix A.2 Informative References</title>
-<para>
-</para>
-</section>
-</section>
-<section xml:id="appendix-b.-citing-this-document">
-<title>Appendix B. Citing This Document</title>
-<section xml:id="appendix-b.1-bibtex-entry">
-<title>Appendix B.1 Bibtex Entry</title>
-<para>
-Note that the following bibtex entry is in the IEEEtran bibtex
-style as described in a document called <quote>How to Use the
-IEEEtran BIBTEX Style</quote>.
-</para>
-<programlisting>
-@online{KatzMixWire,
-title = {Katzenpost Mix Network Wire Protocol Specification},
-author = {Yawning Angel},
-url = {https://github.com/katzenpost/katzenpost/blob/master/docs/specs/wire-protocol.rst},
-year = {2017}
-}
-</programlisting>-->
-        &XWING;
+        <title>References</title>        
         &NOISE;
         &NOISEHFS;
         &PQNOISE;
         &RFC2119;
         &RFC5246;
-        &RFC7748;
+        &RFC7748;        
+        &XWING;
     </section>
-</section>
+</chapter>

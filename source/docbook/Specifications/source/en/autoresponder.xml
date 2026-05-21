@@ -17,7 +17,7 @@
 <?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
-<!DOCTYPE section [
+<!DOCTYPE chapter [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -46,11 +46,12 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="autoresponder">
     
     <info>
-        <title xml:id="autoresponder.title">Provider-side autoresponder extension (Kaetzchen)</title>
+        <title xml:id="autoresponder.title">Provider-side autoresponder extension (Kaetzchen)
+            specification</title>
         <authorgroup>
             <author>
                 <personname>
@@ -81,7 +82,7 @@
         </abstract>
     </info>
     <section>
-        <title>Conventions Used in This Document</title>
+        <title>Conventions used in this document</title>
         <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
                 <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
                 NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
@@ -92,20 +93,20 @@
     <section xml:id="terminology">
         <title xml:id="terminology.title">Terminology</title>
         <para>The following terms are used in this specification.</para>
-        <variablelist>
-            &surb;
+        <variablelist>            
             &blocksphinxplaintext;
+            &surb;
         </variablelist>
     </section>
     
     <section xml:id="extension-overview">
-            <title xml:id="extension-overview.title">1. Extension Overview</title>
+            <title xml:id="extension-overview.title">Extension overview</title>
             <para>Each Kaetzchen agent will register as a potential recipient on its Provider. When
                 the Provider receives a forward packet destined for a Kaetzchen instance, it will
                 hand off the fully unwrapped packet along with its corresponding SURB to the agent,
                 which will then act on the packet and optionally reply utilizing the SURB.</para>
         <section xml:id="agent-requirements">
-            <title xml:id="agent-requirements.title">1.1 Agent Requirements</title>
+            <title xml:id="agent-requirements.title">Agent requirements</title>
             <itemizedlist spacing="compact">
                 <listitem>
                     <para>Each agent operation MUST be idempotent.</para>
@@ -132,7 +133,7 @@
             </itemizedlist>
         </section>
         <section xml:id="mix-message-formats">
-            <title xml:id="mix-message-formats.title">1.2 Mix Message Formats</title>
+            <title xml:id="mix-message-formats.title">Mix message formats</title>
             <para>Messages from clients to Kaetzchen use the following payload format in the forward
                 Sphinx packet:</para>
             <programlisting>struct {
@@ -162,7 +163,7 @@ opaque plaintext[];
         </section>
         </section>
         <section xml:id="pki-extensions">
-            <title xml:id="pki-extensions.title">2. PKI Extensions</title>
+            <title xml:id="pki-extensions.title">PKI extensions</title>
             <para>Each provider SHOULD publish the list of publicly accessible Kaetzchen agent
                 endpoints in its MixDescriptor, along with any other information required to utilize
                 the agent.</para>
@@ -188,7 +189,7 @@ opaque plaintext[];
 }</programlisting>
         </section>
         <section xml:id="anonymity-considerations">
-            <title xml:id="anonymity-considerations.title">3. Anonymity Considerations</title>
+            <title xml:id="anonymity-considerations.title">Anonymity considerations</title>
             <para>In the event that the mix keys for the entire return path are compromised, it is
                 possible for adversaries to unwrap the SURB and determine the final recipient of the
                 reply.</para>
@@ -199,7 +200,7 @@ opaque plaintext[];
                 of the client.</para>
         </section>
         <section xml:id="security-considerations">
-            <title xml:id="security-considerations.title">4. Security Considerations</title>
+            <title xml:id="security-considerations.title">Security considerations</title>
             <para>It is possible to use this mechanism to flood a victim with unwanted traffic by
                 constructing a request with a SURB destined for the target.</para>
             <para>Depending on the operations implemented by each agent, the added functionality may
@@ -223,4 +224,4 @@ opaque plaintext[];
             &SPHINXSPEC;
         </section>
 
-</section>
+</chapter>

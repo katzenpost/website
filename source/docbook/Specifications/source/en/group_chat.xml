@@ -26,7 +26,7 @@
 <?version "0" ?>
 <!-- Optional [?] -->
 
-<!DOCTYPE section [
+<!DOCTYPE chapter [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -54,10 +54,10 @@
     <!ENTITY % local.info.class "| xi:include"> 
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
-<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
   version="5.1" xml:id="group_chat">
   <info>
-    <title xml:id="group_chat.title">Katzenpost Group Chat Design</title>
+    <title xml:id="group_chat.title">Group chat specification</title>
     <authorgroup>
       <author>
         <personname>
@@ -72,22 +72,11 @@
         </personname>
       </author>
     </authorgroup>
-    <!-- Match to title PI above. -->
+    <abstract>
+      <para>to do</para>
+    </abstract>
   </info>
-  <!--<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <title>title: linkTitle: &quot;Group Chat&quot; url:
-  &quot;docs/specs/group_chat.html&quot; description: &quot;&quot;
-  categories: [&quot;&quot;] tags: [&quot;&quot;] author:
-  [&quot;Threebit Hacker&quot;, &quot;David Stainton&quot;] version: 0
-  draft: false</title>
-  <para>
-  </para>
-</section>-->
-  <!--<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <title>Katzenpost Group Chat Design</title>
-  <para>
-  </para>
-</section>-->
+
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Prerequisites</title>
     <para>This design specification is dependent on the BACAP and Pigeonhole protocol designs from
@@ -95,10 +84,10 @@
         System with Messaging</link>, which describes</para>
     <itemizedlist spacing="compact">
       <listitem>
-        <para> the BACAP (blinded and capability) in section 4 and</para>
+        <para> the BACAP (blinded and capability) in §4 and</para>
       </listitem>
       <listitem>
-        <para> the Pigeonhole protocol in section 5. </para>
+        <para> the Pigeonhole protocol in §5. </para>
       </listitem>
     </itemizedlist>
     <para>The <link xlink:href="https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go">source
@@ -150,7 +139,7 @@
       member.</para>
   </section>
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>Group Chat Message Types</title>
+    <title>Group chat message types</title>
     <para>All messages are <code>SingleMessage</code> if they fit in one BACAP slot, or an
         <code>AllOrNothingMessage</code> if they are too big. </para>
     <itemizedlist spacing="compact">
@@ -240,7 +229,7 @@ type GroupChatMessage struct {
 }</programlisting>
   </section>
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>Protocol Flow</title>
+    <title>Protocol flow</title>
     <para>The protocol flow for making a new group from scratch (using whatever authentication
       protocol) is essentially for everybody to exchange <code>PleaseAdd</code> messages.</para>
     <programlisting language="go">// PleaseAdd is a message used by a client to try and gain access to a chat group.
@@ -332,4 +321,4 @@ type SignedPleaseAdd struct {
  
 
     
-</section>
+</chapter>

@@ -17,7 +17,7 @@
 <?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
-<!DOCTYPE section [
+<!DOCTYPE chapter [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -46,11 +46,11 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<section    xmlns="http://docbook.org/ns/docbook"
+<chapter    xmlns="http://docbook.org/ns/docbook"
   xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
   xml:id="pigeonhole_protocol">
   <info>  
-    <title xml:id="pigeonhole_protocol.title">Pigeonhole protocol design</title> <!-- Match to title PI above. -->
+    <title xml:id="pigeonhole_protocol.title">Pigeonhole protocol specification</title>
     <authorgroup>
       <author>
         <personname>
@@ -65,14 +65,13 @@
         </personname>
       </author>
     </authorgroup>
-  </info>
-  <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>Abstract</title>
-    <para> In this specification we describe the components and protocols that compose Pigeonhole
-      scattered storage. We define the behavior of communication clients that send and retrieve
-      individual messages, BACAP streams, and AllOrNothing streams. Client actions are mediated
-      through courier services that interact with storage replicas. </para>
-  </section>
+      <abstract>
+        <para>In this specification we describe the components and protocols that compose Pigeonhole
+        scattered storage. We define the behavior of communication clients that send and retrieve
+        individual messages, BACAP streams, and AllOrNothing streams. Client actions are mediated
+        through courier services that interact with storage replicas.</para>
+      </abstract>
+    </info>
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Introduction</title>
     <para> Pigeonhole scattered storage enables persistent anonymous communication in which
@@ -87,8 +86,8 @@
       user-generated read or write queries to Pigeonhole storage, never directly to other
       users.</para>
     <para>Many derivative protocols can be composed using Pigeonhole communication channels,
-      including group communications. For details about the protocol specified here, see section
-      "§5.6. End-to-end reliable group channels" in our paper <link
+      including group communications. For details about the protocol specified here, see "§5.6.
+      End-to-end reliable group channels" in our paper <link
         xlink:href="https://arxiv.org/abs/2501.02933">Echomix: a Strong Anonymity System with
         Messaging</link>. For more information about BACAP, see §4 of the paper. For an
       understanding of how the core BACAP primitives are implemented, see <link
@@ -97,59 +96,27 @@
       description language (matching <code>pigeonhole/pigeonhole_messages.trunnel</code>);
       code snippets showing in-memory courier or replica state are given in Go. </para>
   </section>
-  <section xml:id="glossary" xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title xml:id="glossary.title">Glossary</title>
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="strong">Box</emphasis>: BACAP's unit of data storage. Each box has a
-          box ID (which also serves as its public key), a signature, and a ciphertext signed
-          payload. </para>
-      </listitem>
-      <listitem>
-        <para><emphasis role="strong">Courier</emphasis>: Service that runs on a service node and
-          interacts with storage replicas. Proxies requests from clients and routes replies back to
-          clients (via SURBs). </para>
-      </listitem>
-      <listitem>
-        <para><emphasis role="strong">Storage replica</emphasis>: The actual storage nodes where
-          message ciphertexts are stored and retrieved. </para>
-      </listitem>
-      <listitem>
-        <para><emphasis role="strong">Intermediate replica</emphasis>: "Intermediate replicas are
-          chosen independently of the two final replicas for that box ID which are derived using the
-          sharding scheme. The reason Alice designates intermediate replicas, as opposed to
-          addressing the final replicas directly, is to avoid revealing to the courier which shard
-          the box falls into." (From &quot;§5.4.1. Writing messages&quot; in the <link
-            xlink:href="https://arxiv.org/abs/2501.02933">paper</link>.)<emphasis role="strong"
-            >Designated replica</emphasis> (a.k.a. <emphasis>final replica</emphasis>,
-            <emphasis>shard replica</emphasis>): One of the two replicas selected deterministically
-          for a given box ID by the <code>Shard2</code> consistent-hash algorithm. The intermediate
-          replicas replicate writes through to the designated replicas. </para>
-      </listitem>
-      <listitem>
-        <para><emphasis role="strong">EnvelopeHash</emphasis>:
-            <code>BLAKE2b-256(CourierEnvelope.sender_pubkey ||
-            CourierEnvelope.ciphertext)</code>. Used by the courier for deduplication of
-          retransmissions and for demultiplexing replica replies. </para>
-      </listitem>
-      <listitem>
-        <para><emphasis role="strong">MKEM</emphasis>: Multi-recipient KEM addressed to the pair of
-          intermediate replicas. One MKEM ciphertext carries, for each recipient, a separate DEK
-          encapsulation (<code>Dek1</code>, <code>Dek2</code>); either recipient may
-          decapsulate and recover the padded <code>ReplicaInnerMessage</code>. </para>
-      </listitem>
-      <listitem>
-        <para><emphasis role="strong">Replica-epoch</emphasis>: A one-week period, distinct from the
-          20-minute mixnet PKI epoch, during which a given replica-side MKEM envelope keypair is
-          valid. See <xref linkend="epochs"/> below. </para>
-      </listitem>
-    </itemizedlist>
-  </section>
+  
+  <section xml:id="terminology">
+    <title xml:id="terminology.title">Terminology</title>
+    <para>The following terms are used in this specification.</para>
+    <variablelist>
+      &box;
+      &courier;
+      &envelope_hash;
+      &mkem;
+      &replica_epoch;
+      &replica;
+      &surb;
+    </variablelist>
+  </section> 
+
   <section xml:id="storage_deployment" xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title xml:id="storage_deployment.title">Storage deployment requirements</title>
       <para>A conforming deployment MUST run at least <emphasis role="strong">four</emphasis>
       storage replicas (n ≥ 4). The enables the intermediate-replica unlinkability property
-      described in the <xref linkend="glossary"/> and in §5.4.1 of the paper: for each
+      described above and in §5.4.1 of the <link xlink:href="https://arxiv.org/abs/2501.02933"
+        >Echomix: a Strong Anonymity System with Messaging</link>: for each
         <code>CourierEnvelope</code>, the client picks two <emphasis>intermediate</emphasis>
       replicas which MUST be disjoint from the two <emphasis>final</emphasis> (sharded) replicas
       that hold the box. Disjointness is what prevents the courier from learning which shard the box
@@ -1379,4 +1346,4 @@ SERIALIZED ENVELOPE DATA (envelope boundaries don't align with box boundaries):
     <para><emphasis role="bold">Bob can now read Alice's message.</emphasis></para>
     
   </section>
-</section>
+</chapter>
