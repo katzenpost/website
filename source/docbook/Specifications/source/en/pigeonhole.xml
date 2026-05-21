@@ -876,13 +876,14 @@ type CourierBookKeeping struct {
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Sharding and replica selection</title>
     <para>For each box, two <emphasis>designated</emphasis> (final) replicas are derived
-      deterministically from the box ID using the <code>Shard2</code> consistent-hash algorithm.
-      (See <link
-        xlink:href="https://github.com/katzenpost/katzenpost/blob/main/replica/common/shard.go"
-          ><code>replica/common/shard.go</code></link>.): </para>
+      deterministically from the box ID using the <code>Shard2</code> consistent-hash algorithm, as
+      shown in the following pseudocode.</para>
     <programlisting>for each online replica r with identity key k_r:
     h_r = BLAKE2b-256(k_r || box_id)
-// return the two replicas whose h_r values are smallest</programlisting>
+return the two replicas whose h_r values are smallest</programlisting>
+    <para>For more information about sharding, see <link
+        xlink:href="https://github.com/katzenpost/katzenpost/blob/main/replica/common/shard.go"
+          ><code>replica/common/shard.go</code></link>.</para>
     <para>The two <emphasis>intermediate</emphasis> replicas chosen by the client for a given
         <code>CourierEnvelope</code> are drawn independently of the designated replicas, per
         <code>pigeonhole.GetRandomIntermediateReplicas</code>: </para>
@@ -906,9 +907,9 @@ type CourierBookKeeping struct {
     <para>Intermediate replicas, upon accepting a <code>ReplicaWrite</code>, compute the designated
       replicas themselves and forward the <code>ReplicaWrite</code> to them via the
         <code>core/wire/commands</code>
-      <code>ReplicaWrite</code> command (see <link
+      <code>ReplicaWrite</code> command. For more information, see <link
         xlink:href="https://github.com/katzenpost/katzenpost/blob/main/replica/connector.go"
-          ><code>replica/connector.go</code></link>). </para>
+          ><code>replica/connector.go</code></link>. </para>
   </section>
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Protocol sequence visualizations</title>
