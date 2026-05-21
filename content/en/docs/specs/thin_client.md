@@ -1,73 +1,201 @@
 ---
-title:
-linkTitle: "Katzenpost Thin Client"
-url: "docs/specs/thin_client.html"
+title: "Katzenpost thin client"
+linkTitle: ""
 description: ""
-categories: [""]
-tags: [""]
-author: ["David Stainton"]
-version: 0
-draft: false
+author: ""
+url: ""
+date: "2026-05-21T10:07:22.995537267-07:00"
+draft: "false"
+slug: "thin_client"
+layout: ""
+type: ""
+weight: "1"
+version: ""
 ---
 
-# Katzenpost Thin Client Design
+<div class="section">
 
-# 1. Introduction
+<div class="titlepage">
 
-A Katzenpost mixnet client has several responsibilities at minimum:
+<div>
 
-* compose Sphinx packets
-* decrypt SURB replies
-* send and receive Noise protocol messages
-* keep up to date with the latest PKI document
+<div>
 
-This document describes the design of the new Katzenpost mix network
-client known as client2. In particular we discuss it's multiplexing and
-privilege separation design elements as well as the protocol used by the
-thin client library.
+## <span id="thin_client"></span>Katzenpost thin client
 
-Therefore applications will be integrated with Katzenpost using the
-connector library known as a thin client library which gives them the
-capability to talk with the connector daemon and in that way interact
-with the mix network. The library itself does not do any
-mixnet-related cryptography since that is already handled by the
-connector daemon. In particular, the PKI document is stripped by the
-daemon before it's passed on to clients using the connector
-library. Likewise, the library doesn\'t decrypt SURB replies or
-compose Sphinx packets, with Noise, Sphinx, and PKI related
-cryptography being handled by the daemon.
+</div>
 
-# 2. Connector library and daemon protocol {#thin-client-and-daemon-protocol}
+</div>
 
-The thin client daemon protocol uses a local network socket,
-either Unix domain socket or TCP.
+------------------------------------------------------------------------
 
+</div>
 
-## 2.3 Protocol messages
+This document describes the design of the new Katzenpost mixnet <span class="emphasis">*thin
+client*</span>. In particular we discuss its multiplexing and privilege-separation design
+elements as well as the protocol used by the thin-client library.
 
-Note that there are two protocol message types and they are always CBOR
-encoded. We send over length prefixed CBOR blobs. That is to say, a length
-prefix encoded as a big endian unsigned four byte integer (uint32).
+<div class="section">
 
-The client sends the `Request` messages and the daemon sends the `Response` messages.
+<div class="titlepage">
 
+<div>
 
-## 2.4 Protocol description
+<div>
 
-Upon connecting to the daemon socket the client must wait for two
-messages. The first message received must have its `is_status` field set
-to **true** and its `is_connected` field indicating whether or not the
-daemon has a mixnet PQ Noise protocol connection to an entry node.
+### <span id="thin_client_intro"></span>Introduction
 
-The client then awaits the second message, which contains the PKI
-document in its `payload` field. This marks the end of the initial
-connection sequence. Note that this PKI document is stripped of all
-cryptographic signatures.
+</div>
 
-In the next protocol phase, the client may send `Request` messages to
-the daemon in order to cause the daemon to encapsulate the given payload
-in a Sphinx packet and send it to the gateway node. Likewise the daemon
-my send the client `Response` messages at any time during this protocol
-phase. These `Response` messages may indicate a connection status
-change, a new PKI document, or a message-sent or reply event.
+</div>
 
+</div>
+
+A Katzenpost mixnet client has several responsibilities at a minimum:
+
+<div class="itemizedlist">
+
+- composing Sphinx packets
+
+- decrypting SURB replies
+
+- sending and receiving Noise protocol messages
+
+- keeping up to date with the latest PKI document
+
+</div>
+
+The thin-client library enables applications to talk with the connector daemon and
+in that
+way interact with the mix network. The library itself does not do any mixnet-related
+cryptography since that is already handled by the thin-client daemon. In particular,
+the
+daemon strips cryptographic signatures from the PKI document before passing data to
+clients
+using the connector library. Noise- and Sphinx-related cryptography are also handled
+by the
+daemon.
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="library_daemon"></span>Thin-client library and daemon protocol
+
+</div>
+
+</div>
+
+</div>
+
+The thin-client daemon protocol uses a local network socket, either a Unix domain
+socket
+or TCP.
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+#### <span id="messages"></span>Messages
+
+</div>
+
+</div>
+
+</div>
+
+There are two protocol message types, both CBOR encoded.
+
+<div class="itemizedlist">
+
+- The client sends `Request` messages.
+
+- The daemon sends `Response` messages.
+
+</div>
+
+Messages are length-prefixed CBOR blobs, that is, a blob is prefixed with a big-endian
+unsigned four-byte integer (uint32) that encodes the blob length.
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+#### <span id="protocol"></span>Protocol description
+
+</div>
+
+</div>
+
+</div>
+
+The protocol has two phases.
+
+<span class="bold">**Phase 1**</span>
+
+Upon connecting to the daemon socket, the thin client waits for two messages.
+
+<div class="itemizedlist">
+
+- <span class="bold">**First message** </span>
+
+  <div class="itemizedlist">
+
+  - The `is_status` field must be set to <span class="strong">**true**</span>
+
+  - The `is_connected` field must indicate whether or not the daemon has
+    a mixnet PQ Noise protocol connection to a mixnet gateway node.
+
+  </div>
+
+</div>
+
+<div class="itemizedlist">
+
+- <span class="bold">**Second message**</span>
+
+  <div class="itemizedlist">
+
+  - The message contains the PKI document in its `payload`field. This
+    marks the end of the initial connection sequence.
+
+  - The PKI document is stripped of cryptographic signatures as noted above.
+
+  </div>
+
+</div>
+
+<span class="bold">**Phase 2**</span>
+
+<div class="itemizedlist">
+
+- The thin client may send `Request` messages to the daemon, which
+  encapsulates the provided payload in a Sphinx packet and sends it to the gateway node.
+
+- The daemon may send `Response` messages to the client at any time during
+  this phase. `Response` messages may communicate a connection status change, a
+  new PKI document, or a message-sent or message-reply event.
+
+</div>
+
+</div>
+
+</div>
+
+</div>

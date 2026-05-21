@@ -106,8 +106,8 @@
         <title xml:id="protocol.title">Protocol description</title>
       </info>
       <para>The protocol has two phases.</para>
-      <para><emphasis role="bold">Phase 1 –</emphasis> Upon connecting to the daemon socket, the
-        thin client waits for two messages. </para>
+      <para><emphasis role="bold">Phase 1</emphasis></para>
+      <para> Upon connecting to the daemon socket, the thin client waits for two messages. </para>
       <itemizedlist>
         <listitem>
           <para><emphasis role="bold">First message </emphasis></para>
