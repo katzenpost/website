@@ -18,7 +18,7 @@
 <?version "" ?> <!-- Optional [?] -->
 
 
-<!DOCTYPE section [
+<!DOCTYPE chapter[
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -47,8 +47,7 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
-    version="5.1" xml:id="mixspec">
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" xml:id="mixspec">
 
     <info>
         <title xml:id="mixspec.title">Mix network specification</title>
@@ -86,8 +85,8 @@
         </authorgroup>
 
         <abstract>
-            <para> This document describes the high level architecture and detailed protocols and
-                behavior required of mix nodes participating in the Katzenpost Mix Network. </para>
+            <para>This document describes the high level architecture and detailed protocols and
+                behavior required of mix nodes participating in the Katzenpost mix network. </para>
         </abstract>
     </info>
     
@@ -95,34 +94,32 @@
         <title xml:id="terminology.title">Terminology</title>
         <para>The following terms are used in this specification.</para>
         <variablelist>
-        &kib;    
-        &mixnet;    
-        &mix;    
-        &node;    
-        &entry;    
-        &servicemix;    
-        &user;    
-        &client;    
-        &katzenpost;    
-        &classestraffic;    
-        &packet;    
-        &payload;    
-        &message;    
-        &msl;            
+            &classestraffic;
+            &client;
+            &entry;
+            &kib;
+            &message;
+            &mix;
+            &mixnet;
+            &msl;
+            &node;
+            &packet;
+            &payload;            
+            &servicemix;
+            &user;
         </variablelist>
     </section>
     <section>
-        <title>Conventions Used in This Document</title>
+        <title>Conventions used in this document</title>
         <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
                 <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
                 NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
-                <quote>OPTIONAL</quote> in this document are to be interpreted as described in <link
-                linkend="RFC2119">RFC2119</link>
+                <quote>OPTIONAL</quote> in this document are to be interpreted as described in <link linkend="RFC2119">RFC2119</link>
         </para>
     </section>
 
     <section xml:id="mixnet_introduction">
-        <title xml:id="mixnet_introduction.title">1. Introduction</title>
+        <title xml:id="mixnet_introduction.title">Introduction</title>
         <para> This specification provides the design of a mix network meant provide an anonymous
             messaging protocol between clients and public mixnet services. </para>
         <para> Various system components such as client software, end to end messaging protocols,
@@ -130,15 +127,14 @@
             specification documents. </para>
     </section>
     <section xml:id="system-overview">
-        <title xml:id="system-overview.title">2. System Overview</title>
+        <title xml:id="system-overview.title">System overview</title>
         <para> The presented system design is based on <link linkend="LOOPIX">LOOPIX</link> Below,
             we present the system overview. </para>
         <para> The entry mixes are responsible for authenticating clients, accepting packets from
             the client, and forwarding them to the mix network, which then relays packets to the
             destination service mix. Our network design uses a strict topology where forward message
             traverse the network from entry mix to service mix. Service mixes can optionally reply
-            if the forward message contained a Single Use Reply Block (see <link
-                linkend="SPHINXSPEC">SPHINXSPEC</link>. </para>
+            if the forward message contained a Single Use Reply Block (see <link linkend="SPHINXSPEC">SPHINXSPEC</link>. </para>
         <para> The PKI system that handles the distribution of various network wide parameters, and
             information required for each participant to participate in the network such as IP
             address/port combinations that each node can be reached at, and cryptographic public
@@ -149,7 +145,7 @@
             application. It is intended to be a low level protocol which can be composed to form
             more elaborate mixnet protocols with stronger more useful privacy notions. </para>
         <section xml:id="threat-model">
-            <title xml:id="threat-model.title">2.1 Threat Model</title>
+            <title xml:id="threat-model.title">Threat model</title>
             <para> Here we cannot present the threat model to the higher level mixnet protocols.
                 However this low level core mixnet protocol does have it’s own threat model which we
                 attempt to elucidate here. </para>
@@ -176,7 +172,7 @@
                 or delay the packets for more or less time than specified. </para>
         </section>
         <section xml:id="network-topology">
-            <title xml:id="network-topology.title">2.2 Network Topology</title>
+            <title xml:id="network-topology.title">Network topology</title>
             <para> The Katzenpost Mix Network uses a layered topology consisting of a fixed number
                 of layers, each containing a set of mixes. At any given time each Mix MUST only be
                 assigned to one specific layer. Each Mix in a given layer N is connected to every
@@ -222,18 +218,17 @@ Layer 0          Layer 1        Layer 2        Layer 3           Layer 4
         </section>
     </section>
     <section xml:id="packet-format-overview">
-        <title xml:id="packet-format-overview.title">3. Packet Format Overview</title>
+        <title xml:id="packet-format-overview.title">Packet format overview</title>
         <para> For the packet format of the transported messages we use the Sphinx cryptographic
             packet format. The detailed description of the packet format, construction, processing
-            and security / anonymity considerations see <link linkend="SPHINXSPEC"
-            >SPHINXSPEC</link>, <quote>The Sphinx Mix Network Cryptographic Packet Format
+            and security / anonymity considerations see <link linkend="SPHINXSPEC">SPHINXSPEC</link>, <quote>The Sphinx Mix Network Cryptographic Packet Format
                 Specification</quote>. </para>
         <para> As the Sphinx packet format is generic, the Katzenpost Mix Network must provide a
             concrete instantiation of the format, as well as additional Sphinx per-hop routing
             information commands. </para>
         <section xml:id="sphinx-cryptographic-primitives">
-            <title xml:id="sphinx-cryptographic-primitives.title">3.1 Sphinx Cryptographic
-                Primitives</title>
+            <title xml:id="sphinx-cryptographic-primitives.title">Sphinx cryptographic
+                primitives</title>
             <para> For the current version of the Katzenpost Mix Network, let the following
                 cryptographic primitives be used as described in the Sphinx specification. </para>
             <itemizedlist spacing="compact">
@@ -244,8 +239,7 @@ Layer 0          Layer 1        Layer 2        Layer 3           Layer 4
                 </listitem>
                 <listitem>
                     <para>
-                        <literal>MAC(K, M)</literal> - HMAC-SHA256 <link linkend="RFC6234"
-                            >RFC6234</link>, M_KEY_LENGTH of 32 bytes (256 bits), and MAC_LENGTH of
+                        <literal>MAC(K, M)</literal> - HMAC-SHA256 <link linkend="RFC6234">RFC6234</link>, M_KEY_LENGTH of 32 bytes (256 bits), and MAC_LENGTH of
                         32 bytes (256 bits). </para>
                 </listitem>
                 <listitem>
@@ -255,14 +249,12 @@ Layer 0          Layer 1        Layer 2        Layer 3           Layer 4
                 </listitem>
                 <listitem>
                     <para>
-                        <literal>S(K, IV)</literal> - CTR-AES256 <link linkend="SP80038A"
-                            >[SP80038A]</link>, S_KEY_LENGTH of 32 bytes (256 bits), and S_IV_LENGTH
+                        <literal>S(K, IV)</literal> - CTR-AES256 <link linkend="SP80038A">[SP80038A]</link>, S_KEY_LENGTH of 32 bytes (256 bits), and S_IV_LENGTH
                         of 12 bytes (96 bits), using a 32 bit counter. </para>
                 </listitem>
                 <listitem>
                     <para>
-                        <literal>SPRP_Encrypt(K, M)/SPRP_Decrypt(K, M)</literal> - AEZv5 <link
-                            linkend="AEZV5">AEZV5</link>, SPRP_KEY_LENGTH of 48 bytes (384 bits). As
+                        <literal>SPRP_Encrypt(K, M)/SPRP_Decrypt(K, M)</literal> - AEZv5 <link linkend="AEZV5">AEZV5</link>, SPRP_KEY_LENGTH of 48 bytes (384 bits). As
                         there is a disconnect between AEZv5 as specified and the Sphinx usage, let
                         the following be the AEZv5 parameters: </para>
                     <itemizedlist spacing="compact">
@@ -286,7 +278,7 @@ Layer 0          Layer 1        Layer 2        Layer 3           Layer 4
             </itemizedlist>
         </section>
         <section xml:id="sphinx-packet-parameters">
-            <title xml:id="sphinx-packet-parameters.title">3.2 Sphinx Packet Parameters</title>
+            <title xml:id="sphinx-packet-parameters.title">Sphinx packet parameters</title>
             <para> The following parameters are used as for the Katzenpost Mix Network instantiation
                 of the Sphinx Packet Format: </para>
             <itemizedlist spacing="compact">
@@ -360,8 +352,8 @@ uint8_t reserved; /* 0x00 */
                 that can happen for a few minutes out of every epoch. </para>
         </section>
         <section xml:id="sphinx-per-hop-routing-information-extensions">
-            <title xml:id="sphinx-per-hop-routing-information-extensions.title">3.3 Sphinx Per-hop
-                Routing Information Extensions</title>
+            <title xml:id="sphinx-per-hop-routing-information-extensions.title">Sphinx per-hop
+                routing information extensions</title>
             <para> The following extensions are added to the Sphinx Per-Hop Routing Information
                 commands. </para>
             <para> Let the following additional routing commands be defined in the extension
@@ -380,23 +372,22 @@ uint32_t delay_ms;
         </section>
     </section>
     <section xml:id="mix-node-operation">
-        <title xml:id="mix-node-operation.title">4. Mix Node Operation</title>
+        <title xml:id="mix-node-operation.title">Mix node operation</title>
         <para> All Mixes behave in the following manner: </para>
         <itemizedlist spacing="compact">
             <listitem>
                 <para> Accept incoming connections from peers, and open persistent connections to
-                    peers as needed <literal>Section 4.1 &lt;4.1&gt;</literal>. </para>
+                    peers as needed. See  <xref linkend="link-layer-connection-management"/>. </para>
             </listitem>
             <listitem>
                 <para> Periodically interact with the PKI to publish Identity and Sphinx packet
                     public keys, and to obtain information about the peers it should be
                     communicating with, along with periodically rotating the Sphinx packet keys for
-                    forward secrecy <literal>Section 4.2 &lt;4.2&gt;</literal>. </para>
+                    forward secrecy . See <xref linkend="sphinx-mix-and-provider-key-rotation"/>. </para>
             </listitem>
             <listitem>
                 <para> Process inbound Sphinx Packets, delay them for the specified time and forward
-                    them to the appropriate Mix and or Provider <literal>Section 4.3
-                        &lt;4.3&gt;</literal>. </para>
+                    them to the appropriate Mix and or Provider. See <xref linkend="sphinx-packet-processing"/>. </para>
             </listitem>
         </itemizedlist>
         <para> All Nodes are identified by their link protocol signing key, for the purpose of the
@@ -404,11 +395,10 @@ uint32_t delay_ms;
         <para> All Nodes participating in the Mix Network MUST share a common view of time, via NTP
             or similar time synchronization mechanism. </para>
         <section xml:id="link-layer-connection-management">
-            <title xml:id="link-layer-connection-management.title">4.1 Link Layer Connection
-                Management</title>
+            <title xml:id="link-layer-connection-management.title">Link layer connection
+                management</title>
             <para> All communication to and from participants in the Katzenpost Mix Network is done
-                via the Katzenpost Mix Network Wire Protocol <link linkend="KATZMIXWIRE"
-                    >KATZMIXWIRE</link>. </para>
+                via the Katzenpost Mix Network Wire Protocol <link linkend="KATZMIXWIRE">KATZMIXWIRE</link>. </para>
             <para> Nodes are responsible for establishing the connection to the next hop, for
                 example, a mix in layer 0 will accept inbound connections from all Providers listed
                 in the PKI, and will proactively establish connections to each mix in layer 1. </para>
@@ -423,8 +413,8 @@ uint32_t delay_ms;
                 long lived connection per potentially eligible peer at all times. </para>
         </section>
         <section xml:id="sphinx-mix-and-provider-key-rotation">
-            <title xml:id="sphinx-mix-and-provider-key-rotation.title">4.2 Sphinx Mix and Provider
-                Key Rotation</title>
+            <title xml:id="sphinx-mix-and-provider-key-rotation.title">Sphinx mix and provider key
+                rotation</title>
             <para> Each Node MUST rotate the key pair used for Sphinx packet processing periodically
                 for forward secrecy reasons and to keep the list of seen packet tags short. The
                 Katzenpost Mix Network uses a fixed interval (<literal>epoch</literal>), so that key
@@ -436,7 +426,7 @@ uint32_t delay_ms;
             </para>
         </section>
         <section xml:id="sphinx-packet-processing">
-            <title xml:id="sphinx-packet-processing.title">4.3 Sphinx Packet Processing</title>
+            <title xml:id="sphinx-packet-processing.title">Sphinx packet processing</title>
             <para> The detailed processing of the Sphinx packet is described in the Sphinx
                 specification: <quote>The Sphinx Mix Network Cryptographic Packet Format
                     Specification</quote>. Below, we present an overview of the steps which the node
@@ -498,9 +488,9 @@ uint32_t delay_ms;
         </section>
     </section>
     <section xml:id="anonymity-considerations">
-        <title xml:id="anonymity-considerations.title">5. Anonymity Considerations</title>
+        <title xml:id="anonymity-considerations.title">Anonymity considerations</title>
         <section xml:id="topology">
-            <title>5.1 Topology</title>
+            <title>Topology</title>
             <para> Layered topology is used because it offers the best level of anonymity and ease
                 of analysis, while being flexible enough to scale up traffic. Whereas most mixnet
                 papers discuss their security properties in the context of a cascade topology, which
@@ -528,9 +518,8 @@ uint32_t delay_ms;
             </orderedlist>
         </section>
         <section xml:id="mixing-strategy">
-            <title xml:id="mixing-strategy.title">5.2 Mixing strategy</title>
-            <para> As a mixing technique the Poisson mix strategy <link linkend="LOOPIX"
-                    >LOOPIX</link> and <link linkend="KESDOGAN98">KESDOGAN98</link> is used, which
+            <title xml:id="mixing-strategy.title">Mixing strategy</title>
+            <para> As a mixing technique the Poisson mix strategy <link linkend="LOOPIX">LOOPIX</link> and <link linkend="KESDOGAN98">KESDOGAN98</link> is used, which
                 REQUIRES that a packet at each hop in the route is delayed by some amount of time,
                 randomly selected by the sender from an exponential distribution. This strategy
                 allows to prevent the timing correlation of the incoming and outgoing traffic from
@@ -540,7 +529,7 @@ uint32_t delay_ms;
         </section>
     </section>
     <section xml:id="security-considerations">
-        <title xml:id="security-considerations.title">6. Security Considerations</title>
+        <title xml:id="security-considerations.title">Security considerations</title>
         <para> The source of all authority in the mixnet system comes from the Directory Authority
             system which is also known as the mixnet PKI. This system gives the mixes and clients a
             consistent view of the network while allowing human intervention when needed. All public
@@ -562,4 +551,4 @@ uint32_t delay_ms;
         &SP80038A;
         &SPHINXSPEC;
     </section>
-</section>
+</chapter>

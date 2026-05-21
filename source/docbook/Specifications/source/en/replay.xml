@@ -17,7 +17,7 @@
 <?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
-<!DOCTYPE section [
+<!DOCTYPE chapter [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -46,7 +46,7 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="replay">
 
     <info>
@@ -71,26 +71,26 @@
         <para>The following terms are used in this specification.</para>
         <variablelist>
             &epoch;
-            &packet;
-            &header;
-            &payload;
             &group;
             &groupelement;
             &groupgenerator;
+            &header;
+            &packet;            
+            &payload;            
             &seda;            
         </variablelist>
     </section>
     <section>
-        <title>Conventions Used in This Document</title>
-        <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
+        <title>Conventions used in this document</title>
+        <para>The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
                 <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
                 NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
                 <quote>OPTIONAL</quote> in this document are to be interpreted as described in <link
                 linkend="RFC2119">RFC2119</link>. </para>
     </section>
     <section xml:id="sphinx_replay_detection_introduction">
-        <title xml:id="sphinx_replay_detection_introduction.title">1. Introduction</title>
-        <para> The Sphinx cryptographic packet format is a compact and provably secure design
+        <title xml:id="sphinx_replay_detection_introduction.title">Introduction</title>
+        <para>The Sphinx cryptographic packet format is a compact and provably secure design
             introduced by George Danezis and Ian Goldberg <link linkend="SPHINX09">SPHINX09</link>.
             Although it supports replay detection, the exact mechanism of replay detection is
             neither described in <link linkend="SPHINX09">SPHINX09</link> nor is it described in our
@@ -98,20 +98,17 @@
             how to efficiently detect Sphinx packet replay attacks. </para>
     </section>
     <section xml:id="sphinx-cryptographic-primitives">
-        <title>2. Sphinx Cryptographic Primitives</title>
-        <para> This specification borrows the following cryptographic primitives constants from our
+        <title>Sphinx cryptographic primitives</title>
+        <para>This specification borrows the following cryptographic primitives constants from our
                 <link linkend="SPHINXSPEC">SPHINXSPEC</link>: </para>
         <itemizedlist>
             <listitem>
-                <para>
-                    <literal>H(M)</literal> - A cryptographic hash function which takes an byte
+                <para><literal>H(M)</literal> - A cryptographic hash function which takes an byte
                     array M to produce a digest consisting of a <literal>HASH_LENGTH</literal> byte
-                    array. <literal>H(M)</literal> MUST be pre-image and collision resistant.
-                </para>
+                    array. <literal>H(M)</literal> MUST be pre-image and collision resistant. </para>
             </listitem>
             <listitem>
-                <para>
-                    <literal>EXP(X, Y)</literal> - An exponentiation function which takes the
+                <para><literal>EXP(X, Y)</literal> - An exponentiation function which takes the
                         <literal>GROUP_ELEMENT_LENGTH</literal> byte array group elements
                         <literal>X</literal> and <literal>Y</literal>, and returns <literal>X ^^
                         Y</literal> as a <literal>GROUP_ELEMENT_LENGTH</literal> byte array. </para>
@@ -123,7 +120,7 @@
         <para> The group defined by <literal>G</literal> and <literal>EXP(X, Y)</literal> MUST
             satisfy the Decision Diffie-Hellman problem. </para>
         <section xml:id="sphinx-parameter-constants">
-            <title>2.1 Sphinx Parameter Constants</title>
+            <title>Sphinx parameter constants</title>
             <itemizedlist spacing="compact">
                 <listitem>
                     <para>
@@ -141,27 +138,29 @@
         </section>
     </section>
     <section xml:id="system-overview">
-        <title>3. System Overview</title>
-        <para> Mixes as currently deployed, have two modes of operation: </para>
+        <title>System overview</title>
+        <para>Mixes as currently deployed, have two modes of operation: </para>
         <orderedlist numeration="arabic" spacing="compact">
             <listitem>
-                <para> Sphinx routing keys and replay caches are persisted to disk </para>
+                <para>Sphinx routing keys and replay caches are persisted to disk </para>
             </listitem>
             <listitem>
-                <para> Sphinx routing keys and replay caches are persisted to memory </para>
+                <para>Sphinx routing keys and replay caches are persisted to memory </para>
             </listitem>
         </orderedlist>
-        <para> These two modes of operation fundamentally represent a tradeoff between mix server
+        <para>These two modes of operation fundamentally represent a tradeoff between mix server
             availability and notional compulsion attack resistance. Ultimately it will be the mix
-            operator’s decision to make since they affect the security and availability of their mix
-            servers. In particular since mix networks are vulnerable to the various types of
-            compulsion attacks (see <link linkend="SPHINXSPEC">SPHINXSPEC</link> section 9.4
-            Compulsion Threat Considerations) and therefore there is some advantage to NOT
-            persisting the Sphinx routing keys to disk. The mix operator can simply poweroff the mix
+            operator’s decision to make since these considerations affect the security and
+            availability of their mix servers. In particular since mix networks are vulnerable to
+            the various types of compulsion attacks (see <link
+                xlink:href="https://katzenpost.network/docs/specs/sphinx_format/#compulsion-threat-considerations"
+                >Compulsion Threat Considerations</link> in the <emphasis>Sphinx cryptographic
+                packet format specification</emphasis>) there is some advantage to NOT persisting
+            the Sphinx routing keys to disk. The mix sever operator can simply power-off the mix
             server before seizure rather than physically destroying the disk in order to prevent
             capture of the Sphinx routing keys. An argument can be made for the use of full disk
             encryption, however this may not be practical for servers hosted in remote locations. </para>
-        <para> On the other hand, persisting Sphinx routing keys and replay caches to disk is useful
+        <para>On the other hand, persisting Sphinx routing keys and replay caches to disk is useful
             because it allows mix operators to shutdown their mix server for maintenance purposes
             without loosing these Sphinx routing keys and replay caches. This means that as soon as
             the maintenance operation is completed the mix server is able to rejoin the network. Our
@@ -169,7 +168,7 @@
             mechanism to notify Directory Authorities of such an outage or maintenance period.
             Therefore if there is loss of Sphinx routing keys this results in a mix outage until the
             next epoch. </para>
-        <para> The two modes of operation both completely prevent replay attacks after a system
+        <para>The two modes of operation both completely prevent replay attacks after a system
             restart. In the case of the disk persistence, replay attacks are prevented because all
             packets traversing the mix have their replay tags persisted to disk cache. This cache is
             therefore once again used to prevent replays after a system restart. In the case of
@@ -181,38 +180,36 @@
             straddle the epoch boundaries. </para>
     </section>
     <section xml:id="sphinx-packet-replay-cache">
-        <title>4. Sphinx Packet Replay Cache</title>
+        <title>Sphinx packet replay cache</title>
         <section xml:id="sphinx-replay-tag-composition">
-            <title>4.1 Sphinx Replay Tag Composition</title>
-            <para> The following excerpt from our <link linkend="SPHINXSPEC">SPHINXSPEC</link> shows
+            <title>Sphinx replay tag composition</title>
+            <para>The following excerpt from our <link linkend="SPHINXSPEC">SPHINXSPEC</link> shows
                 how the replay tag is calculated. </para>
-            <programlisting>
-hdr = sphinx_packet.header
+            <programlisting>hdr = sphinx_packet.header
 shared_secret = EXP( hdr.group_element, private_routing_key )
-replay_tag = H( shared_secret )
-</programlisting>
-            <para> However this tag is not utilized in replay detection until the rest of the Sphinx
+replay_tag = H( shared_secret )</programlisting>
+            <para>However this tag is not utilized in replay detection until the rest of the Sphinx
                 packet is fully processed and it’s header MAC verified as described in <link
                     linkend="SPHINXSPEC">SPHINXSPEC</link>. </para>
         </section>
     </section>
     <section xml:id="sphinx-replay-tag-caching">
-        <title>4.2 Sphinx Replay Tag Caching</title>
-        <para> It would be sufficient to use a key value store or hashmap to detect the presence of
-            a duplicate replay tag however we additionally employ a bloom filter to increase
+        <title>Sphinx replay tag caching</title>
+        <para>It would be sufficient to use a key value store or hashmap to detect the presence of a
+            duplicate replay tag however we additionally employ a bloom filter to increase
             performance. Sphinx keys must periodically be rotated and destroyed to mitigate
             compulsion attacks and therefore our replay caches must likewise be rotated. This kind
             of key erasure scheme limits the window of time that an adversary can perform a
             compulsion attack. See our PKI specification <link linkend="KATZMIXPKI"
                 >KATZMIXPKI</link> for more details regarding epoch key rotation and the grace
             period before and after the epoch boundary. </para>
-        <para> We tune our bloom filter for line-speed; that is to say the bloom filter for a given
+        <para>We tune our bloom filter for line-speed; that is to say the bloom filter for a given
             replay cache is tuned for the maximum number of Sphinx packets that can be sent on the
             wire during the epoch duration of the Sphinx routing key. This of course has to take
             into account the size of the Sphinx packets as well as the maximum line speed of the
             network interface. This is a conservative tuning heuristic given that there must be more
             than this maximum number of Sphinx packets in order for there to be duplicate packets. </para>
-        <para> Our bloomfilter with hashmap replay detection cache looks like this: </para>
+        <para>Our bloomfilter with hashmap replay detection cache looks like this: </para>
         <figure>
             <title>replay cache</title>
             <mediaobject>
@@ -224,16 +221,16 @@ replay_tag = H( shared_secret )
                 </textobject>
             </mediaobject>
         </figure>
-        <para> Note that this diagram does NOT express the full complexity of the replay caching
+        <para>Note that this diagram does NOT express the full complexity of the replay caching
             system. In particular it does not describe how entries are entered into the bloom filter
             and hashmap. Upon either bloom filter mismatch or hashmap mismatch both data structures
             must be locked and the replay tag inserted into each. </para>
-        <para> For the disk persistence mode of operation the hashmap can simply be replaced with an
+        <para>For the disk persistence mode of operation the hashmap can simply be replaced with an
             efficient key value store. Persistent stores may use a write back cache and other
             techniques for efficiency. </para>
         <section xml:id="epoch-boundaries">
-            <title>4.3 Epoch Boundaries</title>
-            <para> Since mixes publish future epoch keys (see <link linkend="KATZMIXPKI"
+            <title xml:id="epoch-boundaries.title">Epoch boundaries</title>
+            <para>Since mixes publish future epoch keys (see <link linkend="KATZMIXPKI"
                     >KATZMIXPKI</link>) so that Sphinx packets flowing through the network can
                 seamlessly straddle the epoch boundaries, our replay detection forms a special kind
                 of double bloom filter system. During the epoch grace period mixes perform trial
@@ -245,53 +242,53 @@ replay_tag = H( shared_secret )
                 and one bloom filter. </para>
         </section>
         <section xml:id="cost-of-checking-replays">
-            <title>4.4 Cost Of Checking Replays</title>
-            <para> The cost of checking a replay tag from a single replay cache is the sum of the
+            <title>Cost of checking replays</title>
+            <para>The cost of checking a replay tag from a single replay cache is the sum of the
                 following operations: </para>
             <orderedlist numeration="arabic" spacing="compact">
                 <listitem>
-                    <para> Sphinx packet unwrap operation </para>
+                    <para>Sphinx packet unwrap operation </para>
                 </listitem>
                 <listitem>
-                    <para> A bloom filter lookup </para>
+                    <para>A bloom filter lookup </para>
                 </listitem>
                 <listitem>
-                    <para> A hashmap or cache lookup </para>
+                    <para>A hashmap or cache lookup </para>
                 </listitem>
             </orderedlist>
-            <para> Therefore these operations are roughly O(1) in complexity. However Sphinx packets
+            <para>Therefore these operations are roughly O(1) in complexity. However Sphinx packets
                 processed near epoch boundaries will not be constant time due to trial decryption
-                with two Sphinx routing keys as mentioned above in section <quote>3.3 Epoch
-                    Boundaries</quote>. </para>
+                with two Sphinx routing keys as mentioned above in <xref linkend="epoch-boundaries"
+                />.</para>
         </section>
     </section>
     <section xml:id="concurrent-processing-of-sphinx-packet-replay-tags">
-        <title>5. Concurrent Processing of Sphinx Packet Replay Tags</title>
-        <para> The best way to implement a software based router is with a <link linkend="SEDA"
+        <title>Concurrent processing of Sphinx packet replay tags</title>
+        <para>The best way to implement a software based router is with a <link linkend="SEDA"
                 >SEDA</link> computational pipeline. We therefore need a mechanism to allow multiple
             threads to reference our rotating Sphinx keys and associated replay caches. Here we
             shall describe a shadow memory system which the mix server uses such that the individual
             worker threads shall always have a reference to the current set of candidate mix keys
             and associates replay caches. </para>
         <section xml:id="pki-updates">
-            <title>5.1 PKI Updates</title>
-            <para> The mix server periodically updates it’s knowledge of the network by downloading
-                a new consensus document as described in <link linkend="KATZMIXPKI"
-                    >KATZMIXPKI</link>. The individual threads in the <quote>cryptoworker</quote>
-                thread pool which process Sphinx packets make use of a <literal>MixKey</literal>
-                data structure which consists of: </para>
+            <title>PKI updates</title>
+            <para>The mix server periodically updates it’s knowledge of the network by downloading a
+                new consensus document as described in <link linkend="KATZMIXPKI">KATZMIXPKI</link>.
+                The individual threads in the <quote>cryptoworker</quote> thread pool which process
+                Sphinx packets make use of a <literal>MixKey</literal> data structure which consists
+                of: </para>
             <orderedlist numeration="arabic" spacing="compact">
                 <listitem>
-                    <para> Sphinx routing key material (public and private X25519 keys) </para>
+                    <para>Sphinx routing key material (public and private X25519 keys) </para>
                 </listitem>
                 <listitem>
-                    <para> Replay Cache </para>
+                    <para>Replay Cache </para>
                 </listitem>
                 <listitem>
-                    <para> Reference Counter </para>
+                    <para>Reference Counter </para>
                 </listitem>
             </orderedlist>
-            <para> Each of these <quote>cryptoworker</quote> thread pool has it’s own hashmap
+            <para>Each of these <quote>cryptoworker</quote> thread pool has it’s own hashmap
                 associating epochs to a reference to the <literal>MixKey</literal>. The mix server
                 PKI threat maintains a single hashmap which associates the epochs with the
                 corresponding <literal>MixKey</literal>. We shall refer to this hashmap as
@@ -301,17 +298,17 @@ replay_tag = H( shared_secret )
                 performs two tasks: </para>
             <orderedlist numeration="arabic" spacing="compact">
                 <listitem>
-                    <para> Removes entries from each <quote>cryptoworker</quote> thread's hashmap
+                    <para>Removes entries from each <quote>cryptoworker</quote> thread's hashmap
                         that are no longer present in <literal>MixKeys</literal> and decrements the
                             <literal>MixKey</literal> reference counter. </para>
                 </listitem>
                 <listitem>
-                    <para> Adds entries present in <literal>MixKeys</literal> but are not present in
+                    <para>Adds entries present in <literal>MixKeys</literal> but are not present in
                         the thread’s hashmap and increments the <literal>MixKey</literal> reference
                         counter. </para>
                 </listitem>
             </orderedlist>
-            <para> Once a given <literal>MixKey</literal> reference counter is decremented to zero,
+            <para>Once a given <literal>MixKey</literal> reference counter is decremented to zero,
                 the <literal>MixKey</literal> and it’s associated on disk data is purged. Note that
                 we do not discuss synchronization primitives, however it should be obvious that
                 updating the replay cache should likely make use of a mutex or similar primitive to
@@ -320,34 +317,6 @@ replay_tag = H( shared_secret )
     </section>
     <section xml:id="appendix-a.-references">
         <title>References</title>
-        <!--    <section xml:id="appendix-a.1-normative-references">
-<title>Appendix A.1 Normative References</title>
-<para>
-</para>
-</section>
-<section xml:id="appendix-a.2-informative-references">
-<title>Appendix A.2 Informative References</title>
-<para>
-</para>
-</section>
-</section>
-<section xml:id="appendix-b.-citing-this-document">
-<title>Appendix B. Citing This Document</title>
-<section xml:id="appendix-b.1-bibtex-entry">
-<title>Appendix B.1 Bibtex Entry</title>
-<para>
-Note that the following bibtex entry is in the IEEEtran bibtex
-style as described in a document called <quote>How to Use the
-IEEEtran BIBTEX Style</quote>.
-</para>
-<programlisting>
-@online{SphinxReplay,
-title = {Sphinx Packet Replay Detection Specification},
-author = {David Stainton},
-url = {https://github.com/katzenpost/katzenpost/blob/main/docs/specs/sphinx_replay_detection.rst},
-year = {2019}
-}
-</programlisting>-->
         &COMPULS05;
         &KATZMIXNET;
         &KATZMIXPKI;
@@ -358,4 +327,4 @@ year = {2019}
         &SPHINX09;
         &SPHINXSPEC;
     </section>
-</section>
+</chapter>

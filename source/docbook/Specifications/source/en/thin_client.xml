@@ -17,7 +17,7 @@
 <?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
-<!DOCTYPE section [
+<!DOCTYPE chapter [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -46,15 +46,25 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
   version="5.1" xml:id="thin_client">
   <info>
-    <title xml:id="thin_client.title">Katzenpost thin client</title>
-    <!-- Match to title PI above. -->
-  </info>
-  <para>This document describes the design of the new Katzenpost mixnet <emphasis>thin
+    <title xml:id="thin_client.title">Thin client specification</title>
+    
+    <authorgroup>
+    <author>
+      <personname>
+        <firstname>David</firstname>
+        <surname>Stainton</surname>
+      </personname>
+    </author>
+  </authorgroup> 
+    <abstract>
+      <para>This document describes the design of the new Katzenpost mixnet <emphasis>thin
       client</emphasis>. In particular we discuss its multiplexing and privilege-separation design
-      elements as well as the protocol used by the thin-client library. </para>
+      elements as well as the protocol used by the thin-client library.</para>
+    </abstract>   
+  </info>
   <section xml:id="thin_client_intro" xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
     <info>
       <title xml:id="thin_client_intro.title">Introduction</title>
@@ -152,4 +162,4 @@
       </itemizedlist>
     </section>
   </section>
-</section>
+</chapter>

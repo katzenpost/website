@@ -18,7 +18,7 @@
 <?version "" ?> <!-- Optional [?] -->
 
 
-<!DOCTYPE section [
+<!DOCTYPE chapter [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -47,7 +47,7 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="decoy">
     <info>
         <title xml:id="decoy.title">Propagation of mix decoy loop statistics</title>
@@ -72,54 +72,25 @@
             </author>
         </authorgroup>
         <abstract>
-            <para> In the context of continuous time mixing strategies such as the memoryless mix
+            <para>In the context of continuous time mixing strategies such as the memoryless mix
                 used by Katzenpost, n-1 attacks may use strategic packetloss. Nodes can also fail
                 for benign reasons. Determining whether or not it’s an n-1 attack is outside the
-                scope of this work. </para>
-            <para>This document describes how we will communicate statistics from mix nodes to mix
-                network directory authorities which tells them about the packetloss they are
-                observing.</para>
+                scope of this work. This document describes how we will communicate statistics from
+                mix nodes to mix network directory authorities which tells them about the packet
+                loss they are observing.</para>
         </abstract>
     </info>
     <section xml:id="terminology">
         <title xml:id="terminology.title">Terminology</title>
         <para>The following terms are used in this specification.</para>
         <variablelist>
-            <varlistentry>
-                <term>Wire protocol</term>
-                <listitem>
-                    <para>Refers to our PQ Noise based protocol which currently uses TCP but in the
-                        near future will optionally use QUIC. This protocol has messages known as
-                        wire protocol <literal>commands</literal>, which are used for various mixnet
-                        functions such as sending or retrieving a message, dirauth voting etc. For
-                        more information, please see our design doc: <link
-                            xlink:href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/wire-protocol.md"
-                            >wire protocol specification</link>
-                    </para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>Providers</term>
-                <listitem>
-                    <para>Refers to a set of node on the edge of the network which have two roles,
-                        handle incoming client connections and run mixnet services. Soon we should
-                        get rid of <literal>Providers</literal> and replace it with two different
-                        sets, <literal>gateway nodes</literal> and <literal>service
-                        nodes</literal>.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>Epoch</term>
-                <listitem>
-                    <para>The Katzenpost epoch is currently set to a 20 minute duration. Each new
-                        epoch there is a new PKI document published containing public key material
-                        that will only be valid for that epoch.</para>
-                </listitem>
-            </varlistentry>
+            &epoch;
+            &providers;
+            &wireprotocol;
         </variablelist>
     </section>
     <section xml:id="design-overview">
-        <title>1. Design Overview</title>
+        <title>Design overview</title>
         <para>Nodes (mixes, gateways, and providers) need to upload packet-loss statistics to the
             directory authorities, so that authorities can label malfunctioning nodes as such in the
             consensus in the next epoch. </para>
@@ -139,7 +110,7 @@
             count-of-loops-received.</para>
     </section>
     <section xml:id="tracking-packet-loss-and-detecting-faulty-mixes">
-        <title>2. Tracking packet loss and detecting faulty mixes</title>
+        <title>Tracking packet loss and detecting faulty mixes</title>
         <para>Katzenpost lets different elements in the network track whether other elements are
             functioning correctly. A node A will do this by sending packets in randomly generated
             loops through the network, and tracking whether the loop comes back or not. When it
@@ -213,7 +184,7 @@ Ratios          map[[64]byte]float64
             consensus decision about the topology of the network. </para>
     </section>
     <section xml:id="uploading-stats-to-dirauths">
-            <title xml:id="uploading-stats-to-dirauths.title">3. Uploading Stats to Dirauths</title>
+            <title xml:id="uploading-stats-to-dirauths.title">Uploading stats to dirauths</title>
             <para> Stats reports are uploaded along with the mix descriptor every Epoch. A
                 cryptographic signature covers both of these fields: </para>
             <programlisting>type UploadDescStats struct {
@@ -231,4 +202,4 @@ Signature []byte
 | ----------- UD_N+1 ---------------------- | ------------ UD N+2 ----------------------- | ----------- UD N+3 ------------------------ |             | ------------------ XXX ---------------- |  </programlisting>
         </section><?oxy_comment_end?>
 
-</section>
+</chapter>

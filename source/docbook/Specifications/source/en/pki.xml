@@ -17,7 +17,7 @@
 <?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
-<!DOCTYPE section [
+<!DOCTYPE chapter [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -46,11 +46,11 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="pki">
 
     <info>
-        <title xml:id="pki.title">Public key infrastructure</title>
+        <title xml:id="pki.title">Public key infrastructure specification</title>
         <authorgroup>
             <author>
                 <personname>
@@ -84,7 +84,7 @@
             </author>
         </authorgroup>
         <abstract>
-            <para/>
+            <para>to do</para>
         </abstract>
     </info>
     
@@ -92,13 +92,13 @@
         <title xml:id="terminology.title">Terminology</title>
         <para>The following terms are used in this specification.</para>
         <variablelist>
-        &pki;    
-        &dirauthsystem;    
-        &msl;    
-        &mixdescriptor;    
-        &family;    
-        &nickname;    
-        &layer;    
+        &dirauthsystem;  
+        &family;
+        &layer;
+        &mixdescriptor;
+        &msl; 
+        &nickname;
+        &pki;                
         &provider;  
         </variablelist>
     </section>
@@ -117,7 +117,7 @@
     </section>
 
     <section xml:id="pki_introduction">
-        <title xml:id="pki_introduction.title">1. Introduction</title>
+        <title xml:id="pki_introduction.title">Introduction</title>
         <para> Mixnets are designed with the assumption that a Public Key Infrastructure (PKI)
             exists and it gives each client the same view of the network. This specification is
             inspired by the Tor and Mixminion Directory Authority systems <link
@@ -143,7 +143,7 @@
             document that have an impact on security and performance. </para>
 
         <section xml:id="security-properties-overview">
-            <title>1.2 Security properties overview</title>
+            <title>Security properties overview</title>
             <para> This Directory Authority system has the following feature goals and security
                 properties: </para>
             <itemizedlist spacing="compact">
@@ -181,7 +181,7 @@
             </itemizedlist>
         </section>
         <section xml:id="differences-from-tor-and-mixminion-directory-authority-systems">
-            <title>1.3 Differences from Tor and Mixminion directory authority systems</title>
+            <title>Differences from Tor and Mixminion directory authority systems</title>
             <para> In this document we specify a Directory Authority system which is different from
                 that of Tor's and Mixminion’s in a number of ways: </para>
             <itemizedlist spacing="compact">
@@ -217,7 +217,7 @@
         </section>
     </section>
     <section xml:id="overview-of-mix-pki-interaction">
-        <title>2. Overview of mix PKI interaction</title>
+        <title>Overview of mix PKI interaction</title>
         <para> Each Mix MUST rotate the key pair used for Sphinx packet processing periodically for
             forward secrecy reasons and to keep the list of seen packet tags short. <link
                 linkend="SPHINX09">SPHINX09</link>
@@ -241,7 +241,7 @@
             rotation epoch, however this shouldn’t present any usability problems since SURBs are
             only used for sending ACK messages from the destination Provider to the sender. </para>
         <section xml:id="pki-protocol-schedule">
-            <title>2.1 PKI protocol schedule</title>
+            <title>PKI protocol schedule</title>
             <para> There are two main constraints to Authority schedule: </para>
             <orderedlist numeration="arabic">
                 <listitem>
@@ -262,7 +262,7 @@
             </para>
         </section>
         <section xml:id="directory-authority-server-schedule">
-            <title>2.1.1 Directory authority server schedule</title>
+            <title>Directory authority server schedule</title>
             <para> Directory Authority server interactions are conducted according to the following
                 schedule, where <literal>T</literal> is the beginning of the current epoch, and
                     <literal>P</literal> is the length of the epoch period. </para>
@@ -290,7 +290,7 @@
             </itemizedlist>
         </section>
         <section xml:id="mix-schedule">
-            <title>2.1.2 Mix schedule</title>
+            <title>Mix schedule</title>
             <para> Mix PKI interactions are conducted according to the following schedule, where T
                 is the beginning of the current epoch. </para>
             <para>
@@ -317,7 +317,7 @@
         </section>
     </section>
     <section xml:id="voting-for-consensus-protocol">
-        <title>3. Voting for consensus protocol</title>
+        <title>Voting for consensus protocol</title>
         <para> In our Directory Authority protocol, all the actors conduct their behavior according
             to a common schedule as outlined in section &quot;2.1 PKI Protocol Schedule&quot;. The
             Directory Authority servers exchange messages to reach consensus about the network.
@@ -325,7 +325,7 @@
             each key rotation epoch, voting, shared random number generation, signature exchange and
             publishing of the network consensus documents. </para>
         <section xml:id="protocol-messages">
-            <title>3.1 Protocol messages</title>
+            <title>Protocol messages</title>
             <para> There are only two document types in this protocol: </para>
             <itemizedlist spacing="compact">
                 <listitem>
@@ -341,14 +341,14 @@
             <para> Mix descriptor and directory documents MUST be properly signed. </para>
         </section>
         <section xml:id="mix-descriptor-and-directory-signing">
-            <title>3.1.1 Mix descriptor and directory signing</title>
+            <title>Mix descriptor and directory signing</title>
             <para> Mixes MUST compose mix descriptors which are signed using their private identity
                 key, an ed25519 key. Directories are signed by one or more Directory Authority
                 servers using their authority key, also an ed25519 key. In all cases, signing is
                 done using JWS <link linkend="RFC7515">RFC7515</link>. </para>
         </section>
         <section xml:id="vote-exchange">
-            <title>3.2 Vote exchange</title>
+            <title>Vote exchange</title>
             <para> As described in section <quote>2.1 PKI Protocol Schedule</quote>, the Directory
                 Authority servers begin the voting process 1/8 of an epoch period after the start of
                 a new epoch. Each Authority exchanges vote directory messages with each other. </para>
@@ -408,7 +408,7 @@ This round of voting was missed. \*/
                 voter to report that their vote was not accepted. </para>
         </section>
         <section xml:id="reveal-exchange">
-            <title>3.3 Reveal exchange</title>
+            <title>Reveal exchange</title>
             <para> As described in section <quote>2.1 PKI Protocol Schedule</quote>, the Directory
                 Authority servers exchange the reveal values after they have exchanged votes which
                 contain a commit value. Each Authority exchanges reveal messages with each other. </para>
@@ -465,7 +465,7 @@ missed. */
                 received for this round. </para>
         </section>
         <section xml:id="cert-exchange">
-            <title>3.4 Cert exchange</title>
+            <title>Cert exchange</title>
             <para> The Cert command is the same as a Vote but contains the set of Reveal values as
                 seen by the voting peer. In order to ensure that a misconfigured or malicious
                 Authority operator cannot amplify their ability to influence the threshold voting
@@ -477,7 +477,7 @@ missed. */
                 of service by a single Authority was observed. </para>
         </section>
         <section xml:id="vote-tabulation-for-consensus-computation">
-            <title>3.5 Vote tabulation for consensus computation</title>
+            <title>Vote tabulation for consensus computation</title>
             <para> The main design constraint of the vote tabulation algorithm is that it MUST be a
                 deterministic process that produces the same result for each directory authority
                 server. This result is known as a network consensus file. </para>
@@ -569,7 +569,7 @@ missed. */
             </orderedlist>
         </section>
         <section xml:id="signature-collection">
-            <title>3.6 Signature collection</title>
+            <title>Signature collection</title>
             <para> Each Authority signs their view of consensus, and exchanges detached Signatures
                 with each other. Upon receiving each Signature it is added to the signatures on the
                 Consensus if it validates the Consensus. The Authority SHOULD warn the administrator
@@ -581,23 +581,23 @@ missed. */
                 peers. </para>
         </section>
         <section xml:id="publication">
-            <title>3.7 Publication</title>
+            <title>Publication</title>
             <para> If the consensus is signed by a majority of members of the voting group then it's
                 a valid consensus and it is published. </para>
         </section>
     </section>
     <section xml:id="pki-protocol-data-structures">
-        <title>4. PKI Protocol data structures</title>
+        <title>PKI protocol data structures</title>
         <section xml:id="mix-descriptor-format">
-            <title>4.1 Mix descriptor format</title>
+            <title>Mix descriptor format</title>
             <para> Note that there is no signature field. This is because mix descriptors are
                 serialized and signed using JWS. The <literal>IdentityKey</literal> field is a
                 public ed25519 key. The <literal>MixKeys</literal> field is a map from epoch to
                 public X25519 keys which is what the Sphinx packet format uses. </para>
-            <note>
+ <!--           <note>
                 <title>Note</title>
                 <para> XXX David: replace the following example with a JWS example: </para>
-            </note>
+            </note>-->
             <programlisting>{
 &quot;Version&quot;: 0,
 &quot;Name&quot;: &quot;&quot;,
@@ -616,7 +616,7 @@ missed. */
 }</programlisting>
         </section>
         <section xml:id="scheduling-mix-downtime">
-            <title>4.1.1 Scheduling mix downtime</title>
+            <title>Scheduling mix downtime</title>
 
             <para> Mix operators can publish a half empty mix descriptor for future epochs to
                 schedule downtime. The mix descriptor fields that MUST be populated are: </para>
@@ -647,10 +647,10 @@ missed. */
                 downtime for one or more epochs by not have those epochs as keys in the map. </para>
         </section>
         <section xml:id="directory-format">
-            <title>4.2 Directory format</title>
-            <para>
+            <title>Directory format</title>
+<!--            <para>
                 <emphasis>Note: replace the following example with a JWS example</emphasis>
-            </para>
+            </para>-->
             <programlisting>{
 &quot;Signatures&quot;: [],
 &quot;Version&quot;: 0,
@@ -662,7 +662,7 @@ missed. */
 }</programlisting>
         </section>
         <section xml:id="shared-random-value-structure">
-            <title>4.3 Shared random value structure</title>
+            <title>Shared random value structure</title>
             <para> Katzenpost’s Shared Random Value computation is inspired by Tor’s Shared Random
                 Subsystem <link linkend="TORSRV">TORSRV</link>. </para>
             <para> Each voting round a commit value is included in the votes sent to other
@@ -693,13 +693,13 @@ H(&quot;shared-random&quot; | Uint64(epoch) | REVEALS | PREVIOUS_SRV)</programli
         </section>
     </section>
         <section xml:id="pki-wire-protocol">
-            <title>5. PKI wire protocol</title>
+            <title>PKI wire protocol</title>
             <para> The Katzenpost Wire Protocol as described in <link linkend="KATZMIXWIRE"
                     >KATZMIXWIRE</link> is used by both clients and by Directory Authority peers. In
                 the following section we describe additional wire protocol commands for publishing
                 mix descriptors, voting and consensus retrieval. </para>
             <section xml:id="mix-descriptor-publication">
-                <title>5.1 Mix descriptor publication</title>
+                <title>Mix descriptor publication</title>
                 <para> The following commands are used for publishing mix descriptors and setting
                     mix descriptor status: </para>
                 <programlisting>enum {
@@ -718,12 +718,12 @@ uint8 error_code;
 } PostDescriptorStatus;</programlisting>
             </section>
             <section xml:id="the-post_descriptor-command">
-                <title>5.1.1 The post_descriptor command</title>
+                <title>The post_descriptor command</title>
                 <para> The post_descriptor command allows mixes to publish their descriptors.
                 </para>
             </section>
         <section xml:id="the-post_descriptor_status-command">
-            <title>5.1.2 The post_descriptor_status command</title>
+            <title>The post_descriptor_status command</title>
             <para> The post_descriptor_status command is sent in response to a post_descriptor
                 command, and uses the following error codes: </para>
             <programlisting>enum {
@@ -736,7 +736,7 @@ descriptor_forbidden(3),
         </section>
 
         <section xml:id="voting">
-            <title>6. Voting</title>
+            <title>Voting</title>
             <para> The following commands are used by Authorities to exchange votes: </para>
             <programlisting>enum {
 vote(22),
@@ -754,7 +754,7 @@ struct {
 uint8 error_code;
 } VoteStatusCommand;</programlisting>
             <section xml:id="the-vote-command">
-                <title>6.1. The vote command</title>
+                <title>The vote command</title>
                 <para> The <literal>vote</literal> command is used to send a PKI document to a peer
                     Authority during the voting period of the PKI schedule. </para>
                 <para> The payload field contains the signed and serialized PKI document
@@ -765,7 +765,7 @@ uint8 error_code;
                     the payload. </para>
             </section>
             <section xml:id="the-vote_status-command">
-                <title>6.2. The vote_status command</title>
+                <title>The vote_status command</title>
                 <para> The <literal>vote_status</literal> command is used to reply to a vote
                     command. The error_code field indicates if there was a failure in the receiving
                     of the PKI document. </para>
@@ -784,7 +784,7 @@ vote_not_found(7),        /* The vote was not found */
                     the voter to report that their vote was not accepted. </para>
             </section>
             <section xml:id="the-get_vote-command">
-                <title>6.3. The get_vote command</title>
+                <title>The get_vote command</title>
                 <para> The <literal>get_vote</literal> command is used to request a PKI document
                     (vote) from a peer Authority. The epoch field contains the epoch from which to
                     request the vote, and the public_key field contains the public identity key of
@@ -799,7 +799,7 @@ vote_not_found(7),        /* The vote was not found */
     
     
             <section xml:id="retrieval-of-consensus">
-                <title>7. Retrieval of consensus</title>
+                <title>Retrieval of consensus</title>
                 <para> Providers in the Katzenpost mix network system <link linkend="KATZMIXNET"
                         >KATZMIXNET</link> may cache validated network consensus files and serve
                     them to clients over the mix network's link layer wire protocol <link
@@ -822,7 +822,7 @@ opaque payload[];
 } ConsensusCommand;</programlisting>
 
             <section xml:id="the-get_consensus-command">
-                <title>7.1 The get_consensus command</title>
+                <title>The get_consensus command</title>
                 <para> The get_consensus command is a command that is used to retrieve a recent
                     consensus document. If a given get_consensus command contains an Epoch value
                     that is either too big or too small then a reply consensus command is sent with
@@ -832,7 +832,7 @@ opaque payload[];
                     get_consensus command. </para>
             </section>
             <section xml:id="the-consensus-command">
-                <title>7.2 The consensus command</title>
+                <title>The consensus command</title>
                 <para> The consensus command is a command that is used to send a recent consensus
                     document. The error_code field indicates if there was a failure in retrieval of
                     the PKI consensus document. </para>
@@ -844,7 +844,7 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
 } ErrorCodes;</programlisting>
             </section>
             <section xml:id="the-cert-command">
-                <title>7.3. The Cert command</title>
+                <title>The Cert command</title>
                 <para> The <literal>cert</literal> command is used to send a PKI document to a peer
                     Authority during the voting period of the PKI schedule. It is the same as the
                         <literal>vote</literal> command, but must contain the set of
@@ -852,7 +852,7 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
                     the voting process. </para>
             </section>
             <section xml:id="the-certstatus-command">
-                <title>7.4. The CertStatus command</title>
+                <title>The CertStatus command</title>
                 <para> The <literal>cert_status</literal> command is the response to a
                         <literal>cert</literal> command, and is the same as a
                         <literal>vote_status</literal> response, other than the command identifier.
@@ -867,12 +867,12 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
                 <para> Signatures exchange is the final round of the consensus protocol and consists
                     of the Sig and SigStatus commands. </para>
         <section xml:id="the-sig-command">
-            <title>8.1. The sig command</title>
+            <title>The sig command</title>
             <para> The <literal>sig</literal> command contains a detached Signature from PublicKey
                 of Consensus for Epoch. </para>
         </section>
         <section xml:id="the-sigstatus-command">
-            <title>8.2. The sig_status command</title>
+            <title>The sig_status command</title>
             <para> The <literal>sig_status</literal> command is the response to a
                     <literal>sig</literal> command. Responses are SigOK, SigNotAuthorized,
                 SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid. </para>
@@ -880,13 +880,13 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
             </section>
         
         <section xml:id="scalability-considerations">
-            <title>9. Scalability considerations</title>
+            <title>Scalability considerations</title>
             <para>
                 <emphasis>TODO: notes on scaling, bandwidth usage etc.</emphasis>
             </para>
         </section>
         <section xml:id="future-work">
-            <title>10. Future work</title>
+            <title>Future work</title>
             <itemizedlist spacing="compact">
                 <listitem>
                     <para> byzantine fault tolerance </para>
@@ -918,7 +918,7 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
         </section>
 
     <section xml:id="anonymity-considerations">
-        <title>11. Anonymity considerations</title>
+        <title>Anonymity considerations</title>
         <itemizedlist spacing="compact">
             <listitem>
                 <para> This system is intentionally designed to provide identical network consensus
@@ -943,7 +943,7 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
         </itemizedlist>
     </section>
     <section xml:id="security-considerations">
-        <title>12. Security considerations</title>
+        <title>Security considerations</title>
         <itemizedlist spacing="compact">
             <listitem>
                 <para> The Directory Authority / PKI system for a given mix network is essentially
@@ -979,29 +979,6 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
     </section>
     <section xml:id="appendix-a.-references">
         <title>References</title>
-       
-
-            <!--        <section xml:id="appendix-a.1-normative-references">      <title>Appendix A.1 Normative References</title>           <para> </para>
-</section>
-<section xml:id="appendix-a.2-informative-references">
-<title>Appendix A.2 Informative References</title>
-<para> </para>
-</section>
-</section>
-<section xml:id="appendix-b.-citing-this-document">
-<title>Appendix B. Citing This Document</title>
-<section xml:id="appendix-b.1-bibtex-entry">
-<title>Appendix B.1 Bibtex Entry</title>
-<para> Note that the following bibtex entry is in the IEEEtran bibtex style as described
-in a document called <quote>How to Use the IEEEtran BIBTEX Style</quote>. </para>
-<programlisting>
-@online{KatzMixPKI,
-title = {Katzenpost Mix Network Public Key Infrastructure Specification},
-author = {Yawning Angel and Ania Piotrowska and David Stainton},
-url= {https://github.com/katzenpost/katzenpost/blob/main/docs/specs/pki.rst},
-year = {2017}
-}
-</programlisting>-->
             &BRIDGING;
             &FINGERPRINTING;
             &KATZMIXNET;
@@ -1022,4 +999,4 @@ year = {2017}
             &TORSRV;
         </section>
 
-</section>
+</chapter>
