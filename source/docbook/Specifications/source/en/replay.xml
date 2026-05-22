@@ -211,13 +211,13 @@ replay_tag = H( shared_secret )</programlisting>
             than this maximum number of Sphinx packets in order for there to be duplicate packets. </para>
         <para>Our bloomfilter with hashmap replay detection cache looks like this: </para>
         <figure>
-            <title>replay cache</title>
+            <title>Replay cache</title>
             <mediaobject>
                 <imageobject>
                     <imagedata fileref="pix/replay1.png"/>
                 </imageobject>
                 <textobject>
-                    <phrase>replay cache</phrase>
+                    <phrase/>
                 </textobject>
             </mediaobject>
         </figure>
