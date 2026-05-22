@@ -1,19 +1,19 @@
 ---
-title: "KEMSphinx"
+title: ""
 linkTitle: "KEMSphinx"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:18:18.836953729-07:00"
+date: "2026-05-21T18:40:14.749901458-07:00"
 draft: "false"
 slug: "kemsphinx"
 layout: ""
 type: ""
-weight: "1"
+weight: "25"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-# <span id="kemsphinx"></span>KEMSphinx
+## <span id="kemsphinx"></span>KEMSphinx specification
 
 </div>
 
@@ -59,28 +59,6 @@ constant packet size and route length hiding.
 
 </div>
 
-<div class="toc">
-
-**Table of Contents**
-
-<span class="section">[1. Introduction](#kemsphinx_introduction)</span>
-
-<span class="section">[2. Post Quantum Hybrid KEM](#post-quantum-hybrid-kem)</span>
-
-<span class="section">[2.1 NIKE to KEM adapter](#nike-to-kem-adapter)</span>
-
-<span class="section">[2.2 KEM Combiner](#kem-combiner)</span>
-
-<span class="section">[3. KEMSphinx Header Design](#kemsphinx-header-design)</span>
-
-<span class="section">[4. KEMSphinx Unwrap Operation](#kemsphinx-unwrap-operation)</span>
-
-<span class="section">[Acknowledgments](#acknowledgments)</span>
-
-<span class="section">[References](#appendix-a.-references)</span>
-
-</div>
-
 <div class="section">
 
 <div class="titlepage">
@@ -89,7 +67,7 @@ constant packet size and route length hiding.
 
 <div>
 
-## <span id="kemsphinx_introduction"></span>1. Introduction
+### <span id="kemsphinx_introduction"></span>Introduction
 
 </div>
 
@@ -136,7 +114,7 @@ ciphertext per mix hop.
 
 <div>
 
-## <span id="post-quantum-hybrid-kem"></span>2. Post Quantum Hybrid KEM
+### <span id="post-quantum-hybrid-kem"></span>Post-quantum hybrid KEM
 
 </div>
 
@@ -144,7 +122,7 @@ ciphertext per mix hop.
 
 </div>
 
-Special care must be taken in order correctly compose a hybrid post quantum KEM that
+Special care must be taken in order correctly compose a hybrid post-quantum KEM that
 is IND-CCA2 robust.
 
 The hybrid post quantum KEMs found in Cloudflare’s circl library are suitable to be
@@ -164,7 +142,7 @@ preserving KEM combiner.
 
 <div>
 
-### <span id="nike-to-kem-adapter"></span>2.1 NIKE to KEM adapter
+#### <span id="nike-to-kem-adapter"></span>NIKE to KEM adapter
 
 </div>
 
@@ -200,7 +178,7 @@ return shared_key
 
 <div>
 
-### <span id="kem-combiner"></span>2.2 KEM Combiner
+#### <span id="kem-combiner"></span>KEM combiner
 
 </div>
 
@@ -257,7 +235,7 @@ return PRF(ss1 || cct) XOR PRF(ss2 || cct) XOR PRF(ss3 || cct)
 
 <div>
 
-## <span id="kemsphinx-header-design"></span>3. KEMSphinx Header Design
+### <span id="kemsphinx-header-design"></span>KEMSphinx header design
 
 </div>
 
@@ -290,14 +268,14 @@ KEM Sphinx header elements:
 3.  Encrypted per routing commands AND KEM ciphertexts, one for each additional
     hop
 
-4.  MAC for this hop (authenticates header fields 1 thru 4)
+4.  MAC for this hop (authenticates header fields 1 through 4)
 
 </div>
 
 We can say that KEMSphinx differs from NIKE Sphinx by replacing the header’s group
 element (e.g. an X25519 public key) field with the KEM ciphertext. Subsequent KEM
-ciphertexts for each hop are stored inside the Sphinx header <span class="quote">“<span class="quote">routing
-information</span>”</span> section.
+ciphertexts for each hop are stored inside the <span class="quote">“<span class="quote">routing information</span>”</span>
+section of the Sphinx packet header.
 
 First we must have a data type to express a mix hop, and we can use lists of these
 hops to express a route:
@@ -376,7 +354,7 @@ sphinx_header.mac = mac
 
 <div>
 
-## <span id="kemsphinx-unwrap-operation"></span>4. KEMSphinx Unwrap Operation
+### <span id="kemsphinx-unwrap-operation"></span>KEMSphinx unwrap operation
 
 </div>
 
@@ -404,7 +382,7 @@ Most of the design here will be exactly the same as in <a href="#SPHINXSPEC" cla
 
 <div>
 
-## <span id="acknowledgments"></span>Acknowledgments
+### <span id="acknowledgments"></span>Acknowledgments
 
 </div>
 
@@ -427,7 +405,7 @@ Westerbaan for answering questions.
 
 <div>
 
-## <span id="appendix-a.-references"></span>References
+### <span id="appendix-a.-references"></span>References
 
 </div>
 

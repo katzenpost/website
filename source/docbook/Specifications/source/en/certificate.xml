@@ -5,8 +5,8 @@
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 
-<?title "Certificate format" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
-<?linkTitle "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
+<?title "" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
+<?linkTitle "Certificate format" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
 <?description "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
 <?author "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
 <?url "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
@@ -14,10 +14,10 @@
 <?slug "certificate_format" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
 <?layout "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
 <?type "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
-<?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
+<?weight "10" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
-<!DOCTYPE chapter [
+<!DOCTYPE section [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -47,7 +47,7 @@
 ]>
 
 <?xml-stylesheet type="text/css" href="/usr/local/Oxygen%20XML%20Editor%2027/frameworks/docbook/css/docbook.css"?>
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="certificate">
 
     <info>
@@ -178,4 +178,4 @@ Signatures []Signature
         &RFC7693;       
         &SPHINCS256;
     </section>
-</chapter>
+</section>

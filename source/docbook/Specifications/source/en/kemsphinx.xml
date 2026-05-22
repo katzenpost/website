@@ -5,7 +5,7 @@
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 
-<?title "KEMSphinx" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
+<?title "" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
 <?linkTitle "KEMSphinx" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
 <?description "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
 <?author "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
@@ -14,10 +14,10 @@
 <?slug "kemsphinx" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
 <?layout "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
 <?type "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
-<?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
+<?weight "25" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
-<!DOCTYPE chapter [
+<!DOCTYPE section [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -46,7 +46,7 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
     version="5.1" xml:id="kemsphinx">
 
     <info>
@@ -279,4 +279,4 @@ sphinx_header.mac = mac
         &SPHINX09;
         &SPHINXSPEC;
     </section>
-</chapter>
+</section>

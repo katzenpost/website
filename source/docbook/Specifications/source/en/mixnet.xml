@@ -5,8 +5,8 @@
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 
-<?title "Mix network design" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
-<?linkTitle "Mix network design" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
+<?title "" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
+<?linkTitle "Mix network" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
 <?description "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
 <?author "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
 <?url "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
@@ -14,11 +14,11 @@
 <?slug "mix_network" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
 <?layout "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
 <?type "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
-<?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
+<?weight "35" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
 
-<!DOCTYPE chapter[
+<!DOCTYPE section[
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -47,7 +47,7 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" xml:id="mixspec">
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" xml:id="mixspec">
 
     <info>
         <title xml:id="mixspec.title">Mix network specification</title>
@@ -551,4 +551,4 @@ uint32_t delay_ms;
         &SP80038A;
         &SPHINXSPEC;
     </section>
-</chapter>
+</section>

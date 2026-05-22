@@ -1,19 +1,19 @@
 ---
-title: "Provider-side autoresponder extension"
+title: ""
 linkTitle: "Autoresponder extension"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:09:52.058622671-07:00"
+date: "2026-05-21T18:39:57.49845868-07:00"
 draft: "false"
 slug: "autoresponder"
 layout: ""
 type: ""
-weight: "1"
+weight: "5"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-# <span id="autoresponder"></span>Provider-side autoresponder extension (Kaetzchen)
+## <span id="autoresponder"></span>Provider-side autoresponder extension (Kaetzchen) specification
 
 </div>
 
@@ -74,32 +74,6 @@ traffic.
 
 </div>
 
-<div class="toc">
-
-**Table of Contents**
-
-<span class="section">[Conventions Used in This Document](#d58e50)</span>
-
-<span class="section">[Terminology](#terminology)</span>
-
-<span class="section">[1. Extension Overview](#extension-overview)</span>
-
-<span class="section">[1.1 Agent Requirements](#agent-requirements)</span>
-
-<span class="section">[1.2 Mix Message Formats](#mix-message-formats)</span>
-
-<span class="section">[2. PKI Extensions](#pki-extensions)</span>
-
-<span class="section">[3. Anonymity Considerations](#anonymity-considerations)</span>
-
-<span class="section">[4. Security Considerations](#security-considerations)</span>
-
-<span class="section">[Acknowledgments](#acknowledgments)</span>
-
-<span class="section">[References](#appendix-a.-references)</span>
-
-</div>
-
 <div class="section">
 
 <div class="titlepage">
@@ -108,7 +82,7 @@ traffic.
 
 <div>
 
-## <span id="d58e50"></span>Conventions Used in This Document
+### <span id="d58e50"></span>Conventions used in this document
 
 </div>
 
@@ -131,7 +105,7 @@ NOT</span>”</span>, <span class="quote">“<span class="quote">RECOMMENDED</sp
 
 <div>
 
-## <span id="terminology"></span>Terminology
+### <span id="terminology"></span>Terminology
 
 </div>
 
@@ -143,15 +117,15 @@ The following terms are used in this specification.
 
 <div class="variablelist">
 
+<span class="term"><span class="bold">**BlockSphinxPlaintext**</span></span>  
+The payload structure which is encapsulated by the Sphinx body.
+
 <span class="term"><span class="bold">**SURB**</span></span>  
 Single use reply block. SURBs are used to achieve recipient anonymity,
 that is to say, SURBs function as a cryptographic delivery token that
 you can give to another client entity so that they can send you a
 message without them knowing your identity or location on the network.
 See `SPHINXSPEC` and `SPHINX`.
-
-<span class="term"><span class="bold">**BlockSphinxPlaintext**</span></span>  
-The payload structure which is encapsulated by the Sphinx body.
 
 </div>
 
@@ -165,7 +139,7 @@ The payload structure which is encapsulated by the Sphinx body.
 
 <div>
 
-## <span id="extension-overview"></span>1. Extension Overview
+### <span id="extension-overview"></span>Extension overview
 
 </div>
 
@@ -186,7 +160,7 @@ which will then act on the packet and optionally reply utilizing the SURB.
 
 <div>
 
-### <span id="agent-requirements"></span>1.1 Agent Requirements
+#### <span id="agent-requirements"></span>Agent requirements
 
 </div>
 
@@ -225,7 +199,7 @@ which will then act on the packet and optionally reply utilizing the SURB.
 
 <div>
 
-### <span id="mix-message-formats"></span>1.2 Mix Message Formats
+#### <span id="mix-message-formats"></span>Mix message formats
 
 </div>
 
@@ -281,7 +255,7 @@ appending <span class="quote">“<span class="quote">0x00</span>”</span> bytes
 
 <div>
 
-## <span id="pki-extensions"></span>2. PKI Extensions
+### <span id="pki-extensions"></span>PKI extensions
 
 </div>
 
@@ -329,7 +303,7 @@ identifier.
 
 <div>
 
-## <span id="anonymity-considerations"></span>3. Anonymity Considerations
+### <span id="anonymity-considerations"></span>Anonymity considerations
 
 </div>
 
@@ -358,7 +332,7 @@ of the client.
 
 <div>
 
-## <span id="security-considerations"></span>4. Security Considerations
+### <span id="security-considerations"></span>Security considerations
 
 </div>
 
@@ -387,7 +361,7 @@ parameterization.
 
 <div>
 
-## <span id="acknowledgments"></span>Acknowledgments
+### <span id="acknowledgments"></span>Acknowledgments
 
 </div>
 
@@ -408,7 +382,7 @@ Breitmoser.
 
 <div>
 
-## <span id="appendix-a.-references"></span>References
+### <span id="appendix-a.-references"></span>References
 
 </div>
 

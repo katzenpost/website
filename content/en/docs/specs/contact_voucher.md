@@ -1,15 +1,15 @@
 ---
-title: "Contact voucher design"
-linkTitle: "Contact voucher design"
+title: ""
+linkTitle: "Contact voucher"
 description: ""
 author: ""
 url: ""
-date: "2026-05-13T18:07:12.574908781-07:00"
+date: "2026-05-21T18:40:07.172874327-07:00"
 draft: "false"
 slug: "contact_voucher"
 layout: ""
 type: ""
-weight: "1"
+weight: "15"
 version: ""
 ---
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-## <span id="voucher"></span>
+## <span id="voucher"></span>Contact voucher specification
 
 </div>
 
@@ -45,37 +45,63 @@ version: ""
 
 </div>
 
+<div>
+
+<div class="abstract">
+
+**Abstract**
+
+</div>
+
+</div>
+
 </div>
 
 ------------------------------------------------------------------------
 
 </div>
 
-In order to join or initiate a conversation, participants need to exchange cryptographic
-key
-material. To address this problem, we created a slightly unusual design: <span class="emphasis">*contact
-vouchers*</span>.
+In order to join or initiate a conversation securely, participants need to exchange
+cryptographic key material. To address this problem, we created a slightly unusual
+design:
+<span class="emphasis">*contact vouchers*</span>.
 
-In many systems, invites to conversations flow from an existing member of the conversation
-to the user being invited. In our contact voucher protocol, this flow is reversed:
-Bob, who
-wishes to join a conversation, hands a contact voucher (out-of-band) to existing member
-Alice,
-who then inducts Bob into the group.
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="voucher-design"></span>Voucher design
+
+</div>
+
+</div>
+
+</div>
+
+In many systems, an invitation to communicate flows from an existing member of a
+conversation to the user being invited. In our contact voucher protocol, this flow
+is
+reversed: Bob, who wishes to join a conversation, hands a contact voucher (out-of-band)
+to
+existing member Alice, who then inducts Bob into the group.
 
 This design mitigates two potential problems with the conventional way of doing things:
 
 <div class="orderedlist">
 
-1.  A third party who observes the contact voucher does not get to read either participant's
-    actual messages. However,
+1.  A third party who observes the contact voucher does not get to read either
+    participant's actual messages. However,
 
     <div class="itemizedlist">
 
-    - A <span class="strong">**passive**</span> adversary learns that the voucher was
+    - A <span class="bold">**passive**</span> adversary learns that the voucher was
       spent, but does not get to observe further interactions.
 
-    - An <span class="strong">**active**</span> adversary can create a new fake group
+    - An <span class="bold">**active**</span> adversary can create a new fake group
       to induct the member into, but does not learn anything about the existing group.
 
     </div>
@@ -88,8 +114,8 @@ This design mitigates two potential problems with the conventional way of doing 
 
     - Bob brings the contact voucher.
 
-    - Alice brings a fingerprint for the `VoucherReplyPublicKey` (thwarting the
-      active attacker).
+    - Alice brings a fingerprint for the `VoucherReplyPublicKey` (thwarting
+      the active attacker).
 
     </div>
 
@@ -107,11 +133,25 @@ This design mitigates two potential problems with the conventional way of doing 
 
 The following diagram illustrates the contact voucher authentication handshake.
 
+<div class="figure">
+
+<span id="d58e83"></span>
+
+**Figure 1. Contact voucher handshake**
+
+<div class="figure-contents">
+
 <div class="mediaobject">
 
-![](/docs/specs/pix/contact-voucher.jpg)
+![Bob and Alice exchange cryptographic information with the mixnet as proxy. They never have direct contact again after their initial meeting in real life.](/docs/specs/pix/contact-voucher.jpg)
 
 </div>
+
+</div>
+
+</div>
+
+  
 
 <div class="section">
 
@@ -121,7 +161,7 @@ The following diagram illustrates the contact voucher authentication handshake.
 
 <div>
 
-### <span id="d58e83"></span>Self-authenticating BACAP payload
+#### <span id="payload"></span>Self-authenticating BACAP payload
 
 </div>
 
@@ -132,26 +172,30 @@ The following diagram illustrates the contact voucher authentication handshake.
 The first message sent, the `VoucherPayload`, is authenticated in the following
 manner:
 
-<div class="itemizedlist">
+<div class="orderedlist">
 
-- The `VoucherPayload` is computed (first).
+1.  The `VoucherPayload` is computed.
 
-- A cryptographic hash of the `VoucherPayload` is computed. This hash
-  <span class="strong">**is**</span> the `Voucher`.
+2.  A cryptographic hash of the `VoucherPayload` is computed. This hash
+    <span class="strong">**is**</span> the <span class="emphasis">*Voucher*</span>.
 
-- The `Voucher` is then used to derive a BACAP read/write capability set.
+3.  The <span class="strong">**Voucher**</span> is used to derive a BACAP
+    read/write capability set.
 
-- The `VoucherPayload` is uploaded to the sequence described by the
-  capability (at index 0).
+4.  The `VoucherPayload` is uploaded to the BACAP sequence described by
+    the capability (at index 0).
 
-- Anyone who intercepts the `Voucher` can read from <span class="strong">**and**</span> write to the message sequence.
+5.  Anyone who intercepts the <span class="strong">**Voucher**</span> can read
+    <span class="strong">**and**</span> write the sequence.
 
-- But: Since the `Voucher` is a hash over the `VoucherPayload`,
-  writing the sequence with anything but the `VoucherPayload` will be detectable
-  by the recipient.
+6.  But: Since the <span class="strong">**Voucher**</span> is a hash over the
+    `VoucherPayload`, writing the sequence with anything but the
+    `VoucherPayload` will be detectable by the recipient.
 
-- This means that the contents <span class="emphasis">*cannot*</span> be undetectably modified by
-  the interceptor.
+7.  This means that the contents <span class="emphasis">*cannot*</span> be modified
+    undetectably by the interceptor.
+
+</div>
 
 </div>
 

@@ -1,19 +1,19 @@
 ---
-title: "Sphinx packet replay detection"
+title: ""
 linkTitle: "Sphinx packet replay detection"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:23:36.266383823-07:00"
+date: "2026-05-21T18:40:40.44103315-07:00"
 draft: "false"
 slug: "packet_replay"
 layout: ""
 type: ""
-weight: "1"
+weight: "50"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-# <span id="replay"></span>Sphinx packet replay detection
+## <span id="replay"></span>Sphinx packet replay detection
 
 </div>
 
@@ -59,40 +59,6 @@ guide and document the existing replay protect for deployed mix networks.
 
 </div>
 
-<div class="toc">
-
-**Table of Contents**
-
-<span class="section">[Terminology](#terminology)</span>
-
-<span class="section">[Conventions Used in This Document](#d58e95)</span>
-
-<span class="section">[1. Introduction](#sphinx_replay_detection_introduction)</span>
-
-<span class="section">[2. Sphinx Cryptographic Primitives](#sphinx-cryptographic-primitives)</span>
-
-<span class="section">[2.1 Sphinx Parameter Constants](#sphinx-parameter-constants)</span>
-
-<span class="section">[3. System Overview](#system-overview)</span>
-
-<span class="section">[4. Sphinx Packet Replay Cache](#sphinx-packet-replay-cache)</span>
-
-<span class="section">[4.1 Sphinx Replay Tag Composition](#sphinx-replay-tag-composition)</span>
-
-<span class="section">[4.2 Sphinx Replay Tag Caching](#sphinx-replay-tag-caching)</span>
-
-<span class="section">[4.3 Epoch Boundaries](#epoch-boundaries)</span>
-
-<span class="section">[4.4 Cost Of Checking Replays](#cost-of-checking-replays)</span>
-
-<span class="section">[5. Concurrent Processing of Sphinx Packet Replay Tags](#concurrent-processing-of-sphinx-packet-replay-tags)</span>
-
-<span class="section">[5.1 PKI Updates](#pki-updates)</span>
-
-<span class="section">[References](#appendix-a.-references)</span>
-
-</div>
-
 <div class="section">
 
 <div class="titlepage">
@@ -101,7 +67,7 @@ guide and document the existing replay protect for deployed mix networks.
 
 <div>
 
-## <span id="terminology"></span>Terminology
+### <span id="terminology"></span>Terminology
 
 </div>
 
@@ -114,26 +80,12 @@ The following terms are used in this specification.
 <div class="variablelist">
 
 <span class="term"><span class="bold">**epoch**</span></span>  
-A fixed time interval defined in section 4.2 Sphinx Mix and Provider Key
-Rotation. The epoch is currently set to 20 minutes.
+A fixed time interval with a current default value of 20 minutes.
 A new PKI document containing public key material
-is published for each epoch and is valid only for that epoch.
-
-<span class="term"><span class="bold">**packet**</span></span>  
-A Sphinx packet, of fixed
-length for each class of traffic, carrying a message payload and metadata for routing.
-Packets are routed anonymously through the mixnet and cryptographically transformed
-at
-each hop.
-
-<span class="term"><span class="bold">**header**</span></span>  
-The packet header consisting of several components, which convey the
-information necessary to verify packet integrity and correctly process the
-packet.
-
-<span class="term"><span class="bold">**payload**</span></span>  
-The fixed-length portion of a packet containing an encrypted message or
-part of a message, to be delivered anonymously.
+is published for each epoch and is valid only for that epoch. For more information
+see
+<a href="https://katzenpost.network/docs/specs/mix_network/#sphinx-mix-and-provider-key-rotation" class="link" target="_top">Sphinx
+mix and provider key rotation</a>.
 
 <span class="term"><span class="bold">**group**</span></span>  
 A finite set of elements and a binary operation that satisfy the
@@ -146,6 +98,22 @@ An individual element of the group.
 <span class="term"><span class="bold">**group generator**</span></span>  
 A group element capable of generating any other element of the group, via
 repeated applications of the generator and the group operation.
+
+<span class="term"><span class="bold">**header**</span></span>  
+The packet header consisting of several components, which convey the
+information necessary to verify packet integrity and correctly process the
+packet.
+
+<span class="term"><span class="bold">**packet**</span></span>  
+A Sphinx packet, of fixed
+length for each class of traffic, carrying a message payload and metadata for routing.
+Packets are routed anonymously through the mixnet and cryptographically transformed
+at
+each hop.
+
+<span class="term"><span class="bold">**payload**</span></span>  
+The fixed-length portion of a packet containing an encrypted message or
+part of a message, to be delivered anonymously.
 
 <span class="term"><span class="bold">**SEDA**</span></span>  
 Staged Event Driven Architecture. 1. A
@@ -168,7 +136,7 @@ purpose computing hardware.
 
 <div>
 
-## <span id="d58e95"></span>Conventions Used in This Document
+### <span id="d58e99"></span>Conventions used in this document
 
 </div>
 
@@ -191,7 +159,7 @@ NOT</span>”</span>, <span class="quote">“<span class="quote">RECOMMENDED</sp
 
 <div>
 
-## <span id="sphinx_replay_detection_introduction"></span>1. Introduction
+### <span id="sphinx_replay_detection_introduction"></span>Introduction
 
 </div>
 
@@ -216,7 +184,7 @@ how to efficiently detect Sphinx packet replay attacks.
 
 <div>
 
-## <span id="sphinx-cryptographic-primitives"></span>2. Sphinx Cryptographic Primitives
+### <span id="sphinx-cryptographic-primitives"></span>Sphinx cryptographic primitives
 
 </div>
 
@@ -224,8 +192,7 @@ how to efficiently detect Sphinx packet replay attacks.
 
 </div>
 
-This specification borrows the following cryptographic primitives constants from
-our
+This specification borrows the following cryptographic primitives constants from our
 <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a>:
 
 <div class="itemizedlist">
@@ -255,7 +222,7 @@ satisfy the Decision Diffie-Hellman problem.
 
 <div>
 
-### <span id="sphinx-parameter-constants"></span>2.1 Sphinx Parameter Constants
+#### <span id="sphinx-parameter-constants"></span>Sphinx parameter constants
 
 </div>
 
@@ -285,7 +252,7 @@ satisfy the Decision Diffie-Hellman problem.
 
 <div>
 
-## <span id="system-overview"></span>3. System Overview
+### <span id="system-overview"></span>System overview
 
 </div>
 
@@ -306,13 +273,12 @@ Mixes as currently deployed, have two modes of operation:
 These two modes of operation fundamentally represent a tradeoff between mix server
 availability and notional compulsion attack resistance. Ultimately it will be the
 mix
-operator’s decision to make since they affect the security and availability of their
-mix
-servers. In particular since mix networks are vulnerable to the various types of
-compulsion attacks (see <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a> section 9.4
-Compulsion Threat Considerations) and therefore there is some advantage to NOT
-persisting the Sphinx routing keys to disk. The mix operator can simply poweroff the
-mix
+operator’s decision to make since these considerations affect the security and
+availability of their mix servers. In particular since mix networks are vulnerable
+to
+the various types of compulsion attacks (see <a href="https://katzenpost.network/docs/specs/sphinx_format/#compulsion-threat-considerations" class="link" target="_top">Compulsion Threat Considerations</a> in the <span class="emphasis">*Sphinx cryptographic
+packet format specification*</span>) there is some advantage to NOT persisting
+the Sphinx routing keys to disk. The mix sever operator can simply power-off the mix
 server before seizure rather than physically destroying the disk in order to prevent
 capture of the Sphinx routing keys. An argument can be made for the use of full disk
 encryption, however this may not be practical for servers hosted in remote locations.
@@ -352,7 +318,7 @@ straddle the epoch boundaries.
 
 <div>
 
-## <span id="sphinx-packet-replay-cache"></span>4. Sphinx Packet Replay Cache
+### <span id="sphinx-packet-replay-cache"></span>Sphinx packet replay cache
 
 </div>
 
@@ -368,7 +334,7 @@ straddle the epoch boundaries.
 
 <div>
 
-### <span id="sphinx-replay-tag-composition"></span>4.1 Sphinx Replay Tag Composition
+#### <span id="sphinx-replay-tag-composition"></span>Sphinx replay tag composition
 
 </div>
 
@@ -400,7 +366,7 @@ packet is fully processed and it’s header MAC verified as described in <a href
 
 <div>
 
-## <span id="sphinx-replay-tag-caching"></span>4.2 Sphinx Replay Tag Caching
+### <span id="sphinx-replay-tag-caching"></span>Sphinx replay tag caching
 
 </div>
 
@@ -409,8 +375,8 @@ packet is fully processed and it’s header MAC verified as described in <a href
 </div>
 
 It would be sufficient to use a key value store or hashmap to detect the presence
-of
-a duplicate replay tag however we additionally employ a bloom filter to increase
+of a
+duplicate replay tag however we additionally employ a bloom filter to increase
 performance. Sphinx keys must periodically be rotated and destroyed to mitigate
 compulsion attacks and therefore our replay caches must likewise be rotated. This
 kind
@@ -431,15 +397,15 @@ Our bloomfilter with hashmap replay detection cache looks like this:
 
 <div class="figure">
 
-<span id="d58e243"></span>
+<span id="d58e249"></span>
 
-**Figure 1. replay cache**
+**Figure 1. Replay cache**
 
 <div class="figure-contents">
 
 <div class="mediaobject">
 
-![replay cache](replay1.png)
+![Replay cache](/docs/specs/pix/pix/replay1.png)
 
 </div>
 
@@ -468,7 +434,7 @@ techniques for efficiency.
 
 <div>
 
-### <span id="epoch-boundaries"></span>4.3 Epoch Boundaries
+#### <span id="epoch-boundaries"></span>Epoch boundaries
 
 </div>
 
@@ -496,7 +462,7 @@ and one bloom filter.
 
 <div>
 
-### <span id="cost-of-checking-replays"></span>4.4 Cost Of Checking Replays
+#### <span id="cost-of-checking-replays"></span>Cost of checking replays
 
 </div>
 
@@ -519,8 +485,7 @@ following operations:
 
 Therefore these operations are roughly O(1) in complexity. However Sphinx packets
 processed near epoch boundaries will not be constant time due to trial decryption
-with two Sphinx routing keys as mentioned above in section <span class="quote">“<span class="quote">3.3 Epoch
-Boundaries</span>”</span>.
+with two Sphinx routing keys as mentioned above in <a href="#epoch-boundaries" class="xref" title="Epoch boundaries">the section called “Epoch boundaries”</a>.
 
 </div>
 
@@ -534,7 +499,7 @@ Boundaries</span>”</span>.
 
 <div>
 
-## <span id="concurrent-processing-of-sphinx-packet-replay-tags"></span>5. Concurrent Processing of Sphinx Packet Replay Tags
+### <span id="concurrent-processing-of-sphinx-packet-replay-tags"></span>Concurrent processing of Sphinx packet replay tags
 
 </div>
 
@@ -556,7 +521,7 @@ and associates replay caches.
 
 <div>
 
-### <span id="pki-updates"></span>5.1 PKI Updates
+#### <span id="pki-updates"></span>PKI updates
 
 </div>
 
@@ -564,10 +529,11 @@ and associates replay caches.
 
 </div>
 
-The mix server periodically updates it’s knowledge of the network by downloading
-a new consensus document as described in <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a>. The individual threads in the <span class="quote">“<span class="quote">cryptoworker</span>”</span>
-thread pool which process Sphinx packets make use of a `MixKey`
-data structure which consists of:
+The mix server periodically updates it’s knowledge of the network by downloading a
+new consensus document as described in <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a>.
+The individual threads in the <span class="quote">“<span class="quote">cryptoworker</span>”</span> thread pool which process
+Sphinx packets make use of a `MixKey` data structure which consists
+of:
 
 <div class="orderedlist">
 
@@ -618,7 +584,7 @@ avoid data races between <span class="quote">“<span class="quote">cryptoworker
 
 <div>
 
-## <span id="appendix-a.-references"></span>References
+### <span id="appendix-a.-references"></span>References
 
 </div>
 

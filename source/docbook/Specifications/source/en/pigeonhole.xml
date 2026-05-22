@@ -5,19 +5,19 @@
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 
-<?title "Pigeonhole protocol design" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
+<?title "" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
 <?linkTitle "Pigeonhole Protocol" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
 <?description "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
-<?author "Threebit Hacker, David Stainton" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
+<?author "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
 <?url "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
 <?draft "false" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#draft] -->
 <?slug "pigeonhole" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
 <?layout "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
 <?type "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
-<?weight "1" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
+<?weight "40" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "" ?> <!-- Optional [?] -->
 
-<!DOCTYPE chapter [
+<!DOCTYPE section [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -46,7 +46,7 @@
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
 
-<chapter    xmlns="http://docbook.org/ns/docbook"
+<section    xmlns="http://docbook.org/ns/docbook"
   xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" 
   xml:id="pigeonhole_protocol">
   <info>  
@@ -1346,4 +1346,4 @@ SERIALIZED ENVELOPE DATA (envelope boundaries don't align with box boundaries):
     <para><emphasis role="bold">Bob can now read Alice's message.</emphasis></para>
     
   </section>
-</chapter>
+</section>

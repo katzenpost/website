@@ -1,19 +1,19 @@
 ---
-title: "Public key infrastructure"
+title: ""
 linkTitle: "Public key infrastructure"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:21:55.199829788-07:00"
+date: "2026-05-21T18:40:33.215664444-07:00"
 draft: "false"
 slug: "pki"
 layout: ""
 type: ""
-weight: "1"
+weight: "45"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-# <span id="pki"></span>Public key infrastructure
+## <span id="pki"></span>Public key infrastructure specification
 
 </div>
 
@@ -69,6 +69,8 @@ version: ""
 
 **Abstract**
 
+to do
+
 </div>
 
 </div>
@@ -76,102 +78,6 @@ version: ""
 </div>
 
 ------------------------------------------------------------------------
-
-</div>
-
-<div class="toc">
-
-**Table of Contents**
-
-<span class="section">[Terminology](#terminology)</span>
-
-<span class="section">[Conventions used in this document](#conventions-used-in-this-document)</span>
-
-<span class="section">[1. Introduction](#pki_introduction)</span>
-
-<span class="section">[1.2 Security properties overview](#security-properties-overview)</span>
-
-<span class="section">[1.3 Differences from Tor and Mixminion directory authority systems](#differences-from-tor-and-mixminion-directory-authority-systems)</span>
-
-<span class="section">[2. Overview of mix PKI interaction](#overview-of-mix-pki-interaction)</span>
-
-<span class="section">[2.1 PKI protocol schedule](#pki-protocol-schedule)</span>
-
-<span class="section">[2.1.1 Directory authority server schedule](#directory-authority-server-schedule)</span>
-
-<span class="section">[2.1.2 Mix schedule](#mix-schedule)</span>
-
-<span class="section">[3. Voting for consensus protocol](#voting-for-consensus-protocol)</span>
-
-<span class="section">[3.1 Protocol messages](#protocol-messages)</span>
-
-<span class="section">[3.1.1 Mix descriptor and directory signing](#mix-descriptor-and-directory-signing)</span>
-
-<span class="section">[3.2 Vote exchange](#vote-exchange)</span>
-
-<span class="section">[3.3 Reveal exchange](#reveal-exchange)</span>
-
-<span class="section">[3.4 Cert exchange](#cert-exchange)</span>
-
-<span class="section">[3.5 Vote tabulation for consensus computation](#vote-tabulation-for-consensus-computation)</span>
-
-<span class="section">[3.6 Signature collection](#signature-collection)</span>
-
-<span class="section">[3.7 Publication](#publication)</span>
-
-<span class="section">[4. PKI Protocol data structures](#pki-protocol-data-structures)</span>
-
-<span class="section">[4.1 Mix descriptor format](#mix-descriptor-format)</span>
-
-<span class="section">[4.1.1 Scheduling mix downtime](#scheduling-mix-downtime)</span>
-
-<span class="section">[4.2 Directory format](#directory-format)</span>
-
-<span class="section">[4.3 Shared random value structure](#shared-random-value-structure)</span>
-
-<span class="section">[5. PKI wire protocol](#pki-wire-protocol)</span>
-
-<span class="section">[5.1 Mix descriptor publication](#mix-descriptor-publication)</span>
-
-<span class="section">[5.1.1 The post_descriptor command](#the-post_descriptor-command)</span>
-
-<span class="section">[5.1.2 The post_descriptor_status command](#the-post_descriptor_status-command)</span>
-
-<span class="section">[6. Voting](#voting)</span>
-
-<span class="section">[6.1. The vote command](#the-vote-command)</span>
-
-<span class="section">[6.2. The vote_status command](#the-vote_status-command)</span>
-
-<span class="section">[6.3. The get_vote command](#the-get_vote-command)</span>
-
-<span class="section">[7. Retrieval of consensus](#retrieval-of-consensus)</span>
-
-<span class="section">[7.1 The get_consensus command](#the-get_consensus-command)</span>
-
-<span class="section">[7.2 The consensus command](#the-consensus-command)</span>
-
-<span class="section">[7.3. The Cert command](#the-cert-command)</span>
-
-<span class="section">[7.4. The CertStatus command](#the-certstatus-command)</span>
-
-<span class="section">[8. Signature exchange](#signature-exchange)</span>
-
-<span class="section">[8.1. The sig command](#the-sig-command)</span>
-
-<span class="section">[8.2. The sig_status command](#the-sigstatus-command)</span>
-
-<span class="section">[9. Scalability considerations](#scalability-considerations)</span>
-
-<span class="section">[10. Future work](#future-work)</span>
-
-<span class="section">[11. Anonymity considerations](#anonymity-considerations)</span>
-
-<span class="section">[12. Security considerations](#security-considerations)</span>
-
-<span class="section">[Acknowledgements](#acknowledgements)</span>
-
-<span class="section">[References](#appendix-a.-references)</span>
 
 </div>
 
@@ -183,7 +89,7 @@ version: ""
 
 <div>
 
-## <span id="terminology"></span>Terminology
+### <span id="terminology"></span>Terminology
 
 </div>
 
@@ -195,29 +101,29 @@ The following terms are used in this specification.
 
 <div class="variablelist">
 
-<span class="term"><span class="bold">**PKI**</span></span>  
-Public key infrastructure
-
 <span class="term"><span class="bold">**directory authority system**</span></span>  
 Refers to specific PKI schemes used by Mixminion and Tor.
-
-<span class="term"><span class="bold">**MSL**</span></span>  
-Maximum segment lifetime, currently set to 120 seconds.
-
-<span class="term"><span class="bold">**mix descriptor**</span></span>  
-A database record which describes a component mix.
 
 <span class="term"><span class="bold">**family**</span></span>  
 Identifier of security domains or entities operating one or more mixes in
 the network. This is used to inform the path selection algorithm.
 
+<span class="term"><span class="bold">**layer**</span></span>  
+The layer indicates which network topology layer a particular mix resides
+in.
+
+<span class="term"><span class="bold">**mix descriptor**</span></span>  
+A database record which describes a component mix.
+
+<span class="term"><span class="bold">**MSL**</span></span>  
+Maximum segment lifetime, currently set to 120 seconds.
+
 <span class="term"><span class="bold">**nickname**</span></span>  
 A nickname string that is unique in the consensus document, see Katzenpost
 Mix Network Specification section 2.2. Network Topology.
 
-<span class="term"><span class="bold">**layer**</span></span>  
-The layer indicates which network topology layer a particular mix resides
-in.
+<span class="term"><span class="bold">**PKI**</span></span>  
+Public key infrastructure
 
 <span class="term"><span class="bold">**provider**</span></span>  
 A service operated by a third party that Clients communicate directly with
@@ -238,7 +144,7 @@ operations on the relayed messages.
 
 <div>
 
-## <span id="conventions-used-in-this-document"></span>Conventions used in this document
+### <span id="conventions-used-in-this-document"></span>Conventions used in this document
 
 </div>
 
@@ -264,7 +170,7 @@ additional cryptographic wire protocol commands. <a href="#KATZMIXWIRE" class="l
 
 <div>
 
-## <span id="pki_introduction"></span>1. Introduction
+### <span id="pki_introduction"></span>Introduction
 
 </div>
 
@@ -304,7 +210,7 @@ document that have an impact on security and performance.
 
 <div>
 
-### <span id="security-properties-overview"></span>1.2 Security properties overview
+#### <span id="security-properties-overview"></span>Security properties overview
 
 </div>
 
@@ -353,7 +259,7 @@ properties:
 
 <div>
 
-### <span id="differences-from-tor-and-mixminion-directory-authority-systems"></span>1.3 Differences from Tor and Mixminion directory authority systems
+#### <span id="differences-from-tor-and-mixminion-directory-authority-systems"></span>Differences from Tor and Mixminion directory authority systems
 
 </div>
 
@@ -402,7 +308,7 @@ that of Tor's and Mixminion’s in a number of ways:
 
 <div>
 
-## <span id="overview-of-mix-pki-interaction"></span>2. Overview of mix PKI interaction
+### <span id="overview-of-mix-pki-interaction"></span>Overview of mix PKI interaction
 
 </div>
 
@@ -447,7 +353,7 @@ only used for sending ACK messages from the destination Provider to the sender.
 
 <div>
 
-### <span id="pki-protocol-schedule"></span>2.1 PKI protocol schedule
+#### <span id="pki-protocol-schedule"></span>PKI protocol schedule
 
 </div>
 
@@ -483,7 +389,7 @@ and bandwidth calculations to see how bad it gets…*</span>
 
 <div>
 
-### <span id="directory-authority-server-schedule"></span>2.1.1 Directory authority server schedule
+#### <span id="directory-authority-server-schedule"></span>Directory authority server schedule
 
 </div>
 
@@ -519,7 +425,7 @@ schedule, where `T` is the beginning of the current epoch, and
 
 <div>
 
-### <span id="mix-schedule"></span>2.1.2 Mix schedule
+#### <span id="mix-schedule"></span>Mix schedule
 
 </div>
 
@@ -564,7 +470,7 @@ document.
 
 <div>
 
-## <span id="voting-for-consensus-protocol"></span>3. Voting for consensus protocol
+### <span id="voting-for-consensus-protocol"></span>Voting for consensus protocol
 
 </div>
 
@@ -588,7 +494,7 @@ publishing of the network consensus documents.
 
 <div>
 
-### <span id="protocol-messages"></span>3.1 Protocol messages
+#### <span id="protocol-messages"></span>Protocol messages
 
 </div>
 
@@ -619,7 +525,7 @@ Mix descriptor and directory documents MUST be properly signed.
 
 <div>
 
-### <span id="mix-descriptor-and-directory-signing"></span>3.1.1 Mix descriptor and directory signing
+#### <span id="mix-descriptor-and-directory-signing"></span>Mix descriptor and directory signing
 
 </div>
 
@@ -642,7 +548,7 @@ done using JWS <a href="#RFC7515" class="link">RFC7515</a>.
 
 <div>
 
-### <span id="vote-exchange"></span>3.2 Vote exchange
+#### <span id="vote-exchange"></span>Vote exchange
 
 </div>
 
@@ -734,7 +640,7 @@ voter to report that their vote was not accepted.
 
 <div>
 
-### <span id="reveal-exchange"></span>3.3 Reveal exchange
+#### <span id="reveal-exchange"></span>Reveal exchange
 
 </div>
 
@@ -820,7 +726,7 @@ received for this round.
 
 <div>
 
-### <span id="cert-exchange"></span>3.4 Cert exchange
+#### <span id="cert-exchange"></span>Cert exchange
 
 </div>
 
@@ -849,7 +755,7 @@ of service by a single Authority was observed.
 
 <div>
 
-### <span id="vote-tabulation-for-consensus-computation"></span>3.5 Vote tabulation for consensus computation
+#### <span id="vote-tabulation-for-consensus-computation"></span>Vote tabulation for consensus computation
 
 </div>
 
@@ -952,7 +858,7 @@ For each distinct mix identity in any vote directory:
 
 <div>
 
-### <span id="signature-collection"></span>3.6 Signature collection
+#### <span id="signature-collection"></span>Signature collection
 
 </div>
 
@@ -982,7 +888,7 @@ peers.
 
 <div>
 
-### <span id="publication"></span>3.7 Publication
+#### <span id="publication"></span>Publication
 
 </div>
 
@@ -1005,7 +911,7 @@ a valid consensus and it is published.
 
 <div>
 
-## <span id="pki-protocol-data-structures"></span>4. PKI Protocol data structures
+### <span id="pki-protocol-data-structures"></span>PKI protocol data structures
 
 </div>
 
@@ -1021,7 +927,7 @@ a valid consensus and it is published.
 
 <div>
 
-### <span id="mix-descriptor-format"></span>4.1 Mix descriptor format
+#### <span id="mix-descriptor-format"></span>Mix descriptor format
 
 </div>
 
@@ -1033,22 +939,6 @@ Note that there is no signature field. This is because mix descriptors are
 serialized and signed using JWS. The `IdentityKey` field is a
 public ed25519 key. The `MixKeys` field is a map from epoch to
 public X25519 keys which is what the Sphinx packet format uses.
-
-<div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-
-<table data-border="0" data-summary="Note: Note">
-<tbody>
-<tr class="odd">
-<td rowspan="2" style="text-align: center;" data-valign="top" width="25"><img src="file:/home/usr/local/Oxygen_XML_Editor_28/frameworks/docbook/css/img/note.png" alt="[Note]" /></td>
-<td style="text-align: left;">Note</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;" data-valign="top"><p>XXX David: replace the following example with a JWS example:</p></td>
-</tr>
-</tbody>
-</table>
-
-</div>
 
 ``` programlisting
 {
@@ -1079,7 +969,7 @@ public X25519 keys which is what the Sphinx packet format uses.
 
 <div>
 
-### <span id="scheduling-mix-downtime"></span>4.1.1 Scheduling mix downtime
+#### <span id="scheduling-mix-downtime"></span>Scheduling mix downtime
 
 </div>
 
@@ -1121,15 +1011,13 @@ downtime for one or more epochs by not have those epochs as keys in the map.
 
 <div>
 
-### <span id="directory-format"></span>4.2 Directory format
+#### <span id="directory-format"></span>Directory format
 
 </div>
 
 </div>
 
 </div>
-
-<span class="emphasis">*Note: replace the following example with a JWS example*</span>
 
 ``` programlisting
 {
@@ -1153,7 +1041,7 @@ downtime for one or more epochs by not have those epochs as keys in the map.
 
 <div>
 
-### <span id="shared-random-value-structure"></span>4.3 Shared random value structure
+#### <span id="shared-random-value-structure"></span>Shared random value structure
 
 </div>
 
@@ -1213,7 +1101,7 @@ H("shared-random" | Uint64(epoch) | REVEALS | PREVIOUS_SRV)
 
 <div>
 
-## <span id="pki-wire-protocol"></span>5. PKI wire protocol
+### <span id="pki-wire-protocol"></span>PKI wire protocol
 
 </div>
 
@@ -1233,7 +1121,7 @@ mix descriptors, voting and consensus retrieval.
 
 <div>
 
-### <span id="mix-descriptor-publication"></span>5.1 Mix descriptor publication
+#### <span id="mix-descriptor-publication"></span>Mix descriptor publication
 
 </div>
 
@@ -1275,7 +1163,7 @@ uint8 error_code;
 
 <div>
 
-### <span id="the-post_descriptor-command"></span>5.1.1 The post_descriptor command
+#### <span id="the-post_descriptor-command"></span>The post_descriptor command
 
 </div>
 
@@ -1295,7 +1183,7 @@ The post_descriptor command allows mixes to publish their descriptors.
 
 <div>
 
-### <span id="the-post_descriptor_status-command"></span>5.1.2 The post_descriptor_status command
+#### <span id="the-post_descriptor_status-command"></span>The post_descriptor_status command
 
 </div>
 
@@ -1327,7 +1215,7 @@ descriptor_forbidden(3),
 
 <div>
 
-## <span id="voting"></span>6. Voting
+### <span id="voting"></span>Voting
 
 </div>
 
@@ -1367,7 +1255,7 @@ uint8 error_code;
 
 <div>
 
-### <span id="the-vote-command"></span>6.1. The vote command
+#### <span id="the-vote-command"></span>The vote command
 
 </div>
 
@@ -1395,7 +1283,7 @@ the payload.
 
 <div>
 
-### <span id="the-vote_status-command"></span>6.2. The vote_status command
+#### <span id="the-vote_status-command"></span>The vote_status command
 
 </div>
 
@@ -1434,7 +1322,7 @@ the voter to report that their vote was not accepted.
 
 <div>
 
-### <span id="the-get_vote-command"></span>6.3. The get_vote command
+#### <span id="the-get_vote-command"></span>The get_vote command
 
 </div>
 
@@ -1461,7 +1349,7 @@ with error_code vote_not_found(7).
 
 <div>
 
-## <span id="retrieval-of-consensus"></span>7. Retrieval of consensus
+### <span id="retrieval-of-consensus"></span>Retrieval of consensus
 
 </div>
 
@@ -1502,7 +1390,7 @@ opaque payload[];
 
 <div>
 
-### <span id="the-get_consensus-command"></span>7.1 The get_consensus command
+#### <span id="the-get_consensus-command"></span>The get_consensus command
 
 </div>
 
@@ -1529,7 +1417,7 @@ get_consensus command.
 
 <div>
 
-### <span id="the-consensus-command"></span>7.2 The consensus command
+#### <span id="the-consensus-command"></span>The consensus command
 
 </div>
 
@@ -1560,7 +1448,7 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
 
 <div>
 
-### <span id="the-cert-command"></span>7.3. The Cert command
+#### <span id="the-cert-command"></span>The Cert command
 
 </div>
 
@@ -1584,7 +1472,7 @@ the voting process.
 
 <div>
 
-### <span id="the-certstatus-command"></span>7.4. The CertStatus command
+#### <span id="the-certstatus-command"></span>The CertStatus command
 
 </div>
 
@@ -1610,7 +1498,7 @@ CertAlreadyReceived, CertTooLate
 
 <div>
 
-## <span id="signature-exchange"></span>8. Signature exchange
+### <span id="signature-exchange"></span>8. Signature exchange
 
 </div>
 
@@ -1629,7 +1517,7 @@ of the Sig and SigStatus commands.
 
 <div>
 
-### <span id="the-sig-command"></span>8.1. The sig command
+#### <span id="the-sig-command"></span>The sig command
 
 </div>
 
@@ -1650,7 +1538,7 @@ of Consensus for Epoch.
 
 <div>
 
-### <span id="the-sigstatus-command"></span>8.2. The sig_status command
+#### <span id="the-sigstatus-command"></span>The sig_status command
 
 </div>
 
@@ -1674,7 +1562,7 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div>
 
-## <span id="scalability-considerations"></span>9. Scalability considerations
+### <span id="scalability-considerations"></span>Scalability considerations
 
 </div>
 
@@ -1694,7 +1582,7 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div>
 
-## <span id="future-work"></span>10. Future work
+### <span id="future-work"></span>Future work
 
 </div>
 
@@ -1732,7 +1620,7 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div>
 
-## <span id="anonymity-considerations"></span>11. Anonymity considerations
+### <span id="anonymity-considerations"></span>Anonymity considerations
 
 </div>
 
@@ -1769,7 +1657,7 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div>
 
-## <span id="security-considerations"></span>12. Security considerations
+### <span id="security-considerations"></span>Security considerations
 
 </div>
 
@@ -1809,7 +1697,7 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div>
 
-## <span id="acknowledgements"></span>Acknowledgements
+### <span id="acknowledgements"></span>Acknowledgements
 
 </div>
 
@@ -1830,7 +1718,7 @@ design review.
 
 <div>
 
-## <span id="appendix-a.-references"></span>References
+### <span id="appendix-a.-references"></span>References
 
 </div>
 

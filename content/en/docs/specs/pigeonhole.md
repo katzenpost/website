@@ -1,15 +1,15 @@
 ---
-title: "Pigeonhole protocol design"
+title: ""
 linkTitle: "Pigeonhole Protocol"
 description: ""
-author: "Threebit Hacker, David Stainton"
+author: ""
 url: ""
-date: "2026-05-19T14:27:50.949359757-07:00"
+date: "2026-05-21T18:40:25.478064544-07:00"
 draft: "false"
 slug: "pigeonhole"
 layout: ""
 type: ""
-weight: "1"
+weight: "40"
 version: ""
 ---
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-## <span id="pigeonhole_protocol"></span>Pigeonhole protocol design
+## <span id="pigeonhole_protocol"></span>Pigeonhole protocol specification
 
 </div>
 
@@ -45,6 +45,21 @@ version: ""
 
 </div>
 
+<div>
+
+<div class="abstract">
+
+**Abstract**
+
+In this specification we describe the components and protocols that compose Pigeonhole
+scattered storage. We define the behavior of communication clients that send and retrieve
+individual messages, BACAP streams, and AllOrNothing streams. Client actions are mediated
+through courier services that interact with storage replicas.
+
+</div>
+
+</div>
+
 </div>
 
 ------------------------------------------------------------------------
@@ -59,30 +74,7 @@ version: ""
 
 <div>
 
-### <span id="d58e42"></span>Abstract
-
-</div>
-
-</div>
-
-</div>
-
-In this specification we describe the components and protocols that compose Pigeonhole
-scattered storage. We define the behavior of communication clients that send and retrieve
-individual messages, BACAP streams, and AllOrNothing streams. Client actions are mediated
-through courier services that interact with storage replicas.
-
-</div>
-
-<div class="section">
-
-<div class="titlepage">
-
-<div>
-
-<div>
-
-### <span id="d58e45"></span>Introduction
+### <span id="d58e43"></span>Introduction
 
 </div>
 
@@ -110,8 +102,8 @@ users.
 
 Many derivative protocols can be composed using Pigeonhole communication channels,
 including group communications. For details about the protocol specified here, see
-section
-"§5.6. End-to-end reliable group channels" in our paper <a href="https://arxiv.org/abs/2501.02933" class="link" target="_top">Echomix: a Strong Anonymity System with
+"§5.6.
+End-to-end reliable group channels" in our paper <a href="https://arxiv.org/abs/2501.02933" class="link" target="_top">Echomix: a Strong Anonymity System with
 Messaging</a>. For more information about BACAP, see §4 of the paper. For an
 understanding of how the core BACAP primitives are implemented, see <a href="https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go" class="link" target="_top">bacap.go</a>.
 
@@ -129,7 +121,7 @@ code snippets showing in-memory courier or replica state are given in Go.
 
 <div>
 
-### <span id="glossary"></span>Glossary
+### <span id="terminology"></span>Terminology
 
 </div>
 
@@ -137,45 +129,49 @@ code snippets showing in-memory courier or replica state are given in Go.
 
 </div>
 
-<div class="itemizedlist">
+The following terms are used in this specification.
 
-- <span class="strong">**Box**</span>: BACAP's unit of data storage. Each box has a
-  box ID (which also serves as its public key), a signature, and a ciphertext signed
-  payload.
+<div class="variablelist">
 
-- <span class="strong">**Courier**</span>: Service that runs on a service node and
-  interacts with storage replicas. Proxies requests from clients and routes replies
-  back to
-  clients (via SURBs).
+<span class="term"><span class="bold">**box**</span></span>  
+BACAP's unit of data storage. Each box has a box ID (which also serves as its
+public key), a signature, and a ciphertext signed payload.
 
-- <span class="strong">**Storage replica**</span>: The actual storage nodes where
-  message ciphertexts are stored and retrieved.
+<span class="term"><span class="bold">**courier**</span></span>  
+Service that runs on a service node and interacts with storage replicas. Proxies
+requests from clients and routes replies back to clients (via SURBs).
 
-- <span class="strong">**Intermediate replica**</span>: "Intermediate replicas are
-  chosen independently of the two final replicas for that box ID which are derived using
-  the
-  sharding scheme. The reason Alice designates intermediate replicas, as opposed to
-  addressing the final replicas directly, is to avoid revealing to the courier which
-  shard
-  the box falls into." (From "§5.4.1. Writing messages" in the <a href="https://arxiv.org/abs/2501.02933" class="link" target="_top">paper</a>.)<span class="strong">**Designated replica**</span> (a.k.a. <span class="emphasis">*final replica*</span>,
-  <span class="emphasis">*shard replica*</span>): One of the two replicas selected deterministically
-  for a given box ID by the `Shard2` consistent-hash algorithm. The intermediate
-  replicas replicate writes through to the designated replicas.
+<span class="term"><span class="bold">**envelope hash**</span></span>  
+`BLAKE2b-256(CourierEnvelope.sender_pubkey || CourierEnvelope.ciphertext)`. Used by the courier for deduplication of retransmissions
+and for demultiplexing replica replies.
 
-- <span class="strong">**EnvelopeHash**</span>:
-  `BLAKE2b-256(CourierEnvelope.sender_pubkey || CourierEnvelope.ciphertext)`. Used by the courier for deduplication of
-  retransmissions and for demultiplexing replica replies.
+<span class="term"><span class="bold">**MKEM**</span></span>  
+Multi-recipient KEM addressed to the pair of intermediate replicas. One MKEM ciphertext
+carries, for each recipient, a separate DEK encapsulation (`Dek1`, `Dek2`); either recipient may decapsulate and
+recover the padded `ReplicaInnerMessage`
 
-- <span class="strong">**MKEM**</span>: Multi-recipient KEM addressed to the pair of
-  intermediate replicas. One MKEM ciphertext carries, for each recipient, a separate
-  DEK
-  encapsulation (`Dek1`, `Dek2`); either recipient may
-  decapsulate and recover the padded `ReplicaInnerMessage`.
+<span class="term"><span class="bold">**replica epoch**</span></span>  
+A one-week period, distinct from the 20-minute mixnet PKI epoch, during which a given
+replica-side MKEM envelope keypair is valid. For more information, see
+<a href="https://katzenpost.network/docs/specs/pigeonhole/#epochs" class="link" target="_top">Epochs</a>.
 
-- <span class="strong">**Replica-epoch**</span>: A one-week period, distinct from the
-  20-minute mixnet PKI epoch, during which a given replica-side MKEM envelope keypair
-  is
-  valid. See <a href="#epochs" class="xref" title="Epochs">the section called “Epochs”</a> below.
+<span class="term"><span class="bold">**storage replica**</span></span>  
+"Intermediate replicas are chosen independently of the two final replicas for that
+box ID which are derived using the sharding scheme. The reason Alice designates
+intermediate replicas, as opposed to addressing the final replicas directly, is to
+avoid
+revealing to the courier which shard the box falls into." (From "§5.4.1. Writing messages"
+in the paper.) Designated replica (a.k.a. final replica, shard replica): One of the
+two
+replicas selected deterministically for a given box ID by the Shard2 consistent-hash
+algorithm. The intermediate replicas replicate writes through to the designated replicas.
+
+<span class="term"><span class="bold">**SURB**</span></span>  
+Single use reply block. SURBs are used to achieve recipient anonymity,
+that is to say, SURBs function as a cryptographic delivery token that
+you can give to another client entity so that they can send you a
+message without them knowing your identity or location on the network.
+See `SPHINXSPEC` and `SPHINX`.
 
 </div>
 
@@ -199,7 +195,7 @@ code snippets showing in-memory courier or replica state are given in Go.
 
 A conforming deployment MUST run at least <span class="strong">**four**</span>
 storage replicas (n ≥ 4). The enables the intermediate-replica unlinkability property
-described in the <a href="#glossary" class="xref" title="Glossary">the section called “Glossary”</a> and in §5.4.1 of the paper: for each
+described above and in §5.4.1 of the <a href="https://arxiv.org/abs/2501.02933" class="link" target="_top">Echomix: a Strong Anonymity System with Messaging</a>: for each
 `CourierEnvelope`, the client picks two <span class="emphasis">*intermediate*</span>
 replicas which MUST be disjoint from the two <span class="emphasis">*final*</span> (sharded) replicas
 that hold the box. Disjointness is what prevents the courier from learning which shard
@@ -295,7 +291,7 @@ timescales, and Pigeonhole touches both:
 
 <div>
 
-#### <span id="d58e191"></span>Epoch tolerance for CourierEnvelope
+#### <span id="d58e193"></span>Epoch tolerance for CourierEnvelope
 
 </div>
 
@@ -355,7 +351,7 @@ encryption" from other courier-side rejections.
 
 <div>
 
-### <span id="d58e242"></span>Pigeonhole message format and constants
+### <span id="d58e244"></span>Pigeonhole message format and constants
 
 </div>
 
@@ -397,7 +393,7 @@ Carriage of these messages differs by hop:
 
 <div>
 
-#### <span id="d58e281"></span>Fundamental size constants
+#### <span id="d58e283"></span>Fundamental size constants
 
 </div>
 
@@ -407,7 +403,7 @@ Carriage of these messages differs by hop:
 
 <div class="table">
 
-<span id="d58e283"></span>
+<span id="d58e285"></span>
 
 **Table 1. **
 
@@ -486,7 +482,7 @@ Carriage of these messages differs by hop:
 
 <div>
 
-#### <span id="d58e337"></span>Maximum BACAP payload
+#### <span id="d58e339"></span>Maximum BACAP payload
 
 </div>
 
@@ -587,7 +583,7 @@ Notable points:
 
 <div>
 
-#### <span id="d58e402"></span>The ReplicaInnerMessage as seen by a replica
+#### <span id="d58e404"></span>The ReplicaInnerMessage as seen by a replica
 
 </div>
 
@@ -623,7 +619,7 @@ A `ReplicaWrite` with `payload_len == 0` is a <a href="#tombstones" class="link"
 
 <div>
 
-### <span id="d58e420"></span>M\<essage types and interactions
+### <span id="d58e422"></span>M\<essage types and interactions
 
 </div>
 
@@ -639,7 +635,7 @@ A `ReplicaWrite` with `payload_len == 0` is a <a href="#tombstones" class="link"
 
 <div>
 
-#### <span id="d58e422"></span>Overview
+#### <span id="d58e424"></span>Overview
 
 </div>
 
@@ -726,7 +722,7 @@ struct courier_query_reply {
 
 <div>
 
-#### <span id="d58e478"></span>CourierEnvelope
+#### <span id="d58e480"></span>CourierEnvelope
 
 </div>
 
@@ -770,7 +766,7 @@ performs the following actions.
 
 <div>
 
-#### <span id="d58e526"></span>ReplicaMessage (wire command)
+#### <span id="d58e528"></span>ReplicaMessage (wire command)
 
 </div>
 
@@ -807,7 +803,7 @@ dispatches on `message_type` to `ReplicaRead` or
 
 <div>
 
-#### <span id="d58e551"></span>ReplicaMessageReply (wire command)
+#### <span id="d58e553"></span>ReplicaMessageReply (wire command)
 
 </div>
 
@@ -846,7 +842,7 @@ replica's envelope keypair.
 
 <div>
 
-#### <span id="d58e579"></span>CourierBookKeeping
+#### <span id="d58e581"></span>CourierBookKeeping
 
 </div>
 
@@ -889,7 +885,7 @@ The dedup cache has a TTL of 5 minutes (`DedupCacheTTL` in <a href="https://gith
 
 <div>
 
-#### <span id="d58e603"></span>CourierEnvelopeReply
+#### <span id="d58e605"></span>CourierEnvelopeReply
 
 </div>
 
@@ -931,7 +927,7 @@ by a replica.
 
 <div>
 
-### <span id="d58e625"></span>Embedded pigeonhole types
+### <span id="d58e627"></span>Embedded pigeonhole types
 
 </div>
 
@@ -951,7 +947,7 @@ MKEM envelopes and their replies.
 
 <div>
 
-#### <span id="d58e628"></span>ReplicaRead
+#### <span id="d58e630"></span>ReplicaRead
 
 </div>
 
@@ -978,7 +974,7 @@ struct replica_read {
 
 <div>
 
-#### <span id="d58e635"></span>ReplicaReadReply
+#### <span id="d58e637"></span>ReplicaReadReply
 
 </div>
 
@@ -1011,7 +1007,7 @@ struct replica_read_reply {
 
 <div>
 
-#### <span id="d58e644"></span>ReplicaWrite
+#### <span id="d58e646"></span>ReplicaWrite
 
 </div>
 
@@ -1046,7 +1042,7 @@ reads return `ReplicaErrorTombstone`.
 
 <div>
 
-#### <span id="d58e666"></span>ReplicaWriteReply
+#### <span id="d58e668"></span>ReplicaWriteReply
 
 </div>
 
@@ -1123,7 +1119,7 @@ box of the temporary stream with tombstones.
 
 <div>
 
-### <span id="d58e725"></span>EnvelopeHash
+### <span id="d58e727"></span>EnvelopeHash
 
 </div>
 
@@ -1156,7 +1152,7 @@ surrounding Sphinx packet (and its SURB) changes between attempts.
 
 <div>
 
-### <span id="d58e756"></span>Error codes
+### <span id="d58e757"></span>Error codes
 
 </div>
 
@@ -1187,7 +1183,7 @@ Returned by a replica in `ReplicaMessageReply.ErrorCode`,
 
 <div class="table">
 
-<span id="d58e774"></span>
+<span id="d58e775"></span>
 
 **Table 2. **
 
@@ -1285,7 +1281,7 @@ protocol states rather than faults. The thin-client helper
 
 <div>
 
-#### <span id="d58e851"></span>Courier envelope error codes
+#### <span id="d58e852"></span>Courier envelope error codes
 
 </div>
 
@@ -1297,7 +1293,7 @@ Returned by the courier in `CourierEnvelopeReply.error_code`.
 
 <div class="table">
 
-<span id="d58e857"></span>
+<span id="d58e858"></span>
 
 **Table 3. **
 
@@ -1356,7 +1352,7 @@ Returned by the courier in `CourierEnvelopeReply.error_code`.
 
 <div>
 
-#### <span id="d58e899"></span>Copy command status codes
+#### <span id="d58e900"></span>Copy command status codes
 
 </div>
 
@@ -1372,7 +1368,7 @@ information.)
 
 <div class="table">
 
-<span id="d58e913"></span>
+<span id="d58e914"></span>
 
 **Table 4. **
 
@@ -1424,7 +1420,7 @@ information.)
 
 <div>
 
-### <span id="d58e946"></span>Sharding and replica selection
+### <span id="d58e948"></span>Sharding and replica selection
 
 </div>
 
@@ -1433,14 +1429,16 @@ information.)
 </div>
 
 For each box, two <span class="emphasis">*designated*</span> (final) replicas are derived
-deterministically from the box ID using the `Shard2` consistent-hash algorithm.
-(See <a href="https://github.com/katzenpost/katzenpost/blob/main/replica/common/shard.go" class="link" target="_top"><code class="code">replica/common/shard.go</code></a>.):
+deterministically from the box ID using the `Shard2` consistent-hash algorithm, as
+shown in the following pseudocode.
 
 ``` programlisting
 for each online replica r with identity key k_r:
     h_r = BLAKE2b-256(k_r || box_id)
-// return the two replicas whose h_r values are smallest
+return the two replicas whose h_r values are smallest
 ```
+
+For more information about sharding, see <a href="https://github.com/katzenpost/katzenpost/blob/main/replica/common/shard.go" class="link" target="_top"><code class="code">replica/common/shard.go</code></a>.
 
 The two <span class="emphasis">*intermediate*</span> replicas chosen by the client for a given
 `CourierEnvelope` are drawn independently of the designated replicas, per
@@ -1462,7 +1460,7 @@ The two <span class="emphasis">*intermediate*</span> replicas chosen by the clie
 
 Intermediate replicas, upon accepting a `ReplicaWrite`, compute the designated
 replicas themselves and forward the `ReplicaWrite` to them via the
-`core/wire/commands``ReplicaWrite` command (see <a href="https://github.com/katzenpost/katzenpost/blob/main/replica/connector.go" class="link" target="_top"><code class="code">replica/connector.go</code></a>).
+`core/wire/commands``ReplicaWrite` command. For more information, see <a href="https://github.com/katzenpost/katzenpost/blob/main/replica/connector.go" class="link" target="_top"><code class="code">replica/connector.go</code></a>.
 
 </div>
 
@@ -1474,7 +1472,7 @@ replicas themselves and forward the `ReplicaWrite` to them via the
 
 <div>
 
-### <span id="d58e1001"></span>Protocol sequence visualizations
+### <span id="d58e1005"></span>Protocol sequence visualizations
 
 </div>
 
@@ -1489,7 +1487,7 @@ write and read operations.
 
 <div class="figure">
 
-<span id="d58e1008"></span>
+<span id="d58e1012"></span>
 
 **Figure 1. Annotated writes**
 
@@ -1511,7 +1509,7 @@ write and read operations.
 
 <div class="figure">
 
-<span id="d58e1021"></span>
+<span id="d58e1025"></span>
 
 **Figure 2. Annotated reads**
 
@@ -1569,7 +1567,7 @@ The protocol works as follows.
 
 <div>
 
-#### <span id="d58e1035"></span>Step 1
+#### <span id="d58e1039"></span>Step 1
 
 </div>
 
@@ -1602,7 +1600,7 @@ in <a href="#temp_stream" class="xref" title="Temporary stream data format">the 
 
 <div>
 
-#### <span id="d58e1055"></span>Step 2
+#### <span id="d58e1059"></span>Step 2
 
 </div>
 
@@ -1716,7 +1714,7 @@ This dedup cache has a TTL of 30 minutes (`CopyDedupCacheTTL` in <a href="https:
 
 <div>
 
-#### <span id="d58e1123"></span>CopyCommand
+#### <span id="d58e1127"></span>CopyCommand
 
 </div>
 
@@ -1818,7 +1816,7 @@ cause the `CopyCommand` to be processed more than once.
 
 <div>
 
-#### <span id="d58e1204"></span>Potential use cases of AllOrNothing
+#### <span id="d58e1208"></span>Potential use cases of AllOrNothing
 
 </div>
 
@@ -1872,7 +1870,7 @@ In no particular order:
 
 <div>
 
-### <span id="d58e1227"></span>Protocol narration example
+### <span id="d58e1231"></span>Protocol narration example
 
 </div>
 

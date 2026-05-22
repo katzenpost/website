@@ -1,10 +1,10 @@
 ---
-title: "Glossary"
+title: ""
 linkTitle: "Glossary"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:17:28.766369-07:00"
+date: "2026-05-21T18:40:10.525683635-07:00"
 draft: "false"
 slug: "glossary"
 layout: ""
@@ -13,7 +13,7 @@ weight: "90"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-# <span id="glossary"></span>Glossary
+## <span id="glossary"></span>Glossary
 
 </div>
 
@@ -48,10 +48,9 @@ We distinguish the following classes of traffic:
 </div>
 
 <span class="term"><span class="bold">**client**</span></span>  
-Software run by the User on its local device to participate in the Mixnet.
-Again let us reiterate that a client is not considered a "node in the
-network" at the level of analysis where we are discussing the core mixnet
-protocol in this here document.
+Software run by the user on their local device to participate in the mixnet.
+A client is not considered a "node in the
+network" for purposes of analyhsis of the core mnixnet protocols.
 
 <span class="term"><span class="bold">**directory authority system**</span></span>  
 Refers to specific PKI schemes used by Mixminion and Tor.
@@ -73,10 +72,12 @@ A mix that has some additional features:
 </div>
 
 <span class="term"><span class="bold">**epoch**</span></span>  
-A fixed time interval defined in section 4.2 Sphinx Mix and Provider Key
-Rotation. The epoch is currently set to 20 minutes.
+A fixed time interval with a current default value of 20 minutes.
 A new PKI document containing public key material
-is published for each epoch and is valid only for that epoch.
+is published for each epoch and is valid only for that epoch. For more information
+see
+<a href="https://katzenpost.network/docs/specs/mix_network/#sphinx-mix-and-provider-key-rotation" class="link" target="_top">Sphinx
+mix and provider key rotation</a>.
 
 <span class="term"><span class="bold">**family**</span></span>  
 Identifier of security domains or entities operating one or more mixes in
@@ -101,9 +102,6 @@ packet.
 
 <span class="term"><span class="bold">**KiB**</span></span>  
 Defined as 1024 8 bit octets.
-
-<span class="term"><span class="bold">**Katzenpost**</span></span>  
-A project to design many improved decryption mixnet protocols.
 
 <span class="term"><span class="bold">**layer**</span></span>  
 The layer indicates which network topology layer a particular mix resides
@@ -135,13 +133,13 @@ A nickname string that is unique in the consensus document, see Katzenpost
 Mix Network Specification section 2.2. Network Topology.
 
 <span class="term"><span class="bold">**node**</span></span>  
-Clients are NOT considered nodes in the mix network. However note that
-network protocols are often layered; in our design documents we describe
+Clients are NOT considered nodes in the mix network. However,
+network protocols are often layered. In our design documents we describe
 "mixnet hidden services" which can be operated by mixnet clients. Therefore
-if you are using node in some adherence to mathematical terminology one
+if you are using the term "node" in some adherence to mathematical terminology, one
 could conceivably designate a client as a node. That having been said, it
 would not be appropriate to the discussion of our core mixnet protocol to
-refer to the clients as nodes.
+refer to clients as nodes.
 
 <span class="term"><span class="bold">**packet**</span></span>  
 A Sphinx packet, of fixed
@@ -174,7 +172,7 @@ correct way to efficiently implement a software based router on general
 purpose computing hardware.
 
 <span class="term"><span class="bold">**service mix**</span></span>  
-A service mix is a mix that has some additional features:
+A service mix is a mix server that has some additional features:
 
 <div class="itemizedlist">
 
