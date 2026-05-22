@@ -1,19 +1,19 @@
 ---
-title: "Sphinx cryptographic packet format"
+title: ""
 linkTitle: "Sphinx cryptographic packet format"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:24:41.117567505-07:00"
+date: "2026-05-21T18:40:44.431705911-07:00"
 draft: "false"
 slug: "sphinx_format"
 layout: ""
 type: ""
-weight: "1"
+weight: "55"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-# <span id="sphinx"></span>Sphinx cryptographic packet format
+## <span id="sphinx"></span>Sphinx cryptographic packet format specification
 
 </div>
 
@@ -84,57 +84,6 @@ serve as an implementation guide.
 
 </div>
 
-<div class="toc">
-
-**Table of Contents**
-
-<span class="section">[Terminology](#terminology)</span>
-
-<span class="section">[Conventions Used in This
-Document](#conventions-used-in-this-document)</span>
-
-<span class="section">[1. Introduction](#sphinx_introduction)</span>
-
-<span class="section">[2. Cryptographic Primitives](#cryptographic-primitives)</span>
-
-<span class="section">[2.1 Sphinx Key Derivation Function](#sphinx-key-derivation-function)</span>
-
-<span class="section">[3. Sphinx Packet Parameters](#sphinx-packet-parameters)</span>
-
-<span class="section">[3.1 Sphinx Parameter Constants](#sphinx-parameter-constants)</span>
-
-<span class="section">[3.2 Sphinx Packet Geometry](#sphinx-packet-geometry)</span>
-
-<span class="section">[4. The Sphinx Cryptographic Packet Structure](#the-sphinx-cryptographic-packet-structure)</span>
-
-<span class="section">[4.1 Sphinx Packet Header](#sphinx-packet-header)</span>
-
-<span class="section">[4.1.1 Per-hop routing information](#per-hop-routing-information)</span>
-
-<span class="section">[4.2 Sphinx Packet Payload](#sphinx-packet-payload)</span>
-
-<span class="section">[5. Sphinx Packet Creation](#sphinx-packet-creation)</span>
-
-<span class="section">[5.1 Create a Sphinx Packet Header](#create-a-sphinx-packet-header)</span>
-
-<span class="section">[5.2 Create a Sphinx Packet](#create-a-sphinx-packet)</span>
-
-<span class="section">[6. Sphinx Packet Processing](#sphinx-packet-processing)</span>
-
-<span class="section">[6.1 Sphinx_Unwrap Operation](#sphinx_unwrap-operation)</span>
-
-<span class="section">[7. Single Use Reply Block (SURB) Creation](#single-use-reply-block-surb-creation)</span>
-
-<span class="section">[8. Single Use Reply Block Replies](#single-use-reply-block-replies)</span>
-
-<span class="section">[9. Anonymity Considerations](#anonymity-considerations)</span>
-
-<span class="section">[10. Security Considerations](#security-considerations)</span>
-
-<span class="section">[References](#appendix-a.-references)</span>
-
-</div>
-
 <div class="section">
 
 <div class="titlepage">
@@ -143,7 +92,7 @@ Document](#conventions-used-in-this-document)</span>
 
 <div>
 
-## <span id="terminology"></span>Terminology
+### <span id="terminology"></span>Terminology
 
 </div>
 
@@ -155,10 +104,26 @@ The following terms are used in this specification.
 
 <div class="variablelist">
 
+<span class="term"><span class="bold">**group element**</span></span>  
+An individual element of the group.
+
+<span class="term"><span class="bold">**group generator**</span></span>  
+A group element capable of generating any other element of the group, via
+repeated applications of the generator and the group operation.
+
+<span class="term"><span class="bold">**header**</span></span>  
+The packet header consisting of several components, which convey the
+information necessary to verify packet integrity and correctly process the
+packet.
+
 <span class="term"><span class="bold">**message**</span></span>  
 A variable-length sequence of octets sent anonymously through the network.
 Short messages are sent in a single packet; long messages are fragmented
 across multiple packets.
+
+<span class="term"><span class="bold">**payload**</span></span>  
+The fixed-length portion of a packet containing an encrypted message or
+part of a message, to be delivered anonymously.
 
 <span class="term"><span class="bold">**packet**</span></span>  
 A Sphinx packet, of fixed
@@ -166,22 +131,6 @@ length for each class of traffic, carrying a message payload and metadata for ro
 Packets are routed anonymously through the mixnet and cryptographically transformed
 at
 each hop.
-
-<span class="term"><span class="bold">**header**</span></span>  
-The packet header consisting of several components, which convey the
-information necessary to verify packet integrity and correctly process the
-packet.
-
-<span class="term"><span class="bold">**payload**</span></span>  
-The fixed-length portion of a packet containing an encrypted message or
-part of a message, to be delivered anonymously.
-
-<span class="term"><span class="bold">**group element**</span></span>  
-An individual element of the group.
-
-<span class="term"><span class="bold">**group generator**</span></span>  
-A group element capable of generating any other element of the group, via
-repeated applications of the generator and the group operation.
 
 </div>
 
@@ -195,7 +144,7 @@ repeated applications of the generator and the group operation.
 
 <div>
 
-## <span id="conventions-used-in-this-document"></span>Conventions Used in This Document
+### <span id="conventions-used-in-this-document"></span>Conventions used in this document
 
 </div>
 
@@ -248,7 +197,7 @@ except for cryptographic attributes, which are specified as opaque byte vectors.
 
 <div>
 
-## <span id="sphinx_introduction"></span>1. Introduction
+### <span id="sphinx_introduction"></span>Introduction
 
 </div>
 
@@ -274,7 +223,7 @@ providing unlinkability for each leg of the packet’s journey over the network.
 
 <div>
 
-## <span id="cryptographic-primitives"></span>2. Cryptographic Primitives
+### <span id="cryptographic-primitives"></span>Cryptographic primitives
 
 </div>
 
@@ -345,7 +294,7 @@ building blocks for Sphinx:
 
 <div>
 
-### <span id="sphinx-key-derivation-function"></span>2.1 Sphinx Key Derivation Function
+#### <span id="sphinx-key-derivation-function"></span>Sphinx key derivation function
 
 </div>
 
@@ -411,7 +360,7 @@ packet_keys = kdf_out[:LEN( SphinxPacketKeys )]
 
 <div>
 
-## <span id="sphinx-packet-parameters"></span>3. Sphinx Packet Parameters
+### <span id="sphinx-packet-parameters"></span>Sphinx packet parameters
 
 </div>
 
@@ -427,7 +376,7 @@ packet_keys = kdf_out[:LEN( SphinxPacketKeys )]
 
 <div>
 
-### <span id="sphinx-parameter-constants"></span>3.1 Sphinx Parameter Constants
+#### <span id="sphinx-parameter-constants"></span>Sphinx parameter constants
 
 </div>
 
@@ -480,7 +429,7 @@ application and security requirements.
 
 <div>
 
-### <span id="sphinx-packet-geometry"></span>3.2 Sphinx Packet Geometry
+#### <span id="sphinx-packet-geometry"></span>Sphinx packet geometry
 
 </div>
 
@@ -536,7 +485,7 @@ PACKET_LENGTH = HEADER_LENGTH + PAYLOAD_LENGTH
 
 <div>
 
-## <span id="the-sphinx-cryptographic-packet-structure"></span>4. The Sphinx Cryptographic Packet Structure
+### <span id="the-sphinx-cryptographic-packet-structure"></span>The Sphinx cryptographic packet Structure
 
 </div>
 
@@ -572,7 +521,7 @@ opaque payload[PAYLOAD_LENGTH];
 
 <div>
 
-### <span id="sphinx-packet-header"></span>4.1 Sphinx Packet Header
+#### <span id="sphinx-packet-header"></span>Sphinx packet header
 
 </div>
 
@@ -631,7 +580,7 @@ opaque MAC[MAC_LENGTH];
 
 <div>
 
-### <span id="per-hop-routing-information"></span>4.1.1 Per-hop routing information
+#### <span id="per-hop-routing-information"></span>Per-hop routing information
 
 </div>
 
@@ -738,7 +687,7 @@ Every non-terminal hop’s `routing_commands` MUST include a
 
 <div>
 
-### <span id="sphinx-packet-payload"></span>4.2 Sphinx Packet Payload
+#### <span id="sphinx-packet-payload"></span>Sphinx packet payload
 
 </div>
 
@@ -775,7 +724,7 @@ payload is decrypted by the recipient.
 
 <div>
 
-## <span id="sphinx-packet-creation"></span>5. Sphinx Packet Creation
+### <span id="sphinx-packet-creation"></span>Sphinx packet creation
 
 </div>
 
@@ -811,7 +760,7 @@ identifier of the next hop.
 
 <div>
 
-### <span id="create-a-sphinx-packet-header"></span>5.1 Create a Sphinx Packet Header
+#### <span id="create-a-sphinx-packet-header"></span>Create a Sphinx packet header
 
 </div>
 
@@ -1018,7 +967,7 @@ payload_keys  - The vector of SPRP keys, to be returned.
 
 <div>
 
-### <span id="create-a-sphinx-packet"></span>5.2 Create a Sphinx Packet
+#### <span id="create-a-sphinx-packet"></span>Create a Sphinx packet
 
 </div>
 
@@ -1112,7 +1061,7 @@ sphinx_packet.payload = payload
 
 <div>
 
-## <span id="sphinx-packet-processing"></span>6. Sphinx Packet Processing
+### <span id="sphinx-packet-processing"></span>Sphinx packet processing
 
 </div>
 
@@ -1144,7 +1093,7 @@ application if the current node is the final recipient.
 
 <div>
 
-### <span id="sphinx_unwrap-operation"></span>6.1 Sphinx_Unwrap Operation
+#### <span id="sphinx_unwrap-operation"></span><span class="emphasis">*Sphinx_Unwrap*</span> operation
 
 </div>
 
@@ -1351,7 +1300,7 @@ sphinx_packet.hdr = hdr
 
 <div>
 
-#### <span id="post-sphinx_unwrap-processing"></span>6.2 Post Sphinx_Unwrap Processing
+##### <span id="post-sphinx_unwrap-processing"></span>Post <span class="emphasis">*Sphinx_Unwrap*</span> processing
 
 </div>
 
@@ -1450,7 +1399,7 @@ sphinx_packet.payload = sphinx_packet.payload[PAYLOAD_TAG_LENGTH:]
 
 <div>
 
-### <span id="single-use-reply-block-surb-creation"></span>7. Single Use Reply Block (SURB) Creation
+#### <span id="single-use-reply-block-surb-creation"></span>Single-use reply block (SURB) creation
 
 </div>
 
@@ -1488,7 +1437,7 @@ opaque payload_key[SPRP_KEY_LENGTH];
 
 <div>
 
-#### <span id="create-a-sphinx-surb-and-decryption-token"></span>7.1 Create a Sphinx SURB and Decryption Token
+##### <span id="create-a-sphinx-surb-and-decryption-token"></span>Create a Sphinx SURB and decryption token
 
 </div>
 
@@ -1590,7 +1539,7 @@ decryption_token = final_key + payload_keys /* Prepend */
 
 <div>
 
-#### <span id="decrypt-a-sphinx-reply-originating-from-a-surb"></span>7.2 Decrypt a Sphinx Reply Originating from a SURB
+##### <span id="decrypt-a-sphinx-reply-originating-from-a-surb"></span>Decrypt a Sphinx reply originating from a SURB
 
 </div>
 
@@ -1678,7 +1627,7 @@ message = message[PAYLOAD_TAG_LENGTH:]
 
 <div>
 
-### <span id="single-use-reply-block-replies"></span>8. Single Use Reply Block Replies
+#### <span id="single-use-reply-block-replies"></span>SURB replies
 
 </div>
 
@@ -1755,7 +1704,7 @@ via `sphinx_surb.node_id`, as the entire reply
 
 <div>
 
-### <span id="anonymity-considerations"></span>9. Anonymity Considerations
+#### <span id="anonymity-considerations"></span>Anonymity considerations
 
 </div>
 
@@ -1771,7 +1720,7 @@ via `sphinx_surb.node_id`, as the entire reply
 
 <div>
 
-#### <span id="optional-non-constant-length-sphinx-packet-header-padding"></span>9.1 Optional Non-constant Length Sphinx Packet Header Padding
+##### <span id="optional-non-constant-length-sphinx-packet-header-padding"></span>Optional non-constant length Sphinx packet header padding
 
 </div>
 
@@ -1812,7 +1761,7 @@ are assumed to have by default in such a design.
 
 <div>
 
-#### <span id="additional-data-field-considerations"></span>9.2 Additional Data Field Considerations
+##### <span id="additional-data-field-considerations"></span>Additional data field considerations
 
 </div>
 
@@ -1839,7 +1788,7 @@ NOT transmit AD that can be used to distinctly identify individual packets.
 
 <div>
 
-#### <span id="forward-secrecy-considerations"></span>9.3 Forward Secrecy Considerations
+##### <span id="forward-secrecy-considerations"></span>Forward secrecy considerations
 
 </div>
 
@@ -1871,7 +1820,7 @@ secure mixes <a href="#SFMIX03" class="link">SFMIX03</a> could be used.
 
 <div>
 
-#### <span id="compulsion-threat-considerations"></span>9.4 Compulsion Threat Considerations
+##### <span id="compulsion-threat-considerations"></span>Compulsion threat considerations
 
 </div>
 
@@ -1899,7 +1848,7 @@ via a series of routing command extensions.
 
 <div>
 
-#### <span id="surb-usage-considerations-for-volunteer-operated-mix-networks"></span>9.5 SURB Usage Considerations for Volunteer Operated Mix Networks
+##### <span id="surb-usage-considerations-for-volunteer-operated-mix-networks"></span>SURB usage considerations for volunteer-operated mix networks
 
 </div>
 
@@ -1931,7 +1880,7 @@ information gained is the identity of the cross-over point.
 
 <div>
 
-### <span id="security-considerations"></span>10. Security Considerations
+#### <span id="security-considerations"></span>Security considerations
 
 </div>
 
@@ -1947,7 +1896,7 @@ information gained is the identity of the cross-over point.
 
 <div>
 
-#### <span id="sphinx-payload-encryption-considerations"></span>10.1 Sphinx Payload Encryption Considerations
+##### <span id="sphinx-payload-encryption-considerations"></span>Sphinx payload encryption considerations
 
 </div>
 
@@ -1988,7 +1937,7 @@ to transmit payload that is known to the creator of the SURB.
 
 <div>
 
-## <span id="appendix-a.-references"></span>References
+### <span id="appendix-a.-references"></span>References
 
 </div>
 

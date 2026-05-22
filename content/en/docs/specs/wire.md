@@ -4,16 +4,16 @@ linkTitle: "Wire protocol"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:25:36.390246469-07:00"
+date: "2026-05-21T18:40:51.228226158-07:00"
 draft: "false"
 slug: "wire_protocol"
 layout: ""
 type: ""
-weight: "1"
+weight: "65"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-## <span id="wire_protocol"></span>Katzenpost mix network wire protocol
+## <span id="wire_protocol"></span>Mix network wire protocol specification
 
 </div>
 
@@ -64,44 +64,6 @@ network communications to, from, and within the Katzenpost Mix Network.
 
 </div>
 
-<div class="toc">
-
-**Table of Contents**
-
-<span class="section">[1.1 Conventions Used in This Document](#conventions-used-in-this-document)</span>
-
-<span class="section">[1. Introduction](#wire_protocol_introduction)</span>
-
-<span class="section">[1.2 Key Encapsulation Mechanism](#key-encapsulation-mechanism)</span>
-
-<span class="section">[2. Core Protocol](#core-protocol)</span>
-
-<span class="section">[2.1 Handshake Phase](#handshake-phase)</span>
-
-<span class="section">[2.1.1 Handshake Authentication](#handshake-authentication)</span>
-
-<span class="section">[2.2 Data Transfer Phase](#data-transfer-phase)</span>
-
-<span class="section">[3. Predefined Commands](#predefined-commands)</span>
-
-<span class="section">[3.1 The no_op Command](#the-no_op-command)</span>
-
-<span class="section">[3.2 The disconnect Command](#the-disconnect-command)</span>
-
-<span class="section">[3.3 The send_packet Command](#the-send_packet-command)</span>
-
-<span class="section">[4. Command Padding](#command-padding)</span>
-
-<span class="section">[5. Anonymity Considerations](#anonymity-considerations)</span>
-
-<span class="section">[6. Security Considerations](#security-considerations)</span>
-
-<span class="section">[Acknowledgments](#acknowledgments)</span>
-
-<span class="section">[References](#appendix-a.-references)</span>
-
-</div>
-
 <div class="section">
 
 <div class="titlepage">
@@ -110,7 +72,7 @@ network communications to, from, and within the Katzenpost Mix Network.
 
 <div>
 
-## <span id="conventions-used-in-this-document"></span>1.1 Conventions Used in This Document
+### <span id="conventions-used-in-this-document"></span>1.1 Conventions used in this document
 
 </div>
 
@@ -138,7 +100,7 @@ cryptographic attributes, which are specified as opaque byte vectors.
 
 <div>
 
-## <span id="wire_protocol_introduction"></span>1. Introduction
+### <span id="wire_protocol_introduction"></span>1. Introduction
 
 </div>
 
@@ -161,7 +123,7 @@ forward secrecy.
 
 <div>
 
-### <span id="key-encapsulation-mechanism"></span>1.2 Key Encapsulation Mechanism
+#### <span id="key-encapsulation-mechanism"></span>1.2 Key encapsulation mechanism
 
 </div>
 
@@ -184,7 +146,7 @@ most users select a hybrid post quantum KEM such as Xwing. <a href="#XWING" clas
 
 <div>
 
-## <span id="core-protocol"></span>2. Core Protocol
+### <span id="core-protocol"></span>2. Core protocol
 
 </div>
 
@@ -237,7 +199,7 @@ is beyond the scope of this document.
 
 <div>
 
-### <span id="handshake-phase"></span>2.1 Handshake Phase
+#### <span id="handshake-phase"></span>2.1 Handshake phase
 
 </div>
 
@@ -284,7 +246,7 @@ SHOULD terminate sessions that are taking too long to handshake.
 
 <div>
 
-### <span id="handshake-authentication"></span>2.1.1 Handshake Authentication
+#### <span id="handshake-authentication"></span>2.1.1 Handshake authentication
 
 </div>
 
@@ -349,7 +311,7 @@ unix_time value to avoid leaking precise load information via packet queueing de
 
 <div>
 
-### <span id="data-transfer-phase"></span>2.2 Data Transfer Phase
+#### <span id="data-transfer-phase"></span>2.2 Data transfer phase
 
 </div>
 
@@ -447,7 +409,7 @@ if it expires.
 
 <div>
 
-## <span id="predefined-commands"></span>3. Predefined Commands
+### <span id="predefined-commands"></span>3. Predefined commands
 
 </div>
 
@@ -463,7 +425,7 @@ if it expires.
 
 <div>
 
-### <span id="the-no_op-command"></span>3.1 The no_op Command
+#### <span id="the-no_op-command"></span>3.1 The <span class="emphasis">*no_op*</span> command
 
 </div>
 
@@ -488,7 +450,7 @@ all received command data MUST be discarded without interpretation.
 
 <div>
 
-### <span id="the-disconnect-command"></span>3.2 The disconnect Command
+#### <span id="the-disconnect-command"></span>3.2 The <span class="emphasis">*disconnect*</span> command
 
 </div>
 
@@ -518,7 +480,7 @@ MUST not send any further traffic after sending a disconnect command.
 
 <div>
 
-### <span id="the-send_packet-command"></span>3.3 The send_packet Command
+#### <span id="the-send_packet-command"></span>3.3 The <span class="emphasis">*send_packet*</span> command
 
 </div>
 
@@ -545,7 +507,7 @@ Initiators MUST terminate the session immediately upon reception of a
 
 <div>
 
-## <span id="command-padding"></span>4. Command Padding
+### <span id="command-padding"></span>4. Command padding
 
 </div>
 
@@ -592,7 +554,7 @@ it would just needlessly take up bandwidth without providing any privacy benefit
 
 <div>
 
-## <span id="anonymity-considerations"></span>5. Anonymity Considerations
+### <span id="anonymity-considerations"></span>5. Anonymity considerations
 
 </div>
 
@@ -618,7 +580,7 @@ the fixed positions of the various public keys.
 
 <div>
 
-## <span id="security-considerations"></span>6. Security Considerations
+### <span id="security-considerations"></span>6. Security considerations
 
 </div>
 
@@ -645,7 +607,7 @@ that large scale quantum computers are applied to historical intercepts.
 
 <div>
 
-## <span id="acknowledgments"></span>Acknowledgments
+### <span id="acknowledgments"></span>Acknowledgments
 
 </div>
 
@@ -666,20 +628,13 @@ protocol, and answering questions regarding Noise.
 
 <div>
 
-## <span id="appendix-a.-references"></span>References
+### <span id="appendix-a.-references"></span>References
 
 </div>
 
 </div>
 
 </div>
-
-<span id="XWING"></span><span class="bold">**XWING**</span>
-
-Manuel Barbosa, Deirdre Connolly, João Diogo Duarte, Aaron Kaiser, Peter Schwabe,
-Karoline Varner, Bas Westerbaan, <span class="quote">“<span class="quote">X-Wing: The Hybrid KEM You’ve Been Looking
-For</span>”</span>,
-<a href="https://eprint.iacr.org/2024/039.pdf" class="link" target="_top">https://eprint.iacr.org/2024/039.pdf</a>.
 
 <span id="NOISE"></span><span class="bold">**NOISE**</span>
 
@@ -711,6 +666,13 @@ Version 1.2</span>”</span>, RFC 5246, DOI 10.17487/RFC5246, August 2008, <a hr
 
 Langley, A., Hamburg, M., and S. Turner, <span class="quote">“<span class="quote">Elliptic Curves for Security</span>”</span>, RFC 7748, January 2016,
 <a href="https://www.rfc-editor.org/info/rfc7748" class="link" target="_top">https://www.rfc-editor.org/info/rfc7748</a>.
+
+<span id="XWING"></span><span class="bold">**XWING**</span>
+
+Manuel Barbosa, Deirdre Connolly, João Diogo Duarte, Aaron Kaiser, Peter Schwabe,
+Karoline Varner, Bas Westerbaan, <span class="quote">“<span class="quote">X-Wing: The Hybrid KEM You’ve Been Looking
+For</span>”</span>,
+<a href="https://eprint.iacr.org/2024/039.pdf" class="link" target="_top">https://eprint.iacr.org/2024/039.pdf</a>.
 
 </div>
 

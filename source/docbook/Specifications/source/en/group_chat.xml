@@ -3,13 +3,13 @@
 <?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
-<?title "Group chat" ?>
+<?title "" ?>
 <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
 <?linkTitle "Group chat" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
 <?description "" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
-<?author "Threebit Hacker, David Stainton" ?>
+<?author "" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
 <?url "" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
@@ -21,12 +21,12 @@
 <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
 <?type "" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
-<?weight "" ?>
+<?weight "20" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
 <?version "0" ?>
 <!-- Optional [?] -->
 
-<!DOCTYPE chapter [
+<!DOCTYPE section [
     <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
         %shared-content;
     <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
@@ -54,7 +54,7 @@
     <!ENTITY % local.info.class "| xi:include"> 
     <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
 ]>
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
   version="5.1" xml:id="group_chat">
   <info>
     <title xml:id="group_chat.title">Group chat specification</title>
@@ -73,7 +73,7 @@
       </author>
     </authorgroup>
     <abstract>
-      <para>to do</para>
+      <para></para>
     </abstract>
   </info>
 
@@ -321,4 +321,4 @@ type SignedPleaseAdd struct {
  
 
     
-</chapter>
+</section>

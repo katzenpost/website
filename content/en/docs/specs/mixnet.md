@@ -1,19 +1,19 @@
 ---
-title: "Mix network design"
-linkTitle: "Mix network design"
+title: ""
+linkTitle: "Mix network"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:21:06.670690242-07:00"
+date: "2026-05-21T18:40:24.760603403-07:00"
 draft: "false"
 slug: "mix_network"
 layout: ""
 type: ""
-weight: "1"
+weight: "35"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-# <span id="mixspec"></span>Mix network specification
+## <span id="mixspec"></span>Mix network specification
 
 </div>
 
@@ -70,7 +70,7 @@ version: ""
 **Abstract**
 
 This document describes the high level architecture and detailed protocols and
-behavior required of mix nodes participating in the Katzenpost Mix Network.
+behavior required of mix nodes participating in the Katzenpost mix network.
 
 </div>
 
@@ -82,54 +82,6 @@ behavior required of mix nodes participating in the Katzenpost Mix Network.
 
 </div>
 
-<div class="toc">
-
-**Table of Contents**
-
-<span class="section">[Terminology](#terminology)</span>
-
-<span class="section">[Conventions Used in This Document](#d58e162)</span>
-
-<span class="section">[1. Introduction](#mixnet_introduction)</span>
-
-<span class="section">[2. System Overview](#system-overview)</span>
-
-<span class="section">[2.1 Threat Model](#threat-model)</span>
-
-<span class="section">[2.2 Network Topology](#network-topology)</span>
-
-<span class="section">[3. Packet Format Overview](#packet-format-overview)</span>
-
-<span class="section">[3.1 Sphinx Cryptographic
-Primitives](#sphinx-cryptographic-primitives)</span>
-
-<span class="section">[3.2 Sphinx Packet Parameters](#sphinx-packet-parameters)</span>
-
-<span class="section">[3.3 Sphinx Per-hop
-Routing Information Extensions](#sphinx-per-hop-routing-information-extensions)</span>
-
-<span class="section">[4. Mix Node Operation](#mix-node-operation)</span>
-
-<span class="section">[4.1 Link Layer Connection
-Management](#link-layer-connection-management)</span>
-
-<span class="section">[4.2 Sphinx Mix and Provider
-Key Rotation](#sphinx-mix-and-provider-key-rotation)</span>
-
-<span class="section">[4.3 Sphinx Packet Processing](#sphinx-packet-processing)</span>
-
-<span class="section">[5. Anonymity Considerations](#anonymity-considerations)</span>
-
-<span class="section">[5.1 Topology](#topology)</span>
-
-<span class="section">[5.2 Mixing strategy](#mixing-strategy)</span>
-
-<span class="section">[6. Security Considerations](#security-considerations)</span>
-
-<span class="section">[References](#appendix-a.-references)</span>
-
-</div>
-
 <div class="section">
 
 <div class="titlepage">
@@ -138,7 +90,7 @@ Key Rotation](#sphinx-mix-and-provider-key-rotation)</span>
 
 <div>
 
-## <span id="terminology"></span>Terminology
+### <span id="terminology"></span>Terminology
 
 </div>
 
@@ -150,27 +102,21 @@ The following terms are used in this specification.
 
 <div class="variablelist">
 
-<span class="term"><span class="bold">**KiB**</span></span>  
-Defined as 1024 8 bit octets.
+<span class="term"><span class="bold">**classes of traffic**</span></span>  
+We distinguish the following classes of traffic:
 
-<span class="term"><span class="bold">**mixnet**</span></span>  
-A mixnet also known as a mix network is a network of mixes that can be
-used to build various privacy preserving protocols.
+<div class="itemizedlist">
 
-<span class="term"><span class="bold">**mix**</span></span>  
-A cryptographic router that is used to compose a mixnet. Mixes use a
-cryptographic operation on messages being routed which provides bitwise
-unlinkability with respect to input versus output messages. Katzenpost is a
-decryption mixnet that uses the Sphinx cryptographic packet format.
+- SURB Replies (also sometimes referred to as ACKs)
 
-<span class="term"><span class="bold">**node**</span></span>  
-Clients are NOT considered nodes in the mix network. However note that
-network protocols are often layered; in our design documents we describe
-"mixnet hidden services" which can be operated by mixnet clients. Therefore
-if you are using node in some adherence to mathematical terminology one
-could conceivably designate a client as a node. That having been said, it
-would not be appropriate to the discussion of our core mixnet protocol to
-refer to the clients as nodes.
+- Forward messages
+
+</div>
+
+<span class="term"><span class="bold">**client**</span></span>  
+Software run by the user on their local device to participate in the mixnet.
+A client is not considered a "node in the
+network" for purposes of analyhsis of the core mnixnet protocols.
 
 <span class="term"><span class="bold">**entry mix, entry node**</span></span>  
 A mix that has some additional features:
@@ -188,8 +134,49 @@ A mix that has some additional features:
 
 </div>
 
+<span class="term"><span class="bold">**KiB**</span></span>  
+Defined as 1024 8 bit octets.
+
+<span class="term"><span class="bold">**message**</span></span>  
+A variable-length sequence of octets sent anonymously through the network.
+Short messages are sent in a single packet; long messages are fragmented
+across multiple packets.
+
+<span class="term"><span class="bold">**mix**</span></span>  
+A cryptographic router that is used to compose a mixnet. Mixes use a
+cryptographic operation on messages being routed which provides bitwise
+unlinkability with respect to input versus output messages. Katzenpost is a
+decryption mixnet that uses the Sphinx cryptographic packet format.
+
+<span class="term"><span class="bold">**mixnet**</span></span>  
+A mixnet also known as a mix network is a network of mixes that can be
+used to build various privacy preserving protocols.
+
+<span class="term"><span class="bold">**MSL**</span></span>  
+Maximum segment lifetime, currently set to 120 seconds.
+
+<span class="term"><span class="bold">**node**</span></span>  
+Clients are NOT considered nodes in the mix network. However,
+network protocols are often layered. In our design documents we describe
+"mixnet hidden services" which can be operated by mixnet clients. Therefore
+if you are using the term "node" in some adherence to mathematical terminology, one
+could conceivably designate a client as a node. That having been said, it
+would not be appropriate to the discussion of our core mixnet protocol to
+refer to clients as nodes.
+
+<span class="term"><span class="bold">**packet**</span></span>  
+A Sphinx packet, of fixed
+length for each class of traffic, carrying a message payload and metadata for routing.
+Packets are routed anonymously through the mixnet and cryptographically transformed
+at
+each hop.
+
+<span class="term"><span class="bold">**payload**</span></span>  
+The fixed-length portion of a packet containing an encrypted message or
+part of a message, to be delivered anonymously.
+
 <span class="term"><span class="bold">**service mix**</span></span>  
-A service mix is a mix that has some additional features:
+A service mix is a mix server that has some additional features:
 
 <div class="itemizedlist">
 
@@ -204,45 +191,6 @@ A service mix is a mix that has some additional features:
 <span class="term"><span class="bold">**user**</span></span>  
 An agent using the Katzenpost system.
 
-<span class="term"><span class="bold">**client**</span></span>  
-Software run by the User on its local device to participate in the Mixnet.
-Again let us reiterate that a client is not considered a "node in the
-network" at the level of analysis where we are discussing the core mixnet
-protocol in this here document.
-
-<span class="term"><span class="bold">**Katzenpost**</span></span>  
-A project to design many improved decryption mixnet protocols.
-
-<span class="term"><span class="bold">**classes of traffic**</span></span>  
-We distinguish the following classes of traffic:
-
-<div class="itemizedlist">
-
-- SURB Replies (also sometimes referred to as ACKs)
-
-- Forward messages
-
-</div>
-
-<span class="term"><span class="bold">**packet**</span></span>  
-A Sphinx packet, of fixed
-length for each class of traffic, carrying a message payload and metadata for routing.
-Packets are routed anonymously through the mixnet and cryptographically transformed
-at
-each hop.
-
-<span class="term"><span class="bold">**payload**</span></span>  
-The fixed-length portion of a packet containing an encrypted message or
-part of a message, to be delivered anonymously.
-
-<span class="term"><span class="bold">**message**</span></span>  
-A variable-length sequence of octets sent anonymously through the network.
-Short messages are sent in a single packet; long messages are fragmented
-across multiple packets.
-
-<span class="term"><span class="bold">**MSL**</span></span>  
-Maximum segment lifetime, currently set to 120 seconds.
-
 </div>
 
 </div>
@@ -255,7 +203,7 @@ Maximum segment lifetime, currently set to 120 seconds.
 
 <div>
 
-## <span id="d58e162"></span>Conventions Used in This Document
+### <span id="d58e156"></span>Conventions used in this document
 
 </div>
 
@@ -278,7 +226,7 @@ NOT</span>”</span>, <span class="quote">“<span class="quote">RECOMMENDED</sp
 
 <div>
 
-## <span id="mixnet_introduction"></span>1. Introduction
+### <span id="mixnet_introduction"></span>Introduction
 
 </div>
 
@@ -303,7 +251,7 @@ specification documents.
 
 <div>
 
-## <span id="system-overview"></span>2. System Overview
+### <span id="system-overview"></span>System overview
 
 </div>
 
@@ -340,7 +288,7 @@ more elaborate mixnet protocols with stronger more useful privacy notions.
 
 <div>
 
-### <span id="threat-model"></span>2.1 Threat Model
+#### <span id="threat-model"></span>Threat model
 
 </div>
 
@@ -388,7 +336,7 @@ or delay the packets for more or less time than specified.
 
 <div>
 
-### <span id="network-topology"></span>2.2 Network Topology
+#### <span id="network-topology"></span>Network topology
 
 </div>
 
@@ -454,7 +402,7 @@ Requirements for the topology:
 
 <div>
 
-## <span id="packet-format-overview"></span>3. Packet Format Overview
+### <span id="packet-format-overview"></span>Packet format overview
 
 </div>
 
@@ -479,7 +427,7 @@ information commands.
 
 <div>
 
-### <span id="sphinx-cryptographic-primitives"></span>3.1 Sphinx Cryptographic Primitives
+#### <span id="sphinx-cryptographic-primitives"></span>Sphinx cryptographic primitives
 
 </div>
 
@@ -534,7 +482,7 @@ cryptographic primitives be used as described in the Sphinx specification.
 
 <div>
 
-### <span id="sphinx-packet-parameters"></span>3.2 Sphinx Packet Parameters
+#### <span id="sphinx-packet-parameters"></span>Sphinx packet parameters
 
 </div>
 
@@ -614,7 +562,7 @@ that can happen for a few minutes out of every epoch.
 
 <div>
 
-### <span id="sphinx-per-hop-routing-information-extensions"></span>3.3 Sphinx Per-hop Routing Information Extensions
+#### <span id="sphinx-per-hop-routing-information-extensions"></span>Sphinx per-hop routing information extensions
 
 </div>
 
@@ -654,7 +602,7 @@ uint32_t delay_ms;
 
 <div>
 
-## <span id="mix-node-operation"></span>4. Mix Node Operation
+### <span id="mix-node-operation"></span>Mix node operation
 
 </div>
 
@@ -667,15 +615,17 @@ All Mixes behave in the following manner:
 <div class="itemizedlist">
 
 - Accept incoming connections from peers, and open persistent connections to
-  peers as needed `Section 4.1 <4.1>`.
+  peers as needed. See <a href="#link-layer-connection-management" class="xref" title="Link layer connection management">the section called “Link layer connection
+  management”</a>.
 
 - Periodically interact with the PKI to publish Identity and Sphinx packet
   public keys, and to obtain information about the peers it should be
   communicating with, along with periodically rotating the Sphinx packet keys for
-  forward secrecy `Section 4.2 <4.2>`.
+  forward secrecy . See <a href="#sphinx-mix-and-provider-key-rotation" class="xref" title="Sphinx mix and provider key rotation">the section called “Sphinx mix and provider key
+  rotation”</a>.
 
 - Process inbound Sphinx Packets, delay them for the specified time and forward
-  them to the appropriate Mix and or Provider `Section 4.3 <4.3>`.
+  them to the appropriate Mix and or Provider. See <a href="#sphinx-packet-processing" class="xref" title="Sphinx packet processing">the section called “Sphinx packet processing”</a>.
 
 </div>
 
@@ -694,7 +644,7 @@ or similar time synchronization mechanism.
 
 <div>
 
-### <span id="link-layer-connection-management"></span>4.1 Link Layer Connection Management
+#### <span id="link-layer-connection-management"></span>Link layer connection management
 
 </div>
 
@@ -732,7 +682,7 @@ long lived connection per potentially eligible peer at all times.
 
 <div>
 
-### <span id="sphinx-mix-and-provider-key-rotation"></span>4.2 Sphinx Mix and Provider Key Rotation
+#### <span id="sphinx-mix-and-provider-key-rotation"></span>Sphinx mix and provider key rotation
 
 </div>
 
@@ -760,7 +710,7 @@ Specification</span>”</span> document. <a href="#KATZMIXPKI" class="link">KATZ
 
 <div>
 
-### <span id="sphinx-packet-processing"></span>4.3 Sphinx Packet Processing
+#### <span id="sphinx-packet-processing"></span>Sphinx packet processing
 
 </div>
 
@@ -842,7 +792,7 @@ than specified by the `NodeDelayCommand`.
 
 <div>
 
-## <span id="anonymity-considerations"></span>5. Anonymity Considerations
+### <span id="anonymity-considerations"></span>Anonymity considerations
 
 </div>
 
@@ -858,7 +808,7 @@ than specified by the `NodeDelayCommand`.
 
 <div>
 
-### <span id="topology"></span>5.1 Topology
+#### <span id="topology"></span>Topology
 
 </div>
 
@@ -900,7 +850,7 @@ importance, are:
 
 <div>
 
-### <span id="mixing-strategy"></span>5.2 Mixing strategy
+#### <span id="mixing-strategy"></span>Mixing strategy
 
 </div>
 
@@ -928,7 +878,7 @@ the application for which the system is deployed.
 
 <div>
 
-## <span id="security-considerations"></span>6. Security Considerations
+### <span id="security-considerations"></span>Security considerations
 
 </div>
 
@@ -954,7 +904,7 @@ Authority system.
 
 <div>
 
-## <span id="appendix-a.-references"></span>References
+### <span id="appendix-a.-references"></span>References
 
 </div>
 

@@ -1,15 +1,15 @@
 ---
-title: "Katzenpost thin client"
-linkTitle: ""
+title: ""
+linkTitle: "Thin client"
 description: ""
 author: ""
 url: ""
-date: "2026-05-21T10:07:22.995537267-07:00"
+date: "2026-05-21T18:40:45.12443777-07:00"
 draft: "false"
 slug: "thin_client"
 layout: ""
 type: ""
-weight: "1"
+weight: "60"
 version: ""
 ---
 
@@ -21,7 +21,35 @@ version: ""
 
 <div>
 
-## <span id="thin_client"></span>Katzenpost thin client
+## <span id="thin_client"></span>Thin client specification
+
+</div>
+
+<div>
+
+<div class="authorgroup">
+
+<div class="author">
+
+### <span class="firstname">David</span> <span class="surname">Stainton</span>
+
+</div>
+
+</div>
+
+</div>
+
+<div>
+
+<div class="abstract">
+
+**Abstract**
+
+This document describes the design of the new Katzenpost mixnet <span class="emphasis">*thin
+client*</span>. In particular we discuss its multiplexing and privilege-separation design
+elements as well as the protocol used by the thin-client library.
+
+</div>
 
 </div>
 
@@ -30,10 +58,6 @@ version: ""
 ------------------------------------------------------------------------
 
 </div>
-
-This document describes the design of the new Katzenpost mixnet <span class="emphasis">*thin
-client*</span>. In particular we discuss its multiplexing and privilege-separation design
-elements as well as the protocol used by the thin-client library.
 
 <div class="section">
 
