@@ -792,6 +792,69 @@ async def start_resending_encrypted_message_no_retry(self, read_cap: 'bytes|None
 {{< /tab >}}
 {{< /tabpane >}}
 
+### WriteStream / write_stream
+
+WriteStream writes a whole payload, of any size, to the destination
+channel using the daemon's windowed selective-ack (SACK) ARQ. The daemon
+splits the payload into as many BACAP boxes as it spans and keeps up to
+`window` boxes in flight at once, retransmitting only those whose
+acknowledgements time out, so a multi-box payload is no longer serialised
+one round trip per box. A `window` of zero asks the daemon to choose a
+default derived from the send rate and round-trip time.
+
+It blocks until every box has been acknowledged (success) or the transfer
+fails, returning the message box index immediately after the last box
+written, ready to seed a subsequent write on the same channel.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) WriteStream(writeCap *bacap.WriteCap, startIndex *bacap.MessageBoxIndex, payload []byte, window int) (nextIndex *bacap.MessageBoxIndex, err error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn write_stream(
+    &self,
+    write_cap: &[u8],
+    start_index: &[u8],
+    payload: &[u8],
+    window: i64,
+) -> Result<Vec<u8>, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def write_stream(self, write_cap, start_index, payload, window = 0):
+{{< /tab >}}
+{{< /tabpane >}}
+
+### ReadStream / read_stream
+
+ReadStream reads boxCount sequential boxes from a channel using the
+daemon's windowed selective-ack (SACK) ARQ, the read counterpart of
+WriteStream. The daemon keeps up to `window` boxes in flight at once,
+retransmitting only those whose payloads time out, decrypts each box, and
+reassembles them in order. A `window` of zero asks the daemon to choose a
+default.
+
+It blocks until every box has been read (success) or the transfer fails,
+returning the concatenated payload and the message box index immediately
+after the last box read.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) ReadStream(readCap *bacap.ReadCap, startIndex *bacap.MessageBoxIndex, boxCount uint32, window int) (payload []byte, nextIndex *bacap.MessageBoxIndex, err error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn read_stream(
+    &self,
+    read_cap: &[u8],
+    start_index: &[u8],
+    box_count: u32,
+    window: i64,
+) -> Result<(Vec<u8>, Vec<u8>), ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def read_stream(self, read_cap, start_index, box_count, window = 0):
+{{< /tab >}}
+{{< /tabpane >}}
+
 ### CancelResendingEncryptedMessage / cancel_resending_encrypted_message
 
 CancelResendingEncryptedMessage cancels ARQ resending for an encrypted message.
