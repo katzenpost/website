@@ -42,9 +42,9 @@ This reference describes the following pinned binding versions:
 
 | Binding | Repository | Tag |
 | --- | --- | --- |
-| Go reference | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/v0.0.76/client/thin) | [v0.0.76](https://github.com/katzenpost/katzenpost/releases/tag/v0.0.76) |
-| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/0.0.15/src) | [0.0.15](https://github.com/katzenpost/thin_client/releases/tag/0.0.15) |
-| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/0.0.15/katzenpost_thinclient) | [0.0.15](https://github.com/katzenpost/thin_client/releases/tag/0.0.15) |
+| Go reference | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/v0.0.79/client/thin) | [v0.0.79](https://github.com/katzenpost/katzenpost/releases/tag/v0.0.79) |
+| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/0.0.17/src) | [0.0.17](https://github.com/katzenpost/thin_client/releases/tag/0.0.17) |
+| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/0.0.17/katzenpost_thinclient) | [0.0.17](https://github.com/katzenpost/thin_client/releases/tag/0.0.17) |
 
 For pinned versions of the full stack (including `kpclientd`, `katzenqt`, and
 the server-side components), see [Build from source](/docs/build_from_source/).
