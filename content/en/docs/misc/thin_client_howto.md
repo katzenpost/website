@@ -1081,8 +1081,16 @@ if err != nil {
 }
 aliceIdx = nextOut // persist this
 
-// Receive on Bob's stream, using the polling pattern shown above,
-// reading with bobRead and advancing bobIdx.
+// Receive on Bob's stream: read with bobRead at bobIdx, advance bobIdx.
+inCt, inEd, inEh, inNext, _ := client.EncryptRead(bobRead, bobIdx)
+bobIdxBytes, _ := bobIdx.MarshalBinary()
+in, err := client.StartResendingEncryptedMessage(
+    bobRead, nil, bobIdxBytes, nil, inEd, inCt, inEh)
+if err != nil {
+    log.Fatal(err)
+}
+log.Printf("Alice received from Bob: %s", in.Plaintext)
+bobIdx = inNext // persist this
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 // Alice's side. (Bob's is the mirror image.)
@@ -1102,8 +1110,14 @@ client.start_resending_encrypted_message(
     &w.envelope_hash).await?;
 alice_idx = w.next_message_box_index; // persist this
 
-// Receive on Bob's stream with the polling pattern, reading with
-// bob_read and advancing bob_idx.
+// Receive on Bob's stream: read with bob_read at bob_idx, advance bob_idx.
+let r = client.encrypt_read(&bob_read, &bob_idx).await?;
+let incoming = client.start_resending_encrypted_message(
+    Some(&bob_read), None, Some(&bob_idx), None,
+    &r.envelope_descriptor, &r.message_ciphertext,
+    &r.envelope_hash).await?;
+println!("Alice received from Bob: {:?}", incoming.plaintext);
+bob_idx = r.next_message_box_index; // persist this
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
 # Alice's side. (Bob's is the mirror image.)
@@ -1125,10 +1139,25 @@ await client.start_resending_encrypted_message(
     envelope_hash=w.envelope_hash)
 alice_idx = w.next_message_box_index  # persist this
 
-# Receive on Bob's stream with the polling pattern, reading with
-# bob_read and advancing bob_idx.
+# Receive on Bob's stream: read with bob_read at bob_idx, advance bob_idx.
+r = await client.encrypt_read(bob_read, bob_idx)
+incoming = await client.start_resending_encrypted_message(
+    read_cap=bob_read, write_cap=None,
+    message_box_index=bob_idx, reply_index=None,
+    envelope_descriptor=r.envelope_descriptor,
+    message_ciphertext=r.message_ciphertext,
+    envelope_hash=r.envelope_hash)
+print("Alice received from Bob:", incoming.plaintext)
+bob_idx = r.next_message_box_index  # persist this
 {{< /tab >}}
 {{< /tabpane >}}
+
+The receive shown is a single read, which already retries through
+brief replication lag. If Bob may not have written his reply yet, wrap
+it in the bounded poll from
+[How to wait for a message that has not been written yet](#how-to-wait-for-a-message-that-has-not-been-written-yet),
+so Alice waits out a longer silence rather than treating an empty box
+as an error.
 
 ---
 
