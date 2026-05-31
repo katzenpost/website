@@ -66,7 +66,6 @@ that tag instead.
 | [Send and receive a large payload (stream API)](#how-to-send-and-receive-a-large-payload-with-the-stream-api) | One-call windowed SACK transfer of any size |
 | [Wait for a message not yet written](#how-to-wait-for-a-message-that-has-not-been-written-yet) | Poll with bounded retry around BoxIDNotFound |
 | [Persist and restore channel state](#how-to-persist-and-restore-channel-state) | Survive a process restart without losing your place |
-| [Hold a two-way conversation](#how-to-hold-a-two-way-conversation) | Wire two streams into a bidirectional channel |
 | [Prepare operations offline](#how-to-prepare-operations-offline) | Do the local crypto now, transmit when connected |
 | [A complete end-to-end example](#a-complete-end-to-end-example) | One runnable Alice-writes, Bob-reads program |
 | [Delete messages with tombstones](#how-to-delete-messages-with-tombstones) | Tombstone one or more boxes |
@@ -1114,118 +1113,6 @@ the reader after every successful read. Persist the index *before*
 acknowledging the message to the rest of your application, so that a
 crash cannot leave you having processed a message whose index you
 never recorded.
-
----
-
-## How to hold a two-way conversation
-
-A stream has exactly one writer, so a conversation between two parties
-is two streams: each party writes to its own and reads from the
-other's. The setup is symmetric: each creates a stream and shares its
-read cap (and first index) with the other out-of-band. Thereafter each
-party writes with its own write cap and polls the peer's stream with
-the peer's read cap, advancing two independent indices.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-// Alice's side. (Bob's is the mirror image.)
-aliceWrite, aliceRead, aliceIdx, err := client.NewKeypair(aliceSeed)
-if err != nil {
-    log.Fatal(err)
-}
-
-// Exchange read caps out-of-band: Alice sends aliceRead+aliceIdx to
-// Bob and receives bobRead+bobIdx from Bob.
-sendOutOfBand(aliceRead, aliceIdx)
-bobRead, bobIdx := receiveOutOfBand()
-
-// Send on Alice's own stream.
-ct, ed, eh, nextOut, _ := client.EncryptWrite(
-    []byte("hello Bob"), aliceWrite, aliceIdx)
-_, err = client.StartResendingEncryptedMessage(
-    nil, aliceWrite, nil, nil, ed, ct, eh)
-if err != nil {
-    log.Fatal(err)
-}
-aliceIdx = nextOut // persist this
-
-// Receive on Bob's stream: read with bobRead at bobIdx, advance bobIdx.
-inCt, inEd, inEh, inNext, _ := client.EncryptRead(bobRead, bobIdx)
-bobIdxBytes, _ := bobIdx.MarshalBinary()
-in, err := client.StartResendingEncryptedMessage(
-    bobRead, nil, bobIdxBytes, nil, inEd, inCt, inEh)
-if err != nil {
-    log.Fatal(err)
-}
-log.Printf("Alice received from Bob: %s", in.Plaintext)
-bobIdx = inNext // persist this
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-// Alice's side. (Bob's is the mirror image.)
-let alice = client.new_keypair(&alice_seed).await?;
-
-// Exchange read caps out-of-band.
-send_out_of_band(&alice.read_cap, &alice.first_message_index);
-let (bob_read, mut bob_idx) = receive_out_of_band();
-let mut alice_idx = alice.first_message_index.clone();
-
-// Send on Alice's own stream.
-let w = client.encrypt_write(b"hello Bob",
-    &alice.write_cap, &alice_idx).await?;
-client.start_resending_encrypted_message(
-    None, Some(&alice.write_cap), None, None,
-    &w.envelope_descriptor, &w.message_ciphertext,
-    &w.envelope_hash).await?;
-alice_idx = w.next_message_box_index; // persist this
-
-// Receive on Bob's stream: read with bob_read at bob_idx, advance bob_idx.
-let r = client.encrypt_read(&bob_read, &bob_idx).await?;
-let incoming = client.start_resending_encrypted_message(
-    Some(&bob_read), None, Some(&bob_idx), None,
-    &r.envelope_descriptor, &r.message_ciphertext,
-    &r.envelope_hash).await?;
-println!("Alice received from Bob: {:?}", incoming.plaintext);
-bob_idx = r.next_message_box_index; // persist this
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-# Alice's side. (Bob's is the mirror image.)
-alice = await client.new_keypair(alice_seed)
-
-# Exchange read caps out-of-band.
-send_out_of_band(alice.read_cap, alice.first_message_index)
-bob_read, bob_idx = receive_out_of_band()
-alice_idx = alice.first_message_index
-
-# Send on Alice's own stream.
-w = await client.encrypt_write(b"hello Bob",
-    alice.write_cap, alice_idx)
-await client.start_resending_encrypted_message(
-    read_cap=None, write_cap=alice.write_cap,
-    message_box_index=None, reply_index=None,
-    envelope_descriptor=w.envelope_descriptor,
-    message_ciphertext=w.message_ciphertext,
-    envelope_hash=w.envelope_hash)
-alice_idx = w.next_message_box_index  # persist this
-
-# Receive on Bob's stream: read with bob_read at bob_idx, advance bob_idx.
-r = await client.encrypt_read(bob_read, bob_idx)
-incoming = await client.start_resending_encrypted_message(
-    read_cap=bob_read, write_cap=None,
-    message_box_index=bob_idx, reply_index=None,
-    envelope_descriptor=r.envelope_descriptor,
-    message_ciphertext=r.message_ciphertext,
-    envelope_hash=r.envelope_hash)
-print("Alice received from Bob:", incoming.plaintext)
-bob_idx = r.next_message_box_index  # persist this
-{{< /tab >}}
-{{< /tabpane >}}
-
-The receive shown is a single read, which already retries through
-brief replication lag. If Bob may not have written his reply yet, wrap
-it in the bounded poll from
-[How to wait for a message that has not been written yet](#how-to-wait-for-a-message-that-has-not-been-written-yet),
-so Alice waits out a longer silence rather than treating an empty box
-as an error.
 
 ---
 
