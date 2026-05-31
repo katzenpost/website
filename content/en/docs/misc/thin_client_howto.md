@@ -62,12 +62,15 @@ that tag instead.
 | [Create a Pigeonhole channel](#how-to-create-a-pigeonhole-channel) | Generate a stream with write/read capabilities |
 | [Write a message](#how-to-write-a-message-to-a-pigeonhole-channel) | Encrypt and send a write to a stream |
 | [Read a message](#how-to-read-a-message-from-a-pigeonhole-channel) | Retrieve and decrypt a message from a stream |
+| [Read back a multi-box payload](#how-to-read-back-a-multi-box-payload) | Concatenate consecutive boxes into one payload |
+| [Send and receive a large payload (stream API)](#how-to-send-and-receive-a-large-payload-with-the-stream-api) | One-call windowed SACK transfer of any size |
 | [Wait for a message not yet written](#how-to-wait-for-a-message-that-has-not-been-written-yet) | Poll with bounded retry around BoxIDNotFound |
 | [Persist and restore channel state](#how-to-persist-and-restore-channel-state) | Survive a process restart without losing your place |
 | [Hold a two-way conversation](#how-to-hold-a-two-way-conversation) | Wire two streams into a bidirectional channel |
 | [Prepare operations offline](#how-to-prepare-operations-offline) | Do the local crypto now, transmit when connected |
 | [A complete end-to-end example](#a-complete-end-to-end-example) | One runnable Alice-writes, Bob-reads program |
 | [Delete messages with tombstones](#how-to-delete-messages-with-tombstones) | Tombstone one or more boxes |
+| [Detect a tombstone when reading](#how-to-detect-a-tombstone-when-reading) | Recognise a deleted box on the read side |
 | [Send to one channel atomically](#how-to-send-to-one-channel-atomically-via-copy-command) | Single-destination copy command |
 | [Send to multiple channels atomically](#how-to-send-to-multiple-channels-atomically) | Multi-destination copy command |
 | [Multi-call buffer passing](#how-to-handle-multi-call-buffer-passing-for-large-copy-streams) | Incremental copy streams with crash recovery |
@@ -494,16 +497,16 @@ if err != nil {
 let seed: [u8; 32] = rand::random();
 let result = client.new_keypair(&seed).await?;
 
-// Writer keeps: result.write_cap, result.first_index
-// Share with reader out-of-band: result.read_cap, result.first_index
+// Writer keeps: result.write_cap, result.first_message_index
+// Share with reader out-of-band: result.read_cap, result.first_message_index
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
 import os
 seed = os.urandom(32)
 result = await client.new_keypair(seed)
 
-# Writer keeps: result.write_cap, result.first_index
-# Share with reader out-of-band: result.read_cap, result.first_index
+# Writer keeps: result.write_cap, result.first_message_index
+# Share with reader out-of-band: result.read_cap, result.first_message_index
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -512,7 +515,15 @@ result = await client.new_keypair(seed)
 ## How to write a message to a Pigeonhole channel
 
 Writing is a two-step process: encrypt the message, then send it via
-ARQ.
+ARQ. A write is idempotent by default: re-sending a box that was
+already filled returns success rather than an error, so a retransmit
+after an uncertain failure is safe. When you must instead distinguish
+a fresh write from a repeat, for instance to implement optimistic
+concurrency, use the box-exists-aware variant
+(`StartResendingEncryptedMessageReturnBoxExists` in Go,
+`no_idempotent_box_already_exists=True` in Rust and Python), which
+surfaces `BoxAlreadyExists` as an error at the cost of one extra
+mixnet round trip.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -569,7 +580,7 @@ result = await client.encrypt_write(b"hello", write_cap, current_index)
 await client.start_resending_encrypted_message(
     read_cap=None,
     write_cap=write_cap,
-    next_message_index=None,
+    message_box_index=None,
     reply_index=None,
     envelope_descriptor=result.envelope_descriptor,
     message_ciphertext=result.message_ciphertext,
@@ -586,7 +597,11 @@ current_index = result.next_message_box_index
 ## How to read a message from a Pigeonhole channel
 
 Reading is also two steps: encrypt a read request, then send it via
-ARQ. The reply contains the plaintext.
+ARQ. The reply contains the plaintext. Unlike a write, a read must be
+given the index of the box being read (the `messageBoxIndex`
+argument, its marshalled bytes in Go); the daemon derives the box ID
+and decrypts the reply from it, so a read that omits the index comes
+back undecrypted.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -598,12 +613,20 @@ if err != nil {
     log.Fatal(err)
 }
 
+// A read MUST supply the marshalled index of the box being read.
+// The daemon needs it to derive the box ID and to decrypt the reply;
+// pass nil and the reply comes back undecrypted.
+idxBytes, err := currentIndex.MarshalBinary()
+if err != nil {
+    log.Fatal(err)
+}
+
 // Send via ARQ (blocks until the message is retrieved)
 result, err := client.StartResendingEncryptedMessage(
     readCap,
     nil,       // writeCap (nil for reads)
-    nil,       // messageBoxIndex
-    nil,       // replyIndex
+    idxBytes,  // messageBoxIndex (required for reads)
+    nil,       // replyIndex (nil uses the default)
     envDesc,
     ciphertext,
     envHash,
@@ -623,9 +646,9 @@ let read_result = client.encrypt_read(&read_cap, &current_index).await?;
 // Send via ARQ (blocks until the message is retrieved)
 let result = client.start_resending_encrypted_message(
     Some(&read_cap),
-    None,                                    // write_cap (None for reads)
-    None,                                    // message_box_index
-    None,                                    // reply_index
+    None,                            // write_cap (None for reads)
+    Some(&current_index),            // message_box_index (required for reads)
+    None,                            // reply_index (None uses the default)
     &read_result.envelope_descriptor,
     &read_result.message_ciphertext,
     &read_result.envelope_hash,
@@ -643,8 +666,8 @@ read_result = await client.encrypt_read(read_cap, current_index)
 plaintext = await client.start_resending_encrypted_message(
     read_cap=read_cap,
     write_cap=None,
-    next_message_index=None,
-    reply_index=None,
+    message_box_index=current_index,  # required for reads
+    reply_index=None,                 # None uses the default
     envelope_descriptor=read_result.envelope_descriptor,
     message_ciphertext=read_result.message_ciphertext,
     envelope_hash=read_result.envelope_hash,
@@ -652,6 +675,183 @@ plaintext = await client.start_resending_encrypted_message(
 
 # Advance the index for the next read
 current_index = read_result.next_message_box_index
+{{< /tab >}}
+{{< /tabpane >}}
+
+---
+
+## How to read back a multi-box payload
+
+A single read retrieves one box. A payload that spanned several boxes,
+anything a copy command wrote, or any write larger than one box of
+plaintext, is read back by stepping through consecutive indices and
+concatenating the plaintexts in the order the writer laid them down.
+
+The reader must know where the payload ends. The boxes themselves
+carry no total length, so the writer frames it. The convention the
+integration tests use, and the one shown here, is a fixed four-byte
+big-endian length prefix on the very first box; the reader accumulates
+boxes until it holds the prefix plus that many bytes.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// readCap and firstIndex were shared by the writer, who prefixed the
+// payload with a 4-byte big-endian length.
+readIndex := firstIndex
+var payload []byte
+var total uint32
+for {
+    ct, ed, eh, nextIndex, err := client.EncryptRead(readCap, readIndex)
+    if err != nil {
+        log.Fatal(err)
+    }
+    idxBytes, err := readIndex.MarshalBinary()
+    if err != nil {
+        log.Fatal(err)
+    }
+    result, err := client.StartResendingEncryptedMessage(
+        readCap, nil, idxBytes, nil, ed, ct, eh)
+    if err != nil {
+        log.Fatal(err)
+    }
+    payload = append(payload, result.Plaintext...)
+
+    // Once the 4-byte prefix is in hand, the total length is known.
+    if total == 0 && len(payload) >= 4 {
+        total = binary.BigEndian.Uint32(payload[:4])
+    }
+    if total > 0 && uint32(len(payload)) >= total+4 {
+        break
+    }
+    readIndex = nextIndex
+}
+payload = payload[4:] // drop the length prefix
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+// read_cap and first_message_index were shared by the writer, who
+// prefixed the payload with a 4-byte big-endian length.
+let mut read_index = first_message_index.clone();
+let mut payload: Vec<u8> = Vec::new();
+let mut total: Option<u32> = None;
+loop {
+    let read = client.encrypt_read(&read_cap, &read_index).await?;
+    let result = client.start_resending_encrypted_message(
+        Some(&read_cap), None, Some(&read_index), None,
+        &read.envelope_descriptor, &read.message_ciphertext,
+        &read.envelope_hash).await?;
+    payload.extend_from_slice(&result.plaintext);
+
+    if total.is_none() && payload.len() >= 4 {
+        total = Some(u32::from_be_bytes(payload[..4].try_into().unwrap()));
+    }
+    if let Some(t) = total {
+        if payload.len() as u32 >= t + 4 {
+            break;
+        }
+    }
+    read_index = read.next_message_box_index;
+}
+let payload = &payload[4..]; // drop the length prefix
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+import struct
+
+# read_cap and first_message_index were shared by the writer, who
+# prefixed the payload with a 4-byte big-endian length.
+read_index = first_message_index
+payload = b""
+total = None
+while True:
+    read = await client.encrypt_read(read_cap, read_index)
+    result = await client.start_resending_encrypted_message(
+        read_cap=read_cap, write_cap=None,
+        message_box_index=read_index, reply_index=None,
+        envelope_descriptor=read.envelope_descriptor,
+        message_ciphertext=read.message_ciphertext,
+        envelope_hash=read.envelope_hash,
+    )
+    payload += result.plaintext
+
+    if total is None and len(payload) >= 4:
+        total = struct.unpack(">I", payload[:4])[0]
+    if total is not None and len(payload) >= total + 4:
+        break
+    read_index = read.next_message_box_index
+
+payload = payload[4:]  # drop the length prefix
+{{< /tab >}}
+{{< /tabpane >}}
+
+This hand loop sends one read per round trip. For bulk transfer the
+stream API below does the same work in a single call, with several
+boxes in flight at once.
+
+---
+
+## How to send and receive a large payload with the stream API
+
+`WriteStream` and `ReadStream` move a payload of any size across as
+many boxes as it spans, using the daemon's windowed selective-ack
+(SACK) ARQ. Where the per-box loop blocks on each box in turn, the
+stream API keeps several boxes in flight at once and retransmits only
+those whose acknowledgements time out, so a multi-box transfer is no
+longer serialised one round trip per box. The daemon does all the
+chunking, encryption, and reassembly; you hand it the whole payload.
+
+Pass a **window** of `0` to let the daemon size the window itself from
+the network parameters (the number of routing layers and the Poisson
+send rate); there is no knob to tune by hand, and that is deliberate.
+
+`ReadStream` must be told how many boxes to fetch. Derive that from
+the byte length the writer shares and the channel's per-box capacity,
+which for the stream API is `MaxPlaintextPayloadLength - 4`: the daemon
+reserves four bytes per box for a length tag, so `ReadStream` returns
+exactly the bytes `WriteStream` was given, with no padding to trim.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+// Writer: hand WriteStream the whole payload; window 0 = daemon default.
+nextIndex, err := client.WriteStream(writeCap, firstIndex, payload, 0)
+if err != nil {
+    log.Fatal(err)
+}
+// Share readCap and firstIndex with the reader, and tell it len(payload).
+
+// Reader: derive the box count from the byte length and the geometry.
+perBox := client.GetPigeonholeGeometry().MaxPlaintextPayloadLength - 4
+boxCount := (len(payload) + perBox - 1) / perBox
+data, nextReadIndex, err := client.ReadStream(
+    readCap, firstIndex, uint32(boxCount), 0)
+if err != nil {
+    log.Fatal(err)
+}
+// data == payload
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+// Writer: window 0 = daemon default.
+let next_index = client.write_stream(
+    &write_cap, &first_message_index, &payload, 0).await?;
+// Share read_cap and first_message_index, and tell the reader payload.len().
+
+// Reader: derive the box count from the byte length and the geometry.
+let per_box = client.pigeonhole_geometry().max_plaintext_payload_length - 4;
+let box_count = ((payload.len() + per_box - 1) / per_box) as u32;
+let (data, next_read_index) = client.read_stream(
+    &read_cap, &first_message_index, box_count, 0).await?;
+// data == payload
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+# Writer: window 0 = daemon default.
+next_index = await client.write_stream(
+    write_cap, first_message_index, payload, 0)
+# Share read_cap and first_message_index, and tell the reader len(payload).
+
+# Reader: derive the box count from the byte length and the geometry.
+per_box = client.pigeonhole_geometry.max_plaintext_payload_length - 4
+box_count = (len(payload) + per_box - 1) // per_box
+data, next_read_index = await client.read_stream(
+    read_cap, first_message_index, box_count, 0)
+# data == payload
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -669,6 +869,20 @@ appears or an application deadline elapses. Use `IsExpectedOutcome` to
 tell a benign "not yet" apart from a real error, so that genuine
 failures are not silently retried forever.
 
+Two refinements are worth knowing. First, the ordinary read already
+retries through brief replication lag on its own (the daemon retries a
+`BoxIDNotFound` read several times before returning it), so a single
+read often serves as a deterministic propagation gate: for a
+sequentially written stream, reading the **last** box written gates on
+all the earlier ones, which were written sooner and so have had at
+least as long to settle. This is the readiness signal to prefer over a
+fixed sleep. Second, when you would rather learn at once that a box is
+absent, for instance to peek at a peer's next message before it has
+been produced, use the no-retry variant
+(`StartResendingEncryptedMessageNoRetry` in Go,
+`no_retry_on_box_id_not_found=True` in Rust and Python), which returns
+`BoxIDNotFound` immediately instead of waiting out the retries.
+
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
 deadline := time.Now().Add(2 * time.Minute)
@@ -681,8 +895,12 @@ for {
         log.Fatal(err)
     }
 
+    idxBytes, err := currentIndex.MarshalBinary()
+    if err != nil {
+        log.Fatal(err)
+    }
     result, err := client.StartResendingEncryptedMessage(
-        readCap, nil, nil, nil, envDesc, ciphertext, envHash,
+        readCap, nil, idxBytes, nil, envDesc, ciphertext, envHash,
     )
     if err == nil {
         plaintext = result.Plaintext
@@ -707,7 +925,7 @@ let deadline = std::time::Instant::now()
 let plaintext = loop {
     let read = client.encrypt_read(&read_cap, &current_index).await?;
     match client.start_resending_encrypted_message(
-        Some(&read_cap), None, None, None,
+        Some(&read_cap), None, Some(&current_index), None,
         &read.envelope_descriptor,
         &read.message_ciphertext,
         &read.envelope_hash,
@@ -737,7 +955,7 @@ while True:
     try:
         plaintext = await client.start_resending_encrypted_message(
             read_cap=read_cap, write_cap=None,
-            next_message_index=None, reply_index=None,
+            message_box_index=current_index, reply_index=None,
             envelope_descriptor=read.envelope_descriptor,
             message_ciphertext=read.message_ciphertext,
             envelope_hash=read.envelope_hash,
@@ -798,8 +1016,8 @@ if err != nil {
 {{< tab header="Rust" lang="rust" >}}
 // new_keypair already returns Vec<u8> for each artefact.
 let kp = client.new_keypair(&seed).await?;
-save_state(&kp.write_cap, &kp.read_cap, &kp.first_index);
-let mut current_index = kp.first_index.clone();
+save_state(&kp.write_cap, &kp.read_cap, &kp.first_message_index);
+let mut current_index = kp.first_message_index.clone();
 
 // ... each time you advance, persist the new index bytes ...
 save_index(&current_index);
@@ -811,8 +1029,8 @@ let (write_cap, read_cap, current_index) = load_state();
 {{< tab header="Python" lang="python" >}}
 # new_keypair already returns bytes for each artefact.
 kp = await client.new_keypair(seed)
-save_state(kp.write_cap, kp.read_cap, kp.first_index)
-current_index = kp.first_index
+save_state(kp.write_cap, kp.read_cap, kp.first_message_index)
+current_index = kp.first_message_index
 
 # ... each time you advance, persist the new index bytes ...
 save_index(current_index)
@@ -871,9 +1089,9 @@ aliceIdx = nextOut // persist this
 let alice = client.new_keypair(&alice_seed).await?;
 
 // Exchange read caps out-of-band.
-send_out_of_band(&alice.read_cap, &alice.first_index);
+send_out_of_band(&alice.read_cap, &alice.first_message_index);
 let (bob_read, mut bob_idx) = receive_out_of_band();
-let mut alice_idx = alice.first_index.clone();
+let mut alice_idx = alice.first_message_index.clone();
 
 // Send on Alice's own stream.
 let w = client.encrypt_write(b"hello Bob",
@@ -892,16 +1110,16 @@ alice_idx = w.next_message_box_index; // persist this
 alice = await client.new_keypair(alice_seed)
 
 # Exchange read caps out-of-band.
-send_out_of_band(alice.read_cap, alice.first_index)
+send_out_of_band(alice.read_cap, alice.first_message_index)
 bob_read, bob_idx = receive_out_of_band()
-alice_idx = alice.first_index
+alice_idx = alice.first_message_index
 
 # Send on Alice's own stream.
 w = await client.encrypt_write(b"hello Bob",
     alice.write_cap, alice_idx)
 await client.start_resending_encrypted_message(
     read_cap=None, write_cap=alice.write_cap,
-    next_message_index=None, reply_index=None,
+    message_box_index=None, reply_index=None,
     envelope_descriptor=w.envelope_descriptor,
     message_ciphertext=w.message_ciphertext,
     envelope_hash=w.envelope_hash)
@@ -978,7 +1196,7 @@ if client.is_connected():
     for e in drain_queue():
         await client.start_resending_encrypted_message(
             read_cap=None, write_cap=write_cap,
-            next_message_index=None, reply_index=None,
+            message_box_index=None, reply_index=None,
             envelope_descriptor=e.envelope_descriptor,
             message_ciphertext=e.message_ciphertext,
             envelope_hash=e.envelope_hash)
@@ -1048,8 +1266,12 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
+    idxBytes, err := idx.MarshalBinary()
+    if err != nil {
+        log.Fatal(err)
+    }
     result, err := client.StartResendingEncryptedMessage(
-        readCap, nil, nil, nil, red, rct, reh)
+        readCap, nil, idxBytes, nil, red, rct, reh)
     if err != nil {
         log.Fatal(err)
     }
@@ -1070,16 +1292,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Alice writes one message.
     let w = client.encrypt_write(
-        b"hello from Alice", &kp.write_cap, &kp.first_index).await?;
+        b"hello from Alice", &kp.write_cap, &kp.first_message_index).await?;
     client.start_resending_encrypted_message(
         None, Some(&kp.write_cap), None, None,
         &w.envelope_descriptor, &w.message_ciphertext,
         &w.envelope_hash).await?;
 
     // Bob reads it back (read_cap would normally be shared out-of-band).
-    let r = client.encrypt_read(&kp.read_cap, &kp.first_index).await?;
+    let r = client.encrypt_read(&kp.read_cap, &kp.first_message_index).await?;
     let result = client.start_resending_encrypted_message(
-        Some(&kp.read_cap), None, None, None,
+        Some(&kp.read_cap), None, Some(&kp.first_message_index), None,
         &r.envelope_descriptor, &r.message_ciphertext,
         &r.envelope_hash).await?;
     println!("Bob read: {:?}", result.plaintext);
@@ -1103,19 +1325,19 @@ async def main():
 
     # Alice writes one message.
     w = await client.encrypt_write(
-        b"hello from Alice", kp.write_cap, kp.first_index)
+        b"hello from Alice", kp.write_cap, kp.first_message_index)
     await client.start_resending_encrypted_message(
         read_cap=None, write_cap=kp.write_cap,
-        next_message_index=None, reply_index=None,
+        message_box_index=None, reply_index=None,
         envelope_descriptor=w.envelope_descriptor,
         message_ciphertext=w.message_ciphertext,
         envelope_hash=w.envelope_hash)
 
     # Bob reads it back (read_cap would normally be shared out-of-band).
-    r = await client.encrypt_read(kp.read_cap, kp.first_index)
+    r = await client.encrypt_read(kp.read_cap, kp.first_message_index)
     plaintext = await client.start_resending_encrypted_message(
         read_cap=kp.read_cap, write_cap=None,
-        next_message_index=None, reply_index=None,
+        message_box_index=kp.first_message_index, reply_index=None,
         envelope_descriptor=r.envelope_descriptor,
         message_ciphertext=r.message_ciphertext,
         envelope_hash=r.envelope_hash)
@@ -1184,13 +1406,76 @@ for envelope in result.envelopes:
     await client.start_resending_encrypted_message(
         read_cap=None,
         write_cap=write_cap,
-        next_message_index=None,
+        message_box_index=None,
         reply_index=None,
         envelope_descriptor=envelope.envelope_descriptor,
         message_ciphertext=envelope.message_ciphertext,
         envelope_hash=envelope.envelope_hash,
     )
 # result.next is the index after the last tombstoned box
+{{< /tab >}}
+{{< /tabpane >}}
+
+---
+
+## How to detect a tombstone when reading
+
+The counterpart to deleting a box is recognising a deleted box on the
+read side. A reader that reaches a tombstoned box does not get silence;
+it gets a definite tombstone error (`ErrTombstone` in Go,
+`ThinClientError::Tombstone` in Rust, `TombstoneError` in Python). Like
+`BoxIDNotFound`, this is an expected outcome rather than a transport
+failure, so `IsExpectedOutcome` treats it as benign; catch it to learn
+that the box was deliberately deleted and to stop reading the stream.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+idxBytes, err := currentIndex.MarshalBinary()
+if err != nil {
+    log.Fatal(err)
+}
+result, err := client.StartResendingEncryptedMessage(
+    readCap, nil, idxBytes, nil, envDesc, ciphertext, envHash)
+switch {
+case err == nil:
+    plaintext := result.Plaintext
+    _ = plaintext // use the message
+case errors.Is(err, thin.ErrTombstone):
+    // The box was deliberately deleted. Expected, not a failure.
+    log.Printf("box at this index was tombstoned")
+default:
+    log.Fatal(err)
+}
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+match client.start_resending_encrypted_message(
+    Some(&read_cap), None, Some(&current_index), None,
+    &read.envelope_descriptor, &read.message_ciphertext,
+    &read.envelope_hash,
+).await {
+    Ok(result) => { /* use result.plaintext */ }
+    Err(ThinClientError::Tombstone) => {
+        // The box was deliberately deleted. Expected, not a failure.
+        println!("box at this index was tombstoned");
+    }
+    Err(e) => return Err(e.into()),
+}
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+from katzenpost_thinclient import TombstoneError
+
+try:
+    result = await client.start_resending_encrypted_message(
+        read_cap=read_cap, write_cap=None,
+        message_box_index=current_index, reply_index=None,
+        envelope_descriptor=read.envelope_descriptor,
+        message_ciphertext=read.message_ciphertext,
+        envelope_hash=read.envelope_hash,
+    )
+    plaintext = result.plaintext  # use the message
+except TombstoneError:
+    # The box was deliberately deleted. Expected, not a failure.
+    print("box at this index was tombstoned")
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -1271,13 +1556,13 @@ let temp = client.new_keypair(&temp_seed).await?;
 
 // Pack payload into copy stream elements
 let envelopes_result = client.create_courier_envelopes_from_payload(
-    &payload, &dest.write_cap, &dest.first_index,
+    &payload, &dest.write_cap, &dest.first_message_index,
     true,  // is_start
     true,  // is_last
 ).await?;
 
 // Write each element to the temporary channel
-let mut temp_index = temp.first_index.clone();
+let mut temp_index = temp.first_message_index.clone();
 for chunk in &envelopes_result.envelopes {
     let write_result = client.encrypt_write(
         chunk, &temp.write_cap, &temp_index,
@@ -1294,7 +1579,7 @@ for chunk in &envelopes_result.envelopes {
 // Send the copy command (blocks until courier acknowledges)
 client.start_resending_copy_command(&temp.write_cap, None, None).await?;
 
-// Share dest.read_cap and dest.first_index with the reader
+// Share dest.read_cap and dest.first_message_index with the reader
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
 import os
@@ -1309,18 +1594,18 @@ temp = await client.new_keypair(temp_seed)
 
 # Pack payload into copy stream elements
 envelopes_result = await client.create_courier_envelopes_from_payload(
-    payload, dest.write_cap, dest.first_index,
+    payload, dest.write_cap, dest.first_message_index,
     is_start=True,
     is_last=True,
 )
 
 # Write each element to the temporary channel
-temp_index = temp.first_index
+temp_index = temp.first_message_index
 for chunk in envelopes_result.envelopes:
     write_result = await client.encrypt_write(chunk, temp.write_cap, temp_index)
     await client.start_resending_encrypted_message(
         read_cap=None, write_cap=temp.write_cap,
-        next_message_index=None, reply_index=None,
+        message_box_index=None, reply_index=None,
         envelope_descriptor=write_result.envelope_descriptor,
         message_ciphertext=write_result.message_ciphertext,
         envelope_hash=write_result.envelope_hash,
@@ -1330,7 +1615,7 @@ for chunk in envelopes_result.envelopes:
 # Send the copy command (blocks until courier acknowledges)
 await client.start_resending_copy_command(temp.write_cap)
 
-# Share dest.read_cap and dest.first_index with the reader
+# Share dest.read_cap and dest.first_message_index with the reader
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -1397,8 +1682,8 @@ let temp = client.new_keypair(&temp_seed).await?;
 
 // Pack multiple payloads
 let destinations = vec![
-    (&payload1[..], &dest1.write_cap[..], &dest1.first_index[..]),
-    (&payload2[..], &dest2.write_cap[..], &dest2.first_index[..]),
+    (&payload1[..], &dest1.write_cap[..], &dest1.first_message_index[..]),
+    (&payload2[..], &dest2.write_cap[..], &dest2.first_message_index[..]),
 ];
 
 let result = client.create_courier_envelopes_from_multi_payload(
@@ -1409,7 +1694,7 @@ let result = client.create_courier_envelopes_from_multi_payload(
 ).await?;
 
 // Write envelopes to temporary channel
-let mut temp_index = temp.first_index.clone();
+let mut temp_index = temp.first_message_index.clone();
 for chunk in &result.envelopes {
     let write_result = client.encrypt_write(
         chunk, &temp.write_cap, &temp_index,
@@ -1436,8 +1721,8 @@ temp = await client.new_keypair(temp_seed)
 
 # Pack multiple payloads
 destinations = [
-    {"payload": payload1, "write_cap": dest1.write_cap, "start_index": dest1.first_index},
-    {"payload": payload2, "write_cap": dest2.write_cap, "start_index": dest2.first_index},
+    {"payload": payload1, "write_cap": dest1.write_cap, "start_index": dest1.first_message_index},
+    {"payload": payload2, "write_cap": dest2.write_cap, "start_index": dest2.first_message_index},
 ]
 
 result = await client.create_courier_envelopes_from_multi_payload(
@@ -1448,12 +1733,12 @@ result = await client.create_courier_envelopes_from_multi_payload(
 )
 
 # Write envelopes to temporary channel
-temp_index = temp.first_index
+temp_index = temp.first_message_index
 for chunk in result.envelopes:
     write_result = await client.encrypt_write(chunk, temp.write_cap, temp_index)
     await client.start_resending_encrypted_message(
         read_cap=None, write_cap=temp.write_cap,
-        next_message_index=None, reply_index=None,
+        message_box_index=None, reply_index=None,
         envelope_descriptor=write_result.envelope_descriptor,
         message_ciphertext=write_result.message_ciphertext,
         envelope_hash=write_result.envelope_hash,
@@ -1620,7 +1905,7 @@ let result = client.create_courier_envelopes_from_tombstone_range(
 ).await?;
 
 // Write to temporary channel
-let mut temp_index = temp.first_index.clone();
+let mut temp_index = temp.first_message_index.clone();
 for chunk in &result.envelopes {
     let write_result = client.encrypt_write(
         chunk, &temp.write_cap, &temp_index,
@@ -1651,12 +1936,12 @@ result = await client.create_courier_envelopes_from_tombstone_range(
 )
 
 # Write to temporary channel
-temp_index = temp.first_index
+temp_index = temp.first_message_index
 for chunk in result.envelopes:
     write_result = await client.encrypt_write(chunk, temp.write_cap, temp_index)
     await client.start_resending_encrypted_message(
         read_cap=None, write_cap=temp.write_cap,
-        next_message_index=None, reply_index=None,
+        message_box_index=None, reply_index=None,
         envelope_descriptor=write_result.envelope_descriptor,
         message_ciphertext=write_result.message_ciphertext,
         envelope_hash=write_result.envelope_hash,
