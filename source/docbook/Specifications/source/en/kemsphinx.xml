@@ -74,17 +74,17 @@
         <itemizedlist spacing="compact">
             <listitem>
                 <para>
-                    <literal>PRIV_KEY, PUB_KEY = GEN_KEYPAIR(RNG)</literal>
+                    <code>PRIV_KEY, PUB_KEY = GEN_KEYPAIR(RNG)</code>
                 </para>
             </listitem>
             <listitem>
                 <para>
-                    <literal>ct, ss = ENCAP(PUB_KEY)</literal> - Encapsulate generates a shared
+                    <code>ct, ss = ENCAP(PUB_KEY)</code> - Encapsulate generates a shared
                     secret, ss, for the public key and encapsulates it into a ciphertext. </para>
             </listitem>
             <listitem>
                 <para>
-                    <literal>ss = DECAP(PRIV_KEY, ct)</literal> - Decapsulate computes the shared
+                    <code>ss = DECAP(PRIV_KEY, ct)</code> - Decapsulate computes the shared
                     key, ss, encapsulated in the ciphertext, ct, for the private key. </para>
             </listitem>
         </itemizedlist>
@@ -92,12 +92,12 @@
         <itemizedlist spacing="compact">
             <listitem>
                 <para>
-                    <literal>||</literal> = concatenate two binary blobs together </para>
+                    <code>||</code> = concatenate two binary blobs together </para>
             </listitem>
             <listitem>
                 <para>
-                    <literal>PRF</literal> = pseudo random function, a cryptographic hash function,
-                        e.g. <literal>Blake2b</literal>. </para>
+                    <code>PRF</code> = pseudo random function, a cryptographic hash function,
+                        e.g. <code>Blake2b</code>. </para>
             </listitem>
         </itemizedlist>
         <para>Therefore we must embed these KEM ciphertexts in the KEMSphinx header, one KEM
@@ -169,39 +169,39 @@ return PRF(ss1 || cct) XOR PRF(ss2 || cct) XOR PRF(ss3 || cct)
         <para>NIKE Sphinx header elements: </para>
         <orderedlist numeration="arabic" spacing="compact">
             <listitem>
-                <para> Version number (MACed but not encrypted) </para>
+                <para>Version number (MACed but not encrypted) </para>
             </listitem>
             <listitem>
-                <para> Group element </para>
+                <para>Group element </para>
             </listitem>
             <listitem>
-                <para> Encrypted per routing commands </para>
+                <para>Encrypted per routing commands </para>
             </listitem>
             <listitem>
-                <para> MAC for this hop (authenticates header fields 1 thru 4) </para>
+                <para>MAC for this hop (authenticates header fields 1 thru 4) </para>
             </listitem>
         </orderedlist>
         <para>KEM Sphinx header elements: </para>
         <orderedlist numeration="arabic" spacing="compact">
             <listitem>
-                <para> Version number (MACed but not encrypted) </para>
+                <para>Version number (MACed but not encrypted) </para>
             </listitem>
             <listitem>
-                <para> One KEM ciphertext for use with the next hop </para>
+                <para>One KEM ciphertext for use with the next hop </para>
             </listitem>
             <listitem>
-                <para> Encrypted per routing commands AND KEM ciphertexts, one for each additional
+                <para>Encrypted per routing commands AND KEM ciphertexts, one for each additional
                     hop </para>
             </listitem>
             <listitem>
-                <para> MAC for this hop (authenticates header fields 1 through 4) </para>
+                <para>MAC for this hop (authenticates header fields 1 through 4) </para>
             </listitem>
         </orderedlist>
         <para>We can say that KEMSphinx differs from NIKE Sphinx by replacing the header’s group
             element (e.g. an X25519 public key) field with the KEM ciphertext. Subsequent KEM
             ciphertexts for each hop are stored inside the <quote>routing information</quote>
             section of the Sphinx packet header. </para>
-        <para> First we must have a data type to express a mix hop, and we can use lists of these
+        <para>First we must have a data type to express a mix hop, and we can use lists of these
             hops to express a route: </para>
         <programlisting>type PathHop struct {
 public_key kem.PublicKey
@@ -211,7 +211,7 @@ routing_commands Commands
             indicates the route through the network: </para>
         <orderedlist numeration="arabic" spacing="compact">
             <listitem>
-                <para> Derive the KEM ciphertexts for each hop. </para>
+                <para>Derive the KEM ciphertexts for each hop. </para>
             </listitem>
         </orderedlist>
         <programlisting>route_keys = []
@@ -223,7 +223,7 @@ route_keys += ss
 }</programlisting>
         <orderedlist numeration="arabic" spacing="compact">
             <listitem override="2">
-                <para> Derive the routing_information keystream and encrypted padding for each hop.
+                <para>Derive the routing_information keystream and encrypted padding for each hop.
                 </para>
             </listitem>
         </orderedlist>
@@ -231,7 +231,7 @@ route_keys += ss
             slot is now increased by the size of the KEM ciphertext. </para>
         <orderedlist numeration="arabic" spacing="compact">
             <listitem override="3">
-                <para> Create the routing_information block. </para>
+                <para>Create the routing_information block. </para>
             </listitem>
         </orderedlist>
         <para>Here we modify the Sphinx implementation to pack the next KEM ciphertext into each
@@ -239,10 +239,10 @@ route_keys += ss
             will decrypt the KEM ciphertext for the next hop in the route. </para>
         <orderedlist numeration="arabic" spacing="compact">
             <listitem override="4">
-                <para> Assemble the completed Sphinx Packet Header and Sphinx Packet Payload SPRP
+                <para>Assemble the completed Sphinx Packet Header and Sphinx Packet Payload SPRP
                     key vector. Same as in <link linkend="SPHINXSPEC">SPHINXSPEC</link> except the
-                        <literal>kem_element</literal> field is set to the first KEM ciphertext,
-                        <literal>route_kems[0]</literal>: </para>
+                        <code>kem_element</code> field is set to the first KEM ciphertext,
+                        <code>route_kems[0]</code>: </para>
             </listitem>
         </orderedlist>
         <programlisting>
@@ -255,14 +255,14 @@ sphinx_header.mac = mac
     </section>
     <section xml:id="kemsphinx-unwrap-operation">
         <title>KEMSphinx unwrap operation</title>
-        <para> Most of the design here will be exactly the same as in <link linkend="SPHINXSPEC"
+        <para>Most of the design here will be exactly the same as in <link linkend="SPHINXSPEC"
                 >SPHINXSPEC</link>. However there are a few notable differences: </para>
         <orderedlist numeration="arabic" spacing="compact">
             <listitem>
-                <para> The shared secret is derived from the KEM ciphertext instead of a DH. </para>
+                <para>The shared secret is derived from the KEM ciphertext instead of a DH. </para>
             </listitem>
             <listitem>
-                <para> Next hop’s KEM ciphertext stored in the encrypted routing information.
+                <para>Next hop’s KEM ciphertext stored in the encrypted routing information.
                 </para>
             </listitem>
         </orderedlist>

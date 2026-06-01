@@ -50,7 +50,7 @@
     version="5.1" xml:id="autoresponder">
     
     <info>
-        <title xml:id="autoresponder.title">Provider-side autoresponder extension (Kaetzchen)
+        <title xml:id="autoresponder.title">Gateway-side autoresponder extension (Kaetzchen)
             specification</title>
         <authorgroup>
             <author>
@@ -73,8 +73,8 @@
             </author>
         </authorgroup>
         <abstract>
-            <para> This interface is meant to provide support for various autoresponder agents
-                    <quote>Kaetzchen</quote> that run on Katzenpost provider instances, thus
+            <para>This interface is meant to provide support for various autoresponder agents
+                    <quote>Kaetzchen</quote> that run on &program_name; gateway instances, thus
                 bypassing the need to run a discrete client instance to provide functionality. The
                 use-cases for such agents include, but are not limited to, user identity key lookup,
                 a discard address, and a loop-back responder for the purpose of cover
@@ -83,7 +83,7 @@
     </info>
     <section>
         <title>Conventions used in this document</title>
-        <para> The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
+        <para>The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
                 <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
                 NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
                 <quote>OPTIONAL</quote> in this document are to be interpreted as described in <link
@@ -95,16 +95,17 @@
         <para>The following terms are used in this specification.</para>
         <variablelist>            
             &blocksphinxplaintext;
+            &gateway;
             &surb;
         </variablelist>
     </section>
     
     <section xml:id="extension-overview">
             <title xml:id="extension-overview.title">Extension overview</title>
-            <para>Each Kaetzchen agent will register as a potential recipient on its Provider. When
-                the Provider receives a forward packet destined for a Kaetzchen instance, it will
-                hand off the fully unwrapped packet along with its corresponding SURB to the agent,
-                which will then act on the packet and optionally reply utilizing the SURB.</para>
+            <para>Each Kaetzchen agent will register as a potential recipient on its gateway. When
+            the gateway receives a forward packet destined for a Kaetzchen instance, it will hand
+            off the fully unwrapped packet along with its corresponding SURB to the agent, which
+            will then act on the packet and optionally reply utilizing the SURB.</para>
         <section xml:id="agent-requirements">
             <title xml:id="agent-requirements.title">Agent requirements</title>
             <itemizedlist spacing="compact">
@@ -114,11 +115,6 @@
                 <listitem>
                     <para>Each agent operation request and response MUST fit within one Sphinx
                         packet.</para>
-                </listitem>
-                <listitem>
-                    <para>Each agent SHOULD register a recipient address that is prefixed with (Or
-                        another standardized delimiter, agreed to by all participating providers in
-                        a given mixnet).</para>
                 </listitem>
                 <listitem>
                     <para>Each agent SHOULD register a recipient address that consists of an RFC5322
@@ -147,36 +143,36 @@ SphinxSURB surb;
 }
 opaque plaintext[];
 } KaetzchenMessage;</programlisting>
-            <para>The plaintext component of a <literal>KaetzchenMessage</literal> MUST be padded by
+            <para>The plaintext component of a <code>KaetzchenMessage</code> MUST be padded by
                 appending <quote>0x00</quote> bytes to make the final total size of a
-                    <literal>KaetzchenMessage</literal> equal to that of a
-                    <literal>BlockSphinxPlaintext</literal>.</para>
+                    <code>KaetzchenMessage</code> equal to that of a
+                    <code>BlockSphinxPlaintext</code>.</para>
             <para>Messages (replies) from the Kaetzchen to client use the following payload format
                 in the SURB generated packet:</para>
             <programlisting>struct {
 opaque plaintext[];
 } KaetzchenReply;</programlisting>
-            <para>The plaintext component of a <literal>KaetzchenReply</literal> MUST be padded by
+            <para>The plaintext component of a <code>KaetzchenReply</code> MUST be padded by
                 appending <quote>0x00</quote> bytes to make the final total size of a
-                    <literal>KaetzchenReply</literal> equal to that of a
-                    <literal>BlockSphinxPlaintext</literal></para>
+                    <code>KaetzchenReply</code> equal to that of a
+                    <code>BlockSphinxPlaintext</code></para>
         </section>
         </section>
         <section xml:id="pki-extensions">
             <title xml:id="pki-extensions.title">PKI extensions</title>
-            <para>Each provider SHOULD publish the list of publicly accessible Kaetzchen agent
-                endpoints in its MixDescriptor, along with any other information required to utilize
-                the agent.</para>
-            <para>Provider should make this information available in the form of a map in which the
-                keys are the label used to identify a given service, and the value is a map with
-                arbitrary keys.</para>
+            <para>Each gateway SHOULD publish the list of publicly accessible Kaetzchen agent
+            endpoints in its <code>MixDescriptor</code>, along with any other information required
+            to utilize the agent.</para>
+            <para>The gateway should make this information available in the form of a map in which
+            the keys are the label used to identify a given service, and the value is a map with
+            arbitrary keys.</para>
             <para>Valid service names refer to the services defined in extensions to this
                 specification. Every service MUST be implemented by one and only one Kaetzchen
                 agent.</para>
-            <para>For each service, the provider MUST advertise a field for the endpoint at which
-                the Kaetzchen agent can be reached, as a key value pair where the key is
-                    <literal>endpoint</literal>, and the value is the provider side endpoint
-                identifier.</para>
+            <para>For each service, the gateway MUST advertise a field for the endpoint at which the
+            Kaetzchen agent can be reached, as a key value pair where the key is
+                <code>endpoint</code>, and the value is the gateway side endpoint
+            identifier.</para>
             <programlisting>{ "kaetzchen":
 { "keyserver" : {
 "endpoint": "+keyserver",
@@ -196,16 +192,16 @@ opaque plaintext[];
             <para>Depending on what sort of operations a given agent implements, there may be
                 additional anonymity impact that requires separate consideration.</para>
             <para>Clients MUST NOT have predictable retransmission otherwise this makes active
-                confirmations attacks possible which could be used to discover the ingress Provider
-                of the client.</para>
+            confirmations attacks possible which could be used to discover the ingress gateway of
+            the client.</para>
         </section>
         <section xml:id="security-considerations">
             <title xml:id="security-considerations.title">Security considerations</title>
             <para>It is possible to use this mechanism to flood a victim with unwanted traffic by
                 constructing a request with a SURB destined for the target.</para>
             <para>Depending on the operations implemented by each agent, the added functionality may
-                end up being a vector for Denial of Service attacks in the form of CPU or network
-                overload.</para>
+            end up being a vector for denial-of-service attacks in the form of CPU or network
+            overload.</para>
             <para>Unless the agent implements additional encryption, message integrity and privacy
                 is limited to that which is provided by the base Sphinx packet format and
                 parameterization.</para>

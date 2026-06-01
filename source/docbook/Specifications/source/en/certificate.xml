@@ -61,7 +61,7 @@
             </author>
         </authorgroup>
         <abstract>
-            <para>This document proposes a certificate format that Katzenpost mix server, directory
+            <para>This document proposes a certificate format that &program_name; mix server, directory
                 authority server and clients will use.</para>
         </abstract>
     </info>
@@ -80,21 +80,21 @@
             mixes and authorities to periodically utilize a long-term signing key for generating
             certificates for new short-term signing keys. </para>
         <para>Yet another use-case for these certificate is to replace the use of JOSE <link
-                linkend="RFC7515">RFC7515</link> in the voting Directory Authority system <link
+                linkend="RFC7515">RFC7515</link> in the voting directory authority system <link
                 linkend="KATZMIXPKI">KATZMIXPKI</link> for the multi-signature documents exchanged
             for voting and consensus. </para>
         <section xml:id="document-format">
             <title>Certificate format</title>
-            <para> The CBOR <link linkend="RFC7049">RFC7049</link> serialization format is used to
+            <para>The CBOR <link linkend="RFC7049">RFC7049</link> serialization format is used to
                 serialize certificates: </para>
-            <para> Signature is a cryptographic signature which has an associated signer ID. </para>
+            <para>Signature is a cryptographic signature which has an associated signer ID. </para>
             <programlisting>type Signature struct {
 // Identity is the identity of the signer.
 Identity []byte
 // Signature is the actual signature value.
 Signature []byte
 }</programlisting>
-            <para> Certificate structure for serializing certificates. </para>
+            <para>Certificate structure for serializing certificates. </para>
             <programlisting>type certificate struct {
 // Version is the certificate format version.
 Version uint32
@@ -114,14 +114,14 @@ Certified []byte
 Signatures []Signature
 }</programlisting>
             <para>That is, one or more signatures sign the certificate. However the
-                    <literal>Certified</literal> field is not the only information that is signed.
-                The <literal>Certified</literal> field along with the other non-signature fields are
+                    <code>Certified</code> field is not the only information that is signed.
+                The <code>Certified</code> field along with the other non-signature fields are
                 all concatenated together and signed. Before serialization the signatures are sorted
                 by their identity so that the output is binary deterministic. </para>
         </section>
         <section xml:id="certificate-types">
             <title>Certificate types</title>
-            <para>The certificate <literal>type</literal> field indicates the type of certificate.
+            <para>The certificate <code>type</code> field indicates the type of certificate.
                 So far we have only two types: </para>
             <itemizedlist spacing="compact">
                 <listitem>

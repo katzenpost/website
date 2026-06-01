@@ -7,43 +7,40 @@
                         that is to say, SURBs function as a cryptographic delivery token that
                         you can give to another client entity so that they can send you a
                         message without them knowing your identity or location on the network.
-                        See <literal>SPHINXSPEC</literal> and <literal>SPHINX</literal>.</para>
+                        See <code>SPHINXSPEC</code> and <code>SPHINX</code>.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY blocksphinxplaintext '<varlistentry>
                 <term><emphasis role="bold">BlockSphinxPlaintext</emphasis></term>
                 <listitem>
-                    <para>The payload structure which is encapsulated by the Sphinx body.</para>
+                    <para>The payload structure that is encapsulated by the Sphinx body.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY wireprotocol '<varlistentry>
                 <term><emphasis role="bold">wire protocol</emphasis></term>
                 <listitem>
-                    <para>Refers to our PQ Noise based protocol which currently uses TCP but in the
+                    <para>Refers to our PQ Noise-based protocol that currently uses TCP but in the
                         near future will optionally use QUIC. This protocol has messages known as
-                        wire protocol <literal>commands</literal>, which are used for various mixnet
-                        functions such as sending or retrieving a message, dirauth voting etc. For
-                        more information, please see our design doc: <link
+                        wire protocol <code>commands</code>, which are used for various mixnet
+                        functions such as sending or retrieving a message and dirauth voting. For
+                        more information, see our <link
                             xlink:href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/wire-protocol.md"
-                            >wire protocol specification</link></para>
+                            >wire protocol specification</link>.</para>
                 </listitem>
             </varlistentry>'>
-<!ENTITY providers '<varlistentry>
-                <term><emphasis role="bold">providers</emphasis></term>
+<!ENTITY gateway '<varlistentry>
+                <term><emphasis role="bold">gateway</emphasis></term>
                 <listitem>
-                    <para>A node on the edge of the network that has two roles,
-                        handling incoming client connections and running mixnet services. Soon we should
-                        get rid of <literal>Providers</literal> and replace it with two different
-                        sets, <literal>gateway nodes</literal> and <literal>service
-                        nodes</literal>.</para>
+                    <para>A mix node on the edge of the mixnet that is the first hop for messages coming from clients. 
+                    The gateway authenticates client connections and queues reply messages (SURBs) for retrieval.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY epoch '<varlistentry>
                 <term><emphasis role="bold">epoch</emphasis></term>
                 <listitem>
-                    <para>A fixed time interval with a current default value of 20 minutes. 
+                    <para>A fixed-time interval with a current default value of 20 minutes. 
                         A new PKI document containing public key material
-                        is published for each epoch and is valid only for that epoch. For more information see 
+                        is published for each epoch and is valid only for that epoch. For more information, see 
                         <link xlink:href="https://katzenpost.network/docs/specs/mix_network/#sphinx-mix-and-provider-key-rotation">Sphinx 
                         mix and provider key rotation</link>.</para>
                 </listitem>
@@ -57,16 +54,16 @@
 <!ENTITY mixnet '<varlistentry>
                 <term><emphasis role="bold">mixnet</emphasis></term>
                 <listitem>
-                    <para>A mixnet also known as a mix network is a network of mixes that can be
-                        used to build various privacy preserving protocols.</para>
+                    <para>A mixnet, or mix network, is a network of mix servers that can be
+                        used to build various privacy-preserving protocols.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY mix '<varlistentry>
-                <term><emphasis role="bold">mix</emphasis></term>
+                <term><emphasis role="bold">mix node</emphasis></term>
                 <listitem>
-                    <para>A cryptographic router that is used to compose a mixnet. Mixes use a
+                    <para>A cryptographic router that is used to compose a mixnet. Mix nodes use a
                         cryptographic operation on messages being routed which provides bitwise
-                        unlinkability with respect to input versus output messages. Katzenpost is a
+                        unlinkability with respect to input versus output messages. &program_name; is a
                         decryption mixnet that uses the Sphinx cryptographic packet format.</para>
                 </listitem>
             </varlistentry>'>
@@ -74,45 +71,44 @@
                 <term><emphasis role="bold">node</emphasis></term>
                 <listitem>
                     <para>Clients are NOT considered nodes in the mix network. However,
-                        network protocols are often layered. In our design documents we describe
-                        "mixnet hidden services" which can be operated by mixnet clients. Therefore
+                        network protocols are often layered. In our design documents, we describe
+                        "mixnet hidden services" that can be operated by mixnet clients. Therefore
                         if you are using the term "node" in some adherence to mathematical terminology, one
-                        could conceivably designate a client as a node. That having been said, it
-                        would not be appropriate to the discussion of our core mixnet protocol to
-                        refer to clients as nodes.</para>
+                        could conceivably designate a client as a node. However, in discussion of our core
+                        mixnet protocol, it is inappropriate to refer to clients as nodes.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY entry '<varlistentry>
                 <term><emphasis role="bold">entry mix, entry node</emphasis></term>
                 <listitem>
-                    <para>A mix that has some additional features: </para>
+                    <para>A mix node that has some additional features: </para>
                     <itemizedlist>
                         <listitem>
-                            <para> An entry mix is always the first hop in routes where the message
+                            <para>An entry mix is always the first hop in routes where the message
                                 originates from a client. </para>
                         </listitem>
                         <listitem>
-                            <para> An entry mix authenticates client’s direct connections via the
+                            <para>An entry mix authenticates client’s direct connections via the
                                 mixnet’s wire protocol. </para>
                         </listitem>
                         <listitem>
-                            <para> An entry mix queues reply messages and allows clients to retrieve
+                            <para>An entry mix queues reply messages and allows clients to retrieve
                                 them later. </para>
                         </listitem>
                     </itemizedlist>
                 </listitem>
             </varlistentry>'>
 <!ENTITY servicemix '<varlistentry>
-                <term><emphasis role="bold">service mix</emphasis></term>
+                <term><emphasis role="bold">service node</emphasis></term>
                 <listitem>
-                    <para>A service mix is a mix server that has some additional features:</para>
+                    <para>A service node is a mix node with additional features:</para>
                     <itemizedlist>
                         <listitem>
-                            <para> A service mix is always the last hop in routes where the message
+                            <para>A service node is always the last hop in routes where the message
                                 originates from a client. </para>
                         </listitem>
                         <listitem>
-                            <para> A service mix runs mixnet services which use a Sphinx SURB based
+                            <para>A service node runs mixnet services which use a Sphinx SURB-based
                                 protocol. </para>
                         </listitem>
                     </itemizedlist>
@@ -121,37 +117,28 @@
 <!ENTITY user '<varlistentry>
                 <term><emphasis role="bold">user</emphasis></term>
                 <listitem>
-                    <para>An agent using the Katzenpost system.</para>
+                    <para>An agent using the &program_name; system.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY client '<varlistentry>
                 <term><emphasis role="bold">client</emphasis></term>
                 <listitem>
-                    <para>Software run by the user on their local device to participate in the mixnet.
-                        A client is not considered a "node in the
-                        network" for purposes of analyhsis of the core mnixnet protocols.</para>
+                    <para>Software run by a user on their local device to participate in the mixnet.
+                        A client is not considered a node in the
+                        network for purposes of analysis of the core mnixnet protocols.</para>
                 </listitem>
             </varlistentry>'>
-<!--<!ENTITY 
 
-inadequate definition
-
-katzenpost ' <varlistentry>
-                <term><emphasis role="bold">&program_name;</emphasis></term>
-                <listitem>
-                    <para>A project to design many improved decryption mixnet protocols.</para>
-                </listitem>
-            </varlistentry>'>-->
 <!ENTITY classestraffic '<varlistentry>
                 <term><emphasis role="bold">classes of traffic</emphasis></term>
                 <listitem>
                     <para>We distinguish the following classes of traffic:</para>
                     <itemizedlist>
                         <listitem>
-                            <para> SURB Replies (also sometimes referred to as ACKs) </para>
+                            <para>SURB replies (sometimes referred to as ACKs)</para>
                         </listitem>
                         <listitem>
-                            <para> Forward messages </para>
+                            <para>Forwarded messages</para>
                         </listitem>
                     </itemizedlist>
                 </listitem>
@@ -165,53 +152,41 @@ katzenpost ' <varlistentry>
 <!ENTITY pki '<varlistentry>
                 <term><emphasis role="bold">PKI</emphasis></term>
                 <listitem>
-                    <para>Public key infrastructure</para>
+                    <para>Public key infrastructure.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY dirauthsystem '<varlistentry>
                 <term><emphasis role="bold">directory authority system</emphasis></term>
                 <listitem>
-                    <para>Refers to specific PKI schemes used by Mixminion and Tor.</para>
+                    <para>Refers to PKI schemes used by Mixminion and Tor.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY mixdescriptor '<varlistentry>
                 <term><emphasis role="bold">mix descriptor</emphasis></term>
                 <listitem>
-                    <para>A database record which describes a component mix.</para>
+                    <para>A database record that describes a mixnet server component.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY family '<varlistentry>
                 <term><emphasis role="bold">family</emphasis></term>
                 <listitem>
-                    <para>Identifier of security domains or entities operating one or more mixes in
+                    <para>Identifier of security domains or entities operating one or more mix nodes in
                         the network. This is used to inform the path selection algorithm.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY nickname '<varlistentry>
                 <term><emphasis role="bold">nickname</emphasis></term>
                 <listitem>
-                    <para>A nickname string that is unique in the consensus document, see Katzenpost
-                        Mix Network Specification section 2.2. Network Topology.</para>
+                    <para>A component nickname string that must be unique in the consensus document.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY layer '<varlistentry>
                 <term><emphasis role="bold">layer</emphasis></term>
                 <listitem>
-                    <para>The layer indicates which network topology layer a particular mix resides
+                    <para>The layer value indicates which network topology layer a particular mix node resides
                         in.</para>
                 </listitem>
-            </varlistentry>'>
-<!ENTITY provider '<varlistentry>
-                <term><emphasis role="bold">provider</emphasis></term>
-                <listitem>
-                    <para>A service operated by a third party that Clients communicate directly with
-                        to communicate with the Mixnet. It is responsible for Client authentication,
-                        forwarding outgoing messages to the Mixnet, and storing incoming messages
-                        for the Client. The Provider MUST have the ability to perform cryptographic
-                        operations on the relayed messages.</para>
-                </listitem>
-            </varlistentry>'>
-           
+            </varlistentry>'>           
 <!ENTITY message '<varlistentry>
                 <term><emphasis role="bold">message</emphasis></term>
                 <listitem>
@@ -232,8 +207,8 @@ katzenpost ' <varlistentry>
 <!ENTITY header '<varlistentry>
                 <term><emphasis role="bold">header</emphasis></term>
                 <listitem>
-                    <para>The packet header consisting of several components, which convey the
-                        information necessary to verify packet integrity and correctly process the
+                    <para>The packet header consisting of several components which convey the
+                        information necessary to verify packet integrity and to correctly process the
                         packet.</para>
                 </listitem>
             </varlistentry>'>
@@ -255,13 +230,13 @@ katzenpost ' <varlistentry>
 <!ENTITY groupelement '<varlistentry>
                 <term><emphasis role="bold">group element</emphasis></term>
                 <listitem>
-                    <para>An individual element of the group.</para>
+                    <para>An individual element of a group.</para>
                 </listitem>
             </varlistentry>'>
 <!ENTITY groupgenerator '<varlistentry>
                 <term><emphasis role="bold">group generator</emphasis></term>
                 <listitem>
-                    <para>A group element capable of generating any other element of the group, via
+                    <para>A group element capable of generating any other element of a group, via
                         repeated applications of the generator and the group operation.</para>
                 </listitem>
             </varlistentry>'>
@@ -270,8 +245,8 @@ katzenpost ' <varlistentry>
                 <listitem>
                     <para>Staged Event Driven Architecture.<!-- <link linkend="SEDA">SEDA</link>--> 1. A
                         highly parallelizable computation model. 2. A computational pipeline
-                        composed of multiple stages connected by queues utilizing active queue
-                        management algorithms that can evict items from the queue based on dwell
+                        composed of multiple stages connected by queues utilizing active 
+                        queue-management algorithms that can evict items from a queue based on dwell
                         time or other criteria where each stage is a thread pool. 3. The only
                         correct way to efficiently implement a software based router on general
                         purpose computing hardware.</para>
@@ -282,7 +257,7 @@ katzenpost ' <varlistentry>
                 <term><emphasis role="bold">box</emphasis></term>
                 <listitem>
                     <para>BACAP&#39;s unit of data storage. Each box has a box ID (which also serves as its 
-                    public key), a signature, and a ciphertext signed payload.</para>
+                    public key), a signature, and a ciphertext-signed payload.</para>
                 </listitem>
             </varlistentry>'>            
 
@@ -295,15 +270,18 @@ katzenpost ' <varlistentry>
             </varlistentry>'>            
 
 <!ENTITY replica '<varlistentry>
-                <term><emphasis role="bold">storage replica</emphasis></term>
+                <term><emphasis role="bold">storage replicas</emphasis></term>
                 <listitem>
                     <para>"Intermediate replicas are chosen independently of the two final replicas for that 
                     box ID which are derived using the sharding scheme. The reason Alice designates 
                     intermediate replicas, as opposed to addressing the final replicas directly, is to avoid 
-                    revealing to the courier which shard the box falls into." (From "§5.4.1. Writing messages" 
-                    in the paper.) Designated replica (a.k.a. final replica, shard replica): One of the two 
-                    replicas selected deterministically for a given box ID by the Shard2 consistent-hash 
-                    algorithm. The intermediate replicas replicate writes through to the designated replicas.</para>
+                    revealing to the courier which shard the box falls into." (From "§5.4.1 "Writing messages" 
+                    in <link xlink:href="https://arxiv.org/abs/2501.02933"
+                    xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">Echomix: a
+                    Strong Anonymity System with Messaging</link>. A designated replica (a.k.a. final replica or
+                    shard replica) is one of the two replicas selected deterministically for a given box ID by 
+                    the Shard2 consistent-hash algorithm. The intermediate replicas write through to the 
+                    designated replicas.</para>
                 </listitem>
             </varlistentry>'>            
 
@@ -323,7 +301,7 @@ katzenpost ' <varlistentry>
                         carries, for each recipient, a separate DEK encapsulation (<code
                         xmlns="http://docbook.org/ns/docbook">Dek1</code>, <code
                         xmlns="http://docbook.org/ns/docbook">Dek2</code>); either recipient may decapsulate and
-                        recover the padded <code xmlns="http://docbook.org/ns/docbook">ReplicaInnerMessage</code></para>
+                        recover the padded <code xmlns="http://docbook.org/ns/docbook">ReplicaInnerMessage</code>.</para>
                 </listitem>
             </varlistentry>'>            
 

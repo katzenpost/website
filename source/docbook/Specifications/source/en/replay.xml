@@ -104,21 +104,21 @@
                 <link linkend="SPHINXSPEC">SPHINXSPEC</link>: </para>
         <itemizedlist>
             <listitem>
-                <para><literal>H(M)</literal> - A cryptographic hash function which takes a byte
-                    array M to produce a digest consisting of a <literal>HASH_LENGTH</literal> byte
-                    array. <literal>H(M)</literal> MUST be pre-image and collision resistant. </para>
+                <para><code>H(M)</code> - A cryptographic hash function which takes a byte
+                    array M to produce a digest consisting of a <code>HASH_LENGTH</code> byte
+                    array. <code>H(M)</code> MUST be pre-image and collision resistant. </para>
             </listitem>
             <listitem>
-                <para><literal>EXP(X, Y)</literal> - An exponentiation function which takes the
-                        <literal>GROUP_ELEMENT_LENGTH</literal> byte array group elements
-                        <literal>X</literal> and <literal>Y</literal>, and returns <literal>X ^^
-                        Y</literal> as a <literal>GROUP_ELEMENT_LENGTH</literal> byte array. </para>
+                <para><code>EXP(X, Y)</code> - An exponentiation function which takes the
+                        <code>GROUP_ELEMENT_LENGTH</code> byte array group elements
+                        <code>X</code> and <code>Y</code>, and returns <code>X ^^
+                        Y</code> as a <code>GROUP_ELEMENT_LENGTH</code> byte array. </para>
             </listitem>
         </itemizedlist>
-        <para>Let <literal>G</literal> denote the generator of the group, and
-                <literal>EXP_KEYGEN()</literal> return a <literal>GROUP_ELEMENT_LENGTH</literal>
+        <para>Let <code>G</code> denote the generator of the group, and
+                <code>EXP_KEYGEN()</code> return a <code>GROUP_ELEMENT_LENGTH</code>
             byte array group element usable as a private key. </para>
-        <para>The group defined by <literal>G</literal> and <literal>EXP(X, Y)</literal> MUST
+        <para>The group defined by <code>G</code> and <code>EXP(X, Y)</code> MUST
             satisfy the <link
                 xlink:href="https://en.wikipedia.org/wiki/Decisional_Diffie%E2%80%93Hellman_assumption"
                 >decisional Diffie-Hellman assumption</link>. </para>
@@ -127,13 +127,13 @@
             <itemizedlist spacing="compact">
                 <listitem>
                     <para>
-                        <literal>HASH_LENGTH</literal> - 32 bytes. &program_name; currently uses
+                        <code>HASH_LENGTH</code> - 32 bytes. &program_name; currently uses
                         SHA-512/256. <link linkend="RFC6234">RFC6234</link>
                     </para>
                 </listitem>
                 <listitem>
                     <para>
-                        <literal>GROUP_ELEMENT_LENGTH</literal> - 32 bytes. &program_name; currently
+                        <code>GROUP_ELEMENT_LENGTH</code> - 32 bytes. &program_name; currently
                         uses X25519. <link linkend="RFC7748">RFC7748</link>
                     </para>
                 </listitem>
@@ -274,7 +274,7 @@ replay_tag = H( shared_secret )</programlisting>
             <para>The mix server periodically updates its knowledge of the network by downloading a
                 new consensus document as described in <link linkend="KATZMIXPKI">KATZMIXPKI</link>.
                 The individual threads in the <emphasis>cryptoworker</emphasis> thread pool that
-                process Sphinx packets make use of a <literal>MixKey</literal> data structure
+                process Sphinx packets make use of a <code>MixKey</code> data structure
                 consisting of the following:</para>
             <itemizedlist spacing="compact">
                 <listitem>
@@ -288,27 +288,26 @@ replay_tag = H( shared_secret )</programlisting>
                 </listitem>
             </itemizedlist>
             <para>Each of these cryptoworker threads has its own hashmap associating epochs with a
-                reference to the <literal>MixKey</literal>.
-                <?oxy_comment_start author="dwrob" timestamp="20260522T124719-0700" comment="&quot;threat&quot; makes no sense."?>The
-                mix server PKI threat maintains a single hashmap which associates the epochs with
-                the corresponding <literal>MixKey</literal>.<?oxy_comment_end?> We refer to this
-                hashmap as <literal>MixKeys</literal>. After a new <literal>MixKey</literal> is
-                added to <literal>MixKeys</literal>, a <emphasis>reshadow</emphasis> operation is
-                performed for each cryptoworker thread. The reshadow operation performs two tasks: </para>
+                reference to the <code>MixKey</code>. The mix server PKI thread maintains a single
+                hashmap which associates the epochs with the corresponding <code>MixKey</code>. We
+                refer to this hashmap as <code>MixKeys</code>. After a new <code>MixKey</code> is
+                added to <code>MixKeys</code>, a <emphasis>reshadow</emphasis> operation is
+                performed for each cryptoworker thread. The <emphasis>reshadow</emphasis> operation
+                performs two tasks: </para>
             <itemizedlist spacing="compact">
                 <listitem>
                     <para>Removes entries from each cryptoworker thread's hashmap that are no longer
-                        present in <literal>MixKeys</literal> and decrements the
-                            <literal>MixKey</literal> reference counter. </para>
+                        present in <code>MixKeys</code> and decrements the
+                            <code>MixKey</code> reference counter. </para>
                 </listitem>
                 <listitem>
-                    <para>Adds entries present in <literal>MixKeys</literal> but not present in the
-                        thread’s hashmap and increments the <literal>MixKey</literal> reference
+                    <para>Adds entries present in <code>MixKeys</code> but not present in the
+                        thread’s hashmap and increments the <code>MixKey</code> reference
                         counter. </para>
                 </listitem>
             </itemizedlist>
-            <para>Once a given <literal>MixKey</literal> reference counter is decremented to zero,
-                the <literal>MixKey</literal> and its associated on-disk data are purged. </para>
+            <para>Once a given <code>MixKey</code> reference counter is decremented to zero,
+                the <code>MixKey</code> and its associated on-disk data are purged. </para>
             <para>Although we do not discuss synchronization primitives, it should be obvious that
                 updating the replay cache should likely make use of a mutex or similar primitive to
                 avoid data races between cryptoworker threads. </para>
