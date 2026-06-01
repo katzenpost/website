@@ -60,7 +60,7 @@
     </author>
   </authorgroup> 
     <abstract>
-      <para>This document describes the design of the new Katzenpost mixnet <emphasis>thin
+      <para>This document describes the design of the new &program_name; mixnet <emphasis>thin
       client</emphasis>. In particular we discuss its multiplexing and privilege-separation design
       elements as well as the protocol used by the thin-client library.</para>
     </abstract>   
@@ -69,7 +69,7 @@
     <info>
       <title xml:id="thin_client_intro.title">Introduction</title>
     </info>       
-    <para>A Katzenpost mixnet client has several responsibilities at a minimum: </para>
+    <para>A &program_name; mixnet client has several responsibilities at a minimum: </para>
     <itemizedlist spacing="compact">
       <listitem>
         <para>composing Sphinx packets </para>
@@ -117,7 +117,7 @@
       </info>
       <para>The protocol has two phases.</para>
       <para><emphasis role="bold">Phase 1</emphasis></para>
-      <para> Upon connecting to the daemon socket, the thin client waits for two messages. </para>
+      <para>Upon connecting to the daemon socket, the thin client waits for two messages. </para>
       <itemizedlist>
         <listitem>
           <para><emphasis role="bold">First message </emphasis></para>
@@ -138,7 +138,7 @@
           <para><emphasis role="bold">Second message</emphasis></para>
           <itemizedlist>
             <listitem>
-              <para>The message contains the PKI document in its <code>payload</code>field. This
+              <para>The message contains the PKI document in its <code>payload</code> field. This
                 marks the end of the initial connection sequence. </para>
             </listitem>
             <listitem>

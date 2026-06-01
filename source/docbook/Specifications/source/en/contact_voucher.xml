@@ -79,7 +79,7 @@
       conversation to the user being invited. In our contact voucher protocol, this flow is
       reversed: Bob, who wishes to join a conversation, hands a contact voucher (out-of-band) to
       existing member Alice, who then inducts Bob into the group.</para>
-  <para> This design mitigates two potential problems with the conventional way of doing things: </para>
+  <para>This design mitigates two potential problems with the conventional way of doing things: </para>
     <orderedlist>
       <listitem>
         <para>A third party who observes the contact voucher does not get to read either

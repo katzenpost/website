@@ -6,7 +6,7 @@
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 
 <?title "" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
-<?linkTitle "Pigeonhole Protocol" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
+<?linkTitle "Pigeonhole protocol" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
 <?description "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
 <?author "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
 <?url "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
@@ -166,7 +166,7 @@
     </section>
   <section xml:id="epochs" xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title xml:id="epochs.title">Epochs</title>
-    <para>Katzenpost has two distinct notions of &quot;epoch&quot; that operate on very different
+    <para>&program_name; has two distinct notions of &quot;epoch&quot; that operate on very different
       timescales, and Pigeonhole touches both: </para>
     <itemizedlist spacing="compact">
       <listitem>
@@ -239,7 +239,7 @@
       <listitem>
         <para><emphasis role="strong">Courier → Replica and Replica → Replica:</emphasis> the
           courier and replicas do not use Sphinx packets between themselves. They communicate over
-          the Katzenpost wire protocol defined in <code>core/wire</code> and
+          the &program_name; wire protocol defined in <code>core/wire</code> and
             <code>core/wire/commands</code>; the relevant commands are <code>ReplicaMessage</code>,
             <code>ReplicaMessageReply</code>, <code>ReplicaWrite</code>, and
             <code>ReplicaWriteReply</code>. Some of these commands embed trunnel-serialized
@@ -390,7 +390,7 @@
     </section>
   </section>
   <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>M&lt;essage types and interactions</title>
+    <title>Message types and interactions</title>
     <section>
       <title>Overview</title>
       <itemizedlist spacing="compact">
@@ -844,7 +844,7 @@ type CourierBookKeeping struct {
     <title>Sharding and replica selection</title>
     <para>For each box, two <emphasis>designated</emphasis> (final) replicas are derived
       deterministically from the box ID using the <code>Shard2</code> consistent-hash algorithm, as
-      shown in the following pseudocode.</para>
+      shown in the following pseudo-code.</para>
     <programlisting>for each online replica r with identity key k_r:
     h_r = BLAKE2b-256(k_r || box_id)
 return the two replicas whose h_r values are smallest</programlisting>

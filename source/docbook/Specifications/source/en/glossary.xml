@@ -60,12 +60,12 @@
         &entry;  
         &epoch;     
         &family;
+        &gateway;
         &group;
         &groupelement;
         &groupgenerator;
         &header;
         &kib;           
-        &katzenpost;
         &layer;   
         &message;
         &mixdescriptor; 
@@ -77,7 +77,6 @@
         &packet;
         &payload;
         &pki;       
-        &provider;  
         &seda;
         &servicemix;
         &surb;

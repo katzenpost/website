@@ -84,10 +84,10 @@
         System with Messaging</link>, which describes</para>
     <itemizedlist spacing="compact">
       <listitem>
-        <para> the BACAP (blinded and capability) in §4 and</para>
+        <para>the BACAP (blinded and capability) in §4 and</para>
       </listitem>
       <listitem>
-        <para> the Pigeonhole protocol in §5. </para>
+        <para>the Pigeonhole protocol in §5. </para>
       </listitem>
     </itemizedlist>
     <para>The <link xlink:href="https://github.com/katzenpost/hpqc/blob/main/bacap/bacap.go">source
@@ -124,10 +124,10 @@
         <para>a <code>MembershipCap</code> for each member, containing:</para>
         <itemizedlist spacing="compact">
           <listitem>
-            <para> a BACAP readcap</para>
+            <para>a BACAP readcap</para>
           </listitem>
           <listitem>
-            <para> a nickname </para>
+            <para>a nickname </para>
           </listitem>
         </itemizedlist>
       </listitem>
@@ -267,20 +267,20 @@ type SignedPleaseAdd struct {
           cryptographic signature produced by their BACAP writecap. </para>
       </listitem>
       <listitem>
-        <para>The introducer receives the <literal>SignedPleaseAdd</literal> message. </para>
+        <para>The introducer receives the <code>SignedPleaseAdd</code> message. </para>
         <orderedlist numeration="loweralpha">
           <listitem>
             <para>If the introducer does not like the DisplayName, they reply to the invited party
-              with a <literal>PleaseReviseDisplayName</literal> message that contains the original
+              with a <code>PleaseReviseDisplayName</code> message that contains the original
                 <code>SignedPleaseAdd</code>. Then they wait for a new
-                <literal>SignedPleaseAdd</literal>.</para>
+                <code>SignedPleaseAdd</code>.</para>
           </listitem>
           <listitem>
             <para>If the introducer approves of the <code>DisplayName</code>, then:</para>
             <itemizedlist>
               <listitem>
                 <para>Because existing members need the new member's readcap, the introducer
-                  publishes the <literal>SignedPleaseAdd</literal> to their own BACAP stream for the
+                  publishes the <code>SignedPleaseAdd</code> to their own BACAP stream for the
                   rest of the group to read. </para>
               </listitem>
               <listitem>
@@ -289,7 +289,7 @@ type SignedPleaseAdd struct {
                   for all existing members. </para>
                 <para><emphasis role="bold">IMPORTANT:</emphasis> The content of both replies must
                   be sent in the same <code>AllOrNothingMessage</code>, despite the
-                    <literal>SignedPleaseAdd</literal> being written to the introducer's own BACAP
+                    <code>SignedPleaseAdd</code> being written to the introducer's own BACAP
                   stream for the group and the <code>ReplyWho</code> being written  to the BACAP
                   stream the introducer is using to communicate with the new member. </para>
                 <para><emphasis role="bold">NOTE:</emphasis> We could send all of this information
