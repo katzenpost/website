@@ -4,9 +4,9 @@ linkTitle: "Mix network"
 description: ""
 author: ""
 url: ""
-date: "2026-05-21T18:40:24.760603403-07:00"
+date: "2026-06-01T19:28:59.551460181-07:00"
 draft: "false"
-slug: "mix_network"
+slug: "mixnet"
 layout: ""
 type: ""
 weight: "35"
@@ -107,19 +107,19 @@ We distinguish the following classes of traffic:
 
 <div class="itemizedlist">
 
-- SURB Replies (also sometimes referred to as ACKs)
+- SURB replies (sometimes referred to as ACKs)
 
-- Forward messages
+- Forwarded messages
 
 </div>
 
 <span class="term"><span class="bold">**client**</span></span>  
-Software run by the user on their local device to participate in the mixnet.
-A client is not considered a "node in the
-network" for purposes of analyhsis of the core mnixnet protocols.
+Software run by a user on their local device to participate in the mixnet.
+A client is not considered a node in the
+network for purposes of analysis of the core mnixnet protocols.
 
 <span class="term"><span class="bold">**entry mix, entry node**</span></span>  
-A mix that has some additional features:
+A mix node that has some additional features:
 
 <div class="itemizedlist">
 
@@ -142,27 +142,26 @@ A variable-length sequence of octets sent anonymously through the network.
 Short messages are sent in a single packet; long messages are fragmented
 across multiple packets.
 
-<span class="term"><span class="bold">**mix**</span></span>  
-A cryptographic router that is used to compose a mixnet. Mixes use a
+<span class="term"><span class="bold">**mix node**</span></span>  
+A cryptographic router that is used to compose a mixnet. Mix nodes use a
 cryptographic operation on messages being routed which provides bitwise
 unlinkability with respect to input versus output messages. Katzenpost is a
 decryption mixnet that uses the Sphinx cryptographic packet format.
 
 <span class="term"><span class="bold">**mixnet**</span></span>  
-A mixnet also known as a mix network is a network of mixes that can be
-used to build various privacy preserving protocols.
+A mixnet, or mix network, is a network of mix servers that can be
+used to build various privacy-preserving protocols.
 
 <span class="term"><span class="bold">**MSL**</span></span>  
 Maximum segment lifetime, currently set to 120 seconds.
 
 <span class="term"><span class="bold">**node**</span></span>  
 Clients are NOT considered nodes in the mix network. However,
-network protocols are often layered. In our design documents we describe
-"mixnet hidden services" which can be operated by mixnet clients. Therefore
+network protocols are often layered. In our design documents, we describe
+"mixnet hidden services" that can be operated by mixnet clients. Therefore
 if you are using the term "node" in some adherence to mathematical terminology, one
-could conceivably designate a client as a node. That having been said, it
-would not be appropriate to the discussion of our core mixnet protocol to
-refer to clients as nodes.
+could conceivably designate a client as a node. However, in discussion of our core
+mixnet protocol, it is inappropriate to refer to clients as nodes.
 
 <span class="term"><span class="bold">**packet**</span></span>  
 A Sphinx packet, of fixed
@@ -175,15 +174,15 @@ each hop.
 The fixed-length portion of a packet containing an encrypted message or
 part of a message, to be delivered anonymously.
 
-<span class="term"><span class="bold">**service mix**</span></span>  
-A service mix is a mix server that has some additional features:
+<span class="term"><span class="bold">**service node**</span></span>  
+A service node is a mix node with additional features:
 
 <div class="itemizedlist">
 
-- A service mix is always the last hop in routes where the message
+- A service node is always the last hop in routes where the message
   originates from a client.
 
-- A service mix runs mixnet services which use a Sphinx SURB based
+- A service node runs mixnet services which use a Sphinx SURB-based
   protocol.
 
 </div>
@@ -268,8 +267,7 @@ destination service mix. Our network design uses a strict topology where forward
 traverse the network from entry mix to service mix. Service mixes can optionally reply
 if the forward message contained a Single Use Reply Block (see <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a>.
 
-The PKI system that handles the distribution of various network wide parameters,
-and
+The PKI system that handles the distribution of various network wide parameters, and
 information required for each participant to participate in the network such as IP
 address/port combinations that each node can be reached at, and cryptographic public
 keys. The specification for the PKI is beyond the scope of this document and is instead
@@ -344,7 +342,7 @@ or delay the packets for more or less time than specified.
 
 </div>
 
-The Katzenpost Mix Network uses a layered topology consisting of a fixed number
+The Katzenpost mix network uses a layered topology consisting of a fixed number
 of layers, each containing a set of mixes. At any given time each Mix MUST only be
 assigned to one specific layer. Each Mix in a given layer N is connected to every
 other Mix in the previous and next layer, and or every participating Provider in the
@@ -412,10 +410,10 @@ Requirements for the topology:
 
 For the packet format of the transported messages we use the Sphinx cryptographic
 packet format. The detailed description of the packet format, construction, processing
-and security / anonymity considerations see <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a>, <span class="quote">“<span class="quote">The Sphinx Mix Network Cryptographic Packet Format
-Specification</span>”</span>.
+and security / anonymity considerations see <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a>, <span class="quote">“<span class="quote">The Sphinx mix network cryptographic packet format
+specification</span>”</span>.
 
-As the Sphinx packet format is generic, the Katzenpost Mix Network must provide a
+As the Sphinx packet format is generic, the Katzenpost mix network must provide a
 concrete instantiation of the format, as well as additional Sphinx per-hop routing
 information commands.
 
@@ -435,7 +433,7 @@ information commands.
 
 </div>
 
-For the current version of the Katzenpost Mix Network, let the following
+For the current version of the Katzenpost mix network, let the following
 cryptographic primitives be used as described in the Sphinx specification.
 
 <div class="itemizedlist">
@@ -446,8 +444,8 @@ cryptographic primitives be used as described in the Sphinx specification.
 - `MAC(K, M)` - HMAC-SHA256 <a href="#RFC6234" class="link">RFC6234</a>, M_KEY_LENGTH of 32 bytes (256 bits), and MAC_LENGTH of
   32 bytes (256 bits).
 
-- `KDF(SALT, IKM)` - HKDF-SHA256, HKDF-Expand only, with SALT
-  used as the info parameter.
+- `KDliteralF(SALT, IKM)` - HKDF-SHA256,
+  `HKDF-Expand` only, with SALT used as the info parameter.
 
 - `S(K, IV)` - CTR-AES256 <a href="#SP80038A" class="link">[SP80038A]</a>, S_KEY_LENGTH of 32 bytes (256 bits), and S_IV_LENGTH
   of 12 bytes (96 bits), using a 32 bit counter.
@@ -490,7 +488,7 @@ cryptographic primitives be used as described in the Sphinx specification.
 
 </div>
 
-The following parameters are used as for the Katzenpost Mix Network instantiation
+The following parameters are used as for the Katzenpost mix network instantiation
 of the Sphinx Packet Format:
 
 <div class="itemizedlist">
@@ -621,8 +619,8 @@ All Mixes behave in the following manner:
 - Periodically interact with the PKI to publish Identity and Sphinx packet
   public keys, and to obtain information about the peers it should be
   communicating with, along with periodically rotating the Sphinx packet keys for
-  forward secrecy . See <a href="#sphinx-mix-and-provider-key-rotation" class="xref" title="Sphinx mix and provider key rotation">the section called “Sphinx mix and provider key
-  rotation”</a>.
+  forward secrecy . See <a href="#sphinx-mix-and-provider-key-rotation" class="xref" title="Sphinx mix- and service-node key rotation">the section called “Sphinx mix- and service-node
+  key rotation”</a>.
 
 - Process inbound Sphinx Packets, delay them for the specified time and forward
   them to the appropriate Mix and or Provider. See <a href="#sphinx-packet-processing" class="xref" title="Sphinx packet processing">the section called “Sphinx packet processing”</a>.
@@ -632,8 +630,7 @@ All Mixes behave in the following manner:
 All Nodes are identified by their link protocol signing key, for the purpose of the
 Sphinx packet source routing hop identifier.
 
-All Nodes participating in the Mix Network MUST share a common view of time, via
-NTP
+All Nodes participating in the mix network MUST share a common view of time, via NTP
 or similar time synchronization mechanism.
 
 <div class="section">
@@ -652,8 +649,8 @@ or similar time synchronization mechanism.
 
 </div>
 
-All communication to and from participants in the Katzenpost Mix Network is done
-via the Katzenpost Mix Network Wire Protocol <a href="#KATZMIXWIRE" class="link">KATZMIXWIRE</a>.
+All communication to and from participants in the Katzenpost mix network is done
+via the Katzenpost mix network wire protocol <a href="#KATZMIXWIRE" class="link">KATZMIXWIRE</a>.
 
 Nodes are responsible for establishing the connection to the next hop, for
 example, a mix in layer 0 will accept inbound connections from all Providers listed
@@ -682,7 +679,7 @@ long lived connection per potentially eligible peer at all times.
 
 <div>
 
-#### <span id="sphinx-mix-and-provider-key-rotation"></span>Sphinx mix and provider key rotation
+#### <span id="sphinx-mix-and-provider-key-rotation"></span>Sphinx mix- and service-node key rotation
 
 </div>
 
@@ -692,13 +689,13 @@ long lived connection per potentially eligible peer at all times.
 
 Each Node MUST rotate the key pair used for Sphinx packet processing periodically
 for forward secrecy reasons and to keep the list of seen packet tags short. The
-Katzenpost Mix Network uses a fixed interval (`epoch`), so that key
+Katzenpost mix network uses a fixed interval (`epoch`), so that key
 rotations happen simultaneously throughout the network, at predictable times.
 
 Let each epoch be exactly `10800 seconds (3 hours)` in duration,
 and the 0th Epoch begin at `2017-06-01 00:00 UTC`. For more details
-see our <span class="quote">“<span class="quote">Katzenpost Mix Network Public Key Infrastructure
-Specification</span>”</span> document. <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a>
+see our <span class="quote">“<span class="quote">Katzenpost mix network public key infrastructure
+specification</span>”</span> document. <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a>
 
 </div>
 
@@ -719,8 +716,8 @@ Specification</span>”</span> document. <a href="#KATZMIXPKI" class="link">KATZ
 </div>
 
 The detailed processing of the Sphinx packet is described in the Sphinx
-specification: <span class="quote">“<span class="quote">The Sphinx Mix Network Cryptographic Packet Format
-Specification</span>”</span>. Below, we present an overview of the steps which the node
+specification: <span class="quote">“<span class="quote">The Sphinx mix network cryptographic packet format
+specification</span>”</span>. Below, we present an overview of the steps which the node
 is performing upon receiving the packet:
 
 <div class="orderedlist">
@@ -886,13 +883,13 @@ the application for which the system is deployed.
 
 </div>
 
-The source of all authority in the mixnet system comes from the Directory Authority
+The source of all authority in the mixnet system comes from the directory authority
 system which is also known as the mixnet PKI. This system gives the mixes and clients
 a
 consistent view of the network while allowing human intervention when needed. All
 public
-mix key material and network connection information is distributed by this Directory
-Authority system.
+mix key material and network connection information is distributed by this directory
+authority system.
 
 </div>
 

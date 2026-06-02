@@ -1,10 +1,10 @@
 ---
 title: ""
-linkTitle: "Pigeonhole Protocol"
+linkTitle: "Pigeonhole protocol"
 description: ""
 author: ""
 url: ""
-date: "2026-05-21T18:40:25.478064544-07:00"
+date: "2026-06-01T19:29:07.427557211-07:00"
 draft: "false"
 slug: "pigeonhole"
 layout: ""
@@ -135,7 +135,7 @@ The following terms are used in this specification.
 
 <span class="term"><span class="bold">**box**</span></span>  
 BACAP's unit of data storage. Each box has a box ID (which also serves as its
-public key), a signature, and a ciphertext signed payload.
+public key), a signature, and a ciphertext-signed payload.
 
 <span class="term"><span class="bold">**courier**</span></span>  
 Service that runs on a service node and interacts with storage replicas. Proxies
@@ -148,23 +148,25 @@ and for demultiplexing replica replies.
 <span class="term"><span class="bold">**MKEM**</span></span>  
 Multi-recipient KEM addressed to the pair of intermediate replicas. One MKEM ciphertext
 carries, for each recipient, a separate DEK encapsulation (`Dek1`, `Dek2`); either recipient may decapsulate and
-recover the padded `ReplicaInnerMessage`
+recover the padded `ReplicaInnerMessage`.
 
 <span class="term"><span class="bold">**replica epoch**</span></span>  
 A one-week period, distinct from the 20-minute mixnet PKI epoch, during which a given
 replica-side MKEM envelope keypair is valid. For more information, see
 <a href="https://katzenpost.network/docs/specs/pigeonhole/#epochs" class="link" target="_top">Epochs</a>.
 
-<span class="term"><span class="bold">**storage replica**</span></span>  
+<span class="term"><span class="bold">**storage replicas**</span></span>  
 "Intermediate replicas are chosen independently of the two final replicas for that
 box ID which are derived using the sharding scheme. The reason Alice designates
 intermediate replicas, as opposed to addressing the final replicas directly, is to
 avoid
-revealing to the courier which shard the box falls into." (From "§5.4.1. Writing messages"
-in the paper.) Designated replica (a.k.a. final replica, shard replica): One of the
-two
-replicas selected deterministically for a given box ID by the Shard2 consistent-hash
-algorithm. The intermediate replicas replicate writes through to the designated replicas.
+revealing to the courier which shard the box falls into." (From "§5.4.1 "Writing messages"
+in <a href="https://arxiv.org/abs/2501.02933" class="link" target="_top">Echomix: a
+Strong Anonymity System with Messaging</a>. A designated replica (a.k.a. final replica or
+shard replica) is one of the two replicas selected deterministically for a given box
+ID by
+the Shard2 consistent-hash algorithm. The intermediate replicas write through to the
+designated replicas.
 
 <span class="term"><span class="bold">**SURB**</span></span>  
 Single use reply block. SURBs are used to achieve recipient anonymity,
@@ -291,7 +293,7 @@ timescales, and Pigeonhole touches both:
 
 <div>
 
-#### <span id="d58e193"></span>Epoch tolerance for CourierEnvelope
+#### <span id="d58e198"></span>Epoch tolerance for CourierEnvelope
 
 </div>
 
@@ -351,7 +353,7 @@ encryption" from other courier-side rejections.
 
 <div>
 
-### <span id="d58e244"></span>Pigeonhole message format and constants
+### <span id="d58e249"></span>Pigeonhole message format and constants
 
 </div>
 
@@ -393,7 +395,7 @@ Carriage of these messages differs by hop:
 
 <div>
 
-#### <span id="d58e283"></span>Fundamental size constants
+#### <span id="d58e288"></span>Fundamental size constants
 
 </div>
 
@@ -403,7 +405,7 @@ Carriage of these messages differs by hop:
 
 <div class="table">
 
-<span id="d58e285"></span>
+<span id="d58e290"></span>
 
 **Table 1. **
 
@@ -482,7 +484,7 @@ Carriage of these messages differs by hop:
 
 <div>
 
-#### <span id="d58e339"></span>Maximum BACAP payload
+#### <span id="d58e344"></span>Maximum BACAP payload
 
 </div>
 
@@ -583,7 +585,7 @@ Notable points:
 
 <div>
 
-#### <span id="d58e404"></span>The ReplicaInnerMessage as seen by a replica
+#### <span id="d58e409"></span>The ReplicaInnerMessage as seen by a replica
 
 </div>
 
@@ -619,7 +621,7 @@ A `ReplicaWrite` with `payload_len == 0` is a <a href="#tombstones" class="link"
 
 <div>
 
-### <span id="d58e422"></span>M\<essage types and interactions
+### <span id="d58e427"></span>Message types and interactions
 
 </div>
 
@@ -635,7 +637,7 @@ A `ReplicaWrite` with `payload_len == 0` is a <a href="#tombstones" class="link"
 
 <div>
 
-#### <span id="d58e424"></span>Overview
+#### <span id="d58e429"></span>Overview
 
 </div>
 
@@ -722,7 +724,7 @@ struct courier_query_reply {
 
 <div>
 
-#### <span id="d58e480"></span>CourierEnvelope
+#### <span id="d58e485"></span>CourierEnvelope
 
 </div>
 
@@ -766,7 +768,7 @@ performs the following actions.
 
 <div>
 
-#### <span id="d58e528"></span>ReplicaMessage (wire command)
+#### <span id="d58e533"></span>ReplicaMessage (wire command)
 
 </div>
 
@@ -803,7 +805,7 @@ dispatches on `message_type` to `ReplicaRead` or
 
 <div>
 
-#### <span id="d58e553"></span>ReplicaMessageReply (wire command)
+#### <span id="d58e558"></span>ReplicaMessageReply (wire command)
 
 </div>
 
@@ -842,7 +844,7 @@ replica's envelope keypair.
 
 <div>
 
-#### <span id="d58e581"></span>CourierBookKeeping
+#### <span id="d58e586"></span>CourierBookKeeping
 
 </div>
 
@@ -885,7 +887,7 @@ The dedup cache has a TTL of 5 minutes (`DedupCacheTTL` in <a href="https://gith
 
 <div>
 
-#### <span id="d58e605"></span>CourierEnvelopeReply
+#### <span id="d58e610"></span>CourierEnvelopeReply
 
 </div>
 
@@ -927,7 +929,7 @@ by a replica.
 
 <div>
 
-### <span id="d58e627"></span>Embedded pigeonhole types
+### <span id="d58e632"></span>Embedded pigeonhole types
 
 </div>
 
@@ -947,7 +949,7 @@ MKEM envelopes and their replies.
 
 <div>
 
-#### <span id="d58e630"></span>ReplicaRead
+#### <span id="d58e635"></span>ReplicaRead
 
 </div>
 
@@ -974,7 +976,7 @@ struct replica_read {
 
 <div>
 
-#### <span id="d58e637"></span>ReplicaReadReply
+#### <span id="d58e642"></span>ReplicaReadReply
 
 </div>
 
@@ -1007,7 +1009,7 @@ struct replica_read_reply {
 
 <div>
 
-#### <span id="d58e646"></span>ReplicaWrite
+#### <span id="d58e651"></span>ReplicaWrite
 
 </div>
 
@@ -1042,7 +1044,7 @@ reads return `ReplicaErrorTombstone`.
 
 <div>
 
-#### <span id="d58e668"></span>ReplicaWriteReply
+#### <span id="d58e673"></span>ReplicaWriteReply
 
 </div>
 
@@ -1119,7 +1121,7 @@ box of the temporary stream with tombstones.
 
 <div>
 
-### <span id="d58e727"></span>EnvelopeHash
+### <span id="d58e732"></span>EnvelopeHash
 
 </div>
 
@@ -1152,7 +1154,7 @@ surrounding Sphinx packet (and its SURB) changes between attempts.
 
 <div>
 
-### <span id="d58e757"></span>Error codes
+### <span id="d58e762"></span>Error codes
 
 </div>
 
@@ -1183,7 +1185,7 @@ Returned by a replica in `ReplicaMessageReply.ErrorCode`,
 
 <div class="table">
 
-<span id="d58e775"></span>
+<span id="d58e780"></span>
 
 **Table 2. **
 
@@ -1281,7 +1283,7 @@ protocol states rather than faults. The thin-client helper
 
 <div>
 
-#### <span id="d58e852"></span>Courier envelope error codes
+#### <span id="d58e857"></span>Courier envelope error codes
 
 </div>
 
@@ -1293,7 +1295,7 @@ Returned by the courier in `CourierEnvelopeReply.error_code`.
 
 <div class="table">
 
-<span id="d58e858"></span>
+<span id="d58e863"></span>
 
 **Table 3. **
 
@@ -1352,7 +1354,7 @@ Returned by the courier in `CourierEnvelopeReply.error_code`.
 
 <div>
 
-#### <span id="d58e900"></span>Copy command status codes
+#### <span id="d58e905"></span>Copy command status codes
 
 </div>
 
@@ -1368,7 +1370,7 @@ information.)
 
 <div class="table">
 
-<span id="d58e914"></span>
+<span id="d58e919"></span>
 
 **Table 4. **
 
@@ -1420,7 +1422,7 @@ information.)
 
 <div>
 
-### <span id="d58e948"></span>Sharding and replica selection
+### <span id="d58e953"></span>Sharding and replica selection
 
 </div>
 
@@ -1430,7 +1432,7 @@ information.)
 
 For each box, two <span class="emphasis">*designated*</span> (final) replicas are derived
 deterministically from the box ID using the `Shard2` consistent-hash algorithm, as
-shown in the following pseudocode.
+shown in the following pseudo-code.
 
 ``` programlisting
 for each online replica r with identity key k_r:
@@ -1472,7 +1474,7 @@ replicas themselves and forward the `ReplicaWrite` to them via the
 
 <div>
 
-### <span id="d58e1005"></span>Protocol sequence visualizations
+### <span id="d58e1010"></span>Protocol sequence visualizations
 
 </div>
 
@@ -1487,7 +1489,7 @@ write and read operations.
 
 <div class="figure">
 
-<span id="d58e1012"></span>
+<span id="d58e1017"></span>
 
 **Figure 1. Annotated writes**
 
@@ -1509,7 +1511,7 @@ write and read operations.
 
 <div class="figure">
 
-<span id="d58e1025"></span>
+<span id="d58e1030"></span>
 
 **Figure 2. Annotated reads**
 
@@ -1567,7 +1569,7 @@ The protocol works as follows.
 
 <div>
 
-#### <span id="d58e1039"></span>Step 1
+#### <span id="d58e1044"></span>Step 1
 
 </div>
 
@@ -1600,7 +1602,7 @@ in <a href="#temp_stream" class="xref" title="Temporary stream data format">the 
 
 <div>
 
-#### <span id="d58e1059"></span>Step 2
+#### <span id="d58e1064"></span>Step 2
 
 </div>
 
@@ -1714,7 +1716,7 @@ This dedup cache has a TTL of 30 minutes (`CopyDedupCacheTTL` in <a href="https:
 
 <div>
 
-#### <span id="d58e1127"></span>CopyCommand
+#### <span id="d58e1132"></span>CopyCommand
 
 </div>
 
@@ -1816,7 +1818,7 @@ cause the `CopyCommand` to be processed more than once.
 
 <div>
 
-#### <span id="d58e1208"></span>Potential use cases of AllOrNothing
+#### <span id="d58e1213"></span>Potential use cases of AllOrNothing
 
 </div>
 
@@ -1870,7 +1872,7 @@ In no particular order:
 
 <div>
 
-### <span id="d58e1231"></span>Protocol narration example
+### <span id="d58e1236"></span>Protocol narration example
 
 </div>
 

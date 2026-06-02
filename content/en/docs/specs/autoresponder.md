@@ -4,7 +4,7 @@ linkTitle: "Autoresponder extension"
 description: ""
 author: ""
 url: ""
-date: "2026-05-21T18:39:57.49845868-07:00"
+date: "2026-06-01T19:28:38.829669417-07:00"
 draft: "false"
 slug: "autoresponder"
 layout: ""
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-## <span id="autoresponder"></span>Provider-side autoresponder extension (Kaetzchen) specification
+## <span id="autoresponder"></span>Gateway-side autoresponder extension (Kaetzchen) specification
 
 </div>
 
@@ -58,7 +58,7 @@ version: ""
 **Abstract**
 
 This interface is meant to provide support for various autoresponder agents
-<span class="quote">“<span class="quote">Kaetzchen</span>”</span> that run on Katzenpost provider instances, thus
+<span class="quote">“<span class="quote">Kaetzchen</span>”</span> that run on Katzenpost gateway instances, thus
 bypassing the need to run a discrete client instance to provide functionality. The
 use-cases for such agents include, but are not limited to, user identity key lookup,
 a discard address, and a loop-back responder for the purpose of cover
@@ -118,7 +118,13 @@ The following terms are used in this specification.
 <div class="variablelist">
 
 <span class="term"><span class="bold">**BlockSphinxPlaintext**</span></span>  
-The payload structure which is encapsulated by the Sphinx body.
+The payload structure that is encapsulated by the Sphinx body.
+
+<span class="term"><span class="bold">**gateway**</span></span>  
+A mix node on the edge of the mixnet that is the first hop for messages coming from
+clients.
+The gateway authenticates client connections and queues reply messages (SURBs) for
+retrieval.
 
 <span class="term"><span class="bold">**SURB**</span></span>  
 Single use reply block. SURBs are used to achieve recipient anonymity,
@@ -147,10 +153,10 @@ See `SPHINXSPEC` and `SPHINX`.
 
 </div>
 
-Each Kaetzchen agent will register as a potential recipient on its Provider. When
-the Provider receives a forward packet destined for a Kaetzchen instance, it will
-hand off the fully unwrapped packet along with its corresponding SURB to the agent,
-which will then act on the packet and optionally reply utilizing the SURB.
+Each Kaetzchen agent will register as a potential recipient on its gateway. When
+the gateway receives a forward packet destined for a Kaetzchen instance, it will hand
+off the fully unwrapped packet along with its corresponding SURB to the agent, which
+will then act on the packet and optionally reply utilizing the SURB.
 
 <div class="section">
 
@@ -174,10 +180,6 @@ which will then act on the packet and optionally reply utilizing the SURB.
 
 - Each agent operation request and response MUST fit within one Sphinx
   packet.
-
-- Each agent SHOULD register a recipient address that is prefixed with (Or
-  another standardized delimiter, agreed to by all participating providers in
-  a given mixnet).
 
 - Each agent SHOULD register a recipient address that consists of an RFC5322
   dot-atom value, and MUST register recipient addresses that are at most 64
@@ -263,21 +265,21 @@ appending <span class="quote">“<span class="quote">0x00</span>”</span> bytes
 
 </div>
 
-Each provider SHOULD publish the list of publicly accessible Kaetzchen agent
-endpoints in its MixDescriptor, along with any other information required to utilize
-the agent.
+Each gateway SHOULD publish the list of publicly accessible Kaetzchen agent
+endpoints in its `MixDescriptor`, along with any other information required
+to utilize the agent.
 
-Provider should make this information available in the form of a map in which the
-keys are the label used to identify a given service, and the value is a map with
+The gateway should make this information available in the form of a map in which
+the keys are the label used to identify a given service, and the value is a map with
 arbitrary keys.
 
 Valid service names refer to the services defined in extensions to this
 specification. Every service MUST be implemented by one and only one Kaetzchen
 agent.
 
-For each service, the provider MUST advertise a field for the endpoint at which
-the Kaetzchen agent can be reached, as a key value pair where the key is
-`endpoint`, and the value is the provider side endpoint
+For each service, the gateway MUST advertise a field for the endpoint at which the
+Kaetzchen agent can be reached, as a key value pair where the key is
+`endpoint`, and the value is the gateway side endpoint
 identifier.
 
 ``` programlisting
@@ -319,8 +321,9 @@ Depending on what sort of operations a given agent implements, there may be
 additional anonymity impact that requires separate consideration.
 
 Clients MUST NOT have predictable retransmission otherwise this makes active
-confirmations attacks possible which could be used to discover the ingress Provider
-of the client.
+confirmations attacks possible which could be used to discover the ingress gateway
+of
+the client.
 
 </div>
 
@@ -344,7 +347,7 @@ It is possible to use this mechanism to flood a victim with unwanted traffic by
 constructing a request with a SURB destined for the target.
 
 Depending on the operations implemented by each agent, the added functionality may
-end up being a vector for Denial of Service attacks in the form of CPU or network
+end up being a vector for denial-of-service attacks in the form of CPU or network
 overload.
 
 Unless the agent implements additional encryption, message integrity and privacy

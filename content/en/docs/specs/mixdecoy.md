@@ -4,9 +4,9 @@ linkTitle: "Mix decoy loop"
 description: ""
 author: ""
 url: ""
-date: "2026-05-21T18:40:18.213585888-07:00"
+date: "2026-06-01T19:28:55.92930074-07:00"
 draft: "false"
-slug: "mix_decoy"
+slug: "mixdecoy"
 layout: ""
 type: ""
 weight: "30"
@@ -58,11 +58,11 @@ version: ""
 **Abstract**
 
 In the context of continuous time mixing strategies such as the memoryless mix
-used by Katzenpost, n-1 attacks may use strategic packetloss. Nodes can also fail
-for benign reasons. Determining whether or not it’s an n-1 attack is outside the
-scope of this work. This document describes how we will communicate statistics from
-mix nodes to mix network directory authorities which tells them about the packet
-loss they are observing.
+used by Katzenpost, n-1 attacks may use strategic packet loss. Nodes can also
+fail for benign reasons. Determining whether or not it’s an n-1 attack is outside
+the scope of this work. This document describes how we will communicate statistics
+from mix nodes to mix network directory authorities which tells them about the
+packet loss they are observing.
 
 </div>
 
@@ -95,25 +95,19 @@ The following terms are used in this specification.
 <div class="variablelist">
 
 <span class="term"><span class="bold">**epoch**</span></span>  
-A fixed time interval with a current default value of 20 minutes.
+A fixed-time interval with a current default value of 20 minutes.
 A new PKI document containing public key material
-is published for each epoch and is valid only for that epoch. For more information
+is published for each epoch and is valid only for that epoch. For more information,
 see
 <a href="https://katzenpost.network/docs/specs/mix_network/#sphinx-mix-and-provider-key-rotation" class="link" target="_top">Sphinx
 mix and provider key rotation</a>.
 
-<span class="term"><span class="bold">**providers**</span></span>  
-A node on the edge of the network that has two roles,
-handling incoming client connections and running mixnet services. Soon we should
-get rid of `Providers` and replace it with two different
-sets, `gateway nodes` and `service nodes`.
-
 <span class="term"><span class="bold">**wire protocol**</span></span>  
-Refers to our PQ Noise based protocol which currently uses TCP but in the
+Refers to our PQ Noise-based protocol that currently uses TCP but in the
 near future will optionally use QUIC. This protocol has messages known as
 wire protocol `commands`, which are used for various mixnet
-functions such as sending or retrieving a message, dirauth voting etc. For
-more information, please see our design doc: <a href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/wire-protocol.md" class="link" target="_top">wire protocol specification</a>
+functions such as sending or retrieving a message and dirauth voting. For
+more information, see our <a href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/wire-protocol.md" class="link" target="_top">wire protocol specification</a>.
 
 </div>
 
@@ -140,13 +134,13 @@ directory authorities, so that authorities can label malfunctioning nodes as suc
 in the
 consensus in the next epoch.
 
-Nodes currently sign and upload a Descriptor in each epoch.
+Nodes currently sign and upload a `Descriptor` in each epoch.
 
-In the future, they would instead upload an UploadDescStats containing:
+In the future, they would instead upload an `UploadDescStats` containing:
 
 <div class="itemizedlist">
 
-- Descriptor
+- `Descriptor`
 
 - Stats
 
@@ -194,12 +188,11 @@ Experimental setup, node A:
   another, for example from a node in the layer `k` to a node in
   the layer `k+1`. Each loop is a sequence of such segments.
 
-- Each node `A` will create 3 hashmaps,
-  `sent_loops_A`, `completed_loops_A` and
-  `ratios_A`. Each of these will use a pair of concatenated
-  mixnode ID’s as the key. The ordering of the ID’s will be from lesser topology
-  layer to greater, e.g. the two-tuple (n, n+1) which is represented here as a 64
-  byte array:
+- Each node `A` will create 3 hashmaps, `sent_loops_A`,
+  `completed_loops_A` and `ratios_A`. Each of these will
+  use a pair of concatenated mix node ID’s as the key. The ordering of the ID’s
+  will be from lesser topology layer to greater, e.g. the two-tuple (n, n+1) which
+  is represented here as a 64 byte array:
 
   ``` programlisting
   var sent_loops_A map[[64]byte]int
