@@ -4,9 +4,9 @@ linkTitle: "Thin client"
 description: ""
 author: ""
 url: ""
-date: "2026-05-21T18:40:45.12443777-07:00"
+date: "2026-06-01T19:29:22.04368638-07:00"
 draft: "false"
-slug: "thin_client"
+slug: "thinclient"
 layout: ""
 type: ""
 weight: "60"
@@ -196,7 +196,7 @@ Upon connecting to the daemon socket, the thin client waits for two messages.
 
   <div class="itemizedlist">
 
-  - The message contains the PKI document in its `payload`field. This
+  - The message contains the PKI document in its `payload` field. This
     marks the end of the initial connection sequence.
 
   - The PKI document is stripped of cryptographic signatures as noted above.

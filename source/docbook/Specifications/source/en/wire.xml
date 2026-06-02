@@ -5,13 +5,13 @@
 <!-- The XSL transform inserts these values as Hugo frontmatter. -->
 <!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
 
-<?title "Wire protocol" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
+<?title "" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
 <?linkTitle "Wire protocol" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
 <?description "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
 <?author "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
 <?url "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
 <?draft "false" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#draft] -->
-<?slug "wire_protocol" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
+<?slug "wireprotocol" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
 <?layout "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
 <?type "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
 <?weight "65" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->

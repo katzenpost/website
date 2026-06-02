@@ -4,9 +4,9 @@ linkTitle: "Certificate format"
 description: ""
 author: ""
 url: ""
-date: "2026-05-21T18:40:01.034927264-07:00"
+date: "2026-06-01T19:28:42.399638346-07:00"
 draft: "false"
-slug: "certificate_format"
+slug: "certificate"
 layout: ""
 type: ""
 weight: "10"
@@ -103,7 +103,7 @@ operational abilities such as key rotation and key revocation. That is, we wish 
 mixes and authorities to periodically utilize a long-term signing key for generating
 certificates for new short-term signing keys.
 
-Yet another use-case for these certificate is to replace the use of JOSE <a href="#RFC7515" class="link">RFC7515</a> in the voting Directory Authority system <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a> for the multi-signature documents exchanged
+Yet another use-case for these certificate is to replace the use of JOSE <a href="#RFC7515" class="link">RFC7515</a> in the voting directory authority system <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a> for the multi-signature documents exchanged
 for voting and consensus.
 
 <div class="section">

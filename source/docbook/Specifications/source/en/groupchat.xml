@@ -15,7 +15,7 @@
 <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
 <?draft "false" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#draft] -->
-<?slug "group_chat" ?>
+<?slug "groupchat" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
 <?layout "" ?>
 <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->

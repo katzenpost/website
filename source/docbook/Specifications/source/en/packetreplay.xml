@@ -11,7 +11,7 @@
 <?author "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
 <?url "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
 <?draft "false" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#draft] -->
-<?slug "packet_replay" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
+<?slug "packetreplay" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
 <?layout "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
 <?type "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
 <?weight "50" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
