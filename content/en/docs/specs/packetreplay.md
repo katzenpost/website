@@ -4,7 +4,7 @@ linkTitle: "Sphinx packet replay detection"
 description: ""
 author: ""
 url: ""
-date: "2026-06-01T19:29:03.074878426-07:00"
+date: "2026-06-02T10:58:24.736503828-07:00"
 draft: "false"
 slug: "packetreplay"
 layout: ""
@@ -407,7 +407,7 @@ Our bloom-filter-with-hashmap replay detection cache looks like this:
 
 <div class="mediaobject">
 
-![Replay cache](/docs/specs/pix/pix/replay1.png)
+![Replay cache](/docs/specs/pix/replay.png)
 
 </div>
 

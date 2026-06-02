@@ -124,7 +124,7 @@
       <title>Contact voucher handshake</title>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="contact-voucher.jpg" />
+          <imagedata fileref="pix/contact-voucher.jpg" />
         </imageobject>                  
         <textobject>
           <phrase>Bob and Alice exchange cryptographic information with the mixnet as proxy. They
