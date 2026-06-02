@@ -19,19 +19,21 @@ The [voucher spec](../contact_voucher/) was very difficult for me to read and it
 
 ## Streams
 
-- **MessageStream** — Bob writes; group reads.
-- **ReplyStream** — Alice seals; Bob reads.
-- **VoucherStream** — the rendezvous; read+write derivable from `Voucher`.
+There is no separate reply stream. Alice replies on the very same stream Bob used to mint the voucher.
+
+- **MessageStream**: Bob writes; the group reads. This is the stream whose live messages the protocol must protect.
+- **VoucherStream**: the rendezvous, derived entirely from the `Voucher`. Box 0 holds Bob's `VoucherPayload`; box 1 holds Alice's `VoucherReply`.
+- **the group's other streams**: each existing member has their own MessageStream, just like Bob's.
 
 ## Stream Objects
 
-- **MessageStream** — `.WriteCap` (Bob keeps), `.ReadCap` (travels in payload, inside `SignedPleaseAdd`).
-- **ReplyStream** — `.rootSK` (Bob keeps), `.rootPK` (travels in payload).
-- **VoucherStream** — read and write caps derivable by anyone holding the `Voucher`.
+- **MessageStream**: `.WriteCap` (Bob keeps), `.ReadCap` (travels in `VoucherPayload`, inside `SignedPleaseAdd`).
+- **VoucherStream**: read and write caps derivable by anyone holding the `Voucher`.
+- **VoucherKeypair**: `VoucherSecretKey` (Bob keeps), `VoucherPublicKey` (travels in `VoucherPayload`). This is the MKEM keypair under which Alice seals the reply to Bob.
 
 ## Messages
 
-- `SignedPleaseAdd` — Bob's signed self-introduction: a serialized `PleaseAdd` (his `DisplayName` and `MessageStream.ReadCap`) plus a signature over it produced by `MessageStream.WriteCap`.
+- `SignedPleaseAdd` is Bob's signed self-introduction: a serialized `PleaseAdd` (his `DisplayName` and `MessageStream.ReadCap`) plus a signature over it produced by `MessageStream.WriteCap`.
 
 ```go
 // PleaseAdd is a member's request to join, carrying their display name
@@ -56,31 +58,31 @@ type SignedPleaseAdd struct {
 }
 ```
 
-- `WhoReply` := the existing members' read caps **each with its nonce** (see below), sealed to Bob.
-- `Introduction` := `SignedPleaseAdd + VoucherSalt`, published to the group. The `VoucherSalt` is the nonce for Bob's stream's payloads.
+- `WhoReply` := the existing members' MessageStream read caps (one or more), so Bob can read everyone already in the group.
+- `VoucherReply` := `WhoReply || VoucherSalt`, MKEM-sealed to `VoucherPublicKey` and written to VoucherStream box 1. Box 1 is an ordinary BACAP box, so the payload is BACAP-encrypted as a stream box and then additionally MKEM-encrypted to Bob's `VoucherPublicKey`; only Bob, holding `VoucherSecretKey`, can open it.
+- `Introduction` := Bob's display name together with his salt-mutated MessageStream read cap, published to the existing group so the members can read Bob. The group receives the mutated cap directly and never the salt.
 
 ```
-VoucherPayload := SignedPleaseAdd || ReplyStream.rootPK
+VoucherPayload := SignedPleaseAdd || VoucherPublicKey
 Voucher        := Hash(VoucherPayload)
 ```
 
-## The VoucherSalt: the box-payload nonce
+## The VoucherSalt: re-seeding the MessageStream
 
-`VoucherSalt` is the **nonce** under which Bob's MessageStream box payloads are encrypted and decrypted. BACAP itself is used unchanged and on its default context: it supplies only the **box ID** and the **signature** (its `SignBox`/`VerifyBox` half), which address and authenticate the boxes. The payload is sealed under an AEAD whose nonce is the `VoucherSalt`, so opening a box needs that nonce in addition to the cap.
+`VoucherSalt` is the heart of the protocol. It is **not** a nonce and it does **not** modify BACAP. It is a value that **replaces the KDF state** inside a MessageStream's `MessageBoxIndex`, which re-seeds the index chain and so moves the stream to a fresh, unpredictable sequence of box IDs. Only two parties ever touch it. Bob mutates his `MessageStream.WriteCap` by the salt and writes his real messages at the mutated position. Alice mutates Bob's matching `MessageStream.ReadCap` by the same salt **once**, before she shares it, so writer and readers meet at the mutated position. The group never learns the salt; it only ever receives the already-mutated read cap.
 
-That is why the spec says **derive Bob's read capability from `VoucherPayload + VoucherSalt`**: neither half alone suffices. The published read cap lets you *locate and verify* Bob's boxes; the `VoucherSalt` is the nonce that lets you *open* them. Read = cap **and** nonce.
+That is why the spec says **derive Bob's read capability from `VoucherPayload + VoucherSalt`**: the read cap published in box 0 is only half of it. That derivation is Alice's alone. The read cap in box 0 names Bob's *original* stream; the salt re-seeds it to where Bob's real messages actually go. She performs the derivation once and hands the result to the group.
 
-The nonce is the one secret a voucher snoop never receives. It is sealed to Bob inside the `VoucherReply` and handed to the existing members in the `Introduction`; it never appears in box 0. So an interceptor of the out-of-band `Voucher` can see that the voucher was spent, find Bob's boxes, and check their signatures, but cannot decrypt a single payload. That is exactly the spec's stated goal. (The salt is born at induction, not at mint: Bob does not know it when he writes box 0, so his `PleaseAdd` carries only his read cap, never the nonce.)
+The salt is the one secret a voucher snoop never receives. It is born at induction, not at mint: Alice mints it and seals it inside the MKEM-encrypted `VoucherReply`. It is never written to box 0, so Bob's `PleaseAdd` carries only his original read cap, never the salt. An interceptor of the out-of-band `Voucher` can derive the VoucherStream, read box 0, and check that the voucher was spent, but he holds only the un-mutated read cap. He cannot compute the salt-mutated box IDs, so he cannot read a single one of Bob's actual messages. That is exactly the spec's stated confidentiality goal.
 
-The nonce is therefore a **per-member** fact, not a global one: a mature group mixes voucher-joined members (whose payloads open under their own `VoucherSalt`) with seed members (on BACAP's default box nonce). Every shared read cap must travel **with** its nonce. In particular `WhoReply` carries, per member, the read cap **and** the nonce under which to open it, and the `Introduction` carries Bob's read cap together with his `VoucherSalt`.
+Because the salt re-seeds rather than decorates the stream, it is a **per-member** fact known only to that member and to whoever inducted them. A mature group mixes voucher-joined members (each on their own salt-mutated index) with seed members (on the unmutated index), and no member needs to carry any salt: every read cap that circulates is already at its live, mutated position. `WhoReply` hands Bob the existing members' live read caps directly, and the `Introduction` hands the group Bob's read cap after Alice has applied his salt.
 
 ## Steps
 
-1. **Bob creates two streams.** He generates MessageStream and ReplyStream, keeping `MessageStream.WriteCap` and `ReplyStream.rootSK`.
-2. **Bob builds the voucher.** He forms `SignedPleaseAdd = {DisplayName, MessageStream.ReadCap}` signed by `MessageStream.WriteCap`; sets `VoucherPayload := SignedPleaseAdd || ReplyStream.rootPK`; `Voucher := Hash(VoucherPayload)`.
-3. **Bob publishes.** The `Voucher` derives VoucherStream; Bob writes `VoucherPayload` to box 0.
-4. **Bob → Alice (OOB).** He hands over only the `Voucher`.
-5. **Alice reads and verifies.** From `Voucher` she derives VoucherStream, reads box 0, checks `Hash(VoucherPayload) == Voucher`, and verifies the `SignedPleaseAdd` signature against its read cap's rootPK.
-6. **Alice replies.** She picks `VoucherSalt`, seals `WhoReply + VoucherSalt` to `ReplyStream.rootPK`, and reads `MessageStream` by opening each box payload with `VoucherSalt` as the nonce.
-7. **Alice commits (all-or-nothing COPY).** In one operation: write the sealed `WhoReply` to VoucherStream box 1; publish `Introduction` (`SignedPleaseAdd + VoucherSalt`) to her group; tombstone box 0 against reuse.
-8. **Bob finishes.** He polls VoucherStream box 1, opens `WhoReply` with `ReplyStream.rootSK`, and recovers `VoucherSalt` (his own stream's payload nonce) along with the members' read caps and the nonce for each. Both now share the live streams, every stream's payloads opened under its own nonce.
+1. **Bob mints.** He generates his MessageStream (keeping `MessageStream.WriteCap`) and a `VoucherKeypair` (keeping `VoucherSecretKey`). He forms `SignedPleaseAdd = {DisplayName, MessageStream.ReadCap}` signed by `MessageStream.WriteCap`; sets `VoucherPayload := SignedPleaseAdd || VoucherPublicKey`; `Voucher := Hash(VoucherPayload)`.
+2. **Bob publishes.** The `Voucher` derives the VoucherStream; Bob writes `VoucherPayload` to box 0.
+3. **Bob → Alice (OOB).** He hands over only the `Voucher`.
+4. **Alice reads and verifies.** From `Voucher` she derives the VoucherStream, reads box 0, checks `Hash(VoucherPayload) == Voucher`, and verifies the `SignedPleaseAdd` signature against its read cap's rootPK.
+5. **Alice replies.** She mints `VoucherSalt`, assembles `WhoReply` from the existing members' live read caps, forms `VoucherReply := WhoReply || VoucherSalt`, and MKEM-seals it to `VoucherPublicKey`.
+6. **Alice commits (all-or-nothing COPY).** She first mutates Bob's published read cap by the `VoucherSalt`. Then, in one operation: write the sealed `VoucherReply` to VoucherStream box 1; publish the `Introduction` (Bob's display name and his salt-mutated read cap) to her group, which never sees the salt itself; tombstone box 0 against reuse.
+7. **Bob finishes.** He polls VoucherStream box 1, MKEM-opens the `VoucherReply` with `VoucherSecretKey`, and recovers `WhoReply` and `VoucherSalt`. He mutates his `MessageStream.WriteCap` by the salt and begins writing real messages there. The group already holds his mutated read cap, so they read him without ever learning the salt. Both sides now share the live streams.
