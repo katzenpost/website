@@ -56,13 +56,21 @@ type SignedPleaseAdd struct {
 }
 ```
 
-- `WhoReply` := the existing members' read caps, sealed to Bob.
-- `Introduction` := `SignedPleaseAdd + VoucherSalt`, published to the group.
+- `WhoReply` := the existing members' read caps **each with its context** (see below), sealed to Bob.
+- `Introduction` := `SignedPleaseAdd + VoucherSalt`, published to the group. The `VoucherSalt` is the context for Bob's stream.
 
 ```
 VoucherPayload := SignedPleaseAdd || ReplyStream.rootPK
 Voucher        := Hash(VoucherPayload)
 ```
+
+## Contexts
+
+Reading a BACAP box takes three things: the **read cap**, the current **index**, and a **context**. The context gates both the box-ID derivation and the per-box keys, so the wrong context finds the wrong box and cannot decrypt it.
+
+Most streams ride a single well-known default context. Bob's MessageStream is the exception. Minting the voucher publishes its read cap in VoucherStream box 0, which anyone who intercepts the out-of-band `Voucher` can read; were the live stream on the default context that interceptor could read all of Bob's future messages. So Alice binds Bob's stream to a secret `ctx = VoucherSalt`, delivered only inside the sealed `WhoReply` (to Bob) and the `Introduction` (to the group). The interceptor, lacking the salt, can neither locate nor decrypt the live boxes. (Note the salt is born at induction, not at mint: Bob does not know it when he writes box 0, so his `PleaseAdd` carries only his read cap, never the context.)
+
+This makes the inductor's and seed members' streams asymmetric to a joiner's: never having been published in a voucher box, they face no such exposure and stay on the default context. A context is therefore a **per-member** fact, not a global one: a mature group mixes voucher-joined members (each on their own salt) with seed members (on the default). Every shared read cap must travel **with** its context. In particular `WhoReply` carries, per member, the read cap **and** the context under which to read it, and the `Introduction` carries Bob's read cap together with his `VoucherSalt`.
 
 ## Steps
 
@@ -73,4 +81,4 @@ Voucher        := Hash(VoucherPayload)
 5. **Alice reads and verifies.** From `Voucher` she derives VoucherStream, reads box 0, checks `Hash(VoucherPayload) == Voucher`, and verifies the `SignedPleaseAdd` signature against its read cap's rootPK.
 6. **Alice replies.** She picks `VoucherSalt`, seals `WhoReply + VoucherSalt` to `ReplyStream.rootPK`, and begins reading `MessageStream` under `ctx = VoucherSalt`.
 7. **Alice commits (all-or-nothing COPY).** In one operation: write the sealed `WhoReply` to VoucherStream box 1; publish `Introduction` (`SignedPleaseAdd + VoucherSalt`) to her group; tombstone box 0 against reuse.
-8. **Bob finishes.** He polls VoucherStream box 1, opens `WhoReply` with `ReplyStream.rootSK`, and recovers `VoucherSalt` (the `ctx`) and the members' read caps. Both now share the live, salted streams.
+8. **Bob finishes.** He polls VoucherStream box 1, opens `WhoReply` with `ReplyStream.rootSK`, and recovers `VoucherSalt` (his own stream's `ctx`) along with the members' read caps and the context for each. Both now share the live streams, every stream read under its own context.
