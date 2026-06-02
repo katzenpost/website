@@ -217,7 +217,7 @@ replay_tag = H( shared_secret )</programlisting>
             <title>Replay cache</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="pix/replay1.png"/>
+                    <imagedata fileref="pix/replay.png"/>
                 </imageobject>
                 <textobject>
                     <phrase/>

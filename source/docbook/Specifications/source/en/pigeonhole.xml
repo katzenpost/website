@@ -889,7 +889,7 @@ return the two replicas whose h_r values are smallest</programlisting>
         <title>Annotated writes</title>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="annotated_write.png" />
+            <imagedata fileref="pix/annotated_write.png" />
           </imageobject>                  
           <textobject>
           <phrase>Protocol annotation image of writes.</phrase>
@@ -905,7 +905,7 @@ return the two replicas whose h_r values are smallest</programlisting>
         <title>Annotated reads</title>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="annotated_read.png" />
+            <imagedata fileref="pix/annotated_read.png" />
           </imageobject>                  
           <textobject>
           <phrase>Protocol annotation image of reads.</phrase>
