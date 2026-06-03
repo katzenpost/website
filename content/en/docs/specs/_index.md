@@ -17,6 +17,7 @@ These technical specifications describe the specifics of Katzenpost protocols an
 
 
 
+
 |    | Title                                                                                   | Description                                                                                                                                                      | Links                                                                           |
 |----|-----------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
 | 📖 | **[Autoresponder extension](/docs/specs/autoresponder)**                                | Autoresponder agent that runs on service nodes                                                                                                                   | [HTML](/docs/specs/autoresponder)&nbsp;/&nbsp;[PDF](/docs/specs/pdf/autoresponder.pdf)      |
@@ -34,9 +35,6 @@ These technical specifications describe the specifics of Katzenpost protocols an
 | 📖 | **[Wire protocol](/docs/specs/wire)**                                                   | A detailed design specification for our PQ Noise based wire protocol, which is used for transport encryption between all the mix nodes and dirauth nodes         | [HTML](/docs/specs/wire) / [PDF](/docs/specs/pdf/wire.pdf)                        |
 | 📖 | **[Glossary](/docs/specs/glossary)**                                                    | Consolidated list of terms defined in the specifications                                                                                                         | [HTML](/docs/specs/glossary) / [PDF](/docs/specs/pdf/glossary.pdf)                |
 | 📖 | **[References](/docs/specs/references)**                                                | Consolidated list of references cited in the specifications                                                                                                      | [HTML](/docs/specs/references) / [PDF](/docs/specs/pdf/references.pdf)            |
-
-
-
 
 
 

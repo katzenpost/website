@@ -289,6 +289,34 @@
   rust:   "ThinClient::start_resending_encrypted_message_no_retry"
   python: "ThinClient.start_resending_encrypted_message_no_retry"
 
+- group: write_stream
+  section: "Pigeonhole: ARQ Transport"
+  title: "WriteStream / write_stream"
+  summary: |
+    Writes a whole payload, of any size, to a channel using the windowed
+    selective-ack (SACK) ARQ. The daemon splits the payload across as many
+    boxes as it spans and keeps a bandwidth-delay-product of boxes in
+    flight, retransmitting only those whose acknowledgements lapse, so a
+    multi-box write is no longer serialised one round trip per box.
+    **Blocks** until every box is acknowledged. A window of zero asks the
+    daemon to choose the default from the consensus send rate and hop count.
+  go:     "ThinClient.WriteStream"
+  rust:   "ThinClient::write_stream"
+  python: "ThinClient.write_stream"
+
+- group: read_stream
+  section: "Pigeonhole: ARQ Transport"
+  title: "ReadStream / read_stream"
+  summary: |
+    Reads a run of sequential boxes from a channel using the windowed
+    selective-ack (SACK) ARQ, the read counterpart of `WriteStream`. The
+    daemon keeps a bandwidth-delay-product of boxes in flight, decrypts
+    each, and reassembles them in order. **Blocks** until every box is read.
+    A window of zero asks the daemon to choose the default.
+  go:     "ThinClient.ReadStream"
+  rust:   "ThinClient::read_stream"
+  python: "ThinClient.read_stream"
+
 - group: cancel_resending_encrypted_message
   section: "Pigeonhole: ARQ Transport"
   title: "CancelResendingEncryptedMessage / cancel_resending_encrypted_message"
