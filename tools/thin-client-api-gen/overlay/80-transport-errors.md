@@ -5,10 +5,10 @@ I/O against the daemon or the mixnet.
 
 | Condition | Go | Rust | Python |
 |---|---|---|---|
-| Daemon not connected to mixnet | ad-hoc error with message "cannot send message in offline mode - daemon not connected to mixnet" (no sentinel — check `IsConnected()` first) | `ThinClientError::OfflineMode(String)` | `ThinClientOfflineError` |
+| Daemon not connected to mixnet | Ad-hoc error with message “cannot send message in offline mode - daemon not connected to mixnet”. (No sentinel - check IsConnected() first.) | `ThinClientError::OfflineMode(String)` | `ThinClientOfflineError` |
 | Operation timed out | `context.DeadlineExceeded` (from `ctx.Err()`) | `ThinClientError::Timeout(String)` | `asyncio.TimeoutError` |
-| Operation cancelled by caller | `context.Canceled` (from `ctx.Err()`) | (no distinct variant — uses higher-level cancellation) | `asyncio.CancelledError` |
-| Local socket to kpclientd lost | returned on the next I/O; thin client attempts reconnect with exponential backoff | ditto (receive `DaemonDisconnectedEvent` on the event sink) | ditto |
+| Operation canceled by caller | `context.Canceled` (from `ctx.Err()`) | No distinct variant — uses higher-level cancellation. | `asyncio.CancelledError` |
+| Local socket to kpclientd lost | returned on the next I/O; thin client attempts reconnect with exponential backoff | ditto (receive `DaemonDisconnectedEvent` on the event sink) | No distinct variant - uses higher-level cancellation. (Receive DaemonDisconnectedEvent on the event sink.) |
 | CBOR (de)serialisation failure | wrapped error | `ThinClientError::CborError(serde_cbor::Error)` | `serde`-layer exception bubbles up |
 
 The Go binding does not provide a named sentinel for offline mode.
