@@ -61,7 +61,7 @@ client = ThinClient(config)
   is received from the directory authorities. The Go binding exposes
   the parsed document as `Document *cpki.Document`. (The lower-level
   `NewPKIDocumentEvent` carrying a raw CBOR `Payload []byte` is used
-  internally between daemon and thin client; applications should
+  internally between daemon and thin client. Applications should
   consume `NewDocumentEvent`.)
 
 - **MessageSentEvent** — emitted when a `SendMessage` request has
@@ -73,8 +73,8 @@ client = ThinClient(config)
   call is received. Fields (Go):
   `MessageID *[MessageIDLength]byte`, `SURBID *[SURBIDLength]byte`,
   `Payload []byte`, `ReplyIndex *uint8`, `ErrorCode uint8`.
-  `ReplyIndex` identifies **which of the box's two replicas answered**:
-  each box is sharded across K=2 replicas, and the value (0 or 1) is
+  `ReplyIndex` identifies **which of the box's two replicas answered**. 
+  Each box is sharded across K=2 replicas, and the value (0 or 1) is
   the position within that pair of the replica whose response was
   used. It is chiefly of interest for Pigeonhole channel reads and may
   be `nil` when not applicable. The same value is accepted as the
@@ -82,9 +82,9 @@ client = ThinClient(config)
   it likewise selects the replica of the pair to address.
 
 - **ShutdownEvent**: emitted when the daemon signals that it is
-  shutting down. It carries no fields. It precedes the loss of the
-  local socket and is what causes the following
-  **DaemonDisconnectedEvent** to report `IsGraceful = true`. Treat it
+  shutting down. Carrying no fields, it precedes the loss of the
+  local socket and is what causes the
+  **DaemonDisconnectedEvent** (see below) to report `IsGraceful = true`. Treat it
   as advance notice of the disconnect; no action is required, since
   the thin client reconnects and replays in-flight requests on its
   own.
