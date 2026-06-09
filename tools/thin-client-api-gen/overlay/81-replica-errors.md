@@ -23,7 +23,7 @@ and its variants. They are defined in
 
 | Error | Go | Rust | Python |
 |-------|-----|------|--------|
-| Operation cancelled | `ErrStartResendingCancelled` | `ThinClientError::StartResendingCancelled` | `StartResendingCancelledError` |
+| Operation canceled | `ErrStartResendingCancelled` | `ThinClientError::StartResendingCancelled` | `StartResendingCancelledError` |
 | Invalid box ID | `ErrInvalidBoxID` | `ThinClientError::InvalidBoxId` | `InvalidBoxIDError` |
 | Invalid signature | `ErrInvalidSignature` | `ThinClientError::InvalidSignature` | `InvalidSignatureError` |
 | Invalid tombstone signature | `ErrInvalidTombstoneSignature` | `ThinClientError::InvalidTombstoneSignature` | `InvalidTombstoneSignatureError` |
