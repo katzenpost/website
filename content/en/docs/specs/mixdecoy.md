@@ -1,19 +1,19 @@
 ---
-title: "Mix decoy loop"
+title: ""
 linkTitle: "Mix decoy loop"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:19:15.703409148-07:00"
+date: "2026-06-02T10:58:17.837752635-07:00"
 draft: "false"
-slug: "mix_decoy"
+slug: "mixdecoy"
 layout: ""
 type: ""
-weight: "1"
+weight: "30"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-# <span id="decoy"></span>Propagation of mix decoy loop statistics
+## <span id="decoy"></span>Propagation of mix decoy loop statistics
 
 </div>
 
@@ -58,13 +58,11 @@ version: ""
 **Abstract**
 
 In the context of continuous time mixing strategies such as the memoryless mix
-used by Katzenpost, n-1 attacks may use strategic packetloss. Nodes can also fail
-for benign reasons. Determining whether or not it’s an n-1 attack is outside the
-scope of this work.
-
-This document describes how we will communicate statistics from mix nodes to mix
-network directory authorities which tells them about the packetloss they are
-observing.
+used by Katzenpost, n-1 attacks may use strategic packet loss. Nodes can also
+fail for benign reasons. Determining whether or not it’s an n-1 attack is outside
+the scope of this work. This document describes how we will communicate statistics
+from mix nodes to mix network directory authorities which tells them about the
+packet loss they are observing.
 
 </div>
 
@@ -76,20 +74,6 @@ observing.
 
 </div>
 
-<div class="toc">
-
-**Table of Contents**
-
-<span class="section">[Terminology](#terminology)</span>
-
-<span class="section">[1. Design Overview](#design-overview)</span>
-
-<span class="section">[2. Tracking packet loss and detecting faulty mixes](#tracking-packet-loss-and-detecting-faulty-mixes)</span>
-
-<span class="section">[3. Uploading Stats to Dirauths](#uploading-stats-to-dirauths)</span>
-
-</div>
-
 <div class="section">
 
 <div class="titlepage">
@@ -98,7 +82,7 @@ observing.
 
 <div>
 
-## <span id="terminology"></span>Terminology
+### <span id="terminology"></span>Terminology
 
 </div>
 
@@ -110,23 +94,20 @@ The following terms are used in this specification.
 
 <div class="variablelist">
 
-<span class="term">Wire protocol</span>  
-Refers to our PQ Noise based protocol which currently uses TCP but in the
+<span class="term"><span class="bold">**epoch**</span></span>  
+A fixed-time interval with a current default value of 20 minutes.
+A new PKI document containing public key material
+is published for each epoch and is valid only for that epoch. For more information,
+see
+<a href="https://katzenpost.network/docs/specs/mix_network/#sphinx-mix-and-provider-key-rotation" class="link" target="_top">Sphinx
+mix and provider key rotation</a>.
+
+<span class="term"><span class="bold">**wire protocol**</span></span>  
+Refers to our PQ Noise-based protocol that currently uses TCP but in the
 near future will optionally use QUIC. This protocol has messages known as
 wire protocol `commands`, which are used for various mixnet
-functions such as sending or retrieving a message, dirauth voting etc. For
-more information, please see our design doc: <a href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/wire-protocol.md" class="link" target="_top">wire protocol specification</a>
-
-<span class="term">Providers</span>  
-Refers to a set of node on the edge of the network which have two roles,
-handle incoming client connections and run mixnet services. Soon we should
-get rid of `Providers` and replace it with two different
-sets, `gateway nodes` and `service nodes`.
-
-<span class="term">Epoch</span>  
-The Katzenpost epoch is currently set to a 20 minute duration. Each new
-epoch there is a new PKI document published containing public key material
-that will only be valid for that epoch.
+functions such as sending or retrieving a message and dirauth voting. For
+more information, see our <a href="https://github.com/katzenpost/katzenpost/blob/main/docs/specs/wire-protocol.md" class="link" target="_top">wire protocol specification</a>.
 
 </div>
 
@@ -140,7 +121,7 @@ that will only be valid for that epoch.
 
 <div>
 
-## <span id="design-overview"></span>1. Design Overview
+### <span id="design-overview"></span>Design overview
 
 </div>
 
@@ -153,13 +134,13 @@ directory authorities, so that authorities can label malfunctioning nodes as suc
 in the
 consensus in the next epoch.
 
-Nodes currently sign and upload a Descriptor in each epoch.
+Nodes currently sign and upload a `Descriptor` in each epoch.
 
-In the future, they would instead upload an UploadDescStats containing:
+In the future, they would instead upload an `UploadDescStats` containing:
 
 <div class="itemizedlist">
 
-- Descriptor
+- `Descriptor`
 
 - Stats
 
@@ -180,7 +161,7 @@ count-of-loops-received.
 
 <div>
 
-## <span id="tracking-packet-loss-and-detecting-faulty-mixes"></span>2. Tracking packet loss and detecting faulty mixes
+### <span id="tracking-packet-loss-and-detecting-faulty-mixes"></span>Tracking packet loss and detecting faulty mixes
 
 </div>
 
@@ -207,12 +188,11 @@ Experimental setup, node A:
   another, for example from a node in the layer `k` to a node in
   the layer `k+1`. Each loop is a sequence of such segments.
 
-- Each node `A` will create 3 hashmaps,
-  `sent_loops_A`, `completed_loops_A` and
-  `ratios_A`. Each of these will use a pair of concatenated
-  mixnode ID’s as the key. The ordering of the ID’s will be from lesser topology
-  layer to greater, e.g. the two-tuple (n, n+1) which is represented here as a 64
-  byte array:
+- Each node `A` will create 3 hashmaps, `sent_loops_A`,
+  `completed_loops_A` and `ratios_A`. Each of these will
+  use a pair of concatenated mix node ID’s as the key. The ordering of the ID’s
+  will be from lesser topology layer to greater, e.g. the two-tuple (n, n+1) which
+  is represented here as a 64 byte array:
 
   ``` programlisting
   var sent_loops_A map[[64]byte]int
@@ -274,7 +254,7 @@ consensus decision about the topology of the network.
 
 <div>
 
-## <span id="uploading-stats-to-dirauths"></span>3. Uploading Stats to Dirauths
+### <span id="uploading-stats-to-dirauths"></span>Uploading stats to dirauths
 
 </div>
 
@@ -282,8 +262,8 @@ consensus decision about the topology of the network.
 
 </div>
 
-Stats reports are uploaded along with the mix descriptor every Epoch. A
-cryptographic signature covers both of these fields:
+Stats reports are uploaded along with the mix descriptor every Epoch. A cryptographic
+signature covers both of these fields:
 
 ``` programlisting
 type UploadDescStats struct {
@@ -293,11 +273,11 @@ Signature []byte
 }    
 ```
 
-Statistics reports collected during the XXX period of time, that is, the time
-between descriptor N+1 upload and descriptor N+2 upload, are what will affect the
-topology choices in epoch N+2 if the dirauths collectively decide to act on the very
-latest statistics reports in order to determine for example if a mix node should be
-removed from the network:
+Statistics reports collected during the XXX period of time, that is, the time between
+descriptor N+1 upload and descriptor N+2 upload, are what will affect the topology
+choices in epoch N+2 if the dirauths collectively decide to act on the very latest
+statistics reports in order to determine for example if a mix node should be removed
+from the network:
 
 ``` programlisting
 | ---------------- epoch N ---------------- | ---------------- epoch N+1 ---------------- | ---------------- epoch N+2 ---------------- |

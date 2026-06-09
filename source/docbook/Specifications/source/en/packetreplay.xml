@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+
+<?title "" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
+<?linkTitle "Sphinx packet replay detection" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
+<?description "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
+<?author "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
+<?url "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
+<?draft "false" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#draft] -->
+<?slug "packetreplay" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
+<?layout "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
+<?type "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
+<?weight "50" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
+<?version "" ?> <!-- Optional [?] -->
+
+<!DOCTYPE section [
+    <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
+        %shared-content;
+    <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
+        %references;
+    <!ENTITY % terms SYSTEM "/home/dwrob/git/website/source/docbook/terms.ent">
+        %terms;    
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.1" xml:id="replay">
+
+    <info>
+        <title xml:id="replay.title">Sphinx packet replay detection</title>
+        <authorgroup>
+            <author>
+                <personname>
+                    <firstname>David</firstname>
+                    <surname>Stainton</surname>
+                </personname>
+            </author>
+        </authorgroup>
+        <abstract>
+            <para>This document defines the replay detection for any protocol that uses the Sphinx
+                cryptographic packet format. This document is meant to serve as an implementation
+                guide and to document the existing replay protection for deployed mix
+                networks.</para>
+        </abstract>
+    </info>
+
+    <section xml:id="terminology">
+        <title xml:id="terminology.title">Terminology</title>
+        <para>The following terms are used in this specification.</para>
+        <variablelist>
+            &epoch;
+            &group;
+            &groupelement;
+            &groupgenerator;
+            &header;
+            &packet;            
+            &payload;            
+            &seda;            
+        </variablelist>
+    </section>
+    <section>
+        <title>Conventions used in this document</title>
+        <para>The key words <quote>MUST</quote>, <quote>MUST NOT</quote>, <quote>REQUIRED</quote>,
+                <quote>SHALL</quote>, <quote>SHALL NOT</quote>, <quote>SHOULD</quote>, <quote>SHOULD
+                NOT</quote>, <quote>RECOMMENDED</quote>, <quote>MAY</quote>, and
+                <quote>OPTIONAL</quote> in this document are to be interpreted as described in <link
+                linkend="RFC2119">RFC2119</link>. </para>
+    </section>
+    <section xml:id="sphinx_replay_detection_introduction">
+        <title xml:id="sphinx_replay_detection_introduction.title">Introduction</title>
+        <para>The Sphinx cryptographic packet format is a compact and provably secure design
+            introduced by George Danezis and Ian Goldberg in <link linkend="SPHINX09"
+                >SPHINX09</link>. Although it supports replay detection, the exact mechanism of
+            replay detection is neither described in <link linkend="SPHINX09">SPHINX09</link> nor is
+            it described in our <link linkend="SPHINXSPEC">SPHINXSPEC</link>. Therefore we detail
+            here how to efficiently detect Sphinx packet replay attacks. </para>
+    </section>
+    <section xml:id="sphinx-cryptographic-primitives">
+        <title>Sphinx cryptographic primitives</title>
+        <para>This specification borrows the following cryptographic primitive constants from our
+                <link linkend="SPHINXSPEC">SPHINXSPEC</link>: </para>
+        <itemizedlist>
+            <listitem>
+                <para><code>H(M)</code> - A cryptographic hash function which takes a byte
+                    array M to produce a digest consisting of a <code>HASH_LENGTH</code> byte
+                    array. <code>H(M)</code> MUST be pre-image and collision resistant. </para>
+            </listitem>
+            <listitem>
+                <para><code>EXP(X, Y)</code> - An exponentiation function which takes the
+                        <code>GROUP_ELEMENT_LENGTH</code> byte array group elements
+                        <code>X</code> and <code>Y</code>, and returns <code>X ^^
+                        Y</code> as a <code>GROUP_ELEMENT_LENGTH</code> byte array. </para>
+            </listitem>
+        </itemizedlist>
+        <para>Let <code>G</code> denote the generator of the group, and
+                <code>EXP_KEYGEN()</code> return a <code>GROUP_ELEMENT_LENGTH</code>
+            byte array group element usable as a private key. </para>
+        <para>The group defined by <code>G</code> and <code>EXP(X, Y)</code> MUST
+            satisfy the <link
+                xlink:href="https://en.wikipedia.org/wiki/Decisional_Diffie%E2%80%93Hellman_assumption"
+                >decisional Diffie-Hellman assumption</link>. </para>
+        <section xml:id="sphinx-parameter-constants">
+            <title>Sphinx parameter constants</title>
+            <itemizedlist spacing="compact">
+                <listitem>
+                    <para>
+                        <code>HASH_LENGTH</code> - 32 bytes. &program_name; currently uses
+                        SHA-512/256. <link linkend="RFC6234">RFC6234</link>
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <code>GROUP_ELEMENT_LENGTH</code> - 32 bytes. &program_name; currently
+                        uses X25519. <link linkend="RFC7748">RFC7748</link>
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </section>
+    <section xml:id="system-overview">
+        <title>System overview</title>
+        <para>Mixnets as currently deployed have two modes of operation:</para>
+        <itemizedlist spacing="compact">
+            <listitem>
+                <para>Sphinx routing keys and replay caches are persisted to disk. </para>
+            </listitem>
+            <listitem>
+                <para>Sphinx routing keys and replay caches are persisted to memory. </para>
+            </listitem>
+        </itemizedlist>
+        <para>These two modes of operation fundamentally represent a tradeoff between mix server
+            availability and notional compulsion attack resistance. Choosing a mode is the mix
+            operator’s decision to make since the security and availability of the mix servers are
+            affected. Since mix networks are vulnerable to various types of compulsion attack (see
+                <link
+                xlink:href="https://katzenpost.network/docs/specs/sphinx_format/#compulsion-threat-considerations"
+                >Compulsion Threat Considerations</link> in the <emphasis>Sphinx cryptographic
+                packet format specification</emphasis>) there is some advantage to
+                <emphasis>not</emphasis> persisting the Sphinx routing keys to disk. The mix server
+            operator can simply power-off the servers before seizure rather than physically
+            destroying disks in order to prevent capture of the Sphinx routing keys. An argument can
+            be made for using full disk encryption, but this may not be practical for servers hosted
+            in remote locations. </para>
+        <para>On the other hand, persisting Sphinx routing keys and replay caches to disk is useful
+            because it allows mix operators to shut down their server for maintenance purposes
+            without loosing the Sphinx routing keys and replay caches. This means that as soon as
+            the maintenance operation is completed, the server is able to rejoin the network. Our
+            current PKI system, described in <link linkend="KATZMIXPKI">KATZMIXPKI</link>, does not
+            provide a mechanism to notify directory authorities of outages or maintenance periods.
+            Consequently if the Sphinx routing keys are lost, a mix server outage occurs until the
+            next epoch. </para>
+        <para>Both modes of operation completely prevent replay attacks after a system restart. In
+            the case of disk persistence, replay attacks are prevented because all packets
+            traversing the server have their replay tags persisted to disk cache. This cache is
+            therefore once again used to prevent replays after a system restart. In the case of
+            memory persistence, replays are prevented upon restart because the Sphinx routing keys
+            are destroyed and therefore the mix will not participate in the network at all until at
+            least the next epoch rotation. However, availability of the mix server may require two
+            epoch rotations because (in accordance with <link linkend="KATZMIXPKI"
+            >KATZMIXPKI</link>) the servers publish future epoch keys so that Sphinx packets flowing
+            through the network can seamlessly straddle epoch boundaries. </para>
+    </section>
+    <section xml:id="sphinx-packet-replay-cache">
+        <title>Sphinx packet replay cache</title>
+        <section xml:id="sphinx-replay-tag-composition">
+            <title>Sphinx replay tag composition</title>
+            <para>The following excerpt from our <link linkend="SPHINXSPEC">SPHINXSPEC</link> shows
+                how the replay tag is calculated. </para>
+            <programlisting>hdr = sphinx_packet.header
+shared_secret = EXP( hdr.group_element, private_routing_key )
+replay_tag = H( shared_secret )</programlisting>
+            <para>However, this tag is not utilized in replay detection until the rest of the Sphinx
+                packet is fully processed and its header is MAC-verified as described in <link
+                    linkend="SPHINXSPEC">SPHINXSPEC</link>. </para>
+        </section>
+    </section>
+    <section xml:id="sphinx-replay-tag-caching">
+        <title>Sphinx replay tag caching</title>
+        <para>Although it would be sufficient to check a key-value store or hashmap to detect
+            duplicate replay tags, we additionally employ a bloom filter to increase performance.
+            Sphinx keys must periodically be rotated and destroyed to mitigate compulsion attacks,
+            and our replay caches must likewise be rotated. This kind of key erasure scheme limits
+            the time window during which an adversary can perform a compulsion attack. See our PKI
+            specification <link linkend="KATZMIXPKI">KATZMIXPKI</link> for more details regarding
+            epoch key rotation and the grace period before and after the epoch boundary. </para>
+        <para>We tune our bloom filter for line-speed; that is to say, the bloom filter for a given
+            replay cache is tuned for the maximum number of Sphinx packets that can be sent on the
+            wire during the epoch duration of the Sphinx routing key. The tuning must take into
+            account the size of the Sphinx packets as well as the maximum line speed of the network
+            interface. This is a conservative tuning heuristic given that there must be more than
+            this maximum number of Sphinx packets in order for there to be duplicate packets. </para>
+        <para>Our bloom-filter-with-hashmap replay detection cache looks like this: </para>
+        <figure>
+            <title>Replay cache</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="pix/replay.png"/>
+                </imageobject>
+                <textobject>
+                    <phrase/>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>This diagram does not express the full complexity of the replay caching system. In
+            particular, it does not describe how entries are entered into the bloom filter and
+            hashmap. Upon either bloom filter mismatch or hashmap mismatch, both data structures
+            must be locked and the replay tag inserted into each. </para>
+        <para>For the disk persistence mode of operation, the hashmap can simply be replaced with an
+            efficient key-value store. Persistent stores may use a write-back cache and other
+            techniques for efficiency. </para>
+        <section xml:id="epoch-boundaries">
+            <title xml:id="epoch-boundaries.title">Epoch boundaries</title>
+            <para>Since mix servers publish future epoch keys, our replay detection forms a special
+                kind of double-bloom-filter system. During the epoch grace period, servers perform a
+                trial decryption of Sphinx packets. The replay cache used is the one associated with
+                the Sphinx routing key that was successfully used to decrypt (unwrap transform) the
+                Sphinx packet. This is not a double-bloom filter in the normal sense of the term
+                since each bloom filter used is distinct and associated with its own cache.
+                Furthermore, replay tags are only inserted into one cache and one bloom filter. </para>
+        </section>
+        <section xml:id="cost-of-checking-replays">
+            <title>Cost of checking replays</title>
+            <para>The cost of checking a replay tag from a single replay cache is the sum of the
+                following operations: </para>
+            <orderedlist numeration="arabic" spacing="compact">
+                <listitem>
+                    <para>Sphinx packet unwrap operation </para>
+                </listitem>
+                <listitem>
+                    <para>Bloom filter lookup </para>
+                </listitem>
+                <listitem>
+                    <para>Hashmap or cache lookup </para>
+                </listitem>
+            </orderedlist>
+            <para>These operations are roughly O(1) in complexity. However, Sphinx packets processed
+                near epoch boundaries will not be constant time due to trial decryption with two
+                Sphinx routing keys as mentioned above in <xref linkend="epoch-boundaries"/>.</para>
+        </section>
+    </section>
+    <section xml:id="concurrent-processing-of-sphinx-packet-replay-tags">
+        <title>Concurrent processing of Sphinx packet replay tags</title>
+        <para>The best way to implement a software-based router is with a <link linkend="SEDA"
+                >SEDA</link> computational pipeline. We therefore need a mechanism to allow multiple
+            threads to reference our rotating Sphinx keys and the associated replay caches. Here we
+            shall describe how the mix server uses a shadow memory system such that the individual
+            worker threads always have a reference to the current set of candidate mix keys and
+            associated replay caches. </para>
+        <section xml:id="pki-updates">
+            <title>PKI updates</title>
+            <para>The mix server periodically updates its knowledge of the network by downloading a
+                new consensus document as described in <link linkend="KATZMIXPKI">KATZMIXPKI</link>.
+                The individual threads in the <emphasis>cryptoworker</emphasis> thread pool that
+                process Sphinx packets make use of a <code>MixKey</code> data structure
+                consisting of the following:</para>
+            <itemizedlist spacing="compact">
+                <listitem>
+                    <para>A Sphinx routing key material (public and private X25519 keys) </para>
+                </listitem>
+                <listitem>
+                    <para>A replay cache </para>
+                </listitem>
+                <listitem>
+                    <para>A reference counter </para>
+                </listitem>
+            </itemizedlist>
+            <para>Each of these cryptoworker threads has its own hashmap associating epochs with a
+                reference to the <code>MixKey</code>. The mix server PKI thread maintains a single
+                hashmap which associates the epochs with the corresponding <code>MixKey</code>. We
+                refer to this hashmap as <code>MixKeys</code>. After a new <code>MixKey</code> is
+                added to <code>MixKeys</code>, a <emphasis>reshadow</emphasis> operation is
+                performed for each cryptoworker thread. The <emphasis>reshadow</emphasis> operation
+                performs two tasks: </para>
+            <itemizedlist spacing="compact">
+                <listitem>
+                    <para>Removes entries from each cryptoworker thread's hashmap that are no longer
+                        present in <code>MixKeys</code> and decrements the
+                            <code>MixKey</code> reference counter. </para>
+                </listitem>
+                <listitem>
+                    <para>Adds entries present in <code>MixKeys</code> but not present in the
+                        thread’s hashmap and increments the <code>MixKey</code> reference
+                        counter. </para>
+                </listitem>
+            </itemizedlist>
+            <para>Once a given <code>MixKey</code> reference counter is decremented to zero,
+                the <code>MixKey</code> and its associated on-disk data are purged. </para>
+            <para>Although we do not discuss synchronization primitives, it should be obvious that
+                updating the replay cache should likely make use of a mutex or similar primitive to
+                avoid data races between cryptoworker threads. </para>
+        </section>
+    </section>
+    <section xml:id="appendix-a.-references">
+        <title>References</title>
+        &COMPULS05;
+        &KATZMIXNET;
+        &KATZMIXPKI;
+        &RFC2119;
+        &RFC6234;
+        &RFC7748;
+        &SEDA;
+        &SPHINX09;
+        &SPHINXSPEC;
+    </section>
+</section>

@@ -1,19 +1,19 @@
 ---
-title: "Certificate format"
-linkTitle: ""
+title: ""
+linkTitle: "Certificate format"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:14:56.917398477-07:00"
+date: "2026-06-02T10:58:05.050489242-07:00"
 draft: "false"
-slug: "certificate_format"
+slug: "certificate"
 layout: ""
 type: ""
-weight: "1"
+weight: "10"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-# <span id="certificate"></span>Certificate format
+## <span id="certificate"></span>Certificate format
 
 </div>
 
@@ -58,27 +58,26 @@ authority server and clients will use.
 
 </div>
 
-<div class="toc">
+<div class="section">
 
-**Table of Contents**
+<div class="titlepage">
 
-<span class="section">[Terminology](#terminology)</span>
+<div>
 
-<span class="section">[Conventions Used in This Document](#conventions-used-in-this-document)</span>
+<div>
 
-<span class="section">[1. Introduction](#certificate_introduction)</span>
+### <span id="conventions-used-in-this-document"></span>Conventions used in this document
 
-<span class="section">[1.1. Document Format](#document-format)</span>
+</div>
 
-<span class="section">[1.2 Certificate Types](#certificate-types)</span>
+</div>
 
-<span class="section">[1.3. Certificate Key Types](#certificate-key-types)</span>
+</div>
 
-<span class="section">[2. Golang API](#golang-api)</span>
-
-<span class="section">[Acknowledgments](#acknowledgments)</span>
-
-<span class="section">[References](#appendix-a.-references)</span>
+The key words <span class="quote">“<span class="quote">MUST</span>”</span>, <span class="quote">“<span class="quote">MUST NOT</span>”</span>, <span class="quote">“<span class="quote">REQUIRED</span>”</span>,
+<span class="quote">“<span class="quote">SHALL</span>”</span>, <span class="quote">“<span class="quote">SHALL NOT</span>”</span>, <span class="quote">“<span class="quote">SHOULD</span>”</span>, <span class="quote">“<span class="quote">SHOULD
+NOT</span>”</span>, <span class="quote">“<span class="quote">RECOMMENDED</span>”</span>, <span class="quote">“<span class="quote">MAY</span>”</span>, and
+<span class="quote">“<span class="quote">OPTIONAL</span>”</span> in this document are to be interpreted as described in <a href="#RFC2119" class="link">RFC2119</a>.
 
 </div>
 
@@ -90,7 +89,7 @@ authority server and clients will use.
 
 <div>
 
-## <span id="terminology"></span>Terminology
+### <span id="certificate_introduction"></span>Introduction
 
 </div>
 
@@ -98,62 +97,13 @@ authority server and clients will use.
 
 </div>
 
-The following terms are used in this specification.
-
-<div class="variablelist">
-
-<span class="term"></span>  
-
-</div>
-
-</div>
-
-<div class="section">
-
-<div class="titlepage">
-
-<div>
-
-<div>
-
-## <span id="conventions-used-in-this-document"></span>Conventions Used in This Document
-
-</div>
-
-</div>
-
-</div>
-
-The key words <span class="quote">“<span class="quote">MUST</span>”</span>, <span class="quote">“<span class="quote">MUST NOT</span>”</span>,
-<span class="quote">“<span class="quote">REQUIRED</span>”</span>, <span class="quote">“<span class="quote">SHALL</span>”</span>, <span class="quote">“<span class="quote">SHALL NOT</span>”</span>,
-<span class="quote">“<span class="quote">SHOULD</span>”</span>, <span class="quote">“<span class="quote">SHOULD NOT</span>”</span>, <span class="quote">“<span class="quote">RECOMMENDED</span>”</span>,
-<span class="quote">“<span class="quote">MAY</span>”</span>, and <span class="quote">“<span class="quote">OPTIONAL</span>”</span> in this document are to be
-interpreted as described in <a href="#RFC2119" class="link">RFC2119</a>.
-
-</div>
-
-<div class="section">
-
-<div class="titlepage">
-
-<div>
-
-<div>
-
-## <span id="certificate_introduction"></span>1. Introduction
-
-</div>
-
-</div>
-
-</div>
-
-Mixes and Directory Authority servers need to have key agility in the sense of
+Mix servers and directory authority servers need to have key agility in the sense
+of
 operational abilities such as key rotation and key revocation. That is, we wish for
 mixes and authorities to periodically utilize a long-term signing key for generating
 certificates for new short-term signing keys.
 
-Yet another use-case for these certificate is to replace the use of JOSE <a href="#RFC7515" class="link">RFC7515</a> in the voting Directory Authority system <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a> for the multi-signature documents exchanged
+Yet another use-case for these certificate is to replace the use of JOSE <a href="#RFC7515" class="link">RFC7515</a> in the voting directory authority system <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a> for the multi-signature documents exchanged
 for voting and consensus.
 
 <div class="section">
@@ -164,7 +114,7 @@ for voting and consensus.
 
 <div>
 
-### <span id="document-format"></span>1.1. Document Format
+#### <span id="document-format"></span>Certificate format
 
 </div>
 
@@ -225,7 +175,7 @@ by their identity so that the output is binary deterministic.
 
 <div>
 
-### <span id="certificate-types"></span>1.2 Certificate Types
+#### <span id="certificate-types"></span>Certificate types
 
 </div>
 
@@ -261,7 +211,7 @@ used to sign mix descriptors which are uploaded to the directory authority serve
 
 <div>
 
-### <span id="certificate-key-types"></span>1.3. Certificate Key Types
+#### <span id="certificate-key-types"></span>Certificate key types
 
 </div>
 
@@ -285,7 +235,7 @@ SPHINCS-256 or SPHINCS+. <a href="#SPHINCS256" class="link">SPHINCS256</a>
 
 <div>
 
-## <span id="golang-api"></span>2. Golang API
+### <span id="golang-api"></span>Golang API
 
 </div>
 
@@ -314,7 +264,7 @@ variety of helper functions that ease use for multi signature use cases.
 
 <div>
 
-## <span id="acknowledgments"></span>Acknowledgments
+### <span id="acknowledgments"></span>Acknowledgments
 
 </div>
 
@@ -341,13 +291,26 @@ document:
 
 <div>
 
-## <span id="appendix-a.-references"></span>References
+### <span id="appendix-a.-references"></span>References
 
 </div>
 
 </div>
 
 </div>
+
+<span id="ED25519"></span><span class="bold">**ED25519**</span>
+
+<a href="https://www.rfc-editor.org/rfc/rfc8032" class="link" target="_top">https://www.rfc-editor.org/rfc/rfc8032</a>.
+
+<span id="KATZMIXPKI"></span><span class="bold">**KATZMIXPKI**</span>
+
+Angel, Y., Piotrowska, A., Stainton, D., <span class="quote">“<span class="quote">Katzenpost Mix Network Public Key Infrastructure Specification</span>”</span>, December 2017, <a href="https://katzenpost.network/docs/specs/pdf/pki.pdf" class="link" target="_top">https://katzenpost.network/docs/specs/pdf/pki.pdf</a>.
+
+<span id="RFC2119"></span><span class="bold">**RFC2119**</span>
+
+Bradner, S., <span class="quote">“<span class="quote">Key words for use in RFCs to Indicate Requirement
+Levels</span>”</span>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a href="http://www.rfc-editor.org/info/rfc2119" class="link" target="_top">http://www.rfc-editor.org/info/rfc2119</a>.
 
 <span id="RFC7049"></span><span class="bold">**RFC7049**</span>
 
@@ -359,23 +322,10 @@ C. Bormann, P. Hoffman, <span class="quote">“<span class="quote">Concise Binar
 Jones, M., Bradley, J., Sakimura, N., <span class="quote">“<span class="quote">JSON Web Signature (JWS)</span>”</span>, May 2015,
 <a href="https://www.rfc-editor.org/info/rfc7515" class="link" target="_top">https://www.rfc-editor.org/info/rfc7515</a>.
 
-<span id="KATZMIXPKI"></span><span class="bold">**KATZMIXPKI**</span>
-
-Angel, Y., Piotrowska, A., Stainton, D., <span class="quote">“<span class="quote">Katzenpost Mix Network Public Key Infrastructure Specification</span>”</span>, December 2017, <a href="https://katzenpost.network/docs/specs/pdf/pki.pdf" class="link" target="_top">https://katzenpost.network/docs/specs/pdf/pki.pdf</a>.
-
-<span id="RFC2119"></span><span class="bold">**RFC2119**</span>
-
-Bradner, S., <span class="quote">“<span class="quote">Key words for use in RFCs to Indicate Requirement
-Levels</span>”</span>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a href="http://www.rfc-editor.org/info/rfc2119" class="link" target="_top">http://www.rfc-editor.org/info/rfc2119</a>.
-
 <span id="RFC7693"></span><span class="bold">**RFC7693**</span>
 
 Saarinen, M-J., Ed., and J-P. Aumasson, <span class="quote">“<span class="quote">The BLAKE2 Cryptographic Hash and Message Authentication Code (MAC)</span>”</span>, RFC 7693, DOI 10.17487/RFC7693, November 2015,
 <a href="http://www.rfc-editor.org/info/rfc7693" class="link" target="_top">http://www.rfc-editor.org/info/rfc7693</a>.
-
-<span id="ED25519"></span><span class="bold">**ED25519**</span>
-
-<a href="https://www.rfc-editor.org/rfc/rfc8032" class="link" target="_top">https://www.rfc-editor.org/rfc/rfc8032</a>.
 
 <span id="SPHINCS256"></span><span class="bold">**SPHINCS256**</span>
 

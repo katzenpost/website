@@ -1,10 +1,10 @@
 ---
-title: "References"
+title: ""
 linkTitle: "References"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:22:38.262314737-07:00"
+date: "2026-06-02T10:58:36.386594224-07:00"
 draft: "false"
 slug: "references"
 layout: ""
@@ -13,7 +13,7 @@ weight: "100"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-# <span id="references"></span>References
+## <span id="references"></span>References
 
 </div>
 

@@ -1,19 +1,19 @@
 ---
-title: "Group chat"
+title: ""
 linkTitle: "Group chat"
 description: ""
-author: "Threebit Hacker, David Stainton"
+author: ""
 url: ""
-date: "2026-05-11T09:45:35.686073327-07:00"
+date: "2026-06-02T10:58:11.422588516-07:00"
 draft: "false"
-slug: "group_chat"
+slug: "groupchat"
 layout: ""
 type: ""
-weight: ""
+weight: "20"
 version: "0"
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: "0"
 
 <div>
 
-# <span id="group_chat"></span>Katzenpost Group Chat Design
+## <span id="group_chat"></span>Group chat specification
 
 </div>
 
@@ -45,25 +45,19 @@ version: "0"
 
 </div>
 
+<div>
+
+<div class="abstract">
+
+**Abstract**
+
+</div>
+
+</div>
+
 </div>
 
 ------------------------------------------------------------------------
-
-</div>
-
-<div class="toc">
-
-**Table of Contents**
-
-<span class="section">[Prerequisites](#d58e44)</span>
-
-<span class="section">[Introduction](#d58e64)</span>
-
-<span class="section">[Group Chat Message Types](#d58e102)</span>
-
-<span class="section">[Protocol Flow](#d58e165)</span>
-
-<span class="section">[Addenda](#d58e239)</span>
 
 </div>
 
@@ -75,7 +69,7 @@ version: "0"
 
 <div>
 
-## <span id="d58e44"></span>Prerequisites
+### <span id="d58e43"></span>Prerequisites
 
 </div>
 
@@ -90,9 +84,9 @@ System with Messaging</a>, which describes
 
 <div class="itemizedlist">
 
-- the BACAP (blinded and capability) in section 4 and
+- the BACAP (blinded and capability) in §4 and
 
-- the Pigeonhole protocol in section 5.
+- the Pigeonhole protocol in §5.
 
 </div>
 
@@ -110,7 +104,7 @@ BACAP are available on pkg.go.dev.
 
 <div>
 
-## <span id="d58e64"></span>Introduction
+### <span id="d58e63"></span>Introduction
 
 </div>
 
@@ -179,7 +173,7 @@ member.
 
 <div>
 
-## <span id="d58e102"></span>Group Chat Message Types
+### <span id="d58e101"></span>Group chat message types
 
 </div>
 
@@ -196,7 +190,7 @@ All messages are `SingleMessage` if they fit in one BACAP slot, or an
 
 </div>
 
-``` golang
+``` programlisting
 // TextPayload encapsulates a normal text message.
 type TextPayload struct {
     // Payload contains a normal UTF-8 text message to be displayed inline.
@@ -210,7 +204,7 @@ type TextPayload struct {
 
 </div>
 
-``` golang
+``` programlisting
 // Introduction introduces a new member to the group.
 type Introduction struct {
     // DisplayName is the party's name to be displayed in chat clients.
@@ -233,7 +227,7 @@ be displayed inline by the chat client. Likewise, a sound bite could be made vis
 in the
 chat along with a play-button. Beyond that, we can support arbitrary file attachments.
 
-``` goland
+``` programlisting
 // FileUpload encapsulates several file types
 // which result in different client behaviors.
 type FileUpload struct {
@@ -257,7 +251,7 @@ type FileUpload struct {
 
 The `Who` message type is used to query who is currently in the group.
 
-``` golang
+``` programlisting
 // Who is used to query the group chat to find out the member read capabilities.
 type Who struct {}
 ```
@@ -272,7 +266,7 @@ The `ReplyWho` message answers the Who query with an
 `AllOrNothingMessage` BACAP stream containing readcaps for all group chat
 members.
 
-``` golang
+``` programlisting
 type ReplyWho struct {
     Payload *bacap.BacapStream
 }
@@ -287,7 +281,7 @@ type ReplyWho struct {
 The `GroupChatMessage` message encapsulates all of the above-mentioned message
 types and is serialized with CBOR.
 
-``` pgolang
+``` programlisting
 // GroupChatMessage encapsulates all chat message types.
 type GroupChatMessage struct {
     // Version is used to ensure we can change this message type in the future.
@@ -314,7 +308,7 @@ type GroupChatMessage struct {
 
 <div>
 
-## <span id="d58e165"></span>Protocol Flow
+### <span id="d58e170"></span>Protocol flow
 
 </div>
 
@@ -325,7 +319,7 @@ type GroupChatMessage struct {
 The protocol flow for making a new group from scratch (using whatever authentication
 protocol) is essentially for everybody to exchange `PleaseAdd` messages.
 
-``` golang
+``` programlisting
 // PleaseAdd is a message used by a client to try and gain access to a chat group.
 type PleaseAdd struct {
     // DisplayName is the party's name to be displayed in chat clients.
@@ -348,7 +342,7 @@ type SignedPleaseAdd struct {
 For introduction to an existing group over an existing channel between an introducer
 member and new member, an `Invitation` message is used.
 
-``` golang
+``` programlisting
 type Invitation struct {
     GroupName string
 }
@@ -414,7 +408,7 @@ The `Invitation` protocol flow works as follows.
 
 <div>
 
-## <span id="d58e239"></span>Addenda
+### <span id="d58e246"></span>Addenda
 
 </div>
 
