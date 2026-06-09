@@ -1,0 +1,646 @@
+---
+title: ""
+linkTitle: "Sphinx packet replay detection"
+description: ""
+author: ""
+url: ""
+date: "2026-06-02T10:58:24.736503828-07:00"
+draft: "false"
+slug: "packetreplay"
+layout: ""
+type: ""
+weight: "50"
+version: ""
+---
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+## <span id="replay"></span>Sphinx packet replay detection
+
+</div>
+
+<div>
+
+<div class="authorgroup">
+
+<div class="author">
+
+### <span class="firstname">David</span> <span class="surname">Stainton</span>
+
+</div>
+
+</div>
+
+</div>
+
+<div>
+
+<div class="abstract">
+
+**Abstract**
+
+This document defines the replay detection for any protocol that uses the Sphinx
+cryptographic packet format. This document is meant to serve as an implementation
+guide and to document the existing replay protection for deployed mix
+networks.
+
+</div>
+
+</div>
+
+</div>
+
+------------------------------------------------------------------------
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="terminology"></span>Terminology
+
+</div>
+
+</div>
+
+</div>
+
+The following terms are used in this specification.
+
+<div class="variablelist">
+
+<span class="term"><span class="bold">**epoch**</span></span>  
+A fixed-time interval with a current default value of 20 minutes.
+A new PKI document containing public key material
+is published for each epoch and is valid only for that epoch. For more information,
+see
+<a href="https://katzenpost.network/docs/specs/mix_network/#sphinx-mix-and-provider-key-rotation" class="link" target="_top">Sphinx
+mix and provider key rotation</a>.
+
+<span class="term"><span class="bold">**group**</span></span>  
+A finite set of elements and a binary operation that satisfy the
+properties of closure, associativity, invertability, and the presence of an
+identity element.
+
+<span class="term"><span class="bold">**group element**</span></span>  
+An individual element of a group.
+
+<span class="term"><span class="bold">**group generator**</span></span>  
+A group element capable of generating any other element of a group, via
+repeated applications of the generator and the group operation.
+
+<span class="term"><span class="bold">**header**</span></span>  
+The packet header consisting of several components which convey the
+information necessary to verify packet integrity and to correctly process the
+packet.
+
+<span class="term"><span class="bold">**packet**</span></span>  
+A Sphinx packet, of fixed
+length for each class of traffic, carrying a message payload and metadata for routing.
+Packets are routed anonymously through the mixnet and cryptographically transformed
+at
+each hop.
+
+<span class="term"><span class="bold">**payload**</span></span>  
+The fixed-length portion of a packet containing an encrypted message or
+part of a message, to be delivered anonymously.
+
+<span class="term"><span class="bold">**SEDA**</span></span>  
+Staged Event Driven Architecture. 1. A
+highly parallelizable computation model. 2. A computational pipeline
+composed of multiple stages connected by queues utilizing active
+queue-management algorithms that can evict items from a queue based on dwell
+time or other criteria where each stage is a thread pool. 3. The only
+correct way to efficiently implement a software based router on general
+purpose computing hardware.
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="d58e99"></span>Conventions used in this document
+
+</div>
+
+</div>
+
+</div>
+
+The key words <span class="quote">“<span class="quote">MUST</span>”</span>, <span class="quote">“<span class="quote">MUST NOT</span>”</span>, <span class="quote">“<span class="quote">REQUIRED</span>”</span>,
+<span class="quote">“<span class="quote">SHALL</span>”</span>, <span class="quote">“<span class="quote">SHALL NOT</span>”</span>, <span class="quote">“<span class="quote">SHOULD</span>”</span>, <span class="quote">“<span class="quote">SHOULD
+NOT</span>”</span>, <span class="quote">“<span class="quote">RECOMMENDED</span>”</span>, <span class="quote">“<span class="quote">MAY</span>”</span>, and
+<span class="quote">“<span class="quote">OPTIONAL</span>”</span> in this document are to be interpreted as described in <a href="#RFC2119" class="link">RFC2119</a>.
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="sphinx_replay_detection_introduction"></span>Introduction
+
+</div>
+
+</div>
+
+</div>
+
+The Sphinx cryptographic packet format is a compact and provably secure design
+introduced by George Danezis and Ian Goldberg in <a href="#SPHINX09" class="link">SPHINX09</a>. Although it supports replay detection, the exact mechanism of
+replay detection is neither described in <a href="#SPHINX09" class="link">SPHINX09</a> nor is
+it described in our <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a>. Therefore we detail
+here how to efficiently detect Sphinx packet replay attacks.
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="sphinx-cryptographic-primitives"></span>Sphinx cryptographic primitives
+
+</div>
+
+</div>
+
+</div>
+
+This specification borrows the following cryptographic primitive constants from our
+<a href="#SPHINXSPEC" class="link">SPHINXSPEC</a>:
+
+<div class="itemizedlist">
+
+- `H(M)` - A cryptographic hash function which takes a byte
+  array M to produce a digest consisting of a `HASH_LENGTH` byte
+  array. `H(M)` MUST be pre-image and collision resistant.
+
+- `EXP(X, Y)` - An exponentiation function which takes the
+  `GROUP_ELEMENT_LENGTH` byte array group elements
+  `X` and `Y`, and returns `X ^^ Y` as a `GROUP_ELEMENT_LENGTH` byte array.
+
+</div>
+
+Let `G` denote the generator of the group, and
+`EXP_KEYGEN()` return a `GROUP_ELEMENT_LENGTH`
+byte array group element usable as a private key.
+
+The group defined by `G` and `EXP(X, Y)` MUST
+satisfy the <a href="https://en.wikipedia.org/wiki/Decisional_Diffie%E2%80%93Hellman_assumption" class="link" target="_top">decisional Diffie-Hellman assumption</a>.
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+#### <span id="sphinx-parameter-constants"></span>Sphinx parameter constants
+
+</div>
+
+</div>
+
+</div>
+
+<div class="itemizedlist">
+
+- `HASH_LENGTH` - 32 bytes. Katzenpost currently uses
+  SHA-512/256. <a href="#RFC6234" class="link">RFC6234</a>
+
+- `GROUP_ELEMENT_LENGTH` - 32 bytes. Katzenpost currently
+  uses X25519. <a href="#RFC7748" class="link">RFC7748</a>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="system-overview"></span>System overview
+
+</div>
+
+</div>
+
+</div>
+
+Mixnets as currently deployed have two modes of operation:
+
+<div class="itemizedlist">
+
+- Sphinx routing keys and replay caches are persisted to disk.
+
+- Sphinx routing keys and replay caches are persisted to memory.
+
+</div>
+
+These two modes of operation fundamentally represent a tradeoff between mix server
+availability and notional compulsion attack resistance. Choosing a mode is the mix
+operator’s decision to make since the security and availability of the mix servers
+are
+affected. Since mix networks are vulnerable to various types of compulsion attack
+(see
+<a href="https://katzenpost.network/docs/specs/sphinx_format/#compulsion-threat-considerations" class="link" target="_top">Compulsion Threat Considerations</a> in the <span class="emphasis">*Sphinx cryptographic
+packet format specification*</span>) there is some advantage to
+<span class="emphasis">*not*</span> persisting the Sphinx routing keys to disk. The mix server
+operator can simply power-off the servers before seizure rather than physically
+destroying disks in order to prevent capture of the Sphinx routing keys. An argument
+can
+be made for using full disk encryption, but this may not be practical for servers
+hosted
+in remote locations.
+
+On the other hand, persisting Sphinx routing keys and replay caches to disk is useful
+because it allows mix operators to shut down their server for maintenance purposes
+without loosing the Sphinx routing keys and replay caches. This means that as soon
+as
+the maintenance operation is completed, the server is able to rejoin the network.
+Our
+current PKI system, described in <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a>, does not
+provide a mechanism to notify directory authorities of outages or maintenance periods.
+Consequently if the Sphinx routing keys are lost, a mix server outage occurs until
+the
+next epoch.
+
+Both modes of operation completely prevent replay attacks after a system restart.
+In
+the case of disk persistence, replay attacks are prevented because all packets
+traversing the server have their replay tags persisted to disk cache. This cache is
+therefore once again used to prevent replays after a system restart. In the case of
+memory persistence, replays are prevented upon restart because the Sphinx routing
+keys
+are destroyed and therefore the mix will not participate in the network at all until
+at
+least the next epoch rotation. However, availability of the mix server may require
+two
+epoch rotations because (in accordance with <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a>) the servers publish future epoch keys so that Sphinx packets flowing
+through the network can seamlessly straddle epoch boundaries.
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="sphinx-packet-replay-cache"></span>Sphinx packet replay cache
+
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+#### <span id="sphinx-replay-tag-composition"></span>Sphinx replay tag composition
+
+</div>
+
+</div>
+
+</div>
+
+The following excerpt from our <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a> shows
+how the replay tag is calculated.
+
+``` programlisting
+hdr = sphinx_packet.header
+shared_secret = EXP( hdr.group_element, private_routing_key )
+replay_tag = H( shared_secret )
+```
+
+However, this tag is not utilized in replay detection until the rest of the Sphinx
+packet is fully processed and its header is MAC-verified as described in <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a>.
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="sphinx-replay-tag-caching"></span>Sphinx replay tag caching
+
+</div>
+
+</div>
+
+</div>
+
+Although it would be sufficient to check a key-value store or hashmap to detect
+duplicate replay tags, we additionally employ a bloom filter to increase performance.
+Sphinx keys must periodically be rotated and destroyed to mitigate compulsion attacks,
+and our replay caches must likewise be rotated. This kind of key erasure scheme limits
+the time window during which an adversary can perform a compulsion attack. See our
+PKI
+specification <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a> for more details regarding
+epoch key rotation and the grace period before and after the epoch boundary.
+
+We tune our bloom filter for line-speed; that is to say, the bloom filter for a given
+replay cache is tuned for the maximum number of Sphinx packets that can be sent on
+the
+wire during the epoch duration of the Sphinx routing key. The tuning must take into
+account the size of the Sphinx packets as well as the maximum line speed of the network
+interface. This is a conservative tuning heuristic given that there must be more than
+this maximum number of Sphinx packets in order for there to be duplicate packets.
+
+Our bloom-filter-with-hashmap replay detection cache looks like this:
+
+<div class="figure">
+
+<span id="d58e254"></span>
+
+**Figure 1. Replay cache**
+
+<div class="figure-contents">
+
+<div class="mediaobject">
+
+![Replay cache](/docs/specs/pix/replay.png)
+
+</div>
+
+</div>
+
+</div>
+
+  
+
+This diagram does not express the full complexity of the replay caching system. In
+particular, it does not describe how entries are entered into the bloom filter and
+hashmap. Upon either bloom filter mismatch or hashmap mismatch, both data structures
+must be locked and the replay tag inserted into each.
+
+For the disk persistence mode of operation, the hashmap can simply be replaced with
+an
+efficient key-value store. Persistent stores may use a write-back cache and other
+techniques for efficiency.
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+#### <span id="epoch-boundaries"></span>Epoch boundaries
+
+</div>
+
+</div>
+
+</div>
+
+Since mix servers publish future epoch keys, our replay detection forms a special
+kind of double-bloom-filter system. During the epoch grace period, servers perform
+a
+trial decryption of Sphinx packets. The replay cache used is the one associated with
+the Sphinx routing key that was successfully used to decrypt (unwrap transform) the
+Sphinx packet. This is not a double-bloom filter in the normal sense of the term
+since each bloom filter used is distinct and associated with its own cache.
+Furthermore, replay tags are only inserted into one cache and one bloom filter.
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+#### <span id="cost-of-checking-replays"></span>Cost of checking replays
+
+</div>
+
+</div>
+
+</div>
+
+The cost of checking a replay tag from a single replay cache is the sum of the
+following operations:
+
+<div class="orderedlist">
+
+1.  Sphinx packet unwrap operation
+
+2.  Bloom filter lookup
+
+3.  Hashmap or cache lookup
+
+</div>
+
+These operations are roughly O(1) in complexity. However, Sphinx packets processed
+near epoch boundaries will not be constant time due to trial decryption with two
+Sphinx routing keys as mentioned above in <a href="#epoch-boundaries" class="xref" title="Epoch boundaries">the section called “Epoch boundaries”</a>.
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="concurrent-processing-of-sphinx-packet-replay-tags"></span>Concurrent processing of Sphinx packet replay tags
+
+</div>
+
+</div>
+
+</div>
+
+The best way to implement a software-based router is with a <a href="#SEDA" class="link">SEDA</a> computational pipeline. We therefore need a mechanism to allow multiple
+threads to reference our rotating Sphinx keys and the associated replay caches. Here
+we
+shall describe how the mix server uses a shadow memory system such that the individual
+worker threads always have a reference to the current set of candidate mix keys and
+associated replay caches.
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+#### <span id="pki-updates"></span>PKI updates
+
+</div>
+
+</div>
+
+</div>
+
+The mix server periodically updates its knowledge of the network by downloading a
+new consensus document as described in <a href="#KATZMIXPKI" class="link">KATZMIXPKI</a>.
+The individual threads in the <span class="emphasis">*cryptoworker*</span> thread pool that
+process Sphinx packets make use of a `MixKey` data structure
+consisting of the following:
+
+<div class="itemizedlist">
+
+- A Sphinx routing key material (public and private X25519 keys)
+
+- A replay cache
+
+- A reference counter
+
+</div>
+
+Each of these cryptoworker threads has its own hashmap associating epochs with a
+reference to the `MixKey`. The mix server PKI thread maintains a single
+hashmap which associates the epochs with the corresponding `MixKey`. We
+refer to this hashmap as `MixKeys`. After a new `MixKey` is
+added to `MixKeys`, a <span class="emphasis">*reshadow*</span> operation is
+performed for each cryptoworker thread. The <span class="emphasis">*reshadow*</span> operation
+performs two tasks:
+
+<div class="itemizedlist">
+
+- Removes entries from each cryptoworker thread's hashmap that are no longer
+  present in `MixKeys` and decrements the
+  `MixKey` reference counter.
+
+- Adds entries present in `MixKeys` but not present in the
+  thread’s hashmap and increments the `MixKey` reference
+  counter.
+
+</div>
+
+Once a given `MixKey` reference counter is decremented to zero,
+the `MixKey` and its associated on-disk data are purged.
+
+Although we do not discuss synchronization primitives, it should be obvious that
+updating the replay cache should likely make use of a mutex or similar primitive to
+avoid data races between cryptoworker threads.
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="appendix-a.-references"></span>References
+
+</div>
+
+</div>
+
+</div>
+
+<span id="COMPULS05"></span><span class="bold">**COMPULS05**</span>
+
+Danezis, G., Clulow, J., <span class="quote">“<span class="quote">Compulsion Resistant Anonymous Communications</span>”</span>,
+Proceedings of Information Hiding Workshop, June 2005,
+<a href="https://www.freehaven.net/anonbib/cache/ih05-danezisclulow.pdf" class="link" target="_top">https://www.freehaven.net/anonbib/cache/ih05-danezisclulow.pdf</a>.
+
+<span id="KATZMIXNET"></span><span class="bold">**KATZMIXNET**</span>
+
+Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">“<span class="quote">Katzenpost
+Mix Network Specification</span>”</span>, June 2017,
+<a href="https://katzenpost.network/docs/specs/pdf/mixnet.pdf" class="link" target="_top">https://katzenpost.network/docs/specs/pdf/mixnet.pdf</a>.
+
+<span id="KATZMIXPKI"></span><span class="bold">**KATZMIXPKI**</span>
+
+Angel, Y., Piotrowska, A., Stainton, D., <span class="quote">“<span class="quote">Katzenpost Mix Network Public Key Infrastructure Specification</span>”</span>, December 2017, <a href="https://katzenpost.network/docs/specs/pdf/pki.pdf" class="link" target="_top">https://katzenpost.network/docs/specs/pdf/pki.pdf</a>.
+
+<span id="RFC2119"></span><span class="bold">**RFC2119**</span>
+
+Bradner, S., <span class="quote">“<span class="quote">Key words for use in RFCs to Indicate Requirement
+Levels</span>”</span>, BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997, <a href="http://www.rfc-editor.org/info/rfc2119" class="link" target="_top">http://www.rfc-editor.org/info/rfc2119</a>.
+
+<span id="RFC6234"></span><span class="bold">**RFC6234**</span>
+
+Eastlake 3rd, D. and T. Hansen, <span class="quote">“<span class="quote">US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF)</span>”</span>, RFC 6234, DOI 10.17487/RFC6234, May 2011,
+<a href="https://www.rfc-editor.org/info/rfc6234" class="link" target="_top">https://www.rfc-editor.org/info/rfc6234</a>.
+
+<span id="RFC7748"></span><span class="bold">**RFC7748**</span>
+
+Langley, A., Hamburg, M., and S. Turner, <span class="quote">“<span class="quote">Elliptic Curves for Security</span>”</span>, RFC 7748, January 2016,
+<a href="https://www.rfc-editor.org/info/rfc7748" class="link" target="_top">https://www.rfc-editor.org/info/rfc7748</a>.
+
+<span id="SEDA"></span><span class="bold">**SEDA**</span>
+
+Welsh, M., Culler, D., Brewer, E., <span class="quote">“<span class="quote">SEDA: An Architecture
+for Well-Conditioned, Scalable Internet Services</span>”</span>, 2001, ACM
+Symposium on Operating Systems Principles,
+<a href="http://www.sosp.org/2001/papers/welsh.pdf" class="link" target="_top">http://www.sosp.org/2001/papers/welsh.pdf</a>.
+
+<span id="SPHINX09"></span><span class="bold">**SPHINX09**</span>
+
+Danezis, G., Goldberg, I., <span class="quote">“<span class="quote">Sphinx: A Compact and Provably Secure Mix
+Format</span>”</span>, DOI 10.1109/SP.2009.15, May 2009, <a href="https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf" class="link" target="_top">https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf</a>.
+
+<span id="SPHINXSPEC"></span><span class="bold">**SPHINXSPEC**</span>
+
+Angel, Y., Danezis, G., Diaz, C., Piotrowska, A., Stainton, D., <span class="quote">“<span class="quote">Sphinx Mix Network Cryptographic Packet Format Specification</span>”</span>, July 2017,
+<a href="https://katzenpost.network/docs/specs/pdf/sphinx.pdf" class="link" target="_top">https://katzenpost.network/docs/specs/pdf/sphinx.pdf</a>.
+
+</div>
+
+</div>

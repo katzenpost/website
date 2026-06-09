@@ -1,19 +1,19 @@
 ---
-title: "Wire protocol"
+title: ""
 linkTitle: "Wire protocol"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:25:36.390246469-07:00"
+date: "2026-06-02T10:58:49.751573055-07:00"
 draft: "false"
-slug: "wire_protocol"
+slug: "wireprotocol"
 layout: ""
 type: ""
-weight: "1"
+weight: "65"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-## <span id="wire_protocol"></span>Katzenpost mix network wire protocol
+## <span id="wire_protocol"></span>Mix network wire protocol specification
 
 </div>
 
@@ -51,7 +51,7 @@ version: ""
 
 **Abstract**
 
-This document defines the Katzenpost Mix Network Wire Protocol for use in all
+This document defines the Katzenpost mix network wire protocol for use in all
 network communications to, from, and within the Katzenpost Mix Network.
 
 </div>
@@ -64,44 +64,6 @@ network communications to, from, and within the Katzenpost Mix Network.
 
 </div>
 
-<div class="toc">
-
-**Table of Contents**
-
-<span class="section">[1.1 Conventions Used in This Document](#conventions-used-in-this-document)</span>
-
-<span class="section">[1. Introduction](#wire_protocol_introduction)</span>
-
-<span class="section">[1.2 Key Encapsulation Mechanism](#key-encapsulation-mechanism)</span>
-
-<span class="section">[2. Core Protocol](#core-protocol)</span>
-
-<span class="section">[2.1 Handshake Phase](#handshake-phase)</span>
-
-<span class="section">[2.1.1 Handshake Authentication](#handshake-authentication)</span>
-
-<span class="section">[2.2 Data Transfer Phase](#data-transfer-phase)</span>
-
-<span class="section">[3. Predefined Commands](#predefined-commands)</span>
-
-<span class="section">[3.1 The no_op Command](#the-no_op-command)</span>
-
-<span class="section">[3.2 The disconnect Command](#the-disconnect-command)</span>
-
-<span class="section">[3.3 The send_packet Command](#the-send_packet-command)</span>
-
-<span class="section">[4. Command Padding](#command-padding)</span>
-
-<span class="section">[5. Anonymity Considerations](#anonymity-considerations)</span>
-
-<span class="section">[6. Security Considerations](#security-considerations)</span>
-
-<span class="section">[Acknowledgments](#acknowledgments)</span>
-
-<span class="section">[References](#appendix-a.-references)</span>
-
-</div>
-
 <div class="section">
 
 <div class="titlepage">
@@ -110,7 +72,7 @@ network communications to, from, and within the Katzenpost Mix Network.
 
 <div>
 
-## <span id="conventions-used-in-this-document"></span>1.1 Conventions Used in This Document
+### <span id="conventions-used-in-this-document"></span>Conventions used in this document
 
 </div>
 
@@ -138,7 +100,7 @@ cryptographic attributes, which are specified as opaque byte vectors.
 
 <div>
 
-## <span id="wire_protocol_introduction"></span>1. Introduction
+### <span id="wire_protocol_introduction"></span>Introduction
 
 </div>
 
@@ -146,12 +108,10 @@ cryptographic attributes, which are specified as opaque byte vectors.
 
 </div>
 
-The Katzenpost Mix Network Wire Protocol (KMNWP) is the custom wire protocol for
-all
-network communications to, from, and within the Katzenpost Mix Network. This protocol
-provides mutual authentication, and an additional layer of cryptographic security
-and
-forward secrecy.
+The Katzenpost mix network wire protocol (KMNWP) is the custom wire protocol for
+all network communications to, from, and within the Katzenpost mix network. This
+protocol provides mutual authentication along with an additional layer of cryptographic
+security and forward secrecy.
 
 <div class="section">
 
@@ -161,7 +121,7 @@ forward secrecy.
 
 <div>
 
-### <span id="key-encapsulation-mechanism"></span>1.2 Key Encapsulation Mechanism
+#### <span id="key-encapsulation-mechanism"></span>Key encapsulation mechanism
 
 </div>
 
@@ -169,8 +129,8 @@ forward secrecy.
 
 </div>
 
-This protocol uses ANY Key Encapsulation Mechanism. However it’s recommended that
-most users select a hybrid post quantum KEM such as Xwing. <a href="#XWING" class="xref">the section called “References”</a>
+This protocol uses ANY key encapsulation mechanism. However, it is recommended
+that most users select a hybrid post-quantum KEM such as Xwing. <a href="#XWING" class="xref">the section called “References”</a>
 
 </div>
 
@@ -184,7 +144,7 @@ most users select a hybrid post quantum KEM such as Xwing. <a href="#XWING" clas
 
 <div>
 
-## <span id="core-protocol"></span>2. Core Protocol
+### <span id="core-protocol"></span>Core protocol
 
 </div>
 
@@ -192,11 +152,11 @@ most users select a hybrid post quantum KEM such as Xwing. <a href="#XWING" clas
 
 </div>
 
-The protocol is based on Kyber and Trevor Perrin’s Noise Protocol Framework <a href="#NOISE" class="xref">the section called “References”</a> along with <span class="quote">“<span class="quote">Post Quantum Noise</span>”</span> paper <a href="#PQNOISE" class="link">PQNOISE</a>. Older previous versions of our transport were
+The protocol is based on Kyber and Trevor Perrin’s Noise protocol framework <a href="#NOISE" class="xref">the section called “References”</a> along with <span class="quote">“<span class="quote">Post Quantum Noise</span>”</span> paper <a href="#PQNOISE" class="link">PQNOISE</a>. Older previous versions of our transport were
 based on <a href="#NOISEHFS" class="link">NOISEHFS</a>.
 
 Our transport protocol begins with a prologue, Noise handshake, followed by a stream
-of Noise Transport messages in a minimal framing layer, over a TCP/IP connection.
+of Noise transport messages in a minimal framing layer, over a TCP/IP connection.
 
 Our Noise protocol is configurable via the KEM selection in the TOML configuration
 files, here’s an example PQ Noise protocol string:
@@ -206,18 +166,17 @@ Noise_pqXX_Xwing_ChaChaPoly_BLAKE2b
 ```
 
 The protocol string is a very condensed description of our protocol. We use the pqXX
-two way Noise pattern which is described as follows:
+two-way Noise pattern which is described as follows:
 
 ``` programlisting
 pqXX: -> e <- ekem, s -> skem, s <- skem
 ```
 
-The next part of the protocol string specifies the KEM, `Xwing`
-which is a hybrid KEM where the share secret outputs of both X25519 and MLKEM768 are
-combined.
+The next part of the protocol string specifies the KEM, `Xwing` which is a
+hybrid KEM where the share secret outputs of both X25519 and MLKEM768 are combined.
 
-Finally the `ChaChaPoly_BLAKE2b` parts of the protocol string
-indicate which stream cipher and hash function we are using.
+Finally the `ChaChaPoly_BLAKE2b` parts of the protocol string indicate
+which stream cipher and hash function we are using.
 
 As a non-standard modification to the Noise protocol, the 65535 byte message length
 limit is increased to 1300000 bytes. We send very large messages over our Noise protocol
@@ -237,7 +196,7 @@ is beyond the scope of this document.
 
 <div>
 
-### <span id="handshake-phase"></span>2.1 Handshake Phase
+#### <span id="handshake-phase"></span>Handshake phase
 
 </div>
 
@@ -245,11 +204,11 @@ is beyond the scope of this document.
 
 </div>
 
-All sessions start in the Handshake Phase, in which an anonymous authenticated
-handshake is conducted.
+All sessions start in the <span class="emphasis">*handshake phase*</span>, in which an
+anonymous authenticated handshake is conducted.
 
-The handshake is a unmodified Noise handshake, with a fixed prologue prefacing
-the initiator's first Noise handshake message. This prologue is also used as the
+The handshake is a unmodified Noise handshake, with a fixed prologue prefacing the
+initiator's first Noise handshake message. This prologue is also used as the
 `prologue` input to the Noise HandshakeState
 `Initialize()` operation for both the initiator and responder.
 
@@ -261,11 +220,11 @@ uint8_t protocol_version; /* 0x03 */
 } Prologue;
 ```
 
-As all Noise handshake messages are fixed sizes, no additional framing is
-required for the handshake.
+As all Noise handshake messages are fixed sizes, no additional framing is required
+for the handshake.
 
-Implementations MUST preserve the Noise handshake hash `[h]` for
-the purpose of implementing authentication (Section 2.3).
+Implementations MUST preserve the Noise handshake hash `[h]` for the
+purpose of implementing authentication (Section 2.3).
 
 Implementations MUST reject handshake attempts by terminating the session
 immediately upon any Noise protocol handshake failure and when, as a responder, they
@@ -284,7 +243,7 @@ SHOULD terminate sessions that are taking too long to handshake.
 
 <div>
 
-### <span id="handshake-authentication"></span>2.1.1 Handshake Authentication
+#### <span id="handshake-authentication"></span>Handshake authentication
 
 </div>
 
@@ -313,31 +272,31 @@ Where:
 - `additional_data` - Optional additional data, such as a
   username, if any.
 
-- `unix_time` - 0 for the initiator, the approximate number
-  of seconds since 1970-01-01 00:00:00 UTC for the responder.
+- `unix_time` - 0 for the initiator, the approximate number of
+  seconds since 1970-01-01 00:00:00 UTC for the responder.
 
 </div>
 
-The initiator MUST send the `AuthenticateMessage` after it has
-received the peer's response (so after `-> s, se` in Noise
-parlance).
+The initiator MUST send the `AuthenticateMessage` after it has received
+the peer's response (so after `-> s, se` in Noise parlance).
 
-The contents of the optional `additional_data` field is
-deliberately left up to the implementation, however it is RECOMMENDED that
-implementations pad the field to be a consistent length regardless of contents to
-avoid leaking information about the authenticating identity.
+The contents of the optional `additional_data` field is deliberately
+left up to the implementation, however it is RECOMMENDED that implementations pad
+the field to be a consistent length regardless of contents to avoid leaking
+information about the authenticating identity.
 
-To authenticate the remote peer given an AuthenticateMessage, the receiving peer
-must validate the `s` component of the Noise handshake (the remote
-peer's long term public key) with the known value, along with any of the information
-in the `additional_data` field such as the user name, if any.
+To authenticate the remote peer given an `AuthenticateMessage`, the
+receiving peer must validate the `s` component of the Noise handshake
+(the remote peer's long-term public key) with the known value, along with any of the
+information in the `additional_data` field such as the user name, if any.
 
-If the validation procedure succeeds, the peer is considered authenticated. If
-the validation procedure fails for any reason, the session MUST be terminated
+If the validation procedure succeeds, the peer is considered authenticated. If the
+validation procedure fails for any reason, the session MUST be terminated
 immediately.
 
 Responders MAY add a slight amount (+- 10 seconds) of random noise to the
-unix_time value to avoid leaking precise load information via packet queueing delay.
+`unix_time` value to avoid leaking precise load information via
+packet queueing delay.
 
 </div>
 
@@ -349,7 +308,7 @@ unix_time value to avoid leaking precise load information via packet queueing de
 
 <div>
 
-### <span id="data-transfer-phase"></span>2.2 Data Transfer Phase
+#### <span id="data-transfer-phase"></span>Data transfer phase
 
 </div>
 
@@ -357,8 +316,9 @@ unix_time value to avoid leaking precise load information via packet queueing de
 
 </div>
 
-Upon successfully concluding the handshake the session enters the Data Transfer
-Phase, where the initiator and responder can exchange KMNWP messages.
+Upon successfully concluding the handshake the session enters the <span class="emphasis">*data
+transfer phase*</span>, where the initiator and responder can exchange KMNWP
+messages.
 
 A KMNWP message is defined to be the following structure:
 
@@ -384,8 +344,7 @@ Notes:
 
 <div class="itemizedlist">
 
-- The padding field, if any MUST be padded with `'0x00'`
-  bytes.
+- The padding field, if any MUST be padded with `'0x00'` bytes.
 
 </div>
 
@@ -406,17 +365,16 @@ Notes:
 
 <div class="itemizedlist">
 
-- The `ciphertext_length` field includes the Noise
-  protocol overhead of 16 bytes, for the Noise Transport message containing
-  the Ciphertext.
+- The `ciphertext_length` field includes the Noise protocol
+  overhead of 16 bytes, for the Noise Transport message containing the
+  Ciphertext.
 
 </div>
 
 All outgoing Message(s) are preceded by a Noise Transport Message containing a
 `CiphertextHeader`, indicating the size of the Noise Transport
 Message transporting the Message Ciphertext. After generating both Noise Transport
-Messages, the sender MUST call the Noise CipherState `Rekey()`
-operation.
+Messages, the sender MUST call the Noise CipherState `Rekey()` operation.
 
 To receive incoming Ciphertext messages, first the Noise Transport Message
 containing the CiphertextHeader is consumed off the network, authenticated and
@@ -432,8 +390,8 @@ Implementations MUST immediately terminate the session any of the
 Implementations MUST immediately terminate the session if an unknown command is
 received in a Message, or if the Message is otherwise malformed in any way.
 
-Implementations MAY impose a reasonable idle timeout, and terminate the session
-if it expires.
+Implementations MAY impose a reasonable idle timeout, and terminate the session if
+it expires.
 
 </div>
 
@@ -447,7 +405,7 @@ if it expires.
 
 <div>
 
-## <span id="predefined-commands"></span>3. Predefined Commands
+### <span id="predefined-commands"></span>Predefined commands
 
 </div>
 
@@ -463,7 +421,7 @@ if it expires.
 
 <div>
 
-### <span id="the-no_op-command"></span>3.1 The no_op Command
+#### <span id="the-no_op-command"></span>The <span class="emphasis">*no_op*</span> command
 
 </div>
 
@@ -471,9 +429,9 @@ if it expires.
 
 </div>
 
-The `no_op` command is a command that explicitly is a No
-Operation, to be used to implement functionality such as keep-alives and or
-application layer padding.
+The `no_op` command is a command that explicitly is a No Operation, to
+be used to implement functionality such as keep-alives and or application layer
+padding.
 
 Implementations MUST NOT send any message payload accompanying this command, and
 all received command data MUST be discarded without interpretation.
@@ -488,7 +446,7 @@ all received command data MUST be discarded without interpretation.
 
 <div>
 
-### <span id="the-disconnect-command"></span>3.2 The disconnect Command
+#### <span id="the-disconnect-command"></span>The disconnect command
 
 </div>
 
@@ -496,10 +454,10 @@ all received command data MUST be discarded without interpretation.
 
 </div>
 
-The `disconnect` command is a command that is used to signal
-explicit session termination. Upon receiving a disconnect command, implementations
-MUST interpret the command as a signal from the peer that no additional commands
-will be sent, and destroy the cryptographic material in the receive CipherState.
+The disconnect command is a command that is used to signal explicit session
+termination. Upon receiving a disconnect command, implementations MUST interpret the
+command as a signal from the peer that no additional commands will be sent, and
+destroy the cryptographic material in the receive CipherState.
 
 While most implementations will likely wish to terminate the session upon
 receiving this command, any additional behavior is explicitly left up to the
@@ -518,7 +476,7 @@ MUST not send any further traffic after sending a disconnect command.
 
 <div>
 
-### <span id="the-send_packet-command"></span>3.3 The send_packet Command
+#### <span id="the-send_packet-command"></span>The send_packet command
 
 </div>
 
@@ -526,12 +484,12 @@ MUST not send any further traffic after sending a disconnect command.
 
 </div>
 
-The `send_packet` command is the command that is used by the
+The <span class="command">**send_packet**</span> command is the command that is used by the
 initiator to transmit a Sphinx Packet over the network. The command’s message is the
-Sphinx Packet destined for the responder.
+Sphinx packet destined for the responder.
 
 Initiators MUST terminate the session immediately upon reception of a
-`send_packet` command.
+<span class="command">**send_packet**</span> command.
 
 </div>
 
@@ -545,7 +503,7 @@ Initiators MUST terminate the session immediately upon reception of a
 
 <div>
 
-## <span id="command-padding"></span>4. Command Padding
+### <span id="command-padding"></span>Command padding
 
 </div>
 
@@ -553,34 +511,43 @@ Initiators MUST terminate the session immediately upon reception of a
 
 </div>
 
-We use traffic padding to hide from a passive network observer which command has
-been
-sent or received.
+We use traffic padding to prevent a passive network observer from observing what
+command has been sent or received. The following commands are padded:
 
-Among the set of padded commands we exclude the `Consensus` command
-because it’s contents are a very large payload which is usually many times larger
-than
-our Sphinx packets. Therefore we only pad these commands:
+<span class="bold">**Client-to-server commands**</span>
 
-GetConsensus NoOp Disconnect SendPacket RetrieveMessage MessageACK Message
-MessageEmpty
+<div class="itemizedlist">
 
-However we split them up into two directions, client to server and server to client
-because they differ in size due to the difference in size between
-`SendPacket` and `Message`:
+- <span class="command">**GetConsensus**</span>
 
-Client to Server commands:
+- <span class="command">**NoOp**</span>
 
-NoOp SendPacket Disconnect RetrieveMessage GetConsensus
+- <span class="command">**Disconnect**</span>
 
-Server to client commands:
+- <span class="command">**SendPacket**</span>
 
-Message MessageACK MessageEmpty
+- <span class="command">**RetrieveMessage**</span>
 
-The `GetConsensus` command is a special case because we only want to
-pad it when it’s sent over the mixnet. We don’t want to pad it when sending to the
-dirauths. Although it would not be so terrible if it’s padded when sent to the dirauths…
-it would just needlessly take up bandwidth without providing any privacy benefits.
+</div>
+
+<span class="bold">**Server-to-client commands**</span>
+
+<div class="itemizedlist">
+
+- <span class="command">**MessageACK**</span>
+
+- <span class="command">**Message**</span>
+
+- <span class="command">**MessageEmpty**</span>
+
+</div>
+
+We exclude the <span class="command">**Consensus**</span> command because its contents are a very
+large payload that is usually many times larger than our Sphinx packets.
+
+The <span class="command">**GetConsensus**</span> command is a special case because we only pad it
+when sending it over the mixnet. We don’t pad it when sending to directory authorities,
+because that would needlessly take up bandwidth without providing privacy benefits.
 
 </div>
 
@@ -592,7 +559,7 @@ it would just needlessly take up bandwidth without providing any privacy benefit
 
 <div>
 
-## <span id="anonymity-considerations"></span>5. Anonymity Considerations
+### <span id="anonymity-considerations"></span>Anonymity considerations
 
 </div>
 
@@ -600,8 +567,7 @@ it would just needlessly take up bandwidth without providing any privacy benefit
 
 </div>
 
-Adversaries being able to determine that two parties are communicating via KMNWP
-is
+Adversaries being able to determine that two parties are communicating via KMNWP is
 beyond the threat model of this protocol. At a minimum, it is trivial to determine
 that
 a KMNWP handshake is being performed, due to the length of each handshake message,
@@ -618,7 +584,7 @@ the fixed positions of the various public keys.
 
 <div>
 
-## <span id="security-considerations"></span>6. Security Considerations
+### <span id="security-considerations"></span>Security considerations
 
 </div>
 
@@ -645,7 +611,7 @@ that large scale quantum computers are applied to historical intercepts.
 
 <div>
 
-## <span id="acknowledgments"></span>Acknowledgments
+### <span id="acknowledgments"></span>Acknowledgments
 
 </div>
 
@@ -666,20 +632,13 @@ protocol, and answering questions regarding Noise.
 
 <div>
 
-## <span id="appendix-a.-references"></span>References
+### <span id="appendix-a.-references"></span>References
 
 </div>
 
 </div>
 
 </div>
-
-<span id="XWING"></span><span class="bold">**XWING**</span>
-
-Manuel Barbosa, Deirdre Connolly, João Diogo Duarte, Aaron Kaiser, Peter Schwabe,
-Karoline Varner, Bas Westerbaan, <span class="quote">“<span class="quote">X-Wing: The Hybrid KEM You’ve Been Looking
-For</span>”</span>,
-<a href="https://eprint.iacr.org/2024/039.pdf" class="link" target="_top">https://eprint.iacr.org/2024/039.pdf</a>.
 
 <span id="NOISE"></span><span class="bold">**NOISE**</span>
 
@@ -711,6 +670,13 @@ Version 1.2</span>”</span>, RFC 5246, DOI 10.17487/RFC5246, August 2008, <a hr
 
 Langley, A., Hamburg, M., and S. Turner, <span class="quote">“<span class="quote">Elliptic Curves for Security</span>”</span>, RFC 7748, January 2016,
 <a href="https://www.rfc-editor.org/info/rfc7748" class="link" target="_top">https://www.rfc-editor.org/info/rfc7748</a>.
+
+<span id="XWING"></span><span class="bold">**XWING**</span>
+
+Manuel Barbosa, Deirdre Connolly, João Diogo Duarte, Aaron Kaiser, Peter Schwabe,
+Karoline Varner, Bas Westerbaan, <span class="quote">“<span class="quote">X-Wing: The Hybrid KEM You’ve Been Looking
+For</span>”</span>,
+<a href="https://eprint.iacr.org/2024/039.pdf" class="link" target="_top">https://eprint.iacr.org/2024/039.pdf</a>.
 
 </div>
 

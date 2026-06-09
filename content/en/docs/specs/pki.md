@@ -1,19 +1,19 @@
 ---
-title: "Public key infrastructure"
+title: ""
 linkTitle: "Public key infrastructure"
 description: ""
 author: ""
 url: ""
-date: "2026-05-11T21:21:55.199829788-07:00"
+date: "2026-06-02T10:58:33.173836774-07:00"
 draft: "false"
 slug: "pki"
 layout: ""
 type: ""
-weight: "1"
+weight: "45"
 version: ""
 ---
 
-<div class="article">
+<div class="section">
 
 <div class="titlepage">
 
@@ -21,7 +21,7 @@ version: ""
 
 <div>
 
-# <span id="pki"></span>Public key infrastructure
+## <span id="pki"></span>Public key infrastructure specification
 
 </div>
 
@@ -69,6 +69,8 @@ version: ""
 
 **Abstract**
 
+to do
+
 </div>
 
 </div>
@@ -76,102 +78,6 @@ version: ""
 </div>
 
 ------------------------------------------------------------------------
-
-</div>
-
-<div class="toc">
-
-**Table of Contents**
-
-<span class="section">[Terminology](#terminology)</span>
-
-<span class="section">[Conventions used in this document](#conventions-used-in-this-document)</span>
-
-<span class="section">[1. Introduction](#pki_introduction)</span>
-
-<span class="section">[1.2 Security properties overview](#security-properties-overview)</span>
-
-<span class="section">[1.3 Differences from Tor and Mixminion directory authority systems](#differences-from-tor-and-mixminion-directory-authority-systems)</span>
-
-<span class="section">[2. Overview of mix PKI interaction](#overview-of-mix-pki-interaction)</span>
-
-<span class="section">[2.1 PKI protocol schedule](#pki-protocol-schedule)</span>
-
-<span class="section">[2.1.1 Directory authority server schedule](#directory-authority-server-schedule)</span>
-
-<span class="section">[2.1.2 Mix schedule](#mix-schedule)</span>
-
-<span class="section">[3. Voting for consensus protocol](#voting-for-consensus-protocol)</span>
-
-<span class="section">[3.1 Protocol messages](#protocol-messages)</span>
-
-<span class="section">[3.1.1 Mix descriptor and directory signing](#mix-descriptor-and-directory-signing)</span>
-
-<span class="section">[3.2 Vote exchange](#vote-exchange)</span>
-
-<span class="section">[3.3 Reveal exchange](#reveal-exchange)</span>
-
-<span class="section">[3.4 Cert exchange](#cert-exchange)</span>
-
-<span class="section">[3.5 Vote tabulation for consensus computation](#vote-tabulation-for-consensus-computation)</span>
-
-<span class="section">[3.6 Signature collection](#signature-collection)</span>
-
-<span class="section">[3.7 Publication](#publication)</span>
-
-<span class="section">[4. PKI Protocol data structures](#pki-protocol-data-structures)</span>
-
-<span class="section">[4.1 Mix descriptor format](#mix-descriptor-format)</span>
-
-<span class="section">[4.1.1 Scheduling mix downtime](#scheduling-mix-downtime)</span>
-
-<span class="section">[4.2 Directory format](#directory-format)</span>
-
-<span class="section">[4.3 Shared random value structure](#shared-random-value-structure)</span>
-
-<span class="section">[5. PKI wire protocol](#pki-wire-protocol)</span>
-
-<span class="section">[5.1 Mix descriptor publication](#mix-descriptor-publication)</span>
-
-<span class="section">[5.1.1 The post_descriptor command](#the-post_descriptor-command)</span>
-
-<span class="section">[5.1.2 The post_descriptor_status command](#the-post_descriptor_status-command)</span>
-
-<span class="section">[6. Voting](#voting)</span>
-
-<span class="section">[6.1. The vote command](#the-vote-command)</span>
-
-<span class="section">[6.2. The vote_status command](#the-vote_status-command)</span>
-
-<span class="section">[6.3. The get_vote command](#the-get_vote-command)</span>
-
-<span class="section">[7. Retrieval of consensus](#retrieval-of-consensus)</span>
-
-<span class="section">[7.1 The get_consensus command](#the-get_consensus-command)</span>
-
-<span class="section">[7.2 The consensus command](#the-consensus-command)</span>
-
-<span class="section">[7.3. The Cert command](#the-cert-command)</span>
-
-<span class="section">[7.4. The CertStatus command](#the-certstatus-command)</span>
-
-<span class="section">[8. Signature exchange](#signature-exchange)</span>
-
-<span class="section">[8.1. The sig command](#the-sig-command)</span>
-
-<span class="section">[8.2. The sig_status command](#the-sigstatus-command)</span>
-
-<span class="section">[9. Scalability considerations](#scalability-considerations)</span>
-
-<span class="section">[10. Future work](#future-work)</span>
-
-<span class="section">[11. Anonymity considerations](#anonymity-considerations)</span>
-
-<span class="section">[12. Security considerations](#security-considerations)</span>
-
-<span class="section">[Acknowledgements](#acknowledgements)</span>
-
-<span class="section">[References](#appendix-a.-references)</span>
 
 </div>
 
@@ -183,7 +89,7 @@ version: ""
 
 <div>
 
-## <span id="terminology"></span>Terminology
+### <span id="terminology"></span>Terminology
 
 </div>
 
@@ -195,36 +101,34 @@ The following terms are used in this specification.
 
 <div class="variablelist">
 
-<span class="term"><span class="bold">**PKI**</span></span>  
-Public key infrastructure
-
 <span class="term"><span class="bold">**directory authority system**</span></span>  
-Refers to specific PKI schemes used by Mixminion and Tor.
+Refers to PKI schemes used by Mixminion and Tor.
+
+<span class="term"><span class="bold">**family**</span></span>  
+Identifier of security domains or entities operating one or more mix nodes in
+the network. This is used to inform the path selection algorithm.
+
+<span class="term"><span class="bold">**gateway**</span></span>  
+A mix node on the edge of the mixnet that is the first hop for messages coming from
+clients.
+The gateway authenticates client connections and queues reply messages (SURBs) for
+retrieval.
+
+<span class="term"><span class="bold">**layer**</span></span>  
+The layer value indicates which network topology layer a particular mix node resides
+in.
+
+<span class="term"><span class="bold">**mix descriptor**</span></span>  
+A database record that describes a mixnet server component.
 
 <span class="term"><span class="bold">**MSL**</span></span>  
 Maximum segment lifetime, currently set to 120 seconds.
 
-<span class="term"><span class="bold">**mix descriptor**</span></span>  
-A database record which describes a component mix.
-
-<span class="term"><span class="bold">**family**</span></span>  
-Identifier of security domains or entities operating one or more mixes in
-the network. This is used to inform the path selection algorithm.
-
 <span class="term"><span class="bold">**nickname**</span></span>  
-A nickname string that is unique in the consensus document, see Katzenpost
-Mix Network Specification section 2.2. Network Topology.
+A component nickname string that must be unique in the consensus document.
 
-<span class="term"><span class="bold">**layer**</span></span>  
-The layer indicates which network topology layer a particular mix resides
-in.
-
-<span class="term"><span class="bold">**provider**</span></span>  
-A service operated by a third party that Clients communicate directly with
-to communicate with the Mixnet. It is responsible for Client authentication,
-forwarding outgoing messages to the Mixnet, and storing incoming messages
-for the Client. The Provider MUST have the ability to perform cryptographic
-operations on the relayed messages.
+<span class="term"><span class="bold">**PKI**</span></span>  
+Public key infrastructure.
 
 </div>
 
@@ -238,7 +142,7 @@ operations on the relayed messages.
 
 <div>
 
-## <span id="conventions-used-in-this-document"></span>Conventions used in this document
+### <span id="conventions-used-in-this-document"></span>Conventions used in this document
 
 </div>
 
@@ -264,7 +168,7 @@ additional cryptographic wire protocol commands. <a href="#KATZMIXWIRE" class="l
 
 <div>
 
-## <span id="pki_introduction"></span>1. Introduction
+### <span id="pki_introduction"></span>Introduction
 
 </div>
 
@@ -272,9 +176,9 @@ additional cryptographic wire protocol commands. <a href="#KATZMIXWIRE" class="l
 
 </div>
 
-Mixnets are designed with the assumption that a Public Key Infrastructure (PKI)
+Mixnets are designed with the assumption that a public key infrastructure (PKI)
 exists and it gives each client the same view of the network. This specification is
-inspired by the Tor and Mixminion Directory Authority systems <a href="#MIXMINIONDIRAUTH" class="link">MIXMINIONDIRAUTH</a><a href="#TORDIRAUTH" class="link">TORDIRAUTH</a> whose main features are precisely what we
+inspired by the Tor and Mixminion directory authority systems <a href="#MIXMINIONDIRAUTH" class="link">MIXMINIONDIRAUTH</a><a href="#TORDIRAUTH" class="link">TORDIRAUTH</a> whose main features are precisely what we
 need for our PKI. These are decentralized systems meant to be collectively operated
 by
 multiple entities.
@@ -283,15 +187,15 @@ The mix network directory authority system (PKI) is essentially a cooperative
 decentralized database and voting system that is used to produce network consensus
 documents which mix clients periodically retrieve and use for their path selection
 algorithm when creating Sphinx packets. These network consensus documents are derived
-from a voting process between the Directory Authority servers.
+from a voting process between the directory authority servers.
 
 This design prevents mix clients from using only a partial view of the network for
 their path selection so as to avoid fingerprinting and bridging attacks <a href="#FINGERPRINTING" class="link">FINGERPRINTING</a>, <a href="#BRIDGING" class="link">BRIDGING</a>, and <a href="#LOCALVIEW" class="link">LOCALVIEW</a>.
 
-The PKI is also used by Authority operators to specify network-wide parameters, for
-example in the Katzenpost Decryption Mix Network <a href="#KATZMIXNET" class="link">KATZMIXNET</a> the Poisson mix strategy is used and, therefore, all clients must
+The PKI is also used by authority operators to specify network-wide parameters, for
+example in the Katzenpost decryption mix network <a href="#KATZMIXNET" class="link">KATZMIXNET</a> the Poisson mix strategy is used and, therefore, all clients must
 use the same lambda parameter for their exponential distribution function when choosing
-hop delays in the path selection. The Mix Network Directory Authority system, aka
+hop delays in the path selection. The mix network directory authority system, aka
 PKI,
 SHALL be used to distribute such network-wide parameters in the network consensus
 document that have an impact on security and performance.
@@ -304,7 +208,7 @@ document that have an impact on security and performance.
 
 <div>
 
-### <span id="security-properties-overview"></span>1.2 Security properties overview
+#### <span id="security-properties-overview"></span>Security properties overview
 
 </div>
 
@@ -312,15 +216,15 @@ document that have an impact on security and performance.
 
 </div>
 
-This Directory Authority system has the following feature goals and security
+This directory authority system has the following feature goals and security
 properties:
 
 <div class="itemizedlist">
 
-- All Directory Authority servers must agree with each other on the set of
-  Directory Authorities.
+- All directory authority servers must agree with each other on the set of
+  directory authorities.
 
-- All Directory Authority servers must agree with each other on the set of
+- All directory authority servers must agree with each other on the set of
   mixes.
 
 - This system is intentionally designed to provide identical network
@@ -329,7 +233,7 @@ properties:
   bridge attacks <a href="#FINGERPRINTING" class="link">FINGERPRINTING</a><a href="#BRIDGING" class="link">BRIDGING</a>.
 
 - This system is NOT byzantine-fault-tolerant, it instead allows for manual
-  intervention upon consensus fault by the Directory Authority operators.
+  intervention upon consensus fault by the directory authority operators.
   Further, these operators are responsible for expelling bad acting operators
   from the system.
 
@@ -338,7 +242,7 @@ properties:
   network by authenticating all descriptor signatures with a list of allowed
   public keys.
 
-- The Directory Authority system for a given mix network is essentially the
+- The directory authority system for a given mix network is essentially the
   root of all authority.
 
 </div>
@@ -353,7 +257,7 @@ properties:
 
 <div>
 
-### <span id="differences-from-tor-and-mixminion-directory-authority-systems"></span>1.3 Differences from Tor and Mixminion directory authority systems
+#### <span id="differences-from-tor-and-mixminion-directory-authority-systems"></span>Differences from Tor and Mixminion directory authority systems
 
 </div>
 
@@ -361,28 +265,28 @@ properties:
 
 </div>
 
-In this document we specify a Directory Authority system which is different from
+In this document we specify a directory authority system which is different from
 that of Tor's and Mixminion’s in a number of ways:
 
 <div class="itemizedlist">
 
-- The list of valid mixes is expressed in an allowlist. For the time being
+- The list of valid mixes is expressed in an allow-list. For the time being
   there is no specified <span class="quote">“<span class="quote">bandwidth authority</span>”</span> system which
   verifies the health of mixes (Further research required in this area).
 
-- There’s no non-directory channel to inform clients that a node is down,
-  so it will end up being a lot of packet loss, since clients will continue to
+- There’s no non-directory channel to inform clients that a node is down, so
+  it will end up being a lot of packet loss, since clients will continue to
   include the missing node in their path selection until keys published by the
   node expire and it falls out of the consensus.
 
-- The schema of the mix descriptors is different from that used in
-  Mixminion and Tor, including a change which allows our mix descriptor to
-  express <span class="emphasis">*n*</span> Sphinx mix routing public keys in a single
-  mix descriptor whereas in the Tor and Mixminion Directory Authority systems,
+- The schema of the mix descriptors is different from that used in Mixminion
+  and Tor, including a change which allows our mix descriptor to express
+  <span class="emphasis">*n*</span> Sphinx mix routing public keys in a single mix
+  descriptor whereas in the Tor and Mixminion directory authority systems,
   <span class="emphasis">*n*</span> descriptors are used.
 
-- The serialization format of mix descriptors is different from that used
-  in Mixminion and Tor.
+- The serialization format of mix descriptors is different from that used in
+  Mixminion and Tor.
 
 - The shared random number computation is performed every voting round, and
   is required for a vote to be accepted by each authority. The shared random
@@ -402,7 +306,7 @@ that of Tor's and Mixminion’s in a number of ways:
 
 <div>
 
-## <span id="overview-of-mix-pki-interaction"></span>2. Overview of mix PKI interaction
+### <span id="overview-of-mix-pki-interaction"></span>Overview of mix PKI interaction
 
 </div>
 
@@ -410,24 +314,21 @@ that of Tor's and Mixminion’s in a number of ways:
 
 </div>
 
-Each Mix MUST rotate the key pair used for Sphinx packet processing periodically
-for
-forward secrecy reasons and to keep the list of seen packet tags short. <a href="#SPHINX09" class="link">SPHINX09</a><a href="#SPHINXSPEC" class="link">SPHINXSPEC</a> The Katzenpost Mix Network uses a fixed
+Each Mix MUST rotate the key pair used for Sphinx packet processing periodically for
+forward secrecy reasons and to keep the list of seen packet tags short. <a href="#SPHINX09" class="link">SPHINX09</a><a href="#SPHINXSPEC" class="link">SPHINXSPEC</a> The Katzenpost mix network uses a fixed
 interval (`epoch`), so that key rotations happen simultaneously
 throughout the network, at predictable times.
 
-Each Directory Authority server MUST use some time synchronization protocol in order
-to correctly use this protocol. This Directory Authority system requires time
+Each directory authority server MUST use some time synchronization protocol in order
+to correctly use this protocol. This directory authority system requires time
 synchronization to within a few minutes.
 
 Let each epoch be exactly `1200 seconds (20 minutes)` in duration,
 and the 0th Epoch begin at `2017-06-01 00:00 UTC`.
 
-To facilitate smooth operation of the network and to allow for delays that span
-across epoch boundaries, Mixes MUST publish keys to the PKI for at least 3 epochs
-in
-advance, unless the mix will be otherwise unavailable in the near future due to planned
-downtime.
+To facilitate smooth operation of the network and to allow for delays that span across
+epoch boundaries, Mixes MUST publish keys to the PKI for at least 3 epochs in advance,
+unless the mix will be otherwise unavailable in the near future due to planned downtime.
 
 At an epoch boundary, messages encrypted to keys from the previous epoch are accepted
 for a grace period of 2 minutes.
@@ -447,7 +348,7 @@ only used for sending ACK messages from the destination Provider to the sender.
 
 <div>
 
-### <span id="pki-protocol-schedule"></span>2.1 PKI protocol schedule
+#### <span id="pki-protocol-schedule"></span>PKI protocol schedule
 
 </div>
 
@@ -455,7 +356,7 @@ only used for sending ACK messages from the destination Provider to the sender.
 
 </div>
 
-There are two main constraints to Authority schedule:
+There are two main constraints to authority schedule:
 
 <div class="orderedlist">
 
@@ -483,7 +384,7 @@ and bandwidth calculations to see how bad it gets…*</span>
 
 <div>
 
-### <span id="directory-authority-server-schedule"></span>2.1.1 Directory authority server schedule
+#### <span id="directory-authority-server-schedule"></span>Directory authority server schedule
 
 </div>
 
@@ -491,7 +392,7 @@ and bandwidth calculations to see how bad it gets…*</span>
 
 </div>
 
-Directory Authority server interactions are conducted according to the following
+directory authority server interactions are conducted according to the following
 schedule, where `T` is the beginning of the current epoch, and
 `P` is the length of the epoch period.
 
@@ -519,7 +420,7 @@ schedule, where `T` is the beginning of the current epoch, and
 
 <div>
 
-### <span id="mix-schedule"></span>2.1.2 Mix schedule
+#### <span id="mix-schedule"></span>Mix schedule
 
 </div>
 
@@ -527,8 +428,8 @@ schedule, where `T` is the beginning of the current epoch, and
 
 </div>
 
-Mix PKI interactions are conducted according to the following schedule, where T
-is the beginning of the current epoch.
+Mix PKI interactions are conducted according to the following schedule, where T is
+the beginning of the current epoch.
 
 `T + P/8` - Deadline for publication of all mixes documents for the
 next epoch.
@@ -546,7 +447,7 @@ the next epoch’s keys.
 previous epoch’s keys, close connections to peers no longer listed in the PKI
 documents and erase the list of seen packet tags.
 
-Mix layer changes are controlled by the Directory Authorities and therefore a mix
+Mix layer changes are controlled by the directory authorities and therefore a mix
 can be reassigned to a different layer in our stratified topology at any new epoch.
 Mixes will maintain incoming and outgoing connections to the various nodes until all
 mix keys have expired, iff the node is still listed anywhere in the current
@@ -564,7 +465,7 @@ document.
 
 <div>
 
-## <span id="voting-for-consensus-protocol"></span>3. Voting for consensus protocol
+### <span id="voting-for-consensus-protocol"></span>Voting for consensus protocol
 
 </div>
 
@@ -572,9 +473,9 @@ document.
 
 </div>
 
-In our Directory Authority protocol, all the actors conduct their behavior according
+In our directory authority protocol, all the actors conduct their behavior according
 to a common schedule as outlined in section "2.1 PKI Protocol Schedule". The
-Directory Authority servers exchange messages to reach consensus about the network.
+directory authority servers exchange messages to reach consensus about the network.
 Other tasks they perform include collecting mix descriptor uploads from each mix for
 each key rotation epoch, voting, shared random number generation, signature exchange
 and
@@ -588,7 +489,7 @@ publishing of the network consensus documents.
 
 <div>
 
-### <span id="protocol-messages"></span>3.1 Protocol messages
+#### <span id="protocol-messages"></span>Protocol messages
 
 </div>
 
@@ -619,7 +520,7 @@ Mix descriptor and directory documents MUST be properly signed.
 
 <div>
 
-### <span id="mix-descriptor-and-directory-signing"></span>3.1.1 Mix descriptor and directory signing
+#### <span id="mix-descriptor-and-directory-signing"></span>Mix descriptor and directory signing
 
 </div>
 
@@ -628,7 +529,7 @@ Mix descriptor and directory documents MUST be properly signed.
 </div>
 
 Mixes MUST compose mix descriptors which are signed using their private identity
-key, an ed25519 key. Directories are signed by one or more Directory Authority
+key, an ed25519 key. Directories are signed by one or more directory authority
 servers using their authority key, also an ed25519 key. In all cases, signing is
 done using JWS <a href="#RFC7515" class="link">RFC7515</a>.
 
@@ -642,7 +543,7 @@ done using JWS <a href="#RFC7515" class="link">RFC7515</a>.
 
 <div>
 
-### <span id="vote-exchange"></span>3.2 Vote exchange
+#### <span id="vote-exchange"></span>Vote exchange
 
 </div>
 
@@ -650,22 +551,22 @@ done using JWS <a href="#RFC7515" class="link">RFC7515</a>.
 
 </div>
 
-As described in section <span class="quote">“<span class="quote">2.1 PKI Protocol Schedule</span>”</span>, the Directory
-Authority servers begin the voting process 1/8 of an epoch period after the start
+As described in section <span class="quote">“<span class="quote">2.1 PKI Protocol Schedule</span>”</span>, the directory
+authority servers begin the voting process 1/8 of an epoch period after the start
 of
-a new epoch. Each Authority exchanges vote directory messages with each other.
+a new epoch. Each authority exchanges vote directory messages with each other.
 
 Authorities archive votes from other authorities and make them available for
 retrieval. Upon receiving a new vote, the authority examines it for new descriptors
 and includes any valid descriptors in its view of the network.
 
-Each Authority includes in its vote a hashed value committing to a choice of a
+Each authority includes in its vote a hashed value committing to a choice of a
 random number for the vote. See section 4.3 for more details.
 
-<span class="strong">**3.2.1 Voting Wire Protocol Commands**</span>
+<span class="strong">**3.2.1 Voting wire protocol commands**</span>
 
-The Katzenpost Wire Protocol as described in `KATZMIXWIRE` is
-used by Authorities to exchange votes. We define additional wire protocol commands
+The Katzenpost wire protocol as described in `KATZMIXWIRE` is
+used by authorities to exchange votes. We define additional wire protocol commands
 for sending votes:
 
 ``` programlisting
@@ -693,20 +594,20 @@ struct {
 
 <span class="strong">**3.2.2 The vote Command**</span>
 
-The vote command is used to send a PKI document to a peer Authority during the
+The vote command is used to send a PKI document to a peer authority during the
 voting period of the PKI schedule.
 
-The payload field contains the signed and serialized PKI document representing
-the sending Authority’s vote. The public_key field contains the public identity key
-of the sending Authority which the receiving Authority can use to verify the
-signature of the payload. The epoch_number field is used by the receiving party to
-quickly check the epoch for the vote before deserializing the payload.
+The payload field contains the signed and serialized PKI document representing the
+sending authority’s vote. The public_key field contains the public identity key of
+the sending authority which the receiving authority can use to verify the signature
+of the payload. The epoch_number field is used by the receiving party to quickly
+check the epoch for the vote before deserializing the payload.
 
 Each authority MUST include its commit value for the shared random computation in
 this phase along with its signed vote. This computation is derived from the Tor
 Shared Random Subsystem, <a href="#TORSRV" class="link">TORSRV</a>.
 
-<span class="strong">**3.2.3 The vote_status Command**</span>
+<span class="strong">**3.2.3 The vote_status command**</span>
 
 The vote_status command is used to reply to a vote command. The error_code field
 indicates if there was a failure in the receiving of the PKI document.
@@ -734,7 +635,7 @@ voter to report that their vote was not accepted.
 
 <div>
 
-### <span id="reveal-exchange"></span>3.3 Reveal exchange
+#### <span id="reveal-exchange"></span>Reveal exchange
 
 </div>
 
@@ -742,13 +643,13 @@ voter to report that their vote was not accepted.
 
 </div>
 
-As described in section <span class="quote">“<span class="quote">2.1 PKI Protocol Schedule</span>”</span>, the Directory
-Authority servers exchange the reveal values after they have exchanged votes which
-contain a commit value. Each Authority exchanges reveal messages with each other.
+As described in section <span class="quote">“<span class="quote">2.1 PKI Protocol Schedule</span>”</span>, the directory
+authority servers exchange the reveal values after they have exchanged votes which
+contain a commit value. Each authority exchanges reveal messages with each other.
 
-3.3.1 Reveal Wire Protocol Commands
+3.3.1 Reveal wire protocol commands
 
-The Katzenpost Wire Protocol as described in <a href="#KATZMIXWIRE" class="link">KATZMIXWIRE</a> is used by Authorities to exchange reveal values previously
+The Katzenpost wire protocol as described in <a href="#KATZMIXWIRE" class="link">KATZMIXWIRE</a> is used by authorities to exchange reveal values previously
 committed to in their votes. We define additional wire protocol commands for
 exchanging reveals:
 
@@ -775,20 +676,20 @@ struct {
 
 <span class="strong">**3.3.2 The reveal Command**</span>
 
-The reveal command is used to send a reveal value to a peer authority during the
-reveal period of the PKI schedule.
+The <span class="command">**reveal**</span> command is used to send a reveal value to a peer
+authority during the reveal period of the PKI schedule.
 
-The payload field contains the signed and serialized reveal value. The public_key
-field contains the public identity key of the sending Authority which the receiving
-Authority can use to verify the signature of the payload. The epoch_number field is
-used by the receiving party to quickly check the epoch for the reveal before
-deserializing the payload.
+The payload field contains the signed and serialized reveal value. The
+`public_key` field contains the public identity key of the sending
+authority which the receiving authority can use to verify the signature of the
+payload. The `epoch_number` field is used by the receiving party to
+quickly check the epoch for the reveal before deserializing the payload.
 
 <span class="strong">**3.3.3 The reveal_status Command**</span>
 
-The reveal_status command is used to reply to a reveal command. The error_code
-field indicates if there was a failure in the receiving of the shared random reveal
-value.
+The <span class="command">**reveal_status**</span> command is used to reply to a
+<span class="command">**reveal**</span> command. The `error_code` field indicates
+if there was a failure in the receiving of the shared random reveal value.
 
 ``` programlisting
 enum {
@@ -803,12 +704,12 @@ missed. */
 } Errorcodes;
 ```
 
-The epoch_number field of the reveal struct is compared with the epoch that is
-currently being voted on. reveal_too_early and reveal_too_late are replied back to
-the authority to report their reveal was not accepted. The status code
-reveal_not_authorized is used if the Authority is rejected. The
-reveal_already_received is used to report that a valid reveal command was already
-received for this round.
+The `epoch_number` field of the reveal struct is compared with the
+epoch that is currently being voted on. The `reveal_too_early` and
+`reveal_too_late` codes are replied back to the authority to report
+their reveal was not accepted. The status code `reveal_not_authorized` is
+used if the authority is rejected. The `reveal_already_received` is used
+to report that a valid reveal command was already received for this round.
 
 </div>
 
@@ -820,7 +721,7 @@ received for this round.
 
 <div>
 
-### <span id="cert-exchange"></span>3.4 Cert exchange
+#### <span id="cert-exchange"></span>Cert exchange
 
 </div>
 
@@ -828,16 +729,17 @@ received for this round.
 
 </div>
 
-The Cert command is the same as a Vote but contains the set of Reveal values as
-seen by the voting peer. In order to ensure that a misconfigured or malicious
-Authority operator cannot amplify their ability to influence the threshold voting
-process, after Reveal messages have been exchanged, Authorities vote again,
-including the Reveals seen by them. Authorities may not introduce new MixDescriptors
-at this phase in the protocol.
+The <span class="command">**Cert**</span> command is the same as a <span class="command">**Vote**</span> but
+contains the set of `Reveal` values as seen by the voting peer. In order
+to ensure that a misconfigured or malicious authority operator cannot amplify their
+ability to influence the threshold voting process, after `Reveal`
+messages have been exchanged, authorities vote again, including the
+`Reveal`s seen by them. Authorities may not introduce new
+`MixDescriptor`s at this phase in the protocol.
 
-Otherwise, a consensus partition can be obtained by withholding Reveal values from
-a threshold number of Peers. In the case of an even-number of Authorities, a denial
-of service by a single Authority was observed.
+Otherwise, a consensus partition can be obtained by withholding Reveal values
+from a threshold number of peers. In the case of an even-number of authorities, a
+denial of service by a single authority was observed.
 
 </div>
 
@@ -849,7 +751,7 @@ of service by a single Authority was observed.
 
 <div>
 
-### <span id="vote-tabulation-for-consensus-computation"></span>3.5 Vote tabulation for consensus computation
+#### <span id="vote-tabulation-for-consensus-computation"></span>Vote tabulation for consensus computation
 
 </div>
 
@@ -932,8 +834,8 @@ For each distinct mix identity in any vote directory:
 1.  Compute a shared random number from the values revealed in the
     <span class="quote">“<span class="quote">Reveal</span>”</span> step. Authorities whose reveal value does not
     verify their commit value MUST be excluded from the consensus round.
-    Authorities ensure that their peers MUST participate in Commit-and-Reveal,
-    and MUST use correct Reveal values obtained from other Peers as part of the
+    Authorities ensure that their peers MUST participate in commit-and-reveal,
+    and MUST use correct Reveal values obtained from other peers as part of the
     <span class="quote">“<span class="quote">Cert</span>”</span> exchange.
 
 2.  Generate or update the network topology using the shared random number as
@@ -952,7 +854,7 @@ For each distinct mix identity in any vote directory:
 
 <div>
 
-### <span id="signature-collection"></span>3.6 Signature collection
+#### <span id="signature-collection"></span>Signature collection
 
 </div>
 
@@ -960,9 +862,9 @@ For each distinct mix identity in any vote directory:
 
 </div>
 
-Each Authority signs their view of consensus, and exchanges detached Signatures
+Each authority signs their view of consensus, and exchanges detached Signatures
 with each other. Upon receiving each Signature it is added to the signatures on the
-Consensus if it validates the Consensus. The Authority SHOULD warn the administrator
+Consensus if it validates the Consensus. The authority SHOULD warn the administrator
 if network partition is detected.
 
 If there is disagreement about the consensus directory, each authority collects
@@ -982,7 +884,7 @@ peers.
 
 <div>
 
-### <span id="publication"></span>3.7 Publication
+#### <span id="publication"></span>Publication
 
 </div>
 
@@ -1005,7 +907,7 @@ a valid consensus and it is published.
 
 <div>
 
-## <span id="pki-protocol-data-structures"></span>4. PKI Protocol data structures
+### <span id="pki-protocol-data-structures"></span>PKI protocol data structures
 
 </div>
 
@@ -1021,7 +923,7 @@ a valid consensus and it is published.
 
 <div>
 
-### <span id="mix-descriptor-format"></span>4.1 Mix descriptor format
+#### <span id="mix-descriptor-format"></span>Mix descriptor format
 
 </div>
 
@@ -1033,22 +935,6 @@ Note that there is no signature field. This is because mix descriptors are
 serialized and signed using JWS. The `IdentityKey` field is a
 public ed25519 key. The `MixKeys` field is a map from epoch to
 public X25519 keys which is what the Sphinx packet format uses.
-
-<div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
-
-<table data-border="0" data-summary="Note: Note">
-<tbody>
-<tr class="odd">
-<td rowspan="2" style="text-align: center;" data-valign="top" width="25"><img src="file:/home/usr/local/Oxygen_XML_Editor_28/frameworks/docbook/css/img/note.png" alt="[Note]" /></td>
-<td style="text-align: left;">Note</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;" data-valign="top"><p>XXX David: replace the following example with a JWS example:</p></td>
-</tr>
-</tbody>
-</table>
-
-</div>
 
 ``` programlisting
 {
@@ -1079,7 +965,7 @@ public X25519 keys which is what the Sphinx packet format uses.
 
 <div>
 
-### <span id="scheduling-mix-downtime"></span>4.1.1 Scheduling mix downtime
+#### <span id="scheduling-mix-downtime"></span>Scheduling mix downtime
 
 </div>
 
@@ -1121,15 +1007,13 @@ downtime for one or more epochs by not have those epochs as keys in the map.
 
 <div>
 
-### <span id="directory-format"></span>4.2 Directory format
+#### <span id="directory-format"></span>Directory format
 
 </div>
 
 </div>
 
 </div>
-
-<span class="emphasis">*Note: replace the following example with a JWS example*</span>
 
 ``` programlisting
 {
@@ -1153,7 +1037,7 @@ downtime for one or more epochs by not have those epochs as keys in the map.
 
 <div>
 
-### <span id="shared-random-value-structure"></span>4.3 Shared random value structure
+#### <span id="shared-random-value-structure"></span>Shared random value structure
 
 </div>
 
@@ -1161,8 +1045,8 @@ downtime for one or more epochs by not have those epochs as keys in the map.
 
 </div>
 
-Katzenpost’s Shared Random Value computation is inspired by Tor’s Shared Random
-Subsystem <a href="#TORSRV" class="link">TORSRV</a>.
+Katzenpost's shared random value computation is inspired by Tor’s shared
+random subsystem <a href="#TORSRV" class="link">TORSRV</a>.
 
 Each voting round a commit value is included in the votes sent to other
 authorities. These are produced as follows:
@@ -1182,17 +1066,17 @@ over the input string calculated as follows:
 
 1.  Validated Reveal commands received including the authorities own reveal
     are sorted by reveal value in ascending order and appended to the input in
-    format IdentityPublicKeyBytes_n | RevealValue_n
+    format `IdentityPublicKeyBytes_n` | `RevealValue`\_n
 
 </div>
 
-However instead of the Identity Public Key bytes we instead encode the Reveal
+However instead of the identity public key bytes we instead encode the reveal
 with the blake2b 256 bit hash of the public key bytes.
 
 <div class="orderedlist">
 
-1.  If a SharedRandomValue for the previous epoch exists, it is appended to
-    the input string, otherwise 32 NUL (x00) bytes are used.
+1.  If a `SharedRandomValue` for the previous epoch exists, it is
+    appended to the input string, otherwise 32 NUL (x00) bytes are used.
 
 </div>
 
@@ -1213,7 +1097,7 @@ H("shared-random" | Uint64(epoch) | REVEALS | PREVIOUS_SRV)
 
 <div>
 
-## <span id="pki-wire-protocol"></span>5. PKI wire protocol
+### <span id="pki-wire-protocol"></span>PKI wire protocol
 
 </div>
 
@@ -1221,9 +1105,9 @@ H("shared-random" | Uint64(epoch) | REVEALS | PREVIOUS_SRV)
 
 </div>
 
-The Katzenpost Wire Protocol as described in <a href="#KATZMIXWIRE" class="link">KATZMIXWIRE</a> is used by both clients and by Directory Authority peers. In
-the following section we describe additional wire protocol commands for publishing
-mix descriptors, voting and consensus retrieval.
+The Katzenpost wire protocol as described in <a href="#KATZMIXWIRE" class="link">KATZMIXWIRE</a> is used by both clients and by directory authority peers. In the
+following section we describe additional wire protocol commands for publishing mix
+descriptors, voting and consensus retrieval.
 
 <div class="section">
 
@@ -1233,7 +1117,7 @@ mix descriptors, voting and consensus retrieval.
 
 <div>
 
-### <span id="mix-descriptor-publication"></span>5.1 Mix descriptor publication
+#### <span id="mix-descriptor-publication"></span>Mix descriptor publication
 
 </div>
 
@@ -1241,8 +1125,8 @@ mix descriptors, voting and consensus retrieval.
 
 </div>
 
-The following commands are used for publishing mix descriptors and setting
-mix descriptor status:
+The following commands are used for publishing mix descriptors and setting mix
+descriptor status:
 
 ``` programlisting
 enum {
@@ -1275,7 +1159,7 @@ uint8 error_code;
 
 <div>
 
-### <span id="the-post_descriptor-command"></span>5.1.1 The post_descriptor command
+#### <span id="the-post_descriptor-command"></span>The post_descriptor command
 
 </div>
 
@@ -1283,7 +1167,8 @@ uint8 error_code;
 
 </div>
 
-The post_descriptor command allows mixes to publish their descriptors.
+The <span class="command">**post_descriptor**</span> command allows mixes to publish their
+descriptors.
 
 </div>
 
@@ -1295,7 +1180,7 @@ The post_descriptor command allows mixes to publish their descriptors.
 
 <div>
 
-### <span id="the-post_descriptor_status-command"></span>5.1.2 The post_descriptor_status command
+#### <span id="the-post_descriptor_status-command"></span>The post_descriptor_status command
 
 </div>
 
@@ -1303,8 +1188,8 @@ The post_descriptor command allows mixes to publish their descriptors.
 
 </div>
 
-The post_descriptor_status command is sent in response to a post_descriptor
-command, and uses the following error codes:
+The <span class="command">**post_descriptor_status**</span> command is sent in response to a
+<span class="command">**post_descriptor**</span> command, and uses the following error codes:
 
 ``` programlisting
 enum {
@@ -1327,7 +1212,7 @@ descriptor_forbidden(3),
 
 <div>
 
-## <span id="voting"></span>6. Voting
+### <span id="voting"></span>Voting
 
 </div>
 
@@ -1335,7 +1220,7 @@ descriptor_forbidden(3),
 
 </div>
 
-The following commands are used by Authorities to exchange votes:
+The following commands are used by authorities to exchange votes:
 
 ``` programlisting
 enum {
@@ -1367,7 +1252,7 @@ uint8 error_code;
 
 <div>
 
-### <span id="the-vote-command"></span>6.1. The vote command
+#### <span id="the-vote-command"></span>The vote command
 
 </div>
 
@@ -1375,15 +1260,15 @@ uint8 error_code;
 
 </div>
 
-The `vote` command is used to send a PKI document to a peer
-Authority during the voting period of the PKI schedule.
+The <span class="command">**vote**</span> command is used to send a PKI document to a peer
+authority during the voting period of the PKI schedule.
 
-The payload field contains the signed and serialized PKI document
-representing the sending Authority’s vote. The public_key field contains the
-public identity key of the sending Authority which the receiving Authority can
-use to verify the signature of the payload. The epoch_number field is used by
-the receiving party to quickly check the epoch for the vote before deserializing
-the payload.
+The `payload` field contains the signed and serialized PKI document
+representing the sending authority’s vote. The `public_key` field
+contains the public identity key of the sending authority which the receiving
+authority can use to verify the signature of the payload. The
+`epoch_number` field is used by the receiving party to quickly check
+the epoch for the vote before deserializing the payload.
 
 </div>
 
@@ -1395,7 +1280,7 @@ the payload.
 
 <div>
 
-### <span id="the-vote_status-command"></span>6.2. The vote_status command
+#### <span id="the-vote_status-command"></span>The vote_status command
 
 </div>
 
@@ -1403,8 +1288,8 @@ the payload.
 
 </div>
 
-The `vote_status` command is used to reply to a vote
-command. The error_code field indicates if there was a failure in the receiving
+The <span class="command">**vote_status**</span> command is used to reply to a vote command.
+The `error_code` field indicates if there was a failure in the receiving
 of the PKI document.
 
 ``` programlisting
@@ -1420,9 +1305,10 @@ vote_not_found(7),        /* The vote was not found */
 }
 ```
 
-The epoch_number field of the vote struct is compared with the epoch that is
-currently being voted on. vote_too_early and vote_too_late are replied back to
-the voter to report that their vote was not accepted.
+The `epoch_number` field of the vote struct is compared with the
+epoch that is currently being voted on. `vote_too_early` and
+`vote_too_late` are replied back to the voter to report that their
+vote was not accepted.
 
 </div>
 
@@ -1434,7 +1320,7 @@ the voter to report that their vote was not accepted.
 
 <div>
 
-### <span id="the-get_vote-command"></span>6.3. The get_vote command
+#### <span id="the-get_vote-command"></span>The get_vote command
 
 </div>
 
@@ -1442,12 +1328,13 @@ the voter to report that their vote was not accepted.
 
 </div>
 
-The `get_vote` command is used to request a PKI document
-(vote) from a peer Authority. The epoch field contains the epoch from which to
-request the vote, and the public_key field contains the public identity key of
-the Authority of the requested vote. A successful query is responded to with a
-vote command, and queries that fail are responded to with a vote_status command
-with error_code vote_not_found(7).
+The <span class="command">**get_vote**</span> command is used to request a PKI document
+(vote) from a peer authority. The epoch field contains the epoch from which to
+request the vote, and the `public_key` field contains the public identity
+key of the authority of the requested vote. A successful query is responded to with
+a <span class="command">**vote**</span> command, and queries that fail are responded to with a
+<span class="command">**vote_status**</span> command with `error_code` value of
+`vote_not_found`.
 
 </div>
 
@@ -1461,7 +1348,7 @@ with error_code vote_not_found(7).
 
 <div>
 
-## <span id="retrieval-of-consensus"></span>7. Retrieval of consensus
+### <span id="retrieval-of-consensus"></span>Retrieval of consensus
 
 </div>
 
@@ -1469,9 +1356,9 @@ with error_code vote_not_found(7).
 
 </div>
 
-Providers in the Katzenpost mix network system <a href="#KATZMIXNET" class="link">KATZMIXNET</a> may cache validated network consensus files and serve
-them to clients over the mix network's link layer wire protocol <a href="#KATZMIXWIRE" class="link">KATZMIXWIRE</a>. We define additional wire protocol
-commands for requesting and sending PKI consensus documents:
+Providers in the Katzenpost mix network system <a href="#KATZMIXNET" class="link">KATZMIXNET</a> may cache validated network consensus files and serve them to
+clients over the mix network's link layer wire protocol <a href="#KATZMIXWIRE" class="link">KATZMIXWIRE</a>. We define additional wire protocol commands for requesting and
+sending PKI consensus documents:
 
 ``` programlisting
 enum {
@@ -1502,7 +1389,7 @@ opaque payload[];
 
 <div>
 
-### <span id="the-get_consensus-command"></span>7.1 The get_consensus command
+#### <span id="the-get_consensus-command"></span>The get_consensus command
 
 </div>
 
@@ -1510,14 +1397,15 @@ opaque payload[];
 
 </div>
 
-The get_consensus command is a command that is used to retrieve a recent
-consensus document. If a given get_consensus command contains an Epoch value
-that is either too big or too small then a reply consensus command is sent with
-an empty payload. Otherwise if the consensus request is valid then a consensus
-command containing a recent consensus document is sent in reply.
+The <span class="command">**get_consensus** </span>command is a command that is used to
+retrieve a recent consensus document. If a given <span class="command">**get_consensus**</span>
+command contains an `Epoch` value that is either too big or too small
+then a reply consensus command is sent with an empty payload. Otherwise if the
+consensus request is valid then a consensus command containing a recent consensus
+document is sent in reply.
 
 Initiators MUST terminate the session immediately upon reception of a
-get_consensus command.
+<span class="command">**get_consensus**</span> command.
 
 </div>
 
@@ -1529,7 +1417,7 @@ get_consensus command.
 
 <div>
 
-### <span id="the-consensus-command"></span>7.2 The consensus command
+#### <span id="the-consensus-command"></span>The consensus command
 
 </div>
 
@@ -1537,9 +1425,9 @@ get_consensus command.
 
 </div>
 
-The consensus command is a command that is used to send a recent consensus
-document. The error_code field indicates if there was a failure in retrieval of
-the PKI consensus document.
+The <span class="command">**consensus**</span> command is a command that is used to send a
+recent consensus document. The error_code field indicates if there was a failure in
+retrieval of the PKI consensus document.
 
 ``` programlisting
 enum {
@@ -1560,7 +1448,7 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
 
 <div>
 
-### <span id="the-cert-command"></span>7.3. The Cert command
+#### <span id="the-cert-command"></span>The Cert command
 
 </div>
 
@@ -1568,37 +1456,11 @@ consensus_gone(2),      /* The consensus will not be available in the future. */
 
 </div>
 
-The `cert` command is used to send a PKI document to a peer
-Authority during the voting period of the PKI schedule. It is the same as the
-`vote` command, but must contain the set of
-SharedRandomCommit and SharedRandomReveal values as seen by the Authority during
-the voting process.
-
-</div>
-
-<div class="section">
-
-<div class="titlepage">
-
-<div>
-
-<div>
-
-### <span id="the-certstatus-command"></span>7.4. The CertStatus command
-
-</div>
-
-</div>
-
-</div>
-
-The `cert_status` command is the response to a
-`cert` command, and is the same as a
-`vote_status` response, other than the command identifier.
-Responses are CertOK, CertTooEarly, CertNotAuthorized, CertNotSigned,
-CertAlreadyReceived, CertTooLate
-
-</div>
+The <span class="command">**cert**</span> command is used to send a PKI document to a peer
+authority during the voting period of the PKI schedule. It is the same as the
+<span class="command">**vote**</span> command, but must contain the set of
+`SharedRandomCommit` and `SharedRandomReveal` values as
+seen by the authority during the voting process.
 
 </div>
 
@@ -1610,7 +1472,34 @@ CertAlreadyReceived, CertTooLate
 
 <div>
 
-## <span id="signature-exchange"></span>8. Signature exchange
+#### <span id="the-certstatus-command"></span>The CertStatus command
+
+</div>
+
+</div>
+
+</div>
+
+The <span class="command">**cert_status**</span> command is the response to a
+<span class="command">**cert**</span> command, and is the same as a `vote_status`
+response, other than the command identifier. Responses are `CertOK`,
+`CertTooEarly`, `CertNotAuthorized`,
+`CertNotSigned`, `CertAlreadyReceived`,
+`CertTooLate`.
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="signature-exchange"></span>8. Signature exchange
 
 </div>
 
@@ -1619,7 +1508,7 @@ CertAlreadyReceived, CertTooLate
 </div>
 
 Signatures exchange is the final round of the consensus protocol and consists
-of the Sig and SigStatus commands.
+of the <span class="command">**Sig**</span> and <span class="command">**SigStatus**</span> commands.
 
 <div class="section">
 
@@ -1629,7 +1518,7 @@ of the Sig and SigStatus commands.
 
 <div>
 
-### <span id="the-sig-command"></span>8.1. The sig command
+#### <span id="the-sig-command"></span>The sig command
 
 </div>
 
@@ -1637,32 +1526,8 @@ of the Sig and SigStatus commands.
 
 </div>
 
-The `sig` command contains a detached Signature from PublicKey
-of Consensus for Epoch.
-
-</div>
-
-<div class="section">
-
-<div class="titlepage">
-
-<div>
-
-<div>
-
-### <span id="the-sigstatus-command"></span>8.2. The sig_status command
-
-</div>
-
-</div>
-
-</div>
-
-The `sig_status` command is the response to a
-`sig` command. Responses are SigOK, SigNotAuthorized,
-SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
-
-</div>
+The <span class="command">**sig**</span> command contains a detached signature from PublicKey of
+Consensus for Epoch.
 
 </div>
 
@@ -1674,7 +1539,33 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div>
 
-## <span id="scalability-considerations"></span>9. Scalability considerations
+#### <span id="the-sigstatus-command"></span>The sig_status command
+
+</div>
+
+</div>
+
+</div>
+
+The <span class="command">**sig_status**</span> command is the response to a
+<span class="command">**sig**</span> command. Responses are `SigOK`,
+`SigNotAuthorized`, `SigNotSigned`,
+`SigTooEarly`, `SigTooLate`,
+`SigAlreadyReceived`, and `SigInvalid`.
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="scalability-considerations"></span>Scalability considerations
 
 </div>
 
@@ -1694,7 +1585,7 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div>
 
-## <span id="future-work"></span>10. Future work
+### <span id="future-work"></span>Future work
 
 </div>
 
@@ -1704,13 +1595,13 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div class="itemizedlist">
 
-- byzantine fault tolerance
+- Byzantine fault tolerance
 
 - PQ crypto signatures for all PKI documents: mix descriptors and
   directories. <a href="#SPHINCS256" class="link">SPHINCS256</a> could be used, we
   already have a golang implementation: https://github.com/Yawning/sphincs256/
 
-- Make a Bandwidth Authority system to measure health of the network. Also
+- Make a bandwidth authority system to measure health of the network. Also
   perform load balancing as described in <a href="#PEERFLOW" class="link">PEERFLOW</a>?
 
 - Implement byzantine attack defenses as described in <a href="#MIRANDA" class="link">MIRANDA</a> and <a href="#MIXRELIABLE" class="link">MIXRELIABLE</a> where mix link performance proofs are recorded and
@@ -1718,7 +1609,7 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 - Choose a different serialization/schema language?
 
-- Use a append only merkle tree instead of this voting protocol.
+- Use a append only Merkle tree instead of this voting protocol.
 
 </div>
 
@@ -1732,7 +1623,7 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div>
 
-## <span id="anonymity-considerations"></span>11. Anonymity considerations
+### <span id="anonymity-considerations"></span>Anonymity considerations
 
 </div>
 
@@ -1749,10 +1640,10 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 - If consensus has failed and thus there is more than one consensus file,
   clients MUST NOT use this compromised consensus and refuse to run.
 
-- We try to avoid randomizing the topology because doing so splits the
-  anonymity sets on each mix into two. That is, packets belonging to the previous
-  topology versus the current topology are trivially distinguishable. On the other
-  hand if enough mixes fall out of consensus eventually the mixnet will need to be
+- We try to avoid randomizing the topology because doing so splits the anonymity
+  sets on each mix into two. That is, packets belonging to the previous topology
+  versus the current topology are trivially distinguishable. On the other hand if
+  enough mixes fall out of consensus eventually the mixnet will need to be
   rebalanced to avoid an attacker compromised path selection. One example of this
   would be the case where the adversary controls the only mix is one layer of the
   network topology.
@@ -1769,7 +1660,7 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div>
 
-## <span id="security-considerations"></span>12. Security considerations
+### <span id="security-considerations"></span>Security considerations
 
 </div>
 
@@ -1779,7 +1670,7 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div class="itemizedlist">
 
-- The Directory Authority / PKI system for a given mix network is essentially
+- The directory authority / PKI system for a given mix network is essentially
   the root of all authority in the system. The PKI controls the contents of the
   network consensus documents that mix clients download and use to inform their
   path selection. Therefore if the PKI as a whole becomes compromised then so will
@@ -1788,13 +1679,13 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
   protocol is used so that the system is more resilient when attacked, in
   accordance with the principle of least authority. <a href="#SECNOTSEP" class="link">SECNOTSEP</a>
 
-- Short epoch durations make it is more practical to make corrections to
-  network state using the PKI voting rounds.
+- Short epoch durations make it is more practical to make corrections to network
+  state using the PKI voting rounds.
 
 - Fewer epoch keys published in advance is a more conservative security policy
   because it implies reduced exposure to key compromise attacks.
 
-- A bad acting Directory Authority who lies on each vote and votes
+- A bad-acting directory authority who lies on each vote and votes
   inconsistently can trivially cause a denial of service for each voting round.
 
 </div>
@@ -1809,7 +1700,7 @@ SigNotSigned, SigTooEarly, SigTooLate, SigAlreadyReceived, and SigInvalid.
 
 <div>
 
-## <span id="acknowledgements"></span>Acknowledgements
+### <span id="acknowledgements"></span>Acknowledgements
 
 </div>
 
@@ -1830,7 +1721,7 @@ design review.
 
 <div>
 
-## <span id="appendix-a.-references"></span>References
+### <span id="appendix-a.-references"></span>References
 
 </div>
 
