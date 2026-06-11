@@ -8,8 +8,6 @@ no_list: true
 body_class: "td-no-sidebar"
 ---
 
-<br/><br/><br/><br/><br/><br/>
-
 <img src="/images/ZII-WIZ3.png" alt="ANSI wizard casting a spell, by Zeus" class="img-fluid mb-4" style="max-width: 640px;">
 
 ## For users
