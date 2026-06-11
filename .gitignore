@@ -2,3 +2,4 @@ build/
 resources/
 public/
 *.xpr
+node_modules/
