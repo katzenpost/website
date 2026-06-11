@@ -32,15 +32,13 @@ help:
 
 check-versions:
 ifndef SKIP_VERSION_CHECK
-	@kp_tag=$$(git -C "$(KATZENPOST_PATH)" describe --tags --exact-match 2>/dev/null || echo ""); \
-	if [ "$$kp_tag" != "$(KATZENPOST_TAG)" ]; then \
-	    echo "ERROR: $(KATZENPOST_PATH) is at '$$kp_tag', expected '$(KATZENPOST_TAG)'." >&2; \
+	@if ! git -C "$(KATZENPOST_PATH)" tag --points-at HEAD | grep -qx "$(KATZENPOST_TAG)"; then \
+	    echo "ERROR: $(KATZENPOST_PATH) HEAD does not carry tag '$(KATZENPOST_TAG)'." >&2; \
 	    echo "       Check out the pinned tag, or set SKIP_VERSION_CHECK=1 to override." >&2; \
 	    exit 1; \
 	fi
-	@tc_tag=$$(git -C "$(THINCLIENT_PATH)" describe --tags --exact-match 2>/dev/null || echo ""); \
-	if [ "$$tc_tag" != "$(THINCLIENT_TAG)" ]; then \
-	    echo "ERROR: $(THINCLIENT_PATH) is at '$$tc_tag', expected '$(THINCLIENT_TAG)'." >&2; \
+	@if ! git -C "$(THINCLIENT_PATH)" tag --points-at HEAD | grep -qx "$(THINCLIENT_TAG)"; then \
+	    echo "ERROR: $(THINCLIENT_PATH) HEAD does not carry tag '$(THINCLIENT_TAG)'." >&2; \
 	    echo "       Check out the pinned tag, or set SKIP_VERSION_CHECK=1 to override." >&2; \
 	    exit 1; \
 	fi
