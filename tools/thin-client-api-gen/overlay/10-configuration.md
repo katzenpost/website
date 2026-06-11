@@ -36,8 +36,8 @@ daemon. The complete file is simply:
     Network = "tcp"
 ```
 
-**`[Dial]`** selects the daemon transport. Set exactly one of the three
-forms:
+**`[Dial]`** selects the daemon transport. Set exactly one of the two
+forms (the `Network` key is an optional refinement of the TCP form):
 
 | Key | Type | Meaning |
 |---|---|---|
@@ -47,4 +47,4 @@ forms:
 
 ### Concurrency
 
-The Go `ThinClient` is safe for concurrent use by multiple goroutines. Because its connection state, current PKI document, and in-flight request tracking are guarded internally, the cancel-from-another-goroutine patterns shown in the [how-to guide](/docs/thin_client_howto/) are sound. The Rust and Python bindings are `async`. An instance is driven from its runtime (a Tokio task or an asyncio event loop) and follows that runtime’s ordinary conventions rather than offering an independent thread-safety guarantee.
+The Go `ThinClient` is safe for concurrent use by multiple goroutines. Because its connection state, current PKI document, and in-flight request tracking are guarded internally, the cancel-from-another-goroutine patterns shown in the [how-to guide](/docs/thin_client_howto/) are sound. The Rust and Python bindings are `async`. An instance is driven from its runtime (a Tokio task or an asyncio event loop) and follows that runtime's ordinary conventions rather than offering an independent thread-safety guarantee.

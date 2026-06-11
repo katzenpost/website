@@ -33,7 +33,7 @@ tokio::spawn(async move {
 {{< tab header="Python" lang="python" >}}
 # Pass async callback functions to the Config constructor.
 # Each callback receives a dict with event-specific keys.
-# All callbacks are optional — omitted events are ignored.
+# All callbacks are optional; omitted events are ignored.
 
 async def on_connection_status(event):
     print(f"Connected: {event['is_connected']}")
@@ -52,28 +52,28 @@ client = ThinClient(config)
 
 ### Event types
 
-- **ConnectionStatusEvent** — emitted when the daemon's connection
+- **ConnectionStatusEvent**: emitted when the daemon's connection
   to the mixnet changes. Fields (Go): `IsConnected bool`, `Err error`,
   `InstanceToken [16]byte`. `InstanceToken` uniquely identifies the
   daemon process and lets clients notice daemon restarts.
 
-- **NewDocumentEvent** — emitted when a new PKI consensus document
+- **NewDocumentEvent**: emitted when a new PKI consensus document
   is received from the directory authorities. The Go binding exposes
   the parsed document as `Document *cpki.Document`. (The lower-level
   `NewPKIDocumentEvent` carrying a raw CBOR `Payload []byte` is used
   internally between daemon and thin client. Applications should
   consume `NewDocumentEvent`.)
 
-- **MessageSentEvent** — emitted when a `SendMessage` request has
+- **MessageSentEvent**: emitted when a `SendMessage` request has
   been transmitted by the daemon. Fields (Go):
   `MessageID *[MessageIDLength]byte`, `SURBID *[SURBIDLength]byte`,
   `SentAt time.Time`, `ReplyETA time.Duration`, `Err string`.
 
-- **MessageReplyEvent** — emitted when a reply to a `SendMessage`
+- **MessageReplyEvent**: emitted when a reply to a `SendMessage`
   call is received. Fields (Go):
   `MessageID *[MessageIDLength]byte`, `SURBID *[SURBIDLength]byte`,
   `Payload []byte`, `ReplyIndex *uint8`, `ErrorCode uint8`.
-  `ReplyIndex` identifies **which of the box's two replicas answered**. 
+  `ReplyIndex` identifies **which of the box's two replicas answered**.
   Each box is sharded across K=2 replicas, and the value (0 or 1) is
   the position within that pair of the replica whose response was
   used. It is chiefly of interest for Pigeonhole channel reads and may
@@ -89,7 +89,7 @@ client = ThinClient(config)
   the thin client reconnects and replays in-flight requests on its
   own.
 
-- **DaemonDisconnectedEvent** — emitted by the thin client (not the
+- **DaemonDisconnectedEvent**: emitted by the thin client (not the
   daemon) when the local socket connection to the daemon is lost.
   Fields (Go): `IsGraceful bool`, `Err error`. `IsGraceful` is true
   precisely when a `ShutdownEvent` preceded the disconnect.

@@ -213,7 +213,7 @@
   title: "NextMessageBoxIndex / next_message_box_index"
   summary: |
     Returns the next message box index in the sequence. This is a local
-    KDF computation — it does not cause network traffic or store state.
+    KDF computation; it does not cause network traffic or store state.
     If you have a BACAP implementation in your language, you can compute
     this locally instead of making a round trip to the daemon.
   go:     "ThinClient.NextMessageBoxIndex"
@@ -254,7 +254,7 @@
 # ---------------------------------------------------------------------------
 
 - group: start_resending_encrypted_message
-  section: "Pigeonhole: Automatic repeat request (ARQ) transport"
+  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
   title: "StartResendingEncryptedMessage / start_resending_encrypted_message"
   summary: |
     Sends an encrypted read or write request to a courier via the ARQ
@@ -268,7 +268,7 @@
   python: "ThinClient.start_resending_encrypted_message"
 
 - group: start_resending_encrypted_message_return_box_exists
-  section: "Pigeonhole: ARQ Transport"
+  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
   title: "StartResendingEncryptedMessageReturnBoxExists"
   summary: |
     Same as the default variant, but returns `BoxAlreadyExists` as an
@@ -279,7 +279,7 @@
   python: "ThinClient.start_resending_encrypted_message_return_box_exists"
 
 - group: start_resending_encrypted_message_no_retry
-  section: "Pigeonhole: ARQ Transport"
+  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
   title: "StartResendingEncryptedMessageNoRetry"
   summary: |
     Same as the default variant, but returns `BoxIDNotFound` immediately
@@ -290,7 +290,7 @@
   python: "ThinClient.start_resending_encrypted_message_no_retry"
 
 - group: write_stream
-  section: "Pigeonhole: ARQ Transport"
+  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
   title: "WriteStream / write_stream"
   summary: |
     Writes a whole payload, of any size, to a channel using the windowed
@@ -305,7 +305,7 @@
   python: "ThinClient.write_stream"
 
 - group: read_stream
-  section: "Pigeonhole: ARQ Transport"
+  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
   title: "ReadStream / read_stream"
   summary: |
     Reads a run of sequential boxes from a channel using the windowed
@@ -318,7 +318,7 @@
   python: "ThinClient.read_stream"
 
 - group: cancel_resending_encrypted_message
-  section: "Pigeonhole: ARQ Transport"
+  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
   title: "CancelResendingEncryptedMessage / cancel_resending_encrypted_message"
   summary: |
     Cancels an in-flight `StartResendingEncryptedMessage` operation.
