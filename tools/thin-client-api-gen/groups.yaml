@@ -26,7 +26,7 @@
     construction (`ThinClient::new`), whereas Go and Python construct the
     client first and then connect via `Dial()` / `start()`.
   notes: |
-    The Rust binding folds the connect step into its constructor:
+    The Rust binding folds the connect step into its constructor, so
     `ThinClient::new` returns an already-connected handle. Go and
     Python construct the client first and connect afterwards via
     `Dial()` / `start()`, allowing the application to set up event
@@ -98,7 +98,7 @@
   go:     "ThinClient.StopEventSink"
 
 # ---------------------------------------------------------------------------
-# PKI and Service Discovery
+# PKI and service discovery
 # ---------------------------------------------------------------------------
 
 - group: pki_document
@@ -151,7 +151,7 @@
   python: "ThinClient.get_services"
 
 # ---------------------------------------------------------------------------
-# Direct Messaging
+# Direct messaging
 # ---------------------------------------------------------------------------
 
 - group: send_message
@@ -190,7 +190,7 @@
   python: "ThinClient.blocking_send_message"
 
 # ---------------------------------------------------------------------------
-# Pigeonhole: Key Management
+# Pigeonhole: Key management
 # ---------------------------------------------------------------------------
 
 - group: new_keypair
@@ -205,7 +205,7 @@
   python: "ThinClient.new_keypair"
 
 # ---------------------------------------------------------------------------
-# Pigeonhole: Index Management
+# Pigeonhole: Index management
 # ---------------------------------------------------------------------------
 
 - group: next_message_box_index
@@ -254,11 +254,11 @@
 # ---------------------------------------------------------------------------
 
 - group: start_resending_encrypted_message
-  section: "Pigeonhole: ARQ Transport"
+  section: "Pigeonhole: Automatic repeat request (ARQ) transport"
   title: "StartResendingEncryptedMessage / start_resending_encrypted_message"
   summary: |
     Sends an encrypted read or write request to a courier via the ARQ
-    (Automatic Repeat reQuest) mechanism. **Blocks** until the operation
+    mechanism. **Blocks** until the operation
     completes or is cancelled. The daemon retransmits the request until
     it receives an acknowledgment from the courier. By default writes
     treat `BoxAlreadyExists` as idempotent success, and reads retry
@@ -296,9 +296,9 @@
     Writes a whole payload, of any size, to a channel using the windowed
     selective-ack (SACK) ARQ. The daemon splits the payload across as many
     boxes as it spans and keeps a bandwidth-delay-product of boxes in
-    flight, retransmitting only those whose acknowledgements lapse, so a
-    multi-box write is no longer serialised one round trip per box.
-    **Blocks** until every box is acknowledged. A window of zero asks the
+    flight, retransmitting only those whose acknowledgments lapse, so a
+    multi-box write is no longer serialized one round trip per box.
+    `WriteStream` blocks until every box is acknowledged. A window of zero asks the
     daemon to choose the default from the consensus send rate and hop count.
   go:     "ThinClient.WriteStream"
   rust:   "ThinClient::write_stream"
@@ -346,7 +346,7 @@
   python: "ThinClient.tombstone_range"
 
 # ---------------------------------------------------------------------------
-# Pigeonhole: Copy Stream Construction
+# Pigeonhole: Copy stream construction
 # ---------------------------------------------------------------------------
 
 - group: create_courier_envelopes_from_payload
@@ -384,7 +384,7 @@
   python: "ThinClient.create_courier_envelopes_from_tombstone_range"
 
 # ---------------------------------------------------------------------------
-# Pigeonhole: Copy Command Transport
+# Pigeonhole: Copy command transport
 # ---------------------------------------------------------------------------
 
 - group: start_resending_copy_command
@@ -401,7 +401,7 @@
   notes: |
     The Rust and Python bindings accept optional `courier_identity_hash`
     and `courier_queue_id` arguments to pin the command to a particular
-    courier; the Go binding exposes that same behaviour through a
+    courier; the Go binding exposes that same behavior through a
     distinct method, `StartResendingCopyCommandWithCourier`.
   go:     "ThinClient.StartResendingCopyCommand"
   rust:   "ThinClient::start_resending_copy_command"
@@ -417,7 +417,7 @@
     `courier_identity_hash` and `courier_queue_id` arguments to
     `start_resending_copy_command`.
   notes: |
-    In Rust and Python the same behaviour is reached not through a
+    In Rust and Python the same behavior is achieved not through a
     separate method but by supplying the optional
     `courier_identity_hash` and `courier_queue_id` arguments to
     `start_resending_copy_command`.
@@ -434,7 +434,7 @@
   python: "ThinClient.cancel_resending_copy_command"
 
 # ---------------------------------------------------------------------------
-# Pigeonhole: Courier Discovery
+# Pigeonhole: Courier discovery
 # ---------------------------------------------------------------------------
 
 - group: get_all_couriers
