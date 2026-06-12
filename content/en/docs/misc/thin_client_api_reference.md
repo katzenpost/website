@@ -1336,8 +1336,9 @@ async def voucher_derive_stream(self, voucher: bytes) -> VoucherStreamResult:
 GetSphinxGeometry returns the Sphinx geometry the daemon supplied during
 the connection handshake. It is nil until Dial() has completed.
 
-The Python binding stores the Sphinx geometry internally but does not
-at present expose a public accessor.
+The Python binding has no getter method; it exposes the Sphinx
+geometry as the public `ThinClient.geometry` attribute (a `Geometry`),
+populated from the daemon's connection status event.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -1353,8 +1354,9 @@ pub fn sphinx_geometry(&self) -> Geometry
 GetPigeonholeGeometry returns the Pigeonhole geometry the daemon supplied
 during the connection handshake. It is nil until Dial() has completed.
 
-The Python binding stores the geometry internally but does not at
-present expose a public accessor.
+The Python binding has no getter method; it exposes the Pigeonhole
+geometry as the public `ThinClient.pigeonhole_geometry` attribute,
+populated from the daemon's connection status event.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}

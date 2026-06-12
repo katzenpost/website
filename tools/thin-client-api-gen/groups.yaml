@@ -545,8 +545,9 @@
     handshake, describing the packet and payload sizes of the mixnet's
     Sphinx packet format.
   notes: |
-    The Python binding stores the Sphinx geometry internally but does not
-    at present expose a public accessor.
+    The Python binding has no getter method; it exposes the Sphinx
+    geometry as the public `ThinClient.geometry` attribute (a `Geometry`),
+    populated from the daemon's connection status event.
   go:   "ThinClient.GetSphinxGeometry"
   rust: "ThinClient::sphinx_geometry"
 
@@ -557,8 +558,9 @@
     Returns the negotiated Pigeonhole geometry, so that callers can size
     payloads to its maximum plaintext payload length.
   notes: |
-    The Python binding stores the geometry internally but does not at
-    present expose a public accessor.
+    The Python binding has no getter method; it exposes the Pigeonhole
+    geometry as the public `ThinClient.pigeonhole_geometry` attribute,
+    populated from the daemon's connection status event.
   go:   "ThinClient.GetPigeonholeGeometry"
   rust: "ThinClient::pigeonhole_geometry"
 
