@@ -125,6 +125,29 @@
   rust:   "ThinClient::get_pki_document_raw"
   python: "ThinClient.get_pki_document_raw"
 
+- group: get_directory_authorities
+  section: "PKI and Service Discovery"
+  title: "GetDirectoryAuthorities / get_directory_authorities"
+  summary: |
+    Returns the directory authority descriptors the client daemon is
+    configured to trust, including their identity keys and addresses.
+  go:     "ThinClient.GetDirectoryAuthorities"
+  rust:   "ThinClient::get_directory_authorities"
+  python: "ThinClient.get_directory_authorities"
+
+- group: pki_document_for_epoch
+  section: "PKI and Service Discovery"
+  title: "PKIDocumentForEpoch / pki_document_for_epoch"
+  summary: |
+    Returns the cached PKI document for a specific epoch, or an error if
+    the daemon has not retained a document for that epoch.
+  notes: |
+    The Rust binding does not expose a per-epoch accessor; Rust callers
+    use `pki_document` for the current document, or `get_pki_document_raw`
+    for the signed document at a given epoch.
+  go:     "ThinClient.PKIDocumentForEpoch"
+  python: "ThinClient.pki_document_for_epoch"
+
 - group: get_service
   section: "PKI and Service Discovery"
   title: "GetService / get_service"
@@ -470,20 +493,73 @@
     the first element of the returned slice.
   rust: "ThinClient::get_courier_destination"
 
-- group: pigeonhole_geometry
-  section: "Pigeonhole: Courier Discovery"
-  title: "pigeonhole_geometry (Rust only)"
+# ---------------------------------------------------------------------------
+# Vouchers
+# ---------------------------------------------------------------------------
+
+- group: voucher_mint
+  section: "Vouchers"
+  title: "VoucherMint / voucher_mint"
   summary: |
-    Returns a reference to the negotiated Pigeonhole geometry, so that
-    callers can size payloads to its `max_plaintext_payload_length`.
-    Go callers obtain this via `GetConfig().PigeonholeGeometry`; the
-    Python binding stores it internally but does not currently expose
-    an accessor.
+    Mints a Voucher from the joiner's MessageStream write capability.
+  go:     "ThinClient.VoucherMint"
+  rust:   "ThinClient::voucher_mint"
+  python: "ThinClient.voucher_mint"
+
+- group: voucher_induct
+  section: "Vouchers"
+  title: "VoucherInduct / voucher_induct"
+  summary: |
+    Verifies a published VoucherPayload and seals a reply to the joiner.
+  go:     "ThinClient.VoucherInduct"
+  rust:   "ThinClient::voucher_induct"
+  python: "ThinClient.voucher_induct"
+
+- group: voucher_open
+  section: "Vouchers"
+  title: "VoucherOpen / voucher_open"
+  summary: |
+    Opens the inductor's sealed reply with the joiner's voucher secret key.
+  go:     "ThinClient.VoucherOpen"
+  rust:   "ThinClient::voucher_open"
+  python: "ThinClient.voucher_open"
+
+- group: voucher_derive_stream
+  section: "Vouchers"
+  title: "VoucherDeriveStream / voucher_derive_stream"
+  summary: |
+    Derives the VoucherStream capabilities from the Voucher.
+  go:     "ThinClient.VoucherDeriveStream"
+  rust:   "ThinClient::voucher_derive_stream"
+  python: "ThinClient.voucher_derive_stream"
+
+# ---------------------------------------------------------------------------
+# Geometry
+# ---------------------------------------------------------------------------
+
+- group: sphinx_geometry
+  section: "Geometry"
+  title: "GetSphinxGeometry / sphinx_geometry"
+  summary: |
+    Returns the Sphinx geometry the daemon supplied during the connection
+    handshake, describing the packet and payload sizes of the mixnet's
+    Sphinx packet format.
   notes: |
-    Go callers retrieve the same value through
-    `GetConfig().PigeonholeGeometry`. The Python binding stores the
-    geometry internally but does not at present expose a public
-    accessor.
+    The Python binding stores the Sphinx geometry internally but does not
+    at present expose a public accessor.
+  go:   "ThinClient.GetSphinxGeometry"
+  rust: "ThinClient::sphinx_geometry"
+
+- group: pigeonhole_geometry
+  section: "Geometry"
+  title: "GetPigeonholeGeometry / pigeonhole_geometry"
+  summary: |
+    Returns the negotiated Pigeonhole geometry, so that callers can size
+    payloads to its maximum plaintext payload length.
+  notes: |
+    The Python binding stores the geometry internally but does not at
+    present expose a public accessor.
+  go:   "ThinClient.GetPigeonholeGeometry"
   rust: "ThinClient::pigeonhole_geometry"
 
 # ---------------------------------------------------------------------------
@@ -517,3 +593,49 @@
   go:     "ThinClient.NewQueryID"
   rust:   "ThinClient::new_query_id"
   python: "ThinClient.new_query_id"
+
+- group: get_message_box_index_counter
+  section: "Utility"
+  title: "GetMessageBoxIndexCounter / get_message_box_index_counter"
+  summary: |
+    Returns the BACAP Idx64 counter embedded in a MessageBoxIndex, the
+    sequence number of a box within its stream.
+  go:     "ThinClient.GetMessageBoxIndexCounter"
+  rust:   "ThinClient::get_message_box_index_counter"
+  python: "ThinClient.get_message_box_index_counter"
+
+- group: get_config
+  section: "Utility"
+  title: "GetConfig / get_config"
+  summary: |
+    Returns the client's configuration object, including the Sphinx and
+    Pigeonhole geometries negotiated with the daemon.
+  notes: |
+    The Rust binding exposes no configuration accessor; Rust callers read
+    the negotiated geometries through the dedicated `sphinx_geometry` and
+    `pigeonhole_geometry` methods.
+  go:     "ThinClient.GetConfig"
+  python: "ThinClient.get_config"
+
+- group: shutdown
+  section: "Utility"
+  title: "Shutdown (Go only)"
+  summary: |
+    Cleanly shuts down the ThinClient instance and stops its background
+    workers. Unlike Close, it does not send a close notification to the
+    daemon.
+  notes: |
+    The Rust and Python bindings expose a single teardown method, `stop`,
+    documented under Close / stop above.
+  go: "ThinClient.Shutdown"
+
+- group: get_logger
+  section: "Utility"
+  title: "GetLogger (Go only)"
+  summary: |
+    Returns a logger instance with the given prefix, using the thin
+    client's configured logging backend.
+  notes: |
+    The Rust and Python bindings leave logging to the host application
+    and expose no equivalent accessor.
+  go: "ThinClient.GetLogger"
