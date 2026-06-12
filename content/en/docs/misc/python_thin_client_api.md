@@ -26,8 +26,8 @@ Do not edit it directly: changes belong in the binding docstrings (in
 the `thin_client` repository) and will be overwritten by the next
 generation pass.
 
-This page documents the **0.0.15** release of the Python
-binding ([source](https://github.com/katzenpost/thin_client/tree/0.0.15/katzenpost_thinclient),
+This page documents the **0.0.18** release of the Python
+binding ([source](https://github.com/katzenpost/thin_client/tree/0.0.18/katzenpost_thinclient),
 [PyPI](https://pypi.org/project/katzenpost_thinclient/)). Symbols are
 re-exported from `katzenpost_thinclient`, so application code may
 import them directly, for example `from katzenpost_thinclient import
@@ -720,6 +720,38 @@ against the authorities listed in ``client.toml``.
 - `Exception` - If the daemon has no cached document for the
   requested epoch, or any other error code is returned.
 
+<a id="katzenpost_thinclient.core.ThinClient.get_directory_authorities"></a>
+
+#### ThinClient.get\_directory\_authorities
+
+```python
+async def get_directory_authorities() -> "List[Dict[str,Any]]"
+```
+
+Return the directory authority descriptors the client daemon is
+configured with.
+
+A thin client holds only its dial transport configuration and
+never sees the daemon's voting authority peer list. This surfaces
+it, so a caller may, for instance, map a PKI document's signature
+fingerprints (the keys of its signature map) to authority
+identifiers via each descriptor's ``identity_key_hash``.
+
+**Returns**:
+
+  List[Dict[str, Any]]: one dict per directory authority, with
+  keys ``identifier`` (str), ``pki_signature_scheme`` (str),
+  ``wire_kem_scheme`` (str), ``addresses`` (list of str),
+  ``identity_public_key_pem`` (str), ``link_public_key_pem``
+  (str), and ``identity_key_hash`` (32 raw bytes, the value by
+  which PKI document signatures are indexed).
+  
+
+**Raises**:
+
+- `Exception` - If the daemon has no voting authority peers
+  configured, or any other error code is returned.
+
 <a id="katzenpost_thinclient.core.ThinClient.parse_pki_doc"></a>
 
 #### ThinClient.parse\_pki\_doc
@@ -1098,6 +1130,74 @@ Queue ID of the courier that handled this message.
 
 ---
 
+<a id="katzenpost_thinclient.pigeonhole.VoucherMintResult"></a>
+
+### VoucherMintResult
+
+```python
+@dataclass
+class VoucherMintResult()
+```
+
+Result from voucher_mint.
+
+Hand ``voucher`` to the inductor out of band and publish
+``voucher_payload`` to VoucherStream box 0. Persist ``voucher_secret_key``
+to open the inductor's reply later.
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.VoucherInductResult"></a>
+
+### VoucherInductResult
+
+```python
+@dataclass
+class VoucherInductResult()
+```
+
+Result from voucher_induct.
+
+``mutated_message_read_cap`` is the joiner's salt-mutated read cap: the
+live read cap the inductor hands the group. Write ``sealed_reply`` to
+VoucherStream box 1.
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.VoucherOpenResult"></a>
+
+### VoucherOpenResult
+
+```python
+@dataclass
+class VoucherOpenResult()
+```
+
+Result from voucher_open.
+
+``mutated_message_write_cap`` is the joiner's salt-mutated write cap: the
+live write cap for real messages, which lands on the same box sequence as
+the read cap the inductor handed the group.
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.VoucherStreamResult"></a>
+
+### VoucherStreamResult
+
+```python
+@dataclass
+class VoucherStreamResult()
+```
+
+Result from voucher_derive_stream: the rendezvous stream caps.
+
+
+---
+
 <a id="katzenpost_thinclient.pigeonhole.new_keypair"></a>
 
 ### new\_keypair
@@ -1333,6 +1433,69 @@ read_cap, None, message_box_index, reply_idx, env_desc, ciphertext, env_hash)
 print(f"Received: {result.plaintext}")
 ```
 
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.write_stream"></a>
+
+### write\_stream
+
+```python
+async def write_stream(self, write_cap, start_index, payload, window=0)
+```
+
+Writes a whole payload, of any size, to a channel using the daemon's
+windowed selective-ack (SACK) ARQ. The daemon splits the payload into as
+many BACAP boxes as it spans and keeps up to ``window`` boxes in flight at
+once, retransmitting only those whose acknowledgements time out, so a
+multi-box payload is no longer serialised one round trip per box. A
+``window`` of zero asks the daemon to choose a default.
+
+The daemon does all chunking and encryption; the caller supplies only the
+cleartext payload, the write capability, and the start index.
+
+**Arguments**:
+
+- `write_cap` - Write capability for the destination channel.
+- `start_index` - Message box index of the first box written.
+- `payload` - Cleartext payload to write.
+- `window` - Maximum boxes in flight at once (0 = daemon default).
+  
+
+**Returns**:
+
+  The message box index immediately after the last box written.
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.read_stream"></a>
+
+### read\_stream
+
+```python
+async def read_stream(self, read_cap, start_index, box_count, window=0)
+```
+
+Reads ``box_count`` sequential boxes from a channel using the daemon's
+windowed selective-ack (SACK) ARQ, the read counterpart of
+``write_stream``. The daemon keeps up to ``window`` boxes in flight,
+decrypts each, and reassembles them in order. A ``window`` of zero asks the
+daemon to choose a default.
+
+**Arguments**:
+
+- `read_cap` - Read capability for the source channel.
+- `start_index` - Message box index of the first box read.
+- `box_count` - Number of sequential boxes to read.
+- `window` - Maximum boxes in flight at once (0 = daemon default).
+  
+
+**Returns**:
+
+  A tuple ``(payload, next_message_box_index)``: the concatenation of the
+  decrypted boxes in order, and the index immediately after the last box.
 
 
 ---
@@ -1992,6 +2155,128 @@ pass
 
 ---
 
+<a id="katzenpost_thinclient.pigeonhole.voucher_mint"></a>
+
+### voucher\_mint
+
+```python
+async def voucher_mint(self, message_write_cap: bytes,
+                       display_name: str) -> VoucherMintResult
+```
+
+Mints a Voucher from the joiner's MessageStream write cap.
+
+**Arguments**:
+
+- `message_write_cap` - The joiner's MessageStream write capability.
+- `display_name` - The joiner's chosen display name.
+  
+
+**Returns**:
+
+- `VoucherMintResult` - The Voucher, the payload to publish, the rendezvous
+  stream caps, and the reply keypair.
+  
+
+**Raises**:
+
+- `Exception` - If minting fails.
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.voucher_induct"></a>
+
+### voucher\_induct
+
+```python
+async def voucher_induct(self, voucher: bytes, voucher_payload: bytes,
+                         who_reply: bytes) -> VoucherInductResult
+```
+
+Verifies a published VoucherPayload and seals a reply to the joiner.
+
+**Arguments**:
+
+- `voucher` - The 32-byte token received out of band.
+- `voucher_payload` - The payload read from VoucherStream box 0.
+- `who_reply` - The opaque group-membership blob to seal for the joiner.
+  
+
+**Returns**:
+
+- `VoucherInductResult` - The joiner's salt-mutated read cap, the sealed
+  reply to write to VoucherStream box 1, and the salt.
+  
+
+**Raises**:
+
+- `Exception` - If induction fails (e.g. hash mismatch or bad signature).
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.voucher_open"></a>
+
+### voucher\_open
+
+```python
+async def voucher_open(self, voucher_secret_key: bytes, sealed_reply: bytes,
+                       message_write_cap: bytes) -> VoucherOpenResult
+```
+
+Opens the inductor's sealed reply with the joiner's voucher secret key,
+recovers the salt, and mutates the joiner's MessageStream write cap by it.
+
+**Arguments**:
+
+- `voucher_secret_key` - The joiner's persisted voucher secret key.
+- `sealed_reply` - The bytes read from VoucherStream box 1.
+- `message_write_cap` - The joiner's MessageStream write cap, mutated by the
+  recovered salt to yield the live write cap for real messages.
+  
+
+**Returns**:
+
+- `VoucherOpenResult` - The opaque WhoReply, the salt, and the salt-mutated
+  write cap.
+  
+
+**Raises**:
+
+- `Exception` - If opening fails (e.g. wrong key).
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.voucher_derive_stream"></a>
+
+### voucher\_derive\_stream
+
+```python
+async def voucher_derive_stream(self, voucher: bytes) -> VoucherStreamResult
+```
+
+Derives the VoucherStream caps from the Voucher, which the inductor needs
+to read box 0 before inducting.
+
+**Arguments**:
+
+- `voucher` - The 32-byte token.
+  
+
+**Returns**:
+
+- `VoucherStreamResult` - The rendezvous stream caps.
+  
+
+**Raises**:
+
+- `Exception` - If derivation fails.
+
+
+---
+
 <a id="katzenpost_thinclient.transport.tcp"></a>
 
 ## katzenpost\_thinclient.transport.tcp
@@ -2301,4 +2586,15 @@ embedded writes. Inspect the diagnostic attributes to determine the cause:
 - `failed_envelope_index` _int_ - 1-based sequential position in the copy
   stream of the envelope whose write triggered the abort. 0 if not
   applicable. This is NOT a BACAP message index.
+
+<a id="katzenpost_thinclient.core.PayloadTooLargeError"></a>
+
+#### PayloadTooLargeError
+
+```python
+class PayloadTooLargeError(Exception)
+```
+
+A WriteStream plaintext or a ReadStream result exceeded the daemon's
+configured maximum stream payload size.
 
