@@ -37,9 +37,9 @@ This reference describes the following pinned binding versions:
 
 | Binding | Repository | Tag |
 | --- | --- | --- |
-| Go reference | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/v0.0.81/client/thin) | [v0.0.81](https://github.com/katzenpost/katzenpost/releases/tag/v0.0.81) |
-| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/0.0.18/src) | [0.0.18](https://github.com/katzenpost/thin_client/releases/tag/0.0.18) |
-| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/0.0.18/katzenpost_thinclient) | [0.0.18](https://github.com/katzenpost/thin_client/releases/tag/0.0.18) |
+| Go reference | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/v0.0.89/client/thin) | [v0.0.89](https://github.com/katzenpost/katzenpost/releases/tag/v0.0.89) |
+| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/0.0.22/src) | [0.0.22](https://github.com/katzenpost/thin_client/releases/tag/0.0.22) |
+| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/0.0.22/katzenpost_thinclient) | [0.0.22](https://github.com/katzenpost/thin_client/releases/tag/0.0.22) |
 
 For pinned versions of the full stack (including `kpclientd`, `katzenqt`, and
 the server-side components), see [Build from source](/docs/build_from_source/).
@@ -832,69 +832,6 @@ async def start_resending_encrypted_message_no_retry(self, read_cap: 'bytes|None
 {{< /tab >}}
 {{< /tabpane >}}
 
-### WriteStream / write_stream
-
-WriteStream writes a whole payload, of any size, to the destination
-channel using the daemon's windowed selective-ack (SACK) ARQ. The daemon
-splits the payload into as many BACAP boxes as it spans and keeps up to
-`window` boxes in flight at once, retransmitting only those whose
-acknowledgements time out, so a multi-box payload is no longer serialised
-one round trip per box. A `window` of zero asks the daemon to choose a
-default derived from the send rate and round-trip time.
-
-WriteStrea blocks until every box has been acknowledged (success) or the transfer
-fails, returning the message box index immediately after the last box
-written, ready to seed a subsequent write on the same channel.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) WriteStream(writeCap *bacap.WriteCap, startIndex *bacap.MessageBoxIndex, payload []byte, window int) (nextIndex *bacap.MessageBoxIndex, err error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn write_stream(
-    &self,
-    write_cap: &[u8],
-    start_index: &[u8],
-    payload: &[u8],
-    window: i64,
-) -> Result<Vec<u8>, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def write_stream(self, write_cap, start_index, payload, window = 0):
-{{< /tab >}}
-{{< /tabpane >}}
-
-### ReadStream / read_stream
-
-ReadStream reads boxCount sequential boxes from a channel using the
-daemon's windowed selective-ack (SACK) ARQ, the read counterpart of
-WriteStream. The daemon keeps up to `window` boxes in flight at once,
-retransmitting only those whose payloads time out, decrypts each box, and
-reassembles them in order. A `window` of zero causes the daemon to choose a
-default.
-
-It blocks until every box has been read (success) or the transfer fails,
-returning the concatenated payload and the message box index immediately
-after the last box read.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) ReadStream(readCap *bacap.ReadCap, startIndex *bacap.MessageBoxIndex, boxCount uint32, window int) (payload []byte, nextIndex *bacap.MessageBoxIndex, err error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn read_stream(
-    &self,
-    read_cap: &[u8],
-    start_index: &[u8],
-    box_count: u32,
-    window: i64,
-) -> Result<(Vec<u8>, Vec<u8>), ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def read_stream(self, read_cap, start_index, box_count, window = 0):
-{{< /tab >}}
-{{< /tabpane >}}
-
 ### CancelResendingEncryptedMessage / cancel_resending_encrypted_message
 
 CancelResendingEncryptedMessage cancels ARQ resending for an encrypted message.
@@ -1089,11 +1026,6 @@ the following actions.
  4. Sends each envelope to intermediate replicas for replication.
  5. Writes tombstones to clean up the temporary channel.
 
-The Rust and Python bindings accept optional `courier_identity_hash`
-and `courier_queue_id` arguments to pin the command to a particular
-courier; the Go binding exposes that same behavior through a
-distinct method, `StartResendingCopyCommandWithCourier`.
-
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
 func (t *ThinClient) StartResendingCopyCommand(writeCap *bacap.WriteCap) error
@@ -1108,37 +1040,6 @@ pub async fn start_resending_copy_command(
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
 async def start_resending_copy_command(self, write_cap: bytes, courier_identity_hash: 'bytes|None' = None, courier_queue_id: 'bytes|None' = None) -> None:
-{{< /tab >}}
-{{< /tabpane >}}
-
-### StartResendingCopyCommandWithCourier (Go only)
-
-StartResendingCopyCommandWithCourier behaves exactly like
-StartResendingCopyCommand save that it dispatches the copy command
-to a courier the caller has chosen, rather than to one selected at
-random from the current PKI document. The courier is identified by
-the (identity-hash, queue-id) pair returned by GetAllCouriers or
-GetDistinctCouriers.
-
-This is the building block for nested copy commands, in which the
-outer command is sent to one courier and the inner commands carried
-inside it reference a different courier. Staggering the two layers
-across distinct couriers reduces the chance that any single
-compromised courier observes both halves of the copy transaction
-and can therefore link them.
-
-In Rust and Python the same behavior is achieved not through a
-separate method but by supplying the optional
-`courier_identity_hash` and `courier_queue_id` arguments to
-`start_resending_copy_command`.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) StartResendingCopyCommandWithCourier(
-	writeCap *bacap.WriteCap,
-	courierIdentityHash *[32]byte,
-	courierQueueID []byte,
-) error
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -1164,75 +1065,6 @@ pub async fn cancel_resending_copy_command(
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
 async def cancel_resending_copy_command(self, write_cap_hash: bytes) -> None:
-{{< /tab >}}
-{{< /tabpane >}}
-
-## Pigeonhole: Courier Discovery
-
-### GetAllCouriers / get_all_couriers
-
-GetAllCouriers returns every courier service advertised in the
-current PKI document, each described by an (identity-hash,
-queue-id) pair. The list reflects only the couriers that the
-current consensus regards as serving.
-
-The principal caller is the nested-copy-command machinery, which
-needs to choose particular couriers rather than accept the random
-draw made on the caller's behalf by StartResendingCopyCommand; for
-simple cases where any courier will do, the default routing path
-is usually preferable.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) GetAllCouriers() (couriers []CourierDescriptor, err error)
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-def get_all_couriers(self) -> 'List[Tuple[bytes, bytes]]':
-{{< /tab >}}
-{{< /tabpane >}}
-
-### GetDistinctCouriers / get_distinct_couriers
-
-GetDistinctCouriers draws n couriers uniformly at random from the
-list returned by GetAllCouriers, without replacement, so that no
-two entries in the returned slice refer to the same courier. This
-is the usual building block for a nested copy command, every layer
-of which must be carried by a different courier.
-
-Returns an error if the current PKI document advertises fewer than
-n couriers.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) GetDistinctCouriers(n int) (couriers []CourierDescriptor, err error)
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-def get_distinct_couriers(self, n: int) -> 'List[Tuple[bytes, bytes]]':
-{{< /tab >}}
-{{< /tabpane >}}
-
-### get_courier_destination (Rust only)
-
-Returns one courier destination, drawn uniformly at random from
-the couriers advertised in the current PKI document, as the
-`(identity_hash, queue_id)` pair the rest of the API expects. This
-spares the caller from handling a list when one courier will do.
-
-The principal use is the routine "pick a courier, send a copy
-command to it" pattern; for the nested-copy-command case where two
-distinct couriers are required, draw them with a single call to
-the underlying service helpers in `helpers.rs` rather than calling
-this method twice and risking the same draw.
-
-Go and Python callers reach the same result by calling
-`GetDistinctCouriers(1)` / `get_distinct_couriers(1)` and taking
-the first element of the returned slice.
-
-{{< tabpane >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn get_courier_destination(
-    &self,
-) -> Result<(Vec<u8>, Vec<u8>), ThinClientError>
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -1448,20 +1280,18 @@ async def get_message_box_index_counter(self, message_box_index: bytes) -> int:
 {{< /tab >}}
 {{< /tabpane >}}
 
-### GetConfig / get_config
+### GetConfig (Go only)
 
 GetConfig returns the client's configuration.
 
-The Rust binding exposes no configuration accessor; Rust callers read
-the negotiated geometries through the dedicated `sphinx_geometry` and
-`pigeonhole_geometry` methods.
+Python callers read the configuration through the plain `config`
+attribute on `ThinClient`. The Rust binding exposes no configuration
+accessor; Rust callers read the negotiated geometries through the
+dedicated `sphinx_geometry` and `pigeonhole_geometry` methods.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
 func (t *ThinClient) GetConfig() *Config
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-def get_config(self) -> Config:
 {{< /tab >}}
 {{< /tabpane >}}
 

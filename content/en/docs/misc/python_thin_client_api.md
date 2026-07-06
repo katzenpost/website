@@ -26,8 +26,8 @@ Do not edit it directly: changes belong in the binding docstrings (in
 the `thin_client` repository) and will be overwritten by the next
 generation pass.
 
-This page documents the **0.0.18** release of the Python
-binding ([source](https://github.com/katzenpost/thin_client/tree/0.0.18/katzenpost_thinclient),
+This page documents the **0.0.22** release of the Python
+binding ([source](https://github.com/katzenpost/thin_client/tree/0.0.22/katzenpost_thinclient),
 [PyPI](https://pypi.org/project/katzenpost_thinclient/)). Symbols are
 re-exported from `katzenpost_thinclient`, so application code may
 import them directly, for example `from katzenpost_thinclient import
@@ -520,20 +520,6 @@ and begin the background event loop.
   Exceptions:
   BrokenPipeError
 
-<a id="katzenpost_thinclient.core.ThinClient.get_config"></a>
-
-#### ThinClient.get\_config
-
-```python
-def get_config() -> Config
-```
-
-Returns the current configuration object.
-
-**Returns**:
-
-- `Config` - The client configuration in use.
-
 <a id="katzenpost_thinclient.core.ThinClient.is_connected"></a>
 
 #### ThinClient.is\_connected
@@ -816,63 +802,6 @@ returns an arbitrary one. To see every advertised instance, use
 
 - `Exception` - If the PKI document is missing, or no node in the
   current consensus advertises ``service_name``.
-
-<a id="katzenpost_thinclient.core.ThinClient.get_all_couriers"></a>
-
-#### ThinClient.get\_all\_couriers
-
-```python
-def get_all_couriers() -> "List[Tuple[bytes, bytes]]"
-```
-
-Return every courier service advertised in the current PKI
-document, each described by an ``(identity_hash, queue_id)``
-tuple. The list reflects only the couriers that the current
-consensus regards as serving.
-
-The principal caller is the nested-copy-command machinery, which
-needs to choose particular couriers rather than accept the random
-draw made on the caller's behalf by
-``start_resending_copy_command``; for simple cases where any
-courier will do, the default routing path is usually preferable.
-
-**Returns**:
-
-  list[tuple[bytes, bytes]]: List of (identity_hash, queue_id) tuples.
-  
-
-**Raises**:
-
-- `Exception` - If no couriers are available.
-
-<a id="katzenpost_thinclient.core.ThinClient.get_distinct_couriers"></a>
-
-#### ThinClient.get\_distinct\_couriers
-
-```python
-def get_distinct_couriers(n: int) -> "List[Tuple[bytes, bytes]]"
-```
-
-Draw ``n`` couriers uniformly at random from the list returned by
-``get_all_couriers``, without replacement, so that no two entries
-in the returned list refer to the same courier. This is the usual
-building block for a nested copy command, every layer of which
-must be carried by a different courier.
-
-**Arguments**:
-
-- `n` _int_ - Number of distinct couriers to return.
-  
-
-**Returns**:
-
-  list[tuple[bytes, bytes]]: List of (identity_hash, queue_id) tuples.
-  
-
-**Raises**:
-
-- `Exception` - If the current PKI document advertises fewer than
-  ``n`` couriers.
 
 <a id="katzenpost_thinclient.core.ThinClient.blocking_send_message"></a>
 
@@ -1433,69 +1362,6 @@ read_cap, None, message_box_index, reply_idx, env_desc, ciphertext, env_hash)
 print(f"Received: {result.plaintext}")
 ```
 
-
-
----
-
-<a id="katzenpost_thinclient.pigeonhole.write_stream"></a>
-
-### write\_stream
-
-```python
-async def write_stream(self, write_cap, start_index, payload, window=0)
-```
-
-Writes a whole payload, of any size, to a channel using the daemon's
-windowed selective-ack (SACK) ARQ. The daemon splits the payload into as
-many BACAP boxes as it spans and keeps up to ``window`` boxes in flight at
-once, retransmitting only those whose acknowledgements time out, so a
-multi-box payload is no longer serialised one round trip per box. A
-``window`` of zero asks the daemon to choose a default.
-
-The daemon does all chunking and encryption; the caller supplies only the
-cleartext payload, the write capability, and the start index.
-
-**Arguments**:
-
-- `write_cap` - Write capability for the destination channel.
-- `start_index` - Message box index of the first box written.
-- `payload` - Cleartext payload to write.
-- `window` - Maximum boxes in flight at once (0 = daemon default).
-  
-
-**Returns**:
-
-  The message box index immediately after the last box written.
-
-
----
-
-<a id="katzenpost_thinclient.pigeonhole.read_stream"></a>
-
-### read\_stream
-
-```python
-async def read_stream(self, read_cap, start_index, box_count, window=0)
-```
-
-Reads ``box_count`` sequential boxes from a channel using the daemon's
-windowed selective-ack (SACK) ARQ, the read counterpart of
-``write_stream``. The daemon keeps up to ``window`` boxes in flight,
-decrypts each, and reassembles them in order. A ``window`` of zero asks the
-daemon to choose a default.
-
-**Arguments**:
-
-- `read_cap` - Read capability for the source channel.
-- `start_index` - Message box index of the first box read.
-- `box_count` - Number of sequential boxes to read.
-- `window` - Maximum boxes in flight at once (0 = daemon default).
-  
-
-**Returns**:
-
-  A tuple ``(payload, next_message_box_index)``: the concatenation of the
-  decrypted boxes in order, and the index immediately after the last box.
 
 
 ---
@@ -2595,6 +2461,62 @@ embedded writes. Inspect the diagnostic attributes to determine the cause:
 class PayloadTooLargeError(Exception)
 ```
 
-A WriteStream plaintext or a ReadStream result exceeded the daemon's
-configured maximum stream payload size.
+A request's payload exceeded the daemon's configured maximum payload
+size.
+
+<a id="katzenpost_thinclient.core.CourierError"></a>
+
+#### CourierError
+
+```python
+class CourierError(Exception)
+```
+
+Base class for errors raised by the courier (as opposed to a storage
+replica). The courier and the replicas are distinct components: a courier
+error means the courier itself rejected or could not dispatch the request,
+and must not be confused with a replica error such as a database failure.
+
+<a id="katzenpost_thinclient.core.CourierInvalidEnvelopeError"></a>
+
+#### CourierInvalidEnvelopeError
+
+```python
+class CourierInvalidEnvelopeError(CourierError)
+```
+
+The courier rejected the CourierEnvelope as malformed.
+
+<a id="katzenpost_thinclient.core.CourierCacheCorruptionError"></a>
+
+#### CourierCacheCorruptionError
+
+```python
+class CourierCacheCorruptionError(CourierError)
+```
+
+The courier detected corruption in its reply cache.
+
+<a id="katzenpost_thinclient.core.CourierPropagationError"></a>
+
+#### CourierPropagationError
+
+```python
+class CourierPropagationError(CourierError)
+```
+
+The courier could not propagate the request to the replicas.
+
+<a id="katzenpost_thinclient.core.CourierInvalidEpochError"></a>
+
+#### CourierInvalidEpochError
+
+```python
+class CourierInvalidEpochError(CourierError)
+```
+
+The courier rejected the CourierEnvelope because its declared replica
+epoch was outside the courier's tolerance window. This is a staleness
+signal from the courier, NOT a replica database failure, even though the
+two share value 4 in their respective source namespaces.
 
