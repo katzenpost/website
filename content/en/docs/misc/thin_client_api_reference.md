@@ -47,9 +47,677 @@ the server-side components), see [Build from source](/docs/build_from_source/).
 For conceptual background on Pigeonhole, see [Understanding Pigeonhole](/docs/pigeonhole_explained/).
 For task-oriented usage guides, see [Thin Client How-to Guide](/docs/thin_client_howto/).
 
+The reference is organized in two parts: the
+[Pigeonhole API](#pigeonhole-api), the message-passing layer most
+applications build on, followed by the
+[Core Thin-Client API](#core-thin-client-api) covering configuration,
+connection management, events, PKI queries, and direct messaging.
+
 ---
 
-## Configuration and Construction
+## Pigeonhole API
+
+The Pigeonhole API is the message-passing layer of the thin client:
+applications write to and read from BACAP-encrypted storage streams
+held on the mixnet's storage replicas, reached through couriers. For
+conceptual background, see
+[Understanding Pigeonhole](/docs/pigeonhole_explained/); for worked
+examples in all three languages, see the
+[Thin Client How-to Guide](/docs/thin_client_howto/).
+
+> **Most Pigeonhole methods cause no mixnet traffic.** Only
+> `StartResendingEncryptedMessage` (and its two variants) and
+> `StartResendingCopyCommand` put traffic on the mixnet; they are
+> marked **Sends mixnet traffic** below. The `Cancel*` methods are
+> local control operations, and everything else is a local
+> computation performed by the daemon over the local socket.
+
+| Method | Purpose |
+|---|---|
+| [NewKeypair / new_keypair](#newkeypair--new_keypair) | Generates a new BACAP keypair from a 32-byte seed. |
+| [NextMessageBoxIndex / next_message_box_index](#nextmessageboxindex--next_message_box_index) | Returns the next message box index in the sequence. |
+| [GetMessageBoxIndexCounter / get_message_box_index_counter](#getmessageboxindexcounter--get_message_box_index_counter) | Returns the BACAP Idx64 counter embedded in a MessageBoxIndex, the sequence number of a box within its stream. |
+| [EncryptRead / encrypt_read](#encryptread--encrypt_read) | Creates an encrypted read request for a single Pigeonhole box. |
+| [EncryptWrite / encrypt_write](#encryptwrite--encrypt_write) | Creates an encrypted write request for a single Pigeonhole box. |
+| [StartResendingEncryptedMessage / start_resending_encrypted_message](#startresendingencryptedmessage--start_resending_encrypted_message) | Sends an encrypted read or write request to a courier via the ARQ mechanism. **Sends mixnet traffic.** |
+| [StartResendingEncryptedMessageReturnBoxExists](#startresendingencryptedmessagereturnboxexists) | Same as the default variant, but returns `BoxAlreadyExists` as an error instead of treating it as success. **Sends mixnet traffic.** |
+| [StartResendingEncryptedMessageNoRetry](#startresendingencryptedmessagenoretry) | Same as the default variant, but returns `BoxIDNotFound` immediately instead of retrying indefinitely. **Sends mixnet traffic.** |
+| [CancelResendingEncryptedMessage / cancel_resending_encrypted_message](#cancelresendingencryptedmessage--cancel_resending_encrypted_message) | Cancels an in-flight `StartResendingEncryptedMessage` operation. |
+| [TombstoneRange / tombstone_range](#tombstonerange--tombstone_range) | Creates encrypted tombstone envelopes for a range of consecutive boxes. |
+| [CreateCourierEnvelopesFromPayload](#createcourierenvelopesfrompayload) | Packs a single payload for one destination into copy stream elements. |
+| [CreateCourierEnvelopesFromMultiPayload](#createcourierenvelopesfrommultipayload) | Packs multiple payloads for different destinations into copy stream elements. |
+| [CreateCourierEnvelopesFromTombstoneRange](#createcourierenvelopesfromtombstonerange) | Packs tombstone envelopes for a range of consecutive destination boxes into copy stream elements. |
+| [StartResendingCopyCommand / start_resending_copy_command](#startresendingcopycommand--start_resending_copy_command) | Sends a copy command to a courier via ARQ and **blocks** until the courier acknowledges completion. **Sends mixnet traffic.** |
+| [CancelResendingCopyCommand / cancel_resending_copy_command](#cancelresendingcopycommand--cancel_resending_copy_command) | Cancels an in-flight copy command. |
+| [VoucherMint / voucher_mint](#vouchermint--voucher_mint) | Mints a Voucher from the joiner's MessageStream write capability. |
+| [VoucherInduct / voucher_induct](#voucherinduct--voucher_induct) | Verifies a published VoucherPayload and seals a reply to the joiner. |
+| [VoucherOpen / voucher_open](#voucheropen--voucher_open) | Opens the inductor's sealed reply with the joiner's voucher secret key. |
+| [VoucherDeriveStream / voucher_derive_stream](#voucherderivestream--voucher_derive_stream) | Derives the VoucherStream capabilities from the Voucher. |
+| [GetPigeonholeGeometry / pigeonhole_geometry](#getpigeonholegeometry--pigeonhole_geometry) | Returns the negotiated Pigeonhole geometry, so that callers can size payloads to its maximum plaintext payload length. |
+
+### Keypairs and Capabilities
+
+#### NewKeypair / new_keypair
+
+NewKeypair creates a new keypair for use with the Pigeonhole protocol.
+
+This method generates a WriteCap and ReadCap from the provided seed using
+the BACAP (blinding-and-capability) protocol. The WriteCap should be stored
+securely for writing messages, while the ReadCap can be shared with others
+to allow them to read messages.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) NewKeypair(seed []byte) (writeCap *bacap.WriteCap, readCap *bacap.ReadCap, firstMessageIndex *bacap.MessageBoxIndex, err error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn new_keypair(
+    &self,
+    seed: &[u8; 32],
+) -> Result<KeypairResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def new_keypair(self, seed: bytes) -> KeypairResult:
+{{< /tab >}}
+{{< /tabpane >}}
+
+### Index Management
+
+#### NextMessageBoxIndex / next_message_box_index
+
+NextMessageBoxIndex increments a MessageBoxIndex using the BACAP NextIndex method.
+
+This method is used when sending multiple messages to different mailboxes using
+the same WriteCap or ReadCap. It properly advances the cryptographic state with
+the following actions.
+  - Incrementing the Idx64 counter.
+  - Deriving new encryption and blinding keys using HKDF.
+  - Updating the HKDF state for the next iteration.
+
+The client daemon handles the cryptographic operations using our BACAP library
+documented here: https://pkg.go.dev/github.com/katzenpost/hpqc/bacap
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) NextMessageBoxIndex(messageBoxIndex *bacap.MessageBoxIndex) (nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn next_message_box_index(
+    &self,
+    message_box_index: &[u8],
+) -> Result<Vec<u8>, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def next_message_box_index(self, message_box_index: bytes) -> bytes:
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### GetMessageBoxIndexCounter / get_message_box_index_counter
+
+GetMessageBoxIndexCounter returns the BACAP Idx64 counter embedded in a
+MessageBoxIndex. Callers can use this to order or compare two indexes
+without having to know bacap.MessageBoxIndex's binary layout.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) GetMessageBoxIndexCounter(messageBoxIndex *bacap.MessageBoxIndex) (uint64, error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn get_message_box_index_counter(
+    &self,
+    message_box_index: &[u8],
+) -> Result<u64, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def get_message_box_index_counter(self, message_box_index: bytes) -> int:
+{{< /tab >}}
+{{< /tabpane >}}
+
+### Preparing Reads and Writes
+
+#### EncryptRead / encrypt_read
+
+EncryptRead encrypts a read operation for a given read capability.
+
+This method prepares an encrypted read request that can be sent to the
+courier service to retrieve a message from a Pigeonhole box. The returned
+ciphertext should be sent via StartResendingEncryptedMessage.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) EncryptRead(readCap *bacap.ReadCap, messageBoxIndex *bacap.MessageBoxIndex) (messageCiphertext []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn encrypt_read(
+    &self,
+    read_cap: &[u8],
+    message_box_index: &[u8],
+) -> Result<EncryptReadResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def encrypt_read(self, read_cap: bytes, message_box_index: bytes) -> EncryptReadResult:
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### EncryptWrite / encrypt_write
+
+EncryptWrite encrypts a write operation for a given write capability.
+
+This method prepares an encrypted write request that can be sent to the
+courier service to store a message in a Pigeonhole box. The returned
+ciphertext should be sent via StartResendingEncryptedMessage.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) EncryptWrite(plaintext []byte, writeCap *bacap.WriteCap, messageBoxIndex *bacap.MessageBoxIndex) (messageCiphertext []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn encrypt_write(
+    &self,
+    plaintext: &[u8],
+    write_cap: &[u8],
+    message_box_index: &[u8],
+) -> Result<EncryptWriteResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def encrypt_write(self, plaintext: bytes, write_cap: bytes, message_box_index: bytes) -> EncryptWriteResult:
+{{< /tab >}}
+{{< /tabpane >}}
+
+### Sending and ARQ Transport
+
+#### StartResendingEncryptedMessage / start_resending_encrypted_message
+
+**Sends mixnet traffic.**
+
+StartResendingEncryptedMessage sends an encrypted message via ARQ and blocks until completion.
+
+This method blocks until a reply is received. CancelResendingEncryptedMessage is only
+useful when called from another goroutine to interrupt this blocking call.
+
+The message will be resent periodically until until one of the following is true:
+  - A reply is received from the courier (this method returns).
+  - The message is canceled via CancelResendingEncryptedMessage (from another goroutine).
+  - The client is shut down.
+
+This is used for both read and write operations in the new Pigeonhole API.
+
+The daemon implements a finite state machine (FSM) for handling the stop-and-wait
+ARQ protocol in the following cases.
+  - For default write operations (writeCap != nil, readCap == nil,
+    noIdempotentBoxAlreadyExists == false):
+    The method waits for an ACK from the courier and returns immediately.
+    The ACK confirms that the courier received the envelope and will dispatch it
+    to both shard replicas. This requires only a single round-trip through
+    the mixnet.
+  - For BoxAlreadyExists-aware writes (noIdempotentBoxAlreadyExists == true):
+    The method waits for an ACK, then sends a second SURB to retrieve the
+    replica's error code. This requires two round-trips through the mixnet.
+  - For read operations (readCap != nil, writeCap == nil):
+    The method waits for an ACK from the courier, then the daemon automatically
+    sends a new SURB to request the payload, and this method waits for the payload.
+    The daemon performs all decryption (MKEM envelope + BACAP payload) and returns
+    the fully decrypted plaintext.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) StartResendingEncryptedMessage(readCap *bacap.ReadCap, writeCap *bacap.WriteCap, messageBoxIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) (*StartResendingResult, error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn start_resending_encrypted_message(
+    &self,
+    read_cap: Option<&[u8]>,
+    write_cap: Option<&[u8]>,
+    message_box_index: Option<&[u8]>,
+    reply_index: Option<u8>,
+    envelope_descriptor: &[u8],
+    message_ciphertext: &[u8],
+    envelope_hash: &[u8; 32],
+) -> Result<StartResendingResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def start_resending_encrypted_message(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes, no_retry_on_box_id_not_found: bool = False, no_idempotent_box_already_exists: bool = False) -> StartResendingResult:
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### StartResendingEncryptedMessageReturnBoxExists
+
+**Sends mixnet traffic.**
+
+StartResendingEncryptedMessageReturnBoxExists behaves exactly like
+StartResendingEncryptedMessage save that it returns
+ErrBoxAlreadyExists when the replica reports that the destination
+box has already been written, rather than swallowing the condition
+as idempotent success. Use it to distinguish a
+fresh write from a repeat: for instance, when implementing
+optimistic concurrency on top of the channel, or when establishing
+whether a particular call actually caused a state change at the
+replica.
+
+Note that this variant costs an additional mixnet round trip: the
+BoxAlreadyExists code is carried by the replica's reply rather than
+the courier's ACK, so the daemon must dispatch a second SURB before
+it can return the answer.
+
+As with StartResendingEncryptedMessage, an in-flight call may be
+cancelled from another goroutine via CancelResendingEncryptedMessage.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) StartResendingEncryptedMessageReturnBoxExists(readCap *bacap.ReadCap, writeCap *bacap.WriteCap, messageBoxIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) (*StartResendingResult, error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn start_resending_encrypted_message_return_box_exists(
+    &self,
+    read_cap: Option<&[u8]>,
+    write_cap: Option<&[u8]>,
+    message_box_index: Option<&[u8]>,
+    reply_index: Option<u8>,
+    envelope_descriptor: &[u8],
+    message_ciphertext: &[u8],
+    envelope_hash: &[u8; 32],
+) -> Result<StartResendingResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def start_resending_encrypted_message_return_box_exists(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes) -> StartResendingResult:
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### StartResendingEncryptedMessageNoRetry
+
+**Sends mixnet traffic.**
+
+StartResendingEncryptedMessageNoRetry behaves exactly like
+StartResendingEncryptedMessage save that it disables the daemon's
+automatic retry of ErrBoxIDNotFound. The caller learns at once that
+the box is absent rather than waiting for replication to settle.
+
+Use it when polling a box that may not yet have been written, for
+instance when a reader peeks ahead at a peer's next message before
+that peer has produced it. The regular variant would block until
+the box appeared, which can be many round trips.
+
+As with StartResendingEncryptedMessage, an in-flight call may be
+cancelled from another goroutine via CancelResendingEncryptedMessage.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) StartResendingEncryptedMessageNoRetry(readCap *bacap.ReadCap, writeCap *bacap.WriteCap, messageBoxIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) (*StartResendingResult, error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn start_resending_encrypted_message_no_retry(
+    &self,
+    read_cap: Option<&[u8]>,
+    write_cap: Option<&[u8]>,
+    message_box_index: Option<&[u8]>,
+    reply_index: Option<u8>,
+    envelope_descriptor: &[u8],
+    message_ciphertext: &[u8],
+    envelope_hash: &[u8; 32],
+) -> Result<StartResendingResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def start_resending_encrypted_message_no_retry(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes) -> StartResendingResult:
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### CancelResendingEncryptedMessage / cancel_resending_encrypted_message
+
+CancelResendingEncryptedMessage cancels ARQ resending for an encrypted message.
+
+This method stops the ARQ for a previously started
+encrypted message transmission. This is useful in the following cases.
+  - A reply has been received through another channel.
+  - The operation should be aborted.
+  - The message is no longer needed.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) CancelResendingEncryptedMessage(envelopeHash *[32]byte) error
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn cancel_resending_encrypted_message(
+    &self,
+    envelope_hash: &[u8; 32],
+) -> Result<(), ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def cancel_resending_encrypted_message(self, envelope_hash: bytes) -> None:
+{{< /tab >}}
+{{< /tabpane >}}
+
+### Tombstones
+
+#### TombstoneRange / tombstone_range
+
+TombstoneRange prepares the encrypted envelopes needed to
+tombstone a consecutive range of Pigeonhole boxes beginning at the
+supplied MessageBoxIndex. A tombstone is a signed empty payload
+that the replica recognizes as a deletion marker; the daemon
+constructs one by signing rather than encrypting whenever
+EncryptWrite is invoked with an empty plaintext.
+
+This method does not itself touch the network: it returns the
+envelopes for the caller to dispatch one by one, typically via
+StartResendingEncryptedMessage. To tombstone a single box, pass
+maxCount=1.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (c *ThinClient) TombstoneRange(
+	writeCap *bacap.WriteCap,
+	start *bacap.MessageBoxIndex,
+	maxCount uint32,
+) (result *TombstoneRangeResult, err error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn tombstone_range(
+    &self,
+    write_cap: &[u8],
+    start: &[u8],
+    max_count: u32,
+) -> TombstoneRangeResult
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def tombstone_range(self, write_cap: bytes, start: bytes, max_count: int) -> TombstoneRangeResult:
+{{< /tab >}}
+{{< /tabpane >}}
+
+### Copy Commands
+
+#### CreateCourierEnvelopesFromPayload
+
+CreateCourierEnvelopesFromPayload packs a payload of arbitrary
+size (up to 10 MB) into properly sized CopyStreamElement chunks
+for one destination channel. Each chunk is a serialized
+CopyStreamElement, ready to be written to a box via EncryptWrite
+followed by StartResendingEncryptedMessage. The caller marks the
+boundaries of the stream with the isStart and isLast flags.
+
+This method is stateless: no daemon state is kept between calls, and
+each invocation runs a fresh encoder and flushes before returning.
+The 10 MB cap guards against accidental memory exhaustion.
+
+Once the chunks have been written to a temporary copy stream, a
+copy command (StartResendingCopyCommand) is dispatched to a
+courier with the WriteCap for that temporary stream; the courier
+reads the chunks back and dispatches each envelope to its
+destination box.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) CreateCourierEnvelopesFromPayload(payload []byte, destWriteCap *bacap.WriteCap, destStartIndex *bacap.MessageBoxIndex, isStart bool, isLast bool) (envelopes [][]byte, nextDestIndex *bacap.MessageBoxIndex, err error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn create_courier_envelopes_from_payload(
+    &self,
+    payload: &[u8],
+    dest_write_cap: &[u8],
+    dest_start_index: &[u8],
+    is_start: bool,
+    is_last: bool,
+) -> Result<CreateEnvelopesResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def create_courier_envelopes_from_payload(self, payload: bytes, dest_write_cap: bytes, dest_start_index: bytes, is_start: bool, is_last: bool) -> 'CreateEnvelopesResult':
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### CreateCourierEnvelopesFromMultiPayload
+
+CreateCourierEnvelopesFromMultiPayload packs payloads bound for
+several destination channels into a single stream of
+CopyStreamElement chunks. This is more space-efficient than
+calling CreateCourierEnvelopesFromPayload once per destination,
+because the shared encoder runs all envelopes together rather than
+padding the final box of each destination independently.
+
+This method is stateless; the buffer argument carries any residual
+encoder state across calls in place of daemon-side bookkeeping.
+Pass nil for buffer on the first call and the buffer returned by
+the previous call thereafter; set isLast on the final call so that
+the encoder flushes its tail.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) CreateCourierEnvelopesFromMultiPayload(destinations []DestinationPayload, isStart bool, isLast bool, buffer []byte) (*CreateEnvelopesResult, error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn create_courier_envelopes_from_multi_payload(
+    &self,
+    destinations: Vec<(&[u8], &[u8], &[u8])>,
+    is_start: bool,
+    is_last: bool,
+    buffer: Option<Vec<u8>>,
+) -> Result<CreateEnvelopesResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def create_courier_envelopes_from_multi_payload(self, destinations: 'List[Dict[str, Any]]', is_start: bool, is_last: bool, buffer: 'bytes | None' = None) -> 'CreateEnvelopesResult':
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### CreateCourierEnvelopesFromTombstoneRange
+
+CreateCourierEnvelopesFromTombstoneRange creates tombstone CourierEnvelopes for a range
+of destination indices, encoded as copy stream elements ready to be written to a
+temporary copy stream channel.
+
+This combines the tombstone creation logic (SignBox with empty payload) with the
+courier envelope wrapping and copy stream encoding of CreateCourierEnvelopesFromPayload.
+
+The buffer parameter enables stateless continuation across multiple calls without
+wasting space in the last box. Pass nil on the first call, then pass the returned
+nextBuffer to the next call.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) CreateCourierEnvelopesFromTombstoneRange(
+	destWriteCap *bacap.WriteCap,
+	destStartIndex *bacap.MessageBoxIndex,
+	maxCount uint32,
+	isStart bool,
+	isLast bool,
+	buffer []byte,
+) (envelopes [][]byte, nextBuffer []byte, nextDestIndex *bacap.MessageBoxIndex, err error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn create_courier_envelopes_from_tombstone_range(
+    &self,
+    dest_write_cap: &[u8],
+    dest_start_index: &[u8],
+    max_count: u32,
+    is_start: bool,
+    is_last: bool,
+    buffer: Option<Vec<u8>>,
+) -> Result<CreateEnvelopesResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def create_courier_envelopes_from_tombstone_range(self, dest_write_cap: bytes, dest_start_index: bytes, max_count: int, is_start: bool, is_last: bool, buffer: 'bytes | None' = None) -> 'CreateEnvelopesResult':
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### StartResendingCopyCommand / start_resending_copy_command
+
+**Sends mixnet traffic.**
+
+StartResendingCopyCommand sends a copy command via ARQ and blocks until completion.
+
+This method blocks until a reply is received. It uses the ARQ
+mechanism to reliably send copy commands to the courier, automatically retrying if
+the reply is not received in time.
+
+The copy command instructs the courier to read from a temporary copy stream channel
+and write the parsed envelopes to their destination channels. The courier performs
+the following actions.
+ 1. Derives a ReadCap from the WriteCap.
+ 2. Reads boxes from the temporary channel.
+ 3. Parses boxes into CourierEnvelopes.
+ 4. Sends each envelope to intermediate replicas for replication.
+ 5. Writes tombstones to clean up the temporary channel.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) StartResendingCopyCommand(writeCap *bacap.WriteCap) error
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn start_resending_copy_command(
+    &self,
+    write_cap: &[u8],
+    courier_identity_hash: Option<&[u8]>,
+    courier_queue_id: Option<&[u8]>,
+) -> Result<(), ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def start_resending_copy_command(self, write_cap: bytes, courier_identity_hash: 'bytes|None' = None, courier_queue_id: 'bytes|None' = None) -> None:
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### CancelResendingCopyCommand / cancel_resending_copy_command
+
+CancelResendingCopyCommand cancels ARQ resending for a copy command.
+
+This method stops the ARQ for a previously started
+copy command. This is useful when:
+  - A reply has been received through another channel.
+  - The operation should be aborted.
+  - The copy command is no longer needed.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) CancelResendingCopyCommand(writeCapHash *[32]byte) error
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn cancel_resending_copy_command(
+    &self,
+    write_cap_hash: &[u8; 32],
+) -> Result<(), ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def cancel_resending_copy_command(self, write_cap_hash: bytes) -> None:
+{{< /tab >}}
+{{< /tabpane >}}
+
+### Contact Vouchers
+
+#### VoucherMint / voucher_mint
+
+VoucherMint mints a Voucher from the joiner's MessageStream write cap. The
+returned reply carries the Voucher to hand over out of band, the payload to
+publish to VoucherStream box 0, the rendezvous stream caps, and the reply
+keypair; persist VoucherSecretKey to open the inductor's reply later.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) VoucherMint(messageWriteCap []byte, displayName string) (*VoucherMintReply, error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn voucher_mint(
+    &self,
+    message_write_cap: &[u8],
+    display_name: &str,
+) -> Result<VoucherMintResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def voucher_mint(self, message_write_cap: bytes, display_name: str) -> VoucherMintResult:
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### VoucherInduct / voucher_induct
+
+VoucherInduct verifies a published VoucherPayload and seals a reply to the
+joiner. The returned reply carries the joiner's salt-mutated read cap (the
+live read cap to hand the group), the sealed reply to write to VoucherStream
+box 1, and the salt the inductor minted.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) VoucherInduct(voucher, voucherPayload, whoReply []byte) (*VoucherInductReply, error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn voucher_induct(
+    &self,
+    voucher: &[u8],
+    voucher_payload: &[u8],
+    who_reply: &[u8],
+) -> Result<VoucherInductResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def voucher_induct(self, voucher: bytes, voucher_payload: bytes, who_reply: bytes) -> VoucherInductResult:
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### VoucherOpen / voucher_open
+
+VoucherOpen opens the inductor's sealed reply with the joiner's voucher
+secret key, recovers the salt, and mutates the joiner's MessageStream write
+cap by it. The returned reply carries the opaque WhoReply, the salt, and the
+salt-mutated write cap with which the joiner writes real messages.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) VoucherOpen(voucherSecretKey, sealedReply, messageWriteCap []byte) (*VoucherOpenReply, error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn voucher_open(
+    &self,
+    voucher_secret_key: &[u8],
+    sealed_reply: &[u8],
+    message_write_cap: &[u8],
+) -> Result<VoucherOpenResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def voucher_open(self, voucher_secret_key: bytes, sealed_reply: bytes, message_write_cap: bytes) -> VoucherOpenResult:
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### VoucherDeriveStream / voucher_derive_stream
+
+VoucherDeriveStream derives the VoucherStream caps from the Voucher, which
+the inductor needs to read box 0 before inducting.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) VoucherDeriveStream(voucher []byte) (*VoucherDeriveStreamReply, error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn voucher_derive_stream(
+    &self,
+    voucher: &[u8],
+) -> Result<VoucherStreamResult, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def voucher_derive_stream(self, voucher: bytes) -> VoucherStreamResult:
+{{< /tab >}}
+{{< /tabpane >}}
+
+### Geometry
+
+#### GetPigeonholeGeometry / pigeonhole_geometry
+
+GetPigeonholeGeometry returns the Pigeonhole geometry the daemon supplied
+during the connection handshake. It is nil until Dial() has completed.
+
+The Python binding has no getter method; it exposes the Pigeonhole
+geometry as the public `ThinClient.pigeonhole_geometry` attribute,
+populated from the daemon's connection status event.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) GetPigeonholeGeometry() *pigeonholeGeo.Geometry
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub fn pigeonhole_geometry(&self) -> PigeonholeGeometry
+{{< /tab >}}
+{{< /tabpane >}}
+
+## Core Thin-Client API
+
+Everything below is the transport and control plumbing shared by all
+thin-client applications: constructing and connecting a client,
+consuming daemon events, querying the PKI, and sending direct
+(non-Pigeonhole) messages into the mixnet.
+
+### Configuration and Construction
 
 The thin client is configured via a TOML file that specifies only how
 to reach the local daemon. We usually name this configuration file
@@ -75,7 +743,7 @@ client = ThinClient(config)
 {{< /tab >}}
 {{< /tabpane >}}
 
-### The `thinclient.toml` file
+#### The `thinclient.toml` file
 
 `thinclient.toml` tells the thin client only where to reach the local
 daemon. The complete file is simply:
@@ -96,13 +764,13 @@ forms (the `Network` key is an optional refinement of the TCP form):
 | `[Dial.Tcp]` `Address` | string | `host:port` of the daemon's TCP listener. |
 | `[Dial.Tcp]` `Network` | string | Optional: `"tcp"`, `"tcp4"`, or `"tcp6"` (default `"tcp"`). |
 
-### Concurrency
+#### Concurrency
 
 The Go `ThinClient` is safe for concurrent use by multiple goroutines. Because its connection state, current PKI document, and in-flight request tracking are guarded internally, the cancel-from-another-goroutine patterns shown in the [how-to guide](/docs/thin_client_howto/) are sound. The Rust and Python bindings are `async`. An instance is driven from its runtime (a Tokio task or an asyncio event loop) and follows that runtime's ordinary conventions rather than offering an independent thread-safety guarantee.
 
-## Connection Management
+### Connection Management
 
-### Dial / new / start
+#### Dial / new / start
 
 Dial establishes a connection to the client daemon and initializes the client.
 
@@ -139,7 +807,7 @@ async def start(self, loop: asyncio.AbstractEventLoop) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
 
-### Close / stop
+#### Close / stop
 
 Close gracefully shuts down the thin client and closes the daemon connection.
 
@@ -163,7 +831,7 @@ def stop(self) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
 
-### IsConnected / is_connected
+#### IsConnected / is_connected
 
 IsConnected returns true if the client daemon is connected to the mixnet.
 
@@ -184,7 +852,7 @@ def is_connected(self) -> bool:
 {{< /tab >}}
 {{< /tabpane >}}
 
-### Disconnect / disconnect
+#### Disconnect / disconnect
 
 Disconnect closes the connection without sending ThinClose.
 The daemon preserves all state for this client's app ID, allowing
@@ -202,7 +870,7 @@ def disconnect(self) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
 
-## Events
+### Events
 
 The thin client emits events for connection status changes, PKI
 document updates, and message replies. Go uses an event channel; Rust
@@ -256,7 +924,7 @@ client = ThinClient(config)
 {{< /tab >}}
 {{< /tabpane >}}
 
-### Event types
+#### Event types
 
 - **ConnectionStatusEvent**: emitted when the daemon's connection
   to the mixnet changes. Fields (Go): `IsConnected bool`, `Err error`,
@@ -300,7 +968,7 @@ client = ThinClient(config)
   Fields (Go): `IsGraceful bool`, `Err error`. `IsGraceful` is true
   precisely when a `ShutdownEvent` preceded the disconnect.
 
-### EventSink / event_sink
+#### EventSink / event_sink
 
 EventSink returns a buffered channel that receives all events from the thin client.
 
@@ -341,7 +1009,7 @@ pub fn event_sink(&self) -> EventSinkReceiver
 {{< /tab >}}
 {{< /tabpane >}}
 
-### StopEventSink (Go only)
+#### StopEventSink (Go only)
 
 StopEventSink stops sending events to the specified channel and cleans up resources.
 
@@ -361,9 +1029,9 @@ func (t *ThinClient) StopEventSink(ch chan Event)
 {{< /tab >}}
 {{< /tabpane >}}
 
-## PKI and Service Discovery
+### PKI and Service Discovery
 
-### PKIDocument / pki_document
+#### PKIDocument / pki_document
 
 PKIDocument returns the thin client's current PKI document.
 
@@ -383,7 +1051,7 @@ def pki_document(self) -> 'Dict[str,Any] | None':
 {{< /tab >}}
 {{< /tabpane >}}
 
-### GetPKIDocumentRaw / get_pki_document_raw
+#### GetPKIDocumentRaw / get_pki_document_raw
 
 GetPKIDocumentRaw returns the cert.Certificate-wrapped signed PKI
 document for the requested epoch, with every directory authority
@@ -410,7 +1078,7 @@ async def get_pki_document_raw(self, epoch: int = 0) -> 'Tuple[bytes,int]':
 {{< /tab >}}
 {{< /tabpane >}}
 
-### GetDirectoryAuthorities / get_directory_authorities
+#### GetDirectoryAuthorities / get_directory_authorities
 
 GetDirectoryAuthorities returns the directory authority descriptors the
 client daemon is configured with.
@@ -435,7 +1103,7 @@ async def get_directory_authorities(self) -> 'List[Dict[str,Any]]':
 {{< /tab >}}
 {{< /tabpane >}}
 
-### PKIDocumentForEpoch / pki_document_for_epoch
+#### PKIDocumentForEpoch / pki_document_for_epoch
 
 PKIDocumentForEpoch returns the PKI document for a specific epoch from cache.
 
@@ -462,7 +1130,7 @@ def pki_document_for_epoch(self, epoch: int) -> 'Dict[str,Any]':
 {{< /tab >}}
 {{< /tabpane >}}
 
-### GetService / get_service
+#### GetService / get_service
 
 GetService returns a randomly selected service matching the specified capability.
 
@@ -485,7 +1153,7 @@ def get_service(self, service_name: str) -> ServiceDescriptor:
 {{< /tab >}}
 {{< /tabpane >}}
 
-### GetServices / get_services
+#### GetServices / get_services
 
 GetServices returns all services matching the specified capability name.
 
@@ -506,9 +1174,11 @@ def get_services(self, capability: str) -> 'List[ServiceDescriptor]':
 {{< /tab >}}
 {{< /tabpane >}}
 
-## Direct Messaging
+### Direct Messaging
 
-### SendMessage / send_message
+#### SendMessage / send_message
+
+**Sends mixnet traffic.**
 
 SendMessage sends a message with reply capability using the legacy API.
 
@@ -538,7 +1208,9 @@ async def send_message(self, surb_id: bytes, payload: bytes | str, dest_node: by
 {{< /tab >}}
 {{< /tabpane >}}
 
-### SendMessageWithoutReply / send_message_without_reply
+#### SendMessageWithoutReply / send_message_without_reply
+
+**Sends mixnet traffic.**
 
 SendMessageWithoutReply sends a fire-and-forget message using the legacy API.
 
@@ -563,7 +1235,9 @@ async def send_message_without_reply(self, payload: bytes | str, dest_node: byte
 {{< /tab >}}
 {{< /tabpane >}}
 
-### BlockingSendMessage / blocking_send_message
+#### BlockingSendMessage / blocking_send_message
+
+**Sends mixnet traffic.**
 
 BlockingSendMessage sends a message and blocks until a reply is received.
 
@@ -593,577 +1267,9 @@ async def blocking_send_message(self, payload: bytes | str, dest_node: bytes, de
 {{< /tab >}}
 {{< /tabpane >}}
 
-## Pigeonhole: Key Management
+### Geometry
 
-### NewKeypair / new_keypair
-
-NewKeypair creates a new keypair for use with the Pigeonhole protocol.
-
-This method generates a WriteCap and ReadCap from the provided seed using
-the BACAP (blinding-and-capability) protocol. The WriteCap should be stored
-securely for writing messages, while the ReadCap can be shared with others
-to allow them to read messages.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) NewKeypair(seed []byte) (writeCap *bacap.WriteCap, readCap *bacap.ReadCap, firstMessageIndex *bacap.MessageBoxIndex, err error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn new_keypair(
-    &self,
-    seed: &[u8; 32],
-) -> Result<KeypairResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def new_keypair(self, seed: bytes) -> KeypairResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-## Pigeonhole: Index Management
-
-### NextMessageBoxIndex / next_message_box_index
-
-NextMessageBoxIndex increments a MessageBoxIndex using the BACAP NextIndex method.
-
-This method is used when sending multiple messages to different mailboxes using
-the same WriteCap or ReadCap. It properly advances the cryptographic state with
-the following actions.
-  - Incrementing the Idx64 counter.
-  - Deriving new encryption and blinding keys using HKDF.
-  - Updating the HKDF state for the next iteration.
-
-The client daemon handles the cryptographic operations using our BACAP library
-documented here: https://pkg.go.dev/github.com/katzenpost/hpqc/bacap
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) NextMessageBoxIndex(messageBoxIndex *bacap.MessageBoxIndex) (nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn next_message_box_index(
-    &self,
-    message_box_index: &[u8],
-) -> Result<Vec<u8>, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def next_message_box_index(self, message_box_index: bytes) -> bytes:
-{{< /tab >}}
-{{< /tabpane >}}
-
-## Pigeonhole: Encryption
-
-### EncryptRead / encrypt_read
-
-EncryptRead encrypts a read operation for a given read capability.
-
-This method prepares an encrypted read request that can be sent to the
-courier service to retrieve a message from a Pigeonhole box. The returned
-ciphertext should be sent via StartResendingEncryptedMessage.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) EncryptRead(readCap *bacap.ReadCap, messageBoxIndex *bacap.MessageBoxIndex) (messageCiphertext []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn encrypt_read(
-    &self,
-    read_cap: &[u8],
-    message_box_index: &[u8],
-) -> Result<EncryptReadResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def encrypt_read(self, read_cap: bytes, message_box_index: bytes) -> EncryptReadResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-### EncryptWrite / encrypt_write
-
-EncryptWrite encrypts a write operation for a given write capability.
-
-This method prepares an encrypted write request that can be sent to the
-courier service to store a message in a Pigeonhole box. The returned
-ciphertext should be sent via StartResendingEncryptedMessage.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) EncryptWrite(plaintext []byte, writeCap *bacap.WriteCap, messageBoxIndex *bacap.MessageBoxIndex) (messageCiphertext []byte, envelopeDescriptor []byte, envelopeHash *[32]byte, nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn encrypt_write(
-    &self,
-    plaintext: &[u8],
-    write_cap: &[u8],
-    message_box_index: &[u8],
-) -> Result<EncryptWriteResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def encrypt_write(self, plaintext: bytes, write_cap: bytes, message_box_index: bytes) -> EncryptWriteResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-## Pigeonhole: Automatic Repeat Request (ARQ) Transport
-
-### StartResendingEncryptedMessage / start_resending_encrypted_message
-
-StartResendingEncryptedMessage sends an encrypted message via ARQ and blocks until completion.
-
-This method blocks until a reply is received. CancelResendingEncryptedMessage is only
-useful when called from another goroutine to interrupt this blocking call.
-
-The message will be resent periodically until until one of the following is true:
-  - A reply is received from the courier (this method returns).
-  - The message is canceled via CancelResendingEncryptedMessage (from another goroutine).
-  - The client is shut down.
-
-This is used for both read and write operations in the new Pigeonhole API.
-
-The daemon implements a finite state machine (FSM) for handling the stop-and-wait
-ARQ protocol in the following cases.
-  - For default write operations (writeCap != nil, readCap == nil,
-    noIdempotentBoxAlreadyExists == false):
-    The method waits for an ACK from the courier and returns immediately.
-    The ACK confirms that the courier received the envelope and will dispatch it
-    to both shard replicas. This requires only a single round-trip through
-    the mixnet.
-  - For BoxAlreadyExists-aware writes (noIdempotentBoxAlreadyExists == true):
-    The method waits for an ACK, then sends a second SURB to retrieve the
-    replica's error code. This requires two round-trips through the mixnet.
-  - For read operations (readCap != nil, writeCap == nil):
-    The method waits for an ACK from the courier, then the daemon automatically
-    sends a new SURB to request the payload, and this method waits for the payload.
-    The daemon performs all decryption (MKEM envelope + BACAP payload) and returns
-    the fully decrypted plaintext.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) StartResendingEncryptedMessage(readCap *bacap.ReadCap, writeCap *bacap.WriteCap, messageBoxIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) (*StartResendingResult, error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn start_resending_encrypted_message(
-    &self,
-    read_cap: Option<&[u8]>,
-    write_cap: Option<&[u8]>,
-    message_box_index: Option<&[u8]>,
-    reply_index: Option<u8>,
-    envelope_descriptor: &[u8],
-    message_ciphertext: &[u8],
-    envelope_hash: &[u8; 32],
-) -> Result<StartResendingResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def start_resending_encrypted_message(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes, no_retry_on_box_id_not_found: bool = False, no_idempotent_box_already_exists: bool = False) -> StartResendingResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-### StartResendingEncryptedMessageReturnBoxExists
-
-StartResendingEncryptedMessageReturnBoxExists behaves exactly like
-StartResendingEncryptedMessage save that it returns
-ErrBoxAlreadyExists when the replica reports that the destination
-box has already been written, rather than swallowing the condition
-as idempotent success. Use it to distinguish a
-fresh write from a repeat: for instance, when implementing
-optimistic concurrency on top of the channel, or when establishing
-whether a particular call actually caused a state change at the
-replica.
-
-Note that this variant costs an additional mixnet round trip: the
-BoxAlreadyExists code is carried by the replica's reply rather than
-the courier's ACK, so the daemon must dispatch a second SURB before
-it can return the answer.
-
-As with StartResendingEncryptedMessage, an in-flight call may be
-cancelled from another goroutine via CancelResendingEncryptedMessage.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) StartResendingEncryptedMessageReturnBoxExists(readCap *bacap.ReadCap, writeCap *bacap.WriteCap, messageBoxIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) (*StartResendingResult, error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn start_resending_encrypted_message_return_box_exists(
-    &self,
-    read_cap: Option<&[u8]>,
-    write_cap: Option<&[u8]>,
-    message_box_index: Option<&[u8]>,
-    reply_index: Option<u8>,
-    envelope_descriptor: &[u8],
-    message_ciphertext: &[u8],
-    envelope_hash: &[u8; 32],
-) -> Result<StartResendingResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def start_resending_encrypted_message_return_box_exists(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes) -> StartResendingResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-### StartResendingEncryptedMessageNoRetry
-
-StartResendingEncryptedMessageNoRetry behaves exactly like
-StartResendingEncryptedMessage save that it disables the daemon's
-automatic retry of ErrBoxIDNotFound. The caller learns at once that
-the box is absent rather than waiting for replication to settle.
-
-Use it when polling a box that may not yet have been written, for
-instance when a reader peeks ahead at a peer's next message before
-that peer has produced it. The regular variant would block until
-the box appeared, which can be many round trips.
-
-As with StartResendingEncryptedMessage, an in-flight call may be
-cancelled from another goroutine via CancelResendingEncryptedMessage.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) StartResendingEncryptedMessageNoRetry(readCap *bacap.ReadCap, writeCap *bacap.WriteCap, messageBoxIndex []byte, replyIndex *uint8, envelopeDescriptor []byte, messageCiphertext []byte, envelopeHash *[32]byte) (*StartResendingResult, error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn start_resending_encrypted_message_no_retry(
-    &self,
-    read_cap: Option<&[u8]>,
-    write_cap: Option<&[u8]>,
-    message_box_index: Option<&[u8]>,
-    reply_index: Option<u8>,
-    envelope_descriptor: &[u8],
-    message_ciphertext: &[u8],
-    envelope_hash: &[u8; 32],
-) -> Result<StartResendingResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def start_resending_encrypted_message_no_retry(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes) -> StartResendingResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-### CancelResendingEncryptedMessage / cancel_resending_encrypted_message
-
-CancelResendingEncryptedMessage cancels ARQ resending for an encrypted message.
-
-This method stops the ARQ for a previously started
-encrypted message transmission. This is useful in the following cases.
-  - A reply has been received through another channel.
-  - The operation should be aborted.
-  - The message is no longer needed.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) CancelResendingEncryptedMessage(envelopeHash *[32]byte) error
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn cancel_resending_encrypted_message(
-    &self,
-    envelope_hash: &[u8; 32],
-) -> Result<(), ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def cancel_resending_encrypted_message(self, envelope_hash: bytes) -> None:
-{{< /tab >}}
-{{< /tabpane >}}
-
-## Pigeonhole: Tombstones
-
-### TombstoneRange / tombstone_range
-
-TombstoneRange prepares the encrypted envelopes needed to
-tombstone a consecutive range of Pigeonhole boxes beginning at the
-supplied MessageBoxIndex. A tombstone is a signed empty payload
-that the replica recognizes as a deletion marker; the daemon
-constructs one by signing rather than encrypting whenever
-EncryptWrite is invoked with an empty plaintext.
-
-This method does not itself touch the network: it returns the
-envelopes for the caller to dispatch one by one, typically via
-StartResendingEncryptedMessage. To tombstone a single box, pass
-maxCount=1.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (c *ThinClient) TombstoneRange(
-	writeCap *bacap.WriteCap,
-	start *bacap.MessageBoxIndex,
-	maxCount uint32,
-) (result *TombstoneRangeResult, err error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn tombstone_range(
-    &self,
-    write_cap: &[u8],
-    start: &[u8],
-    max_count: u32,
-) -> TombstoneRangeResult
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def tombstone_range(self, write_cap: bytes, start: bytes, max_count: int) -> TombstoneRangeResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-## Pigeonhole: Copy Stream Construction
-
-### CreateCourierEnvelopesFromPayload
-
-CreateCourierEnvelopesFromPayload packs a payload of arbitrary
-size (up to 10 MB) into properly sized CopyStreamElement chunks
-for one destination channel. Each chunk is a serialized
-CopyStreamElement, ready to be written to a box via EncryptWrite
-followed by StartResendingEncryptedMessage. The caller marks the
-boundaries of the stream with the isStart and isLast flags.
-
-This method is stateless: no daemon state is kept between calls, and
-each invocation runs a fresh encoder and flushes before returning.
-The 10 MB cap guards against accidental memory exhaustion.
-
-Once the chunks have been written to a temporary copy stream, a
-copy command (StartResendingCopyCommand) is dispatched to a
-courier with the WriteCap for that temporary stream; the courier
-reads the chunks back and dispatches each envelope to its
-destination box.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) CreateCourierEnvelopesFromPayload(payload []byte, destWriteCap *bacap.WriteCap, destStartIndex *bacap.MessageBoxIndex, isStart bool, isLast bool) (envelopes [][]byte, nextDestIndex *bacap.MessageBoxIndex, err error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn create_courier_envelopes_from_payload(
-    &self,
-    payload: &[u8],
-    dest_write_cap: &[u8],
-    dest_start_index: &[u8],
-    is_start: bool,
-    is_last: bool,
-) -> Result<CreateEnvelopesResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def create_courier_envelopes_from_payload(self, payload: bytes, dest_write_cap: bytes, dest_start_index: bytes, is_start: bool, is_last: bool) -> 'CreateEnvelopesResult':
-{{< /tab >}}
-{{< /tabpane >}}
-
-### CreateCourierEnvelopesFromMultiPayload
-
-CreateCourierEnvelopesFromMultiPayload packs payloads bound for
-several destination channels into a single stream of
-CopyStreamElement chunks. This is more space-efficient than
-calling CreateCourierEnvelopesFromPayload once per destination,
-because the shared encoder runs all envelopes together rather than
-padding the final box of each destination independently.
-
-This method is stateless; the buffer argument carries any residual
-encoder state across calls in place of daemon-side bookkeeping.
-Pass nil for buffer on the first call and the buffer returned by
-the previous call thereafter; set isLast on the final call so that
-the encoder flushes its tail.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) CreateCourierEnvelopesFromMultiPayload(destinations []DestinationPayload, isStart bool, isLast bool, buffer []byte) (*CreateEnvelopesResult, error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn create_courier_envelopes_from_multi_payload(
-    &self,
-    destinations: Vec<(&[u8], &[u8], &[u8])>,
-    is_start: bool,
-    is_last: bool,
-    buffer: Option<Vec<u8>>,
-) -> Result<CreateEnvelopesResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def create_courier_envelopes_from_multi_payload(self, destinations: 'List[Dict[str, Any]]', is_start: bool, is_last: bool, buffer: 'bytes | None' = None) -> 'CreateEnvelopesResult':
-{{< /tab >}}
-{{< /tabpane >}}
-
-### CreateCourierEnvelopesFromTombstoneRange
-
-CreateCourierEnvelopesFromTombstoneRange creates tombstone CourierEnvelopes for a range
-of destination indices, encoded as copy stream elements ready to be written to a
-temporary copy stream channel.
-
-This combines the tombstone creation logic (SignBox with empty payload) with the
-courier envelope wrapping and copy stream encoding of CreateCourierEnvelopesFromPayload.
-
-The buffer parameter enables stateless continuation across multiple calls without
-wasting space in the last box. Pass nil on the first call, then pass the returned
-nextBuffer to the next call.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) CreateCourierEnvelopesFromTombstoneRange(
-	destWriteCap *bacap.WriteCap,
-	destStartIndex *bacap.MessageBoxIndex,
-	maxCount uint32,
-	isStart bool,
-	isLast bool,
-	buffer []byte,
-) (envelopes [][]byte, nextBuffer []byte, nextDestIndex *bacap.MessageBoxIndex, err error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn create_courier_envelopes_from_tombstone_range(
-    &self,
-    dest_write_cap: &[u8],
-    dest_start_index: &[u8],
-    max_count: u32,
-    is_start: bool,
-    is_last: bool,
-    buffer: Option<Vec<u8>>,
-) -> Result<CreateEnvelopesResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def create_courier_envelopes_from_tombstone_range(self, dest_write_cap: bytes, dest_start_index: bytes, max_count: int, is_start: bool, is_last: bool, buffer: 'bytes | None' = None) -> 'CreateEnvelopesResult':
-{{< /tab >}}
-{{< /tabpane >}}
-
-## Pigeonhole: Copy Command Transport
-
-### StartResendingCopyCommand / start_resending_copy_command
-
-StartResendingCopyCommand sends a copy command via ARQ and blocks until completion.
-
-This method blocks until a reply is received. It uses the ARQ
-mechanism to reliably send copy commands to the courier, automatically retrying if
-the reply is not received in time.
-
-The copy command instructs the courier to read from a temporary copy stream channel
-and write the parsed envelopes to their destination channels. The courier performs
-the following actions.
- 1. Derives a ReadCap from the WriteCap.
- 2. Reads boxes from the temporary channel.
- 3. Parses boxes into CourierEnvelopes.
- 4. Sends each envelope to intermediate replicas for replication.
- 5. Writes tombstones to clean up the temporary channel.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) StartResendingCopyCommand(writeCap *bacap.WriteCap) error
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn start_resending_copy_command(
-    &self,
-    write_cap: &[u8],
-    courier_identity_hash: Option<&[u8]>,
-    courier_queue_id: Option<&[u8]>,
-) -> Result<(), ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def start_resending_copy_command(self, write_cap: bytes, courier_identity_hash: 'bytes|None' = None, courier_queue_id: 'bytes|None' = None) -> None:
-{{< /tab >}}
-{{< /tabpane >}}
-
-### CancelResendingCopyCommand / cancel_resending_copy_command
-
-CancelResendingCopyCommand cancels ARQ resending for a copy command.
-
-This method stops the ARQ for a previously started
-copy command. This is useful when:
-  - A reply has been received through another channel.
-  - The operation should be aborted.
-  - The copy command is no longer needed.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) CancelResendingCopyCommand(writeCapHash *[32]byte) error
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn cancel_resending_copy_command(
-    &self,
-    write_cap_hash: &[u8; 32],
-) -> Result<(), ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def cancel_resending_copy_command(self, write_cap_hash: bytes) -> None:
-{{< /tab >}}
-{{< /tabpane >}}
-
-## Vouchers
-
-### VoucherMint / voucher_mint
-
-VoucherMint mints a Voucher from the joiner's MessageStream write cap. The
-returned reply carries the Voucher to hand over out of band, the payload to
-publish to VoucherStream box 0, the rendezvous stream caps, and the reply
-keypair; persist VoucherSecretKey to open the inductor's reply later.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) VoucherMint(messageWriteCap []byte, displayName string) (*VoucherMintReply, error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn voucher_mint(
-    &self,
-    message_write_cap: &[u8],
-    display_name: &str,
-) -> Result<VoucherMintResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def voucher_mint(self, message_write_cap: bytes, display_name: str) -> VoucherMintResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-### VoucherInduct / voucher_induct
-
-VoucherInduct verifies a published VoucherPayload and seals a reply to the
-joiner. The returned reply carries the joiner's salt-mutated read cap (the
-live read cap to hand the group), the sealed reply to write to VoucherStream
-box 1, and the salt the inductor minted.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) VoucherInduct(voucher, voucherPayload, whoReply []byte) (*VoucherInductReply, error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn voucher_induct(
-    &self,
-    voucher: &[u8],
-    voucher_payload: &[u8],
-    who_reply: &[u8],
-) -> Result<VoucherInductResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def voucher_induct(self, voucher: bytes, voucher_payload: bytes, who_reply: bytes) -> VoucherInductResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-### VoucherOpen / voucher_open
-
-VoucherOpen opens the inductor's sealed reply with the joiner's voucher
-secret key, recovers the salt, and mutates the joiner's MessageStream write
-cap by it. The returned reply carries the opaque WhoReply, the salt, and the
-salt-mutated write cap with which the joiner writes real messages.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) VoucherOpen(voucherSecretKey, sealedReply, messageWriteCap []byte) (*VoucherOpenReply, error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn voucher_open(
-    &self,
-    voucher_secret_key: &[u8],
-    sealed_reply: &[u8],
-    message_write_cap: &[u8],
-) -> Result<VoucherOpenResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def voucher_open(self, voucher_secret_key: bytes, sealed_reply: bytes, message_write_cap: bytes) -> VoucherOpenResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-### VoucherDeriveStream / voucher_derive_stream
-
-VoucherDeriveStream derives the VoucherStream caps from the Voucher, which
-the inductor needs to read box 0 before inducting.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) VoucherDeriveStream(voucher []byte) (*VoucherDeriveStreamReply, error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn voucher_derive_stream(
-    &self,
-    voucher: &[u8],
-) -> Result<VoucherStreamResult, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def voucher_derive_stream(self, voucher: bytes) -> VoucherStreamResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-## Geometry
-
-### GetSphinxGeometry / sphinx_geometry
+#### GetSphinxGeometry / sphinx_geometry
 
 GetSphinxGeometry returns the Sphinx geometry the daemon supplied during
 the connection handshake. It is nil until Dial() has completed.
@@ -1181,27 +1287,9 @@ pub fn sphinx_geometry(&self) -> Geometry
 {{< /tab >}}
 {{< /tabpane >}}
 
-### GetPigeonholeGeometry / pigeonhole_geometry
+### Utility
 
-GetPigeonholeGeometry returns the Pigeonhole geometry the daemon supplied
-during the connection handshake. It is nil until Dial() has completed.
-
-The Python binding has no getter method; it exposes the Pigeonhole
-geometry as the public `ThinClient.pigeonhole_geometry` attribute,
-populated from the daemon's connection status event.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) GetPigeonholeGeometry() *pigeonholeGeo.Geometry
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub fn pigeonhole_geometry(&self) -> PigeonholeGeometry
-{{< /tab >}}
-{{< /tabpane >}}
-
-## Utility
-
-### NewMessageID / new_message_id
+#### NewMessageID / new_message_id
 
 NewMessageID generates a new cryptographically random message identifier.
 
@@ -1221,7 +1309,7 @@ def new_message_id() -> bytes:
 {{< /tab >}}
 {{< /tabpane >}}
 
-### NewSURBID / new_surb_id
+#### NewSURBID / new_surb_id
 
 NewSURBID generates a new SURB.
 
@@ -1240,7 +1328,7 @@ def new_surb_id(self) -> bytes:
 {{< /tab >}}
 {{< /tabpane >}}
 
-### NewQueryID / new_query_id
+#### NewQueryID / new_query_id
 
 NewQueryID generates a new cryptographically random query identifier.
 
@@ -1259,28 +1347,7 @@ def new_query_id(self) -> bytes:
 {{< /tab >}}
 {{< /tabpane >}}
 
-### GetMessageBoxIndexCounter / get_message_box_index_counter
-
-GetMessageBoxIndexCounter returns the BACAP Idx64 counter embedded in a
-MessageBoxIndex. Callers can use this to order or compare two indexes
-without having to know bacap.MessageBoxIndex's binary layout.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) GetMessageBoxIndexCounter(messageBoxIndex *bacap.MessageBoxIndex) (uint64, error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn get_message_box_index_counter(
-    &self,
-    message_box_index: &[u8],
-) -> Result<u64, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def get_message_box_index_counter(self, message_box_index: bytes) -> int:
-{{< /tab >}}
-{{< /tabpane >}}
-
-### GetConfig (Go only)
+#### GetConfig (Go only)
 
 GetConfig returns the client's configuration.
 
@@ -1295,7 +1362,7 @@ func (t *ThinClient) GetConfig() *Config
 {{< /tab >}}
 {{< /tabpane >}}
 
-### Shutdown (Go only)
+#### Shutdown (Go only)
 
 Shutdown cleanly shuts down the ThinClient instance.
 
@@ -1312,7 +1379,7 @@ func (t *ThinClient) Shutdown()
 {{< /tab >}}
 {{< /tabpane >}}
 
-### GetLogger (Go only)
+#### GetLogger (Go only)
 
 GetLogger returns a logger instance with the specified prefix.
 

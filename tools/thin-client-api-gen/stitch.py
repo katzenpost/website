@@ -24,6 +24,17 @@ PINNED_VERSIONS_PLACEHOLDER = "<!-- PINNED_VERSIONS_TABLE -->"
 
 DATA_TYPES_PLACEHOLDER = "<!-- DATA_TYPES_TABLE -->"
 
+METHOD_TOC_PLACEHOLDER = "<!-- METHOD_TOC -->"
+
+TRAFFIC_BADGE = "**Sends mixnet traffic.**"
+
+# H2 part headings, keyed by the `part:` field in groups.yaml. Parts are
+# emitted in the order their keys first appear in the groups list.
+PART_TITLES = {
+    "pigeonhole": "Pigeonhole API",
+    "core": "Core Thin-Client API",
+}
+
 
 def _one_line(text: str) -> str:
     """Collapse a multi-line doc comment to a single table-cell line."""
@@ -108,18 +119,25 @@ def load_overlay(overlay_dir: Path) -> dict[str, list[str]]:
     Placement is encoded in the filename:
       - `NN-<name>.md` where NN < "80" → before all groups
       - `NN-<name>.md` where NN >= "80" → after all groups
+      - `part-<part-key>.md`           → after the H2 heading of the part
+        whose groups.yaml `part:` key is <part-key>
       - `after-<section-slug>.md`      → after the group section whose name
         slugifies to <section-slug>
     """
     result: dict = {
         "top": [],           # rendered before all groups
         "post": [],          # rendered after all groups
-        "before_section": {},  # slug -> list of bodies, rendered after the H2 heading but before its groups
+        "part_intro": {},    # part key -> list of bodies, rendered after the part's H2 heading
+        "before_section": {},  # slug -> list of bodies, rendered after the H3 heading but before its groups
         "after_section": {},   # slug -> list of bodies, rendered after all groups of a section
     }
     for path in sorted(overlay_dir.glob("*.md")):
         stem = path.stem
         body = path.read_text(encoding="utf-8")
+        if stem.startswith("part-"):
+            key = stem[len("part-"):]
+            result["part_intro"].setdefault(key, []).append(body)
+            continue
         if stem.startswith("after-"):
             slug = stem[len("after-"):]
             result["after_section"].setdefault(slug, []).append(body)
@@ -133,6 +151,47 @@ def load_overlay(overlay_dir: Path) -> dict[str, list[str]]:
         else:
             result["post"].append(body)
     return result
+
+
+def hugo_anchor(title: str) -> str:
+    """Reproduce Hugo's default (GitHub-style) auto heading ID.
+
+    Lowercase; alphanumerics, hyphens, and underscores survive; each
+    space becomes a hyphen; all other characters are dropped. Unlike
+    `slugify_section`, consecutive hyphens are NOT collapsed, matching
+    Goldmark: "A / B" → "a--b".
+    """
+    out = []
+    for ch in title.lower():
+        if ch.isalnum() or ch in "-_":
+            out.append(ch)
+        elif ch == " ":
+            out.append("-")
+    return "".join(out)
+
+
+def first_sentence(text: str) -> str:
+    """Collapse text to one line and truncate at the first sentence."""
+    line = _one_line(text)
+    dot = line.find(". ")
+    return line[: dot + 1] if dot != -1 else line
+
+
+def render_method_toc(part_groups: list[dict]) -> str:
+    """Render the per-method index table for one part's intro overlay."""
+    lines = [
+        "| Method | Purpose |",
+        "|---|---|",
+    ]
+    for group in part_groups:
+        title = group.get("title") or group.get("group")
+        anchor = hugo_anchor(title)
+        purpose = first_sentence(group.get("summary") or "")
+        if group.get("traffic"):
+            purpose = f"{purpose} {TRAFFIC_BADGE}".strip()
+        purpose = purpose.replace("|", "\\|")
+        lines.append(f"| [{title}](#{anchor}) | {purpose} |")
+    return "\n".join(lines)
 
 
 def slugify_section(section: str) -> str:
@@ -234,7 +293,10 @@ def render_group(
 ) -> str:
     lines: list[str] = []
     title = group.get("title") or group.get("group")
-    lines.append(f"### {title}\n")
+    lines.append(f"#### {title}\n")
+
+    if group.get("traffic"):
+        lines.append(TRAFFIC_BADGE + "\n")
 
     prose = resolve_prose(group, go_syms, rust_syms, py_syms)
     if prose:
@@ -321,26 +383,51 @@ def render_document(
             "not found in any top overlay fragment"
         )
 
-    # Group the groups list by section, preserving insertion order.
-    sections_ordered: list[str] = []
-    by_section: dict[str, list[dict]] = {}
+    # Bucket the groups by part, then by section within each part, both in
+    # first-seen order.
+    parts_ordered: list[str] = []
+    by_part: dict[str, list[dict]] = {}
     for group in groups:
-        sec = group.get("section") or ""
-        if sec not in by_section:
-            sections_ordered.append(sec)
-            by_section[sec] = []
-        by_section[sec].append(group)
+        part_key = group.get("part") or ""
+        if not part_key:
+            unresolved.append(f"{group.get('group')}: missing 'part' field")
+        if part_key not in by_part:
+            parts_ordered.append(part_key)
+            by_part[part_key] = []
+        by_part[part_key].append(group)
 
-    for section in sections_ordered:
-        slug = slugify_section(section) if section else ""
-        if section:
-            parts.append(f"## {section}\n\n")
-        for frag in overlay["before_section"].get(slug, []):
+    for part_key in parts_ordered:
+        part_groups = by_part[part_key]
+        part_title = PART_TITLES.get(part_key)
+        if part_title is None:
+            unresolved.append(f"unknown part key {part_key!r}")
+            part_title = part_key
+        if part_title:
+            parts.append(f"## {part_title}\n\n")
+        toc = render_method_toc(part_groups)
+        for frag in overlay["part_intro"].get(part_key, []):
+            frag = frag.replace(METHOD_TOC_PLACEHOLDER, toc)
             parts.append(frag.rstrip() + "\n\n")
-        for group in by_section[section]:
-            parts.append(render_group(group, go_syms, rust_syms, py_syms, unresolved))
-        for frag in overlay["after_section"].get(slug, []):
-            parts.append(frag.rstrip() + "\n\n")
+
+        sections_ordered: list[str] = []
+        by_section: dict[str, list[dict]] = {}
+        for group in part_groups:
+            sec = group.get("section") or ""
+            if sec not in by_section:
+                sections_ordered.append(sec)
+                by_section[sec] = []
+            by_section[sec].append(group)
+
+        for section in sections_ordered:
+            slug = slugify_section(section) if section else ""
+            if section:
+                parts.append(f"### {section}\n\n")
+            for frag in overlay["before_section"].get(slug, []):
+                parts.append(frag.rstrip() + "\n\n")
+            for group in by_section[section]:
+                parts.append(render_group(group, go_syms, rust_syms, py_syms, unresolved))
+            for frag in overlay["after_section"].get(slug, []):
+                parts.append(frag.rstrip() + "\n\n")
 
     for frag in overlay["post"]:
         parts.append(fill(frag).rstrip() + "\n\n")

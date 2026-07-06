@@ -1,4 +1,9 @@
-## Configuration and Construction
+Everything below is the transport and control plumbing shared by all
+thin-client applications: constructing and connecting a client,
+consuming daemon events, querying the PKI, and sending direct
+(non-Pigeonhole) messages into the mixnet.
+
+### Configuration and Construction
 
 The thin client is configured via a TOML file that specifies only how
 to reach the local daemon. We usually name this configuration file
@@ -24,7 +29,7 @@ client = ThinClient(config)
 {{< /tab >}}
 {{< /tabpane >}}
 
-### The `thinclient.toml` file
+#### The `thinclient.toml` file
 
 `thinclient.toml` tells the thin client only where to reach the local
 daemon. The complete file is simply:
@@ -45,6 +50,6 @@ forms (the `Network` key is an optional refinement of the TCP form):
 | `[Dial.Tcp]` `Address` | string | `host:port` of the daemon's TCP listener. |
 | `[Dial.Tcp]` `Network` | string | Optional: `"tcp"`, `"tcp4"`, or `"tcp6"` (default `"tcp"`). |
 
-### Concurrency
+#### Concurrency
 
 The Go `ThinClient` is safe for concurrent use by multiple goroutines. Because its connection state, current PKI document, and in-flight request tracking are guarded internally, the cancel-from-another-goroutine patterns shown in the [how-to guide](/docs/thin_client_howto/) are sound. The Rust and Python bindings are `async`. An instance is driven from its runtime (a Tokio task or an asyncio event loop) and follows that runtime's ordinary conventions rather than offering an independent thread-safety guarantee.

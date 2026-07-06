@@ -43,4 +43,10 @@ the server-side components), see [Build from source](/docs/build_from_source/).
 For conceptual background on Pigeonhole, see [Understanding Pigeonhole](/docs/pigeonhole_explained/).
 For task-oriented usage guides, see [Thin Client How-to Guide](/docs/thin_client_howto/).
 
+The reference is organized in two parts: the
+[Pigeonhole API](#pigeonhole-api), the message-passing layer most
+applications build on, followed by the
+[Core Thin-Client API](#core-thin-client-api) covering configuration,
+connection management, events, PKI queries, and direct messaging.
+
 ---
