@@ -15,9 +15,11 @@ url: "docs/pigeonhole_explained"
 
 Pigeonhole is the storage layer of the Katzenpost mix network. It
 lets applications communicate anonymously using encrypted,
-append-only streams. From a passive network observer's perspective
-there is no consistent stream access and instead everything looks like
-randomly scattered queries across storage servers.
+append-only streams. Even the storage servers themselves see only
+randomly scattered, unlinkable queries with no consistent stream
+access; a passive network observer sees less still, nothing but
+Sphinx-encrypted traffic whose timing is decoupled from application
+activity.
 
 ```text
    client      ┌───── via mix network ─────┐    courier        replicas
@@ -43,10 +45,10 @@ signatures.
 
 For the privacy properties and the adversary they are designed to
 withstand, see the [threat model](/docs/threat_model/) and the
-[Echomix paper](https://arxiv.org/abs/2501.02933); a passive network
-observer learns only that scattered, unlinkable queries traverse the
-storage servers, never which messages belong to one stream nor who
-reads them. For protocol details, see the
+[Echomix paper](https://arxiv.org/abs/2501.02933); even the storage
+servers learn only that scattered, unlinkable queries reach them,
+never which boxes belong to one stream nor who reads them. For
+protocol details, see the
 [Pigeonhole specification](/docs/specs/pigeonhole/) and sections
 4-5 of the paper. Note that the published threat model is an evolving
 work in progress and does not yet incorporate the newer designs the
@@ -138,9 +140,9 @@ geometry, described below.
   credentials independent of any epoch schedule and continue to work
   indefinitely, but the data at any given box location does not carry
   across a **replica epoch** transition (the weekly schedule, not the
-  20-minute network epoch): at the start of a new replica epoch the box
-  reads as empty, even though the capability that addresses it is
-  unchanged. Workflows that need data to outlive the replica epoch in
+  20-minute network epoch): at the start of a new replica epoch a read
+  at that index returns `BoxIDNotFound`, even though the capability
+  that addresses it is unchanged. Workflows that need data to outlive the replica epoch in
   which it was written must arrange to re-emit it (the copy command,
   described below, is the usual instrument for doing so atomically).
 - **Unlinkable.** Storage servers cannot tell which messages belong
@@ -363,7 +365,7 @@ deletion.
 ## Protocol Composition
 
 Many different protocols can be composed using these Pigeonhole streams.
-For example, in our [Group Chat Design](/docs/specs/group_chat) each
+For example, in our [Group Chat Design](/docs/specs/groupchat/) each
 group participant creates their own channel to write to. Each of the participants
 shares their own channel's ReadCap with the other group members. Therefore
 each group member monitors and reads from all the other channels in the group.
