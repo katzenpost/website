@@ -17,9 +17,10 @@ Pigeonhole is the storage layer of the Katzenpost mix network. It
 lets applications communicate anonymously using encrypted,
 append-only streams. Even the storage servers themselves see only
 randomly scattered, unlinkable queries with no consistent stream
-access; a passive network observer sees less still, nothing but
-Sphinx-encrypted traffic whose timing is decoupled from application
-activity.
+access; a passive network observer sees less still: Sphinx-encrypted
+traffic within the mix network, and fixed-throughput PQ Noise
+connections between couriers and replicas (and between replicas)
+whose rate is independent of application activity.
 
 ```text
    client      ┌───── via mix network ─────┐    courier        replicas
