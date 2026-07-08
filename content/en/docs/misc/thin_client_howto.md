@@ -520,7 +520,8 @@ after an uncertain failure is safe. When you must instead distinguish
 a fresh write from a repeat, for instance to implement optimistic
 concurrency, use the box-exists-aware variant
 (`StartResendingEncryptedMessageReturnBoxExists` in Go,
-`no_idempotent_box_already_exists=True` in Rust and Python), which
+`start_resending_encrypted_message_return_box_exists` in Rust,
+`no_idempotent_box_already_exists=True` in Python), which
 surfaces `BoxAlreadyExists` as an error at the cost of one extra
 mixnet round trip.
 
@@ -937,8 +938,9 @@ tell a benign "not yet" apart from a real error, so that genuine
 failures are not silently retried forever.
 
 Two refinements are worth knowing. First, the ordinary read already
-retries through brief replication lag on its own (the daemon retries a
-`BoxIDNotFound` read several times before returning it), so a single
+retries through brief replication lag on its own (a default read does
+not return `BoxIDNotFound` at all: the daemon retries without bound
+until the box is written), so a single
 read often serves as a deterministic propagation gate: for a
 sequentially written stream, reading the **last** box written gates on
 all the earlier ones, which were written sooner and so have had at
@@ -947,7 +949,8 @@ fixed sleep. Second, when you would rather learn at once that a box is
 absent, for instance to peek at a peer's next message before it has
 been produced, use the no-retry variant
 (`StartResendingEncryptedMessageNoRetry` in Go,
-`no_retry_on_box_id_not_found=True` in Rust and Python), which returns
+`start_resending_encrypted_message_no_retry` in Rust,
+`no_retry_on_box_id_not_found=True` in Python), which returns
 `BoxIDNotFound` immediately instead of waiting out the retries.
 
 {{< tabpane >}}
@@ -966,7 +969,7 @@ for {
     if err != nil {
         log.Fatal(err)
     }
-    result, err := client.StartResendingEncryptedMessage(
+    result, err := client.StartResendingEncryptedMessageNoRetry(
         readCap, nil, idxBytes, nil, envDesc, ciphertext, envHash,
     )
     if err == nil {
@@ -991,7 +994,7 @@ let deadline = std::time::Instant::now()
     + std::time::Duration::from_secs(120);
 let plaintext = loop {
     let read = client.encrypt_read(&read_cap, &current_index).await?;
-    match client.start_resending_encrypted_message(
+    match client.start_resending_encrypted_message_no_retry(
         Some(&read_cap), None, Some(&current_index), None,
         &read.envelope_descriptor,
         &read.message_ciphertext,
@@ -1026,6 +1029,7 @@ while True:
             envelope_descriptor=read.envelope_descriptor,
             message_ciphertext=read.message_ciphertext,
             envelope_hash=read.envelope_hash,
+            no_retry_on_box_id_not_found=True,
         )
         current_index = read.next_message_box_index
         break
