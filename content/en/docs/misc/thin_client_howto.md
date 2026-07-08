@@ -63,7 +63,6 @@ that tag instead.
 | [Write a message](#how-to-write-a-message-to-a-pigeonhole-channel) | Encrypt and send a write to a stream |
 | [Read a message](#how-to-read-a-message-from-a-pigeonhole-channel) | Retrieve and decrypt a message from a stream |
 | [Read back a multi-box payload](#how-to-read-back-a-multi-box-payload) | Concatenate consecutive boxes into one payload |
-| [Send and receive a large payload (stream API)](#how-to-send-and-receive-a-large-payload-with-the-stream-api) | One-call windowed SACK transfer of any size |
 | [Wait for a message not yet written](#how-to-wait-for-a-message-that-has-not-been-written-yet) | Poll with bounded retry around BoxIDNotFound |
 | [Persist and restore channel state](#how-to-persist-and-restore-channel-state) | Survive a process restart without losing your place |
 | [Prepare operations offline](#how-to-prepare-operations-offline) | Do the local crypto now, transmit when connected |
@@ -782,146 +781,9 @@ payload = payload[4:]  # drop the length prefix
 {{< /tab >}}
 {{< /tabpane >}}
 
-The hand loop above sends one read per round trip. The same payload
-can be read far more efficiently with the windowed stream API
-(`ReadStream`): peek the first box to learn the framed length, then
-fetch the remaining boxes in a single call that keeps several in flight
-at once. Because `ReadStream` returns exactly the bytes that were
-written, the four-byte prefix it hands back is the same one the writer
-laid down, and the per-box capacity is `MaxPlaintextPayloadLength - 4`.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-perBox := client.GetPigeonholeGeometry().MaxPlaintextPayloadLength - 4
-
-// Peek the first box to learn the framed length.
-first, idx1, err := client.ReadStream(readCap, firstIndex, 1, 0)
-if err != nil {
-    log.Fatal(err)
-}
-total := int(binary.BigEndian.Uint32(first[:4])) + 4 // prefix + data
-totalBoxes := (total + perBox - 1) / perBox
-
-// Fetch the remainder in one windowed call (window 0 = daemon default).
-payload := first
-if totalBoxes > 1 {
-    rest, _, err := client.ReadStream(readCap, idx1, uint32(totalBoxes-1), 0)
-    if err != nil {
-        log.Fatal(err)
-    }
-    payload = append(payload, rest...)
-}
-payload = payload[4:] // drop the length prefix
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-let per_box = client.pigeonhole_geometry().max_plaintext_payload_length - 4;
-
-// Peek the first box to learn the framed length.
-let (first, idx1) = client.read_stream(
-    &read_cap, &first_message_index, 1, 0).await?;
-let total = u32::from_be_bytes(first[..4].try_into().unwrap()) as usize + 4;
-let total_boxes = (total + per_box - 1) / per_box;
-
-// Fetch the remainder in one windowed call (window 0 = daemon default).
-let mut payload = first;
-if total_boxes > 1 {
-    let (rest, _) = client.read_stream(
-        &read_cap, &idx1, (total_boxes - 1) as u32, 0).await?;
-    payload.extend_from_slice(&rest);
-}
-let payload = &payload[4..]; // drop the length prefix
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-import struct
-
-per_box = client.pigeonhole_geometry.max_plaintext_payload_length - 4
-
-# Peek the first box to learn the framed length.
-first, idx1 = await client.read_stream(read_cap, first_message_index, 1, 0)
-total = struct.unpack(">I", first[:4])[0] + 4  # prefix + data
-total_boxes = (total + per_box - 1) // per_box
-
-# Fetch the remainder in one windowed call (window 0 = daemon default).
-payload = first
-if total_boxes > 1:
-    rest, _ = await client.read_stream(read_cap, idx1, total_boxes - 1, 0)
-    payload += rest
-payload = payload[4:]  # drop the length prefix
-{{< /tab >}}
-{{< /tabpane >}}
-
-When the reader already knows the payload's size or box count, it can
-skip the peek and issue a single `ReadStream`; see
-[How to send and receive a large payload with the stream API](#how-to-send-and-receive-a-large-payload-with-the-stream-api).
-
----
-
-## How to send and receive a large payload with the stream API
-
-`WriteStream` and `ReadStream` move a payload of any size across as
-many boxes as it spans, using the daemon's windowed selective-ack
-(SACK) ARQ. Where the per-box loop blocks on each box in turn, the
-stream API keeps several boxes in flight at once and retransmits only
-those whose acknowledgements time out, so a multi-box transfer is no
-longer serialised one round trip per box. The daemon does all the
-chunking, encryption, and reassembly; you hand it the whole payload.
-
-Pass a **window** of `0` to let the daemon size the window itself from
-the network parameters (the number of routing layers and the Poisson
-send rate); there is no knob to tune by hand, and that is deliberate.
-
-`ReadStream` must be told how many boxes to fetch. Derive that from
-the byte length the writer shares and the channel's per-box capacity,
-which for the stream API is `MaxPlaintextPayloadLength - 4`: the daemon
-reserves four bytes per box for a length tag, so `ReadStream` returns
-exactly the bytes `WriteStream` was given, with no padding to trim.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-// Writer: hand WriteStream the whole payload; window 0 = daemon default.
-nextIndex, err := client.WriteStream(writeCap, firstIndex, payload, 0)
-if err != nil {
-    log.Fatal(err)
-}
-// Share readCap and firstIndex with the reader, and tell it len(payload).
-
-// Reader: derive the box count from the byte length and the geometry.
-perBox := client.GetPigeonholeGeometry().MaxPlaintextPayloadLength - 4
-boxCount := (len(payload) + perBox - 1) / perBox
-data, nextReadIndex, err := client.ReadStream(
-    readCap, firstIndex, uint32(boxCount), 0)
-if err != nil {
-    log.Fatal(err)
-}
-// data == payload
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-// Writer: window 0 = daemon default.
-let next_index = client.write_stream(
-    &write_cap, &first_message_index, &payload, 0).await?;
-// Share read_cap and first_message_index, and tell the reader payload.len().
-
-// Reader: derive the box count from the byte length and the geometry.
-let per_box = client.pigeonhole_geometry().max_plaintext_payload_length - 4;
-let box_count = ((payload.len() + per_box - 1) / per_box) as u32;
-let (data, next_read_index) = client.read_stream(
-    &read_cap, &first_message_index, box_count, 0).await?;
-// data == payload
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-# Writer: window 0 = daemon default.
-next_index = await client.write_stream(
-    write_cap, first_message_index, payload, 0)
-# Share read_cap and first_message_index, and tell the reader len(payload).
-
-# Reader: derive the box count from the byte length and the geometry.
-per_box = client.pigeonhole_geometry.max_plaintext_payload_length - 4
-box_count = (len(payload) + per_box - 1) // per_box
-data, next_read_index = await client.read_stream(
-    read_cap, first_message_index, box_count, 0)
-# data == payload
-{{< /tab >}}
-{{< /tabpane >}}
+Each iteration of the loop costs one mixnet round trip. To write
+many boxes atomically in the other direction, use a copy command;
+see the copy command recipes below.
 
 ---
 
