@@ -83,6 +83,11 @@
     it receives an acknowledgment from the courier. By default writes
     treat `BoxAlreadyExists` as idempotent success, and reads retry
     indefinitely on `BoxIDNotFound`.
+  notes: |
+    The Python binding exposes the two variant behaviors below as
+    keyword-only flags on this method (`no_retry_on_box_id_not_found`
+    and `no_idempotent_box_already_exists`) rather than as separate
+    methods.
   go:     "ThinClient.StartResendingEncryptedMessage"
   rust:   "ThinClient::start_resending_encrypted_message"
   python: "ThinClient.start_resending_encrypted_message"
@@ -94,11 +99,12 @@
   traffic: true
   summary: |
     Same as the default variant, but returns `BoxAlreadyExists` as an
-    error instead of treating it as success. Use this when you need to
-    distinguish a new write from a repeated one.
+    error instead of treating it as success.
+  notes: |
+    In Python, pass `no_idempotent_box_already_exists=True` to
+    `start_resending_encrypted_message` instead.
   go:     "ThinClient.StartResendingEncryptedMessageReturnBoxExists"
   rust:   "ThinClient::start_resending_encrypted_message_return_box_exists"
-  python: "ThinClient.start_resending_encrypted_message_return_box_exists"
 
 - group: start_resending_encrypted_message_no_retry
   part: pigeonhole
@@ -107,11 +113,12 @@
   traffic: true
   summary: |
     Same as the default variant, but returns `BoxIDNotFound` immediately
-    instead of retrying indefinitely. Use this when polling for a message
-    that may not exist yet.
+    instead of retrying indefinitely.
+  notes: |
+    In Python, pass `no_retry_on_box_id_not_found=True` to
+    `start_resending_encrypted_message` instead.
   go:     "ThinClient.StartResendingEncryptedMessageNoRetry"
   rust:   "ThinClient::start_resending_encrypted_message_no_retry"
-  python: "ThinClient.start_resending_encrypted_message_no_retry"
 
 - group: cancel_resending_encrypted_message
   part: pigeonhole

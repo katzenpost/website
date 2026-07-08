@@ -37,7 +37,7 @@ This reference describes the following pinned binding versions:
 
 | Binding | Repository | Tag |
 | --- | --- | --- |
-| Go reference | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/v0.0.89/client/thin) | [v0.0.89](https://github.com/katzenpost/katzenpost/releases/tag/v0.0.89) |
+| Go reference | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/v0.0.90/client/thin) | [v0.0.90](https://github.com/katzenpost/katzenpost/releases/tag/v0.0.90) |
 | Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/0.0.22/src) | [0.0.22](https://github.com/katzenpost/thin_client/releases/tag/0.0.22) |
 | Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/0.0.22/katzenpost_thinclient) | [0.0.22](https://github.com/katzenpost/thin_client/releases/tag/0.0.22) |
 
@@ -190,34 +190,24 @@ in mixnet round trips.
 
 **Sends mixnet traffic.**
 
-StartResendingEncryptedMessage sends an encrypted message via ARQ and blocks until completion.
+StartResendingEncryptedMessage sends an encrypted read or write request
+to a courier through the daemon's stop-and-wait ARQ and blocks until the
+operation completes, fails, or is cancelled via
+CancelResendingEncryptedMessage. The daemon retransmits until the
+courier answers; see
+https://katzenpost.network/docs/pigeonhole_explained/#the-pigeonhole-arq
+for the retransmission behavior and per-operation round-trip costs.
 
-This method blocks until a reply is received. CancelResendingEncryptedMessage is only
-useful when called from another goroutine to interrupt this blocking call.
+A write completes on the courier's ACK, a single mixnet round trip, and
+by default treats BoxAlreadyExists as idempotent success. A read is
+two-phased: after the ACK the daemon collects the payload with a fresh
+SURB, decrypts it, and returns the plaintext; by default a read retries
+BoxIDNotFound until the box is written.
 
-The message will be resent periodically until until one of the following is true:
-  - A reply is received from the courier (this method returns).
-  - The message is canceled via CancelResendingEncryptedMessage (from another goroutine).
-  - The client is shut down.
-
-This is used for both read and write operations in the new Pigeonhole API.
-
-The daemon implements a finite state machine (FSM) for handling the stop-and-wait
-ARQ protocol in the following cases.
-  - For default write operations (writeCap != nil, readCap == nil,
-    noIdempotentBoxAlreadyExists == false):
-    The method waits for an ACK from the courier and returns immediately.
-    The ACK confirms that the courier received the envelope and will dispatch it
-    to both shard replicas. This requires only a single round-trip through
-    the mixnet.
-  - For BoxAlreadyExists-aware writes (noIdempotentBoxAlreadyExists == true):
-    The method waits for an ACK, then sends a second SURB to retrieve the
-    replica's error code. This requires two round-trips through the mixnet.
-  - For read operations (readCap != nil, writeCap == nil):
-    The method waits for an ACK from the courier, then the daemon automatically
-    sends a new SURB to request the payload, and this method waits for the payload.
-    The daemon performs all decryption (MKEM envelope + BACAP payload) and returns
-    the fully decrypted plaintext.
+The Python binding exposes the two variant behaviors below as
+keyword-only flags on this method (`no_retry_on_box_id_not_found`
+and `no_idempotent_box_already_exists`) rather than as separate
+methods.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -248,19 +238,17 @@ StartResendingEncryptedMessageReturnBoxExists behaves exactly like
 StartResendingEncryptedMessage save that it returns
 ErrBoxAlreadyExists when the replica reports that the destination
 box has already been written, rather than swallowing the condition
-as idempotent success. Use it to distinguish a
-fresh write from a repeat: for instance, when implementing
-optimistic concurrency on top of the channel, or when establishing
-whether a particular call actually caused a state change at the
-replica.
+as idempotent success.
 
-Note that this variant costs an additional mixnet round trip: the
+This variant costs an additional mixnet round trip: the
 BoxAlreadyExists code is carried by the replica's reply rather than
 the courier's ACK, so the daemon must dispatch a second SURB before
 it can return the answer.
 
-As with StartResendingEncryptedMessage, an in-flight call may be
-cancelled from another goroutine via CancelResendingEncryptedMessage.
+An in-flight call may be cancelled via CancelResendingEncryptedMessage.
+
+In Python, pass `no_idempotent_box_already_exists=True` to
+`start_resending_encrypted_message` instead.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -278,9 +266,6 @@ pub async fn start_resending_encrypted_message_return_box_exists(
     envelope_hash: &[u8; 32],
 ) -> Result<StartResendingResult, ThinClientError>
 {{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def start_resending_encrypted_message_return_box_exists(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes) -> StartResendingResult:
-{{< /tab >}}
 {{< /tabpane >}}
 
 #### StartResendingEncryptedMessageNoRetry
@@ -289,16 +274,14 @@ async def start_resending_encrypted_message_return_box_exists(self, read_cap: 'b
 
 StartResendingEncryptedMessageNoRetry behaves exactly like
 StartResendingEncryptedMessage save that it disables the daemon's
-automatic retry of ErrBoxIDNotFound. The caller learns at once that
-the box is absent rather than waiting for replication to settle.
+automatic retry of ErrBoxIDNotFound: the caller learns at once that
+the box has not been written yet, rather than blocking until it
+appears.
 
-Use it when polling a box that may not yet have been written, for
-instance when a reader peeks ahead at a peer's next message before
-that peer has produced it. The regular variant would block until
-the box appeared, which can be many round trips.
+An in-flight call may be cancelled via CancelResendingEncryptedMessage.
 
-As with StartResendingEncryptedMessage, an in-flight call may be
-cancelled from another goroutine via CancelResendingEncryptedMessage.
+In Python, pass `no_retry_on_box_id_not_found=True` to
+`start_resending_encrypted_message` instead.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -316,20 +299,16 @@ pub async fn start_resending_encrypted_message_no_retry(
     envelope_hash: &[u8; 32],
 ) -> Result<StartResendingResult, ThinClientError>
 {{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def start_resending_encrypted_message_no_retry(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes) -> StartResendingResult:
-{{< /tab >}}
 {{< /tabpane >}}
 
 #### CancelResendingEncryptedMessage / cancel_resending_encrypted_message
 
 CancelResendingEncryptedMessage cancels ARQ resending for an encrypted message.
 
-This method stops the ARQ for a previously started
-encrypted message transmission. This is useful in the following cases.
-  - A reply has been received through another channel.
-  - The operation should be aborted.
-  - The message is no longer needed.
+The daemon stops retransmitting the operation identified by
+envelopeHash, the blocked StartResendingEncryptedMessage caller
+returns ErrStartResendingCancelled, and the operation is removed
+from in-flight tracking so it is not replayed after a reconnect.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -358,9 +337,8 @@ Understanding Pigeonhole.
 TombstoneRange prepares the encrypted envelopes needed to
 tombstone a consecutive range of Pigeonhole boxes beginning at the
 supplied MessageBoxIndex. A tombstone is a signed empty payload
-that the replica recognizes as a deletion marker; the daemon
-constructs one by signing rather than encrypting whenever
-EncryptWrite is invoked with an empty plaintext.
+that deletes a box's contents; see
+https://katzenpost.network/docs/pigeonhole_explained/#tombstones.
 
 This method does not itself touch the network: it returns the
 envelopes for the caller to dispatch one by one, typically via
@@ -405,15 +383,10 @@ CopyStreamElement, ready to be written to a box via EncryptWrite
 followed by StartResendingEncryptedMessage. The caller marks the
 boundaries of the stream with the isStart and isLast flags.
 
-This method is stateless: no daemon state is kept between calls, and
-each invocation runs a fresh encoder and flushes before returning.
-The 10 MB cap guards against accidental memory exhaustion.
-
-Once the chunks have been written to a temporary copy stream, a
-copy command (StartResendingCopyCommand) is dispatched to a
-courier with the WriteCap for that temporary stream; the courier
-reads the chunks back and dispatches each envelope to its
-destination box.
+This method is stateless: no daemon state is kept between calls.
+It causes no mixnet traffic. See
+https://katzenpost.network/docs/pigeonhole_explained/#copy-commands
+for the copy command workflow the chunks feed into.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -440,14 +413,13 @@ CreateCourierEnvelopesFromMultiPayload packs payloads bound for
 several destination channels into a single stream of
 CopyStreamElement chunks. This is more space-efficient than
 calling CreateCourierEnvelopesFromPayload once per destination,
-because the shared encoder runs all envelopes together rather than
-padding the final box of each destination independently.
+because it avoids padding the final box of each destination
+independently.
 
 This method is stateless; the buffer argument carries any residual
-encoder state across calls in place of daemon-side bookkeeping.
-Pass nil for buffer on the first call and the buffer returned by
-the previous call thereafter; set isLast on the final call so that
-the encoder flushes its tail.
+state across calls. Pass nil for buffer on the first call and the
+buffer returned by the previous call thereafter; set isLast on the
+final call to flush the remainder.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -473,8 +445,8 @@ CreateCourierEnvelopesFromTombstoneRange creates tombstone CourierEnvelopes for 
 of destination indices, encoded as copy stream elements ready to be written to a
 temporary copy stream channel.
 
-This combines the tombstone creation logic (SignBox with empty payload) with the
-courier envelope wrapping and copy stream encoding of CreateCourierEnvelopesFromPayload.
+This combines tombstone creation with the copy stream encoding of
+CreateCourierEnvelopesFromPayload.
 
 The buffer parameter enables stateless continuation across multiple calls without
 wasting space in the last box. Pass nil on the first call, then pass the returned
@@ -511,20 +483,15 @@ async def create_courier_envelopes_from_tombstone_range(self, dest_write_cap: by
 
 **Sends mixnet traffic.**
 
-StartResendingCopyCommand sends a copy command via ARQ and blocks until completion.
+StartResendingCopyCommand sends a copy command to a courier through the
+daemon's stop-and-wait ARQ and blocks until the courier acknowledges
+completion. The copy command hands the courier the write capability of
+a temporary copy stream; the courier executes the stream's envelopes to
+their destination boxes and tombstones the temporary stream. See
+https://katzenpost.network/docs/pigeonhole_explained/#copy-commands
+for the workflow and its all-or-nothing semantics.
 
-This method blocks until a reply is received. It uses the ARQ
-mechanism to reliably send copy commands to the courier, automatically retrying if
-the reply is not received in time.
-
-The copy command instructs the courier to read from a temporary copy stream channel
-and write the parsed envelopes to their destination channels. The courier performs
-the following actions.
- 1. Derives a ReadCap from the WriteCap.
- 2. Reads boxes from the temporary channel.
- 3. Parses boxes into CourierEnvelopes.
- 4. Sends each envelope to intermediate replicas for replication.
- 5. Writes tombstones to clean up the temporary channel.
+An in-flight call may be cancelled via CancelResendingCopyCommand.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -547,11 +514,10 @@ async def start_resending_copy_command(self, write_cap: bytes, courier_identity_
 
 CancelResendingCopyCommand cancels ARQ resending for a copy command.
 
-This method stops the ARQ for a previously started
-copy command. This is useful when:
-  - A reply has been received through another channel.
-  - The operation should be aborted.
-  - The copy command is no longer needed.
+The daemon stops retransmitting the copy command identified by
+writeCapHash (the blake2b-256 hash of the serialized write
+capability), and the operation is removed from in-flight tracking
+so it is not replayed after a reconnect.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -689,17 +655,13 @@ alongside its result.
 
 #### NextMessageBoxIndex / next_message_box_index
 
-NextMessageBoxIndex increments a MessageBoxIndex using the BACAP NextIndex method.
+NextMessageBoxIndex returns the message box index that follows
+messageBoxIndex in its BACAP stream. The computation happens in the
+daemon and causes no mixnet traffic.
 
-This method is used when sending multiple messages to different mailboxes using
-the same WriteCap or ReadCap. It properly advances the cryptographic state with
-the following actions.
-  - Incrementing the Idx64 counter.
-  - Deriving new encryption and blinding keys using HKDF.
-  - Updating the HKDF state for the next iteration.
-
-The client daemon handles the cryptographic operations using our BACAP library
-documented here: https://pkg.go.dev/github.com/katzenpost/hpqc/bacap
+Most callers never need this method: EncryptRead, EncryptWrite, and
+the copy stream constructors already return the next index alongside
+their results.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
