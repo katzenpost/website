@@ -42,6 +42,8 @@ the server-side components), see [Build from source](/docs/build_from_source/).
 
 For conceptual background on Pigeonhole, see [Understanding Pigeonhole](/docs/pigeonhole_explained/).
 For task-oriented usage guides, see [Thin Client How-to Guide](/docs/thin_client_howto/).
+The design and its security analysis are presented in the
+[Echomix paper](https://arxiv.org/abs/2501.02933).
 
 The reference is organized in two parts: the
 [Pigeonhole API](#pigeonhole-api), the message-passing layer most
