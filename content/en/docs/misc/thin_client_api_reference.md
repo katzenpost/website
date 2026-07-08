@@ -131,7 +131,7 @@ examples in all three languages, see the
 
 | Method | Purpose |
 |---|---|
-| [GetPigeonholeGeometry / pigeonhole_geometry](#getpigeonholegeometry--pigeonhole_geometry) | Returns the negotiated Pigeonhole geometry, so that callers can size payloads to its maximum plaintext payload length. *(Go, Rust)* |
+| [GetPigeonholeGeometry / pigeonhole_geometry](#getpigeonholegeometry--pigeonhole_geometry) | Returns the negotiated Pigeonhole geometry, so that callers can size payloads to its maximum plaintext payload length. |
 
 **[Auxiliary Index Helpers](#auxiliary-index-helpers)**
 
@@ -693,14 +693,14 @@ async def voucher_derive_stream(self, voucher: bytes) -> VoucherStreamResult:
 
 #### GetPigeonholeGeometry / pigeonhole_geometry
 
-*Available in: Go, Rust.*
-
 GetPigeonholeGeometry returns the Pigeonhole geometry the daemon supplied
 during the connection handshake. It is nil until Dial() has completed.
 
-> **Note:** The Python binding has no getter method; it exposes the Pigeonhole
-> geometry as the public `ThinClient.pigeonhole_geometry` attribute,
-> populated from the daemon's connection status event.
+> **Note:** The Python binding has no getter method yet; it exposes the
+> Pigeonhole geometry as the public `pigeonhole_geometry` attribute,
+> cached from the daemon's connection handshake so applications can
+> size their payloads. A getter method is planned for the next
+> release.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -708,6 +708,12 @@ func (t *ThinClient) GetPigeonholeGeometry() *pigeonholeGeo.Geometry
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub fn pigeonhole_geometry(&self) -> PigeonholeGeometry
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+# Public attribute, cached from the connection handshake;
+# None until the daemon connects. A getter method is planned
+# for the next release.
+geo = client.pigeonhole_geometry
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -813,7 +819,7 @@ consuming daemon events, querying the PKI, and sending direct
 
 | Method | Purpose |
 |---|---|
-| [GetSphinxGeometry / sphinx_geometry](#getsphinxgeometry--sphinx_geometry) | Returns the Sphinx geometry the daemon supplied during the connection handshake, describing the packet and payload sizes of the mixnet's Sphinx packet format. *(Go, Rust)* |
+| [GetSphinxGeometry / sphinx_geometry](#getsphinxgeometry--sphinx_geometry) | Returns the Sphinx geometry the daemon supplied during the connection handshake, describing the packet and payload sizes of the mixnet's Sphinx packet format. |
 
 **[Utility](#utility)**
 
@@ -1400,14 +1406,13 @@ async def blocking_send_message(self, payload: bytes | str, dest_node: bytes, de
 
 #### GetSphinxGeometry / sphinx_geometry
 
-*Available in: Go, Rust.*
-
 GetSphinxGeometry returns the Sphinx geometry the daemon supplied during
 the connection handshake. It is nil until Dial() has completed.
 
-> **Note:** The Python binding has no getter method; it exposes the Sphinx
-> geometry as the public `ThinClient.geometry` attribute (a `Geometry`),
-> populated from the daemon's connection status event.
+> **Note:** The Python binding has no getter method yet; it exposes the Sphinx
+> geometry as the public `geometry` attribute (a `Geometry`), cached
+> from the daemon's connection handshake so applications can size
+> their payloads. A getter method is planned for the next release.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -1415,6 +1420,12 @@ func (t *ThinClient) GetSphinxGeometry() *geo.Geometry
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub fn sphinx_geometry(&self) -> Geometry
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+# Public attribute, cached from the connection handshake;
+# None until the daemon connects. A getter method is planned
+# for the next release.
+geo = client.geometry
 {{< /tab >}}
 {{< /tabpane >}}
 

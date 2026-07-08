@@ -15,6 +15,9 @@
 #     go:     "Receiver.Method"    # key into extractor output; use
 #     rust:   "Receiver::method"   #   `::` or `.` interchangeably.
 #     python: "Receiver.method"    # omit a binding if not present.
+#     python_snippet: |            # literal code for a binding with no
+#       client.attribute           #   method but an equivalent form;
+#                                  #   also go_snippet / rust_snippet
 
 # ===========================================================================
 # Part: Pigeonhole API
@@ -275,11 +278,18 @@
     Returns the negotiated Pigeonhole geometry, so that callers can size
     payloads to its maximum plaintext payload length.
   notes: |
-    The Python binding has no getter method; it exposes the Pigeonhole
-    geometry as the public `ThinClient.pigeonhole_geometry` attribute,
-    populated from the daemon's connection status event.
+    The Python binding has no getter method yet; it exposes the
+    Pigeonhole geometry as the public `pigeonhole_geometry` attribute,
+    cached from the daemon's connection handshake so applications can
+    size their payloads. A getter method is planned for the next
+    release.
   go:   "ThinClient.GetPigeonholeGeometry"
   rust: "ThinClient::pigeonhole_geometry"
+  python_snippet: |
+    # Public attribute, cached from the connection handshake;
+    # None until the daemon connects. A getter method is planned
+    # for the next release.
+    geo = client.pigeonhole_geometry
 
 # ---------------------------------------------------------------------------
 # Auxiliary index helpers
@@ -542,11 +552,17 @@
     handshake, describing the packet and payload sizes of the mixnet's
     Sphinx packet format.
   notes: |
-    The Python binding has no getter method; it exposes the Sphinx
-    geometry as the public `ThinClient.geometry` attribute (a `Geometry`),
-    populated from the daemon's connection status event.
+    The Python binding has no getter method yet; it exposes the Sphinx
+    geometry as the public `geometry` attribute (a `Geometry`), cached
+    from the daemon's connection handshake so applications can size
+    their payloads. A getter method is planned for the next release.
   go:   "ThinClient.GetSphinxGeometry"
   rust: "ThinClient::sphinx_geometry"
+  python_snippet: |
+    # Public attribute, cached from the connection handshake;
+    # None until the daemon connects. A getter method is planned
+    # for the next release.
+    geo = client.geometry
 
 # ---------------------------------------------------------------------------
 # Utility

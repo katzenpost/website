@@ -207,7 +207,8 @@ def render_method_toc(part_groups: list[dict]) -> str:
             purpose = first_sentence(group.get("summary") or "")
             if group.get("traffic"):
                 purpose = f"{purpose} {TRAFFIC_BADGE}".strip()
-            have = [TAB_LABEL[b] for b in BINDINGS if group.get(b)]
+            have = [TAB_LABEL[b] for b in BINDINGS
+                    if group.get(b) or group.get(f"{b}_snippet")]
             if 0 < len(have) < len(BINDINGS):
                 purpose = f"{purpose} *({', '.join(have)})*".strip()
             purpose = purpose.replace("|", "\\|")
@@ -322,8 +323,9 @@ def render_group(
 
     # Methods absent from one or more bindings get an availability
     # line; full-coverage methods stay unmarked so the marker carries
-    # meaning.
-    have = [TAB_LABEL[b] for b in BINDINGS if group.get(b)]
+    # meaning. A binding documented via a snippet counts as covered.
+    have = [TAB_LABEL[b] for b in BINDINGS
+            if group.get(b) or group.get(f"{b}_snippet")]
     if 0 < len(have) < len(BINDINGS):
         lines.append(f"*Available in: {', '.join(have)}.*\n")
 
@@ -351,6 +353,12 @@ def render_group(
     ):
         key = group.get(binding)
         if not key:
+            # A `<binding>_snippet` documents a binding that has no
+            # method for this operation but does have an equivalent
+            # form (e.g. a public attribute).
+            snippet = group.get(f"{binding}_snippet")
+            if snippet:
+                tabs.append((binding, lang_tag, snippet))
             continue
         sym = resolve_symbol(syms, key)
         if sym is None:
