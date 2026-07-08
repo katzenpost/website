@@ -59,8 +59,11 @@ connection management, events, PKI queries, and direct messaging.
 
 The Pigeonhole API is the message-passing layer of the thin client:
 applications write to and read from BACAP-encrypted storage streams
-held on the mixnet's storage replicas, reached through couriers. For
-conceptual background, see
+held on the mixnet's storage replicas, reached through couriers.
+Much of this API wraps the
+[BACAP](https://pkg.go.dev/github.com/katzenpost/hpqc/bacap) scheme,
+with the daemon performing all BACAP operations on the
+application's behalf. For conceptual background, see
 [Understanding Pigeonhole](/docs/pigeonhole_explained/); for worked
 examples in all three languages, see the
 [Thin Client How-to Guide](/docs/thin_client_howto/).
@@ -68,15 +71,16 @@ examples in all three languages, see the
 > **Most Pigeonhole methods cause no mixnet traffic.** Only
 > `StartResendingEncryptedMessage` (and its two variants) and
 > `StartResendingCopyCommand` put traffic on the mixnet; they are
-> marked **Sends mixnet traffic** below. The `Cancel*` methods are
-> local control operations, and everything else is a local
-> computation performed by the daemon over the local socket.
+> marked **Sends mixnet traffic** below and deliver through the
+> daemon's stop-and-wait ARQ, described in
+> [The Pigeonhole ARQ](/docs/pigeonhole_explained/#the-pigeonhole-arq).
+> The `Cancel*` methods are local control operations, and everything
+> else is a local computation performed by the daemon over the local
+> socket.
 
 | Method | Purpose |
 |---|---|
 | [NewKeypair / new_keypair](#newkeypair--new_keypair) | Generates a new BACAP keypair from a 32-byte seed. |
-| [NextMessageBoxIndex / next_message_box_index](#nextmessageboxindex--next_message_box_index) | Returns the next message box index in the sequence. |
-| [GetMessageBoxIndexCounter / get_message_box_index_counter](#getmessageboxindexcounter--get_message_box_index_counter) | Returns the BACAP Idx64 counter embedded in a MessageBoxIndex, the sequence number of a box within its stream. |
 | [EncryptRead / encrypt_read](#encryptread--encrypt_read) | Creates an encrypted read request for a single Pigeonhole box. |
 | [EncryptWrite / encrypt_write](#encryptwrite--encrypt_write) | Creates an encrypted write request for a single Pigeonhole box. |
 | [StartResendingEncryptedMessage / start_resending_encrypted_message](#startresendingencryptedmessage--start_resending_encrypted_message) | Sends an encrypted read or write request to a courier via the ARQ mechanism. **Sends mixnet traffic.** |
@@ -94,6 +98,8 @@ examples in all three languages, see the
 | [VoucherOpen / voucher_open](#voucheropen--voucher_open) | Opens the inductor's sealed reply with the joiner's voucher secret key. |
 | [VoucherDeriveStream / voucher_derive_stream](#voucherderivestream--voucher_derive_stream) | Derives the VoucherStream capabilities from the Voucher. |
 | [GetPigeonholeGeometry / pigeonhole_geometry](#getpigeonholegeometry--pigeonhole_geometry) | Returns the negotiated Pigeonhole geometry, so that callers can size payloads to its maximum plaintext payload length. |
+| [NextMessageBoxIndex / next_message_box_index](#nextmessageboxindex--next_message_box_index) | Returns the next message box index in the sequence. |
+| [GetMessageBoxIndexCounter / get_message_box_index_counter](#getmessageboxindexcounter--get_message_box_index_counter) | Returns the BACAP Idx64 counter embedded in a MessageBoxIndex, the sequence number of a box within its stream. |
 
 ### Keypairs and Capabilities
 
@@ -118,58 +124,6 @@ pub async fn new_keypair(
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
 async def new_keypair(self, seed: bytes) -> KeypairResult:
-{{< /tab >}}
-{{< /tabpane >}}
-
-### Index Management
-
-#### NextMessageBoxIndex / next_message_box_index
-
-NextMessageBoxIndex increments a MessageBoxIndex using the BACAP NextIndex method.
-
-This method is used when sending multiple messages to different mailboxes using
-the same WriteCap or ReadCap. It properly advances the cryptographic state with
-the following actions.
-  - Incrementing the Idx64 counter.
-  - Deriving new encryption and blinding keys using HKDF.
-  - Updating the HKDF state for the next iteration.
-
-The client daemon handles the cryptographic operations using our BACAP library
-documented here: https://pkg.go.dev/github.com/katzenpost/hpqc/bacap
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) NextMessageBoxIndex(messageBoxIndex *bacap.MessageBoxIndex) (nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn next_message_box_index(
-    &self,
-    message_box_index: &[u8],
-) -> Result<Vec<u8>, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def next_message_box_index(self, message_box_index: bytes) -> bytes:
-{{< /tab >}}
-{{< /tabpane >}}
-
-#### GetMessageBoxIndexCounter / get_message_box_index_counter
-
-GetMessageBoxIndexCounter returns the BACAP Idx64 counter embedded in a
-MessageBoxIndex. Callers can use this to order or compare two indexes
-without having to know bacap.MessageBoxIndex's binary layout.
-
-{{< tabpane >}}
-{{< tab header="Go" lang="go" >}}
-func (t *ThinClient) GetMessageBoxIndexCounter(messageBoxIndex *bacap.MessageBoxIndex) (uint64, error)
-{{< /tab >}}
-{{< tab header="Rust" lang="rust" >}}
-pub async fn get_message_box_index_counter(
-    &self,
-    message_box_index: &[u8],
-) -> Result<u64, ThinClientError>
-{{< /tab >}}
-{{< tab header="Python" lang="python" >}}
-async def get_message_box_index_counter(self, message_box_index: bytes) -> int:
 {{< /tab >}}
 {{< /tabpane >}}
 
@@ -225,6 +179,12 @@ async def encrypt_write(self, plaintext: bytes, write_cap: bytes, message_box_in
 {{< /tabpane >}}
 
 ### Sending and ARQ Transport
+
+The senders in this section deliver envelopes through the daemon's
+stop-and-wait ARQ.
+[The Pigeonhole ARQ](/docs/pigeonhole_explained/#the-pigeonhole-arq)
+describes the retransmission behavior and what each operation costs
+in mixnet round trips.
 
 #### StartResendingEncryptedMessage / start_resending_encrypted_message
 
@@ -388,6 +348,11 @@ async def cancel_resending_encrypted_message(self, envelope_hash: bytes) -> None
 
 ### Tombstones
 
+A tombstone is a signed empty payload that deletes a box's
+contents. See
+[Tombstones](/docs/pigeonhole_explained/#tombstones) in
+Understanding Pigeonhole.
+
 #### TombstoneRange / tombstone_range
 
 TombstoneRange prepares the encrypted envelopes needed to
@@ -424,6 +389,12 @@ async def tombstone_range(self, write_cap: bytes, start: bytes, max_count: int) 
 {{< /tabpane >}}
 
 ### Copy Commands
+
+A copy command atomically writes a batch of envelopes to existing
+streams by way of a temporary copy stream, which a courier executes
+and then tombstones. See
+[Copy commands](/docs/pigeonhole_explained/#copy-commands) in
+Understanding Pigeonhole for the workflow and its use cases.
 
 #### CreateCourierEnvelopesFromPayload
 
@@ -707,6 +678,62 @@ func (t *ThinClient) GetPigeonholeGeometry() *pigeonholeGeo.Geometry
 {{< /tab >}}
 {{< tab header="Rust" lang="rust" >}}
 pub fn pigeonhole_geometry(&self) -> PigeonholeGeometry
+{{< /tab >}}
+{{< /tabpane >}}
+
+### Auxiliary Index Helpers
+
+Most applications never need these methods: every call that
+consumes a message box index already returns the next index
+alongside its result.
+
+#### NextMessageBoxIndex / next_message_box_index
+
+NextMessageBoxIndex increments a MessageBoxIndex using the BACAP NextIndex method.
+
+This method is used when sending multiple messages to different mailboxes using
+the same WriteCap or ReadCap. It properly advances the cryptographic state with
+the following actions.
+  - Incrementing the Idx64 counter.
+  - Deriving new encryption and blinding keys using HKDF.
+  - Updating the HKDF state for the next iteration.
+
+The client daemon handles the cryptographic operations using our BACAP library
+documented here: https://pkg.go.dev/github.com/katzenpost/hpqc/bacap
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) NextMessageBoxIndex(messageBoxIndex *bacap.MessageBoxIndex) (nextMessageBoxIndex *bacap.MessageBoxIndex, err error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn next_message_box_index(
+    &self,
+    message_box_index: &[u8],
+) -> Result<Vec<u8>, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def next_message_box_index(self, message_box_index: bytes) -> bytes:
+{{< /tab >}}
+{{< /tabpane >}}
+
+#### GetMessageBoxIndexCounter / get_message_box_index_counter
+
+GetMessageBoxIndexCounter returns the BACAP Idx64 counter embedded in a
+MessageBoxIndex. Callers can use this to order or compare two indexes
+without having to know bacap.MessageBoxIndex's binary layout.
+
+{{< tabpane >}}
+{{< tab header="Go" lang="go" >}}
+func (t *ThinClient) GetMessageBoxIndexCounter(messageBoxIndex *bacap.MessageBoxIndex) (uint64, error)
+{{< /tab >}}
+{{< tab header="Rust" lang="rust" >}}
+pub async fn get_message_box_index_counter(
+    &self,
+    message_box_index: &[u8],
+) -> Result<u64, ThinClientError>
+{{< /tab >}}
+{{< tab header="Python" lang="python" >}}
+async def get_message_box_index_counter(self, message_box_index: bytes) -> int:
 {{< /tab >}}
 {{< /tabpane >}}
 

@@ -37,34 +37,6 @@
   python: "ThinClient.new_keypair"
 
 # ---------------------------------------------------------------------------
-# Index management
-# ---------------------------------------------------------------------------
-
-- group: next_message_box_index
-  part: pigeonhole
-  section: "Index Management"
-  title: "NextMessageBoxIndex / next_message_box_index"
-  summary: |
-    Returns the next message box index in the sequence. This is a local
-    KDF computation; it does not cause network traffic or store state.
-    If you have a BACAP implementation in your language, you can compute
-    this locally instead of making a round trip to the daemon.
-  go:     "ThinClient.NextMessageBoxIndex"
-  rust:   "ThinClient::next_message_box_index"
-  python: "ThinClient.next_message_box_index"
-
-- group: get_message_box_index_counter
-  part: pigeonhole
-  section: "Index Management"
-  title: "GetMessageBoxIndexCounter / get_message_box_index_counter"
-  summary: |
-    Returns the BACAP Idx64 counter embedded in a MessageBoxIndex, the
-    sequence number of a box within its stream.
-  go:     "ThinClient.GetMessageBoxIndexCounter"
-  rust:   "ThinClient::get_message_box_index_counter"
-  python: "ThinClient.get_message_box_index_counter"
-
-# ---------------------------------------------------------------------------
 # Preparing reads and writes
 # ---------------------------------------------------------------------------
 
@@ -301,6 +273,34 @@
     populated from the daemon's connection status event.
   go:   "ThinClient.GetPigeonholeGeometry"
   rust: "ThinClient::pigeonhole_geometry"
+
+# ---------------------------------------------------------------------------
+# Auxiliary index helpers
+# ---------------------------------------------------------------------------
+
+- group: next_message_box_index
+  part: pigeonhole
+  section: "Auxiliary Index Helpers"
+  title: "NextMessageBoxIndex / next_message_box_index"
+  summary: |
+    Returns the next message box index in the sequence. This is a local
+    KDF computation; it does not cause network traffic or store state.
+    If you have a BACAP implementation in your language, you can compute
+    this locally instead of making a round trip to the daemon.
+  go:     "ThinClient.NextMessageBoxIndex"
+  rust:   "ThinClient::next_message_box_index"
+  python: "ThinClient.next_message_box_index"
+
+- group: get_message_box_index_counter
+  part: pigeonhole
+  section: "Auxiliary Index Helpers"
+  title: "GetMessageBoxIndexCounter / get_message_box_index_counter"
+  summary: |
+    Returns the BACAP Idx64 counter embedded in a MessageBoxIndex, the
+    sequence number of a box within its stream.
+  go:     "ThinClient.GetMessageBoxIndexCounter"
+  rust:   "ThinClient::get_message_box_index_counter"
+  python: "ThinClient.get_message_box_index_counter"
 
 # ===========================================================================
 # Part: Core Thin-Client API
