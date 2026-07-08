@@ -140,6 +140,11 @@ examples in all three languages, see the
 | [NextMessageBoxIndex / next_message_box_index](#nextmessageboxindex--next_message_box_index) | Returns the next message box index in the sequence. |
 | [GetMessageBoxIndexCounter / get_message_box_index_counter](#getmessageboxindexcounter--get_message_box_index_counter) | Returns the BACAP Idx64 counter embedded in a MessageBoxIndex, the sequence number of a box within its stream. |
 
+Looking for connection management, events, PKI queries, or direct
+messaging? Those live in the
+[Core Thin-Client API](#core-thin-client-api) below, which opens with
+its own method index.
+
 ---
 
 ### Keypairs and Capabilities

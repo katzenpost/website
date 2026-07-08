@@ -20,3 +20,8 @@ examples in all three languages, see the
 > socket.
 
 <!-- METHOD_TOC -->
+
+Looking for connection management, events, PKI queries, or direct
+messaging? Those live in the
+[Core Thin-Client API](#core-thin-client-api) below, which opens with
+its own method index.
