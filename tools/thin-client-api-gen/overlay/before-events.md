@@ -50,7 +50,7 @@ client = ThinClient(config)
 {{< /tab >}}
 {{< /tabpane >}}
 
-### Event types
+#### Event types
 
 - **ConnectionStatusEvent**: emitted when the daemon's connection
   to the mixnet changes. Fields (Go): `IsConnected bool`, `Err error`,

@@ -24,7 +24,9 @@ processors:
     documented_only: true
     skip_empty_modules: true
   - type: smart
-  - type: crossref
+  # No crossref processor: nothing in the docstrings uses its #Symbol
+  # reference syntax, and it mangles the #fragment of any plain URL
+  # (https://...#copy-commands became `copy`-commands).
 
 renderer:
   type: markdown

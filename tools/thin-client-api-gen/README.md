@@ -65,7 +65,10 @@ make clean
    docstring (Go: `Parameters:` / `Returns:` sections; Rust: `# Arguments`
    / `# Returns` / `# Errors`; Python: Google-style `Args:` / `Returns:` /
    `Raises:`).
-2. Add a group entry in `groups.yaml` naming the per-binding symbols.
+2. Add a group entry in `groups.yaml` naming the per-binding symbols,
+   with a `part:` (`pigeonhole` or `core`) and a `section:` placing it
+   in the document. Methods that send mixnet traffic get `traffic: true`,
+   which renders a badge and marks the method-index entry.
 3. Run `make check` to confirm there are no unresolved references.
 4. Run `make build` and diff the output to confirm the section renders as
    expected.

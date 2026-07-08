@@ -4,21 +4,331 @@
 #
 # Schema:
 #   - group: <stable-id>           # internal anchor name
-#     section: "<H2 heading>"      # only emitted when changed from prior group
-#     title: "<H3 title>"
-#     summary: |                   # optional prose paragraph under the H3
+#     part: pigeonhole | core      # H2 part the group belongs to
+#     section: "<H3 heading>"      # only emitted when changed from prior group
+#     title: "<H4 title>"
+#     traffic: true                # optional; marks methods that send mixnet traffic
+#     summary: |                   # optional prose paragraph under the H4
 #       ...
 #     notes: |                     # optional secondary paragraph
 #       ...
 #     go:     "Receiver.Method"    # key into extractor output; use
 #     rust:   "Receiver::method"   #   `::` or `.` interchangeably.
 #     python: "Receiver.method"    # omit a binding if not present.
+#     python_snippet: |            # literal code for a binding with no
+#       client.attribute           #   method but an equivalent form;
+#                                  #   also go_snippet / rust_snippet
+
+# ===========================================================================
+# Part: Pigeonhole API
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# Keypairs and capabilities
+# ---------------------------------------------------------------------------
+
+- group: new_keypair
+  part: pigeonhole
+  section: "Keypairs and Capabilities"
+  title: "NewKeypair / new_keypair"
+  summary: |
+    Generates a new BACAP keypair from a 32-byte seed. Returns the write
+    capability, read capability, and first message index for a new
+    Pigeonhole stream. Does not cause network traffic.
+  go:     "ThinClient.NewKeypair"
+  rust:   "ThinClient::new_keypair"
+  python: "ThinClient.new_keypair"
+
+# ---------------------------------------------------------------------------
+# Preparing reads and writes
+# ---------------------------------------------------------------------------
+
+- group: encrypt_read
+  part: pigeonhole
+  section: "Preparing Reads and Writes"
+  title: "EncryptRead / encrypt_read"
+  summary: |
+    Creates an encrypted read request for a single Pigeonhole box. The
+    returned ciphertext and envelope data must be sent via
+    `StartResendingEncryptedMessage` to actually perform the read.
+    Does not cause network traffic.
+  go:     "ThinClient.EncryptRead"
+  rust:   "ThinClient::encrypt_read"
+  python: "ThinClient.encrypt_read"
+
+- group: encrypt_write
+  part: pigeonhole
+  section: "Preparing Reads and Writes"
+  title: "EncryptWrite / encrypt_write"
+  summary: |
+    Creates an encrypted write request for a single Pigeonhole box. The
+    returned ciphertext and envelope data must be sent via
+    `StartResendingEncryptedMessage` to actually perform the write.
+    To create a tombstone (deletion marker), pass an empty byte slice as
+    the plaintext.
+  go:     "ThinClient.EncryptWrite"
+  rust:   "ThinClient::encrypt_write"
+  python: "ThinClient.encrypt_write"
+
+# ---------------------------------------------------------------------------
+# Sending and ARQ transport
+# ---------------------------------------------------------------------------
+
+- group: start_resending_encrypted_message
+  part: pigeonhole
+  section: "Sending and ARQ Transport"
+  title: "StartResendingEncryptedMessage / start_resending_encrypted_message"
+  traffic: true
+  summary: |
+    Sends an encrypted read or write request to a courier via the ARQ
+    mechanism. **Blocks** until the operation
+    completes or is cancelled. The daemon retransmits the request until
+    it receives an acknowledgment from the courier. By default writes
+    treat `BoxAlreadyExists` as idempotent success, and reads retry
+    indefinitely on `BoxIDNotFound`.
+  notes: |
+    The Python binding exposes the two variant behaviors below as
+    keyword-only flags on this method (`no_retry_on_box_id_not_found`
+    and `no_idempotent_box_already_exists`) rather than as separate
+    methods.
+  go:     "ThinClient.StartResendingEncryptedMessage"
+  rust:   "ThinClient::start_resending_encrypted_message"
+  python: "ThinClient.start_resending_encrypted_message"
+
+- group: start_resending_encrypted_message_return_box_exists
+  part: pigeonhole
+  section: "Sending and ARQ Transport"
+  title: "StartResendingEncryptedMessageReturnBoxExists"
+  traffic: true
+  summary: |
+    Same as the default variant, but returns `BoxAlreadyExists` as an
+    error instead of treating it as success.
+  notes: |
+    In Python, pass `no_idempotent_box_already_exists=True` to
+    `start_resending_encrypted_message` instead.
+  go:     "ThinClient.StartResendingEncryptedMessageReturnBoxExists"
+  rust:   "ThinClient::start_resending_encrypted_message_return_box_exists"
+
+- group: start_resending_encrypted_message_no_retry
+  part: pigeonhole
+  section: "Sending and ARQ Transport"
+  title: "StartResendingEncryptedMessageNoRetry"
+  traffic: true
+  summary: |
+    Same as the default variant, but returns `BoxIDNotFound` immediately
+    instead of retrying indefinitely.
+  notes: |
+    In Python, pass `no_retry_on_box_id_not_found=True` to
+    `start_resending_encrypted_message` instead.
+  go:     "ThinClient.StartResendingEncryptedMessageNoRetry"
+  rust:   "ThinClient::start_resending_encrypted_message_no_retry"
+
+- group: cancel_resending_encrypted_message
+  part: pigeonhole
+  section: "Sending and ARQ Transport"
+  title: "CancelResendingEncryptedMessage / cancel_resending_encrypted_message"
+  summary: |
+    Cancels an in-flight `StartResendingEncryptedMessage` operation.
+    The blocked caller receives a `StartResendingCancelled` error.
+    Removes the operation from in-flight tracking so it will not be
+    replayed on reconnect.
+  go:     "ThinClient.CancelResendingEncryptedMessage"
+  rust:   "ThinClient::cancel_resending_encrypted_message"
+  python: "ThinClient.cancel_resending_encrypted_message"
+
+# ---------------------------------------------------------------------------
+# Tombstones
+# ---------------------------------------------------------------------------
+
+- group: tombstone_range
+  part: pigeonhole
+  section: "Tombstones"
+  title: "TombstoneRange / tombstone_range"
+  summary: |
+    Creates encrypted tombstone envelopes for a range of consecutive
+    boxes. Tombstones are writes with an empty payload that delete the
+    box contents. Does not cause network traffic; the caller must send
+    each envelope individually via `StartResendingEncryptedMessage`.
+  go:     "ThinClient.TombstoneRange"
+  rust:   "ThinClient::tombstone_range"
+  python: "ThinClient.tombstone_range"
+
+# ---------------------------------------------------------------------------
+# Copy commands
+# ---------------------------------------------------------------------------
+
+- group: create_courier_envelopes_from_payload
+  part: pigeonhole
+  section: "Copy Commands"
+  title: "CreateCourierEnvelopesFromPayload / create_courier_envelopes_from_payload"
+  summary: |
+    Packs a single payload for one destination into copy stream elements.
+    The payload can be up to ~10 MB. Returns properly sized chunks ready
+    to be written to boxes via `EncryptWrite`.
+  go:     "ThinClient.CreateCourierEnvelopesFromPayload"
+  rust:   "ThinClient::create_courier_envelopes_from_payload"
+  python: "ThinClient.create_courier_envelopes_from_payload"
+
+- group: create_courier_envelopes_from_multi_payload
+  part: pigeonhole
+  section: "Copy Commands"
+  title: "CreateCourierEnvelopesFromMultiPayload / create_courier_envelopes_from_multi_payload"
+  summary: |
+    Packs multiple payloads for different destinations into copy stream
+    elements. More space-efficient than calling the single-payload
+    variant multiple times because envelopes are packed together without
+    wasted padding.
+  go:     "ThinClient.CreateCourierEnvelopesFromMultiPayload"
+  rust:   "ThinClient::create_courier_envelopes_from_multi_payload"
+  python: "ThinClient.create_courier_envelopes_from_multi_payload"
+
+- group: create_courier_envelopes_from_tombstone_range
+  part: pigeonhole
+  section: "Copy Commands"
+  title: "CreateCourierEnvelopesFromTombstoneRange / create_courier_envelopes_from_tombstone_range"
+  summary: |
+    Packs tombstone envelopes for a range of consecutive destination
+    boxes into copy stream elements. Use this to atomically tombstone
+    boxes as part of a copy command.
+  go:     "ThinClient.CreateCourierEnvelopesFromTombstoneRange"
+  rust:   "ThinClient::create_courier_envelopes_from_tombstone_range"
+  python: "ThinClient.create_courier_envelopes_from_tombstone_range"
+
+- group: start_resending_copy_command
+  part: pigeonhole
+  section: "Copy Commands"
+  title: "StartResendingCopyCommand / start_resending_copy_command"
+  traffic: true
+  summary: |
+    Sends a copy command to a courier via ARQ and **blocks** until the
+    courier acknowledges completion. The courier reads the temporary
+    copy stream, executes each envelope, tombstones the temporary
+    stream, and sends an ACK. The daemon picks the courier; the Rust
+    and Python bindings additionally accept optional
+    `courier_identity_hash` and `courier_queue_id` arguments to pin
+    the command to a particular courier for nested copy commands.
+  go:     "ThinClient.StartResendingCopyCommand"
+  rust:   "ThinClient::start_resending_copy_command"
+  python: "ThinClient.start_resending_copy_command"
+
+- group: cancel_resending_copy_command
+  part: pigeonhole
+  section: "Copy Commands"
+  title: "CancelResendingCopyCommand / cancel_resending_copy_command"
+  summary: |
+    Cancels an in-flight copy command. The parameter is the blake2b-256
+    hash of the serialized write capability.
+  go:     "ThinClient.CancelResendingCopyCommand"
+  rust:   "ThinClient::cancel_resending_copy_command"
+  python: "ThinClient.cancel_resending_copy_command"
+
+# ---------------------------------------------------------------------------
+# Contact vouchers
+# ---------------------------------------------------------------------------
+
+- group: voucher_mint
+  part: pigeonhole
+  section: "Contact Vouchers"
+  title: "VoucherMint / voucher_mint"
+  summary: |
+    Mints a Voucher from the joiner's MessageStream write capability.
+  go:     "ThinClient.VoucherMint"
+  rust:   "ThinClient::voucher_mint"
+  python: "ThinClient.voucher_mint"
+
+- group: voucher_induct
+  part: pigeonhole
+  section: "Contact Vouchers"
+  title: "VoucherInduct / voucher_induct"
+  summary: |
+    Verifies a published VoucherPayload and seals a reply to the joiner.
+  go:     "ThinClient.VoucherInduct"
+  rust:   "ThinClient::voucher_induct"
+  python: "ThinClient.voucher_induct"
+
+- group: voucher_open
+  part: pigeonhole
+  section: "Contact Vouchers"
+  title: "VoucherOpen / voucher_open"
+  summary: |
+    Opens the inductor's sealed reply with the joiner's voucher secret key.
+  go:     "ThinClient.VoucherOpen"
+  rust:   "ThinClient::voucher_open"
+  python: "ThinClient.voucher_open"
+
+- group: voucher_derive_stream
+  part: pigeonhole
+  section: "Contact Vouchers"
+  title: "VoucherDeriveStream / voucher_derive_stream"
+  summary: |
+    Derives the VoucherStream capabilities from the Voucher.
+  go:     "ThinClient.VoucherDeriveStream"
+  rust:   "ThinClient::voucher_derive_stream"
+  python: "ThinClient.voucher_derive_stream"
+
+# ---------------------------------------------------------------------------
+# Pigeonhole geometry
+# ---------------------------------------------------------------------------
+
+- group: pigeonhole_geometry
+  part: pigeonhole
+  section: "Pigeonhole Geometry"
+  title: "GetPigeonholeGeometry / pigeonhole_geometry"
+  summary: |
+    Returns the negotiated Pigeonhole geometry, so that callers can size
+    payloads to its maximum plaintext payload length.
+  notes: |
+    The Python binding has no getter method yet; it exposes the
+    Pigeonhole geometry as the public `pigeonhole_geometry` attribute,
+    cached from the daemon's connection handshake so applications can
+    size their payloads. A getter method is planned for the next
+    release.
+  go:   "ThinClient.GetPigeonholeGeometry"
+  rust: "ThinClient::pigeonhole_geometry"
+  python_snippet: |
+    # Public attribute, cached from the connection handshake;
+    # None until the daemon connects. A getter method is planned
+    # for the next release.
+    geo = client.pigeonhole_geometry
+
+# ---------------------------------------------------------------------------
+# Auxiliary index helpers
+# ---------------------------------------------------------------------------
+
+- group: next_message_box_index
+  part: pigeonhole
+  section: "Auxiliary Index Helpers"
+  title: "NextMessageBoxIndex / next_message_box_index"
+  summary: |
+    Returns the next message box index in the sequence. This is a local
+    KDF computation; it does not cause network traffic or store state.
+    If you have a BACAP implementation in your language, you can compute
+    this locally instead of making a round trip to the daemon.
+  go:     "ThinClient.NextMessageBoxIndex"
+  rust:   "ThinClient::next_message_box_index"
+  python: "ThinClient.next_message_box_index"
+
+- group: get_message_box_index_counter
+  part: pigeonhole
+  section: "Auxiliary Index Helpers"
+  title: "GetMessageBoxIndexCounter / get_message_box_index_counter"
+  summary: |
+    Returns the BACAP Idx64 counter embedded in a MessageBoxIndex, the
+    sequence number of a box within its stream.
+  go:     "ThinClient.GetMessageBoxIndexCounter"
+  rust:   "ThinClient::get_message_box_index_counter"
+  python: "ThinClient.get_message_box_index_counter"
+
+# ===========================================================================
+# Part: Core Thin-Client API
+# ===========================================================================
 
 # ---------------------------------------------------------------------------
 # Connection management
 # ---------------------------------------------------------------------------
 
 - group: connect
+  part: core
   section: "Connection Management"
   title: "Dial / new / start"
   summary: |
@@ -36,6 +346,7 @@
   python: "ThinClient.start"
 
 - group: close
+  part: core
   section: "Connection Management"
   title: "Close / stop"
   summary: |
@@ -46,6 +357,7 @@
   python: "ThinClient.stop"
 
 - group: is_connected
+  part: core
   section: "Connection Management"
   title: "IsConnected / is_connected"
   summary: |
@@ -55,6 +367,7 @@
   python: "ThinClient.is_connected"
 
 - group: disconnect
+  part: core
   section: "Connection Management"
   title: "Disconnect / disconnect"
   summary: |
@@ -69,6 +382,7 @@
 # ---------------------------------------------------------------------------
 
 - group: event_sink
+  part: core
   section: "Events"
   title: "EventSink / event_sink"
   summary: |
@@ -84,8 +398,9 @@
   rust:   "ThinClient::event_sink"
 
 - group: stop_event_sink
+  part: core
   section: "Events"
-  title: "StopEventSink (Go only)"
+  title: "StopEventSink"
   summary: |
     Stops delivering events on the given channel. Rust receivers are
     dropped via their own lifetime; Python's callback model requires no
@@ -102,6 +417,7 @@
 # ---------------------------------------------------------------------------
 
 - group: pki_document
+  part: core
   section: "PKI and Service Discovery"
   title: "PKIDocument / pki_document"
   summary: |
@@ -112,6 +428,7 @@
   python: "ThinClient.pki_document"
 
 - group: get_pki_document_raw
+  part: core
   section: "PKI and Service Discovery"
   title: "GetPKIDocumentRaw / get_pki_document_raw"
   summary: |
@@ -125,7 +442,33 @@
   rust:   "ThinClient::get_pki_document_raw"
   python: "ThinClient.get_pki_document_raw"
 
+- group: get_directory_authorities
+  part: core
+  section: "PKI and Service Discovery"
+  title: "GetDirectoryAuthorities / get_directory_authorities"
+  summary: |
+    Returns the directory authority descriptors the client daemon is
+    configured to trust, including their identity keys and addresses.
+  go:     "ThinClient.GetDirectoryAuthorities"
+  rust:   "ThinClient::get_directory_authorities"
+  python: "ThinClient.get_directory_authorities"
+
+- group: pki_document_for_epoch
+  part: core
+  section: "PKI and Service Discovery"
+  title: "PKIDocumentForEpoch / pki_document_for_epoch"
+  summary: |
+    Returns the cached PKI document for a specific epoch, or an error if
+    the daemon has not retained a document for that epoch.
+  notes: |
+    The Rust binding does not expose a per-epoch accessor; Rust callers
+    use `pki_document` for the current document, or `get_pki_document_raw`
+    for the signed document at a given epoch.
+  go:     "ThinClient.PKIDocumentForEpoch"
+  python: "ThinClient.pki_document_for_epoch"
+
 - group: get_service
+  part: core
   section: "PKI and Service Discovery"
   title: "GetService / get_service"
   summary: |
@@ -137,6 +480,7 @@
   python: "ThinClient.get_service"
 
 - group: get_services
+  part: core
   section: "PKI and Service Discovery"
   title: "GetServices / get_services"
   summary: |
@@ -155,8 +499,10 @@
 # ---------------------------------------------------------------------------
 
 - group: send_message
+  part: core
   section: "Direct Messaging"
   title: "SendMessage / send_message"
+  traffic: true
   summary: |
     Sends a message with a SURB (Single Use Reply Block) that allows the
     destination service to reply. This method is asynchronous: it returns
@@ -169,8 +515,10 @@
   python: "ThinClient.send_message"
 
 - group: send_message_without_reply
+  part: core
   section: "Direct Messaging"
   title: "SendMessageWithoutReply / send_message_without_reply"
+  traffic: true
   summary: |
     Sends a fire-and-forget message with no SURB. The destination cannot
     reply.
@@ -179,8 +527,10 @@
   python: "ThinClient.send_message_without_reply"
 
 - group: blocking_send_message
+  part: core
   section: "Direct Messaging"
   title: "BlockingSendMessage / blocking_send_message"
+  traffic: true
   summary: |
     Sends a message and blocks until a reply is received or the timeout
     expires. This is a convenience wrapper that generates a SURB ID,
@@ -190,307 +540,36 @@
   python: "ThinClient.blocking_send_message"
 
 # ---------------------------------------------------------------------------
-# Pigeonhole: Key management
+# Sphinx geometry
 # ---------------------------------------------------------------------------
 
-- group: new_keypair
-  section: "Pigeonhole: Key Management"
-  title: "NewKeypair / new_keypair"
+- group: sphinx_geometry
+  part: core
+  section: "Sphinx Geometry"
+  title: "GetSphinxGeometry / sphinx_geometry"
   summary: |
-    Generates a new BACAP keypair from a 32-byte seed. Returns the write
-    capability, read capability, and first message index for a new
-    Pigeonhole stream. Does not cause network traffic.
-  go:     "ThinClient.NewKeypair"
-  rust:   "ThinClient::new_keypair"
-  python: "ThinClient.new_keypair"
-
-# ---------------------------------------------------------------------------
-# Pigeonhole: Index management
-# ---------------------------------------------------------------------------
-
-- group: next_message_box_index
-  section: "Pigeonhole: Index Management"
-  title: "NextMessageBoxIndex / next_message_box_index"
-  summary: |
-    Returns the next message box index in the sequence. This is a local
-    KDF computation; it does not cause network traffic or store state.
-    If you have a BACAP implementation in your language, you can compute
-    this locally instead of making a round trip to the daemon.
-  go:     "ThinClient.NextMessageBoxIndex"
-  rust:   "ThinClient::next_message_box_index"
-  python: "ThinClient.next_message_box_index"
-
-# ---------------------------------------------------------------------------
-# Pigeonhole: Encryption
-# ---------------------------------------------------------------------------
-
-- group: encrypt_read
-  section: "Pigeonhole: Encryption"
-  title: "EncryptRead / encrypt_read"
-  summary: |
-    Creates an encrypted read request for a single Pigeonhole box. The
-    returned ciphertext and envelope data must be sent via
-    `StartResendingEncryptedMessage` to actually perform the read.
-    Does not cause network traffic.
-  go:     "ThinClient.EncryptRead"
-  rust:   "ThinClient::encrypt_read"
-  python: "ThinClient.encrypt_read"
-
-- group: encrypt_write
-  section: "Pigeonhole: Encryption"
-  title: "EncryptWrite / encrypt_write"
-  summary: |
-    Creates an encrypted write request for a single Pigeonhole box. The
-    returned ciphertext and envelope data must be sent via
-    `StartResendingEncryptedMessage` to actually perform the write.
-    To create a tombstone (deletion marker), pass an empty byte slice as
-    the plaintext.
-  go:     "ThinClient.EncryptWrite"
-  rust:   "ThinClient::encrypt_write"
-  python: "ThinClient.encrypt_write"
-
-# ---------------------------------------------------------------------------
-# Pigeonhole: ARQ Transport
-# ---------------------------------------------------------------------------
-
-- group: start_resending_encrypted_message
-  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
-  title: "StartResendingEncryptedMessage / start_resending_encrypted_message"
-  summary: |
-    Sends an encrypted read or write request to a courier via the ARQ
-    mechanism. **Blocks** until the operation
-    completes or is cancelled. The daemon retransmits the request until
-    it receives an acknowledgment from the courier. By default writes
-    treat `BoxAlreadyExists` as idempotent success, and reads retry
-    indefinitely on `BoxIDNotFound`.
-  go:     "ThinClient.StartResendingEncryptedMessage"
-  rust:   "ThinClient::start_resending_encrypted_message"
-  python: "ThinClient.start_resending_encrypted_message"
-
-- group: start_resending_encrypted_message_return_box_exists
-  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
-  title: "StartResendingEncryptedMessageReturnBoxExists"
-  summary: |
-    Same as the default variant, but returns `BoxAlreadyExists` as an
-    error instead of treating it as success. Use this when you need to
-    distinguish a new write from a repeated one.
-  go:     "ThinClient.StartResendingEncryptedMessageReturnBoxExists"
-  rust:   "ThinClient::start_resending_encrypted_message_return_box_exists"
-  python: "ThinClient.start_resending_encrypted_message_return_box_exists"
-
-- group: start_resending_encrypted_message_no_retry
-  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
-  title: "StartResendingEncryptedMessageNoRetry"
-  summary: |
-    Same as the default variant, but returns `BoxIDNotFound` immediately
-    instead of retrying indefinitely. Use this when polling for a message
-    that may not exist yet.
-  go:     "ThinClient.StartResendingEncryptedMessageNoRetry"
-  rust:   "ThinClient::start_resending_encrypted_message_no_retry"
-  python: "ThinClient.start_resending_encrypted_message_no_retry"
-
-- group: write_stream
-  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
-  title: "WriteStream / write_stream"
-  summary: |
-    Writes a whole payload, of any size, to a channel using the windowed
-    selective-ack (SACK) ARQ. The daemon splits the payload across as many
-    boxes as it spans and keeps a bandwidth-delay-product of boxes in
-    flight, retransmitting only those whose acknowledgments lapse, so a
-    multi-box write is no longer serialized one round trip per box.
-    `WriteStream` blocks until every box is acknowledged. A window of zero asks the
-    daemon to choose the default from the consensus send rate and hop count.
-  go:     "ThinClient.WriteStream"
-  rust:   "ThinClient::write_stream"
-  python: "ThinClient.write_stream"
-
-- group: read_stream
-  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
-  title: "ReadStream / read_stream"
-  summary: |
-    Reads a run of sequential boxes from a channel using the windowed
-    selective-ack (SACK) ARQ, the read counterpart of `WriteStream`. The
-    daemon keeps a bandwidth-delay-product of boxes in flight, decrypts
-    each, and reassembles them in order. **Blocks** until every box is read.
-    A window of zero asks the daemon to choose the default.
-  go:     "ThinClient.ReadStream"
-  rust:   "ThinClient::read_stream"
-  python: "ThinClient.read_stream"
-
-- group: cancel_resending_encrypted_message
-  section: "Pigeonhole: Automatic Repeat Request (ARQ) Transport"
-  title: "CancelResendingEncryptedMessage / cancel_resending_encrypted_message"
-  summary: |
-    Cancels an in-flight `StartResendingEncryptedMessage` operation.
-    The blocked caller receives a `StartResendingCancelled` error.
-    Removes the operation from in-flight tracking so it will not be
-    replayed on reconnect.
-  go:     "ThinClient.CancelResendingEncryptedMessage"
-  rust:   "ThinClient::cancel_resending_encrypted_message"
-  python: "ThinClient.cancel_resending_encrypted_message"
-
-# ---------------------------------------------------------------------------
-# Pigeonhole: Tombstones
-# ---------------------------------------------------------------------------
-
-- group: tombstone_range
-  section: "Pigeonhole: Tombstones"
-  title: "TombstoneRange / tombstone_range"
-  summary: |
-    Creates encrypted tombstone envelopes for a range of consecutive
-    boxes. Tombstones are writes with an empty payload that delete the
-    box contents. Does not cause network traffic; the caller must send
-    each envelope individually via `StartResendingEncryptedMessage`.
-  go:     "ThinClient.TombstoneRange"
-  rust:   "ThinClient::tombstone_range"
-  python: "ThinClient.tombstone_range"
-
-# ---------------------------------------------------------------------------
-# Pigeonhole: Copy stream construction
-# ---------------------------------------------------------------------------
-
-- group: create_courier_envelopes_from_payload
-  section: "Pigeonhole: Copy Stream Construction"
-  title: "CreateCourierEnvelopesFromPayload"
-  summary: |
-    Packs a single payload for one destination into copy stream elements.
-    The payload can be up to ~10 MB. Returns properly sized chunks ready
-    to be written to boxes via `EncryptWrite`.
-  go:     "ThinClient.CreateCourierEnvelopesFromPayload"
-  rust:   "ThinClient::create_courier_envelopes_from_payload"
-  python: "ThinClient.create_courier_envelopes_from_payload"
-
-- group: create_courier_envelopes_from_multi_payload
-  section: "Pigeonhole: Copy Stream Construction"
-  title: "CreateCourierEnvelopesFromMultiPayload"
-  summary: |
-    Packs multiple payloads for different destinations into copy stream
-    elements. More space-efficient than calling the single-payload
-    variant multiple times because envelopes are packed together without
-    wasted padding.
-  go:     "ThinClient.CreateCourierEnvelopesFromMultiPayload"
-  rust:   "ThinClient::create_courier_envelopes_from_multi_payload"
-  python: "ThinClient.create_courier_envelopes_from_multi_payload"
-
-- group: create_courier_envelopes_from_tombstone_range
-  section: "Pigeonhole: Copy Stream Construction"
-  title: "CreateCourierEnvelopesFromTombstoneRange"
-  summary: |
-    Packs tombstone envelopes for a range of consecutive destination
-    boxes into copy stream elements. Use this to atomically tombstone
-    boxes as part of a copy command.
-  go:     "ThinClient.CreateCourierEnvelopesFromTombstoneRange"
-  rust:   "ThinClient::create_courier_envelopes_from_tombstone_range"
-  python: "ThinClient.create_courier_envelopes_from_tombstone_range"
-
-# ---------------------------------------------------------------------------
-# Pigeonhole: Copy command transport
-# ---------------------------------------------------------------------------
-
-- group: start_resending_copy_command
-  section: "Pigeonhole: Copy Command Transport"
-  title: "StartResendingCopyCommand / start_resending_copy_command"
-  summary: |
-    Sends a copy command to a courier via ARQ and **blocks** until the
-    courier acknowledges completion. The courier reads the temporary
-    copy stream, executes each envelope, tombstones the temporary
-    stream, and sends an ACK. The Rust and Python bindings take
-    optional courier-identity parameters to pin the command to a
-    specific courier; the Go binding exposes this as a separate
-    method (see below).
+    Returns the Sphinx geometry the daemon supplied during the connection
+    handshake, describing the packet and payload sizes of the mixnet's
+    Sphinx packet format.
   notes: |
-    The Rust and Python bindings accept optional `courier_identity_hash`
-    and `courier_queue_id` arguments to pin the command to a particular
-    courier; the Go binding exposes that same behavior through a
-    distinct method, `StartResendingCopyCommandWithCourier`.
-  go:     "ThinClient.StartResendingCopyCommand"
-  rust:   "ThinClient::start_resending_copy_command"
-  python: "ThinClient.start_resending_copy_command"
-
-- group: start_resending_copy_command_with_courier
-  section: "Pigeonhole: Copy Command Transport"
-  title: "StartResendingCopyCommandWithCourier (Go only)"
-  summary: |
-    Like `StartResendingCopyCommand` but sends to a specific courier
-    instead of a random one. Used for nested copy commands. In Rust
-    and Python this is achieved by supplying the optional
-    `courier_identity_hash` and `courier_queue_id` arguments to
-    `start_resending_copy_command`.
-  notes: |
-    In Rust and Python the same behavior is achieved not through a
-    separate method but by supplying the optional
-    `courier_identity_hash` and `courier_queue_id` arguments to
-    `start_resending_copy_command`.
-  go:     "ThinClient.StartResendingCopyCommandWithCourier"
-
-- group: cancel_resending_copy_command
-  section: "Pigeonhole: Copy Command Transport"
-  title: "CancelResendingCopyCommand / cancel_resending_copy_command"
-  summary: |
-    Cancels an in-flight copy command. The parameter is the blake2b-256
-    hash of the serialized write capability.
-  go:     "ThinClient.CancelResendingCopyCommand"
-  rust:   "ThinClient::cancel_resending_copy_command"
-  python: "ThinClient.cancel_resending_copy_command"
-
-# ---------------------------------------------------------------------------
-# Pigeonhole: Courier discovery
-# ---------------------------------------------------------------------------
-
-- group: get_all_couriers
-  section: "Pigeonhole: Courier Discovery"
-  title: "GetAllCouriers / get_all_couriers"
-  summary: |
-    Returns every courier service advertised in the current PKI
-    document. Not yet exposed in the Rust binding.
-  go:     "ThinClient.GetAllCouriers"
-  python: "ThinClient.get_all_couriers"
-
-- group: get_distinct_couriers
-  section: "Pigeonhole: Courier Discovery"
-  title: "GetDistinctCouriers / get_distinct_couriers"
-  summary: |
-    Returns `n` distinct couriers drawn at random from the current PKI
-    document. Not yet exposed in the Rust binding.
-  go:     "ThinClient.GetDistinctCouriers"
-  python: "ThinClient.get_distinct_couriers"
-
-- group: get_courier_destination
-  section: "Pigeonhole: Courier Discovery"
-  title: "get_courier_destination (Rust only)"
-  summary: |
-    Returns a single courier destination as a
-    `(identity_hash, queue_id)` tuple, sparing the caller from
-    handling a list. Go and Python callers achieve the same by
-    calling `GetDistinctCouriers(1)` / `get_distinct_couriers(1)`
-    and taking the first element.
-  notes: |
-    Go and Python callers reach the same result by calling
-    `GetDistinctCouriers(1)` / `get_distinct_couriers(1)` and taking
-    the first element of the returned slice.
-  rust: "ThinClient::get_courier_destination"
-
-- group: pigeonhole_geometry
-  section: "Pigeonhole: Courier Discovery"
-  title: "pigeonhole_geometry (Rust only)"
-  summary: |
-    Returns a reference to the negotiated Pigeonhole geometry, so that
-    callers can size payloads to its `max_plaintext_payload_length`.
-    Go callers obtain this via `GetConfig().PigeonholeGeometry`; the
-    Python binding stores it internally but does not currently expose
-    an accessor.
-  notes: |
-    Go callers retrieve the same value through
-    `GetConfig().PigeonholeGeometry`. The Python binding stores the
-    geometry internally but does not at present expose a public
-    accessor.
-  rust: "ThinClient::pigeonhole_geometry"
+    The Python binding has no getter method yet; it exposes the Sphinx
+    geometry as the public `geometry` attribute (a `Geometry`), cached
+    from the daemon's connection handshake so applications can size
+    their payloads. A getter method is planned for the next release.
+  go:   "ThinClient.GetSphinxGeometry"
+  rust: "ThinClient::sphinx_geometry"
+  python_snippet: |
+    # Public attribute, cached from the connection handshake;
+    # None until the daemon connects. A getter method is planned
+    # for the next release.
+    geo = client.geometry
 
 # ---------------------------------------------------------------------------
 # Utility
 # ---------------------------------------------------------------------------
 
 - group: new_message_id
+  part: core
   section: "Utility"
   title: "NewMessageID / new_message_id"
   summary: |
@@ -500,6 +579,7 @@
   python: "ThinClient.new_message_id"
 
 - group: new_surb_id
+  part: core
   section: "Utility"
   title: "NewSURBID / new_surb_id"
   summary: |
@@ -509,6 +589,7 @@
   python: "ThinClient.new_surb_id"
 
 - group: new_query_id
+  part: core
   section: "Utility"
   title: "NewQueryID / new_query_id"
   summary: |
@@ -517,3 +598,42 @@
   go:     "ThinClient.NewQueryID"
   rust:   "ThinClient::new_query_id"
   python: "ThinClient.new_query_id"
+
+- group: get_config
+  part: core
+  section: "Utility"
+  title: "GetConfig"
+  summary: |
+    Returns the client's configuration object, including the Sphinx and
+    Pigeonhole geometries negotiated with the daemon.
+  notes: |
+    Python callers read the configuration through the plain `config`
+    attribute on `ThinClient`. The Rust binding exposes no configuration
+    accessor; Rust callers read the negotiated geometries through the
+    dedicated `sphinx_geometry` and `pigeonhole_geometry` methods.
+  go:     "ThinClient.GetConfig"
+
+- group: shutdown
+  part: core
+  section: "Utility"
+  title: "Shutdown"
+  summary: |
+    Cleanly shuts down the ThinClient instance and stops its background
+    workers. Unlike Close, it does not send a close notification to the
+    daemon.
+  notes: |
+    The Rust and Python bindings expose a single teardown method, `stop`,
+    documented under Close / stop above.
+  go: "ThinClient.Shutdown"
+
+- group: get_logger
+  part: core
+  section: "Utility"
+  title: "GetLogger"
+  summary: |
+    Returns a logger instance with the given prefix, using the thin
+    client's configured logging backend.
+  notes: |
+    The Rust and Python bindings leave logging to the host application
+    and expose no equivalent accessor.
+  go: "ThinClient.GetLogger"

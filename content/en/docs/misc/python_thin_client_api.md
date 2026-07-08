@@ -26,8 +26,8 @@ Do not edit it directly: changes belong in the binding docstrings (in
 the `thin_client` repository) and will be overwritten by the next
 generation pass.
 
-This page documents the **0.0.15** release of the Python
-binding ([source](https://github.com/katzenpost/thin_client/tree/0.0.15/katzenpost_thinclient),
+This page documents the **0.0.23** release of the Python
+binding ([source](https://github.com/katzenpost/thin_client/tree/0.0.23/katzenpost_thinclient),
 [PyPI](https://pypi.org/project/katzenpost_thinclient/)). Symbols are
 re-exported from `katzenpost_thinclient`, so application code may
 import them directly, for example `from katzenpost_thinclient import
@@ -520,20 +520,6 @@ and begin the background event loop.
   Exceptions:
   BrokenPipeError
 
-<a id="katzenpost_thinclient.core.ThinClient.get_config"></a>
-
-#### ThinClient.get\_config
-
-```python
-def get_config() -> Config
-```
-
-Returns the current configuration object.
-
-**Returns**:
-
-- `Config` - The client configuration in use.
-
 <a id="katzenpost_thinclient.core.ThinClient.is_connected"></a>
 
 #### ThinClient.is\_connected
@@ -720,6 +706,38 @@ against the authorities listed in ``client.toml``.
 - `Exception` - If the daemon has no cached document for the
   requested epoch, or any other error code is returned.
 
+<a id="katzenpost_thinclient.core.ThinClient.get_directory_authorities"></a>
+
+#### ThinClient.get\_directory\_authorities
+
+```python
+async def get_directory_authorities() -> "List[Dict[str,Any]]"
+```
+
+Return the directory authority descriptors the client daemon is
+configured with.
+
+A thin client holds only its dial transport configuration and
+never sees the daemon's voting authority peer list. This surfaces
+it, so a caller may, for instance, map a PKI document's signature
+fingerprints (the keys of its signature map) to authority
+identifiers via each descriptor's ``identity_key_hash``.
+
+**Returns**:
+
+  List[Dict[str, Any]]: one dict per directory authority, with
+  keys ``identifier`` (str), ``pki_signature_scheme`` (str),
+  ``wire_kem_scheme`` (str), ``addresses`` (list of str),
+  ``identity_public_key_pem`` (str), ``link_public_key_pem``
+  (str), and ``identity_key_hash`` (32 raw bytes, the value by
+  which PKI document signatures are indexed).
+  
+
+**Raises**:
+
+- `Exception` - If the daemon has no voting authority peers
+  configured, or any other error code is returned.
+
 <a id="katzenpost_thinclient.core.ThinClient.parse_pki_doc"></a>
 
 #### ThinClient.parse\_pki\_doc
@@ -784,63 +802,6 @@ returns an arbitrary one. To see every advertised instance, use
 
 - `Exception` - If the PKI document is missing, or no node in the
   current consensus advertises ``service_name``.
-
-<a id="katzenpost_thinclient.core.ThinClient.get_all_couriers"></a>
-
-#### ThinClient.get\_all\_couriers
-
-```python
-def get_all_couriers() -> "List[Tuple[bytes, bytes]]"
-```
-
-Return every courier service advertised in the current PKI
-document, each described by an ``(identity_hash, queue_id)``
-tuple. The list reflects only the couriers that the current
-consensus regards as serving.
-
-The principal caller is the nested-copy-command machinery, which
-needs to choose particular couriers rather than accept the random
-draw made on the caller's behalf by
-``start_resending_copy_command``; for simple cases where any
-courier will do, the default routing path is usually preferable.
-
-**Returns**:
-
-  list[tuple[bytes, bytes]]: List of (identity_hash, queue_id) tuples.
-  
-
-**Raises**:
-
-- `Exception` - If no couriers are available.
-
-<a id="katzenpost_thinclient.core.ThinClient.get_distinct_couriers"></a>
-
-#### ThinClient.get\_distinct\_couriers
-
-```python
-def get_distinct_couriers(n: int) -> "List[Tuple[bytes, bytes]]"
-```
-
-Draw ``n`` couriers uniformly at random from the list returned by
-``get_all_couriers``, without replacement, so that no two entries
-in the returned list refer to the same courier. This is the usual
-building block for a nested copy command, every layer of which
-must be carried by a different courier.
-
-**Arguments**:
-
-- `n` _int_ - Number of distinct couriers to return.
-  
-
-**Returns**:
-
-  list[tuple[bytes, bytes]]: List of (identity_hash, queue_id) tuples.
-  
-
-**Raises**:
-
-- `Exception` - If the current PKI document advertises fewer than
-  ``n`` couriers.
 
 <a id="katzenpost_thinclient.core.ThinClient.blocking_send_message"></a>
 
@@ -1098,6 +1059,74 @@ Queue ID of the courier that handled this message.
 
 ---
 
+<a id="katzenpost_thinclient.pigeonhole.VoucherMintResult"></a>
+
+### VoucherMintResult
+
+```python
+@dataclass
+class VoucherMintResult()
+```
+
+Result from voucher_mint.
+
+Hand ``voucher`` to the inductor out of band and publish
+``voucher_payload`` to VoucherStream box 0. Persist ``voucher_secret_key``
+to open the inductor's reply later.
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.VoucherInductResult"></a>
+
+### VoucherInductResult
+
+```python
+@dataclass
+class VoucherInductResult()
+```
+
+Result from voucher_induct.
+
+``mutated_message_read_cap`` is the joiner's salt-mutated read cap: the
+live read cap the inductor hands the group. Write ``sealed_reply`` to
+VoucherStream box 1.
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.VoucherOpenResult"></a>
+
+### VoucherOpenResult
+
+```python
+@dataclass
+class VoucherOpenResult()
+```
+
+Result from voucher_open.
+
+``mutated_message_write_cap`` is the joiner's salt-mutated write cap: the
+live write cap for real messages, which lands on the same box sequence as
+the read cap the inductor handed the group.
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.VoucherStreamResult"></a>
+
+### VoucherStreamResult
+
+```python
+@dataclass
+class VoucherStreamResult()
+```
+
+Result from voucher_derive_stream: the rendezvous stream caps.
+
+
+---
+
 <a id="katzenpost_thinclient.pigeonhole.new_keypair"></a>
 
 ### new\_keypair
@@ -1258,36 +1287,29 @@ async def start_resending_encrypted_message(
         envelope_descriptor: bytes,
         message_ciphertext: bytes,
         envelope_hash: bytes,
+        *,
         no_retry_on_box_id_not_found: bool = False,
         no_idempotent_box_already_exists: bool = False
 ) -> StartResendingResult
 ```
 
-Starts resending an encrypted message via ARQ.
+Sends an encrypted read or write request to a courier through the
+daemon's stop-and-wait ARQ and blocks until the operation completes,
+fails, or is cancelled via ``cancel_resending_encrypted_message``.
+The daemon retransmits until the courier answers; see
+https://katzenpost.network/docs/pigeonhole_explained/#the-pigeonhole-arq
+for the retransmission behavior and per-operation round-trip costs.
 
-This method initiates automatic repeat request (ARQ) for an encrypted message,
-which will be resent periodically until either:
-- A reply is received from the courier
-- The message is cancelled via cancel_resending_encrypted_message
-- The client is shut down
+A write completes on the courier's ACK, a single mixnet round trip,
+and by default treats BoxAlreadyExists as idempotent success. A read
+is two-phased: after the ACK the daemon collects the payload with a
+fresh SURB, decrypts it, and returns the plaintext; by default a
+read retries BoxIDNotFound until the box is written.
 
-This is used for both read and write operations in the new Pigeonhole API.
-
-The daemon implements a finite state machine (FSM) for handling the stop-and-wait ARQ protocol:
-- For default write operations (write_cap != None, read_cap == None,
-no_idempotent_box_already_exists == False):
-The method waits for an ACK from the courier and returns immediately.
-The ACK confirms the courier received the envelope and will dispatch it
-to both shard replicas. This requires only a single round-trip through
-the mixnet.
-- For BoxAlreadyExists-aware writes (no_idempotent_box_already_exists == True):
-The method waits for an ACK, then sends a second SURB to retrieve the
-replica's error code. This requires two round-trips through the mixnet.
-- For read operations (read_cap != None, write_cap == None):
-The method waits for an ACK from the courier, then the daemon automatically
-sends a new SURB to request the payload, and this method waits for the payload.
-The daemon performs all decryption (MKEM envelope + BACAP payload) and returns
-the fully decrypted plaintext.
+The two keyword-only flags select the variant behaviors that the Go
+binding exposes as separate methods
+(``StartResendingEncryptedMessageNoRetry`` and
+``StartResendingEncryptedMessageReturnBoxExists``).
 
 **Arguments**:
 
@@ -1337,136 +1359,6 @@ print(f"Received: {result.plaintext}")
 
 ---
 
-<a id="katzenpost_thinclient.pigeonhole.start_resending_encrypted_message_return_box_exists"></a>
-
-### start\_resending\_encrypted\_message\_return\_box\_exists
-
-```python
-async def start_resending_encrypted_message_return_box_exists(
-        self, read_cap: "bytes|None", write_cap: "bytes|None",
-        message_box_index: "bytes|None", reply_index: "int|None",
-        envelope_descriptor: bytes, message_ciphertext: bytes,
-        envelope_hash: bytes) -> StartResendingResult
-```
-
-Behaves exactly like ``start_resending_encrypted_message`` save that
-it raises ``BoxAlreadyExistsError`` when the replica reports the
-destination box has already been written, rather than swallowing the
-condition as idempotent success. Use this when one needs to
-distinguish a fresh write from a repeat: for instance, when
-implementing optimistic concurrency on top of the channel, or when
-establishing whether a particular call actually caused a state
-change at the replica.
-
-Note that this variant costs an additional mixnet round trip: the
-BoxAlreadyExists code is carried by the replica's reply rather than
-the courier's ACK, so the daemon must dispatch a second SURB before
-it can return the answer.
-
-As with ``start_resending_encrypted_message``, an in-flight call
-can be cancelled from another task via
-``cancel_resending_encrypted_message``.
-
-**Arguments**:
-
-- `read_cap` - Read capability (can be None for write operations, required for reads).
-- `write_cap` - Write capability (can be None for read operations, required for writes).
-- `message_box_index` - Current message box index being operated on (required for reads).
-- `reply_index` - Index of the reply to use (typically 0 or 1).
-- `envelope_descriptor` - Serialized envelope descriptor for MKEM decryption.
-- `message_ciphertext` - MKEM-encrypted message to send (from encrypt_read or encrypt_write).
-- `envelope_hash` - Hash of the courier envelope.
-  
-
-**Returns**:
-
-- `StartResendingResult` - Contains plaintext, courier_identity_hash, and courier_queue_id.
-  
-
-**Raises**:
-
-- `BoxAlreadyExistsError` - If the box already contains data.
-- `Exception` - If the operation fails.
-  
-
-**Example**:
-
-
-```python
-try:
-await client.start_resending_encrypted_message_return_box_exists(
-None, write_cap, None, None, env_desc, ciphertext, env_hash)
-except BoxAlreadyExistsError:
-print("Box already has data; write was idempotent")
-```
-
-
-
----
-
-<a id="katzenpost_thinclient.pigeonhole.start_resending_encrypted_message_no_retry"></a>
-
-### start\_resending\_encrypted\_message\_no\_retry
-
-```python
-async def start_resending_encrypted_message_no_retry(
-        self, read_cap: "bytes|None", write_cap: "bytes|None",
-        message_box_index: "bytes|None", reply_index: "int|None",
-        envelope_descriptor: bytes, message_ciphertext: bytes,
-        envelope_hash: bytes) -> StartResendingResult
-```
-
-Behaves exactly like ``start_resending_encrypted_message`` save that
-it disables the daemon's automatic retry of ``BoxIDNotFoundError``.
-The caller learns at once that the box is absent rather than waiting
-for replication to settle.
-
-Use this when polling a box that may not yet have been written: for
-instance, when a reader peeks ahead at a peer's next message before
-that peer has produced it. The regular variant would block until
-the box appeared, which can be many round trips.
-
-As with ``start_resending_encrypted_message``, an in-flight call
-can be cancelled from another task via
-``cancel_resending_encrypted_message``.
-
-**Arguments**:
-
-- `read_cap` - Read capability (can be None for write operations, required for reads).
-- `write_cap` - Write capability (can be None for read operations, required for writes).
-- `message_box_index` - Current message box index being operated on (required for reads).
-- `reply_index` - Index of the reply to use (typically 0 or 1).
-- `envelope_descriptor` - Serialized envelope descriptor for MKEM decryption.
-- `message_ciphertext` - MKEM-encrypted message to send (from encrypt_read or encrypt_write).
-- `envelope_hash` - Hash of the courier envelope.
-  
-
-**Returns**:
-
-- `StartResendingResult` - Contains plaintext, courier_identity_hash, and courier_queue_id.
-  
-
-**Raises**:
-
-- `BoxIDNotFoundError` - If the box does not exist (no automatic retries).
-- `Exception` - If the operation fails.
-  
-
-**Example**:
-
-
-```python
-try:
-result = await client.start_resending_encrypted_message_no_retry(
-read_cap, None, message_box_index, reply_idx, env_desc, ciphertext, env_hash)
-except BoxIDNotFoundError:
-print("Box not found; message not yet written")
-```
-
-
-
----
-
 <a id="katzenpost_thinclient.pigeonhole.cancel_resending_encrypted_message"></a>
 
 ### cancel\_resending\_encrypted\_message
@@ -1478,11 +1370,10 @@ async def cancel_resending_encrypted_message(self,
 
 Cancels ARQ resending for an encrypted message.
 
-This method stops the automatic repeat request (ARQ) for a previously started
-encrypted message transmission. This is useful when:
-- A reply has been received through another channel
-- The operation should be aborted
-- The message is no longer needed
+The daemon stops retransmitting the operation identified by
+``envelope_hash``, the blocked ``start_resending_encrypted_message``
+caller raises an error, and the operation is removed from in-flight
+tracking so it is not replayed after a reconnect.
 
 **Arguments**:
 
@@ -1513,16 +1404,13 @@ await client.cancel_resending_encrypted_message(env_hash)
 async def next_message_box_index(self, message_box_index: bytes) -> bytes
 ```
 
-Increments a MessageBoxIndex using the BACAP NextIndex method.
+Returns the message box index that follows ``message_box_index`` in
+its BACAP stream. The computation happens in the daemon and causes
+no mixnet traffic.
 
-This method is used when sending multiple messages to different mailboxes using
-the same WriteCap or ReadCap. It properly advances the cryptographic state by:
-- Incrementing the Idx64 counter
-- Deriving new encryption and blinding keys using HKDF
-- Updating the HKDF state for the next iteration
-
-The daemon handles the cryptographic operations internally, ensuring correct
-BACAP protocol implementation.
+Most callers never need this method: ``encrypt_read``,
+``encrypt_write``, and the copy stream constructors already return
+the next index alongside their results.
 
 **Arguments**:
 
@@ -1611,15 +1499,20 @@ async def start_resending_copy_command(
         courier_queue_id: "bytes|None" = None) -> None
 ```
 
-Starts resending a copy command to a courier via ARQ.
+Sends a copy command to a courier through the daemon's stop-and-wait
+ARQ and blocks until the courier acknowledges completion. The copy
+command hands the courier the write capability of a temporary copy
+stream; the courier executes the stream's envelopes to their
+destination boxes and tombstones the temporary stream. See
+https://katzenpost.network/docs/pigeonhole_explained/#copy-commands
+for the workflow and its all-or-nothing semantics.
 
-This method instructs a courier to read data from a temporary channel
-(identified by the write_cap) and write it to the destination channel.
-The command is automatically retransmitted until acknowledged.
+If ``courier_identity_hash`` and ``courier_queue_id`` are both
+provided, the copy command is pinned to that specific courier;
+otherwise the daemon picks one.
 
-If courier_identity_hash and courier_queue_id are both provided,
-the copy command is sent to that specific courier. Otherwise, a
-random courier is selected.
+An in-flight call may be cancelled via
+``cancel_resending_copy_command``.
 
 **Arguments**:
 
@@ -1659,11 +1552,10 @@ async def cancel_resending_copy_command(self, write_cap_hash: bytes) -> None
 
 Cancels ARQ resending for a copy command.
 
-This method stops the automatic repeat request (ARQ) for a previously started
-copy command. Use this when:
-- The copy operation should be aborted
-- The operation is no longer needed
-- You want to clean up pending ARQ operations
+The daemon stops retransmitting the copy command identified by
+``write_cap_hash`` (the blake2b-256 hash of the serialized write
+capability), and the operation is removed from in-flight tracking
+so it is not replayed after a reconnect.
 
 **Arguments**:
 
@@ -1703,15 +1595,10 @@ via ``encrypt_write`` followed by ``start_resending_encrypted_message``;
 the caller marks the boundaries of the stream with the ``is_start``
 and ``is_last`` flags.
 
-This method is stateless: no daemon state is kept between calls,
-each invocation runs a fresh encoder and flushes before returning.
-The 10 MB cap guards against accidental memory exhaustion.
-
-Once the chunks have been written to a temporary copy stream, a
-copy command (``start_resending_copy_command``) is dispatched to a
-courier with the write capability for that temporary stream; the
-courier reads the chunks back and writes each envelope to its
-destination box.
+This method is stateless: no daemon state is kept between calls.
+It causes no mixnet traffic. See
+https://katzenpost.network/docs/pigeonhole_explained/#copy-commands
+for the copy command workflow the chunks feed into.
 
 Multiple calls can target the same destination stream by passing
 ``next_dest_index`` from the previous result as ``dest_start_index``.
@@ -1753,14 +1640,14 @@ async def create_courier_envelopes_from_multi_payload(
 Packs payloads bound for several destination channels into a single
 stream of ``CopyStreamElement`` chunks. This is more space-efficient
 than calling ``create_courier_envelopes_from_payload`` once per
-destination, because the shared encoder runs all envelopes together
-rather than padding the final box of each destination independently.
+destination, because it avoids padding the final box of each
+destination independently.
 
-This method is stateless: the ``buffer`` argument carries any residual
-encoder state across calls in place of daemon-side bookkeeping. Pass
-``None`` for ``buffer`` on the first call and the ``buffer`` returned
-by the previous call thereafter; set ``is_last`` on the final call so
-the encoder flushes its tail.
+This method is stateless: the ``buffer`` argument carries any
+residual state across calls. Pass ``None`` for ``buffer`` on the
+first call and the ``buffer`` returned by the previous call
+thereafter; set ``is_last`` on the final call to flush the
+remainder.
 
 **Arguments**:
 
@@ -1884,10 +1771,9 @@ async def tombstone_range(self, write_cap: bytes, start: bytes,
 
 Prepares the encrypted envelopes needed to tombstone a consecutive
 range of pigeonhole boxes beginning at the supplied
-``MessageBoxIndex``. A tombstone is a signed empty payload that the
-replica recognises as a deletion marker; the daemon constructs one
-by signing rather than encrypting whenever ``encrypt_write`` is
-invoked with an empty plaintext.
+``MessageBoxIndex``. A tombstone is a signed empty payload that
+deletes a box's contents; see
+https://katzenpost.network/docs/pigeonhole_explained/#tombstones.
 
 This method does not itself touch the network: it returns the
 envelopes for the caller to dispatch one by one, typically via
@@ -1945,17 +1831,14 @@ async def create_courier_envelopes_from_tombstone_range(
 ```
 
 Packs tombstones for a consecutive range of destination boxes into
-``CopyStreamElement`` chunks. The chunks are written to a temporary
-copy stream and then dispatched as a copy command; the courier
-applies all the tombstones atomically, which is the natural way to
-retire a range of boxes as part of the same copy transaction that
-writes their successors.
+``CopyStreamElement`` chunks, combining tombstone creation with the
+copy stream encoding of ``create_courier_envelopes_from_payload``.
 
-This method is stateless: the ``buffer`` argument carries any residual
-encoder state across calls in place of daemon-side bookkeeping. Pass
-``None`` for ``buffer`` on the first call and the ``buffer`` returned
-by the previous call thereafter; set ``is_last`` on the final call so
-the encoder flushes its tail.
+This method is stateless: the ``buffer`` argument carries any
+residual state across calls. Pass ``None`` for ``buffer`` on the
+first call and the ``buffer`` returned by the previous call
+thereafter; set ``is_last`` on the final call to flush the
+remainder.
 
 **Arguments**:
 
@@ -1988,6 +1871,128 @@ for envelope in result.envelopes:
 pass
 ```
 
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.voucher_mint"></a>
+
+### voucher\_mint
+
+```python
+async def voucher_mint(self, message_write_cap: bytes,
+                       display_name: str) -> VoucherMintResult
+```
+
+Mints a Voucher from the joiner's MessageStream write cap.
+
+**Arguments**:
+
+- `message_write_cap` - The joiner's MessageStream write capability.
+- `display_name` - The joiner's chosen display name.
+  
+
+**Returns**:
+
+- `VoucherMintResult` - The Voucher, the payload to publish, the rendezvous
+  stream caps, and the reply keypair.
+  
+
+**Raises**:
+
+- `Exception` - If minting fails.
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.voucher_induct"></a>
+
+### voucher\_induct
+
+```python
+async def voucher_induct(self, voucher: bytes, voucher_payload: bytes,
+                         who_reply: bytes) -> VoucherInductResult
+```
+
+Verifies a published VoucherPayload and seals a reply to the joiner.
+
+**Arguments**:
+
+- `voucher` - The 32-byte token received out of band.
+- `voucher_payload` - The payload read from VoucherStream box 0.
+- `who_reply` - The opaque group-membership blob to seal for the joiner.
+  
+
+**Returns**:
+
+- `VoucherInductResult` - The joiner's salt-mutated read cap, the sealed
+  reply to write to VoucherStream box 1, and the salt.
+  
+
+**Raises**:
+
+- `Exception` - If induction fails (e.g. hash mismatch or bad signature).
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.voucher_open"></a>
+
+### voucher\_open
+
+```python
+async def voucher_open(self, voucher_secret_key: bytes, sealed_reply: bytes,
+                       message_write_cap: bytes) -> VoucherOpenResult
+```
+
+Opens the inductor's sealed reply with the joiner's voucher secret key,
+recovers the salt, and mutates the joiner's MessageStream write cap by it.
+
+**Arguments**:
+
+- `voucher_secret_key` - The joiner's persisted voucher secret key.
+- `sealed_reply` - The bytes read from VoucherStream box 1.
+- `message_write_cap` - The joiner's MessageStream write cap, mutated by the
+  recovered salt to yield the live write cap for real messages.
+  
+
+**Returns**:
+
+- `VoucherOpenResult` - The opaque WhoReply, the salt, and the salt-mutated
+  write cap.
+  
+
+**Raises**:
+
+- `Exception` - If opening fails (e.g. wrong key).
+
+
+---
+
+<a id="katzenpost_thinclient.pigeonhole.voucher_derive_stream"></a>
+
+### voucher\_derive\_stream
+
+```python
+async def voucher_derive_stream(self, voucher: bytes) -> VoucherStreamResult
+```
+
+Derives the VoucherStream caps from the Voucher, which the inductor needs
+to read box 0 before inducting.
+
+**Arguments**:
+
+- `voucher` - The 32-byte token.
+  
+
+**Returns**:
+
+- `VoucherStreamResult` - The rendezvous stream caps.
+  
+
+**Raises**:
+
+- `Exception` - If derivation fails.
 
 
 ---
@@ -2301,4 +2306,71 @@ embedded writes. Inspect the diagnostic attributes to determine the cause:
 - `failed_envelope_index` _int_ - 1-based sequential position in the copy
   stream of the envelope whose write triggered the abort. 0 if not
   applicable. This is NOT a BACAP message index.
+
+<a id="katzenpost_thinclient.core.PayloadTooLargeError"></a>
+
+#### PayloadTooLargeError
+
+```python
+class PayloadTooLargeError(Exception)
+```
+
+A request's payload exceeded the daemon's configured maximum payload
+size.
+
+<a id="katzenpost_thinclient.core.CourierError"></a>
+
+#### CourierError
+
+```python
+class CourierError(Exception)
+```
+
+Base class for errors raised by the courier (as opposed to a storage
+replica). The courier and the replicas are distinct components: a courier
+error means the courier itself rejected or could not dispatch the request,
+and must not be confused with a replica error such as a database failure.
+
+<a id="katzenpost_thinclient.core.CourierInvalidEnvelopeError"></a>
+
+#### CourierInvalidEnvelopeError
+
+```python
+class CourierInvalidEnvelopeError(CourierError)
+```
+
+The courier rejected the CourierEnvelope as malformed.
+
+<a id="katzenpost_thinclient.core.CourierCacheCorruptionError"></a>
+
+#### CourierCacheCorruptionError
+
+```python
+class CourierCacheCorruptionError(CourierError)
+```
+
+The courier detected corruption in its reply cache.
+
+<a id="katzenpost_thinclient.core.CourierPropagationError"></a>
+
+#### CourierPropagationError
+
+```python
+class CourierPropagationError(CourierError)
+```
+
+The courier could not propagate the request to the replicas.
+
+<a id="katzenpost_thinclient.core.CourierInvalidEpochError"></a>
+
+#### CourierInvalidEpochError
+
+```python
+class CourierInvalidEpochError(CourierError)
+```
+
+The courier rejected the CourierEnvelope because its declared replica
+epoch was outside the courier's tolerance window. This is a staleness
+signal from the courier, NOT a replica database failure, even though the
+two share value 4 in their respective source namespaces.
 
