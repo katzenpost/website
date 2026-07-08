@@ -16,6 +16,11 @@ description: "A post-quantum mix network providing strong metadata privacy again
 </div>
 {{< /blocks/cover >}}
 
+## Public letter to the European Parliament
+
+Ahead of Thursday's Chat Control vote:
+[*Chat Control, Thursday: you are about to outlaw what you paid us to build*](/pages/chat-control/).
+
 ## What it is
 
 Katzenpost is a free and open-source mix network. It hides who is talking
