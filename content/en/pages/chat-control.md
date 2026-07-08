@@ -7,6 +7,17 @@ type: "pages"
 slug: "/chat-control/"
 ---
 
+<style>
+  section.header h1 {
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+  }
+  .td-content {
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+</style>
+
 *This is a public letter to the Members of the European Parliament, published at [https://katzenpost.network/pages/chat-control](https://katzenpost.network/pages/chat-control).*
 
 Dear Members of the European Parliament,
