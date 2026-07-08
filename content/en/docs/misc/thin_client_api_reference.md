@@ -78,26 +78,63 @@ examples in all three languages, see the
 > else is a local computation performed by the daemon over the local
 > socket.
 
+**[Keypairs and Capabilities](#keypairs-and-capabilities)**
+
 | Method | Purpose |
 |---|---|
 | [NewKeypair / new_keypair](#newkeypair--new_keypair) | Generates a new BACAP keypair from a 32-byte seed. |
+
+**[Preparing Reads and Writes](#preparing-reads-and-writes)**
+
+| Method | Purpose |
+|---|---|
 | [EncryptRead / encrypt_read](#encryptread--encrypt_read) | Creates an encrypted read request for a single Pigeonhole box. |
 | [EncryptWrite / encrypt_write](#encryptwrite--encrypt_write) | Creates an encrypted write request for a single Pigeonhole box. |
+
+**[Sending and ARQ Transport](#sending-and-arq-transport)**
+
+| Method | Purpose |
+|---|---|
 | [StartResendingEncryptedMessage / start_resending_encrypted_message](#startresendingencryptedmessage--start_resending_encrypted_message) | Sends an encrypted read or write request to a courier via the ARQ mechanism. **Sends mixnet traffic.** |
 | [StartResendingEncryptedMessageReturnBoxExists](#startresendingencryptedmessagereturnboxexists) | Same as the default variant, but returns `BoxAlreadyExists` as an error instead of treating it as success. **Sends mixnet traffic.** |
 | [StartResendingEncryptedMessageNoRetry](#startresendingencryptedmessagenoretry) | Same as the default variant, but returns `BoxIDNotFound` immediately instead of retrying indefinitely. **Sends mixnet traffic.** |
 | [CancelResendingEncryptedMessage / cancel_resending_encrypted_message](#cancelresendingencryptedmessage--cancel_resending_encrypted_message) | Cancels an in-flight `StartResendingEncryptedMessage` operation. |
+
+**[Tombstones](#tombstones)**
+
+| Method | Purpose |
+|---|---|
 | [TombstoneRange / tombstone_range](#tombstonerange--tombstone_range) | Creates encrypted tombstone envelopes for a range of consecutive boxes. |
+
+**[Copy Commands](#copy-commands)**
+
+| Method | Purpose |
+|---|---|
 | [CreateCourierEnvelopesFromPayload](#createcourierenvelopesfrompayload) | Packs a single payload for one destination into copy stream elements. |
 | [CreateCourierEnvelopesFromMultiPayload](#createcourierenvelopesfrommultipayload) | Packs multiple payloads for different destinations into copy stream elements. |
 | [CreateCourierEnvelopesFromTombstoneRange](#createcourierenvelopesfromtombstonerange) | Packs tombstone envelopes for a range of consecutive destination boxes into copy stream elements. |
 | [StartResendingCopyCommand / start_resending_copy_command](#startresendingcopycommand--start_resending_copy_command) | Sends a copy command to a courier via ARQ and **blocks** until the courier acknowledges completion. **Sends mixnet traffic.** |
 | [CancelResendingCopyCommand / cancel_resending_copy_command](#cancelresendingcopycommand--cancel_resending_copy_command) | Cancels an in-flight copy command. |
+
+**[Contact Vouchers](#contact-vouchers)**
+
+| Method | Purpose |
+|---|---|
 | [VoucherMint / voucher_mint](#vouchermint--voucher_mint) | Mints a Voucher from the joiner's MessageStream write capability. |
 | [VoucherInduct / voucher_induct](#voucherinduct--voucher_induct) | Verifies a published VoucherPayload and seals a reply to the joiner. |
 | [VoucherOpen / voucher_open](#voucheropen--voucher_open) | Opens the inductor's sealed reply with the joiner's voucher secret key. |
 | [VoucherDeriveStream / voucher_derive_stream](#voucherderivestream--voucher_derive_stream) | Derives the VoucherStream capabilities from the Voucher. |
+
+**[Geometry](#geometry)**
+
+| Method | Purpose |
+|---|---|
 | [GetPigeonholeGeometry / pigeonhole_geometry](#getpigeonholegeometry--pigeonhole_geometry) | Returns the negotiated Pigeonhole geometry, so that callers can size payloads to its maximum plaintext payload length. |
+
+**[Auxiliary Index Helpers](#auxiliary-index-helpers)**
+
+| Method | Purpose |
+|---|---|
 | [NextMessageBoxIndex / next_message_box_index](#nextmessageboxindex--next_message_box_index) | Returns the next message box index in the sequence. |
 | [GetMessageBoxIndexCounter / get_message_box_index_counter](#getmessageboxindexcounter--get_message_box_index_counter) | Returns the BACAP Idx64 counter embedded in a MessageBoxIndex, the sequence number of a box within its stream. |
 

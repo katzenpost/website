@@ -178,20 +178,39 @@ def first_sentence(text: str) -> str:
 
 
 def render_method_toc(part_groups: list[dict]) -> str:
-    """Render the per-method index table for one part's intro overlay."""
-    lines = [
-        "| Method | Purpose |",
-        "|---|---|",
-    ]
+    """Render the per-method index for one part's intro overlay.
+
+    Methods are grouped by their section, mirroring the document body:
+    each section contributes a bold heading linked to its anchor and a
+    mini-table of its methods.
+    """
+    sections_ordered: list[str] = []
+    by_section: dict[str, list[dict]] = {}
     for group in part_groups:
-        title = group.get("title") or group.get("group")
-        anchor = hugo_anchor(title)
-        purpose = first_sentence(group.get("summary") or "")
-        if group.get("traffic"):
-            purpose = f"{purpose} {TRAFFIC_BADGE}".strip()
-        purpose = purpose.replace("|", "\\|")
-        lines.append(f"| [{title}](#{anchor}) | {purpose} |")
-    return "\n".join(lines)
+        sec = group.get("section") or ""
+        if sec not in by_section:
+            sections_ordered.append(sec)
+            by_section[sec] = []
+        by_section[sec].append(group)
+
+    blocks: list[str] = []
+    for section in sections_ordered:
+        lines: list[str] = []
+        if section:
+            lines.append(f"**[{section}](#{hugo_anchor(section)})**")
+            lines.append("")
+        lines.append("| Method | Purpose |")
+        lines.append("|---|---|")
+        for group in by_section[section]:
+            title = group.get("title") or group.get("group")
+            anchor = hugo_anchor(title)
+            purpose = first_sentence(group.get("summary") or "")
+            if group.get("traffic"):
+                purpose = f"{purpose} {TRAFFIC_BADGE}".strip()
+            purpose = purpose.replace("|", "\\|")
+            lines.append(f"| [{title}](#{anchor}) | {purpose} |")
+        blocks.append("\n".join(lines))
+    return "\n\n".join(blocks)
 
 
 def slugify_section(section: str) -> str:
