@@ -157,7 +157,7 @@
 - group: create_courier_envelopes_from_payload
   part: pigeonhole
   section: "Copy Commands"
-  title: "CreateCourierEnvelopesFromPayload"
+  title: "CreateCourierEnvelopesFromPayload / create_courier_envelopes_from_payload"
   summary: |
     Packs a single payload for one destination into copy stream elements.
     The payload can be up to ~10 MB. Returns properly sized chunks ready
@@ -169,7 +169,7 @@
 - group: create_courier_envelopes_from_multi_payload
   part: pigeonhole
   section: "Copy Commands"
-  title: "CreateCourierEnvelopesFromMultiPayload"
+  title: "CreateCourierEnvelopesFromMultiPayload / create_courier_envelopes_from_multi_payload"
   summary: |
     Packs multiple payloads for different destinations into copy stream
     elements. More space-efficient than calling the single-payload
@@ -182,7 +182,7 @@
 - group: create_courier_envelopes_from_tombstone_range
   part: pigeonhole
   section: "Copy Commands"
-  title: "CreateCourierEnvelopesFromTombstoneRange"
+  title: "CreateCourierEnvelopesFromTombstoneRange / create_courier_envelopes_from_tombstone_range"
   summary: |
     Packs tombstone envelopes for a range of consecutive destination
     boxes into copy stream elements. Use this to atomically tombstone
@@ -390,7 +390,7 @@
 - group: stop_event_sink
   part: core
   section: "Events"
-  title: "StopEventSink (Go only)"
+  title: "StopEventSink"
   summary: |
     Stops delivering events on the given channel. Rust receivers are
     dropped via their own lifetime; Python's callback model requires no
@@ -586,7 +586,7 @@
 - group: get_config
   part: core
   section: "Utility"
-  title: "GetConfig (Go only)"
+  title: "GetConfig"
   summary: |
     Returns the client's configuration object, including the Sphinx and
     Pigeonhole geometries negotiated with the daemon.
@@ -600,7 +600,7 @@
 - group: shutdown
   part: core
   section: "Utility"
-  title: "Shutdown (Go only)"
+  title: "Shutdown"
   summary: |
     Cleanly shuts down the ThinClient instance and stops its background
     workers. Unlike Close, it does not send a close notification to the
@@ -613,7 +613,7 @@
 - group: get_logger
   part: core
   section: "Utility"
-  title: "GetLogger (Go only)"
+  title: "GetLogger"
   summary: |
     Returns a logger instance with the given prefix, using the thin
     client's configured logging backend.

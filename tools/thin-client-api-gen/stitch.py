@@ -207,6 +207,9 @@ def render_method_toc(part_groups: list[dict]) -> str:
             purpose = first_sentence(group.get("summary") or "")
             if group.get("traffic"):
                 purpose = f"{purpose} {TRAFFIC_BADGE}".strip()
+            have = [TAB_LABEL[b] for b in BINDINGS if group.get(b)]
+            if 0 < len(have) < len(BINDINGS):
+                purpose = f"{purpose} *({', '.join(have)})*".strip()
             purpose = purpose.replace("|", "\\|")
             lines.append(f"| [{title}](#{anchor}) | {purpose} |")
         blocks.append("\n".join(lines))
@@ -317,13 +320,27 @@ def render_group(
     if group.get("traffic"):
         lines.append(TRAFFIC_BADGE + "\n")
 
+    # Methods absent from one or more bindings get an availability
+    # line; full-coverage methods stay unmarked so the marker carries
+    # meaning.
+    have = [TAB_LABEL[b] for b in BINDINGS if group.get(b)]
+    if 0 < len(have) < len(BINDINGS):
+        lines.append(f"*Available in: {', '.join(have)}.*\n")
+
     prose = resolve_prose(group, go_syms, rust_syms, py_syms)
     if prose:
         lines.append(prose.rstrip() + "\n")
 
+    # Curated cross-binding notes render as a blockquote so the
+    # editorial voice is visibly distinct from the docstring prose.
     notes = group.get("notes")
     if notes:
-        lines.append(notes.rstrip() + "\n")
+        note_lines = notes.rstrip().splitlines()
+        quoted = ["> " + note_lines[0]]
+        for line in note_lines[1:]:
+            quoted.append(("> " + line).rstrip() if line.strip() else ">")
+        quoted[0] = "> **Note:** " + note_lines[0]
+        lines.append("\n".join(quoted) + "\n")
 
     # Tab pane
     tabs: list[tuple[str, str, str]] = []  # (binding, lang_tag, signature)

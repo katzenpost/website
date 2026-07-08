@@ -98,8 +98,8 @@ examples in all three languages, see the
 | Method | Purpose |
 |---|---|
 | [StartResendingEncryptedMessage / start_resending_encrypted_message](#startresendingencryptedmessage--start_resending_encrypted_message) | Sends an encrypted read or write request to a courier via the ARQ mechanism. **Sends mixnet traffic.** |
-| [StartResendingEncryptedMessageReturnBoxExists](#startresendingencryptedmessagereturnboxexists) | Same as the default variant, but returns `BoxAlreadyExists` as an error instead of treating it as success. **Sends mixnet traffic.** |
-| [StartResendingEncryptedMessageNoRetry](#startresendingencryptedmessagenoretry) | Same as the default variant, but returns `BoxIDNotFound` immediately instead of retrying indefinitely. **Sends mixnet traffic.** |
+| [StartResendingEncryptedMessageReturnBoxExists](#startresendingencryptedmessagereturnboxexists) | Same as the default variant, but returns `BoxAlreadyExists` as an error instead of treating it as success. **Sends mixnet traffic.** *(Go, Rust)* |
+| [StartResendingEncryptedMessageNoRetry](#startresendingencryptedmessagenoretry) | Same as the default variant, but returns `BoxIDNotFound` immediately instead of retrying indefinitely. **Sends mixnet traffic.** *(Go, Rust)* |
 | [CancelResendingEncryptedMessage / cancel_resending_encrypted_message](#cancelresendingencryptedmessage--cancel_resending_encrypted_message) | Cancels an in-flight `StartResendingEncryptedMessage` operation. |
 
 **[Tombstones](#tombstones)**
@@ -112,9 +112,9 @@ examples in all three languages, see the
 
 | Method | Purpose |
 |---|---|
-| [CreateCourierEnvelopesFromPayload](#createcourierenvelopesfrompayload) | Packs a single payload for one destination into copy stream elements. |
-| [CreateCourierEnvelopesFromMultiPayload](#createcourierenvelopesfrommultipayload) | Packs multiple payloads for different destinations into copy stream elements. |
-| [CreateCourierEnvelopesFromTombstoneRange](#createcourierenvelopesfromtombstonerange) | Packs tombstone envelopes for a range of consecutive destination boxes into copy stream elements. |
+| [CreateCourierEnvelopesFromPayload / create_courier_envelopes_from_payload](#createcourierenvelopesfrompayload--create_courier_envelopes_from_payload) | Packs a single payload for one destination into copy stream elements. |
+| [CreateCourierEnvelopesFromMultiPayload / create_courier_envelopes_from_multi_payload](#createcourierenvelopesfrommultipayload--create_courier_envelopes_from_multi_payload) | Packs multiple payloads for different destinations into copy stream elements. |
+| [CreateCourierEnvelopesFromTombstoneRange / create_courier_envelopes_from_tombstone_range](#createcourierenvelopesfromtombstonerange--create_courier_envelopes_from_tombstone_range) | Packs tombstone envelopes for a range of consecutive destination boxes into copy stream elements. |
 | [StartResendingCopyCommand / start_resending_copy_command](#startresendingcopycommand--start_resending_copy_command) | Sends a copy command to a courier via ARQ and **blocks** until the courier acknowledges completion. **Sends mixnet traffic.** |
 | [CancelResendingCopyCommand / cancel_resending_copy_command](#cancelresendingcopycommand--cancel_resending_copy_command) | Cancels an in-flight copy command. |
 
@@ -131,7 +131,7 @@ examples in all three languages, see the
 
 | Method | Purpose |
 |---|---|
-| [GetPigeonholeGeometry / pigeonhole_geometry](#getpigeonholegeometry--pigeonhole_geometry) | Returns the negotiated Pigeonhole geometry, so that callers can size payloads to its maximum plaintext payload length. |
+| [GetPigeonholeGeometry / pigeonhole_geometry](#getpigeonholegeometry--pigeonhole_geometry) | Returns the negotiated Pigeonhole geometry, so that callers can size payloads to its maximum plaintext payload length. *(Go, Rust)* |
 
 **[Auxiliary Index Helpers](#auxiliary-index-helpers)**
 
@@ -249,10 +249,10 @@ two-phased: after the ACK the daemon collects the payload with a fresh
 SURB, decrypts it, and returns the plaintext; by default a read retries
 BoxIDNotFound until the box is written.
 
-The Python binding exposes the two variant behaviors below as
-keyword-only flags on this method (`no_retry_on_box_id_not_found`
-and `no_idempotent_box_already_exists`) rather than as separate
-methods.
+> **Note:** The Python binding exposes the two variant behaviors below as
+> keyword-only flags on this method (`no_retry_on_box_id_not_found`
+> and `no_idempotent_box_already_exists`) rather than as separate
+> methods.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -279,6 +279,8 @@ async def start_resending_encrypted_message(self, read_cap: 'bytes|None', write_
 
 **Sends mixnet traffic.**
 
+*Available in: Go, Rust.*
+
 StartResendingEncryptedMessageReturnBoxExists behaves exactly like
 StartResendingEncryptedMessage save that it returns
 ErrBoxAlreadyExists when the replica reports that the destination
@@ -292,8 +294,8 @@ it can return the answer.
 
 An in-flight call may be cancelled via CancelResendingEncryptedMessage.
 
-In Python, pass `no_idempotent_box_already_exists=True` to
-`start_resending_encrypted_message` instead.
+> **Note:** In Python, pass `no_idempotent_box_already_exists=True` to
+> `start_resending_encrypted_message` instead.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -317,6 +319,8 @@ pub async fn start_resending_encrypted_message_return_box_exists(
 
 **Sends mixnet traffic.**
 
+*Available in: Go, Rust.*
+
 StartResendingEncryptedMessageNoRetry behaves exactly like
 StartResendingEncryptedMessage save that it disables the daemon's
 automatic retry of ErrBoxIDNotFound: the caller learns at once that
@@ -325,8 +329,8 @@ appears.
 
 An in-flight call may be cancelled via CancelResendingEncryptedMessage.
 
-In Python, pass `no_retry_on_box_id_not_found=True` to
-`start_resending_encrypted_message` instead.
+> **Note:** In Python, pass `no_retry_on_box_id_not_found=True` to
+> `start_resending_encrypted_message` instead.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -423,7 +427,7 @@ and then tombstones. See
 [Copy commands](/docs/pigeonhole_explained/#copy-commands) in
 Understanding Pigeonhole for the workflow and its use cases.
 
-#### CreateCourierEnvelopesFromPayload
+#### CreateCourierEnvelopesFromPayload / create_courier_envelopes_from_payload
 
 CreateCourierEnvelopesFromPayload packs a payload of arbitrary
 size (up to 10 MB) into properly sized CopyStreamElement chunks
@@ -456,7 +460,7 @@ async def create_courier_envelopes_from_payload(self, payload: bytes, dest_write
 {{< /tab >}}
 {{< /tabpane >}}
 
-#### CreateCourierEnvelopesFromMultiPayload
+#### CreateCourierEnvelopesFromMultiPayload / create_courier_envelopes_from_multi_payload
 
 CreateCourierEnvelopesFromMultiPayload packs payloads bound for
 several destination channels into a single stream of
@@ -488,7 +492,7 @@ async def create_courier_envelopes_from_multi_payload(self, destinations: 'List[
 {{< /tab >}}
 {{< /tabpane >}}
 
-#### CreateCourierEnvelopesFromTombstoneRange
+#### CreateCourierEnvelopesFromTombstoneRange / create_courier_envelopes_from_tombstone_range
 
 CreateCourierEnvelopesFromTombstoneRange creates tombstone CourierEnvelopes for a range
 of destination indices, encoded as copy stream elements ready to be written to a
@@ -684,12 +688,14 @@ async def voucher_derive_stream(self, voucher: bytes) -> VoucherStreamResult:
 
 #### GetPigeonholeGeometry / pigeonhole_geometry
 
+*Available in: Go, Rust.*
+
 GetPigeonholeGeometry returns the Pigeonhole geometry the daemon supplied
 during the connection handshake. It is nil until Dial() has completed.
 
-The Python binding has no getter method; it exposes the Pigeonhole
-geometry as the public `ThinClient.pigeonhole_geometry` attribute,
-populated from the daemon's connection status event.
+> **Note:** The Python binding has no getter method; it exposes the Pigeonhole
+> geometry as the public `ThinClient.pigeonhole_geometry` attribute,
+> populated from the daemon's connection status event.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -776,8 +782,8 @@ consuming daemon events, querying the PKI, and sending direct
 
 | Method | Purpose |
 |---|---|
-| [EventSink / event_sink](#eventsink--event_sink) | Returns a channel (Go) or receiver (Rust) that yields events from the daemon. |
-| [StopEventSink (Go only)](#stopeventsink-go-only) | Stops delivering events on the given channel. |
+| [EventSink / event_sink](#eventsink--event_sink) | Returns a channel (Go) or receiver (Rust) that yields events from the daemon. *(Go, Rust)* |
+| [StopEventSink](#stopeventsink) | Stops delivering events on the given channel. *(Go)* |
 
 **[PKI and Service Discovery](#pki-and-service-discovery)**
 
@@ -786,9 +792,9 @@ consuming daemon events, querying the PKI, and sending direct
 | [PKIDocument / pki_document](#pkidocument--pki_document) | Returns the current PKI consensus document, which contains the network topology and available services. |
 | [GetPKIDocumentRaw / get_pki_document_raw](#getpkidocumentraw--get_pki_document_raw) | Returns the signed PKI document for a given epoch with every directory authority signature intact, so callers may verify the document themselves. |
 | [GetDirectoryAuthorities / get_directory_authorities](#getdirectoryauthorities--get_directory_authorities) | Returns the directory authority descriptors the client daemon is configured to trust, including their identity keys and addresses. |
-| [PKIDocumentForEpoch / pki_document_for_epoch](#pkidocumentforepoch--pki_document_for_epoch) | Returns the cached PKI document for a specific epoch, or an error if the daemon has not retained a document for that epoch. |
+| [PKIDocumentForEpoch / pki_document_for_epoch](#pkidocumentforepoch--pki_document_for_epoch) | Returns the cached PKI document for a specific epoch, or an error if the daemon has not retained a document for that epoch. *(Go, Python)* |
 | [GetService / get_service](#getservice--get_service) | Returns a random instance of the named service from the PKI document. |
-| [GetServices / get_services](#getservices--get_services) | Returns all instances of a service with the given capability name. |
+| [GetServices / get_services](#getservices--get_services) | Returns all instances of a service with the given capability name. *(Go, Python)* |
 
 **[Direct Messaging](#direct-messaging)**
 
@@ -802,7 +808,7 @@ consuming daemon events, querying the PKI, and sending direct
 
 | Method | Purpose |
 |---|---|
-| [GetSphinxGeometry / sphinx_geometry](#getsphinxgeometry--sphinx_geometry) | Returns the Sphinx geometry the daemon supplied during the connection handshake, describing the packet and payload sizes of the mixnet's Sphinx packet format. |
+| [GetSphinxGeometry / sphinx_geometry](#getsphinxgeometry--sphinx_geometry) | Returns the Sphinx geometry the daemon supplied during the connection handshake, describing the packet and payload sizes of the mixnet's Sphinx packet format. *(Go, Rust)* |
 
 **[Utility](#utility)**
 
@@ -811,9 +817,9 @@ consuming daemon events, querying the PKI, and sending direct
 | [NewMessageID / new_message_id](#newmessageid--new_message_id) | Returns a new random message ID (16 bytes). |
 | [NewSURBID / new_surb_id](#newsurbid--new_surb_id) | Returns a new random SURB ID for correlating message replies. |
 | [NewQueryID / new_query_id](#newqueryid--new_query_id) | Returns a new random query ID for correlating requests and replies within the thin client protocol. |
-| [GetConfig (Go only)](#getconfig-go-only) | Returns the client's configuration object, including the Sphinx and Pigeonhole geometries negotiated with the daemon. |
-| [Shutdown (Go only)](#shutdown-go-only) | Cleanly shuts down the ThinClient instance and stops its background workers. |
-| [GetLogger (Go only)](#getlogger-go-only) | Returns a logger instance with the given prefix, using the thin client's configured logging backend. |
+| [GetConfig](#getconfig) | Returns the client's configuration object, including the Sphinx and Pigeonhole geometries negotiated with the daemon. *(Go)* |
+| [Shutdown](#shutdown) | Cleanly shuts down the ThinClient instance and stops its background workers. *(Go)* |
+| [GetLogger](#getlogger) | Returns a logger instance with the given prefix, using the thin client's configured logging backend. *(Go)* |
 
 ---
 
@@ -891,11 +897,11 @@ After successful connection, the client will automatically handle:
   - connection status changes
   - event distribution to application code
 
-The Rust binding folds the connect step into its constructor, so
-`ThinClient::new` returns an already-connected handle. Go and
-Python construct the client first and connect afterwards via
-`Dial()` / `start()`, allowing the application to set up event
-sinks (in Go) or callbacks (in Python) before any traffic flows.
+> **Note:** The Rust binding folds the connect step into its constructor, so
+> `ThinClient::new` returns an already-connected handle. Go and
+> Python construct the client first and connect afterwards via
+> `Dial()` / `start()`, allowing the application to set up event
+> sinks (in Go) or callbacks (in Python) before any traffic flows.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -1074,6 +1080,8 @@ client = ThinClient(config)
 
 #### EventSink / event_sink
 
+*Available in: Go, Rust.*
+
 EventSink returns a buffered channel that receives all events from the thin client.
 
 This method creates a new event channel that will receive copies of all
@@ -1099,10 +1107,10 @@ Note: The event sink channel is NOT closed when the client shuts down.
 Consumers should also select on HaltCh() to detect shutdown, or they
 can check for a ShutdownEvent in the event stream.
 
-The Rust binding returns an `mpsc::Receiver` carrying the same
-event stream. The Python binding has no equivalent method:
-Python applications instead register async callbacks on the
-`Config` constructor and receive events through those.
+> **Note:** The Rust binding returns an `mpsc::Receiver` carrying the same
+> event stream. The Python binding has no equivalent method:
+> Python applications instead register async callbacks on the
+> `Config` constructor and receive events through those.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -1113,7 +1121,9 @@ pub fn event_sink(&self) -> EventSinkReceiver
 {{< /tab >}}
 {{< /tabpane >}}
 
-#### StopEventSink (Go only)
+#### StopEventSink
+
+*Available in: Go.*
 
 StopEventSink stops sending events to the specified channel and cleans up resources.
 
@@ -1122,10 +1132,10 @@ be called when the application is done processing events from a channel
 returned by EventSink(). Failure to call this method may result in resource
 leaks and continued event processing overhead.
 
-Rust subscribers are released by dropping the
-`mpsc::Receiver`, so the binding exposes no explicit teardown
-method. Python's callback model owns no per-subscriber
-resources either, and so likewise needs no equivalent.
+> **Note:** Rust subscribers are released by dropping the
+> `mpsc::Receiver`, so the binding exposes no explicit teardown
+> method. Python's callback model owns no per-subscriber
+> resources either, and so likewise needs no equivalent.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -1211,6 +1221,8 @@ async def get_directory_authorities(self) -> 'List[Dict[str,Any]]':
 
 #### PKIDocumentForEpoch / pki_document_for_epoch
 
+*Available in: Go, Python.*
+
 PKIDocumentForEpoch returns the PKI document for a specific epoch from cache.
 
 This method provides access to PKI documents from previous epochs that are
@@ -1223,9 +1235,9 @@ The client automatically caches the last 5 epochs of PKI documents. If the
 requested epoch is not in cache, the current document is returned as a
 fallback.
 
-The Rust binding does not expose a per-epoch accessor; Rust callers
-use `pki_document` for the current document, or `get_pki_document_raw`
-for the signed document at a given epoch.
+> **Note:** The Rust binding does not expose a per-epoch accessor; Rust callers
+> use `pki_document` for the current document, or `get_pki_document_raw`
+> for the signed document at a given epoch.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -1261,15 +1273,17 @@ def get_service(self, service_name: str) -> ServiceDescriptor:
 
 #### GetServices / get_services
 
+*Available in: Go, Python.*
+
 GetServices returns all services matching the specified capability name.
 
 This method searches the current PKI document for services that provide
 the specified capability. Services in Katzenpost are identified by their
 capability names (e.g., "echo", "courier", "keyserver").
 
-The Rust binding exposes the same lookup as the free function
-`find_services` in `helpers.rs`, rather than as a method on
-`ThinClient`.
+> **Note:** The Rust binding exposes the same lookup as the free function
+> `find_services` in `helpers.rs`, rather than as a method on
+> `ThinClient`.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -1381,12 +1395,14 @@ async def blocking_send_message(self, payload: bytes | str, dest_node: bytes, de
 
 #### GetSphinxGeometry / sphinx_geometry
 
+*Available in: Go, Rust.*
+
 GetSphinxGeometry returns the Sphinx geometry the daemon supplied during
 the connection handshake. It is nil until Dial() has completed.
 
-The Python binding has no getter method; it exposes the Sphinx
-geometry as the public `ThinClient.geometry` attribute (a `Geometry`),
-populated from the daemon's connection status event.
+> **Note:** The Python binding has no getter method; it exposes the Sphinx
+> geometry as the public `ThinClient.geometry` attribute (a `Geometry`),
+> populated from the daemon's connection status event.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -1459,14 +1475,16 @@ def new_query_id(self) -> bytes:
 {{< /tab >}}
 {{< /tabpane >}}
 
-#### GetConfig (Go only)
+#### GetConfig
+
+*Available in: Go.*
 
 GetConfig returns the client's configuration.
 
-Python callers read the configuration through the plain `config`
-attribute on `ThinClient`. The Rust binding exposes no configuration
-accessor; Rust callers read the negotiated geometries through the
-dedicated `sphinx_geometry` and `pigeonhole_geometry` methods.
+> **Note:** Python callers read the configuration through the plain `config`
+> attribute on `ThinClient`. The Rust binding exposes no configuration
+> accessor; Rust callers read the negotiated geometries through the
+> dedicated `sphinx_geometry` and `pigeonhole_geometry` methods.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -1474,7 +1492,9 @@ func (t *ThinClient) GetConfig() *Config
 {{< /tab >}}
 {{< /tabpane >}}
 
-#### Shutdown (Go only)
+#### Shutdown
+
+*Available in: Go.*
 
 Shutdown cleanly shuts down the ThinClient instance.
 
@@ -1482,8 +1502,8 @@ This method stops all background workers and closes the connection to the
 client daemon. It is equivalent to calling Halt() and is provided for
 compatibility. For proper cleanup, prefer using Close().
 
-The Rust and Python bindings expose a single teardown method, `stop`,
-documented under Close / stop above.
+> **Note:** The Rust and Python bindings expose a single teardown method, `stop`,
+> documented under Close / stop above.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
@@ -1491,15 +1511,17 @@ func (t *ThinClient) Shutdown()
 {{< /tab >}}
 {{< /tabpane >}}
 
-#### GetLogger (Go only)
+#### GetLogger
+
+*Available in: Go.*
 
 GetLogger returns a logger instance with the specified prefix.
 
 This allows applications to create loggers that integrate with the thin
 client's logging system and maintain consistent log formatting.
 
-The Rust and Python bindings leave logging to the host application
-and expose no equivalent accessor.
+> **Note:** The Rust and Python bindings leave logging to the host application
+> and expose no equivalent accessor.
 
 {{< tabpane >}}
 {{< tab header="Go" lang="go" >}}
