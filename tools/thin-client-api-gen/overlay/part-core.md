@@ -3,6 +3,10 @@ thin-client applications: constructing and connecting a client,
 consuming daemon events, querying the PKI, and sending direct
 (non-Pigeonhole) messages into the mixnet.
 
+<!-- METHOD_TOC -->
+
+---
+
 ### Configuration and Construction
 
 The thin client is configured via a TOML file that specifies only how

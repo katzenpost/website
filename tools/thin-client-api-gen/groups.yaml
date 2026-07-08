@@ -269,7 +269,7 @@
 
 - group: pigeonhole_geometry
   part: pigeonhole
-  section: "Geometry"
+  section: "Pigeonhole Geometry"
   title: "GetPigeonholeGeometry / pigeonhole_geometry"
   summary: |
     Returns the negotiated Pigeonhole geometry, so that callers can size
@@ -535,7 +535,7 @@
 
 - group: sphinx_geometry
   part: core
-  section: "Geometry"
+  section: "Sphinx Geometry"
   title: "GetSphinxGeometry / sphinx_geometry"
   summary: |
     Returns the Sphinx geometry the daemon supplied during the connection

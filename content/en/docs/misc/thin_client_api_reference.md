@@ -127,7 +127,7 @@ examples in all three languages, see the
 | [VoucherOpen / voucher_open](#voucheropen--voucher_open) | Opens the inductor's sealed reply with the joiner's voucher secret key. |
 | [VoucherDeriveStream / voucher_derive_stream](#voucherderivestream--voucher_derive_stream) | Derives the VoucherStream capabilities from the Voucher. |
 
-**[Geometry](#geometry)**
+**[Pigeonhole Geometry](#pigeonhole-geometry)**
 
 | Method | Purpose |
 |---|---|
@@ -139,6 +139,8 @@ examples in all three languages, see the
 |---|---|
 | [NextMessageBoxIndex / next_message_box_index](#nextmessageboxindex--next_message_box_index) | Returns the next message box index in the sequence. |
 | [GetMessageBoxIndexCounter / get_message_box_index_counter](#getmessageboxindexcounter--get_message_box_index_counter) | Returns the BACAP Idx64 counter embedded in a MessageBoxIndex, the sequence number of a box within its stream. |
+
+---
 
 ### Keypairs and Capabilities
 
@@ -165,6 +167,8 @@ pub async fn new_keypair(
 async def new_keypair(self, seed: bytes) -> KeypairResult:
 {{< /tab >}}
 {{< /tabpane >}}
+
+---
 
 ### Preparing Reads and Writes
 
@@ -216,6 +220,8 @@ pub async fn encrypt_write(
 async def encrypt_write(self, plaintext: bytes, write_cap: bytes, message_box_index: bytes) -> EncryptWriteResult:
 {{< /tab >}}
 {{< /tabpane >}}
+
+---
 
 ### Sending and ARQ Transport
 
@@ -364,6 +370,8 @@ async def cancel_resending_encrypted_message(self, envelope_hash: bytes) -> None
 {{< /tab >}}
 {{< /tabpane >}}
 
+---
+
 ### Tombstones
 
 A tombstone is a signed empty payload that deletes a box's
@@ -404,6 +412,8 @@ pub async fn tombstone_range(
 async def tombstone_range(self, write_cap: bytes, start: bytes, max_count: int) -> TombstoneRangeResult:
 {{< /tab >}}
 {{< /tabpane >}}
+
+---
 
 ### Copy Commands
 
@@ -573,6 +583,8 @@ async def cancel_resending_copy_command(self, write_cap_hash: bytes) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
 
+---
+
 ### Contact Vouchers
 
 #### VoucherMint / voucher_mint
@@ -666,7 +678,9 @@ async def voucher_derive_stream(self, voucher: bytes) -> VoucherStreamResult:
 {{< /tab >}}
 {{< /tabpane >}}
 
-### Geometry
+---
+
+### Pigeonhole Geometry
 
 #### GetPigeonholeGeometry / pigeonhole_geometry
 
@@ -685,6 +699,8 @@ func (t *ThinClient) GetPigeonholeGeometry() *pigeonholeGeo.Geometry
 pub fn pigeonhole_geometry(&self) -> PigeonholeGeometry
 {{< /tab >}}
 {{< /tabpane >}}
+
+---
 
 ### Auxiliary Index Helpers
 
@@ -738,12 +754,68 @@ async def get_message_box_index_counter(self, message_box_index: bytes) -> int:
 {{< /tab >}}
 {{< /tabpane >}}
 
+---
+
 ## Core Thin-Client API
 
 Everything below is the transport and control plumbing shared by all
 thin-client applications: constructing and connecting a client,
 consuming daemon events, querying the PKI, and sending direct
 (non-Pigeonhole) messages into the mixnet.
+
+**[Connection Management](#connection-management)**
+
+| Method | Purpose |
+|---|---|
+| [Dial / new / start](#dial--new--start) | Connect to the kpclientd daemon. |
+| [Close / stop](#close--stop) | Disconnect from the daemon and shut down the thin client. |
+| [IsConnected / is_connected](#isconnected--is_connected) | Returns whether the daemon is currently connected to the mixnet. |
+| [Disconnect / disconnect](#disconnect--disconnect) | Disconnect from the daemon without shutting down. |
+
+**[Events](#events)**
+
+| Method | Purpose |
+|---|---|
+| [EventSink / event_sink](#eventsink--event_sink) | Returns a channel (Go) or receiver (Rust) that yields events from the daemon. |
+| [StopEventSink (Go only)](#stopeventsink-go-only) | Stops delivering events on the given channel. |
+
+**[PKI and Service Discovery](#pki-and-service-discovery)**
+
+| Method | Purpose |
+|---|---|
+| [PKIDocument / pki_document](#pkidocument--pki_document) | Returns the current PKI consensus document, which contains the network topology and available services. |
+| [GetPKIDocumentRaw / get_pki_document_raw](#getpkidocumentraw--get_pki_document_raw) | Returns the signed PKI document for a given epoch with every directory authority signature intact, so callers may verify the document themselves. |
+| [GetDirectoryAuthorities / get_directory_authorities](#getdirectoryauthorities--get_directory_authorities) | Returns the directory authority descriptors the client daemon is configured to trust, including their identity keys and addresses. |
+| [PKIDocumentForEpoch / pki_document_for_epoch](#pkidocumentforepoch--pki_document_for_epoch) | Returns the cached PKI document for a specific epoch, or an error if the daemon has not retained a document for that epoch. |
+| [GetService / get_service](#getservice--get_service) | Returns a random instance of the named service from the PKI document. |
+| [GetServices / get_services](#getservices--get_services) | Returns all instances of a service with the given capability name. |
+
+**[Direct Messaging](#direct-messaging)**
+
+| Method | Purpose |
+|---|---|
+| [SendMessage / send_message](#sendmessage--send_message) | Sends a message with a SURB (Single Use Reply Block) that allows the destination service to reply. **Sends mixnet traffic.** |
+| [SendMessageWithoutReply / send_message_without_reply](#sendmessagewithoutreply--send_message_without_reply) | Sends a fire-and-forget message with no SURB. **Sends mixnet traffic.** |
+| [BlockingSendMessage / blocking_send_message](#blockingsendmessage--blocking_send_message) | Sends a message and blocks until a reply is received or the timeout expires. **Sends mixnet traffic.** |
+
+**[Sphinx Geometry](#sphinx-geometry)**
+
+| Method | Purpose |
+|---|---|
+| [GetSphinxGeometry / sphinx_geometry](#getsphinxgeometry--sphinx_geometry) | Returns the Sphinx geometry the daemon supplied during the connection handshake, describing the packet and payload sizes of the mixnet's Sphinx packet format. |
+
+**[Utility](#utility)**
+
+| Method | Purpose |
+|---|---|
+| [NewMessageID / new_message_id](#newmessageid--new_message_id) | Returns a new random message ID (16 bytes). |
+| [NewSURBID / new_surb_id](#newsurbid--new_surb_id) | Returns a new random SURB ID for correlating message replies. |
+| [NewQueryID / new_query_id](#newqueryid--new_query_id) | Returns a new random query ID for correlating requests and replies within the thin client protocol. |
+| [GetConfig (Go only)](#getconfig-go-only) | Returns the client's configuration object, including the Sphinx and Pigeonhole geometries negotiated with the daemon. |
+| [Shutdown (Go only)](#shutdown-go-only) | Cleanly shuts down the ThinClient instance and stops its background workers. |
+| [GetLogger (Go only)](#getlogger-go-only) | Returns a logger instance with the given prefix, using the thin client's configured logging backend. |
+
+---
 
 ### Configuration and Construction
 
@@ -795,6 +867,8 @@ forms (the `Network` key is an optional refinement of the TCP form):
 #### Concurrency
 
 The Go `ThinClient` is safe for concurrent use by multiple goroutines. Because its connection state, current PKI document, and in-flight request tracking are guarded internally, the cancel-from-another-goroutine patterns shown in the [how-to guide](/docs/thin_client_howto/) are sound. The Rust and Python bindings are `async`. An instance is driven from its runtime (a Tokio task or an asyncio event loop) and follows that runtime's ordinary conventions rather than offering an independent thread-safety guarantee.
+
+---
 
 ### Connection Management
 
@@ -897,6 +971,8 @@ pub async fn disconnect(&self)
 def disconnect(self) -> None:
 {{< /tab >}}
 {{< /tabpane >}}
+
+---
 
 ### Events
 
@@ -1057,6 +1133,8 @@ func (t *ThinClient) StopEventSink(ch chan Event)
 {{< /tab >}}
 {{< /tabpane >}}
 
+---
+
 ### PKI and Service Discovery
 
 #### PKIDocument / pki_document
@@ -1202,6 +1280,8 @@ def get_services(self, capability: str) -> 'List[ServiceDescriptor]':
 {{< /tab >}}
 {{< /tabpane >}}
 
+---
+
 ### Direct Messaging
 
 #### SendMessage / send_message
@@ -1295,7 +1375,9 @@ async def blocking_send_message(self, payload: bytes | str, dest_node: bytes, de
 {{< /tab >}}
 {{< /tabpane >}}
 
-### Geometry
+---
+
+### Sphinx Geometry
 
 #### GetSphinxGeometry / sphinx_geometry
 
@@ -1314,6 +1396,8 @@ func (t *ThinClient) GetSphinxGeometry() *geo.Geometry
 pub fn sphinx_geometry(&self) -> Geometry
 {{< /tab >}}
 {{< /tabpane >}}
+
+---
 
 ### Utility
 
@@ -1422,6 +1506,8 @@ and expose no equivalent accessor.
 func (t *ThinClient) GetLogger(prefix string) *logging.Logger
 {{< /tab >}}
 {{< /tabpane >}}
+
+---
 
 ## Data Types
 
@@ -1591,6 +1677,8 @@ Passed *into* CreateCourierEnvelopesFromMultiPayload, one per destination channe
 | `WriteCap` | `*bacap.WriteCap` | WriteCap is the write capability for the destination channel. |
 | `StartIndex` | `*bacap.MessageBoxIndex` | StartIndex is the starting index in the destination channel. |
 
+---
+
 ## Transport and Lifecycle Errors
 
 These errors can in principle be raised by *any* method that performs
@@ -1609,6 +1697,8 @@ Applications that must distinguish "daemon offline" from other errors
 should test `IsConnected()` *before* sending, not compare error values
 after the fact. The Rust and Python bindings provide proper sentinels
 testable with `matches!` / `isinstance`.
+
+---
 
 ## Replica and Courier Errors
 
@@ -1657,6 +1747,8 @@ index at which processing stopped:
 | Go | `ErrCopyCommandFailed` (see `CopyCommandFailedError` struct for fields) |
 | Rust | `ThinClientError::CopyCommandFailed { replica_error_code, failed_envelope_index }` |
 | Python | `CopyCommandFailedError(replica_error_code, failed_envelope_index)` |
+
+---
 
 ## Expected Outcomes vs Real Failures
 

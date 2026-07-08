@@ -415,13 +415,15 @@ def render_document(
             by_part[part_key] = []
         by_part[part_key].append(group)
 
-    for part_key in parts_ordered:
+    for part_index, part_key in enumerate(parts_ordered):
         part_groups = by_part[part_key]
         part_title = PART_TITLES.get(part_key)
         if part_title is None:
             unresolved.append(f"unknown part key {part_key!r}")
             part_title = part_key
         if part_title:
+            if part_index > 0:
+                parts.append("---\n\n")
             parts.append(f"## {part_title}\n\n")
         toc = render_method_toc(part_groups)
         for frag in overlay["part_intro"].get(part_key, []):
@@ -440,6 +442,7 @@ def render_document(
         for section in sections_ordered:
             slug = slugify_section(section) if section else ""
             if section:
+                parts.append("---\n\n")
                 parts.append(f"### {section}\n\n")
             for frag in overlay["before_section"].get(slug, []):
                 parts.append(frag.rstrip() + "\n\n")
@@ -449,6 +452,7 @@ def render_document(
                 parts.append(frag.rstrip() + "\n\n")
 
     for frag in overlay["post"]:
+        parts.append("---\n\n")
         parts.append(fill(frag).rstrip() + "\n\n")
 
     if data_types_spec and not data_types_seen:
