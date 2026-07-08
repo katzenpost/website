@@ -38,8 +38,8 @@ This reference describes the following pinned binding versions:
 | Binding | Repository | Tag |
 | --- | --- | --- |
 | Go reference | [katzenpost/client/thin](https://github.com/katzenpost/katzenpost/tree/v0.0.90/client/thin) | [v0.0.90](https://github.com/katzenpost/katzenpost/releases/tag/v0.0.90) |
-| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/0.0.22/src) | [0.0.22](https://github.com/katzenpost/thin_client/releases/tag/0.0.22) |
-| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/0.0.22/katzenpost_thinclient) | [0.0.22](https://github.com/katzenpost/thin_client/releases/tag/0.0.22) |
+| Rust | [thin_client/src](https://github.com/katzenpost/thin_client/tree/0.0.23/src) | [0.0.23](https://github.com/katzenpost/thin_client/releases/tag/0.0.23) |
+| Python | [thin_client/katzenpost_thinclient](https://github.com/katzenpost/thin_client/tree/0.0.23/katzenpost_thinclient) | [0.0.23](https://github.com/katzenpost/thin_client/releases/tag/0.0.23) |
 
 For pinned versions of the full stack (including `kpclientd`, `katzenqt`, and
 the server-side components), see [Build from source](/docs/build_from_source/).
@@ -226,7 +226,7 @@ pub async fn start_resending_encrypted_message(
 ) -> Result<StartResendingResult, ThinClientError>
 {{< /tab >}}
 {{< tab header="Python" lang="python" >}}
-async def start_resending_encrypted_message(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes, no_retry_on_box_id_not_found: bool = False, no_idempotent_box_already_exists: bool = False) -> StartResendingResult:
+async def start_resending_encrypted_message(self, read_cap: 'bytes|None', write_cap: 'bytes|None', message_box_index: 'bytes|None', reply_index: 'int|None', envelope_descriptor: bytes, message_ciphertext: bytes, envelope_hash: bytes, *, no_retry_on_box_id_not_found: bool = False, no_idempotent_box_already_exists: bool = False) -> StartResendingResult:
 {{< /tab >}}
 {{< /tabpane >}}
 
