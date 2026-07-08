@@ -243,7 +243,7 @@ because every stream has exactly one writer. The
 Go, Rust, and Python.
 
 
-## What the client daemon does
+## Division of labor
 
 Your application talks to a local daemon (kpclientd) through a thin
 client library. The daemon handles all cryptography (BACAP
@@ -256,6 +256,47 @@ indexes, and persists state for crash recovery.
 Most API calls are local crypto operations with no network traffic.
 Only `StartResendingEncryptedMessage` and `StartResendingCopyCommand`
 touch the network.
+
+
+## The Pigeonhole ARQ
+
+The two sending methods deliver their envelopes through a
+stop-and-wait ARQ (Automatic Repeat reQuest) inside the daemon: one
+outstanding query per operation, retransmitted until it is answered
+or cancelled. All sends and retransmissions leave on the client's
+Poisson traffic schedule, so retries are indistinguishable from any
+other client traffic.
+
+How many mixnet round trips an operation costs depends on what it
+is:
+
+- **A write** costs one round trip. The courier's ACK confirms it
+  has taken custody of the envelope and will dispatch it to both of
+  the box's replicas; the operation completes on that ACK. If the
+  box already exists, the write completes as an idempotent success
+  by default; the `ReturnBoxExists` variant instead spends a second
+  round trip to fetch the replica's answer and reports
+  `BoxAlreadyExists` as an error.
+
+- **A read** costs two phases: the courier first ACKs the query,
+  then the daemon sends a fresh SURB to collect the payload once
+  the courier has fetched it from a replica. The daemon decrypts
+  the reply and hands the application plaintext. If the box has not
+  been written yet, the replica answers `BoxIDNotFound`; by default
+  the daemon keeps retrying on its Poisson schedule until the box
+  appears, while the `NoRetry` variant reports the condition
+  immediately (see
+  [Consistency and timing](#consistency-and-timing)).
+
+- **A copy command** costs one ARQ exchange: the courier ACKs after
+  it has executed the whole copy stream.
+
+The daemon picks a courier when the operation starts and pins every
+retransmission and follow-up phase to it, because the courier holds
+per-envelope state for the exchange. An in-flight operation can be
+cancelled by envelope hash (`CancelResendingEncryptedMessage`) or by
+write-cap hash for copy commands (`CancelResendingCopyCommand`),
+which unblocks the waiting caller.
 
 
 ## Consistency and timing
