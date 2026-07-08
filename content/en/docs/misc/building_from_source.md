@@ -101,42 +101,42 @@ replica)</td>
 <code class="literal">cmd/courier</code>,
 <code class="literal">cmd/replica</code></td>
 <td style="text-align: left;">main</td>
-<td style="text-align: left;"><code class="literal">v0.0.76</code></td>
+<td style="text-align: left;"><code class="literal">{{< pin "katzenpost" >}}</code></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><code class="literal">kpclientd</code> (client daemon)</td>
 <td style="text-align: left;"><a href="https://github.com/katzenpost/katzenpost" class="link" target="_top">katzenpost</a></td>
 <td style="text-align: left;"><code class="literal">cmd/kpclientd</code></td>
 <td style="text-align: left;">main</td>
-<td style="text-align: left;"><code class="literal">v0.0.76</code></td>
+<td style="text-align: left;"><code class="literal">{{< pin "katzenpost" >}}</code></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Go thin client (reference)</td>
 <td style="text-align: left;"><a href="https://github.com/katzenpost/katzenpost" class="link" target="_top">katzenpost</a></td>
 <td style="text-align: left;"><code class="literal">client/thin</code></td>
 <td style="text-align: left;">main</td>
-<td style="text-align: left;"><code class="literal">v0.0.76</code></td>
+<td style="text-align: left;"><code class="literal">{{< pin "katzenpost" >}}</code></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Rust thin client</td>
 <td style="text-align: left;"><a href="https://github.com/katzenpost/thin_client" class="link" target="_top">thin_client</a></td>
 <td style="text-align: left;"><code class="literal">src</code></td>
 <td style="text-align: left;">main</td>
-<td style="text-align: left;"><code class="literal">0.0.15</code></td>
+<td style="text-align: left;"><code class="literal">{{< pin "thin_client" >}}</code></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Python thin client</td>
 <td style="text-align: left;"><a href="https://github.com/katzenpost/thin_client" class="link" target="_top">thin_client</a></td>
 <td style="text-align: left;"><code class="literal">katzenpost_thinclient</code></td>
 <td style="text-align: left;">main</td>
-<td style="text-align: left;"><code class="literal">0.0.15</code></td>
+<td style="text-align: left;"><code class="literal">{{< pin "thin_client" >}}</code></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><code class="literal">katzenqt</code> (Qt group chat client)</td>
 <td style="text-align: left;"><a href="https://github.com/katzenpost/katzenqt" class="link" target="_top">katzenqt</a></td>
 <td style="text-align: left;">(root)</td>
-<td style="text-align: left;">resending_api2026</td>
-<td style="text-align: left;"><code class="literal">0.0.2-rc6</code></td>
+<td style="text-align: left;">main</td>
+<td style="text-align: left;"><code class="literal">{{< pin "katzenqt" >}}</code></td>
 </tr>
 </tbody>
 </table>
@@ -208,7 +208,7 @@ cryptographic and network operations.
 ``` programlisting
 git clone https://github.com/katzenpost/katzenpost
 cd katzenpost
-git checkout v0.0.76
+git checkout {{< pin "katzenpost" >}}
 cd cmd/kpclientd
 go build
 ```
@@ -250,7 +250,7 @@ The Go thin client is a library, imported as a Go module:
 import "github.com/katzenpost/katzenpost/client/thin"
 ```
 
-Pin to `v0.0.76` in your application’s
+Pin to `{{< pin "katzenpost" >}}` in your application’s
 `go.mod`. There is no separate build step; the
 library is compiled with your application.
 
@@ -272,18 +272,22 @@ library is compiled with your application.
 
 </div>
 
-``` programlisting
-git clone https://github.com/katzenpost/thin_client
-cd thin_client
-git checkout 0.0.15
-cargo build --release
-```
-
-Or, in another Rust project’s `Cargo.toml`:
+The Rust thin client is published on
+<a href="https://crates.io/crates/katzenpost_thin_client" class="link" target="_top">crates.io</a>;
+in your project’s `Cargo.toml`:
 
 ``` programlisting
 [dependencies]
-katzenpost_thin_client = "0.0.15"
+katzenpost_thin_client = "{{< pin "thin_client" >}}"
+```
+
+Or, to build from source:
+
+``` programlisting
+git clone https://github.com/katzenpost/thin_client
+cd thin_client
+git checkout {{< pin "thin_client" >}}
+cargo build --release
 ```
 
 </div>
@@ -304,14 +308,23 @@ katzenpost_thin_client = "0.0.15"
 
 </div>
 
-The Python thin client is best installed into a virtualenv, both
-to isolate its dependencies and to avoid any disturbance of the
-system Python.
+The Python thin client is published on
+<a href="https://pypi.org/project/katzenpost_thinclient/" class="link" target="_top">PyPI</a>
+and is best installed into a virtualenv, both to isolate its
+dependencies and to avoid any disturbance of the system Python.
+
+``` programlisting
+python3 -m venv .venv
+source .venv/bin/activate
+pip install katzenpost_thinclient=={{< pin "thin_client" >}}
+```
+
+Or, to install from source:
 
 ``` programlisting
 git clone https://github.com/katzenpost/thin_client
 cd thin_client
-git checkout 0.0.15
+git checkout {{< pin "thin_client" >}}
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -342,19 +355,10 @@ No central server is involved. The underlying design is set out in
 the <a href="https://arxiv.org/abs/2501.02933" class="link" target="_top">Echomix
 paper</a>.
 
-``` programlisting
-sudo apt install libxcb-cursor0 libegl1
-git clone https://github.com/katzenpost/katzenqt
-cd katzenqt
-git checkout 0.0.2-rc6
-make deps
-make run
-```
-
-If `make deps run` does not produce a running
-interface, the component-by-component sequence in
-`katzenqt`’s `README.md` is the
-recommended fallback.
+Build, install, and run instructions live on
+<a href="/docs/build_katzenqt/" class="link" target="_top">Build and
+run katzenqt from source</a>; the pinned tag is
+`{{< pin "katzenqt" >}}` (see the table above).
 
 </div>
 

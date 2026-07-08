@@ -17,11 +17,10 @@ application that runs over the Katzenpost mix network and the
 Pigeonhole storage services. The design is set out in the
 [Echomix paper](https://arxiv.org/abs/2501.02933).
 
-> **Warning.** `katzenqt` is in active development and has not yet
-> been tagged for general release. It is not appropriate to rely on
-> the software for anonymity, security, or privacy at this stage.
-> Pre-built packages will be linked from the [docs landing](/docs/)
-> once a release is cut.
+> **Warning.** `katzenqt` is in active development. It is not
+> appropriate to rely on the software for anonymity, security, or
+> privacy at this stage. Pre-built packages will be linked from the
+> [docs landing](/docs/) once they are available.
 
 ## Prerequisites
 
@@ -42,11 +41,20 @@ GUI.
 ```shell
 git clone https://github.com/katzenpost/katzenqt
 cd katzenqt
+git checkout {{% pin "katzenqt" %}}
 make deps
 make run
 ```
 
 If `make run` opens the `katzenqt` window, you are ready.
+
+Out of the box, `make run` connects to the **namenlos public
+mixnet**: the Makefile installs a `kpclientd` configuration that
+dials namenlos and a thin client configuration that reaches the
+daemon over a local socket. No configuration editing is required. If
+the application cannot connect or messages fail to move, first check
+the network's health on the
+[namenlos status page](https://status.namenlos.network/).
 
 ## Step by step (if the quick start fails)
 
@@ -88,14 +96,6 @@ instances on the same machine (one talking to the other):
 ```shell
 KQT_STATE=alice make run    # uses ~/.local/share/katzenqt/alice.sqlite3
 ```
-
-## Current caveats
-
-- `katzenqt` is currently developed against a debug branch of the
-  `katzenpost` repository (`tb/debug2025-09-21`) rather than the
-  pinned release tag listed on [Build from source](/docs/build_from_source/).
-  This will be reconciled when a `katzenqt` tag is cut.
-- A tag has not yet been published.
 
 ## See also
 
