@@ -16,8 +16,7 @@ Client applications, packages, and a public mixnet.
 
 |     | Title | Description |
 |-----|-------|-------------|
-| 🐈  | **Namenlos public mixnet** *(coming soon)* | A public Katzenpost mix network that anyone may use, without the burden of operating their own. |
-| 📦  | **`kpclientd` packages and binaries** *(coming soon)* | Pre-built distribution packages and binaries for the client daemon, so users will not need to build from source. |
+| 🐈  | **Namenlos public mixnet** | A public Katzenpost mix network that anyone may use, without the burden of operating their own. `katzenqt` connects to it out of the box; live network health is on the [status page](https://status.namenlos.network/). |
 | 💬  | **katzenqt group chat** | A decentralised group chat application running over the Katzenpost mix network and the Pigeonhole storage services. Pre-built packages forthcoming. [Build and run from source](/docs/build_katzenqt/) in the meantime. |
 
 ## For operators
@@ -27,8 +26,7 @@ You wish to run your own Katzenpost mix network with friends and collaborators.
 |     | Title | Description |
 |-----|-------|-------------|
 | 📖  | **[Admin Guide](/docs/admin_guide/)** | Deploying and operating Katzenpost servers: installation, configuration, the Docker test mixnet, NAT considerations, and a full configuration appendix. |
-| 🐳  | **[Run a Mix Server in Docker](/docs/misc/run_katzenpost_mixnode_docker/)** | A focused recipe for running a single Katzenpost mix server inside a Docker container, intended for operators who wish to participate in an existing mix network. |
-| 🔧  | **[Build from source](/docs/misc/build_from_source/)** | Pinned versions of the Katzenpost stack and brief instructions for building each component (kpclientd, thin clients, katzenqt, server-side) from source. |
+| 🐳  | **[Run a Mix Server in Docker](/docs/run_katzenpost_mixnode_docker/)** | A focused recipe for running a single Katzenpost mix server inside a Docker container, intended for operators who wish to participate in an existing mix network. |
 
 ## For application developers
 
@@ -36,10 +34,10 @@ You wish to build software that integrates with Katzenpost.
 
 |     | Title | Description |
 |-----|-------|-------------|
-| 📘  | **[Thin Client API Reference](/docs/misc/thin_client_api_reference/)** | Complete API reference for the Go, Rust, and Python thin client libraries. |
-| 📗  | **[Thin Client How-to Guide](/docs/misc/thin_client_howto/)** | Task-oriented guides for accomplishing common operations with the thin client API. |
-| 🕊️  | **[Understanding Pigeonhole](/docs/misc/pigeonhole_explained/)** | A high-level introduction to the Pigeonhole anonymous storage protocol for application developers. |
-| 🔧  | **[Build from source](/docs/misc/build_from_source/)** | Pinned versions of the Katzenpost stack and brief instructions for building each component from source. |
+| 📘  | **[Thin Client API Reference](/docs/thin_client_api_reference/)** | Complete API reference for the Go, Rust, and Python thin client libraries. |
+| 📗  | **[Thin Client How-to Guide](/docs/thin_client_howto/)** | Task-oriented guides for accomplishing common operations with the thin client API. |
+| 🕊️  | **[Understanding Pigeonhole](/docs/pigeonhole_explained/)** | A high-level introduction to the Pigeonhole anonymous storage protocol for application developers. |
+| 🔧  | **[Build from source](/docs/build_from_source/)** | Pinned versions of the Katzenpost stack and brief instructions for building each component from source. |
 
 ## For core developers
 
@@ -60,7 +58,7 @@ Read in the order below. Seasoned mixnet researchers may skip ahead to the Echom
 |-----|-------|-------------|
 | 📚  | **1. [Literature Review](/research/Literature_overview__website_version.pdf)** *(last updated April 2024)* | Start here if you are new to mixnet research. Field context, attack taxonomy, and the conceptual positions the Echomix paper builds on. |
 | <img src="/iconx/arxiv.svg" alt="arXiv" height="14">  | **2. [Echomix paper](https://arxiv.org/abs/2501.02933)** | *Echomix: a Strong Anonymity System with Messaging.* Katzenpost's design, presented as research (arXiv). |
-| 🔒  | **3. [Threat Model](/docs/misc/threat_model/)** ([PDF](/research/Threat_Model_Doc.pdf)) | Detailed security assumptions and mitigations specific to the deployed system. |
+| 🔒  | **3. [Threat Model](/docs/threat_model/)** ([PDF](/research/Threat_Model_Doc.pdf)) | Detailed security assumptions and mitigations specific to the deployed system. |
 
 Supplementary reading:
 
