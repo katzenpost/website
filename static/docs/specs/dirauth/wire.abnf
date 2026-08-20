@@ -1,0 +1,45 @@
+; Katzenpost v0.0.107, ABNF (RFC 5234) over octets, not ASCII hex text.
+; Structural grammar only. Body lengths, key widths, padding capacities and
+; status/payload conditions remain semantic constraints in section 2.22.
+; Each identity-public-key has the configured signature scheme's public-key size.
+; Bodies are followed by zero padding only on the gateway connection.
+
+authority-command = noop / get-consensus / consensus / post-descriptor /
+                    post-replica-descriptor / descriptor-status /
+                    replica-descriptor-status / vote / reveal / cert / sig /
+                    vote-status / reveal-status / cert-status / sig-status
+gateway-command = get-consensus2 / consensus2
+
+noop = %x00 zero %x00.00.00.00
+get-consensus = %x12 zero %x00.00.00.08 epoch
+consensus = %x13 zero uint32-be consensus-code payload
+post-descriptor = %x14 zero uint32-be epoch payload
+post-replica-descriptor = %x0B zero uint32-be epoch payload
+descriptor-status = %x15 zero %x00.00.00.01 descriptor-code
+replica-descriptor-status = %x0A zero %x00.00.00.01 descriptor-code
+vote = %x16 zero uint32-be epoch identity-public-key payload
+reveal = %x19 zero uint32-be epoch identity-public-key payload
+cert = %x1D zero uint32-be epoch identity-public-key payload
+sig = %x1B zero uint32-be epoch identity-public-key payload
+vote-status = %x17 zero %x00.00.00.01 %x00-07
+reveal-status = %x1A zero %x00.00.00.01 %x08-0D
+cert-status = %x1E zero %x00.00.00.01 %x0E-13
+sig-status = %x1C zero %x00.00.00.01 %x14-1A
+get-consensus2 = %x20 zero %x00.00.00.08 epoch *zero
+consensus2 = %x1F zero uint32-be consensus-code uint32-be uint32-be payload *zero
+
+epoch = 8OCTET
+uint32-be = 4OCTET
+identity-public-key = 1*OCTET
+payload = *OCTET
+consensus-code = %x00-02
+descriptor-code = %x00-04
+zero = %x00
+; OCTET is the RFC 5234 core rule %x00-FF.
+
+; Noise authenticates the length before reading the command ciphertext.
+; Header plaintext is uint32-be(len(command ciphertext)), including its tag.
+; Both encryptions advance the directional nonce. Rekey follows both.
+transport-record = encrypted-length-header encrypted-command
+encrypted-length-header = 20OCTET
+encrypted-command = 22*OCTET
