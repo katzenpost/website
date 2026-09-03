@@ -27,21 +27,43 @@
         <title xml:id="container.title">Using the &program_name; Docker test network</title>
     </info>
            
-    <para>Katzenpost provides a ready-to-deploy Docker
-            image for developers who need a non-production test environment for developing
-        and testing client applications and server side plugins. By running this image on a single computer, you avoid the
-        need to build and manage a complex multi-node mix net. The image can also be run using <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://podman.io/">Podman</link></para>
+    <para><?oxy_delete author="dwrob" timestamp="20260902T190549-0700" content="Katzenpost"?><?oxy_insert_start author="dwrob" timestamp="20260902T190549-0700"?>&program_name;<?oxy_insert_end?>
+        provides a ready-to-deploy Docker image for developers who need a non-production test
+        environment for developing and testing client applications and server side plugins. By
+        running this image on a single computer, you avoid the need to build and manage a complex
+        multi-node mix net. The image can also be run using <link
+            xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://podman.io/"
+        >Podman</link></para>
     <para>The test mix network includes the following components:</para>
     <itemizedlist>
         <listitem>
-            <para>Three directory authority (<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://katzenpost.network/docs/specs/pki.html">PKI</link>) nodes</para>
+            <para>Three directory authority (<link xmlns:xlink="http://www.w3.org/1999/xlink"
+                    xlink:href="https://katzenpost.network/docs/specs/pki.html">PKI</link>)
+                nodes<?oxy_insert_start author="dwrob" timestamp="20260902T191458-0700"?>.<?oxy_insert_end?></para>
         </listitem>
         <listitem>
-            <para>Six <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://katzenpost.network/docs/specs/mixnet/">mix</link> nodes,
-                including one node serving also as both gateway and service provider</para>
+            <para>Six <link xmlns:xlink="http://www.w3.org/1999/xlink"
+                    xlink:href="https://katzenpost.network/docs/specs/mixnet/">mix</link> nodes,
+                including one node serving also as both gateway and service
+                provider<?oxy_insert_start author="dwrob" timestamp="20260902T191501-0700"?>.<?oxy_insert_end?></para>
+        </listitem>
+        <?oxy_insert_start author="dwrob" timestamp="20260902T190132-0700"?>
+        <listitem>
+            <para>Five <link xlink:href="xxxx">replica</link> nodes for storage.</para>
         </listitem>
         <listitem>
-            <para>A ping utility, <command>run-ping</command></para>
+            <para>The &program_name; <link xlink:href="xxxx">client</link>, which (despite the name)
+                is a daemon that runs on machines that host a client application, such as a chat
+                client.</para>
+        </listitem>
+        <listitem>
+            <para>The &program_name;<link xlink:href="xxxx"> thin-client</link>, a network shim that
+                sits between the client daemon and client application.</para>
+        </listitem>
+        <?oxy_insert_end?>
+        <listitem>
+            <para>A ping utility,
+                <command>run-ping</command><?oxy_insert_start author="dwrob" timestamp="20260902T191517-0700"?>.<?oxy_insert_end?></para>
         </listitem>
     </itemizedlist>
     
@@ -50,7 +72,9 @@
             <title xml:id="requirements.title">Requirements</title>
         </info>         
         
-        <para>Before running the Katzenpost docker image, make sure that the
+        <para>Before running the
+            <?oxy_delete author="dwrob" timestamp="20260902T190617-0700" content="Katzenpost"?><?oxy_insert_start author="dwrob" timestamp="20260902T190617-0700"?>&program_name;<?oxy_insert_end?>
+            docker image, make sure that the
             following<?oxy_comment_start author="dwrob" timestamp="20240607T121424-0700" comment="Add minimum hardware specs?"?>
             software<?oxy_comment_end?> is installed. </para>
         <itemizedlist>
@@ -73,9 +97,10 @@
                 <para><link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://www.docker.com">Docker</link>, <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://docs.docker.com/compose/">Docker Compose</link>, and
                     (optionally) <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://podman.io">Podman</link></para>
                 <note>
-                    <para>If both Docker and Podman are present on your system, Katzenpost uses
-                        Podman. Podman is a drop-in daemonless equivalent to Docker that does not
-                        require superuser privileges to run.</para>
+                    <para>If both Docker and Podman are present on your system,
+                        <?oxy_delete author="dwrob" timestamp="20260902T190622-0700" content="Katzenpost"?><?oxy_insert_start author="dwrob" timestamp="20260902T190623-0700"?>&program_name;<?oxy_insert_end?>
+                        uses Podman. Podman is a drop-in daemonless equivalent to Docker that does
+                        not require superuser privileges to run.</para>
                 </note>
             </listitem>
         </itemizedlist>
@@ -95,7 +120,12 @@
             network. </para>
         <procedure>
             <step performance="required">
-                <para>Install the Katzenpost code repository, hosted at <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/katzenpost">https://github.com/katzenpost</uri>. The main Katzenpost
+                <para>Install the
+                    <?oxy_delete author="dwrob" timestamp="20260902T190635-0700" content="Katzenpost"?><?oxy_insert_start author="dwrob" timestamp="20260902T190635-0700"?>&program_name;<?oxy_insert_end?>
+                    code repository, hosted at <uri xmlns:xlink="http://www.w3.org/1999/xlink"
+                        xlink:href="https://github.com/katzenpost"
+                        >https://github.com/katzenpost</uri>. The main
+                    <?oxy_delete author="dwrob" timestamp="20260902T190642-0700" content="Katzenpost"?><?oxy_insert_start author="dwrob" timestamp="20260902T190643-0700"?>&program_name;<?oxy_insert_end?>
                     repository contains code for the server components as well as the docker image.
                     Clone the repository with the following command (your directory location may
                     vary):</para>
@@ -130,16 +160,17 @@
         <info>
             <title xml:id="basic-ops.title">Operating the test mixnet</title>
         </info>
-        
         <para>Navigate to <filename>katzenpost/docker</filename>. The <filename>Makefile</filename>
-            contains target operations to create, manage, and test the self-contained Katzenpost
+            contains target operations to create, manage, and test the self-contained
+            <?oxy_delete author="dwrob" timestamp="20260902T190654-0700" content="Katzenpost"?><?oxy_insert_start author="dwrob" timestamp="20260902T190654-0700"?>&program_name;<?oxy_insert_end?>
             container network. To invoke a target, run a command with the using the following
             pattern:</para>
         <programlisting> <prompt>~/katzenpost/docker$ </prompt><command>make<replaceable> target</replaceable></command></programlisting>
-        <para>Running <command>make</command> with no target specified returns a list of available
-            targets.</para>
-        <table><info><title>Table 1: Makefile targets</title></info>
-            
+        <para> These make targets allow you to control the test network:</para>
+        <table>
+            <info>
+                <title>Table 1: Makefile targets</title>
+            </info>
             <tgroup cols="2">
                 <tbody>
                     <row>
@@ -151,89 +182,143 @@
                         </entry>
                     </row>
                     <row>
-                        <entry>
-                            <para><emphasis role="bold">start</emphasis></para>
-                        </entry>
-                        <entry>
-                            <para>Run the test network in the background.</para>
-                        </entry>
+                        <entry><emphasis role="bold">config-only</emphasis></entry>
+                        <entry>generate configuration files only (no docker containers)</entry>
                     </row>
                     <row>
-                        <entry>
-                            <para><emphasis role="bold">stop</emphasis></para>
-                        </entry>
-                        <entry>
-                            <para>Stop the test network.</para>
-                        </entry>
+                        <entry><emphasis role="bold">start</emphasis></entry>
+                        <entry>Run the test network in the background.</entry>
                     </row>
                     <row>
-                        <entry>
-                            <para><emphasis role="bold">wait</emphasis></para>
-                        </entry>
-                        <entry>
-                            <para>Wait for the test network to have consensus.</para>
-                        </entry>
+                        <entry><emphasis role="bold">stop</emphasis></entry>
+                        <entry>Stop the test network.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">client-restart</emphasis></entry>
+                        <entry>restart just the kpclientd daemon</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">client-logs</emphasis></entry>
+                        <entry>view kpclientd daemon logs</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">courier-restart</emphasis></entry>
+                        <entry>restart courier plugin via thwack interface</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">servicenode-restart</emphasis></entry>
+                        <entry>restart servicenode container (heavier)</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">replica-restart</emphasis></entry>
+                        <entry>rebuild replica binary and restart all replica containers</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">wait</emphasis></entry>
+                        <entry>Wait for testnet to have consensus and at least 2 storage
+                            replicas.</entry>
                     </row>
                     <row>
                         <entry><emphasis role="bold">watch</emphasis></entry>
+                        <entry>Display all log entries in real time until Ctrl-C.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">watch-replicas</emphasis></entry>
+                        <entry>Display only replica logs.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">watch-auth</emphasis></entry>
+                        <entry>Display only directory authority logs.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">watch-mixes</emphasis></entry>
+                        <entry>Display ony mix-node logs.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">watch-courier</emphasis></entry>
+                        <entry>Display courier-service logs.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">watch-serrvicenode</emphasis></entry>
+                        <entry>Display service-node logs.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">watch-gateway</emphasis></entry>
+                        <entry>Display gateway logs.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">watch-all-separate</emphasis></entry>
+                        <entry>Display all logs with component label.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">start-with-client-metrics</emphasis></entry>
+                        <entry>Start with prometheus + grafana and kpclientd metrics.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">print-url-grafana</emphasis></entry>
+                        <entry>Print the Grafana URL.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">print-url-prometheus</emphasis></entry>
+                        <entry>Print the Prometheus URL.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">pumba-latency</emphasis></entry>
                         <entry>
-                            <para>Display live log entries until <command>Ctrl-C</command>.</para>
+                            <para>Induce network delay/jitter on mixnet containers (see pumba_*
+                                vars).</para>
                         </entry>
                     </row>
                     <row>
+                        <entry><emphasis role="bold">pumba-loss</emphasis></entry>
+                        <entry>Induce packet loss on mixnet containers (see pumba_* vars).</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">pumba-corrupt</emphasis></entry>
+                        <entry>Induce single-bit packet corruption (see pumba_corrupt_pct).</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">pumba-pause</emphasis></entry>
+                        <entry>Freeze a single container for pumba_pause_duration.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">pumba-status</emphasis></entry>
                         <entry>
-                            <para><emphasis role="bold">status</emphasis></para>
-                        </entry>
-                        <entry>
-                            <para>Show test network consensus status.</para>
+                            <para>Show all running pumba chaos containers.</para>
                         </entry>
                     </row>
                     <row>
-                        <entry>
-                            <para><emphasis role="bold">show-latest-vote</emphasis></para>
-                        </entry>
-                        <entry>
-                            <para>Show latest consensus vote.</para>
-                        </entry>
+                        <entry><emphasis role="bold">pumba-stop</emphasis></entry>
+                        <entry>Stop every katzenpost_pumba_* chaos container.</entry>
                     </row>
                     <row>
-                        <entry>
-                            <para><emphasis role="bold">run-ping</emphasis></para>
-                        </entry>
-                        <entry>Send a ping over the test network.</entry>
+                        <entry><emphasis role="bold">status</emphasis></entry>
+                        <entry>Show testnet consensus status.</entry>
                     </row>
                     <row>
-                        <entry>
-                            <para><emphasis role="bold">clean-bin</emphasis></para>
-                        </entry>
-                        <entry>
-                            <para>Stop all components and delete binaries.</para>
-                        </entry>
+                        <entry><emphasis role="bold">show-latest-vote</emphasis></entry>
+                        <entry>Does what it says.</entry>
                     </row>
                     <row>
-                        <entry>
-                            <para><emphasis role="bold">clean-local</emphasis></para>
-                        </entry>
-                        <entry>
-                            <para>Stop all components, delete binaries, and delete data.</para>
-                        </entry>
+                        <entry><emphasis role="bold">run-ping</emphasis></entry>
+                        <entry>Send a ping over the testnet.</entry>
                     </row>
                     <row>
-                        <entry>
-                            <para><emphasis role="bold">clean-local-dryrun</emphasis></para>
-                        </entry>
-                        <entry>
-                            <para>Show what clean-local would delete.</para>
-                        </entry>
+                        <entry><emphasis role="bold">clean-bin</emphasis></entry>
+                        <entry>Stop the test network and delete compiled binaries.</entry>
                     </row>
                     <row>
-                        <entry>
-                            <para><emphasis role="bold">clean</emphasis></para>
-                        </entry>
-                        <entry>
-                            <para>Same as <emphasis role="bold">clean-local</emphasis>, but also
-                                deletes <code>go_deps</code> image.</para>
-                        </entry>
+                        <entry><emphasis role="bold">clean-local</emphasis></entry>
+                        <entry>Stop test network and delete data and binaries.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">clean-local-dryrun</emphasis></entry>
+                        <entry>Show what <emphasis role="bold">clean-local</emphasis> would
+                            delete.</entry>
+                    </row>
+                    <row>
+                        <entry><emphasis role="bold">clean</emphasis></entry>
+                        <entry>Delete all of the above, as well as go_deps images.</entry>
                     </row>
                 </tbody>
             </tgroup>
@@ -242,7 +327,6 @@
             <info>
                 <title xml:id="start-mixnet.title">Starting and monitoring the mixnet</title>
             </info>
-            
             <para>The first time that you run <command>make start</command>, the Docker image is
                 downloaded, built, installed, and started. This takes several minutes. When the
                 build is complete, the command exits while the network remains running in the
@@ -250,23 +334,27 @@
             <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make start</command></programlisting>
             <para>Subsequent runs of <command>make start</command> either start or restart the
                 network without building the components from scratch. The exception to this is when
-                you delete any of the Katzenpost binaries (dirauth.alpine, server.alpine, etc.).
-                In that case, <command>make start</command> rebuilds just the parts of the network
-                dependent on the deleted binary. For more information about the files created during
-                the Docker build, see <xref linkend="topology"/>.</para>
+                you delete any of the
+                <?oxy_delete author="dwrob" timestamp="20260902T190708-0700" content="Katzenpost"?><?oxy_insert_start author="dwrob" timestamp="20260902T190708-0700"?>&program_name;<?oxy_insert_end?>
+                binaries (dirauth.alpine, server.alpine, etc.). In that case, <command>make
+                    start</command> rebuilds just the parts of the network dependent on the deleted
+                binary. For more information about the files created during the Docker build, see
+                    <xref linkend="topology"/>.</para>
             <para/>
             <note>
                 <para>When running <command>make start</command> , be aware of the following
                     considerations:</para>
                 <itemizedlist>
                     <listitem>
-                        <para>If you are using Podman (recommended), no superuser privileges are required.
-                            Simply run <command>make start</command> as a regular user.</para>
+                        <para>If you are using Podman (recommended), no superuser privileges are
+                            required. Simply run <command>make start</command> as a regular
+                            user.</para>
                     </listitem>
                     <listitem>
-                        <para>If you intend to use Docker instead of Podman, you may need to run <command>make</command>
-                            as superuser depending on your Docker configuration. You can override the automatic
-                            Podman selection by adding the argument <command>docker=docker</command> to the command:
+                        <para>If you intend to use Docker instead of Podman, you may need to run
+                                <command>make</command> as superuser depending on your Docker
+                            configuration. You can override the automatic Podman selection by adding
+                            the argument <command>docker=docker</command> to the command:
                             <programlisting><prompt>~/katzenpost/docker$ </prompt><command>make start docker=docker</command></programlisting></para>
                     </listitem>
                 </itemizedlist>
@@ -305,7 +393,6 @@
             <info>
                 <title xml:id="test-mixnet.title">Testing the mixnet</title>
             </info>
-            
             <para>At this point, you should have a locally running mix network. You can test whether
                 it is working correctly by using <command>run-ping</command>, which launches a
                 packet into the network and watches for a successful reply. Run the following
@@ -334,7 +421,6 @@
             <info>
                 <title xml:id="shutdown-mixnet.title">Shutting down the mixnet</title>
             </info>
-            
             <para>The mix network continues to run in the terminal where you started it until you
                 issue a <command>Ctrl-C</command> key sequence, or until you issue the following
                 command in another terminal:</para>
@@ -346,7 +432,6 @@
             <info>
                 <title xml:id="uninstall-mixnet.title">Uninstalling and cleaning up</title>
             </info>
-            
             <para>Several command targets can be used to uninstall the Docker image and restore your
                 system to a clean state. The following examples demonstrate the commands and their
                 output.</para>
@@ -517,65 +602,160 @@
                 <tbody>
                     <row>
                         <entry morerows="2">
-                            <para><link xlink:href="&baseURL;docs/admin_guide/components.html#intro-dirauth"
-                                    >Directory authority</link><!--<link linkend="intro-dirauth">Directory authority</link>--></para>
+                            <para><link
+                                    xlink:href="&baseURL;docs/admin_guide/components.html#intro-dirauth"
+                                    >Directory
+                                authority</link><!--<link linkend="intro-dirauth">Directory authority</link>--></para>
                         </entry>
                         <entry>auth1</entry>
                         <entry>Dirauth1</entry>
-                        <entry morerows="7"><para>127.0.0.1 (localhost)</para></entry>
-                        <entry><para>30001</para></entry>
+                        <entry morerows="9">
+                            <para>127.0.0.1 (localhost)</para>
+                        </entry>
+                        <entry>
+                            <para>30001</para>
+                        </entry>
                     </row>
                     <row>
-                        <entry><para>auth2</para></entry>
+                        <entry>
+                            <para>auth2</para>
+                        </entry>
                         <entry>Dirauth 2</entry>
-                        <entry><para>30002</para></entry>
+                        <entry>
+                            <para>30002</para>
+                        </entry>
                     </row>
                     <row>
-                        <entry><para>auth3</para></entry>
+                        <entry>
+                            <para>auth3</para>
+                        </entry>
                         <entry>Dirauth 3</entry>
-                        <entry><para>30003</para></entry>
+                        <entry>
+                            <para>30003</para>
+                        </entry>
                     </row>
                     <row>
-                        <entry><link xlink:href="&baseURL;docs/admin_guide/components.html#intro-gateway"
-                                >Gateway node</link><!--<link linkend="intro-gateway">Gateway node</link>--></entry>
+                        <entry><link
+                                xlink:href="&baseURL;docs/admin_guide/components.html#intro-gateway"
+                                >Gateway
+                            node</link><!--<link linkend="intro-gateway">Gateway node</link>--></entry>
                         <entry>gateway1</entry>
                         <entry>Gateway node</entry>
                         <entry>30004</entry>
                     </row>
                     <row>
-                        <entry>
-                            <para><link xlink:href="&baseURL;docs/admin_guide/components.html#intro-service"
-                                    >Service node</link><!--<link linkend="intro-service">Service node</link>--></para>
+                        <entry morerows="2">
+                            <para><link
+                                    xlink:href="&baseURL;docs/admin_guide/components.html#intro-service"
+                                    >Service
+                                node</link><!--<link linkend="intro-service">Service node</link>--></para>
                         </entry>
-                        <entry><para>servicenode1</para></entry>
+                        <entry>
+                            <para>servicenode1</para>
+                        </entry>
                         <entry>Service node</entry>
-                        <entry><para>30006 </para></entry>
+                        <entry>
+                            <para>30006 </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <?oxy_insert_start author="dwrob" timestamp="20260902T185547-0700"?>
+                            <para>servicenode2</para>
+                            <?oxy_insert_end?>
+                        </entry>
+                        <entry/>
+                        <entry/>
+                    </row>
+                    <row>
+                        <entry>
+                            <?oxy_insert_start author="dwrob" timestamp="20260902T185548-0700"?>
+                            <para>servicenode3</para>
+                            <?oxy_insert_end?>
+                        </entry>
+                        <entry/>
+                        <entry/>
                     </row>
                     <row>
                         <entry morerows="2">
-                            <para><link xlink:href="&baseURL;docs/admin_guide/components.html#intro-mix"
-                                    >Mix node</link><!--<link linkend="intro-mix">Mix node</link>--></para>
+                            <para><link
+                                    xlink:href="&baseURL;docs/admin_guide/components.html#intro-mix"
+                                    >Mix
+                                node</link><!--<link linkend="intro-mix">Mix node</link>--></para>
                         </entry>
-                        <entry><para>mix1</para></entry>
+                        <entry>
+                            <para>mix1</para>
+                        </entry>
                         <entry>Layer 1 mix node</entry>
-                        <entry><para>30008</para></entry>
+                        <entry>
+                            <para>30008</para>
+                        </entry>
                     </row>
                     <row>
-                        <entry><para>mix2</para></entry>
+                        <entry>
+                            <para>mix2</para>
+                        </entry>
                         <entry>Layer 2 mix node</entry>
-                        <entry><para>30010</para></entry>
+                        <entry>
+                            <para>30010</para>
+                        </entry>
                     </row>
                     <row>
-                        <entry><para>mix3</para></entry>
+                        <entry>
+                            <para>mix3</para>
+                        </entry>
                         <entry>Layer 3 mix node</entry>
-                        <entry><para>30012</para></entry>
+                        <entry>
+                            <para>30012</para>
+                        </entry>
+                    </row>
+                    <?oxy_insert_start author="dwrob" timestamp="20260902T184905-0700"?>
+                    <row>
+                        <entry morerows="4">Replica</entry>
+                        <entry>replica1</entry>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                    </row>
+                    <?oxy_insert_end?>
+                    <row>
+                        <entry><?oxy_insert_start author="dwrob" timestamp="20260902T185134-0700"?>replica2<?oxy_insert_end?></entry>
+                        <?oxy_insert_start author="dwrob" timestamp="20260902T184905-0700"?>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                        <?oxy_insert_end?>
+                    </row>
+                    <row>
+                        <entry><?oxy_insert_start author="dwrob" timestamp="20260902T185132-0700"?>replica3<?oxy_insert_end?></entry>
+                        <?oxy_insert_start author="dwrob" timestamp="20260902T184905-0700"?>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                        <?oxy_insert_end?>
+                    </row>
+                    <row>
+                        <entry><?oxy_insert_start author="dwrob" timestamp="20260902T185137-0700"?>replica4<?oxy_insert_end?></entry>
+                        <?oxy_insert_start author="dwrob" timestamp="20260902T184905-0700"?>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                        <?oxy_insert_end?>
+                    </row>
+                    <row>
+                        <entry><?oxy_insert_start author="dwrob" timestamp="20260902T185138-0700"?>replica5<?oxy_insert_end?></entry>
+                        <?oxy_insert_start author="dwrob" timestamp="20260902T184905-0700"?>
+                        <entry/>
+                        <entry/>
+                        <entry/>
+                        <?oxy_insert_end?>
                     </row>
                 </tbody>
             </tgroup>
         </table>
         <section>
             <info>
-                <title>The Docker file tree</title>
+                <title>The test network file tree</title>
             </info>
             
             <para>The following <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://manpages.debian.org/bookworm/tree/tree.1.en.html">tree</link>
@@ -587,97 +767,255 @@
                     hosts</guilabel>.</para>
 
 
-        <programlisting>katzenpost/docker/voting_mixnet/
-|---<emphasis role="bold">auth1</emphasis>
-|   |---<emphasis role="bold">authority.toml</emphasis>
-|   |---identity.private.pem
-|   |---identity.public.pem
-|   |---katzenpost.log
-|   |---link.private.pem
-|   |---link.public.pem
-|   |---persistence.db
-|---<emphasis role="bold">auth2</emphasis>
-|   |---<emphasis role="bold">authority.toml</emphasis>
-|   |---identity.private.pem
-|   |---identity.public.pem
-|   |---katzenpost.log
-|   |---link.private.pem
-|   |---link.public.pem
-|   |---persistence.db
-|---<emphasis role="bold">auth3</emphasis>
-|   |---<emphasis role="bold">authority.toml</emphasis>
-|   |---identity.private.pem
-|   |---identity.public.pem
-|   |---katzenpost.log
-|   |---link.private.pem
-|   |---link.public.pem
-|   |---persistence.db
-|---client
-|   |---client.toml
-|---client2
-|   |---client.toml
-|---dirauth.alpine
-|---docker-compose.yml
-|---echo_server.alpine
-|---fetch.alpine
-|---<emphasis role="bold">gateway1</emphasis>
-|   |---identity.private.pem
-|   |---identity.public.pem
-|   |---katzenpost.log
-|   |---<emphasis role="bold">katzenpost.toml</emphasis>
-|   |---link.private.pem
-|   |---link.public.pem
-|   |---management_sock
-|   |---spool.db
-|   |---users.db
-|---memspool.alpine
-|---<emphasis role="bold">mix1</emphasis>
-|   |---identity.private.pem
-|   |---identity.public.pem
-|   |---katzenpost.log
-|   |---<emphasis role="bold">katzenpost.toml</emphasis>
-|   |---link.private.pem
-|   |---link.public.pem
-|---<emphasis role="bold">mix2</emphasis>
-|   |---identity.private.pem
-|   |---identity.public.pem
-|   |---katzenpost.log
-|   |---<emphasis role="bold">katzenpost.toml</emphasis>
-|   |---link.private.pem
-|   |---link.public.pem
-|---<emphasis role="bold">mix3</emphasis>
-|   |---identity.private.pem
-|   |---identity.public.pem
-|   |---katzenpost.log
-|   |---<emphasis role="bold">katzenpost.toml</emphasis>
-|   |---link.private.pem
-|   |---link.public.pem
-|---panda_server.alpine
-|---pigeonhole.alpine
-|---ping.alpine
-|---prometheus.yml
-|---proxy_client.alpine
-|---proxy_server.alpine
-|---running.stamp
-|---server.alpine
-|---<emphasis role="bold">servicenode1</emphasis>
-|   |---identity.private.pem
-|   |---identity.public.pem
-|   |---katzenpost.log
-|   |---<emphasis role="bold">katzenpost.toml</emphasis>
-|   |---link.private.pem
-|   |---link.public.pem
-|   |---management_sock
-|   |---map.storage
-|   |---memspool.13.log
-|   |---memspool.storage
-|   |---panda.25.log
-|   |---panda.storage
-|   |---pigeonHole.19.log
-|   |---proxy.31.log
-|---voting_mixnet</programlisting>
+        <programlisting>katzenpost/docker/voting_mixnet/ (running)
+
+│
+├── auth1
+│   ├── authority.toml
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   └── persistence.db
+├── auth2
+│   ├── authority.toml
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   └── persistence.db
+├── auth3
+│   ├── authority.toml
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   └── persistence.db
+├── client
+│   ├── client.toml
+│   └── thinclient.toml
+├── courier.alpine
+├── dirauth.alpine
+├── docker-compose.yml
+├── echo_server.alpine
+├── fetch.alpine
+├── gateway1
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── katzenpost.toml
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   ├── management_sock
+│   ├── selfcheck.toml
+│   └── spool.db
+├── kpclientd.alpine
+├── mix1
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── katzenpost.toml
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   └── selfcheck.toml
+├── mix2
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── katzenpost.toml
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   └── selfcheck.toml
+├── mix3
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── katzenpost.toml
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   └── selfcheck.toml
+├── mixnet-alpine
+├── proxy_client.alpine
+├── proxy_server.alpine
+├── replica1
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   ├── replica.483.private.pem
+│   ├── replica.483.public.pem
+│   ├── replica.484.private.pem
+│   ├── replica.484.public.pem
+│   ├── replica-boxes.db
+│   │   ├── 000002.log
+│   │   ├── CURRENT
+│   │   ├── LOCK
+│   │   ├── MANIFEST-000001
+│   │   └── OPTIONS-000003
+│   ├── replica-metadata.db
+│   │   ├── 000002.log
+│   │   ├── CURRENT
+│   │   ├── LOCK
+│   │   ├── MANIFEST-000001
+│   │   └── OPTIONS-000003
+│   ├── replica.toml
+│   └── selfcheck.toml
+├── replica2
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   ├── replica.483.private.pem
+│   ├── replica.483.public.pem
+│   ├── replica.484.private.pem
+│   ├── replica.484.public.pem
+│   ├── replica-boxes.db
+│   │   ├── 000002.log
+│   │   ├── CURRENT
+│   │   ├── LOCK
+│   │   ├── MANIFEST-000001
+│   │   └── OPTIONS-000003
+│   ├── replica-metadata.db
+│   │   ├── 000002.log
+│   │   ├── CURRENT
+│   │   ├── LOCK
+│   │   ├── MANIFEST-000001
+│   │   └── OPTIONS-000003
+│   ├── replica.toml
+│   └── selfcheck.toml
+├── replica3
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   ├── replica.483.private.pem
+│   ├── replica.483.public.pem
+│   ├── replica.484.private.pem
+│   ├── replica.484.public.pem
+│   ├── replica-boxes.db
+│   │   ├── 000002.log
+│   │   ├── CURRENT
+│   │   ├── LOCK
+│   │   ├── MANIFEST-000001
+│   │   └── OPTIONS-000003
+│   ├── replica-metadata.db
+│   │   ├── 000002.log
+│   │   ├── CURRENT
+│   │   ├── LOCK
+│   │   ├── MANIFEST-000001
+│   │   └── OPTIONS-000003
+│   ├── replica.toml
+│   └── selfcheck.toml
+├── replica4
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   ├── replica.483.private.pem
+│   ├── replica.483.public.pem
+│   ├── replica.484.private.pem
+│   ├── replica.484.public.pem
+│   ├── replica-boxes.db
+│   │   ├── 000002.log
+│   │   ├── CURRENT
+│   │   ├── LOCK
+│   │   ├── MANIFEST-000001
+│   │   └── OPTIONS-000003
+│   ├── replica-metadata.db
+│   │   ├── 000002.log
+│   │   ├── CURRENT
+│   │   ├── LOCK
+│   │   ├── MANIFEST-000001
+│   │   └── OPTIONS-000003
+│   ├── replica.toml
+│   └── selfcheck.toml
+├── replica5
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   ├── replica.483.private.pem
+│   ├── replica.483.public.pem
+│   ├── replica.484.private.pem
+│   ├── replica.484.public.pem
+│   ├── replica-boxes.db
+│   │   ├── 000002.log
+│   │   ├── CURRENT
+│   │   ├── LOCK
+│   │   ├── MANIFEST-000001
+│   │   └── OPTIONS-000003
+│   ├── replica-metadata.db
+│   │   ├── 000002.log
+│   │   ├── CURRENT
+│   │   ├── LOCK
+│   │   ├── MANIFEST-000001
+│   │   └── OPTIONS-000003
+│   ├── replica.toml
+│   └── selfcheck.toml
+├── replica.alpine
+├── running.stamp
+├── server.alpine
+├── servicenode1
+│   ├── courier
+│   │   ├── 23.courier.socket
+│   │   ├── courier.log
+│   │   ├── courier.toml
+│   │   ├── link.private.pem
+│   │   └── link.public.pem
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── katzenpost.toml
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   ├── management_sock
+│   ├── proxy.30.log
+│   └── selfcheck.toml
+├── servicenode2
+│   ├── courier
+│   │   ├── 23.courier.socket
+│   │   ├── courier.log
+│   │   ├── courier.toml
+│   │   ├── link.private.pem
+│   │   └── link.public.pem
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── katzenpost.toml
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   ├── management_sock
+│   ├── proxy.31.log
+│   └── selfcheck.toml
+├── servicenode3
+│   ├── courier
+│   │   ├── 23.courier.socket
+│   │   ├── courier.log
+│   │   ├── courier.toml
+│   │   ├── link.private.pem
+│   │   └── link.public.pem
+│   ├── identity.private.pem
+│   ├── identity.public.pem
+│   ├── katzenpost.log
+│   ├── katzenpost.toml
+│   ├── link.private.pem
+│   ├── link.public.pem
+│   ├── management_sock
+│   ├── proxy.30.log
+│   └── selfcheck.toml
+└── thinclient
+</programlisting>
         <para>Examples of complete TOML configuration files are provided in <link xlink:href="&baseURL;docs/admin_guide/docker-config-appendix.html"
                 >Appendix: Configuration files from the Docker test mixnet</link><!--<xref linkend="docker-config" endterm="docker-config.title"/>-->.</para>
         </section>
     </section>
 </article>
+<?oxy_options track_changes="on"?>
