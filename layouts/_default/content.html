@@ -1,4 +1,4 @@
-<div class="td-content">
+<div class="td-content{{ if in (slice "dirauth" "wireprotocol" "certificate") .Params.slug }} protocol-spec{{ end }}">
 	<h1>{{ .Title }}</h1>
 	{{ with .Params.description }}<div class="lead">{{ . | markdownify }}</div>{{ end }}
 	{{ with .Params.author -}}
