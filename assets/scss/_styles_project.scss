@@ -3,6 +3,272 @@
 /* Import Chroma monokai syntax highlighting */
 @import "chroma_monokai";
 
+/* Keep specification diagrams legible instead of scaling them to phone width. */
+.protocol-spec {
+    --directory-fill: #48351f;
+    --directory-stroke: #f3bd66;
+    --link-fill: #1c3c4c;
+    --link-stroke: #7acee9;
+    --local-fill: #34383d;
+    --local-stroke: #c3cbd5;
+    min-width: 0;
+    overflow-wrap: anywhere;
+
+    &.td-content :not(pre) > code {
+        white-space: normal;
+        overflow-wrap: anywhere;
+        color: inherit !important;
+        background-color: transparent !important;
+        font: inherit !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    h2[id], h3[id], h4[id], h5[id] {
+        scroll-margin-top: 8rem;
+    }
+
+    span[id^="r-"] {
+        scroll-margin-top: 8rem;
+    }
+
+    table:has(span[id^="r-"]) td:first-child {
+        white-space: nowrap;
+    }
+
+    a[href*="#r-"] {
+        white-space: nowrap;
+    }
+
+    .key-value-table {
+        table {
+            display: table;
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        th, td {
+            overflow-wrap: anywhere;
+        }
+
+        code {
+            white-space: normal;
+        }
+
+        th:nth-child(1) { width: 25%; }
+        th:nth-child(2) { width: 35%; }
+        th:nth-child(3) { width: 40%; }
+
+        table:has(span[id^="r-"]) {
+            th:nth-child(1) { width: 14%; }
+            th:nth-child(2) { width: 26%; }
+            th:nth-child(3) { width: 60%; }
+        }
+
+        @media (max-width: 575.98px) {
+            table, tbody { display: block; }
+
+            thead {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                overflow: hidden;
+                clip-path: inset(50%);
+                white-space: nowrap;
+            }
+
+            tbody tr {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                border-bottom: 1px solid #59616b;
+            }
+
+            td {
+                min-width: 0;
+                border: 0;
+            }
+
+            td:first-child { font-weight: 600; }
+
+            td:not(:first-child) {
+                padding-top: 0;
+            }
+        }
+    }
+
+    .protocol-tone-directory {
+        --diagram-fill: var(--directory-fill);
+        --diagram-accent: var(--directory-stroke);
+    }
+
+    .protocol-tone-link {
+        --diagram-fill: var(--link-fill);
+        --diagram-accent: var(--link-stroke);
+    }
+
+    .protocol-tone-local {
+        --diagram-fill: var(--local-fill);
+        --diagram-accent: var(--local-stroke);
+    }
+
+    .protocol-diagram, .protocol-example {
+        margin: 1rem 0;
+        border: 1px solid var(--local-stroke);
+        border-radius: 4px;
+        background: #1a1d22;
+        overflow: hidden;
+
+        .diagram-heading {
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid var(--local-stroke);
+            background: var(--local-fill);
+            color: #e6edf3;
+            text-align: left;
+            font: 600 16px sans-serif;
+
+            .diagram-title, .diagram-icons {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            img {
+                display: inline-block;
+                width: 32px;
+                height: 32px;
+                margin: 0;
+            }
+        }
+
+        .protocol-actor {
+            fill: var(--diagram-fill) !important;
+            stroke: var(--diagram-accent) !important;
+        }
+
+        .protocol-actor-label {
+            transform: translateY(12px);
+        }
+    }
+
+    .protocol-example .highlight, .protocol-example pre {
+        margin: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .diagram-scroll {
+        max-width: 100%;
+        overflow-x: auto;
+        margin: 0;
+
+        &:focus-visible {
+            outline: 2px solid $primary;
+            outline-offset: 2px;
+        }
+
+        pre.mermaid {
+            width: max-content;
+            min-width: 100%;
+            max-width: none !important;
+            margin: 0;
+            padding: 0.5rem !important;
+            overflow: visible;
+            border: 0 !important;
+
+            svg {
+                display: block;
+                margin-inline: auto;
+                max-width: none !important;
+
+                * {
+                    filter: none !important;
+                }
+
+                .node rect, .node polygon, .node circle, .node path,
+                .cluster rect, rect.actor, rect.note, rect.rect, .labelBox {
+                    stroke-width: 1.25px !important;
+                    vector-effect: non-scaling-stroke;
+                }
+
+                // Mermaid measures labels in this font. The site's monospace
+                // body font otherwise widens HTML labels after layout.
+                text, tspan, foreignObject * {
+                    font-family: sans-serif !important;
+                }
+
+                .node-badge::before {
+                    content: "";
+                    width: 32px;
+                    height: 32px;
+                    flex-shrink: 0;
+                    background: center / contain no-repeat;
+                    box-sizing: content-box;
+                    padding: 6px;
+                    border: 1px solid #7acee9;
+                    border-radius: 50%;
+                    background-color: #1c3c4c;
+                    background-size: 32px 32px;
+                }
+
+                .role-authority::before {
+                    background-image: url('/docs/specs/dirauth/icons/authority.svg');
+                }
+                .role-gateway::before {
+                    background-image: url('/docs/specs/dirauth/icons/gateway.svg');
+                }
+                .role-mix::before {
+                    background-image: url('/docs/specs/dirauth/icons/mix.svg');
+                }
+                .role-service::before {
+                    background-image: url('/docs/specs/dirauth/icons/service.svg');
+                }
+                .role-replica::before {
+                    background-image: url('/docs/specs/dirauth/icons/replica.svg');
+                }
+
+                .node-roster {
+                    --node-size: 124px;
+                    display: grid;
+                    grid-template-columns: repeat(2, var(--node-size));
+                    gap: 8px;
+                    margin-top: 8px;
+                }
+
+                .node-badge {
+                    display: inline-flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    width: var(--node-size);
+                    gap: 4px;
+                    white-space: nowrap;
+                }
+
+                .node-roster .node-badge:last-child:nth-child(odd) {
+                    grid-column: 1 / -1;
+                    justify-self: center;
+                }
+
+                .node-roster.authorities .node-badge::before {
+                    border-color: #f3bd66;
+                    background-color: #48351f;
+                }
+
+                foreignObject img {
+                    display: inline-block !important;
+                    width: 32px !important;
+                    height: 32px !important;
+                    max-width: 32px !important;
+                    margin: 0 !important;
+                }
+            }
+        }
+    }
+
+}
+
 
 /* Stylez */
 .h1,
