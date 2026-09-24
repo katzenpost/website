@@ -18,7 +18,17 @@ And then I'll discuss details about about the formalization.
 
 ## Sphinx Links
 
-* The original Sphinx cryptographic packet format paper: [Sphinx: A Compact and Provably Secure Mix Format](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf)
+* The original Sphinx paper: [Sphinx: A Compact and Provably Secure Mix Format](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf)
+
+Followup work by other researchers to improve Sphinx and specify stronger security properties:
+
+* [Breaking and (Partially) Fixing Provably Secure Onion Routing](https://arxiv.org/pdf/1910.13772)
+
+* [Provable Security for the Onion Routing and Mix Network Packet Format Sphinx](https://arxiv.org/pdf/2312.08028)
+
+
+
+Some of my contributions to Sphinx:
 
 * The Katzenpost Specification of the Sphinx packet format: https://katzenpost.network/docs/specs/sphinx/
 
@@ -26,16 +36,20 @@ And then I'll discuss details about about the formalization.
 
 * The Katzenpost Proverif model of KEM Sphinx: https://github.com/katzenpost/formal_specifications/blob/main/sphinx/kem_sphinx.passive.pv
 
+* The Katzenpost implementation of the Sphinx, originally written by Yawning Angel: https://github.com/katzenpost/katzenpost/tree/main/core/sphinx
+  I later added the KEM Sphinx variant and test vectors which are shared with the Lean implementation.
 
 
 ## Katzenpost's Post Quantum Sphinx
 
 In the Katzenpost mixnet project we use a golang implementation of the Sphinx packet format which is generic
-over a NIKE interface. This means we can use any NIKE (non-interactive key exchange) such as X25519 or X448.
-Our implementation can also use any KEM for the KEM Sphinx variant.
+over a NIKE interface. This means we can use any NIKE (non-interactive key exchange).
+Our implementation can also use any KEM (key encapsulation mechanism) for the KEM Sphinx variant.
 
 * https://github.com/katzenpost/katzenpost/tree/main/core/sphinx
 
+To be clear, both variations of Sphinx can be post quantum or hybrid post quantum combining classical and post quantum
+public key primitives together.
 
 
 ## HPQC: Katzenposts's hybrid post quantum cryptography library
@@ -45,14 +59,21 @@ Our implementation can also use any KEM for the KEM Sphinx variant.
 HPQC defines our KEM and NIKE golang interfaces which we use to genericize cryptographic protocols like Sphinx.
 One interesting contribution of HPQC is that we can use a NIKE combiner and a KEM combiner to make hybrid NIKEs and KEMs
 which mix classical and postquantum primitives together. Also HPQC has a NIKE to KEM adapter (hashed ElGamal construction)
-which allows us to combine a NIKE such as X25519 as if it were a KEM along with MLKEM.
+which allows us to combine a NIKE such as X25519 as if it were a KEM along with MLKEM. This helps us make hybrid KEMs
+by for example combining X25519 with a post quantum KEM such as MLKEM.
 
 
 
 ## The Crypt Walker Theorems
 
-A couple of years ago I chatted with Mario Carneiro on the Lean Zulip
-and asked him questions about modeling cryptography in Lean. At some point
+A couple of years ago I was very excited to be learning Lean. I started the Lean theorem prover meetup
+at the Noisebridge hacker space in San Francisco, which ran as a weekly study group.
+I was fortunate that some very smart people attended
+the study meetings because I was able to learn a lot from the group.
+
+The Lean community on the Lean Zulip was also very enthusiastic to answer my questions and help
+me when I got stuck. Several times I ended up chatting with Mario Carneiro on the Lean Zulip
+and asked him questions about program verification and modeling cryptography in Lean. At some point
 he posted a sort of minimal KEM type definition in Lean whose struct contains
 a proposition field with the KEM completeness theorem. It says that everything the KEM
 encapsulates can be decapsulated:
@@ -61,10 +82,13 @@ https://leanprover.zulipchat.com/#narrow/channel/236449-Program-verification/top
 
 At the time, I was considering that I didn't really want yet another symbolic modeler for cryptography
 because I was already using Proverif which works great and automates finding security flaws.
-So I wrote Lean implementations of a few constructions in HPQC including a NIKE to KEM adapter, the NIKE combiner, the KEM combiner.
-I was able to get help both in person at a Lean study meetup and on the Lean zulip when I had Lean programming questions.
-The Lean community is very friendly and very smart.
+Obviously if I used Lean's type theory to make a symbolic modeler for cryptography protocols, it wouldn't
+have any automated security analysis or any of the features that Proverif or Tamarin have for finding protocol information leaks etc.
 
+I didn't fully understand the implications of what Mario was showing me.
+It's so much more than a symbolic model but we'll come back to that shortly.
+
+So I wrote Lean implementations of a few constructions in HPQC including a NIKE to KEM adapter, the NIKE combiner, the KEM combiner.
 After about two years passed, I started working on CryptWalker again, at the Utrecht University Summer Lean Theorem Prover class.
 It was a 5 day Lean workshop with a couple of days devoted to the student chosen projects.
 I was able to write theorems about the HPQC constructs that said:
@@ -78,7 +102,7 @@ And then I wrote a theorem that said:
 
 
 
-## Proclivity Towards Dependent Types
+##  Towards A Dependent Type Proclivity
 
 Instead of writing a struct type definition and then separate thereoms,
 I realized that some of the theorems about a given cryptographic primitive can be placed inside the type's struct field
@@ -87,7 +111,7 @@ a thereom that says the group operation is commutative. That's the whole point o
 commutative and therefore both parties can computate the same shared secret by different means, e.g. g^x^y = g^y^x
 
 Likewise I make a completeness proposition field for the KEM type that says the KEM can always depcapsulate whatever it encapsulates.
-Once the NIKE to KEm adapter is wired to use these new types there is no longer any need to write the following theorem:
+Once the NIKE to KEM adapter is wired to use these new types there is no longer any need to write the following theorem:
 
 * Given a lawful NIKE, the NIKE to KEM adapter (hashed ElGamal construction) produces a lawful KEM.
 
@@ -95,7 +119,7 @@ It's no longer needed because the type system prevents a NIKE implementation fro
 Likewise, all KEM instances must satisfy the completeness theorem built into the KEM type, in the struct's proposition field.
 To be clear, these type proposition fields are in fact proof obligations for all type instances of NIKE and KEM.
 HOWEVER, the tradeoff is that now we get a type system gaurantee that the rules of the type cannot be violated and only
-valid type instances can ever be expressed in Lean.
+valid type instances can ever be expressed.
 
 
 
@@ -115,9 +139,9 @@ were reduced and greatly simplified!
 
 I proceeded to development this Sphinx formalization in Lean in roughly 4 phases:
 
-1. Implement Sphinx is a static cryptographic construction with specific primitives.
+1. Implement Sphinx as a static cryptographic construction with specific primitives.
 2. Try to prove the 4 security properties from the Sphinx paper: fail because the proofs involve too much complexity from the individual cryptographic primitive funtions.
-3. Rewrite our Lean language Sphinx construction to use generic depedent types representing each cryptographic function in the construction: NIKE/KEM, Stream Cipher, KDF, MAC, Wide-block Cipher.
+3. Rewrite our Lean language Sphinx construction to use generic dependent types representing each cryptographic function in the construction: NIKE/KEM, Stream Cipher, KDF, MAC, Wide-block Cipher.
 4. Try to prove the 4 security properties from the Sphinx paper: Success!
 
 In other words, when trying to prove the security properties of the static Sphinx construction using for example the AEZ block cipher
@@ -302,12 +326,26 @@ structure KEMSphinxScheme extends CryptWalker.Sphinx.Interface.Sphinx where
     fun key iv target => xorBytes_achieves_any_target (stream.keystream key iv target.size) target
 ```
 
+
+
 ## Sphinx Considerations
 
-I honestly can't think of a reason why Sphinx wrap-resistance would be useful.
+The reason we have the two sub types NIKESphinxScheme and KEMSphinxScheme is because we wanted
+to embed all the security properties into struct proposition fields, and since the Sphinx wrap-resistance property
+only applies to NIKE Sphinx we therefore needed two Sphinx types to work with.
+
+I can't think of a reason why Sphinx wrap-resistance would be useful.
+
 But I'm biased because I usually only think about Sphinx as it is used with the Katzenpost mixnet.
 KEM Sphinx doesn't get the wrap-resistance properties and that's fine.
 But KEM Sphinx does have a huge downside. It has a large bandwidth overhead with one KEM ciphertext per hop.
+
+
+
+
+## Conclusion: dependent types for the win
+
+It turns out that dependent types are great for writing cryptography libraries!
 
 
 
