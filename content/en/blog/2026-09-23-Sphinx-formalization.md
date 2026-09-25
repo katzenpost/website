@@ -26,6 +26,15 @@ Followup work by other researchers to improve Sphinx and specify stronger securi
 
 * [Provable Security for the Onion Routing and Mix Network Packet Format Sphinx](https://arxiv.org/pdf/2312.08028)
 
+* EROR (ePrint 2024/020)
+
+* Onion Routing with Replies (ePrint 2021/1178) / ASIACRYPT version
+
+* Outfox (arXiv 2412.19937) / academia.edu copy
+
+* OmniSphinx (arXiv 2608.13008)
+
+* Improving the Sphinx Mix Network
 
 
 Some of my contributions to Sphinx:
