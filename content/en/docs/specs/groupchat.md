@@ -510,23 +510,28 @@ current group member has acknowledged it — its plaintext.
   exceeding one replica epoch, so that a member who never acknowledges (an
   old client, or one that has permanently left) cannot oblige every other
   member to retain records indefinitely.
-- **Backfill.** On recognising an acknowledgement of one of its own boxes, a
-  stream owner rewrites — at the same index, with the same plaintext —
-  every later box it still holds a record for. Pigeonhole writes are
-  content-idempotent (rewriting a box that still holds the same content is
-  accepted, not rejected; see "Append-only and immutable" in "Understanding
-  Pigeonhole"), and BACAP's per-box encryption is deterministic (§4 of the
-  Echomix paper), so rewriting a surviving box is a harmless no-op, while
-  rewriting a box the replicas have garbage-collected restores it. This is
-  the mechanism by which a stream, whose storage is otherwise ephemeral, is
-  kept available for as long as the group continues to acknowledge it.
+- **Backfill.** A stream owner rewrites — at the same index, with the same
+  plaintext, or as a tombstone once no active member still needs it
+  (Retention, above) — every box it still holds a record of (Sent-box
+  records, above). Pigeonhole writes are content-idempotent (rewriting a box
+  that still holds the same content is accepted, not rejected; see
+  "Append-only and immutable" in "Understanding Pigeonhole"), and BACAP's
+  per-box encryption is deterministic (§4 of the Echomix paper), so
+  rewriting a surviving box is a harmless no-op, while rewriting a box the
+  replicas have garbage-collected restores it. This is the mechanism by
+  which a stream, whose storage is otherwise ephemeral, is kept available for
+  as long as the stream owner retains a record of it, independent of
+  whether, or how often, anyone has acknowledged it. What actually triggers
+  a rewrite — a periodic, unconditional refresh run on the stream owner's
+  own schedule — is described in "Optimistic resync" below; receiving an
+  acknowledgement does not itself trigger one.
 - **Rate-limiting the rewrite.** A rewrite is only useful once per replica
   epoch, since a box cannot be garbage-collected — and so cannot need
   restoring — more often than that. Implementations SHOULD NOT rewrite the
-  same box more than once within a given replica epoch, however many
-  acknowledgements name it, bounding the mixnet traffic a chatty or replayed
-  acknowledgement can cause to a small, fixed multiple of the stream's own
-  size, once per epoch, independent of how many acknowledgements arrive.
+  same box more than once within a given replica epoch, however often the
+  periodic refresh considers it, bounding the mixnet traffic backfill costs
+  to a small, fixed multiple of the stream's own size, once per epoch,
+  independent of how frequently that refresh runs.
 
 </div>
 
@@ -548,13 +553,17 @@ current group member has acknowledged it — its plaintext.
 
 </div>
 
-Backfill, above, is reactive: it triggers only on receiving an
-acknowledgement naming a box. Two members each stalled behind a gap in the
-other's stream can never trigger it for one another, since neither can read
-far enough on the other's stream to produce a fresh acknowledgement in the
-first place. Optimistic resync removes that dependency, on both ends, using
-nothing beyond what is already used elsewhere in this specification and in
-"Understanding Pigeonhole".
+Backfill, above, already runs independent of acknowledgement: a stream
+owner's periodic refresh (below) rewrites every box it still holds a record
+of on its own schedule, whether or not, or how promptly, anyone
+acknowledges anything. That alone keeps a stream owner's own positions
+populated even when every reader is stalled. It is not, on its own, enough
+to resynchronise a pair of members each stalled behind a gap in the other's
+stream: each one's positions being kept populated does nothing for a reader
+that is still waiting on the one gap in front of it and has no reason to
+look any further. Optimistic resync's other half addresses exactly that,
+using nothing beyond what is already used elsewhere in this specification
+and in "Understanding Pigeonhole".
 
 <div class="orderedlist">
 
