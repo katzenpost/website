@@ -493,10 +493,13 @@ type GroupChatMessage struct {
 
 </div>
 
-**Sent-box records.** To make use of an acknowledgement, a stream owner is
-expected to keep, for every box it has written to its own stream, a record of
-that box's `MessageBoxIndex`, its position in write order, and — until every
-current group member has acknowledged it — its plaintext.
+**Sent-box records.** Making use of an acknowledgement depends on a second,
+distinct kind of retention — not the replicas' own storage retention
+(Pigeonhole storage is ephemeral, above), which no client controls, but the
+stream owner's own client retaining, for every box it has written to its own
+stream, a record of that box's `MessageBoxIndex`, its position in write
+order, and — until every current group member has acknowledged it — its
+plaintext.
 
 <div class="itemizedlist">
 
@@ -510,28 +513,28 @@ current group member has acknowledged it — its plaintext.
   exceeding one replica epoch, so that a member who never acknowledges (an
   old client, or one that has permanently left) cannot oblige every other
   member to retain records indefinitely.
-- **Backfill.** A stream owner rewrites — at the same index, with the same
-  plaintext, or as a tombstone once no active member still needs it
-  (Retention, above) — every box it still holds a record of (Sent-box
-  records, above). Pigeonhole writes are content-idempotent (rewriting a box
-  that still holds the same content is accepted, not rejected; see
-  "Append-only and immutable" in "Understanding Pigeonhole"), and BACAP's
-  per-box encryption is deterministic (§4 of the Echomix paper), so
-  rewriting a surviving box is a harmless no-op, while rewriting a box the
-  replicas have garbage-collected restores it. This is the mechanism by
-  which a stream, whose storage is otherwise ephemeral, is kept available for
-  as long as the stream owner retains a record of it, independent of
-  whether, or how often, anyone has acknowledged it. What actually triggers
-  a rewrite — a periodic, unconditional refresh run on the stream owner's
-  own schedule — is described in "Optimistic resync" below; receiving an
-  acknowledgement does not itself trigger one.
+- **Backfill.** A stream owner keeps every box it still holds a record of
+  (Sent-box records, above) refreshed against garbage collection, for two
+  different reasons that happen to produce the same rewrite. A box no
+  active member has yet fully acknowledged is rewritten with its original
+  plaintext, in case garbage collection beat a slow member to it. A box
+  everyone has already acknowledged is instead rewritten as a tombstone —
+  not because the content is still needed, but because a position left to
+  quietly expire would later look, to a stalled reader, indistinguishable
+  from one never written at all (see "Optimistic resync" below). Either
+  rewrite is a harmless no-op against a box that survived and a restoration
+  against one garbage-collected, because Pigeonhole writes are
+  content-idempotent (see "Append-only and immutable" in "Understanding
+  Pigeonhole") and BACAP's per-box encryption is deterministic (§4 of the
+  Echomix paper). The trigger is always the periodic refresh described in
+  "Optimistic resync" below; receiving an acknowledgement never itself
+  causes a rewrite.
 - **Rate-limiting the rewrite.** A rewrite is only useful once per replica
   epoch, since a box cannot be garbage-collected — and so cannot need
   restoring — more often than that. Implementations SHOULD NOT rewrite the
   same box more than once within a given replica epoch, however often the
   periodic refresh considers it, bounding the mixnet traffic backfill costs
-  to a small, fixed multiple of the stream's own size, once per epoch,
-  independent of how frequently that refresh runs.
+  to a small, fixed multiple of the stream's own size.
 
 </div>
 
@@ -553,73 +556,65 @@ current group member has acknowledged it — its plaintext.
 
 </div>
 
-Backfill, above, already runs independent of acknowledgement: a stream
-owner's periodic refresh (below) rewrites every box it still holds a record
-of on its own schedule, whether or not, or how promptly, anyone
-acknowledges anything. That alone keeps a stream owner's own positions
-populated even when every reader is stalled. It is not, on its own, enough
-to resynchronise a pair of members each stalled behind a gap in the other's
-stream: each one's positions being kept populated does nothing for a reader
-that is still waiting on the one gap in front of it and has no reason to
-look any further. Optimistic resync's other half addresses exactly that,
-using nothing beyond what is already used elsewhere in this specification
-and in "Understanding Pigeonhole".
+The periodic refresh that makes backfill (above) possible is also the
+stream owner's half of resynchronising two members each stalled behind a
+gap in the other's stream; the reader's half is a stall detector and a
+scan. Together they need nothing beyond what is already used elsewhere in
+this specification and in "Understanding Pigeonhole".
 
 <div class="orderedlist">
 
-1.  **Stream owner: periodic, unconditional refresh.** Independent of
-    whether any acknowledgement has ever been received, a stream owner
-    periodically — well within a replica epoch — rewrites every box it still
-    holds a record of (Sent-box records, above), subject to the same
-    once-per-epoch limit backfill already observes. A box whose plaintext
-    has already been discarded (every acknowledging member's floor has
-    passed it) is instead rewritten as a tombstone — an empty, signed
-    payload, unconditionally accepted as an overwrite — rather than with its
-    original content, since nobody who still needs it remains to be served;
-    this keeps the position occupied without indefinitely retaining
-    plaintext nobody needs. Either way, every position in the stream owner's
-    stream stays populated rather than falling silently absent, however long
-    any given reader has been stalled and whatever it has or has not
-    acknowledged.
+1.  **Stream owner: periodic refresh.** Well within a replica epoch, a
+    stream owner re-examines every box in Sent-box records (above) and,
+    subject to the once-per-epoch limit above, rewrites whichever are due —
+    real content or a tombstone, exactly as Backfill (above) determines —
+    independent of whether, or how promptly, anyone has acknowledged
+    anything. Every position in the stream stays populated, however long
+    any reader has been stalled.
 
-2.  **Reader: stall detection and forward scan.** A reader unable to advance
-    past the same expected next box for longer than a bound (comfortably
-    under a replica epoch, so the owner's refresh above has had a chance to
-    run at least once) stops waiting on that one position and instead scans
-    forward: it advances its own expected position past the stalled one —
-    BACAP index derivation needs no network round trip and no knowledge of
-    what, if anything, has been written at a position to compute the
-    position that follows it (§4 of the Echomix paper) — and asks, for each
-    successive position, whether reading it, without waiting out the
-    ordinary retry a genuinely-not-yet-written box invites, yields data, a
-    tombstone, or `BoxIDNotFound`:
+2.  **Reader: stall detection and scan.** A reader unable to advance past
+    the same expected next box for longer than a bound (comfortably under a
+    replica epoch, so the refresh above has had a chance to run) stops
+    waiting there and looks both ways. It rechecks a short trailing window
+    of positions it has already passed, using index values retained from
+    when it read them — a BACAP index is a KDF ratchet state, so it can
+    only be advanced, never recovered backward (§4 of the Echomix paper),
+    which is why revisiting one requires having kept it; this catches, for
+    instance, a box a replica had not finished replicating on an earlier
+    attempt. It also scans forward past the stalled position: deriving each
+    next index from the last needs no network round trip and no knowledge
+    of what, if anything, was written there, so the reader can keep
+    deriving positions and asking, for each, without waiting out the
+    ordinary retry a genuinely-not-yet-written box invites, whether it holds
+    data, a tombstone, or nothing:
 
     <div class="itemizedlist">
 
-    - Data is a genuine message the reader had not yet received (perhaps
-      very old); it is processed as any other message would be, and the
-      scan continues past it.
-    - A tombstone confirms something was once written at that position —
-      either real content every current member already has, or a
-      placeholder the owner's refresh maintains — and the scan continues
-      past it, with nothing to process.
-    - `BoxIDNotFound` is the true current end of the stream: nothing has
-      ever been written there, and the reader resumes ordinary reading from
-      that position.
+    - Data is a genuine message the reader had not yet received; it is
+      processed as any other message would be, and the scan continues past
+      it.
+    - A tombstone confirms something was once written there — real content
+      everyone already has, or a placeholder the refresh above maintains —
+      and the scan continues past it.
+    - `BoxIDNotFound` is the true current end of the stream: adopt this
+      position as the new expected next box, clear the stall, and resume
+      ordinary reading.
 
     </div>
 
 </div>
 
-A pair of members each stalled behind the other therefore resynchronise
-without either side ever needing to send a fresh acknowledgement: each one's
-own stream stays populated by its own periodic refresh, and each one's own
-stall eventually triggers its own forward scan past the other's gap.
-
-This does not repair every possible loss: if both members' relevant records
-have themselves aged out of retention (Sent-box records, above) before
-either side's refresh or scan has run, there is nothing left for either side
-to find.
+Two members each stalled behind the other therefore resynchronise without
+either side ever needing to send a fresh acknowledgement: each one's own
+stream stays populated by its own refresh, and each one's own stall
+eventually triggers its own scan past the other's gap. As long as each side
+comes back online at least once per replica epoch, recovery always
+eventually completes: the refresh never lets a position go a full epoch
+unrefreshed, so garbage collection never gets ahead of it. The Sent-box
+retention window (Sent-box records, above; comfortably longer than a
+replica epoch) is not a limit on this — it exists only so that a member who
+has stopped coming back at all, ever, is eventually forgotten rather than
+held onto forever.
 
 </div>
 
