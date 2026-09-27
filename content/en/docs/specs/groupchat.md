@@ -456,40 +456,47 @@ type GroupChatMessage struct {
     Who *Who
     ReplyWho *ReplyWho
 
-    // Acks lists the BACAP MessageBoxIndex of the furthest box this
-    // sender has newly read on each other member's stream since it
-    // last acknowledged one. See "Opportunistic acknowledgements and
-    // backfill".
-    Acks [][]byte
+    // Acks maps an acknowledged member's channel id -- the 32-byte
+    // public-key prefix of that member's read cap -- to the BACAP
+    // MessageBoxIndex of the furthest box this sender has newly read on
+    // that member's stream since it last acknowledged one. See
+    // "Opportunistic acknowledgements and backfill".
+    Acks map[[32]byte][]byte
 }
 ```
 
 <div class="itemizedlist">
 
-- Each entry is a bare `MessageBoxIndex` (the 104-byte BACAP position value
-  used elsewhere to address a box; see BACAP in §4 of the Echomix paper) —
-  nothing else. No further label is carried, deliberately:
-
-  <div class="itemizedlist">
-
-  - The identity of the acknowledging member follows from which member's own
-    stream the acknowledging message was itself read from. There is no
-    broadcast channel in this design; every message already arrives
-    attributed to its sender by the stream it was read on.
-  - The identity of the acknowledged stream follows from the value itself.
-    A `MessageBoxIndex` addresses one and only one position on one specific
-    stream's BACAP ratchet, so a recipient recognises an entry as being
-    "about me" simply by finding it, byte for byte, among the boxes it has
-    itself written. An entry matching nothing a recipient has written is,
-    from that recipient's point of view, addressed to some other member,
-    and is otherwise ignored.
-
-  </div>
-
+- Each key is a member's **channel id**: the 32-byte public-key prefix of
+  that member's read cap — the same prefix `MembershipHash` (above) is
+  computed over, and the same prefix a repeated handshake is matched
+  against to recognise it as the same member, not a new one. It is stable
+  across the index-mutation variants of a single member's cap (a joiner's
+  original cap, the salt-mutated cap the group holds, any future-only cap
+  issued later all share it), unlike the cap's own index suffix, which
+  changes on every mutation. A stream owner recognises an acknowledgement
+  of its own stream with one lookup: does its own channel id appear as a
+  key.
+- Each value is the raw `MessageBoxIndex` (the 104-byte BACAP position
+  value used elsewhere to address a box; see BACAP in §4 of the Echomix
+  paper) — nothing else — naming the furthest box newly read on that
+  member's stream.
+- The identity of the *acknowledging* member (as against the acknowledged
+  one, above) still follows from which member's own stream the
+  acknowledging message was itself read from: there is no broadcast
+  channel in this design, so a message already arrives attributed to its
+  sender by the stream it was read on, whatever channel ids its `Acks`
+  keys name.
+- A channel id is not secret — every member holds every other member's read
+  cap, in order to read their stream in the first place — so a stream
+  owner still checks a claimed index against its own Sent-box records
+  (below) before acting on it: an index that matches nothing the owner
+  actually wrote is ignored, the same as a stale or forged claim would be.
 - Because BACAP reading is sequential, acknowledging a stream's Nth box
   implies every earlier box on that stream has already been read too; a
-  conforming implementation therefore need include, per acknowledged stream,
-  only the single highest index newly read since its last acknowledgement.
+  conforming implementation therefore need include, per acknowledged
+  stream, only the single highest index newly read since its last
+  acknowledgement.
 
 </div>
 
