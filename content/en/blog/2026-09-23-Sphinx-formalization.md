@@ -314,8 +314,8 @@ structure Sphinx where
 Notice that `wrap` and `newSURB` take no filler argument. Earlier versions took the filler for unused hops
 from the caller, and nothing in the type stopped a caller from passing zeros. That is exactly the path length leak
 found in the "Breaking and (Partially) Fixing" paper above: a recognizable padding pattern tells the last mix how
-long the path was. The Katzenpost golang implementation already fills these bytes with randomness. In
-[CryptWalker PR #19](https://github.com/katzenpost/CryptWalker/pull/19) the Lean `wrap` draws the filler from its
+long the path was. The Katzenpost golang implementation already fills these bytes with randomness. The Lean
+`wrap` draws the filler from its
 own random `State` instead, so a zero filler can no longer be expressed. That's the dependent type thesis again:
 fix it in the type, and every instance gets the fix.
 
