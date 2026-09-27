@@ -419,11 +419,15 @@ The `Invitation` protocol flow works as follows.
 Pigeonhole storage is ephemeral: a box survives for roughly one to two weeks
 before the replicas garbage-collect it (see "Ephemeral" in
 <a href="/docs/pigeonhole_explained" class="link" target="_top">Understanding
-Pigeonhole</a>). Because BACAP reading is sequential, a reader missing one
-box on a member's stream cannot make progress reading any later box on that
-stream either, even though later boxes may still be stored. Nothing
-described so far in this specification repairs that gap once it has
-occurred.
+Pigeonhole</a>). A reader is, of course, always free to advance past a
+position it cannot yet fill and check further ahead instead of waiting there
+indefinitely — deriving the position that follows one needs no knowledge of
+what, if anything, was written at it (see "Optimistic resync" below). But
+doing so cannot recover what was actually written at the position it
+skipped: once a box has been garbage-collected, its content survives nowhere
+but in its author's own memory of having written it. Reading past a gap is
+therefore not the same as closing it. Nothing described so far in this
+specification restores a box's content once it is gone.
 
 <div class="itemizedlist">
 
