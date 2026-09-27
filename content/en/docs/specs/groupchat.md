@@ -408,6 +408,285 @@ The `Invitation` protocol flow works as follows.
 
 <div>
 
+### <span id="opportunistic_acks"></span>Opportunistic acknowledgements and backfill
+
+</div>
+
+</div>
+
+</div>
+
+Pigeonhole storage is ephemeral: a box survives for roughly one to two weeks
+before the replicas garbage-collect it (see "Ephemeral" in
+<a href="/docs/pigeonhole_explained" class="link" target="_top">Understanding
+Pigeonhole</a>). Because BACAP reading is sequential, a reader missing one
+box on a member's stream cannot make progress reading any later box on that
+stream either, even though later boxes may still be stored. Nothing
+described so far in this specification repairs that gap once it has
+occurred.
+
+<div class="itemizedlist">
+
+- **Opportunistic acknowledgement.** Whenever a member sends any message to
+  the group, for any of the reasons already described (`TextPayload`,
+  `FileUpload`, `Introduction`, a `Who` / `ReplyWho` exchange), it may also
+  carry, in the same message, an acknowledgement of the furthest box it has
+  newly read on any other member's stream since it last acknowledged one.
+  Acknowledgements are never sent as messages of their own: a member that has
+  nothing else to say to the group has nothing to acknowledge either, and
+  simply says nothing.
+
+</div>
+
+`GroupChatMessage` gains a field to carry them:
+
+``` programlisting
+// GroupChatMessage encapsulates all chat message types.
+type GroupChatMessage struct {
+    Version int
+    MembershipHash *[32]byte
+
+    TextPayload *TextPayload
+    Introduction *Introduction
+    FileUpload *FileUpload
+    Who *Who
+    ReplyWho *ReplyWho
+
+    // Acks lists the BACAP MessageBoxIndex of the furthest box this
+    // sender has newly read on each other member's stream since it
+    // last acknowledged one. See "Opportunistic acknowledgements and
+    // backfill".
+    Acks [][]byte
+}
+```
+
+<div class="itemizedlist">
+
+- Each entry is a bare `MessageBoxIndex` (the 104-byte BACAP position value
+  used elsewhere to address a box; see BACAP in §4 of the Echomix paper) —
+  nothing else. No further label is carried, deliberately:
+
+  <div class="itemizedlist">
+
+  - The identity of the acknowledging member follows from which member's own
+    stream the acknowledging message was itself read from. There is no
+    broadcast channel in this design; every message already arrives
+    attributed to its sender by the stream it was read on.
+  - The identity of the acknowledged stream follows from the value itself.
+    A `MessageBoxIndex` addresses one and only one position on one specific
+    stream's BACAP ratchet, so a recipient recognises an entry as being
+    "about me" simply by finding it, byte for byte, among the boxes it has
+    itself written. An entry matching nothing a recipient has written is,
+    from that recipient's point of view, addressed to some other member,
+    and is otherwise ignored.
+
+  </div>
+
+- Because BACAP reading is sequential, acknowledging a stream's Nth box
+  implies every earlier box on that stream has already been read too; a
+  conforming implementation therefore need include, per acknowledged stream,
+  only the single highest index newly read since its last acknowledgement.
+
+</div>
+
+**Sent-box records.** To make use of an acknowledgement, a stream owner is
+expected to keep, for every box it has written to its own stream, a record of
+that box's `MessageBoxIndex`, its position in write order, and — until every
+current group member has acknowledged it — its plaintext.
+
+<div class="itemizedlist">
+
+- **Retention.** Once every other currently active group member has
+  acknowledged a box, or a later one, its plaintext is no longer needed for
+  delivery, since every current recipient already has it: an implementation
+  MAY discard the plaintext at that point while still remembering the box's
+  position, so that position can continue to be kept occupied (see
+  "Optimistic resync" below). A record MUST eventually be discarded outright,
+  regardless of acknowledgement, after a bounded retention window comfortably
+  exceeding one replica epoch, so that a member who never acknowledges (an
+  old client, or one that has permanently left) cannot oblige every other
+  member to retain records indefinitely.
+- **Backfill.** On recognising an acknowledgement of one of its own boxes, a
+  stream owner rewrites — at the same index, with the same plaintext —
+  every later box it still holds a record for. Pigeonhole writes are
+  content-idempotent (rewriting a box that still holds the same content is
+  accepted, not rejected; see "Append-only and immutable" in "Understanding
+  Pigeonhole"), and BACAP's per-box encryption is deterministic (§4 of the
+  Echomix paper), so rewriting a surviving box is a harmless no-op, while
+  rewriting a box the replicas have garbage-collected restores it. This is
+  the mechanism by which a stream, whose storage is otherwise ephemeral, is
+  kept available for as long as the group continues to acknowledge it.
+- **Rate-limiting the rewrite.** A rewrite is only useful once per replica
+  epoch, since a box cannot be garbage-collected — and so cannot need
+  restoring — more often than that. Implementations SHOULD NOT rewrite the
+  same box more than once within a given replica epoch, however many
+  acknowledgements name it, bounding the mixnet traffic a chatty or replayed
+  acknowledgement can cause to a small, fixed multiple of the stream's own
+  size, once per epoch, independent of how many acknowledgements arrive.
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="optimistic_resync"></span>Optimistic resync
+
+</div>
+
+</div>
+
+</div>
+
+Backfill, above, is reactive: it triggers only on receiving an
+acknowledgement naming a box. Two members each stalled behind a gap in the
+other's stream can never trigger it for one another, since neither can read
+far enough on the other's stream to produce a fresh acknowledgement in the
+first place. Optimistic resync removes that dependency, on both ends, using
+nothing beyond what is already used elsewhere in this specification and in
+"Understanding Pigeonhole".
+
+<div class="orderedlist">
+
+1.  **Stream owner: periodic, unconditional refresh.** Independent of
+    whether any acknowledgement has ever been received, a stream owner
+    periodically — well within a replica epoch — rewrites every box it still
+    holds a record of (Sent-box records, above), subject to the same
+    once-per-epoch limit backfill already observes. A box whose plaintext
+    has already been discarded (every acknowledging member's floor has
+    passed it) is instead rewritten as a tombstone — an empty, signed
+    payload, unconditionally accepted as an overwrite — rather than with its
+    original content, since nobody who still needs it remains to be served;
+    this keeps the position occupied without indefinitely retaining
+    plaintext nobody needs. Either way, every position in the stream owner's
+    stream stays populated rather than falling silently absent, however long
+    any given reader has been stalled and whatever it has or has not
+    acknowledged.
+
+2.  **Reader: stall detection and forward scan.** A reader unable to advance
+    past the same expected next box for longer than a bound (comfortably
+    under a replica epoch, so the owner's refresh above has had a chance to
+    run at least once) stops waiting on that one position and instead scans
+    forward: it advances its own expected position past the stalled one —
+    BACAP index derivation needs no network round trip and no knowledge of
+    what, if anything, has been written at a position to compute the
+    position that follows it (§4 of the Echomix paper) — and asks, for each
+    successive position, whether reading it, without waiting out the
+    ordinary retry a genuinely-not-yet-written box invites, yields data, a
+    tombstone, or `BoxIDNotFound`:
+
+    <div class="itemizedlist">
+
+    - Data is a genuine message the reader had not yet received (perhaps
+      very old); it is processed as any other message would be, and the
+      scan continues past it.
+    - A tombstone confirms something was once written at that position —
+      either real content every current member already has, or a
+      placeholder the owner's refresh maintains — and the scan continues
+      past it, with nothing to process.
+    - `BoxIDNotFound` is the true current end of the stream: nothing has
+      ever been written there, and the reader resumes ordinary reading from
+      that position.
+
+    </div>
+
+</div>
+
+A pair of members each stalled behind the other therefore resynchronise
+without either side ever needing to send a fresh acknowledgement: each one's
+own stream stays populated by its own periodic refresh, and each one's own
+stall eventually triggers its own forward scan past the other's gap.
+
+This does not repair every possible loss: if both members' relevant records
+have themselves aged out of retention (Sent-box records, above) before
+either side's refresh or scan has run, there is nothing left for either side
+to find.
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="disappearing_messages"></span>Disappearing messages
+
+</div>
+
+</div>
+
+</div>
+
+Backfill and resync, above, exist to keep a stream owner's own messages
+available for longer than Pigeonhole storage would otherwise guarantee.
+Disappearing messages is the same mechanism, deliberately pointed the other
+way: a stream owner may choose to actively shorten a message's life below
+what storage would otherwise allow, tombstoning it before replica garbage
+collection would have removed it regardless — trading the availability the
+mechanisms above work to preserve for an earlier, deliberate end to a
+message's life.
+
+This is a purely local, unilateral choice: like the read progress tracked
+elsewhere in this specification, it governs only what a member's own client
+does with its own outbound stream, and is never negotiated with, or binding
+on, any other member.
+
+Two policies are defined. An implementation offering this feature MUST
+support both, since they serve different intents and neither substitutes for
+the other:
+
+<div class="itemizedlist">
+
+- **Ack-gated.** A box is tombstoned, and then no longer retained even as a
+  placeholder for resync (above), once it, or a later box on the same
+  stream, has been acknowledged by every other currently active group
+  member — exactly the condition under which backfill's own retention
+  (above) would otherwise merely discard the plaintext and keep a
+  placeholder. This policy never destroys a box some active member has not
+  yet acknowledged; a slow or temporarily unreachable member only delays
+  deletion, never prevents it once they return.
+- **Age-fraction.** A box is tombstoned once an elapsed fraction `f` of the
+  replica epoch has passed since it was written, chosen by the sending
+  member, regardless of whether anyone has acknowledged it. Because this
+  policy can destroy a message no other member has yet read, that is a
+  deliberate consequence of choosing it, not an oversight.
+
+</div>
+
+`f` MUST be constrained to `0 <= f < 1`. This is not a matter of taste: a box
+written at replica-epoch time `t` cannot be garbage-collected by the
+replicas before slightly more than one full replica epoch has elapsed after
+`t`, however early or late within its own epoch `t` fell (see "Ephemeral" in
+"Understanding Pigeonhole"). A retention shorter than one full replica epoch
+— any `f < 1` — therefore always tombstones before replica garbage
+collection could have removed the box regardless; `f >= 1` offers no such
+guarantee, and can lose that race, defeating the entire purpose of choosing
+this policy over simply waiting for storage to expire on its own.
+
+Which message types a disappearing-message policy applies to — ordinary chat
+content, as against membership or protocol messages such as `Introduction`
+or `ReplyWho`, whose loss could affect other members' view of the group — is
+left to be settled by implementations for now, rather than fixed here.
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
 ### <span id="d58e246"></span>Addenda
 
 </div>
