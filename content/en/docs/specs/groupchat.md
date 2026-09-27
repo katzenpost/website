@@ -579,10 +579,15 @@ this specification and in "Understanding Pigeonhole".
     anything. Every position in the stream stays populated, however long
     any reader has been stalled.
 
-2.  **Reader: stall detection and scan.** A reader unable to advance past
-    the same expected next box for longer than a bound (comfortably under a
-    replica epoch, so the refresh above has had a chance to run) stops
-    waiting there and looks both ways. It rechecks a short trailing window
+2.  **Reader: stall detection and scan.** Ordinary reading already retries
+    the expected next box on its own paced cadence; there is no separate
+    clock to consult, only genuine attempts. The first such attempt to come
+    back not-found marks the start of a stall. Every later retry that also
+    comes back not-found checks how long that has been going on: short of a
+    bound (comfortably under a replica epoch, so the refresh above has had
+    a chance to run), the reader simply keeps retrying as it always did;
+    once past it, the reader stops waiting on that one position alone and
+    looks both ways instead. It rechecks a short trailing window
     of positions it has already passed, using index values retained from
     when it read them — a BACAP index is a KDF ratchet state, so it can
     only be advanced, never recovered backward (§4 of the Echomix paper),
@@ -614,11 +619,11 @@ this specification and in "Understanding Pigeonhole".
 Item 2 is a small state machine with exactly three states:
 
 ``` programlisting
-Waiting --BoxIDNotFound--> Stalled --elapsed past threshold--> Scanning
-   ^                           |                                   |
-   |<------Data / Tombstone----+                                   |
-   |                                                                |
-   +<-----------------------BoxIDNotFound (the true frontier)-------+
+Waiting --BoxIDNotFound--> Stalled --BoxIDNotFound, past threshold--> Scanning
+   ^                           |     (else: self-loops on Stalled)          |
+   |<------Data / Tombstone----+                                           |
+   |                                                                        |
+   +<-----------------------BoxIDNotFound (the true frontier)---------------+
 
 (Scanning self-loops on Data and on Tombstone: each just advances the
 probe to the next position and stays in Scanning.)
@@ -629,7 +634,8 @@ probe to the next position and stays in Scanning.)
 | Waiting  | Data or Tombstone at the expected position | —              | Waiting    | advance the expected position by one (ingest a `Data` message)     |
 | Waiting  | `BoxIDNotFound` at the expected position   | first time     | Stalled    | record when the stall began                                        |
 | Stalled  | Data or Tombstone at the expected position | —              | Waiting    | advance the expected position; clear the recorded stall            |
-| Stalled  | time since the stall began                 | past the threshold | Scanning | reprobe the short trailing window behind; probe forward             |
+| Stalled  | `BoxIDNotFound` at the expected position, again | not yet past the threshold | Stalled | none: this retry was no different from any other, so far           |
+| Stalled  | `BoxIDNotFound` at the expected position, again | past the threshold | Scanning | reprobe the short trailing window behind; probe forward             |
 | Scanning | Data at a probed position                  | —              | Scanning   | ingest it; probe the next position forward                          |
 | Scanning | Tombstone at a probed position             | —              | Scanning   | probe the next position forward                                     |
 | Scanning | `BoxIDNotFound` at a probed position        | —              | Waiting    | adopt this position as the expected next box; clear the recorded stall |
