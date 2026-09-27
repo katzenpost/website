@@ -604,6 +604,34 @@ this specification and in "Understanding Pigeonhole".
 
 </div>
 
+Item 2 is a small state machine with exactly three states:
+
+``` programlisting
+Waiting --BoxIDNotFound--> Stalled --elapsed past threshold--> Scanning
+   ^                           |                                   |
+   |<------Data / Tombstone----+                                   |
+   |                                                                |
+   +<-----------------------BoxIDNotFound (the true frontier)-------+
+
+(Scanning self-loops on Data and on Tombstone: each just advances the
+probe to the next position and stays in Scanning.)
+```
+
+| State    | On                                 | Guard                | Next state | Effect                                                            |
+|----------|------------------------------------|-----------------------|------------|--------------------------------------------------------------------|
+| Waiting  | Data or Tombstone at the expected position | —              | Waiting    | advance the expected position by one (ingest a `Data` message)     |
+| Waiting  | `BoxIDNotFound` at the expected position   | first time     | Stalled    | record when the stall began                                        |
+| Stalled  | Data or Tombstone at the expected position | —              | Waiting    | advance the expected position; clear the recorded stall            |
+| Stalled  | time since the stall began                 | past the threshold | Scanning | reprobe the short trailing window behind; probe forward             |
+| Scanning | Data at a probed position                  | —              | Scanning   | ingest it; probe the next position forward                          |
+| Scanning | Tombstone at a probed position             | —              | Scanning   | probe the next position forward                                     |
+| Scanning | `BoxIDNotFound` at a probed position        | —              | Waiting    | adopt this position as the expected next box; clear the recorded stall |
+
+The backward reprobe on entering Scanning is a one-time side check, not a
+state of its own: whatever it turns up (nothing, or a previously missed
+box) is ingested the same way ordinary reading would, and does not affect
+which of the table's transitions fires.
+
 Two members each stalled behind the other therefore resynchronise without
 either side ever needing to send a fresh acknowledgement: each one's own
 stream stays populated by its own refresh, and each one's own stall
