@@ -416,29 +416,25 @@ The `Invitation` protocol flow works as follows.
 
 </div>
 
-Pigeonhole storage is ephemeral: a box survives for roughly one to two weeks
-before the replicas garbage-collect it (see "Ephemeral" in
+Pigeonhole storage is ephemeral: a box survives roughly one to two weeks
+before replicas garbage-collect it (see "Ephemeral" in
 <a href="/docs/pigeonhole_explained" class="link" target="_top">Understanding
-Pigeonhole</a>). A reader is, of course, always free to advance past a
-position it cannot yet fill and check further ahead instead of waiting there
-indefinitely — deriving the position that follows one needs no knowledge of
-what, if anything, was written at it (see "Refresh and scan" below). But
-doing so cannot recover what was actually written at the position it
-skipped: once a box has been garbage-collected, its content survives nowhere
-but in its author's own memory of having written it. Reading past a gap is
-therefore not the same as closing it. Nothing described so far in this
-specification restores a box's content once it is gone.
+Pigeonhole</a>). A reader can always skip a position it cannot fill and
+check further ahead — deriving the next position needs no knowledge of
+what, if anything, is at the current one (see "Refresh and scan" below) —
+but that cannot recover what was actually written there: once
+garbage-collected, a box's content survives only in its author's memory of
+writing it. Reading past a gap is not the same as closing it; nothing so
+far in this specification restores lost content.
 
 <div class="itemizedlist">
 
-- **Opportunistic acknowledgement.** Whenever a member sends any message to
-  the group, for any of the reasons already described (`TextPayload`,
-  `FileUpload`, `Introduction`, a `Who` / `ReplyWho` exchange), it may also
-  carry, in the same message, an acknowledgement of the furthest box it has
-  newly read on any other member's stream since it last acknowledged one.
-  Acknowledgements are never sent as messages of their own: a member that has
-  nothing else to say to the group has nothing to acknowledge either, and
-  simply says nothing.
+- **Opportunistic acknowledgement.** Any message a member sends to the group
+  — `TextPayload`, `FileUpload`, `Introduction`, a `Who` / `ReplyWho`
+  exchange — may also carry an acknowledgement of the furthest box it has
+  newly read on another member's stream since it last acknowledged one.
+  Acknowledgements are never sent on their own: a member with nothing else
+  to say has nothing to acknowledge either.
 
 </div>
 
@@ -468,80 +464,69 @@ type GroupChatMessage struct {
 <div class="itemizedlist">
 
 - Each key is a member's **channel id**: the 32-byte public-key prefix of
-  that member's read cap — the same prefix `MembershipHash` (above) is
-  computed over, and the same prefix a repeated handshake is matched
-  against to recognise it as the same member, not a new one. It is stable
-  across the index-mutation variants of a single member's cap (a joiner's
-  original cap, the salt-mutated cap the group holds, any future-only cap
-  issued later all share it), unlike the cap's own index suffix, which
-  changes on every mutation. A stream owner recognises an acknowledgement
-  of its own stream with one lookup: does its own channel id appear as a
-  key.
+  that member's read cap — the same prefix `MembershipHash` (above) hashes,
+  and the same one a repeated handshake matches to recognise the same
+  member rather than a new one. It stays stable across every
+  index-mutation variant of a member's cap (original, salt-mutated,
+  future-only), unlike the cap's own index suffix. A stream owner
+  recognises its own acknowledgement with one lookup: is its own channel id
+  a key.
 - Each value is the raw `MessageBoxIndex` (the 104-byte BACAP position
-  value used elsewhere to address a box; see BACAP in §4 of the Echomix
-  paper) — nothing else — naming the furthest box newly read on that
-  member's stream.
-- The identity of the *acknowledging* member (as against the acknowledged
-  one, above) still follows from which member's own stream the
-  acknowledging message was itself read from: there is no broadcast
-  channel in this design, so a message already arrives attributed to its
-  sender by the stream it was read on, whatever channel ids its `Acks`
-  keys name.
-- A channel id is not secret — every member holds every other member's read
-  cap, in order to read their stream in the first place — so a stream
-  owner still checks a claimed index against its own Sent-box records
-  (below) before acting on it: an index that matches nothing the owner
-  actually wrote is ignored, the same as a stale or forged claim would be.
+  value used elsewhere to address a box; §4 of the Echomix paper) —
+  nothing else — naming the furthest box newly read on that member's
+  stream.
+- The *acknowledging* member's identity (as against the acknowledged one,
+  above) still comes from which member's own stream carried the message:
+  with no broadcast channel in this design, a message already arrives
+  attributed to its sender, whatever channel ids its `Acks` keys name.
+- A channel id is not secret — every member already holds every other
+  member's read cap, to read their stream — so a stream owner still checks
+  a claimed index against its own Sent-box records (below): one matching
+  nothing it actually wrote is ignored, stale or forged alike.
 - Because BACAP reading is sequential, acknowledging a stream's Nth box
-  implies every earlier box on that stream has already been read too; a
-  conforming implementation therefore need include, per acknowledged
-  stream, only the single highest index newly read since its last
-  acknowledgement.
+  implies every earlier one has already been read; a conforming
+  implementation therefore need only include, per stream, the single
+  highest index newly read since its last acknowledgement.
 
 </div>
 
 **Sent-box records.** Making use of an acknowledgement depends on a second,
-distinct kind of retention — not the replicas' own storage retention
+distinct kind of retention — not the replicas' storage retention
 (Pigeonhole storage is ephemeral, above), which no client controls, but the
-stream owner's own client retaining, for every box it has written to its own
-stream, a record of that box's `MessageBoxIndex`, its position in write
-order, and — until every current group member has acknowledged it — its
-plaintext.
+stream owner's own client keeping, for every box it has written, a record
+of its `MessageBoxIndex`, its write-order position, and — until every
+current member has acknowledged it — its plaintext.
 
 <div class="itemizedlist">
 
-- **Retention.** Once every other currently active group member has
-  acknowledged a box, or a later one, its plaintext is no longer needed for
-  delivery, since every current recipient already has it: an implementation
-  MAY discard the plaintext at that point while still remembering the box's
-  position, so that position can continue to be kept occupied (see
-  "Refresh and scan" below). A record MUST eventually be discarded outright,
-  regardless of acknowledgement, after a bounded retention window comfortably
-  exceeding one replica epoch, so that a member who never acknowledges (an
-  old client, or one that has permanently left) cannot oblige every other
-  member to retain records indefinitely.
-- **Backfill.** A stream owner keeps every box it still holds a record of
-  (Sent-box records, above) refreshed against garbage collection, for two
-  different reasons that happen to produce the same rewrite. A box no
-  active member has yet fully acknowledged is rewritten with its original
-  plaintext, in case garbage collection beat a slow member to it. A box
-  everyone has already acknowledged is instead rewritten as a tombstone —
-  not because the content is still needed, but because a position left to
-  quietly expire would later look, to a stalled reader, indistinguishable
-  from one never written at all (see "Refresh and scan" below). Either
-  rewrite is a harmless no-op against a box that survived and a restoration
-  against one garbage-collected, because Pigeonhole writes are
-  content-idempotent (see "Append-only and immutable" in "Understanding
-  Pigeonhole") and BACAP's per-box encryption is deterministic (§4 of the
-  Echomix paper). The trigger is always the periodic refresh described in
-  "Refresh and scan" below; receiving an acknowledgement never itself
-  causes a rewrite.
+- **Retention.** Once every other active member has acknowledged a box, or
+  a later one, its plaintext is no longer needed for delivery: an
+  implementation MAY discard it, while still remembering the box's
+  position so it stays occupied (see "Refresh and scan" below). A record
+  MUST eventually be discarded outright, regardless of acknowledgement,
+  after a bounded window comfortably exceeding one replica epoch, so a
+  member who never acknowledges — an old client, or one gone for good —
+  cannot force every other member to retain records forever.
+- **Backfill.** A stream owner keeps every box in its Sent-box records
+  refreshed against garbage collection, for two reasons that produce the
+  same rewrite. A box no active member has fully acknowledged is rewritten
+  with its original plaintext, in case garbage collection beat a slow
+  member to it. A box everyone has acknowledged is instead rewritten as a
+  tombstone — not because it's still needed, but because a position left
+  to expire would later look, to a reader, indistinguishable from one
+  never written (see "Refresh and scan" below). Either rewrite is
+  harmless: a no-op if the box survived, a restoration if it didn't,
+  because Pigeonhole writes are content-idempotent ("Append-only and
+  immutable" in "Understanding Pigeonhole") and BACAP's per-box encryption
+  is deterministic (§4, Echomix). The trigger is always the periodic
+  refresh in "Refresh and scan"; an acknowledgement never itself causes a
+  rewrite.
 - **Rate-limiting the rewrite.** A rewrite is only useful once per replica
-  epoch, since a box cannot be garbage-collected — and so cannot need
+  epoch, since a box can't be garbage-collected — and so can't need
   restoring — more often than that. Implementations SHOULD NOT rewrite the
-  same box more than once within a given replica epoch, however often the
-  periodic refresh considers it, bounding the mixnet traffic backfill costs
-  to a small, fixed multiple of the stream's own size.
+  same box more than once per epoch, however often the refresh considers
+  it, bounding backfill's mixnet traffic to a small, fixed multiple of the
+  stream's own size.
 
 </div>
 
@@ -563,69 +548,56 @@ plaintext.
 
 </div>
 
-The periodic refresh that makes backfill (above) possible is also the
-stream owner's half of resynchronising two members each stuck behind a gap
-in the other's stream. The reader's half is a scan — the same bidirectional
-probe described below — but, unlike the stream owner's refresh, nothing
-about when to run it can safely be decided by the client on its own.
+The periodic refresh that makes backfill possible is also the stream
+owner's half of resynchronising two members each stuck behind a gap in the
+other's stream. The reader's half is a scan — but, unlike the refresh, the
+client cannot safely decide on its own when to run it.
 
-Nothing observable from a reader's own side reliably distinguishes a stream
-that has simply gone quiet — its owner has nothing new to say, which is
-completely ordinary and can last indefinitely in a quiet group — from one
-stuck behind a position that was written and then garbage-collected before
-it was read: both look identical, forever, as the same repeated
-`BoxIDNotFound` reply to the same expected position, since that reply means
-"nothing has ever been written here" without saying whether that is because
-nothing has been written *yet* or because it once was and is now gone. No
-threshold on how long this has continued turns that ambiguity into reliable
-detection; a short one produces false positives (scanning a stream that was
-never actually stuck), a long one is merely slower to react to a real one,
-and no choice of it ever actually tells the reader which case it is in. An
-implementation MAY surface how long a stream has gone without progress as
-information for the user, but MUST NOT use it to trigger a scan
-automatically: that decision belongs to the user, made with context — how
-well they know the other member, other channels of contact, plain
-suspicion — that no protocol-level signal has access to. Concretely, a
-conforming client exposes a scan as something the user asks for (a menu
-item or equivalent), one stream at a time, rather than as a background
-behaviour.
+Nothing observable from a reader's side distinguishes a stream that has
+simply gone quiet — completely ordinary, and can last indefinitely — from
+one stuck behind a position that was written and then garbage-collected:
+both look identical, forever, as the same repeated `BoxIDNotFound`, which
+means only "nothing has ever been written here," not whether that's
+because nothing has been written *yet* or because it once was and is now
+gone. No threshold turns that ambiguity into reliable detection: a short
+one scans streams that were never stuck, a long one is merely slow to
+react to a real gap, and neither ever tells the reader which case it's in.
+An implementation MAY show the user how long a stream has gone quiet, but
+MUST NOT use that to trigger a scan itself: the decision is the user's,
+made with context — how well they know the other member, other contact,
+plain suspicion — that no protocol-level signal has. Concretely, a
+conforming client exposes a scan as something the user asks for, one
+stream at a time, not as a background behaviour.
 
 <div class="orderedlist">
 
 1.  **Stream owner: periodic refresh.** Well within a replica epoch, a
-    stream owner re-examines every box in Sent-box records (above) and,
-    subject to the once-per-epoch limit above, rewrites whichever are due —
-    real content or a tombstone, exactly as Backfill (above) determines —
-    independent of whether, or how promptly, anyone has acknowledged
-    anything, and independent of whether any reader has asked for a scan.
-    Every position in the stream stays populated, however long it has been
-    since a reader last looked.
+    stream owner re-examines every box in its Sent-box records and,
+    subject to the once-per-epoch limit above, rewrites whichever are due
+    — content or tombstone, as Backfill determines — regardless of
+    acknowledgements or scan requests. Every position stays populated,
+    however long since a reader last looked.
 
-2.  **Reader: scan, on request.** Once the user asks their client to scan a
-    given member's stream, the client looks both ways from the position
-    ordinary reading is stuck on. It rechecks a short trailing window of
-    positions it has already passed, using index values retained from when
-    it read them — a BACAP index is a KDF ratchet state, so it can only be
-    advanced, never recovered backward (§4 of the Echomix paper), which is
-    why revisiting one requires having kept it; this catches, for instance,
-    a box a replica had not finished replicating on an earlier attempt. It
-    also scans forward past the stuck position: deriving each next index
-    from the last needs no network round trip and no knowledge of what, if
-    anything, was written there, so the client can keep deriving positions
-    and asking, for each, without waiting out the ordinary retry a
-    genuinely-not-yet-written box invites, whether it holds data, a
-    tombstone, or nothing:
+2.  **Reader: scan, on request.** Once the user asks their client to scan
+    a stream, it looks both ways from the stuck position. It rechecks a
+    short trailing window it has already passed, using index values kept
+    from when it read them — a BACAP index only advances, never recovers
+    backward (§4 of the Echomix paper), so revisiting one needs its value
+    kept — catching, say, a box a replica hadn't finished replicating. It
+    also scans forward: deriving each next index needs no network round
+    trip and no knowledge of what's there, so the client keeps deriving
+    and asking, for each, without waiting out the ordinary not-yet-written
+    retry, whether it holds data, a tombstone, or nothing:
 
     <div class="itemizedlist">
 
-    - Data is a genuine message the reader had not yet received; it is
-      processed as any other message would be, and the scan continues past
-      it.
+    - Data is a genuine, unreceived message: process it normally and
+      continue past it.
     - A tombstone confirms something was once written there — real content
-      everyone already has, or a placeholder the refresh above maintains —
-      and the scan continues past it.
+      everyone already has, or a placeholder the refresh maintains — and
+      the scan continues past it.
     - `BoxIDNotFound` is the true current end of the stream: adopt this
-      position as the new expected next box, and resume ordinary reading.
+      position as the new expected next box and resume ordinary reading.
 
     </div>
 
@@ -637,9 +609,8 @@ Item 2 is a small state machine with exactly two states:
 Reading --the user requests a scan--> Scanning --BoxIDNotFound (the true frontier)--> Reading
 
 (Reading self-loops on Data, Tombstone, and BoxIDNotFound: ordinary
-reading, unchanged from elsewhere in this specification. Scanning
-self-loops on Data and on Tombstone: each just advances the probe to
-the next position and stays in Scanning.)
+reading, unchanged. Scanning self-loops on Data and Tombstone, each
+just advancing the probe.)
 ```
 
 | State    | On                                          | Next state | Effect                                                       |
@@ -653,20 +624,17 @@ the next position and stays in Scanning.)
 | Scanning | the user requests a scan again                | Scanning   | none: already scanning                                          |
 
 The backward reprobe on entering Scanning is a one-time side check, not a
-state of its own: whatever it turns up (nothing, or a previously missed
-box) is ingested the same way ordinary reading would, and does not affect
-which of the table's transitions fires.
+state of its own: whatever it turns up is ingested like ordinary reading,
+and doesn't affect which transition fires.
 
 Two members each stuck behind a gap in the other's stream resynchronise
-once each has, at some point, asked their own client to scan: each one's
-own stream stays populated by its own refresh, so there is always
-something there for a scan to find. This is not an automatic guarantee —
-nothing in this specification claims recovery happens on its own, or
-promptly, only that it is always available on request — and it depends on
-asking before the stream owner's own Sent-box retention window (above;
-comfortably longer than a replica epoch) has let the position go: that
-window is not a limit on how long a scan itself may take, but on how long
-after the fact one can still find anything.
+once each has asked their own client to scan: each one's stream stays
+populated by its own refresh, so there is always something for a scan to
+find. This is not automatic — recovery happens on request, not on its own
+or promptly — and it depends on asking before the stream owner's Sent-box
+retention window (above; comfortably longer than a replica epoch) lets the
+position go: that window bounds not how long a scan may take, but how long
+after the fact anything can still be found.
 
 </div>
 
@@ -686,56 +654,50 @@ after the fact one can still find anything.
 
 </div>
 
-Backfill and resync, above, exist to keep a stream owner's own messages
-available for longer than Pigeonhole storage would otherwise guarantee.
-Disappearing messages is the same mechanism, deliberately pointed the other
-way: a stream owner may choose to actively shorten a message's life below
-what storage would otherwise allow, tombstoning it before replica garbage
+Backfill and refresh, above, keep a stream owner's messages available
+longer than Pigeonhole storage would otherwise guarantee. Disappearing
+messages points the same mechanism the other way: a stream owner may
+shorten a message's life instead, tombstoning it before replica garbage
 collection would have removed it regardless — trading the availability the
-mechanisms above work to preserve for an earlier, deliberate end to a
-message's life.
+mechanisms above preserve for an earlier, deliberate end.
 
-This is a purely local, unilateral choice: like the read progress tracked
-elsewhere in this specification, it governs only what a member's own client
-does with its own outbound stream, and is never negotiated with, or binding
-on, any other member.
+This is a purely local, unilateral choice: like read progress elsewhere in
+this specification, it governs only a member's own outbound stream, and is
+never negotiated with, or binding on, anyone else.
 
-Two policies are defined. An implementation offering this feature MUST
-support both, since they serve different intents and neither substitutes for
-the other:
+Two policies are defined; an implementation offering this feature MUST
+support both, since they serve different intents and neither substitutes
+for the other:
 
 <div class="itemizedlist">
 
-- **Ack-gated.** A box is tombstoned, and then no longer retained even as a
-  placeholder for resync (above), once it, or a later box on the same
-  stream, has been acknowledged by every other currently active group
-  member — exactly the condition under which backfill's own retention
-  (above) would otherwise merely discard the plaintext and keep a
-  placeholder. This policy never destroys a box some active member has not
-  yet acknowledged; a slow or temporarily unreachable member only delays
-  deletion, never prevents it once they return.
-- **Age-fraction.** A box is tombstoned once an elapsed fraction `f` of the
-  replica epoch has passed since it was written, chosen by the sending
-  member, regardless of whether anyone has acknowledged it. Because this
-  policy can destroy a message no other member has yet read, that is a
-  deliberate consequence of choosing it, not an oversight.
+- **Ack-gated.** A box is tombstoned, and no longer even kept as a
+  placeholder (above), once it or a later box on the same stream has been
+  acknowledged by every other active member — exactly the condition under
+  which Backfill's retention would otherwise just discard the plaintext.
+  This never destroys a box some active member hasn't yet acknowledged; a
+  slow or unreachable member only delays deletion, never prevents it.
+- **Age-fraction.** A box is tombstoned once a sender-chosen fraction `f`
+  of the replica epoch has elapsed since it was written, regardless of
+  acknowledgement. This can destroy a message no other member has yet
+  read — a deliberate consequence of choosing this policy, not an
+  oversight.
 
 </div>
 
-`f` MUST be constrained to `0 <= f < 1`. This is not a matter of taste: a box
-written at replica-epoch time `t` cannot be garbage-collected by the
-replicas before slightly more than one full replica epoch has elapsed after
-`t`, however early or late within its own epoch `t` fell (see "Ephemeral" in
-"Understanding Pigeonhole"). A retention shorter than one full replica epoch
-— any `f < 1` — therefore always tombstones before replica garbage
+`f` MUST be constrained to `0 <= f < 1`. This is not a matter of taste: a
+box written at replica-epoch time `t` cannot be garbage-collected before
+slightly more than one full epoch has elapsed after `t`, however early or
+late within its own epoch `t` fell (see "Ephemeral" in "Understanding
+Pigeonhole"). Any `f < 1` therefore always tombstones before garbage
 collection could have removed the box regardless; `f >= 1` offers no such
-guarantee, and can lose that race, defeating the entire purpose of choosing
-this policy over simply waiting for storage to expire on its own.
+guarantee and can lose that race, defeating the point of choosing this
+policy over just waiting for storage to expire.
 
-Which message types a disappearing-message policy applies to — ordinary chat
-content, as against membership or protocol messages such as `Introduction`
-or `ReplyWho`, whose loss could affect other members' view of the group — is
-left to be settled by implementations for now, rather than fixed here.
+Which message types a disappearing-message policy applies to — ordinary
+chat content, as against membership or protocol messages such as
+`Introduction` or `ReplyWho`, whose loss could affect other members' view
+of the group — is left to implementations for now, rather than fixed here.
 
 </div>
 
