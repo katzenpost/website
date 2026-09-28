@@ -422,7 +422,7 @@ before the replicas garbage-collect it (see "Ephemeral" in
 Pigeonhole</a>). A reader is, of course, always free to advance past a
 position it cannot yet fill and check further ahead instead of waiting there
 indefinitely — deriving the position that follows one needs no knowledge of
-what, if anything, was written at it (see "Optimistic resync" below). But
+what, if anything, was written at it (see "Refresh and scan" below). But
 doing so cannot recover what was actually written at the position it
 skipped: once a box has been garbage-collected, its content survives nowhere
 but in its author's own memory of having written it. Reading past a gap is
@@ -515,7 +515,7 @@ plaintext.
   delivery, since every current recipient already has it: an implementation
   MAY discard the plaintext at that point while still remembering the box's
   position, so that position can continue to be kept occupied (see
-  "Optimistic resync" below). A record MUST eventually be discarded outright,
+  "Refresh and scan" below). A record MUST eventually be discarded outright,
   regardless of acknowledgement, after a bounded retention window comfortably
   exceeding one replica epoch, so that a member who never acknowledges (an
   old client, or one that has permanently left) cannot oblige every other
@@ -528,13 +528,13 @@ plaintext.
   everyone has already acknowledged is instead rewritten as a tombstone —
   not because the content is still needed, but because a position left to
   quietly expire would later look, to a stalled reader, indistinguishable
-  from one never written at all (see "Optimistic resync" below). Either
+  from one never written at all (see "Refresh and scan" below). Either
   rewrite is a harmless no-op against a box that survived and a restoration
   against one garbage-collected, because Pigeonhole writes are
   content-idempotent (see "Append-only and immutable" in "Understanding
   Pigeonhole") and BACAP's per-box encryption is deterministic (§4 of the
   Echomix paper). The trigger is always the periodic refresh described in
-  "Optimistic resync" below; receiving an acknowledgement never itself
+  "Refresh and scan" below; receiving an acknowledgement never itself
   causes a rewrite.
 - **Rate-limiting the rewrite.** A rewrite is only useful once per replica
   epoch, since a box cannot be garbage-collected — and so cannot need
@@ -555,7 +555,7 @@ plaintext.
 
 <div>
 
-### <span id="optimistic_resync"></span>Optimistic resync
+### <span id="refresh_and_scan"></span>Refresh and scan
 
 </div>
 
