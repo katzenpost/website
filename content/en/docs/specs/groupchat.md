@@ -564,10 +564,31 @@ plaintext.
 </div>
 
 The periodic refresh that makes backfill (above) possible is also the
-stream owner's half of resynchronising two members each stalled behind a
-gap in the other's stream; the reader's half is a stall detector and a
-scan. Together they need nothing beyond what is already used elsewhere in
-this specification and in "Understanding Pigeonhole".
+stream owner's half of resynchronising two members each stuck behind a gap
+in the other's stream. The reader's half is a scan — the same bidirectional
+probe described below — but, unlike the stream owner's refresh, nothing
+about when to run it can safely be decided by the client on its own.
+
+Nothing observable from a reader's own side reliably distinguishes a stream
+that has simply gone quiet — its owner has nothing new to say, which is
+completely ordinary and can last indefinitely in a quiet group — from one
+stuck behind a position that was written and then garbage-collected before
+it was read: both look identical, forever, as the same repeated
+`BoxIDNotFound` reply to the same expected position, since that reply means
+"nothing has ever been written here" without saying whether that is because
+nothing has been written *yet* or because it once was and is now gone. No
+threshold on how long this has continued turns that ambiguity into reliable
+detection; a short one produces false positives (scanning a stream that was
+never actually stuck), a long one is merely slower to react to a real one,
+and no choice of it ever actually tells the reader which case it is in. An
+implementation MAY surface how long a stream has gone without progress as
+information for the user, but MUST NOT use it to trigger a scan
+automatically: that decision belongs to the user, made with context — how
+well they know the other member, other channels of contact, plain
+suspicion — that no protocol-level signal has access to. Concretely, a
+conforming client exposes a scan as something the user asks for (a menu
+item or equivalent), one stream at a time, rather than as a background
+behaviour.
 
 <div class="orderedlist">
 
@@ -576,29 +597,24 @@ this specification and in "Understanding Pigeonhole".
     subject to the once-per-epoch limit above, rewrites whichever are due —
     real content or a tombstone, exactly as Backfill (above) determines —
     independent of whether, or how promptly, anyone has acknowledged
-    anything. Every position in the stream stays populated, however long
-    any reader has been stalled.
+    anything, and independent of whether any reader has asked for a scan.
+    Every position in the stream stays populated, however long it has been
+    since a reader last looked.
 
-2.  **Reader: stall detection and scan.** Ordinary reading already retries
-    the expected next box on its own paced cadence; there is no separate
-    clock to consult, only genuine attempts. The first such attempt to come
-    back not-found marks the start of a stall. Every later retry that also
-    comes back not-found checks how long that has been going on: short of a
-    bound (comfortably under a replica epoch, so the refresh above has had
-    a chance to run), the reader simply keeps retrying as it always did;
-    once past it, the reader stops waiting on that one position alone and
-    looks both ways instead. It rechecks a short trailing window
-    of positions it has already passed, using index values retained from
-    when it read them — a BACAP index is a KDF ratchet state, so it can
-    only be advanced, never recovered backward (§4 of the Echomix paper),
-    which is why revisiting one requires having kept it; this catches, for
-    instance, a box a replica had not finished replicating on an earlier
-    attempt. It also scans forward past the stalled position: deriving each
-    next index from the last needs no network round trip and no knowledge
-    of what, if anything, was written there, so the reader can keep
-    deriving positions and asking, for each, without waiting out the
-    ordinary retry a genuinely-not-yet-written box invites, whether it holds
-    data, a tombstone, or nothing:
+2.  **Reader: scan, on request.** Once the user asks their client to scan a
+    given member's stream, the client looks both ways from the position
+    ordinary reading is stuck on. It rechecks a short trailing window of
+    positions it has already passed, using index values retained from when
+    it read them — a BACAP index is a KDF ratchet state, so it can only be
+    advanced, never recovered backward (§4 of the Echomix paper), which is
+    why revisiting one requires having kept it; this catches, for instance,
+    a box a replica had not finished replicating on an earlier attempt. It
+    also scans forward past the stuck position: deriving each next index
+    from the last needs no network round trip and no knowledge of what, if
+    anything, was written there, so the client can keep deriving positions
+    and asking, for each, without waiting out the ordinary retry a
+    genuinely-not-yet-written box invites, whether it holds data, a
+    tombstone, or nothing:
 
     <div class="itemizedlist">
 
@@ -609,53 +625,48 @@ this specification and in "Understanding Pigeonhole".
       everyone already has, or a placeholder the refresh above maintains —
       and the scan continues past it.
     - `BoxIDNotFound` is the true current end of the stream: adopt this
-      position as the new expected next box, clear the stall, and resume
-      ordinary reading.
+      position as the new expected next box, and resume ordinary reading.
 
     </div>
 
 </div>
 
-Item 2 is a small state machine with exactly three states:
+Item 2 is a small state machine with exactly two states:
 
 ``` programlisting
-Waiting --BoxIDNotFound--> Stalled --BoxIDNotFound, past threshold--> Scanning
-   ^                           |     (else: self-loops on Stalled)          |
-   |<------Data / Tombstone----+                                           |
-   |                                                                        |
-   +<-----------------------BoxIDNotFound (the true frontier)---------------+
+Reading --the user requests a scan--> Scanning --BoxIDNotFound (the true frontier)--> Reading
 
-(Scanning self-loops on Data and on Tombstone: each just advances the
-probe to the next position and stays in Scanning.)
+(Reading self-loops on Data, Tombstone, and BoxIDNotFound: ordinary
+reading, unchanged from elsewhere in this specification. Scanning
+self-loops on Data and on Tombstone: each just advances the probe to
+the next position and stays in Scanning.)
 ```
 
-| State    | On                                 | Guard                | Next state | Effect                                                            |
-|----------|------------------------------------|-----------------------|------------|--------------------------------------------------------------------|
-| Waiting  | Data or Tombstone at the expected position | —              | Waiting    | advance the expected position by one (ingest a `Data` message)     |
-| Waiting  | `BoxIDNotFound` at the expected position   | first time     | Stalled    | record when the stall began                                        |
-| Stalled  | Data or Tombstone at the expected position | —              | Waiting    | advance the expected position; clear the recorded stall            |
-| Stalled  | `BoxIDNotFound` at the expected position, again | not yet past the threshold | Stalled | none: this retry was no different from any other, so far           |
-| Stalled  | `BoxIDNotFound` at the expected position, again | past the threshold | Scanning | reprobe the short trailing window behind; probe forward             |
-| Scanning | Data at a probed position                  | —              | Scanning   | ingest it; probe the next position forward                          |
-| Scanning | Tombstone at a probed position             | —              | Scanning   | probe the next position forward                                     |
-| Scanning | `BoxIDNotFound` at a probed position        | —              | Waiting    | adopt this position as the expected next box; clear the recorded stall |
+| State    | On                                          | Next state | Effect                                                       |
+|----------|----------------------------------------------|------------|----------------------------------------------------------------|
+| Reading  | Data or Tombstone at the expected position    | Reading    | advance the expected position by one (ingest a `Data` message) |
+| Reading  | `BoxIDNotFound` at the expected position      | Reading    | none: ordinary reading, unchanged                               |
+| Reading  | the user requests a scan                      | Scanning   | reprobe the short trailing window behind; probe forward         |
+| Scanning | Data at a probed position                     | Scanning   | ingest it; probe the next position forward                      |
+| Scanning | Tombstone at a probed position                | Scanning   | probe the next position forward                                 |
+| Scanning | `BoxIDNotFound` at a probed position           | Reading    | adopt this position as the expected next box                    |
+| Scanning | the user requests a scan again                | Scanning   | none: already scanning                                          |
 
 The backward reprobe on entering Scanning is a one-time side check, not a
 state of its own: whatever it turns up (nothing, or a previously missed
 box) is ingested the same way ordinary reading would, and does not affect
 which of the table's transitions fires.
 
-Two members each stalled behind the other therefore resynchronise without
-either side ever needing to send a fresh acknowledgement: each one's own
-stream stays populated by its own refresh, and each one's own stall
-eventually triggers its own scan past the other's gap. As long as each side
-comes back online at least once per replica epoch, recovery always
-eventually completes: the refresh never lets a position go a full epoch
-unrefreshed, so garbage collection never gets ahead of it. The Sent-box
-retention window (Sent-box records, above; comfortably longer than a
-replica epoch) is not a limit on this — it exists only so that a member who
-has stopped coming back at all, ever, is eventually forgotten rather than
-held onto forever.
+Two members each stuck behind a gap in the other's stream resynchronise
+once each has, at some point, asked their own client to scan: each one's
+own stream stays populated by its own refresh, so there is always
+something there for a scan to find. This is not an automatic guarantee —
+nothing in this specification claims recovery happens on its own, or
+promptly, only that it is always available on request — and it depends on
+asking before the stream owner's own Sent-box retention window (above;
+comfortably longer than a replica epoch) has let the position go: that
+window is not a limit on how long a scan itself may take, but on how long
+after the fact one can still find anything.
 
 </div>
 
