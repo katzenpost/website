@@ -68,7 +68,7 @@ Our implementation can also use any KEM (key encapsulation mechanism) for the KE
 
 * https://github.com/katzenpost/katzenpost/tree/main/core/sphinx
 
-To be clear, both variations of Sphinx can be post quantum or hybrid post quantum combining classical and post quantum
+To be clear, both variations of Sphinx can be hybrid post quantum combining classical and post quantum
 public key primitives together.
 
 
