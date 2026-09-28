@@ -421,7 +421,7 @@ before replicas garbage-collect it (see "Ephemeral" in
 <a href="/docs/pigeonhole_explained" class="link" target="_top">Understanding
 Pigeonhole</a>). A reader can always skip a position it cannot fill and
 check further ahead: deriving the next position needs no knowledge of
-what, if anything, is at the current one (see "Refresh and scan" below).
+what, if anything, is at the current one (see "Rewrite and scan" below).
 But that cannot recover what was actually written there: once
 garbage-collected, a box's content survives only in its author's memory of
 writing it. Reading past a gap is not the same as closing it; nothing so
@@ -501,31 +501,31 @@ current member has acknowledged it, its plaintext.
 - **Retention.** Once every other active member has acknowledged a box, or
   a later one, its plaintext is no longer needed for delivery: an
   implementation MAY discard it, while still remembering the box's
-  position so it stays occupied (see "Refresh and scan" below). A record
+  position so it stays occupied (see "Rewrite and scan" below). A record
   MUST eventually be discarded outright, regardless of acknowledgement,
   after a bounded window comfortably exceeding one replica epoch, so a
   member who never acknowledges (an old client, or one gone for good)
   cannot force every other member to retain records forever.
 - **Backfill.** A stream owner keeps every box in its Sent-box records
-  refreshed against garbage collection, for two reasons that produce the
+  rewritten against garbage collection, for two reasons that produce the
   same rewrite. A box no active member has fully acknowledged is rewritten
   with its original plaintext, in case garbage collection beat a slow
   member to it. A box everyone has acknowledged is instead rewritten as a
   tombstone: not because it's still needed, but because a position left
   to expire would later look, to a reader, indistinguishable from one
-  never written (see "Refresh and scan" below). Either rewrite is
+  never written (see "Rewrite and scan" below). Either rewrite is
   harmless: a no-op if the box survived, a restoration if it didn't,
   because Pigeonhole writes are content-idempotent ("Append-only and
   immutable" in "Understanding Pigeonhole") and BACAP's per-box encryption
   is deterministic (§4, Echomix). The trigger is always the periodic
-  refresh in "Refresh and scan"; an acknowledgement never itself causes a
-  rewrite.
+  rewrite described in "Rewrite and scan"; an acknowledgement never itself
+  causes a rewrite.
 - **Rate-limiting the rewrite.** A rewrite is only useful once per replica
   epoch, since a box can't be garbage-collected (and so can't need
   restoring) more often than that. Implementations SHOULD NOT rewrite the
-  same box more than once per epoch, however often the refresh considers
-  it, bounding backfill's mixnet traffic to a small, fixed multiple of the
-  stream's own size.
+  same box more than once per epoch, however often the periodic rewrite
+  considers it, bounding backfill's mixnet traffic to a small, fixed
+  multiple of the stream's own size.
 
 </div>
 
@@ -539,7 +539,7 @@ current member has acknowledged it, its plaintext.
 
 <div>
 
-### <span id="refresh_and_scan"></span>Refresh and scan
+### <span id="rewrite_and_scan"></span>Rewrite and scan
 
 </div>
 
@@ -547,10 +547,10 @@ current member has acknowledged it, its plaintext.
 
 </div>
 
-The periodic refresh that makes backfill possible is also the stream
+The periodic rewrite that makes backfill possible is also the stream
 owner's half of resynchronising two members each stuck behind a gap in the
-other's stream. The reader's half is a scan. Unlike the refresh, though,
-the client cannot safely decide on its own when to run it.
+other's stream. The reader's half is a scan. Unlike the periodic rewrite,
+though, the client cannot safely decide on its own when to run it.
 
 Nothing observable from a reader's side distinguishes a stream that has
 simply gone quiet (completely ordinary, and can last indefinitely) from
@@ -570,7 +570,7 @@ stream at a time, not as a background behaviour.
 
 <div class="orderedlist">
 
-1.  **Stream owner: periodic refresh.** Well within a replica epoch, a
+1.  **Stream owner: periodic rewrite.** Well within a replica epoch, a
     stream owner re-examines every box in its Sent-box records and,
     subject to the once-per-epoch limit above, rewrites whichever are due
     (content or tombstone, as Backfill determines) regardless of
@@ -593,8 +593,8 @@ stream at a time, not as a background behaviour.
     - Data is a genuine, unreceived message: process it normally and
       continue past it.
     - A tombstone confirms something was once written there (real content
-      everyone already has, or a placeholder the refresh maintains), and
-      the scan continues past it.
+      everyone already has, or a placeholder the periodic rewrite
+      maintains), and the scan continues past it.
     - `BoxIDNotFound` is the true current end of the stream: adopt this
       position as the new expected next box and resume ordinary reading.
 
@@ -628,12 +628,12 @@ and doesn't affect which transition fires.
 
 Two members each stuck behind a gap in the other's stream resynchronise
 once each has asked their own client to scan: each one's stream stays
-populated by its own refresh, so there is always something for a scan to
-find. This is not automatic (recovery happens on request, not on its own
-or promptly), and it depends on asking before the stream owner's Sent-box
-retention window (above; comfortably longer than a replica epoch) lets the
-position go: that window bounds not how long a scan may take, but how long
-after the fact anything can still be found.
+populated by its own periodic rewrite, so there is always something for a
+scan to find. This is not automatic (recovery happens on request, not on
+its own or promptly), and it depends on asking before the stream owner's
+Sent-box retention window (above; comfortably longer than a replica epoch)
+lets the position go: that window bounds not how long a scan may take, but
+how long after the fact anything can still be found.
 
 </div>
 
@@ -653,9 +653,9 @@ after the fact anything can still be found.
 
 </div>
 
-Backfill and refresh, above, keep a stream owner's messages available
-longer than Pigeonhole storage would otherwise guarantee. Disappearing
-messages points the same mechanism the other way: a stream owner may
+Backfill and the periodic rewrite, above, keep a stream owner's messages
+available longer than Pigeonhole storage would otherwise guarantee.
+Disappearing messages points the same mechanism the other way: a stream owner may
 shorten a message's life instead, tombstoning it before replica garbage
 collection would have removed it regardless. This trades the availability
 the mechanisms above preserve for an earlier, deliberate end.
