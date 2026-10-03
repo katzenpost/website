@@ -433,7 +433,8 @@ far in this specification restores lost content.
 
 </div>
 
-`GroupChatMessage` gains a field to carry them:
+`GroupChatMessage` gains two fields to carry them, and `Introduction`
+one:
 
 ``` programlisting
 // GroupChatMessage encapsulates all chat message types.
@@ -446,48 +447,60 @@ type GroupChatMessage struct {
     Who *Who
     ReplyWho *ReplyWho
 
-    // Acks is a packed bit trie: a binary trie naming every member this
-    // sender acknowledges, then one BACAP MessageBoxIndex per named
-    // member, each the furthest box this sender has newly read on that
-    // member's stream since it last acknowledged one. See "The Acks
-    // trie". Absent when there is nothing to acknowledge.
+    // Acks names the members this sender acknowledges by their roster
+    // index, then carries one BACAP MessageBoxIndex per named member,
+    // each the furthest box this sender has newly read on that member's
+    // stream since it last acknowledged one. See "Rosters". Absent when
+    // there is nothing to acknowledge.
     Acks []byte
+
+    // Adds announces the members this sender has added to its roster
+    // since its last message, three bytes each. See "Rosters". Absent
+    // when there are none.
+    Adds []byte
+}
+
+// Introduction introduces a new member to the group.
+type Introduction struct {
+    DisplayName string
+    UniversalReadCap *bacap.UniversalReadCap
+
+    // Index is the roster index the introducing member gives the new
+    // member. See "Rosters".
+    Index uint8
 }
 ```
 
 <div class="itemizedlist">
 
-- `Acks` is one byte string in two parts: a trie, then the values. The
-  trie names the acknowledged members and the values follow back to back
-  in the order the trie names them. Nothing else frames an entry, which
-  is what keeps the field small (see "The Acks trie" below).
-- Each acknowledged member is a **leaf** of the trie, placed by its
-  **name**: a hash of its read-cap public key (see "The Acks trie"). The
-  path from the root to the leaf spells the shortest run of leading bits
-  of that name which the name of no other read cap the sender holds
-  shares. The public key behind a name is the part of a cap that stays
-  stable across every index-mutation variant (original, salt-mutated,
-  future-only), unlike the cap's own index suffix, and it remains the
-  member's identity; a leaf only points at that member within the one
-  message carrying it.
+- `Acks` is one byte string in two parts: first what names the
+  acknowledged members, then their values back to back. Nothing else
+  frames an entry, which is what keeps the field small (see "Rosters"
+  below).
+- Each acknowledged member is named by its **roster index**: its position
+  in the sender's own roster (see "Rosters"). A roster index only points
+  at a member within the sender's numbering. The member's identity
+  remains its read-cap public key, the part of a cap that stays stable
+  across every index-mutation variant (original, salt-mutated,
+  future-only), unlike the cap's own index suffix.
 - Each value is the raw `MessageBoxIndex` (the 104-byte BACAP position
   value used elsewhere to address a box; §4 of the Echomix paper), nothing
   else, naming the furthest box newly read on that member's stream. Every
   value is exactly that size: the fixed size is the only thing marking
   where one value ends and the next begins.
 - The linkage between a member and its acknowledgement is positional: the
-  first leaf the trie writes belongs to the first value, the second leaf
-  to the second, and so on. A client is free to load the result into a
-  dictionary of its own.
+  values follow in ascending order of roster index, the first value
+  belonging to the lowest roster index named, and so on. A client is free
+  to load the result into a dictionary of its own.
 - The *acknowledging* member's identity (as against the acknowledged one,
   above) still comes from which member's own stream carried the message:
   with no broadcast channel in this design, a message already arrives
-  attributed to its sender, whatever members its `Acks` trie names.
-- A leaf is not secret (every member already holds every other member's
-  read cap, to read their stream), so a stream owner still checks a
-  claimed index against its own Sent-box records (below): one matching
-  nothing it actually wrote is ignored, stale, forged, or misattributed
-  (see "The Acks trie") alike.
+  attributed to its sender, whatever members its `Acks` names.
+- A roster index is not secret (every member follows every other
+  member's roster), so a stream owner still checks a claimed
+  `MessageBoxIndex` against its own Sent-box records (below): one
+  matching nothing it actually wrote is ignored, stale, forged, or
+  misnumbered alike.
 - Because BACAP reading is sequential, acknowledging a stream's Nth box
   implies every earlier one has already been read; a conforming
   implementation therefore need only include, per stream, the single
@@ -495,114 +508,116 @@ type GroupChatMessage struct {
 
 </div>
 
-**The Acks trie.** Members are named by a shared trie rather than by
-their public keys, or by a map keyed on prefixes of them, because a
-message may acknowledge every member the sender has read, and this
-protocol is meant eventually to cross transports (LoRa, for one) where
-every byte of a group message counts. The trie is built by the sender
-alone, against the sender's own current view of the group, with no
-agreement among members and nothing announced in advance.
+**Rosters.** Members are named by small numbers rather than by their
+public keys, or by anything derived from them, because a message may
+acknowledge every member the sender has read, and this protocol is meant
+eventually to cross transports (LoRa, for one) where every byte of a
+group message counts. Each member numbers the others itself, with no
+agreement among members. What makes the numbers usable is that every
+member can follow every other member's numbering from that member's own
+stream.
 
 <div class="itemizedlist">
 
-- **Names.** A member's name is
-  `BLAKE2b-256("KP:acks-trie:v1" || public key)`: BLAKE2b with a 32-byte
-  digest and no key, over the fifteen ASCII bytes of the domain string
-  followed by the 32-byte read-cap public key. The trie is built from
-  names, never from the keys themselves. A name's leading bits are uniform
-  whatever the key type, and hashing strips the structure of the key
-  encoding: an Ed25519 point and its negation differ in a single bit of
-  their encoding, and unhashed would share a branch 248 bits deep at no
-  cost to whoever holds one of them.
-- **Layout.** The trie is binary and written in pre-order, a node's
-  0-child before its 1-child. Each node is two bits: whether it has a
-  0-child, then whether it has a 1-child. `00` is a leaf. Bits fill each
-  byte from its most significant bit, and the last byte of the trie is
-  padded with zero bits. The values begin at the next byte. A leaf at
-  depth `d` spells `d` leading bits of a name, the bits of a name being
-  numbered from the most significant bit of its first byte.
-- **Choosing.** For each member it acknowledges, the sender finds the
-  longest run of leading bits that member's name shares with the name of
-  any other read cap it holds, and places the leaf one bit deeper. A leaf
-  is therefore never the root, and no leaf lies on the path to another:
-  the leaves form a prefix-free set. The trie is rebuilt for every
-  message, so when the sender learns of a member whose name runs
-  alongside one it already acknowledges, that leaf moves deeper on its
-  own and readers need no notice of it.
-- **Size.** The top of the trie is shared by every member beneath it, so
-  the cost per member falls as more are named. In a group of sixteen,
-  naming one member takes about two bytes of trie and naming all fifteen
-  others about ten. In a group of sixty-four, naming all sixty-three
-  others takes about thirty-nine.
-- **Claiming.** A stream owner walks the trie from the root, at each node
-  taking the child that matches the next bit of its own name. If that
-  child is absent, the message carries no acknowledgement for it. If the
-  walk reaches a leaf, the leaf is its own, and the leaf's
-  position among the leaves selects its value. That is the whole rule. An
-  owner MUST NOT reject a leaf for being shallower than the owner itself
-  would have placed it: doing so would refuse genuine acknowledgements
-  from every sender that has not yet learned of some neighbouring member,
-  to prevent a rarer misattribution instead.
+- **Roster.** Every member has a roster: an ordered list of the members
+  it has numbered, itself included, each identified by read-cap public
+  key. Its roster index for a member is that member's position in the
+  list, counted from zero, and fits in one byte. A roster only grows: an
+  entry is never moved, and a roster index is never given to a second
+  member. Every member keeps a copy of every other member's roster, which
+  is what that member's roster indexes are read against.
+- **Starting.** A member who starts a group alone has a roster holding
+  only itself. Members who start a group together each begin with the
+  same roster: themselves, in ascending order of read-cap public key. A
+  new member's roster starts as a copy of its introducer's as it stands
+  at the `Introduction` announcing the new member, whose own entry is
+  included.
+- **Growing.** A member numbers another at the moment it says so on its
+  own stream, and it always states the roster index, so that anyone
+  reading that stream can keep their copy in step. A member introducing a
+  new member sets `Introduction.Index`. A member that learns of a new
+  member from someone else's `Introduction` announces it in `Adds`.
+- **Adds.** `Adds` is a byte string of three-byte entries `(x, j, k)`, in
+  ascending order of `x`. Each says: the sender's roster index `x` now
+  holds the member that the sender's roster index `j` holds at its own
+  roster index `k`. Ordinarily `j` is the introducer and `k` the
+  `Introduction.Index` the sender has just read on the introducer's
+  stream. `Adds` is applied before the `Acks` of the same message, so a
+  member can be numbered and acknowledged at once. A sender MUST NOT
+  acknowledge a roster index it has not announced. Like an
+  acknowledgement, `Adds` is never sent on its own. A reader that cannot
+  yet follow the reference (it has not read that far on the stream of the
+  member at `j`) keeps the entry and resolves it when it can.
+- **Repeats.** An `Introduction.Index` or an `Adds` entry for a roster
+  index the reader's copy already holds is ignored. Reading an old box
+  again is therefore harmless.
+- **Layout.** Let `n` be the number of members a message acknowledges,
+  and `b` the number of bytes a bitmap needs, at one bit per roster
+  index, to reach the highest roster index among them. When `n` is at
+  most `b`, the members are named by a list: one byte each, holding the
+  roster index, in ascending order. Otherwise they are named by a bitmap
+  of `b` bytes, in which roster index `i` is bit `i mod 8` of byte
+  `i div 8`, bits counted from the most significant. The values begin at
+  the next byte.
+- **Optimization.** The plain form of this scheme is the list: one byte
+  per acknowledged member. Because roster indexes are small and
+  consecutive, the same members can instead be marked at one bit per
+  roster index, and the sender writes whichever form is shorter. In the
+  bytes that name members this is a large saving when a message
+  acknowledges many of them, and none when it acknowledges one or two. In
+  a group of sixteen, acknowledging all fifteen others takes two bytes
+  instead of fifteen; in a group of sixty-four, acknowledging all
+  sixty-three others takes eight instead of sixty-three. It is a
+  saving in naming only: each named member still carries its value. No
+  flag is spent choosing between the forms: the length of the field tells
+  a reader which it holds (see "Parsing").
+- **Parsing.** `Acks` arrives from another party. Since every value is
+  exactly one `MessageBoxIndex`, a reader divides the length of the field
+  by that size: the quotient is `n`, the number of values, and the
+  remainder is the length of what precedes them. A remainder equal to `n`
+  is a list. A smaller remainder is a bitmap. A parser MUST treat the
+  whole `Acks` field as carrying no acknowledgements when the remainder
+  is greater than `n`, when a list is not in strictly ascending order,
+  when the last byte of a bitmap is zero, or when a bitmap does not have
+  exactly `n` bits set. An empty `Acks` acknowledges nothing. An `Adds`
+  whose length is not a multiple of three is ignored whole.
+- **Claiming.** A stream owner finds its own roster index in its copy of
+  the sender's roster. If the message's `Acks` names that roster index,
+  the value in that position is its own. If it does not, or if the
+  sender's roster does not hold the owner, the message carries no
+  acknowledgement for it.
 - **Resolving.** A reader that wants every acknowledgement, not only its
-  own, collects each leaf's path as it parses and matches it against the
-  members it holds: a leaf points at every held member whose name begins
-  with that path. A path is not an identifier and MUST NOT be
-  stored or compared as one. A reader resolves each leaf afresh, and the
-  same member may sit at different depths in successive messages from one
-  sender.
-- **Parsing.** The trie arrives from another party. A parser MUST treat
-  the whole `Acks` field as carrying no acknowledgements when the root is
-  a leaf, when a path grows longer than a name, when the bytes run
-  out inside the trie, or when what follows the trie is not exactly one
-  value per leaf. An empty `Acks` acknowledges nothing.
-- **Misattribution.** Because members' views of the group are only
-  eventually consistent, a leaf can be claimed by the wrong member:
-  exactly when the acknowledged member and some other member share the
-  leaf's path and the sender does not yet know that other member. The
-  window closes as soon as the sender learns of them. Within it the
-  claimed index names a box on the acknowledged member's stream, so it
-  matches nothing the wrong claimant ever wrote and the Sent-box check
-  above discards it. Any future shortening of the value weakens that
-  check in proportion.
-- **Divergence.** A reader classifies each leaf in a sender's `Acks`
-  against the members it holds. Three outcomes each tell it that the
-  sender's view of the group differs from its own:
-
-  <div class="itemizedlist">
-
-  - **Matches none.** The sender holds a member the reader lacks.
-  - **Matches two or more.** The sender lacks at least one of those
-    members, or it would have placed the leaf deeper.
-  - **Longer than the reader would need.** The sender holds a member,
-    running alongside this one, that the reader lacks.
-
-  </div>
-
-  The protocol does not act on this; an implementation MAY surface it.
-- **Grinding.** Read-cap public keys are self-chosen, so a member can
-  search for one whose name shares a long run of leading bits with
-  another member's. Sharing `t` bits takes about `2^t` attempts and costs
-  `t/4` bytes of trie whenever either member is acknowledged, and nothing
-  else: claiming stays by one's own name, and the Sent-box check stands.
-- **Test vector.** Four read-cap public keys, each 32 repetitions of one
-  byte, and their names:
+  own, reads each named roster index against its copy of the sender's
+  roster. A value at a roster index it cannot resolve is skipped, which
+  the fixed value size allows. A roster index means nothing outside the
+  roster of the member that sent it, and MUST NOT be compared across
+  senders.
+- **Skipped boxes.** A reader that passes a position on a member's stream
+  without reading it (see "Rewrite and scan") may have missed an
+  `Introduction` or an `Adds`. The entries it already holds stay valid,
+  and later entries still land where they belong, because each states its
+  roster index. A roster index it never saw announced stays unresolved
+  for that reader.
+- **Removal.** A member may stop reading another member's stream without
+  telling anyone. Its roster keeps that entry regardless, because every
+  other member still counts from it. It MAY forget which member held the
+  entry, but MUST NOT acknowledge that roster index again or give it to
+  another member.
+- **Views.** A member's copy of another's roster shows directly which
+  members that one has numbered. The protocol does not act on a
+  difference between rosters; an implementation MAY surface it.
+- **Examples.** A sender whose roster holds sixteen members:
 
   ``` programlisting
-  01..  3f0b20d5f56100c6943b05282e9f064ef76681fae54d0afa596a4be6f65696e4
-  02..  bad28d93044a3586a608085295bf7f7923d2239148abade34fb94c288cf7c775
-  03..  e9033432880507ba846972edbdfacb8ac61ea1fe2bfebb8d708a8907731eec0c
-  04..  1be760393e1ad785c5699696738ff4780b75754b481d0a23d8d8625894eafa70
+  acknowledges     named as    form      whole field
+  9                09          list      105 bytes
+  3, 12            03 0c       list      210 bytes
+  3, 12, 13        10 0c       bitmap    314 bytes
+  1 to 15          7f ff       bitmap    1562 bytes
   ```
 
-  A sender holding all four, the first its own, acknowledges the other
-  three. The trie is the two bytes `e8 c0`: the bits
-  `11 10 10 00 11 00 00` and two bits of padding. The root has both
-  children. Under its 0-child, two single-child nodes lead to the leaf
-  for key `04`, at path `000`: one bit past the `00` its name shares with
-  the sender's own. Under the root's 1-child, a two-child node ends in
-  the leaves for key `02`, at path `10`, and key `03`, at path `11`. The
-  three values follow in that order: for `04`, for `02`, for `03`. The
-  whole field is 314 bytes.
+  An `Adds` of `05 02 07` says: this sender's roster index 5 now holds
+  the member that its roster index 2 holds at roster index 7.
 
 </div>
 
