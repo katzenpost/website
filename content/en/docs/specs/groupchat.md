@@ -461,14 +461,15 @@ type GroupChatMessage struct {
   trie names the acknowledged members and the values follow back to back
   in the order the trie names them. Nothing else frames an entry, which
   is what keeps the field small (see "The Acks trie" below).
-- Each acknowledged member is a **leaf** of the trie. The path from the
-  root to the leaf spells the shortest run of leading bits of that
-  member's read-cap public key that no other read cap the sender holds
-  shares. The public key it abbreviates is the part of a cap that stays
+- Each acknowledged member is a **leaf** of the trie, placed by its
+  **name**: a hash of its read-cap public key (see "The Acks trie"). The
+  path from the root to the leaf spells the shortest run of leading bits
+  of that name which the name of no other read cap the sender holds
+  shares. The public key behind a name is the part of a cap that stays
   stable across every index-mutation variant (original, salt-mutated,
   future-only), unlike the cap's own index suffix, and it remains the
-  member's identity; a leaf only names that member within the one message
-  carrying it.
+  member's identity; a leaf only points at that member within the one
+  message carrying it.
 - Each value is the raw `MessageBoxIndex` (the 104-byte BACAP position
   value used elsewhere to address a box; §4 of the Echomix paper), nothing
   else, naming the furthest box newly read on that member's stream. Every
@@ -504,31 +505,39 @@ agreement among members and nothing announced in advance.
 
 <div class="itemizedlist">
 
+- **Names.** A member's name is
+  `BLAKE2b-256("KP:acks-trie:v1" || public key)`: BLAKE2b with a 32-byte
+  digest and no key, over the fifteen ASCII bytes of the domain string
+  followed by the 32-byte read-cap public key. The trie is built from
+  names, never from the keys themselves. A name's leading bits are uniform
+  whatever the key type, and hashing strips the structure of the key
+  encoding: an Ed25519 point and its negation differ in a single bit of
+  their encoding, and unhashed would share a branch 248 bits deep at no
+  cost to whoever holds one of them.
 - **Layout.** The trie is binary and written in pre-order, a node's
   0-child before its 1-child. Each node is two bits: whether it has a
   0-child, then whether it has a 1-child. `00` is a leaf. Bits fill each
   byte from its most significant bit, and the last byte of the trie is
   padded with zero bits. The values begin at the next byte. A leaf at
-  depth `d` names the `d` leading bits spelled by the path to it, the bits
-  of a public key being numbered from the most significant bit of its
-  first byte.
+  depth `d` spells `d` leading bits of a name, the bits of a name being
+  numbered from the most significant bit of its first byte.
 - **Choosing.** For each member it acknowledges, the sender finds the
-  longest run of leading bits that member's read-cap public key shares
-  with any other read cap it holds, and places the leaf one bit deeper.
-  A leaf is therefore never the root, and no leaf lies on the path to
-  another. The trie is rebuilt for every message, so when the sender
-  learns of a member whose key runs alongside one it already
-  acknowledges, that leaf moves deeper on its own and readers need no
-  notice of it.
+  longest run of leading bits that member's name shares with the name of
+  any other read cap it holds, and places the leaf one bit deeper. A leaf
+  is therefore never the root, and no leaf lies on the path to another:
+  the leaves form a prefix-free set. The trie is rebuilt for every
+  message, so when the sender learns of a member whose name runs
+  alongside one it already acknowledges, that leaf moves deeper on its
+  own and readers need no notice of it.
 - **Size.** The top of the trie is shared by every member beneath it, so
   the cost per member falls as more are named. In a group of sixteen,
   naming one member takes about two bytes of trie and naming all fifteen
   others about ten. In a group of sixty-four, naming all sixty-three
   others takes about thirty-nine.
 - **Claiming.** A stream owner walks the trie from the root, at each node
-  taking the child that matches the next bit of its own read-cap public
-  key. If that child is absent, the message carries no acknowledgement
-  for it. If the walk reaches a leaf, the leaf is its own, and the leaf's
+  taking the child that matches the next bit of its own name. If that
+  child is absent, the message carries no acknowledgement for it. If the
+  walk reaches a leaf, the leaf is its own, and the leaf's
   position among the leaves selects its value. That is the whole rule. An
   owner MUST NOT reject a leaf for being shallower than the owner itself
   would have placed it: doing so would refuse genuine acknowledgements
@@ -536,14 +545,14 @@ agreement among members and nothing announced in advance.
   to prevent a rarer misattribution instead.
 - **Resolving.** A reader that wants every acknowledgement, not only its
   own, collects each leaf's path as it parses and matches it against the
-  members it holds: a leaf names every held member whose public key
-  begins with that path. A path is not an identifier and MUST NOT be
+  members it holds: a leaf points at every held member whose name begins
+  with that path. A path is not an identifier and MUST NOT be
   stored or compared as one. A reader resolves each leaf afresh, and the
   same member may sit at different depths in successive messages from one
   sender.
 - **Parsing.** The trie arrives from another party. A parser MUST treat
   the whole `Acks` field as carrying no acknowledgements when the root is
-  a leaf, when a path grows longer than a public key, when the bytes run
+  a leaf, when a path grows longer than a name, when the bytes run
   out inside the trie, or when what follows the trie is not exactly one
   value per leaf. An empty `Acks` acknowledges nothing.
 - **Misattribution.** Because members' views of the group are only
@@ -571,18 +580,29 @@ agreement among members and nothing announced in advance.
 
   The protocol does not act on this; an implementation MAY surface it.
 - **Grinding.** Read-cap public keys are self-chosen, so a member can
-  pick one sharing a long run of leading bits with another member's. That
-  costs two bits of trie for every shared bit whenever either is
-  acknowledged, at most sixty-five bytes for the pair, and nothing else:
-  claiming stays by one's own key, and the Sent-box check stands.
-- **Example.** A sender holds four read caps whose public keys begin
-  `01`, `7a13`, `7a88` and `c4`, the first its own, and acknowledges the
-  other three. The trie is the three bytes `d5 66 c0`, the bits
-  `11 01 01 01 01 10 01 10 11 00 00 00`. The root has both children.
-  Seven single-child nodes then follow the bits `1111010` that complete
-  the shared byte `7a`. A two-child node splits `7a13` from `7a88`, and
-  two leaves end them. The last leaf is `c4`, one bit below the root. The
-  three values follow in that order: for `7a13`, for `7a88`, for `c4`.
+  search for one whose name shares a long run of leading bits with
+  another member's. Sharing `t` bits takes about `2^t` attempts and costs
+  `t/4` bytes of trie whenever either member is acknowledged, and nothing
+  else: claiming stays by one's own name, and the Sent-box check stands.
+- **Test vector.** Four read-cap public keys, each 32 repetitions of one
+  byte, and their names:
+
+  ``` programlisting
+  01..  3f0b20d5f56100c6943b05282e9f064ef76681fae54d0afa596a4be6f65696e4
+  02..  bad28d93044a3586a608085295bf7f7923d2239148abade34fb94c288cf7c775
+  03..  e9033432880507ba846972edbdfacb8ac61ea1fe2bfebb8d708a8907731eec0c
+  04..  1be760393e1ad785c5699696738ff4780b75754b481d0a23d8d8625894eafa70
+  ```
+
+  A sender holding all four, the first its own, acknowledges the other
+  three. The trie is the two bytes `e8 c0`: the bits
+  `11 10 10 00 11 00 00` and two bits of padding. The root has both
+  children. Under its 0-child, two single-child nodes lead to the leaf
+  for key `04`, at path `000`: one bit past the `00` its name shares with
+  the sender's own. Under the root's 1-child, a two-child node ends in
+  the leaves for key `02`, at path `10`, and key `03`, at path `11`. The
+  three values follow in that order: for `04`, for `02`, for `03`. The
+  whole field is 314 bytes.
 
 </div>
 
