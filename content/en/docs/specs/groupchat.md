@@ -446,40 +446,47 @@ type GroupChatMessage struct {
     Who *Who
     ReplyWho *ReplyWho
 
-    // Acks maps a channel prefix (the shortest prefix of an acknowledged
-    // member's read-cap public key that this sender can tell apart from
-    // every other member it holds; see "Channel prefixes") to the BACAP
-    // MessageBoxIndex of the furthest box this sender has newly read on
-    // that member's stream since it last acknowledged one. The key is
-    // a CBOR byte string: a plain Go string would encode as a text
-    // string, which must be valid UTF-8.
-    Acks map[cbor.ByteString][]byte
+    // Acks is a packed bit trie: a binary trie naming every member this
+    // sender acknowledges, then one BACAP MessageBoxIndex per named
+    // member, each the furthest box this sender has newly read on that
+    // member's stream since it last acknowledged one. See "The Acks
+    // trie". Absent when there is nothing to acknowledge.
+    Acks []byte
 }
 ```
 
 <div class="itemizedlist">
 
-- Each key is a **channel prefix**: the shortest prefix of the
-  acknowledged member's read-cap public key that is a prefix of no other
-  read cap the sender holds, never shorter than one byte (see "Channel
-  prefixes" below). The public key it abbreviates is the part of a cap
-  that stays stable across every index-mutation variant (original,
-  salt-mutated, future-only), unlike the cap's own index suffix, and it
-  remains the member's identity; the prefix only names that member within
-  the one message carrying it. A stream owner recognises its own
-  acknowledgement by one test: is some key a prefix of its own public key.
+- `Acks` is one byte string in two parts: a trie, then the values. The
+  trie names the acknowledged members and the values follow back to back
+  in the order the trie names them. Nothing else frames an entry, which
+  is what keeps the field small (see "The Acks trie" below).
+- Each acknowledged member is a **leaf** of the trie. The path from the
+  root to the leaf spells the shortest run of leading bits of that
+  member's read-cap public key that no other read cap the sender holds
+  shares. The public key it abbreviates is the part of a cap that stays
+  stable across every index-mutation variant (original, salt-mutated,
+  future-only), unlike the cap's own index suffix, and it remains the
+  member's identity; a leaf only names that member within the one message
+  carrying it.
 - Each value is the raw `MessageBoxIndex` (the 104-byte BACAP position
   value used elsewhere to address a box; §4 of the Echomix paper), nothing
-  else, naming the furthest box newly read on that member's stream.
+  else, naming the furthest box newly read on that member's stream. Every
+  value is exactly that size: the fixed size is the only thing marking
+  where one value ends and the next begins.
+- The linkage between a member and its acknowledgement is positional: the
+  first leaf the trie writes belongs to the first value, the second leaf
+  to the second, and so on. A client is free to load the result into a
+  dictionary of its own.
 - The *acknowledging* member's identity (as against the acknowledged one,
   above) still comes from which member's own stream carried the message:
   with no broadcast channel in this design, a message already arrives
-  attributed to its sender, whatever channel prefixes its `Acks` keys name.
-- A channel prefix is not secret (every member already holds every other
-  member's read cap, to read their stream), so a stream owner still checks
-  a claimed index against its own Sent-box records (below): one matching
+  attributed to its sender, whatever members its `Acks` trie names.
+- A leaf is not secret (every member already holds every other member's
+  read cap, to read their stream), so a stream owner still checks a
+  claimed index against its own Sent-box records (below): one matching
   nothing it actually wrote is ignored, stale, forged, or misattributed
-  (see "Channel prefixes") alike.
+  (see "The Acks trie") alike.
 - Because BACAP reading is sequential, acknowledging a stream's Nth box
   implies every earlier one has already been read; a conforming
   implementation therefore need only include, per stream, the single
@@ -487,45 +494,68 @@ type GroupChatMessage struct {
 
 </div>
 
-**Channel prefixes.** A key abbreviates a member's read-cap public key
-rather than carrying it whole because a message may acknowledge every
-member the sender has read, and this protocol is meant eventually to
-cross transports (LoRa, for one) where every byte of a group message
-counts. A prefix is chosen by the sender alone, against the sender's own
-current view of the group, with no agreement among members and nothing
-announced in advance.
+**The Acks trie.** Members are named by a shared trie rather than by
+their public keys, or by a map keyed on prefixes of them, because a
+message may acknowledge every member the sender has read, and this
+protocol is meant eventually to cross transports (LoRa, for one) where
+every byte of a group message counts. The trie is built by the sender
+alone, against the sender's own current view of the group, with no
+agreement among members and nothing announced in advance.
 
 <div class="itemizedlist">
 
-- **Choosing.** For each member it acknowledges, the sender takes the
-  shortest prefix of that member's read-cap public key that is a prefix
-  of no other read cap it holds, and never less than one byte. Public
-  keys being uniformly random, this is one byte for nearly every member
-  of a group under about thirty and two bytes beyond: among `n` members
-  about `n²/512` pairs share a first byte. Prefixes are recomputed for
-  every message, so when the sender learns of a member whose key shares
-  a prefix with one it already acknowledges, both lengthen on their own
-  and readers need no notice of it.
-- **Claiming.** A stream owner claims an entry if, and only if, its key
-  is a prefix of the owner's own read-cap public key. That is the whole
-  rule. An owner MUST NOT reject an entry for being shorter than the
-  owner itself would have chosen: doing so would refuse genuine
-  acknowledgements from every sender that has not yet learned of some
-  colliding member, to prevent a rarer misattribution instead.
-- **Resolving.** A prefix is not an identifier and MUST NOT be stored or
-  compared as one. A reader resolves each key afresh against the members
-  it holds at the time, and the same member may be named by prefixes of
-  different lengths in successive messages from one sender.
+- **Layout.** The trie is binary and written in pre-order, a node's
+  0-child before its 1-child. Each node is two bits: whether it has a
+  0-child, then whether it has a 1-child. `00` is a leaf. Bits fill each
+  byte from its most significant bit, and the last byte of the trie is
+  padded with zero bits. The values begin at the next byte. A leaf at
+  depth `d` names the `d` leading bits spelled by the path to it, the bits
+  of a public key being numbered from the most significant bit of its
+  first byte.
+- **Choosing.** For each member it acknowledges, the sender finds the
+  longest run of leading bits that member's read-cap public key shares
+  with any other read cap it holds, and places the leaf one bit deeper.
+  A leaf is therefore never the root, and no leaf lies on the path to
+  another. The trie is rebuilt for every message, so when the sender
+  learns of a member whose key runs alongside one it already
+  acknowledges, that leaf moves deeper on its own and readers need no
+  notice of it.
+- **Size.** The top of the trie is shared by every member beneath it, so
+  the cost per member falls as more are named. In a group of sixteen,
+  naming one member takes about two bytes of trie and naming all fifteen
+  others about ten. In a group of sixty-four, naming all sixty-three
+  others takes about thirty-nine.
+- **Claiming.** A stream owner walks the trie from the root, at each node
+  taking the child that matches the next bit of its own read-cap public
+  key. If that child is absent, the message carries no acknowledgement
+  for it. If the walk reaches a leaf, the leaf is its own, and the leaf's
+  position among the leaves selects its value. That is the whole rule. An
+  owner MUST NOT reject a leaf for being shallower than the owner itself
+  would have placed it: doing so would refuse genuine acknowledgements
+  from every sender that has not yet learned of some neighbouring member,
+  to prevent a rarer misattribution instead.
+- **Resolving.** A reader that wants every acknowledgement, not only its
+  own, collects each leaf's path as it parses and matches it against the
+  members it holds: a leaf names every held member whose public key
+  begins with that path. A path is not an identifier and MUST NOT be
+  stored or compared as one. A reader resolves each leaf afresh, and the
+  same member may sit at different depths in successive messages from one
+  sender.
+- **Parsing.** The trie arrives from another party. A parser MUST treat
+  the whole `Acks` field as carrying no acknowledgements when the root is
+  a leaf, when a path grows longer than a public key, when the bytes run
+  out inside the trie, or when what follows the trie is not exactly one
+  value per leaf. An empty `Acks` acknowledges nothing.
 - **Misattribution.** Because members' views of the group are only
-  eventually consistent, an entry can be claimed by the wrong member:
-  exactly when the acknowledged member and some other member share a
-  prefix and the sender does not yet know that other member. The window
-  closes as soon as the sender learns of them. Within it the claimed
-  index names a box on the acknowledged member's stream, so it matches
-  nothing the wrong claimant ever wrote and the Sent-box check above
-  discards it. Any future shortening of the value weakens that check in
-  proportion.
-- **Divergence.** A reader classifies each key in a sender's `Acks`
+  eventually consistent, a leaf can be claimed by the wrong member:
+  exactly when the acknowledged member and some other member share the
+  leaf's path and the sender does not yet know that other member. The
+  window closes as soon as the sender learns of them. Within it the
+  claimed index names a box on the acknowledged member's stream, so it
+  matches nothing the wrong claimant ever wrote and the Sent-box check
+  above discards it. Any future shortening of the value weakens that
+  check in proportion.
+- **Divergence.** A reader classifies each leaf in a sender's `Acks`
   against the members it holds. Three outcomes each tell it that the
   sender's view of the group differs from its own:
 
@@ -533,18 +563,26 @@ announced in advance.
 
   - **Matches none.** The sender holds a member the reader lacks.
   - **Matches two or more.** The sender lacks at least one of those
-    members, or it would have chosen a longer prefix.
+    members, or it would have placed the leaf deeper.
   - **Longer than the reader would need.** The sender holds a member,
-    colliding with this one, that the reader lacks.
+    running alongside this one, that the reader lacks.
 
   </div>
 
   The protocol does not act on this; an implementation MAY surface it.
 - **Grinding.** Read-cap public keys are self-chosen, so a member can
-  pick one sharing a long prefix with another member's. That costs
-  everyone a longer prefix for those two members and nothing else:
-  claiming stays by prefix of one's own key, and the Sent-box check
-  stands.
+  pick one sharing a long run of leading bits with another member's. That
+  costs two bits of trie for every shared bit whenever either is
+  acknowledged, at most sixty-five bytes for the pair, and nothing else:
+  claiming stays by one's own key, and the Sent-box check stands.
+- **Example.** A sender holds four read caps whose public keys begin
+  `01`, `7a13`, `7a88` and `c4`, the first its own, and acknowledges the
+  other three. The trie is the three bytes `d5 66 c0`, the bits
+  `11 01 01 01 01 10 01 10 11 00 00 00`. The root has both children.
+  Seven single-child nodes then follow the bits `1111010` that complete
+  the shared byte `7a`. A two-child node splits `7a13` from `7a88`, and
+  two leaves end them. The last leaf is `c4`, one bit below the root. The
+  three values follow in that order: for `7a13`, for `7a88`, for `c4`.
 
 </div>
 
