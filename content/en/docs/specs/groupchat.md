@@ -433,8 +433,7 @@ far in this specification restores lost content.
 
 </div>
 
-`GroupChatMessage` gains two fields to carry them, and `Introduction`
-one:
+`GroupChatMessage` gains a field to carry them:
 
 ``` programlisting
 // GroupChatMessage encapsulates all chat message types.
@@ -453,21 +452,6 @@ type GroupChatMessage struct {
     // stream since it last acknowledged one. See "Rosters". Absent when
     // there is nothing to acknowledge.
     Acks []byte
-
-    // Adds announces the members this sender has added to its roster
-    // since its last message, three bytes each. See "Rosters". Absent
-    // when there are none.
-    Adds []byte
-}
-
-// Introduction introduces a new member to the group.
-type Introduction struct {
-    DisplayName string
-    UniversalReadCap *bacap.UniversalReadCap
-
-    // Index is the roster index the introducing member gives the new
-    // member. See "Rosters".
-    Index uint8
 }
 ```
 
@@ -513,9 +497,9 @@ public keys, or by anything derived from them, because a message may
 acknowledge every member the sender has read, and this protocol is meant
 eventually to cross transports (LoRa, for one) where every byte of a
 group message counts. Each member numbers the others itself, with no
-agreement among members. What makes the numbers usable is that every
-member can follow every other member's numbering from that member's own
-stream.
+agreement among members, and never states a number. What makes the
+numbers usable is that every member can work out every other member's
+numbering by watching what that member acknowledges.
 
 <div class="itemizedlist">
 
@@ -532,52 +516,61 @@ stream.
   new member's roster starts as a copy of its introducer's as it stands
   at the `Introduction` announcing the new member, whose own entry is
   included.
-- **Growing.** A member numbers another at the moment it says so on its
-  own stream, and it always states the roster index, so that anyone
-  reading that stream can keep their copy in step. A member introducing a
-  new member sets `Introduction.Index`. A member that learns of a new
-  member from someone else's `Introduction` announces it in `Adds`.
-- **Adds.** `Adds` is a byte string of three-byte entries `(x, j, k)`, in
-  ascending order of `x`. Each says: the sender's roster index `x` now
-  holds the member that the sender's roster index `j` holds at its own
-  roster index `k`. Ordinarily `j` is the introducer and `k` the
-  `Introduction.Index` the sender has just read on the introducer's
-  stream. `Adds` is applied before the `Acks` of the same message, so a
-  member can be numbered and acknowledged at once. A sender MUST NOT
-  acknowledge a roster index it has not announced. Like an
-  acknowledgement, `Adds` is never sent on its own. A reader that cannot
-  yet follow the reference (it has not read that far on the stream of the
-  member at `j`) keeps the entry and resolves it when it can.
-- **Repeats.** An `Introduction.Index` or an `Adds` entry for a roster
-  index the reader's copy already holds is ignored. Reading an old box
-  again is therefore harmless.
+- **Growing.** A roster grows in two ways, and neither adds anything to a
+  message. A member that introduces a new member numbers it in that
+  `Introduction`, the message that ends the contact voucher protocol. A
+  member that learns of a new member from someone else's `Introduction`
+  numbers it in the first message it sends whose acknowledgement of the
+  introducer's stream reaches or passes the box holding that
+  `Introduction`. Either way the new member takes the next free roster
+  index. When one message numbers several members, those reached through
+  its acknowledgements come first, in the order their introducers stand
+  in the sender's roster and, for one introducer, in the order of its
+  stream; a member the message itself introduces comes last. A member
+  can be acknowledged from the sender's next message on, not in the
+  message that numbers it.
+- **Watching.** To follow another member's roster, a member keeps a
+  record of what that member has acknowledged: for each stream, how far
+  each of its messages reached. When an acknowledgement reaches or passes
+  a box the watcher knows to hold an `Introduction`, the watcher adds the
+  new member to its copy of that roster. A watcher that reads the
+  `Introduction` only afterwards, having been behind on the introducer's
+  stream, adds the new member then, in the place the recorded
+  acknowledgement gives it. Until it has, a roster index it cannot place
+  is one it cannot resolve.
+- **Repeats.** A member already in a roster is not added to it again,
+  whoever introduces it a second time. Reading an old box again is
+  therefore harmless.
 - **Reply to a new member.** The reply that hands a new member the
   group's read caps (`ReplyWho` here, `WhoReply` in the contact voucher
   protocol) lists them in the order of the introducer's roster as it
   stands at the `Introduction` it accompanies, so that a read cap's
   position is its roster index. A position whose stream the introducer no
   longer reads (see "Removal") is sent empty. The new member takes the
-  next position: its own roster index is the number of positions listed,
-  and equals the `Index` of that `Introduction`. The reply carries one
-  thing more:
+  next position: its own roster index, in its introducer's roster and in
+  its own, is the number of positions listed. The reply carries one thing
+  more:
 
   ``` programlisting
   // Rosters holds, for each member in the order of the introducer's
-  // roster, that member's roster as the introducer last saw it.
+  // roster, that member's roster as the introducer has followed it.
   Rosters [][]byte
   ```
 
   Each roster is one byte per entry, in that member's own order, and each
   byte is the introducer's roster index for the member in that entry.
-  `0xff` marks an entry the introducer cannot identify. This is sent
-  once, to the new member alone. It is what lets a new member read every
-  existing member's roster indexes from the first message it receives,
-  without the history that produced them. From there it follows each
-  member's stream like anyone else.
-- **Limit.** A roster holds at most 255 entries, roster indexes 0 to 254;
-  `0xff` is kept for the marker above. Because a roster index is never
-  reused, this bounds the members a roster has ever held, not the members
-  it holds now.
+  This is sent once, to the new member alone. It is what lets a new
+  member read every existing member's roster indexes from the first
+  message it receives, without the history of acknowledgements that
+  produced them. From there it watches each member like anyone else. A
+  roster is handed over only as far as the introducer has followed it:
+  where a member has acknowledged further along a stream than the
+  introducer has itself read, the introducer cannot yet tell whom that
+  member learned of there, and the new member's copy starts without
+  them.
+- **Limit.** A roster holds at most 256 entries, roster indexes 0 to 255.
+  Because a roster index is never reused, this bounds the members a
+  roster has ever held, not the members it holds now.
 - **Layout.** Let `n` be the number of members a message acknowledges,
   and `b` the number of bytes a bitmap needs, at one bit per roster
   index, to reach the highest roster index among them. When `n` is at
@@ -595,10 +588,10 @@ stream.
   a group of sixteen, acknowledging all fifteen others takes two bytes
   instead of fifteen; in a group of sixty-four, acknowledging all
   sixty-three others takes eight instead of sixty-three (see the first
-  table under "Design tradeoffs"). It is a
-  saving in naming only: each named member still carries its value. No
-  flag is spent choosing between the forms: the length of the field tells
-  a reader which it holds (see "Parsing").
+  table under "Design tradeoffs"). It is a saving in naming only: each
+  named member still carries its value. No flag is spent choosing between
+  the forms: the length of the field tells a reader which it holds (see
+  "Parsing").
 - **Parsing.** `Acks` arrives from another party. Since every value is
   exactly one `MessageBoxIndex`, a reader divides the length of the field
   by that size: the quotient is `n`, the number of values, and the
@@ -609,10 +602,8 @@ stream.
   explicit count. A parser MUST treat the whole `Acks` field as carrying
   no acknowledgements when the remainder is greater than `n`, when a list
   is not in strictly ascending order, when the last byte of a bitmap is
-  zero, when a bitmap does not have exactly `n` bits set, when a bitmap
-  is longer than 32 bytes, or when roster index 255 is named. An empty
-  `Acks` acknowledges nothing. An `Adds` whose length is not a multiple
-  of three is ignored whole.
+  zero, when a bitmap does not have exactly `n` bits set, or when a
+  bitmap is longer than 32 bytes. An empty `Acks` acknowledges nothing.
 - **Claiming.** A stream owner finds its own roster index in its copy of
   the sender's roster. If the message's `Acks` names that roster index,
   the value in that position is its own. If it does not, or if the
@@ -625,11 +616,11 @@ stream.
   roster of the member that sent it, and MUST NOT be compared across
   senders.
 - **Skipped boxes.** A reader that passes a position on a member's stream
-  without reading it (see "Rewrite and scan") may have missed an
-  `Introduction` or an `Adds`. The entries it already holds stay valid,
-  and later entries still land where they belong, because each states its
-  roster index. A roster index it never saw announced stays unresolved
-  for that reader.
+  without reading it (see "Rewrite and scan") may have missed the message
+  in which that member numbered someone. Its copy of that roster is then
+  sure only as far as the entries it already held: a later roster index
+  may point at the wrong member for that reader. The Sent-box check
+  discards an acknowledgement taken by the wrong member.
 - **Removal.** A member may stop reading another member's stream without
   telling anyone. Its roster keeps that entry regardless, because every
   other member still counts from it. It MAY forget which member held the
@@ -649,14 +640,11 @@ stream.
   1 to 15          7f ff       bitmap    1562 bytes
   ```
 
-  An `Adds` of `05 02 07` says: this sender's roster index 5 now holds
-  the member that its roster index 2 holds at roster index 7.
-
 </div>
 
-**Design tradeoffs.** Four decisions shape the rosters, and each table
+**Design tradeoffs.** Five decisions shape the rosters, and each table
 below shows what one of them buys and what it gives up. The alternative
-in the first, third and fourth is the design an earlier revision of this
+in the first, fourth and fifth is the design an earlier revision of this
 specification used: a binary trie over hashes of the members' public
 keys, built afresh by the sender for every message, so that nothing had
 to be remembered between messages. Its figures are means measured on real
@@ -677,6 +665,17 @@ field is the same in every column and is left out.
 | 64      | 32           | 27.8                  | 32                  | 8                       |
 | 64      | 63           | 39.0                  | 63                  | 8                       |
 
+*A roster's growth is read from acknowledgements, not announced.* The
+alternative is for a member to state each new roster index in its next
+message, at three bytes an entry.
+
+|                                    | Announced in the next message                  | Read from acknowledgements (chosen)                                      |
+|------------------------------------|------------------------------------------------|--------------------------------------------------------------------------|
+| Bytes per member, per new member   | 3                                              | none                                                                     |
+| What a watcher keeps               | each member's roster                           | each member's roster, and how far each member has acknowledged each stream |
+| A new member can be acknowledged   | in the message that numbers it                 | from the following message                                               |
+| After a skipped box                | later entries still land at their stated place | later entries may be misplaced                                           |
+
 *Every roster handed to a new member, as ordered lists.* Bytes added to
 the introducer's reply, once per introduction, and what that adds to the
 read caps the reply already carries. Order is paid for because the order
@@ -687,21 +686,22 @@ bitmap per member would do.
 |------------------------------|------------------------|---------|---------------------|
 | 16                           | 256                    | 32      | 12%                 |
 | 64                           | 4096                   | 512     | 47%                 |
-| 254                          | 64516                  | 8128    | 187%                |
+| 255                          | 65025                  | 8160    | 188%                |
 
 *State and one-time bytes in exchange for smaller messages.* Every reader
-must follow every member's roster, where the trie needed nothing
-remembered. A group grown to sixteen members has also spent about 1570
-bytes once that the trie would not have: 1240 in rosters across fifteen
-replies, 315 in `Adds`, and 15 in `Introduction.Index`. Group messages
-needed, at sixteen members, to earn that back:
+must follow every member's roster, and to do so must remember how far
+every member has acknowledged every stream, where the trie needed nothing
+remembered. A group grown to sixteen members has also spent about 1240
+bytes once that the trie would not have, all of it in the rosters handed
+over across fifteen replies. Group messages needed, at sixteen members,
+to earn that back:
 
 | A typical message acknowledges | Saved per message against the trie | Messages to break even |
 |--------------------------------|------------------------------------|------------------------|
-| 1 member                       | 1.0 bytes                          | about 1600             |
-| 3 members                      | 2.0 bytes                          | about 800              |
-| 8 members                      | 5.1 bytes                          | about 300              |
-| 15 members                     | 7.6 bytes                          | about 200              |
+| 1 member                       | 1.0 bytes                          | about 1200             |
+| 3 members                      | 2.0 bytes                          | about 600              |
+| 8 members                      | 5.1 bytes                          | about 250              |
+| 15 members                     | 7.6 bytes                          | about 160              |
 
 *A roster index is retired, never reused.* Removal is unannounced, so
 nobody else would know the numbers had moved.
@@ -710,7 +710,7 @@ nobody else would know the numbers had moved.
 |----------------------------------|----------------------|-------------------------------------------------------------------------|
 | Later messages                   | nothing              | one dead bit per retired roster index, in each bitmap reaching past it  |
 | Later replies to new members     | nothing              | one byte per retired roster index, in each roster that holds it         |
-| Group size                       | no limit from naming | 255 members ever numbered                                               |
+| Group size                       | no limit from naming | 256 members ever numbered                                               |
 | Left with the member who removed | nothing              | an empty numbered position                                              |
 
 **Sent-box records.** Making use of an acknowledgement depends on a second,
