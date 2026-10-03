@@ -452,40 +452,96 @@ type GroupChatMessage struct {
     Who *Who
     ReplyWho *ReplyWho
 
-    // Acks maps an acknowledged member's channel id -- the 32-byte
-    // public-key prefix of that member's read cap -- to the BACAP
+    // Acks maps a channel prefix (the shortest prefix of an acknowledged
+    // member's read-cap public key that this sender can tell apart from
+    // every other member it holds; see "Channel prefixes") to the BACAP
     // MessageBoxIndex of the furthest box this sender has newly read on
-    // that member's stream since it last acknowledged one. See
-    // "Opportunistic acknowledgements and backfill".
-    Acks map[[32]byte][]byte
+    // that member's stream since it last acknowledged one. The key is
+    // encoded as a CBOR byte string, not a text string.
+    Acks map[string][]byte
 }
 ```
 
 <div class="itemizedlist">
 
-- Each key is a member's **channel id**: the 32-byte public-key prefix of
-  that member's read cap, the same prefix `MembershipHash` (above) hashes,
-  and the same one a repeated handshake matches to recognise the same
-  member rather than a new one. It stays stable across every
-  index-mutation variant of a member's cap (original, salt-mutated,
-  future-only), unlike the cap's own index suffix. A stream owner
-  recognises its own acknowledgement with one lookup: is its own channel id
-  a key.
+- Each key is a **channel prefix**: the shortest prefix of the
+  acknowledged member's read-cap public key that is a prefix of no other
+  read cap the sender holds, never shorter than one byte (see "Channel
+  prefixes" below). The public key it abbreviates is the part of a cap
+  that stays stable across every index-mutation variant (original,
+  salt-mutated, future-only), unlike the cap's own index suffix, and it
+  remains the member's identity; the prefix only names that member within
+  the one message carrying it. A stream owner recognises its own
+  acknowledgement by one test: is some key a prefix of its own public key.
 - Each value is the raw `MessageBoxIndex` (the 104-byte BACAP position
   value used elsewhere to address a box; §4 of the Echomix paper), nothing
   else, naming the furthest box newly read on that member's stream.
 - The *acknowledging* member's identity (as against the acknowledged one,
   above) still comes from which member's own stream carried the message:
   with no broadcast channel in this design, a message already arrives
-  attributed to its sender, whatever channel ids its `Acks` keys name.
-- A channel id is not secret (every member already holds every other
+  attributed to its sender, whatever channel prefixes its `Acks` keys name.
+- A channel prefix is not secret (every member already holds every other
   member's read cap, to read their stream), so a stream owner still checks
   a claimed index against its own Sent-box records (below): one matching
-  nothing it actually wrote is ignored, stale or forged alike.
+  nothing it actually wrote is ignored, stale, forged, or misattributed
+  (see "Channel prefixes") alike.
 - Because BACAP reading is sequential, acknowledging a stream's Nth box
   implies every earlier one has already been read; a conforming
   implementation therefore need only include, per stream, the single
   highest index newly read since its last acknowledgement.
+
+</div>
+
+**Channel prefixes.** A key abbreviates a member's read-cap public key
+rather than carrying it whole because a message may acknowledge every
+member the sender has read, and this protocol is meant eventually to
+cross transports (LoRa, for one) where every byte of a group message
+counts. A prefix is chosen by the sender alone, against the sender's own
+current view of the group, with no agreement among members and nothing
+announced in advance.
+
+<div class="itemizedlist">
+
+- **Choosing.** For each member it acknowledges, the sender takes the
+  shortest prefix of that member's read-cap public key that is a prefix
+  of no other read cap it holds, and never less than one byte. Public
+  keys being uniformly random, this is one byte for nearly every member
+  of a group under about thirty and two bytes beyond: among `n` members
+  about `n²/512` pairs share a first byte. Prefixes are recomputed for
+  every message, so when the sender learns of a member whose key shares
+  a prefix with one it already acknowledges, both lengthen on their own
+  and readers need no notice of it.
+- **Claiming.** A stream owner claims an entry if, and only if, its key
+  is a prefix of the owner's own read-cap public key. That is the whole
+  rule. An owner MUST NOT reject an entry for being shorter than the
+  owner itself would have chosen: doing so would refuse genuine
+  acknowledgements from every sender that has not yet learned of some
+  colliding member, to prevent a rarer misattribution instead.
+- **Resolving.** A prefix is not an identifier and MUST NOT be stored or
+  compared as one. A reader resolves each key afresh against the members
+  it holds at the time, and the same member may be named by prefixes of
+  different lengths in successive messages from one sender.
+- **Misattribution.** Because members' views of the group are only
+  eventually consistent, an entry can be claimed by the wrong member:
+  exactly when the acknowledged member and some other member share a
+  prefix and the sender does not yet know that other member. The window
+  closes as soon as the sender learns of them. Within it the claimed
+  index names a box on the acknowledged member's stream, so it matches
+  nothing the wrong claimant ever wrote and the Sent-box check above
+  discards it. Any future shortening of the value weakens that check in
+  proportion.
+- **Divergence.** A key that matches no member the reader holds, one
+  that matches more than one, or one longer than the reader would itself
+  have chosen each tells the reader that the sender's view of the group
+  differs from its own: the sender holds a member the reader lacks,
+  lacks one the reader holds, or holds a colliding member the reader
+  lacks, respectively. The protocol does not act on this; an
+  implementation MAY surface it.
+- **Grinding.** Read-cap public keys are self-chosen, so a member can
+  pick one sharing a long prefix with another member's. That costs
+  everyone a longer prefix for those two members and nothing else:
+  claiming stays by prefix of one's own key, and the Sent-box check
+  stands.
 
 </div>
 
