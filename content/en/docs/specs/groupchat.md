@@ -534,9 +534,8 @@ rest work out its numbering by watching what it acknowledges.
   stands at the `Introduction` it accompanies, so that a read cap's
   position is its roster index. A position whose stream the introducer no
   longer reads (see "Removal") is sent empty. The new member takes the
-  next position: its own roster index, in its introducer's roster and in
-  its own, is the number of positions listed. The reply carries one thing
-  more:
+  next position, in its introducer's roster and in its own. The reply
+  carries one thing more:
 
   ``` programlisting
   // Rosters holds, for each member in the order of the introducer's
@@ -545,16 +544,12 @@ rest work out its numbering by watching what it acknowledges.
   ```
 
   Each roster is one byte per entry, in that member's own order, and each
-  byte is the introducer's roster index for the member in that entry.
-  This is sent once, to the new member alone. It is what lets a new
-  member read every existing member's roster indexes from the first
-  message it receives, without the history of acknowledgements that
-  produced them. From there it watches each member like anyone else. A
-  roster is handed over only as far as the introducer has followed it:
-  where a member has acknowledged further along a stream than the
-  introducer has itself read, the introducer cannot yet tell whom that
-  member learned of there, and the new member's copy starts without
-  them.
+  byte is the introducer's roster index for the member in that entry. It
+  is sent once, to the new member alone, and stands in for the history of
+  acknowledgements the new member never saw. A roster is handed over only
+  as far as the introducer has followed it: a member that has
+  acknowledged further along a stream than the introducer has read may
+  hold members the copy lacks.
 - **Layout.** `Acks` is one byte string: what names the acknowledged
   members, then one value for each, back to back in ascending order of
   roster index. Nothing else frames an entry. Let `n` be the number of
@@ -567,17 +562,13 @@ rest work out its numbering by watching what it acknowledges.
   free to load the result into a dictionary of its own.
 - **Optimization.** The plain form of this scheme is the list: one byte
   per acknowledged member. Because roster indexes are small and
-  consecutive, the same members can instead be marked at one bit per
-  roster index, and the sender writes whichever form is shorter. In the
-  bytes that name members this is a large saving when a message
-  acknowledges many of them, and none when it acknowledges one or two. In
-  a group of sixteen, acknowledging all fifteen others takes two bytes
-  instead of fifteen; in a group of sixty-four, acknowledging all
-  sixty-three others takes eight instead of sixty-three (see the first
-  table under "Design tradeoffs"). It is a saving in naming only: each
-  named member still carries its value. No flag is spent choosing between
-  the forms: the length of the field tells a reader which it holds (see
-  "Parsing").
+  consecutive, the same members can instead be marked at one bit each,
+  and the sender writes whichever form is shorter. In the bytes that name
+  members this is a large saving when a message acknowledges many of
+  them, and none when it acknowledges one or two: in a group of sixteen,
+  acknowledging all fifteen others takes two bytes instead of fifteen
+  (see the first table under "Design tradeoffs"). It is a saving in
+  naming only: each named member still carries its value.
 - **Parsing.** `Acks` arrives from another party. Since every value is
   exactly one `MessageBoxIndex`, a reader divides the length of the field
   by that size: the quotient is `n`, the number of values, and the
@@ -590,32 +581,24 @@ rest work out its numbering by watching what it acknowledges.
   is not in strictly ascending order, when the last byte of a bitmap is
   zero, when a bitmap does not have exactly `n` bits set, or when a
   bitmap is longer than 32 bytes. An empty `Acks` acknowledges nothing.
-- **Claiming.** A stream owner finds its own roster index in its copy of
-  the sender's roster. If the message's `Acks` names that roster index,
-  the value in that position is its own. If it does not, or if the
-  sender's roster does not hold the owner, the message carries no
-  acknowledgement for it.
-- **Resolving.** A reader that wants every acknowledgement, not only its
-  own, reads each named roster index against its copy of the sender's
-  roster. A value at a roster index it cannot resolve is skipped, which
-  the fixed value size allows. A roster index means nothing outside the
-  roster of the member that sent it, and MUST NOT be compared across
-  senders.
+- **Reading.** A reader takes each named roster index against its copy
+  of the sender's roster. A stream owner needs only its own: if the
+  sender's roster holds it and the message's `Acks` names that roster
+  index, the value in that position is its own. A value at a roster index
+  the reader cannot resolve is skipped, which the fixed value size
+  allows. A roster index means nothing outside the roster of the member
+  that sent it, and MUST NOT be compared across senders.
 - **Skipped boxes.** A reader that passes a position on a member's stream
   without reading it (see "Rewrite and scan") may have missed the message
   in which that member numbered someone. Its copy of that roster is then
-  sure only as far as the entries it already held: a later roster index
-  may point at the wrong member for that reader. The Sent-box check
-  discards an acknowledgement taken by the wrong member.
+  sure only as far as the entries it already held, and a later roster
+  index may point at the wrong member. The Sent-box check discards an
+  acknowledgement taken by the wrong member.
 - **Removal.** A member may stop reading another member's stream without
   telling anyone. Its roster keeps that entry regardless, because every
   other member still counts from it. It MAY forget which member held the
   entry, but MUST NOT acknowledge that roster index again or give it to
-  another member. In a reply to a new member it sends that position
-  empty.
-- **Views.** A member's copy of another's roster shows directly which
-  members that one has numbered. The protocol does not act on a
-  difference between rosters; an implementation MAY surface it.
+  another member.
 - **Examples.** A sender whose roster holds sixteen members:
 
   ``` programlisting
