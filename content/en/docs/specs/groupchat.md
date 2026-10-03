@@ -611,17 +611,16 @@ rest work out its numbering by watching what it acknowledges.
 
 </div>
 
-**Design tradeoffs.** Five decisions shape the rosters, and each table
-below shows what one of them buys and what it gives up. The alternative
-in the first, fourth and fifth is the design an earlier revision of this
-specification used: a binary trie over hashes of the members' public
-keys, built afresh by the sender for every message, so that nothing had
-to be remembered between messages. Its figures are means measured on real
-encodings of random groups.
+**Design tradeoffs.** Each table shows what one decision buys and what
+it gives up. Where a trie is the alternative, it is the design an earlier
+revision of this specification used: a binary trie over hashes of the
+members' public keys, rebuilt by the sender for every message, with
+nothing remembered between messages. Its figures are means measured on
+real encodings of random groups.
 
 *Roster indexes instead of a trie, and a bitmap instead of one byte per
-member.* Bytes naming the members in one message. The CBOR header of the
-field is the same in every column and is left out.
+member.* Bytes naming the members in one message, leaving out the CBOR
+header of the field, which is the same in every column.
 
 | Members | Acknowledged | Trie over hashed keys | One byte per member | List or bitmap (chosen) |
 |---------|--------------|-----------------------|---------------------|-------------------------|
@@ -635,7 +634,7 @@ field is the same in every column and is left out.
 | 64      | 63           | 39.0                  | 63                  | 8                       |
 
 *A roster's growth is read from acknowledgements, not announced.* The
-alternative is for a member to state each new roster index in its next
+alternative is to state each new roster index in the member's next
 message, at three bytes an entry.
 
 |                                    | Announced in the next message                  | Read from acknowledgements (chosen)                                      |
@@ -646,10 +645,9 @@ message, at three bytes an entry.
 | After a skipped box                | later entries still land at their stated place | later entries may be misplaced                                           |
 
 *Every roster handed to a new member, as ordered lists.* Bytes added to
-the introducer's reply, once per introduction, and what that adds to the
-read caps the reply already carries. Order is paid for because the order
-of a roster is what fixes its roster indexes. Were order not needed, one
-bitmap per member would do.
+the introducer's reply, once per introduction, and their share of the
+read caps already in it. A bitmap per member would do if order did not
+matter; it does, because the order of a roster fixes its roster indexes.
 
 | Members already in the group | Ordered lists (chosen) | Bitmaps | Growth of the reply |
 |------------------------------|------------------------|---------|---------------------|
@@ -657,13 +655,11 @@ bitmap per member would do.
 | 64                           | 4096                   | 512     | 47%                 |
 | 255                          | 65025                  | 8160    | 188%                |
 
-*State and one-time bytes in exchange for smaller messages.* Every reader
-must follow every member's roster, and to do so must remember how far
-every member has acknowledged every stream, where the trie needed nothing
-remembered. A group grown to sixteen members has also spent about 1240
-bytes once that the trie would not have, all of it in the rosters handed
-over across fifteen replies. Group messages needed, at sixteen members,
-to earn that back:
+*State and one-time bytes in exchange for smaller messages.* The trie
+needed nothing remembered; rosters need every reader to follow every
+member's. A group grown to sixteen members has also spent about 1240
+bytes once, all in the rosters handed over across fifteen replies. Group
+messages needed, at sixteen members, to earn that back:
 
 | A typical message acknowledges | Saved per message against the trie | Messages to break even |
 |--------------------------------|------------------------------------|------------------------|
