@@ -551,6 +551,33 @@ stream.
 - **Repeats.** An `Introduction.Index` or an `Adds` entry for a roster
   index the reader's copy already holds is ignored. Reading an old box
   again is therefore harmless.
+- **Reply to a new member.** The reply that hands a new member the
+  group's read caps (`ReplyWho` here, `WhoReply` in the contact voucher
+  protocol) lists them in the order of the introducer's roster as it
+  stands at the `Introduction` it accompanies, so that a read cap's
+  position is its roster index. A position whose stream the introducer no
+  longer reads (see "Removal") is sent empty. The new member takes the
+  next position: its own roster index is the number of positions listed,
+  and equals the `Index` of that `Introduction`. The reply carries one
+  thing more:
+
+  ``` programlisting
+  // Rosters holds, for each member in the order of the introducer's
+  // roster, that member's roster as the introducer last saw it.
+  Rosters [][]byte
+  ```
+
+  Each roster is one byte per entry, in that member's own order, and each
+  byte is the introducer's roster index for the member in that entry.
+  `0xff` marks an entry the introducer cannot identify. This is sent
+  once, to the new member alone. It is what lets a new member read every
+  existing member's roster indexes from the first message it receives,
+  without the history that produced them. From there it follows each
+  member's stream like anyone else.
+- **Limit.** A roster holds at most 255 entries, roster indexes 0 to 254;
+  `0xff` is kept for the marker above. Because a roster index is never
+  reused, this bounds the members a roster has ever held, not the members
+  it holds now.
 - **Layout.** Let `n` be the number of members a message acknowledges,
   and `b` the number of bytes a bitmap needs, at one bit per roster
   index, to reach the highest roster index among them. When `n` is at
@@ -602,7 +629,8 @@ stream.
   telling anyone. Its roster keeps that entry regardless, because every
   other member still counts from it. It MAY forget which member held the
   entry, but MUST NOT acknowledge that roster index again or give it to
-  another member.
+  another member. In a reply to a new member it sends that position
+  empty.
 - **Views.** A member's copy of another's roster shows directly which
   members that one has numbered. The protocol does not act on a
   difference between rosters; an implementation MAY surface it.
