@@ -457,29 +457,15 @@ type GroupChatMessage struct {
 
 <div class="itemizedlist">
 
-- `Acks` is one byte string in two parts: first what names the
-  acknowledged members, then their values back to back. Nothing else
-  frames an entry, which is what keeps the field small (see "Rosters"
-  below).
-- Each acknowledged member is named by its **roster index**: its position
-  in the sender's own roster (see "Rosters"). A roster index only points
-  at a member within the sender's numbering. The member's identity
-  remains its read-cap public key, the part of a cap that stays stable
-  across every index-mutation variant (original, salt-mutated,
-  future-only), unlike the cap's own index suffix.
 - Each value is the raw `MessageBoxIndex` (the 104-byte BACAP position
   value used elsewhere to address a box; §4 of the Echomix paper), nothing
   else, naming the furthest box newly read on that member's stream. Every
   value is exactly that size: the fixed size is the only thing marking
   where one value ends and the next begins.
-- The linkage between a member and its acknowledgement is positional: the
-  values follow in ascending order of roster index, the first value
-  belonging to the lowest roster index named, and so on. A client is free
-  to load the result into a dictionary of its own.
-- The *acknowledging* member's identity (as against the acknowledged one,
-  above) still comes from which member's own stream carried the message:
-  with no broadcast channel in this design, a message already arrives
-  attributed to its sender, whatever members its `Acks` names.
+- The *acknowledging* member's identity still comes from which member's
+  own stream carried the message: with no broadcast channel in this
+  design, a message already arrives attributed to its sender, whatever
+  members its `Acks` names.
 - A roster index is not secret (every member follows every other
   member's roster), so a stream owner still checks a claimed
   `MessageBoxIndex` against its own Sent-box records (below): one
@@ -504,12 +490,15 @@ numbering by watching what that member acknowledges.
 <div class="itemizedlist">
 
 - **Roster.** Every member has a roster: an ordered list of the members
-  it has numbered, itself included, each identified by read-cap public
-  key. Its roster index for a member is that member's position in the
-  list, counted from zero, and fits in one byte. A roster only grows: an
-  entry is never moved, and a roster index is never given to a second
-  member. Every member keeps a copy of every other member's roster, which
-  is what that member's roster indexes are read against.
+  it has numbered, itself included. Its roster index for a member is that
+  member's position in the list, counted from zero. A roster only grows:
+  an entry is never moved and a roster index is never given to a second
+  member, so the 256 that one byte allows are all a roster can ever hold.
+  A roster index only points at a member within one roster. The member's
+  identity remains its read-cap public key, the part of a cap that stays
+  the same across every index-mutation variant (original, salt-mutated,
+  future-only). Every member keeps a copy of every other member's roster,
+  which is what that member's roster indexes are read against.
 - **Starting.** A member who starts a group alone has a roster holding
   only itself. Members who start a group together each begin with the
   same roster: themselves, in ascending order of read-cap public key. A
@@ -570,17 +559,16 @@ numbering by watching what that member acknowledges.
   introducer has itself read, the introducer cannot yet tell whom that
   member learned of there, and the new member's copy starts without
   them.
-- **Limit.** A roster holds at most 256 entries, roster indexes 0 to 255.
-  Because a roster index is never reused, this bounds the members a
-  roster has ever held, not the members it holds now.
-- **Layout.** Let `n` be the number of members a message acknowledges,
-  and `b` the number of bytes a bitmap needs, at one bit per roster
-  index, to reach the highest roster index among them. When `n` is at
-  most `b`, the members are named by a list: one byte each, holding the
-  roster index, in ascending order. Otherwise they are named by a bitmap
-  of `b` bytes, in which roster index `i` is bit `i mod 8` of byte
-  `i div 8`, bits counted from the most significant. The values begin at
-  the next byte.
+- **Layout.** `Acks` is one byte string: what names the acknowledged
+  members, then one value for each, back to back in ascending order of
+  roster index. Nothing else frames an entry. Let `n` be the number of
+  members named, and `b` the number of bytes a bitmap needs, at one bit
+  per roster index, to reach the highest roster index among them. When
+  `n` is at most `b`, the members are named by a list: one byte each,
+  holding the roster index, in ascending order. Otherwise they are named
+  by a bitmap of `b` bytes, in which roster index `i` is bit `i mod 8` of
+  byte `i div 8`, bits counted from the most significant. A client is
+  free to load the result into a dictionary of its own.
 - **Optimization.** The plain form of this scheme is the list: one byte
   per acknowledged member. Because roster indexes are small and
   consecutive, the same members can instead be marked at one bit per
