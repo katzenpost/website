@@ -524,13 +524,21 @@ announced in advance.
   nothing the wrong claimant ever wrote and the Sent-box check above
   discards it. Any future shortening of the value weakens that check in
   proportion.
-- **Divergence.** A key that matches no member the reader holds, one
-  that matches more than one, or one longer than the reader would itself
-  have chosen each tells the reader that the sender's view of the group
-  differs from its own: the sender holds a member the reader lacks,
-  lacks one the reader holds, or holds a colliding member the reader
-  lacks, respectively. The protocol does not act on this; an
-  implementation MAY surface it.
+- **Divergence.** A reader classifies each key in a sender's `Acks`
+  against the members it holds. Three outcomes each tell it that the
+  sender's view of the group differs from its own:
+
+  <div class="itemizedlist">
+
+  - **Matches none.** The sender holds a member the reader lacks.
+  - **Matches two or more.** The sender lacks at least one of those
+    members, or it would have chosen a longer prefix.
+  - **Longer than the reader would need.** The sender holds a member,
+    colliding with this one, that the reader lacks.
+
+  </div>
+
+  The protocol does not act on this; an implementation MAY surface it.
 - **Grinding.** Read-cap public keys are self-chosen, so a member can
   pick one sharing a long prefix with another member's. That costs
   everyone a longer prefix for those two members and nothing else:
