@@ -415,12 +415,9 @@ Pigeonhole storage is ephemeral: a box survives roughly one to two weeks
 before replicas garbage-collect it (see "Ephemeral" in
 <a href="/docs/pigeonhole_explained" class="link" target="_top">Understanding
 Pigeonhole</a>). A reader can always skip a position it cannot fill and
-check further ahead: deriving the next position needs no knowledge of
-what, if anything, is at the current one (see "Rewrite and scan" below).
-But that cannot recover what was actually written there: once
-garbage-collected, a box's content survives only in its author's memory of
-writing it. Reading past a gap is not the same as closing it; nothing so
-far in this specification restores lost content.
+read on (see "Rewrite and scan" below), but that does not recover what
+was written there: once garbage-collected, a box's content survives only
+with its author. Nothing so far in this specification restores it.
 
 <div class="itemizedlist">
 
@@ -696,19 +693,17 @@ current member has acknowledged it, its plaintext.
   member who never acknowledges (an old client, or one gone for good)
   cannot force every other member to retain records forever.
 - **Backfill.** A stream owner keeps every box in its Sent-box records
-  rewritten against garbage collection, for two reasons that produce the
-  same rewrite. A box no active member has fully acknowledged is rewritten
-  with its original plaintext, in case garbage collection beat a slow
-  member to it. A box everyone has acknowledged is instead rewritten as a
-  tombstone: not because it's still needed, but because a position left
-  to expire would later look, to a reader, indistinguishable from one
-  never written (see "Rewrite and scan" below). Either rewrite is
-  harmless: a no-op if the box survived, a restoration if it didn't,
-  because Pigeonhole writes are content-idempotent ("Append-only and
-  immutable" in "Understanding Pigeonhole") and BACAP's per-box encryption
-  is deterministic (§4, Echomix). The trigger is always the periodic
-  rewrite described in "Rewrite and scan"; an acknowledgement never itself
-  causes a rewrite.
+  rewritten against garbage collection. A box not yet acknowledged by
+  every active member is rewritten with its original plaintext, in case
+  garbage collection beat a slow member to it. A box everyone has
+  acknowledged is rewritten as a tombstone, because a position left to
+  expire would later look to a reader like one never written (see
+  "Rewrite and scan" below). Either rewrite is harmless, a no-op if the
+  box survived and a restoration if it did not, because Pigeonhole writes
+  are content-idempotent ("Append-only and immutable" in "Understanding
+  Pigeonhole") and BACAP's per-box encryption is deterministic (§4,
+  Echomix). The trigger is always the periodic rewrite described in
+  "Rewrite and scan"; an acknowledgement never itself causes one.
 - **Rate-limiting the rewrite.** A rewrite is only useful once per replica
   epoch, since a box can't be garbage-collected (and so can't need
   restoring) more often than that. Implementations SHOULD NOT rewrite the
@@ -741,21 +736,16 @@ owner's half of resynchronising two members each stuck behind a gap in the
 other's stream. The reader's half is a scan. Unlike the periodic rewrite,
 though, the client cannot safely decide on its own when to run it.
 
-Nothing observable from a reader's side distinguishes a stream that has
-simply gone quiet (completely ordinary, and can last indefinitely) from
-one stuck behind a position that was written and then garbage-collected:
-both look identical, forever, as the same repeated `BoxIDNotFound`, which
-means only "nothing has ever been written here," not whether that's
-because nothing has been written *yet* or because it once was and is now
-gone. No threshold turns that ambiguity into reliable detection: a short
-one scans streams that were never stuck, a long one is merely slow to
-react to a real gap, and neither ever tells the reader which case it's in.
-An implementation MAY show the user how long a stream has gone quiet, but
-MUST NOT use that to trigger a scan itself: the decision is the user's,
-made with context (how well they know the other member, other contact,
-plain suspicion) that no protocol-level signal has. Concretely, a
-conforming client exposes a scan as something the user asks for, one
-stream at a time, not as a background behaviour.
+A reader cannot tell a stream that has gone quiet, which is ordinary and
+can last indefinitely, from one stuck behind a position that was written
+and then garbage-collected: both show the same repeated `BoxIDNotFound`.
+No threshold turns that into reliable detection: a short one scans
+streams that were never stuck, and a long one is merely slow to react to
+a real gap. An implementation MAY show the user how long a stream has
+been quiet, but MUST NOT use that to trigger a scan itself. The decision
+is the user's, made with context no protocol signal has, and a conforming
+client offers a scan as something the user asks for, one stream at a
+time, not as a background behaviour.
 
 <div class="orderedlist">
 
@@ -774,32 +764,15 @@ stream at a time, not as a background behaviour.
     kept. This catches, say, a box a replica hadn't finished replicating.
     It also scans forward: deriving each next index needs no network round
     trip and no knowledge of what's there, so the client keeps deriving
-    and asking, for each, without waiting out the ordinary not-yet-written
-    retry, whether it holds data, a tombstone, or nothing:
-
-    <div class="itemizedlist">
-
-    - Data is a genuine, unreceived message: process it normally and
-      continue past it.
-    - A tombstone confirms something was once written there (real content
-      everyone already has, or a placeholder the periodic rewrite
-      maintains), and the scan continues past it.
-    - `BoxIDNotFound` is the true current end of the stream: adopt this
-      position as the new expected next box and resume ordinary reading.
-
-    </div>
+    and asking, without waiting out the ordinary not-yet-written retry,
+    whether each holds data (a message not yet received), a tombstone
+    (something was once written there: content everyone already has, or a
+    placeholder the periodic rewrite maintains), or nothing (the true
+    current end of the stream).
 
 </div>
 
 Item 2 is a small state machine with exactly two states:
-
-``` programlisting
-Reading --the user requests a scan--> Scanning --BoxIDNotFound (the true frontier)--> Reading
-
-(Reading self-loops on Data, Tombstone, and BoxIDNotFound: ordinary
-reading, unchanged. Scanning self-loops on Data and Tombstone, each
-just advancing the probe.)
-```
 
 | State    | On                                          | Next state | Effect                                                       |
 |----------|----------------------------------------------|------------|----------------------------------------------------------------|
@@ -816,13 +789,12 @@ state of its own: whatever it turns up is ingested like ordinary reading,
 and doesn't affect which transition fires.
 
 Two members each stuck behind a gap in the other's stream resynchronise
-once each has asked their own client to scan: each one's stream stays
-populated by its own periodic rewrite, so there is always something for a
-scan to find. This is not automatic (recovery happens on request, not on
-its own or promptly), and it depends on asking before the stream owner's
-Sent-box retention window (above; comfortably longer than a replica epoch)
-lets the position go: that window bounds not how long a scan may take, but
-how long after the fact anything can still be found.
+once each has asked their own client to scan, because each stream stays
+populated by its owner's periodic rewrite. Recovery is on request, not
+automatic, and it must be asked for before the stream owner's Sent-box
+retention window (above) lets the position go: that window bounds how
+long after the fact anything can still be found, not how long a scan may
+take.
 
 </div>
 
@@ -873,14 +845,12 @@ for the other:
 
 </div>
 
-`f` MUST be constrained to `0 <= f < 1`. This is not a matter of taste: a
-box written at replica-epoch time `t` cannot be garbage-collected before
-slightly more than one full epoch has elapsed after `t`, however early or
-late within its own epoch `t` fell (see "Ephemeral" in "Understanding
-Pigeonhole"). Any `f < 1` therefore always tombstones before garbage
-collection could have removed the box regardless; `f >= 1` offers no such
-guarantee and can lose that race, defeating the point of choosing this
-policy over just waiting for storage to expire.
+`f` MUST satisfy `0 <= f < 1`. A box cannot be garbage-collected until
+slightly more than one full replica epoch after it was written, wherever
+in its own epoch that fell (see "Ephemeral" in "Understanding
+Pigeonhole"). So any `f < 1` tombstones before garbage collection could
+have removed the box, while `f >= 1` can lose that race, which defeats
+the point of choosing this policy over waiting for storage to expire.
 
 Which message types a disappearing-message policy applies to (ordinary
 chat content, as against membership or protocol messages such as
