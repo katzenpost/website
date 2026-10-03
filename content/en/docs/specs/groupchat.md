@@ -455,6 +455,9 @@ type GroupChatMessage struct {
 }
 ```
 
+`Acks` names each acknowledged member by its **roster index** and carries
+one value for it (see "Rosters" below).
+
 <div class="itemizedlist">
 
 - Each value is the raw `MessageBoxIndex` (the 104-byte BACAP position
@@ -479,13 +482,11 @@ type GroupChatMessage struct {
 </div>
 
 **Rosters.** Members are named by small numbers rather than by their
-public keys, or by anything derived from them, because a message may
-acknowledge every member the sender has read, and this protocol is meant
-eventually to cross transports (LoRa, for one) where every byte of a
-group message counts. Each member numbers the others itself, with no
-agreement among members, and never states a number. What makes the
-numbers usable is that every member can work out every other member's
-numbering by watching what that member acknowledges.
+public keys, because a message may acknowledge every member the sender
+has read, and this protocol is meant eventually to cross transports
+(LoRa, for one) where every byte of a group message counts. No number is
+ever stated in a message: each member numbers the others itself, and the
+rest work out its numbering by watching what it acknowledges.
 
 <div class="itemizedlist">
 
@@ -505,29 +506,24 @@ numbering by watching what that member acknowledges.
   new member's roster starts as a copy of its introducer's as it stands
   at the `Introduction` announcing the new member, whose own entry is
   included.
-- **Growing.** A roster grows in two ways, and neither adds anything to a
-  message. A member that introduces a new member numbers it in that
+- **Growing.** A member that introduces a new member numbers it in that
   `Introduction`, the message that ends the contact voucher protocol. A
-  member that learns of a new member from someone else's `Introduction`
-  numbers it in the first message it sends whose acknowledgement of the
-  introducer's stream reaches or passes the box holding that
-  `Introduction`. Either way the new member takes the next free roster
-  index. When one message numbers several members, those reached through
-  its acknowledgements come first, in the order their introducers stand
-  in the sender's roster and, for one introducer, in the order of its
-  stream; a member the message itself introduces comes last. A member
-  can be acknowledged from the sender's next message on, not in the
-  message that numbers it.
-- **Watching.** To follow another member's roster, a member keeps a
-  record of what that member has acknowledged: for each stream, how far
-  each of its messages reached. When an acknowledgement reaches or passes
-  a box the watcher knows to hold an `Introduction`, the watcher adds the
-  new member to its copy of that roster. An acknowledgement need not name
-  the box holding the `Introduction`: acknowledging any later box on that
-  stream acknowledges it too. A watcher that reads the `Introduction`
-  only afterwards, having been behind on the introducer's stream, adds
-  the new member then, in the place the recorded acknowledgement gives
-  it. Until it has, a roster index it cannot place is one it cannot
+  member that learns of one from someone else's `Introduction` numbers it
+  in the first message it sends whose acknowledgement of the introducer's
+  stream reaches or passes the box holding that `Introduction`. The
+  acknowledgement need not name that box: acknowledging any later box on
+  the stream acknowledges it too. The new member takes the next free
+  roster index, and can be acknowledged from the sender's next message
+  on. When one message numbers several members, those reached through its
+  acknowledgements come first, in the order their introducers stand in
+  the sender's roster and, for one introducer, in the order of its
+  stream; a member the message itself introduces comes last.
+- **Watching.** To follow a roster, every other member records how far
+  each of its owner's messages acknowledged each stream, and applies the
+  rule above. A watcher that reads an `Introduction` only after the
+  acknowledgement that covered it, having been behind on the introducer's
+  stream, adds the new member then, in the place that acknowledgement
+  gives it. Until it has, a roster index it cannot place is one it cannot
   resolve.
 - **Repeats.** A member already in a roster is not added to it again,
   whoever introduces it a second time. Reading an old box again is
