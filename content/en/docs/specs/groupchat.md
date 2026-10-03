@@ -533,11 +533,13 @@ numbering by watching what that member acknowledges.
   record of what that member has acknowledged: for each stream, how far
   each of its messages reached. When an acknowledgement reaches or passes
   a box the watcher knows to hold an `Introduction`, the watcher adds the
-  new member to its copy of that roster. A watcher that reads the
-  `Introduction` only afterwards, having been behind on the introducer's
-  stream, adds the new member then, in the place the recorded
-  acknowledgement gives it. Until it has, a roster index it cannot place
-  is one it cannot resolve.
+  new member to its copy of that roster. An acknowledgement need not name
+  the box holding the `Introduction`: acknowledging any later box on that
+  stream acknowledges it too. A watcher that reads the `Introduction`
+  only afterwards, having been behind on the introducer's stream, adds
+  the new member then, in the place the recorded acknowledgement gives
+  it. Until it has, a roster index it cannot place is one it cannot
+  resolve.
 - **Repeats.** A member already in a roster is not added to it again,
   whoever introduces it a second time. Reading an old box again is
   therefore harmless.
