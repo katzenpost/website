@@ -594,7 +594,8 @@ stream.
   acknowledges many of them, and none when it acknowledges one or two. In
   a group of sixteen, acknowledging all fifteen others takes two bytes
   instead of fifteen; in a group of sixty-four, acknowledging all
-  sixty-three others takes eight instead of sixty-three. It is a
+  sixty-three others takes eight instead of sixty-three (see the first
+  table under "Design tradeoffs"). It is a
   saving in naming only: each named member still carries its value. No
   flag is spent choosing between the forms: the length of the field tells
   a reader which it holds (see "Parsing").
@@ -648,6 +649,65 @@ stream.
   the member that its roster index 2 holds at roster index 7.
 
 </div>
+
+**Design tradeoffs.** Four decisions shape the rosters, and each table
+below shows what one of them buys and what it gives up. The alternative
+in the first, third and fourth is the design an earlier revision of this
+specification used: a binary trie over hashes of the members' public
+keys, built afresh by the sender for every message, so that nothing had
+to be remembered between messages. Its figures are means measured on real
+encodings of random groups.
+
+*Roster indexes instead of a trie, and a bitmap instead of one byte per
+member.* Bytes naming the members in one message. The CBOR header of the
+field is the same in every column and is left out.
+
+| Members | Acknowledged | Trie over hashed keys | One byte per member | List or bitmap (chosen) |
+|---------|--------------|-----------------------|---------------------|-------------------------|
+| 16      | 1            | 2.0                   | 1                   | 1                       |
+| 16      | 3            | 3.9                   | 3                   | 1.9                     |
+| 16      | 8            | 7.1                   | 8                   | 2                       |
+| 16      | 15           | 9.6                   | 15                  | 2                       |
+| 64      | 1            | 2.4                   | 1                   | 1                       |
+| 64      | 3            | 5.5                   | 3                   | 3                       |
+| 64      | 32           | 27.8                  | 32                  | 8                       |
+| 64      | 63           | 39.0                  | 63                  | 8                       |
+
+*Every roster handed to a new member, as ordered lists.* Bytes added to
+the introducer's reply, once per introduction, and what that adds to the
+read caps the reply already carries. Order is paid for because the order
+of a roster is what fixes its roster indexes. Were order not needed, one
+bitmap per member would do.
+
+| Members already in the group | Ordered lists (chosen) | Bitmaps | Growth of the reply |
+|------------------------------|------------------------|---------|---------------------|
+| 16                           | 256                    | 32      | 12%                 |
+| 64                           | 4096                   | 512     | 47%                 |
+| 254                          | 64516                  | 8128    | 187%                |
+
+*State and one-time bytes in exchange for smaller messages.* Every reader
+must follow every member's roster, where the trie needed nothing
+remembered. A group grown to sixteen members has also spent about 1570
+bytes once that the trie would not have: 1240 in rosters across fifteen
+replies, 315 in `Adds`, and 15 in `Introduction.Index`. Group messages
+needed, at sixteen members, to earn that back:
+
+| A typical message acknowledges | Saved per message against the trie | Messages to break even |
+|--------------------------------|------------------------------------|------------------------|
+| 1 member                       | 1.0 bytes                          | about 1600             |
+| 3 members                      | 2.0 bytes                          | about 800              |
+| 8 members                      | 5.1 bytes                          | about 300              |
+| 15 members                     | 7.6 bytes                          | about 200              |
+
+*A roster index is retired, never reused.* Removal is unannounced, so
+nobody else would know the numbers had moved.
+
+| After a removal                  | Trie                 | Rosters (chosen)                                                        |
+|----------------------------------|----------------------|-------------------------------------------------------------------------|
+| Later messages                   | nothing              | one dead bit per retired roster index, in each bitmap reaching past it  |
+| Later replies to new members     | nothing              | one byte per retired roster index, in each roster that holds it         |
+| Group size                       | no limit from naming | 255 members ever numbered                                               |
+| Left with the member who removed | nothing              | an empty numbered position                                              |
 
 **Sent-box records.** Making use of an acknowledgement depends on a second,
 distinct kind of retention: not the replicas' storage retention
