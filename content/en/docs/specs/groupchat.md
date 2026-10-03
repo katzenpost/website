@@ -603,12 +603,16 @@ stream.
   exactly one `MessageBoxIndex`, a reader divides the length of the field
   by that size: the quotient is `n`, the number of values, and the
   remainder is the length of what precedes them. A remainder equal to `n`
-  is a list. A smaller remainder is a bitmap. A parser MUST treat the
-  whole `Acks` field as carrying no acknowledgements when the remainder
-  is greater than `n`, when a list is not in strictly ascending order,
-  when the last byte of a bitmap is zero, or when a bitmap does not have
-  exactly `n` bits set. An empty `Acks` acknowledges nothing. An `Adds`
-  whose length is not a multiple of three is ignored whole.
+  is a list. A smaller remainder is a bitmap. This works only because a
+  value is longer than the longest list or bitmap, which is 32 bytes:
+  were a value ever made shorter than 33 bytes, the field would need an
+  explicit count. A parser MUST treat the whole `Acks` field as carrying
+  no acknowledgements when the remainder is greater than `n`, when a list
+  is not in strictly ascending order, when the last byte of a bitmap is
+  zero, when a bitmap does not have exactly `n` bits set, when a bitmap
+  is longer than 32 bytes, or when roster index 255 is named. An empty
+  `Acks` acknowledges nothing. An `Adds` whose length is not a multiple
+  of three is ignored whole.
 - **Claiming.** A stream owner finds its own roster index in its copy of
   the sender's roster. If the message's `Acks` names that roster index,
   the value in that position is its own. If it does not, or if the
