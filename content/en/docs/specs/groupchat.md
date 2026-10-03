@@ -156,8 +156,6 @@ The group state consists of:
 
   </div>
 
-- a `MembershipHash` (a hash over all of the MembershipCaps)
-
 </div>
 
 The group chat is completely decentralized. Each member must keep track of every other
@@ -287,9 +285,6 @@ type GroupChatMessage struct {
     // Version is used to ensure we can change this message type in the future.
     Version int
 
-    // MembershipHash is the hash of the user's PleaseAdd message.
-    MembershipHash *[32]byte
-    
     TextPayload *TextPayload
     Introduction *Introduction
     FileUpload *FileUpload
@@ -444,7 +439,6 @@ far in this specification restores lost content.
 // GroupChatMessage encapsulates all chat message types.
 type GroupChatMessage struct {
     Version int
-    MembershipHash *[32]byte
 
     TextPayload *TextPayload
     Introduction *Introduction
