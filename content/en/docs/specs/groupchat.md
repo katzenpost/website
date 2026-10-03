@@ -443,11 +443,9 @@ type GroupChatMessage struct {
     Who *Who
     ReplyWho *ReplyWho
 
-    // Acks names the members this sender acknowledges by their roster
-    // index, then carries one BACAP MessageBoxIndex per named member,
-    // each the furthest box this sender has newly read on that member's
-    // stream since it last acknowledged one. See "Rosters". Absent when
-    // there is nothing to acknowledge.
+    // Acks names the members this sender acknowledges by roster index
+    // and carries one BACAP MessageBoxIndex for each. See "Rosters".
+    // Absent when there is nothing to acknowledge.
     Acks []byte
 }
 ```
@@ -458,10 +456,10 @@ one value for it (see "Rosters" below).
 <div class="itemizedlist">
 
 - Each value is the raw `MessageBoxIndex` (the 104-byte BACAP position
-  value used elsewhere to address a box; §4 of the Echomix paper), nothing
-  else, naming the furthest box newly read on that member's stream. Every
-  value is exactly that size: the fixed size is the only thing marking
-  where one value ends and the next begins.
+  value used elsewhere to address a box; §4 of the Echomix paper) of the
+  furthest box newly read on that member's stream, and nothing else. The
+  fixed size is the only thing marking where one value ends and the next
+  begins.
 - The *acknowledging* member's identity still comes from which member's
   own stream carried the message: with no broadcast channel in this
   design, a message already arrives attributed to its sender, whatever
@@ -492,11 +490,11 @@ rest work out its numbering by watching what it acknowledges.
   member's position in the list, counted from zero. A roster only grows:
   an entry is never moved and a roster index is never given to a second
   member, so the 256 that one byte allows are all a roster can ever hold.
-  A roster index only points at a member within one roster. The member's
-  identity remains its read-cap public key, the part of a cap that stays
-  the same across every index-mutation variant (original, salt-mutated,
-  future-only). Every member keeps a copy of every other member's roster,
-  which is what that member's roster indexes are read against.
+  The member's identity remains its read-cap public key, the part of a
+  cap that stays the same across every index-mutation variant (original,
+  salt-mutated, future-only). Every member keeps a copy of every other
+  member's roster, which is what that member's roster indexes are read
+  against.
 - **Starting.** A member who starts a group alone has a roster holding
   only itself. Members who start a group together each begin with the
   same roster: themselves, in ascending order of read-cap public key. A
