@@ -451,8 +451,9 @@ type GroupChatMessage struct {
     // every other member it holds; see "Channel prefixes") to the BACAP
     // MessageBoxIndex of the furthest box this sender has newly read on
     // that member's stream since it last acknowledged one. The key is
-    // encoded as a CBOR byte string, not a text string.
-    Acks map[string][]byte
+    // a CBOR byte string: a plain Go string would encode as a text
+    // string, which must be valid UTF-8.
+    Acks map[cbor.ByteString][]byte
 }
 ```
 
