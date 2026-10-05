@@ -516,7 +516,8 @@ acknowledged it.
 
 <div class="itemizedlist">
 
-- **Retention.** Once every other active member has acknowledged a box,
+- **Retention.** Once every other member established on the stream (see
+  Joining) has acknowledged a box,
   its plaintext MAY be discarded, but its position is kept. Records MUST be
   discarded after a bounded window exceeding one replica epoch, so absent
   members cannot force retention forever.
@@ -527,6 +528,31 @@ acknowledged it.
   encryption is deterministic. Acknowledgements never trigger a rewrite.
 - **Rate limit.** Implementations SHOULD NOT rewrite a box more than once
   per replica epoch.
+
+</div>
+
+**Joining.** Reliability starts only once a member and a stream owner have
+exchanged acknowledgements. Until then, reading that stream is best-effort.
+
+<div class="itemizedlist">
+
+- **Established.** A member is established on a stream once the owner has
+  read its first acknowledgement of that stream. Retention and ack-gated
+  tombstoning count only established members.
+- **Confirmation.** The member knows it is established once the owner's
+  stream acknowledges the box carrying that first acknowledgement. From
+  that box on, the stream is reliable for it.
+- **Catch-up.** Before confirmation, a reader stuck at position `N` that
+  has read another member's acknowledgement of the stream at position
+  `k >= N` MAY probe `N+1` through `k` without waiting. It verifies the
+  acknowledged index by deriving the stream forward from `N`, at most as far
+  as the Sent-box retention window, and ignores an index that does not
+  match. Data is ingested, a tombstone is skipped, and an absent box is
+  shown as unavailable, with its index kept for a recheck.
+- **History.** Read caps and history given to a new member are
+  best-effort. Missing boxes are shown as unavailable.
+- **Silent members.** A member that never writes is never established. It
+  reads best-effort only and never delays discarding.
 
 </div>
 
@@ -550,7 +576,8 @@ acknowledged it.
 
 A reader cannot tell a quiet stream from one stuck behind a
 garbage-collected box: both return `BoxIDNotFound`. An implementation MAY
-show how long a stream has been quiet but MUST NOT scan automatically. The
+show how long a stream has been quiet but MUST NOT scan automatically,
+except to catch up while joining (see Joining). The
 user requests a scan, one stream at a time.
 
 <div class="orderedlist">
@@ -593,7 +620,7 @@ support both policies:
 
 <div class="itemizedlist">
 
-- **Ack-gated.** Tombstone a box once every other active member has
+- **Ack-gated.** Tombstone a box once every other established member has
   acknowledged it or a later box. Slow members delay deletion but never
   prevent it.
 - **Age-fraction.** Tombstone a box once fraction `f` of the replica epoch
