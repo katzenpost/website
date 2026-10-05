@@ -56,12 +56,12 @@
             
             <mediaobject>                                           
                 <imageobject>
-                    <imagedata fileref="pix/components-production.png" scale="65"/>
+                    <imagedata fileref="pix/components-production-2026.png" scale="65"/>
                 </imageobject>
             </mediaobject>
             
         </figure>
-        <para><link xlink:href="&baseURL;docs/admin_guide/pix/components-production.png" xlink:show="new"
+        <para><link xlink:href="&baseURL;docs/admin_guide/pix/components-production-2026.png" xlink:show="new"
                 >Enlarge diagram</link></para>
         <para>The mix network contains an <emphasis>n</emphasis>-layer topology of mix-nodes, with
             three nodes per layer in this example. Sphinx packets traverse the network in one
