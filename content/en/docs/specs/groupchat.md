@@ -152,6 +152,8 @@ The group state consists of:
 
   - a BACAP readcap
 
+  - the index of the next box to read, kept separately from the readcap
+
   - a nickname
 
   </div>
@@ -262,7 +264,7 @@ type Who struct {}
 
 The `ReplyWho` message answers the Who query with an
 `AllOrNothingMessage` BACAP stream containing readcaps for all group chat
-members.
+members, each with the index to start reading at.
 
 ``` programlisting
 type ReplyWho struct {
@@ -374,7 +376,7 @@ The `Invitation` protocol flow works as follows.
 
         - Because the new member needs existing members' readcaps, the introducer
           replies to the new member with `ReplyWho` message containing readcaps
-          for all existing members.
+          for all existing members, each with the index to start reading at.
 
           <span class="bold">**IMPORTANT:**</span> The content of both replies must
           be sent in the same `AllOrNothingMessage`, despite the
@@ -473,8 +475,9 @@ to save bytes on constrained transports such as LoRa.
   watcher that reads an `Introduction` late adds the member at the place the
   covering acknowledgement gave it. Until then, that index is unresolved.
 - **Repeats.** A member already in a roster is never added again.
-- **Reply to a new member.** The reply carrying the group's read caps
-  (`ReplyWho`, or `WhoReply` in the contact voucher protocol) lists them in
+- **Reply to a new member.** The reply carrying the group's read caps, each
+  with its start index (`ReplyWho`, or `WhoReply` in the contact voucher
+  protocol), lists them in
   the introducer's roster order, so position equals roster index. A
   removed member's slot is sent empty. The reply also carries every
   member's roster, as the introducer has followed it, sent once:
@@ -531,14 +534,16 @@ acknowledged it.
 </div>
 
 **Joining.** A new member receives its introducer's view of the group as of
-the `Introduction`: a read cap for every stream, and the rosters the
-introducer knew about (see Reply to a new member).
+the `Introduction`: a read cap and a start index for every member's stream
+in the introducer's roster, and the rosters the introducer knew about (see
+Reply to a new member). Read caps are sent unchanged; the index travels
+beside them and is advanced separately.
 
 <div class="itemizedlist">
 
-- **Start positions.** Each read cap starts at the box after the
-  introducer's last published acknowledgement of that stream, and the
-  introducer's own at the `Introduction`. The introducer takes these in the
+- **Start positions.** Each start index is the box after the introducer's
+  last published acknowledgement of that stream, and the introducer's own
+  is the `Introduction`. The introducer takes these in the
   same all-or-nothing commit that writes the `Introduction`.
 - **Retention.** A member that reads an `Introduction` keeps every box of
   its own stream that the introducer had not acknowledged at that point,
