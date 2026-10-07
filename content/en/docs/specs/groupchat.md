@@ -516,8 +516,7 @@ acknowledged it.
 
 <div class="itemizedlist">
 
-- **Retention.** Once every other member established on the stream (see
-  Joining) has acknowledged a box,
+- **Retention.** Once every other active member has acknowledged a box,
   its plaintext MAY be discarded, but its position is kept. Records MUST be
   discarded after a bounded window exceeding one replica epoch, so absent
   members cannot force retention forever.
@@ -531,28 +530,29 @@ acknowledged it.
 
 </div>
 
-**Joining.** Reliability starts only once a member and a stream owner have
-exchanged acknowledgements. Until then, reading that stream is best-effort.
+**Joining.** A new member inherits its introducer's acknowledgements at the
+moment of the `Introduction`, and starts reading just past them.
 
 <div class="itemizedlist">
 
-- **Established.** A member is established on a stream once the owner has
-  read its first acknowledgement of that stream. Retention and ack-gated
-  tombstoning count only established members.
-- **Confirmation.** The member knows it is established once the owner's
-  stream acknowledges the box carrying that first acknowledgement. From
-  that box on, the stream is reliable for it.
-- **Catch-up.** Before confirmation, a reader stuck at position `N` that
-  has read another member's acknowledgement of the stream at position
-  `k >= N` MAY probe `N+1` through `k` without waiting. It verifies the
-  acknowledged index by deriving the stream forward from `N`, at most as far
-  as the Sent-box retention window, and ignores an index that does not
-  match. Data is ingested, a tombstone is skipped, and an absent box is
-  shown as unavailable, with its index kept for a recheck.
-- **History.** Read caps and history given to a new member are
-  best-effort. Missing boxes are shown as unavailable.
-- **Silent members.** A member that never writes is never established. It
-  reads best-effort only and never delays discarding.
+- **Start positions.** The reply carrying the group's read caps starts each
+  stream at the box after the introducer's last published acknowledgement
+  of it, and the introducer's own stream at the `Introduction`. The
+  introducer takes these in the same all-or-nothing commit that writes the
+  `Introduction`.
+- **Inherited acknowledgements.** A member that reads an `Introduction`
+  counts the new member from then on, starting from the introducer's
+  acknowledgements as of that point. An `Introduction` takes effect before
+  any `Acks` in the same message.
+- **No race.** Members read the introducer's stream in order. Before the
+  `Introduction`, the introducer's acknowledgements stop short of the new
+  member's start positions. After it, the new member is counted in its own
+  right. So no box the new member was given is discarded before it reads
+  it.
+- **History.** To give a new member everything since an invitation began,
+  the introducer holds back new acknowledgements until the commit. Older
+  history is sent from the introducer's own copy, never by starting a
+  stream earlier.
 
 </div>
 
@@ -576,8 +576,7 @@ exchanged acknowledgements. Until then, reading that stream is best-effort.
 
 A reader cannot tell a quiet stream from one stuck behind a
 garbage-collected box: both return `BoxIDNotFound`. An implementation MAY
-show how long a stream has been quiet but MUST NOT scan automatically,
-except to catch up while joining (see Joining). The
+show how long a stream has been quiet but MUST NOT scan automatically. The
 user requests a scan, one stream at a time.
 
 <div class="orderedlist">
@@ -620,7 +619,7 @@ support both policies:
 
 <div class="itemizedlist">
 
-- **Ack-gated.** Tombstone a box once every other established member has
+- **Ack-gated.** Tombstone a box once every other active member has
   acknowledged it or a later box. Slow members delay deletion but never
   prevent it.
 - **Age-fraction.** Tombstone a box once fraction `f` of the replica epoch

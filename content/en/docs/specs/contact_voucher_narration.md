@@ -58,7 +58,7 @@ type SignedPleaseAdd struct {
 }
 ```
 
-- `WhoReply` := the existing members' MessageStream read caps (one or more), so Bob can read everyone already in the group.
+- `WhoReply` := the existing members' MessageStream read caps (one or more), so Bob can read everyone already in the group. Each starts at the box after Alice's last published acknowledgement of that stream; Alice's own starts at her `Introduction` of Bob.
 - `VoucherReply` := `WhoReply || VoucherSalt`, MKEM-sealed to `VoucherPublicKey` and written to VoucherStream box 1. Box 1 is an ordinary BACAP box, so the payload is BACAP-encrypted as a stream box and then additionally MKEM-encrypted to Bob's `VoucherPublicKey`; only Bob, holding `VoucherSecretKey`, can open it.
 - `Introduction` := Bob's display name together with his salt-mutated MessageStream read cap, published to the existing group so the members can read Bob. The group receives the mutated cap directly and never the salt.
 
@@ -83,6 +83,6 @@ Because the salt re-seeds rather than decorates the stream, it is a **per-member
 2. **Bob publishes.** The `Voucher` derives the VoucherStream; Bob writes `VoucherPayload` to box 0.
 3. **Bob → Alice (OOB).** He hands over only the `Voucher`.
 4. **Alice reads and verifies.** From `Voucher` she derives the VoucherStream, reads box 0, checks `Hash(VoucherPayload) == Voucher`, and verifies the `SignedPleaseAdd` signature against its read cap's rootPK.
-5. **Alice replies.** She mints `VoucherSalt`, assembles `WhoReply` from the existing members' live read caps, forms `VoucherReply := WhoReply || VoucherSalt`, and MKEM-seals it to `VoucherPublicKey`.
-6. **Alice commits (all-or-nothing COPY).** She first mutates Bob's published read cap by the `VoucherSalt`. Then, in one operation: write the sealed `VoucherReply` to VoucherStream box 1; publish the `Introduction` (Bob's display name and his salt-mutated read cap) to her group, which never sees the salt itself; tombstone box 0 against reuse.
+5. **Alice replies.** She mints `VoucherSalt`, assembles `WhoReply` from the start positions above, forms `VoucherReply := WhoReply || VoucherSalt`, and MKEM-seals it to `VoucherPublicKey`. She publishes no acknowledgements between this step and the commit.
+6. **Alice commits (all-or-nothing COPY).** She first mutates Bob's published read cap by the `VoucherSalt`. Then, in one operation: write the sealed `VoucherReply` to VoucherStream box 1; publish the `Introduction` (Bob's display name and his salt-mutated read cap) to her group, which never sees the salt itself; tombstone box 0 against reuse. Because no acknowledgement separates the start positions from this commit, there is no race: Bob inherits Alice's acknowledgements as of the `Introduction` (see Joining in the group chat spec). She rewrites box 1 each replica epoch until Bob's first message appears, for at most the Sent-box retention window; a Bob later than that needs a new voucher.
 7. **Bob finishes.** He polls VoucherStream box 1, MKEM-opens the `VoucherReply` with `VoucherSecretKey`, and recovers `WhoReply` and `VoucherSalt`. He mutates his `MessageStream.WriteCap` by the salt and begins writing real messages there. The group already holds his mutated read cap, so they read him without ever learning the salt. Both sides now share the live streams.
