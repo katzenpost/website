@@ -530,25 +530,23 @@ acknowledged it.
 
 </div>
 
-**Joining.** A new member inherits its introducer's acknowledgements at the
-moment of the `Introduction`, and starts reading just past them.
+**Joining.** A new member receives its introducer's view of the group as of
+the `Introduction`: a read cap for every stream, and the rosters the
+introducer knew about (see Reply to a new member).
 
 <div class="itemizedlist">
 
-- **Start positions.** The reply carrying the group's read caps starts each
-  stream at the box after the introducer's last published acknowledgement
-  of it, and the introducer's own stream at the `Introduction`. The
-  introducer takes these in the same all-or-nothing commit that writes the
-  `Introduction`.
-- **Inherited acknowledgements.** A member that reads an `Introduction`
-  counts the new member from then on, starting from the introducer's
-  acknowledgements as of that point. An `Introduction` takes effect before
-  any `Acks` in the same message.
-- **No race.** Members read the introducer's stream in order. Before the
-  `Introduction`, the introducer's acknowledgements stop short of the new
-  member's start positions. After it, the new member is counted in its own
-  right. So no box the new member was given is discarded before it reads
-  it.
+- **Start positions.** Each read cap starts at the box after the
+  introducer's last published acknowledgement of that stream, and the
+  introducer's own at the `Introduction`. The introducer takes these in the
+  same all-or-nothing commit that writes the `Introduction`.
+- **Retention.** A member that reads an `Introduction` keeps every box of
+  its own stream that the introducer had not acknowledged at that point,
+  until the new member acknowledges it. An `Introduction` takes effect
+  before any `Acks` in the same message.
+- **No race.** Members read the introducer's stream in order, so each sees
+  the `Introduction` before any acknowledgement that would let it discard
+  a box the new member was given.
 - **History.** To give a new member everything since an invitation began,
   the introducer holds back new acknowledgements until the commit. Older
   history is sent from the introducer's own copy, never by starting a
