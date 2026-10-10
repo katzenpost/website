@@ -432,19 +432,29 @@ type GroupChatMessage struct {
     ReplyWho *ReplyWho
 
     Acks []byte
+    Numbers []byte
+    IntroducedAt []byte
 }
 ```
 
 This new `Acks` field is a mapping from roster indexes (see Rosters below) to BACAP
 `MessageBoxIndex` values. Its encoding is described in
 <a href="#acks_wire_format" class="link">Acks wire format</a>.
-Acks is nil when we don't have anything to acknowledge; one of the content fields must not
-be nil.
+Acks is nil when we don't have anything to acknowledge. `Numbers` and
+`IntroducedAt` keep rosters in step; they are described under Rosters below.
 
-Throughout this specification we use roster indexes as the channel identities. That is to say,
-Alice simply keeps a list of channels she learns about and refers to them with a 0 index scheme
-ordered by the time she learned of each, e.g. 0 is Alice herself, 1 is Bob, 2 is Carol and so on.
-In this manner we accomplish our goal of efficient bandwidth usage.
+`TextPayload` and `FileUpload` are content. `Introduction`, `Numbers` and
+`IntroducedAt` are control. A message carries either content or control,
+never both. The retention policy deletes content only (see
+<a href="#disappearing_messages" class="link">Disappearing messages</a>), so
+a message that changes a roster stays readable for as long as its Sent-box
+record lasts.
+
+Throughout this specification we use roster indexes as the channel
+identities. Alice keeps a list of the channels she has numbered and refers
+to each by its place in that list, counting from 0: 0 is Alice herself, 1
+is the next member she numbered, and so on. One byte names a member, which
+keeps acknowledgements small.
 
 <div class="itemizedlist">
 
@@ -471,28 +481,24 @@ to save bytes on constrained transports such as LoRa.
   each start with all founders in ascending order of read-cap public key. A
   new member starts with a copy of its introducer's roster as of the
   `Introduction` announcing it.
-- **Growing.** Index assignments are never announced; every reader
-  derives them from the sender's stream. An introducer numbers a new
-  member in the message carrying its `Introduction`. Any other member
-  numbers the new member in its first message whose acknowledgement of the
-  introducer's stream reaches or passes that `Introduction`. Reading is
-  private but acknowledgements are public, so every reader of the sender's
-  stream sees the numbering happen at the same message.
-
-  - The new member is appended, taking the sender's next unused index.
-  - A message's `Acks` are resolved against the sender's roster as it was
-    before that message. A member numbered by a message is therefore first
-    acknowledged in the sender's following message.
-  - When one message numbers several members, they are appended in this
-    order: first those reached through acknowledgements, sorted by each
-    introducer's index in the sender's roster, then by the position of each
-    `Introduction` in its introducer's stream; last, the member the message
-    itself introduces.
-
-- **Watching.** Members follow each other's rosters by recording how far
-  each member has acknowledged each stream and applying the rule above. A
-  watcher that reads an `Introduction` late adds the member at the place the
-  covering acknowledgement gave it. Until then, that index is unresolved.
+- **Numbering.** A member numbers another by appending it to its roster,
+  taking its next unused index, and announcing the assignment in the
+  `Numbers` field of a control message. Each entry states the index
+  assigned and the `Introduction` that introduced the member: its
+  introducer's roster index and the `Introduction`'s position on the
+  introducer's stream. An introducer numbers the new member in the message
+  carrying its `Introduction`. Every other member numbers a new member
+  after reading its `Introduction`, and MUST do so before acknowledging the
+  new member's stream. Entries are in ascending order of index.
+- **Watching.** A reader learns each sender's roster from that sender's
+  `Numbers`. Until the reader has read the `Introduction` an entry names,
+  the member at that index is unresolved.
+- **Introduced at.** A new member's first message is a control message
+  carrying `IntroducedAt`: its introducer's roster index and the position
+  of the `Introduction` it joined through. A member can be introduced more
+  than once, so readers take the new member's starting roster from the
+  `Introduction` that `IntroducedAt` names. Until they have read it, the new
+  member's roster is unknown and its acknowledgements are skipped.
 - **Repeats.** A member already in a roster is never added again.
 - **Reply to a new member.** The reply carrying the group's read caps, each
   with its start index (`ReplyWho`, or `WhoReply` in the contact voucher
@@ -510,12 +516,13 @@ to save bytes on constrained transports such as LoRa.
 - **Reading.** Resolve each index against the sender's roster. Skip values
   at unresolved indexes. Roster indexes MUST NOT be compared across
   senders.
-- **Skipped boxes.** A reader that skips a box may miss a numbering and
-  misplace later indexes. The Sent-box check discards the resulting bad
-  acknowledgements.
+- **Skipped boxes.** A reader that skips a box may miss a `Numbers`
+  entry. Every entry states its index, so later entries still land in
+  place, and the missed index stays unresolved.
 - **Removal.** A member may silently stop reading a stream. It keeps the
   roster entry, MUST NOT acknowledge that index again, and MUST NOT reuse
-  it.
+  it. It no longer waits for the removed member's acknowledgements before
+  discarding plaintext. The removed member keeps its read caps.
 
 </div>
 
@@ -548,22 +555,26 @@ beside them and is advanced separately.
 
 <div class="itemizedlist">
 
-- **Start positions.** Each start index is the box after the introducer's
-  last published acknowledgement of that stream, and the introducer's own
-  is the `Introduction`. The introducer takes these in the
-  same all-or-nothing commit that writes the `Introduction`.
+- **Catching up.** Before an invitation begins, the introducer reads every
+  stream to its end, scanning any it is stuck on (see
+  <a href="#rewrite_and_scan" class="link">Rewrite and scan</a>).
+- **Start positions.** Each start index is the box after where the
+  introducer had read that stream when the invitation began, and the
+  introducer's own is the `Introduction`.
+- **Holding back.** From the start of an invitation until the
+  all-or-nothing commit that writes the `Introduction`, the introducer
+  sends no acknowledgements and numbers no one. Its published
+  acknowledgements then stop short of every start index, and its roster
+  stays as the reply describes it.
 - **Retention.** A member that reads an `Introduction` keeps every box of
   its own stream that the introducer had not acknowledged at that point,
   until the new member acknowledges it or the member's retention policy
-  deletes it. An `Introduction` takes effect
-  before any `Acks` in the same message.
+  deletes it.
 - **No race.** Members read the introducer's stream in order, so each sees
   the `Introduction` before any acknowledgement that would let it discard
   a box the new member was given.
-- **History.** To give a new member everything since an invitation began,
-  the introducer holds back new acknowledgements until the commit. Older
-  history is sent from the introducer's own copy, never by starting a
-  stream earlier.
+- **History.** Older history is sent from the introducer's own copy, never
+  by starting a stream earlier.
 
 </div>
 
@@ -632,6 +643,40 @@ The most compact encoding is defined as follows.
 
 </div>
 
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+#### <span id="numbers_wire_format"></span>Numbers and IntroducedAt wire format
+
+</div>
+
+</div>
+
+</div>
+
+`Numbers` and `IntroducedAt` are encoded by hand for the same constrained
+pipes as `Acks`.
+
+<div class="itemizedlist">
+
+- **Numbers.** A sequence of 10-byte entries in ascending order of index.
+  Each entry is the roster index assigned (1 byte), the introducer's
+  roster index in the sender's roster (1 byte), and the position of the
+  `Introduction` on the introducer's stream, the 8-byte little-endian
+  counter of its `MessageBoxIndex`. A parser MUST ignore the whole field if
+  its length is not a multiple of 10 or its indexes are not strictly
+  ascending.
+- **IntroducedAt.** One entry without its first byte: 9 bytes.
+
+</div>
+
+</div>
+
 </div>
 
 <div class="section">
@@ -651,25 +696,40 @@ The most compact encoding is defined as follows.
 </div>
 
 A reader cannot tell a quiet stream from one stuck behind a
-garbage-collected box: both return `BoxIDNotFound`. An implementation MAY
-show how long a stream has been quiet but MUST NOT scan automatically. The
-user requests a scan, one stream at a time.
+garbage-collected box by reading it: both return `BoxIDNotFound`.
+Acknowledgements tell them apart. If any member has acknowledged a stream
+beyond a reader's position, there is more to read and the reader is stuck.
 
 <div class="orderedlist">
 
 1.  **Periodic rewrite.** Well within each replica epoch, the stream owner
     rewrites due boxes (see Backfill), keeping every position populated.
 
-2.  **Scan.** The reader rechecks a short window behind the stuck position,
-    using index values it kept, since BACAP indexes cannot be derived
-    backward. It then probes forward without waiting between positions:
-    data is ingested, a tombstone is skipped, and the first
-    `BoxIDNotFound` becomes the new expected position, ending the scan.
+2.  **Kept indexes.** A reader keeps the `MessageBoxIndex` of each position
+    it passed without data, a tombstone or a skipped box, for a short
+    window behind its position. BACAP indexes cannot be derived backward,
+    so an index is kept as it is passed.
+
+3.  **Scan.** The reader rechecks its kept indexes and ingests any box now
+    readable. If a member has acknowledged the stream beyond the reader's
+    position, the reader jumps to the furthest acknowledged box, deriving
+    and keeping the indexes of the boxes it skips. It then probes forward
+    without waiting between positions: data is ingested, a tombstone is
+    skipped, and the first `BoxIDNotFound` becomes the new expected
+    position, ending the scan.
+
+4.  **When to scan.** An implementation MAY scan automatically when another
+    member has acknowledged the stream beyond the reader's position.
+    Otherwise it MUST NOT scan automatically. It MAY show how long the
+    stream has been quiet, and the user requests a scan, one stream at a
+    time.
 
 </div>
 
 Two members stuck behind gaps in each other's streams resynchronise once
 both scan, provided they do so within the owner's Sent-box retention window.
+A reader stuck behind boxes that are gone for good resumes at the furthest
+acknowledged box and loses the boxes it skipped.
 
 </div>
 
@@ -693,6 +753,10 @@ Disappearing messages is the feature that causes a user's client to remove messa
 based on a user specified message retention policy. For example, a client's message retention policy could keep
 decrypted plaintext messages from other members for X number of days. Likewise policy could retain sent message
 plaintext for Y number of days.
+
+The retention policy applies to content only. Control messages are kept for
+as long as their Sent-box records last, so a message that disappears never
+takes a roster change with it.
 
 Once a client makes a message "disappear" as per this feature, then after that point in time
 the client can never retransmit that box. Backfill rewrites it as a tombstone instead.
