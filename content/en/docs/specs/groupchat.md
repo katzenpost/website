@@ -493,14 +493,18 @@ to save bytes on constrained transports such as LoRa.
 - **Watching.** A reader learns each sender's roster from that sender's
   `Numbers`. Until the reader has read the `Introduction` an entry names,
   the member at that index is unresolved.
-- **Introduced at.** A new member's first message is a control message
-  carrying `IntroducedAt`: its introducer's roster index and the position
-  of the `Introduction` it joined through. A member can be introduced more
-  than once, so readers take the new member's starting roster from the
-  `Introduction` that `IntroducedAt` names. Until they have read it, the new
-  member's roster is unknown and its acknowledgements are skipped.
+- **Introduced at.** A new member learns where its `Introduction` landed
+  by reading its introducer's stream, and its next message after that is a
+  control message carrying `IntroducedAt`: its introducer's roster index
+  and the position of the `Introduction` it joined through. A member can be
+  introduced more than once, so readers take the new member's starting
+  roster from the `Introduction` that `IntroducedAt` names. Until they have
+  read it, the new member's roster is unknown and its acknowledgements are
+  skipped.
 - **Repeats.** A member already in a roster is never added again.
-- **Reply to a new member.** The reply carrying the group's read caps, each
+- **Reply to a new member.** The reply is built before the new member's
+  read cap or its `Introduction`'s position is known, so it names the new
+  member only by the index it will take. The reply carrying the group's read caps, each
   with its start index (`ReplyWho`, or `WhoReply` in the contact voucher
   protocol), lists them in
   the introducer's roster order, so position equals roster index. A
@@ -668,9 +672,12 @@ pipes as `Acks`.
   Each entry is the roster index assigned (1 byte), the introducer's
   roster index in the sender's roster (1 byte), and the position of the
   `Introduction` on the introducer's stream, the 8-byte little-endian
-  counter of its `MessageBoxIndex`. A parser MUST ignore the whole field if
-  its length is not a multiple of 10 or its indexes are not strictly
-  ascending.
+  counter of its `MessageBoxIndex`. In a message carrying an
+  `Introduction`, the entry for the member it introduces has position 0,
+  meaning that `Introduction`: its own position is not known when it is
+  encoded, and stream counters start at a random point, so no real box is
+  at 0. A parser MUST ignore the whole field if its length is not a
+  multiple of 10 or its indexes are not strictly ascending.
 - **IntroducedAt.** One entry without its first byte: 9 bytes.
 
 </div>
