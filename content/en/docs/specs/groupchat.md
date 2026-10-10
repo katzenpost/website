@@ -521,7 +521,8 @@ to save bytes on constrained transports such as LoRa.
 
 **Sent-box records.** A stream owner records, for each box it wrote, its
 `MessageBoxIndex`, its position, and its plaintext until every member has
-acknowledged it.
+acknowledged it or its retention policy deletes the plaintext (see
+<a href="#disappearing_messages" class="link">Disappearing messages</a>).
 
 <div class="itemizedlist">
 
@@ -530,7 +531,7 @@ acknowledged it.
   discarded after a bounded window exceeding one replica epoch, so absent
   members cannot force retention forever.
 - **Backfill.** The owner periodically rewrites every recorded box:
-  unacknowledged boxes with their plaintext, fully acknowledged boxes as
+  boxes whose plaintext it still has with that plaintext, and the rest as
   tombstones, so the position still reads as written. Rewrites are
   idempotent since Pigeonhole writes are content-idempotent and BACAP
   encryption is deterministic. Acknowledgements never trigger a rewrite.
@@ -553,7 +554,8 @@ beside them and is advanced separately.
   same all-or-nothing commit that writes the `Introduction`.
 - **Retention.** A member that reads an `Introduction` keeps every box of
   its own stream that the introducer had not acknowledged at that point,
-  until the new member acknowledges it. An `Introduction` takes effect
+  until the new member acknowledges it or the member's retention policy
+  deletes it. An `Introduction` takes effect
   before any `Acks` in the same message.
 - **No race.** Members read the introducer's stream in order, so each sees
   the `Introduction` before any acknowledgement that would let it discard
@@ -693,11 +695,10 @@ decrypted plaintext messages from other members for X number of days. Likewise p
 plaintext for Y number of days.
 
 Once a client makes a message "disappear" as per this feature, then after that point in time
-the client can never retransmit that box. However if required the client may send a tombstone in place of the box's contents.
+the client can never retransmit that box. Backfill rewrites it as a tombstone instead.
 The tombstone in place of the box is still very useful for resyncing.
-It can also server to tell other members that they didn't read your message in time before your client's retention policy purged the plaintext data.
-
-</div>
+A member that reaches a tombstone at a position it has not yet read can also tell from it
+that it didn't read your message in time before your client's retention policy purged the plaintext data.
 
 </div>
 
