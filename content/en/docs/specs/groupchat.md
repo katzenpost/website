@@ -435,14 +435,15 @@ type GroupChatMessage struct {
 }
 ```
 
-This new `Acks` field is really just a mapping from channel identities to BACAP indexes.
-We define it as a byte slice so that we handle the serialization more efficiently than CBOR.
+This new `Acks` field is a mapping from roster indexes (see Rosters below) to BACAP
+`MessageBoxIndex` values. Its encoding is described in
+<a href="#acks_wire_format" class="link">Acks wire format</a>.
 Acks is nil when we don't have anything to acknowledge; one of the content fields must not
 be nil.
 
 Throughout this specification we use roster indexes as the channel identities. That is to say,
 Alice simply keeps a list of channels she learns about and refers to them with a 0 index scheme
-ordered by the time she learned of each, e.g. 0 is Bob, 1 is Carol, 2 is George and so on.
+ordered by the time she learned of each, e.g. 0 is Alice herself, 1 is Bob, 2 is Carol and so on.
 In this manner we accomplish our goal of efficient bandwidth usage.
 
 <div class="itemizedlist">
@@ -470,6 +471,24 @@ to save bytes on constrained transports such as LoRa.
   each start with all founders in ascending order of read-cap public key. A
   new member starts with a copy of its introducer's roster as of the
   `Introduction` announcing it.
+- **Growing.** Index assignments are never announced; every reader
+  derives them from the sender's stream. An introducer numbers a new
+  member in the message carrying its `Introduction`. Any other member
+  numbers the new member in its first message whose acknowledgement of the
+  introducer's stream reaches or passes that `Introduction`. Reading is
+  private but acknowledgements are public, so every reader of the sender's
+  stream sees the numbering happen at the same message.
+
+  - The new member is appended, taking the sender's next unused index.
+  - A message's `Acks` are resolved against the sender's roster as it was
+    before that message. A member numbered by a message is therefore first
+    acknowledged in the sender's following message.
+  - When one message numbers several members, they are appended in this
+    order: first those reached through acknowledgements, sorted by each
+    introducer's index in the sender's roster, then by the position of each
+    `Introduction` in its introducer's stream; last, the member the message
+    itself introduces.
+
 - **Watching.** Members follow each other's rosters by recording how far
   each member has acknowledged each stream and applying the rule above. A
   watcher that reads an `Introduction` late adds the member at the place the
@@ -488,10 +507,6 @@ to save bytes on constrained transports such as LoRa.
   Rosters [][]byte
   ```
 
-- **Layout.** The `Acks` field is in fact expressing the mapping from roster index
-  to BACAP index values. However, for the purposes of an efficient implementation
-  the optimally bandwidth efficient layout of the Acks field involves encoding
-  these roster indexes using a bitmap.
 - **Reading.** Resolve each index against the sender's roster. Skip values
   at unresolved indexes. Roster indexes MUST NOT be compared across
   senders.
@@ -530,13 +545,6 @@ in the introducer's roster, and the rosters the introducer knew about (see
 Reply to a new member). Read caps are sent unchanged; the index travels
 beside them and is advanced separately.
 
-Currently, we have one open problem. Our BACAP API defines a ReadCap type as containing
-the master public key AND the start index. Therefore whenever we send a readcap over the wire
-we are needlessly sending a start index even when we don't need it anymore. We should
-probably fix this, especially given that our goal is to be as bandwidth efficient as possible.
-
-
-
 <div class="itemizedlist">
 
 - **Start positions.** Each start index is the box after the introducer's
@@ -554,6 +562,71 @@ probably fix this, especially given that our goal is to be as bandwidth efficien
   the introducer holds back new acknowledgements until the commit. Older
   history is sent from the introducer's own copy, never by starting a
   stream earlier.
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+#### <span id="acks_wire_format"></span>Acks wire format
+
+</div>
+
+</div>
+
+</div>
+
+We encode the `Acks` mapping by hand as a byte slice rather than as a CBOR map. The
+motivation is to let this protocol run over constrained pipes, such as
+LoRa radio links, where every byte counts.
+
+Let `n` be the number of entries. Every value is a
+104-byte `MessageBoxIndex`, so the values cost `104n` bytes in any
+encoding. Only the cost of naming the keys varies.
+
+<div class="itemizedlist">
+
+- **Simplest.** A list of (roster index, value) pairs. The keys cost one
+  byte each, `n` bytes in total.
+- **Bitmap.** A bitmap with one bit per roster index, followed by the
+  values in ascending roster index order. Let `b` be the bytes a bitmap
+  needs to reach the highest acknowledged index; `b` is at most 32. The
+  keys cost `b` bytes. This beats the list when many members are
+  acknowledged at once.
+- **Most compact.** Use whichever of the two key encodings is shorter:
+  `min(n, b)` bytes. No length prefix or type tag is needed, because both
+  can be inferred from the field length (see Parsing). This is the
+  encoding `Acks` uses.
+
+</div>
+
+For example, if the highest acknowledged index is 19, the bitmap is 3
+bytes. Acknowledging 3 members then costs 3 key bytes either way;
+acknowledging 10 costs 10 as a list but only 3 as a bitmap.
+
+The most compact encoding is defined as follows.
+
+<div class="itemizedlist">
+
+- **Layout.** `Acks` is the keys followed by the values in ascending
+  roster index order. If `n <= b`, the keys are a list of `n` index bytes
+  in ascending order. Otherwise they are a `b`-byte bitmap where index `i`
+  is bit `i mod 8`, counting from the most significant bit, of byte
+  `i div 8`.
+- **Parsing.** Divide the field length by 104: the quotient is `n` and the
+  remainder is the key length. A remainder equal to `n` means a list;
+  smaller means a bitmap. This works because keys are at most 32 bytes,
+  shorter than one value. A parser MUST ignore the whole field if the
+  remainder exceeds `n`, a list is not strictly ascending, a bitmap's last
+  byte is zero, a bitmap does not have exactly `n` bits set, or a bitmap
+  exceeds 32 bytes.
+
+</div>
 
 </div>
 
@@ -653,6 +726,11 @@ Which message types these policies apply to is left to implementations.
 GOOD QUESTION: If we are adding a lot of people at once,do we really need to upload
 all of
 the members <span class="emphasis">*n*</span> times?
+
+OPEN PROBLEM: Our BACAP API defines a ReadCap type as containing
+the master public key AND the start index. Therefore whenever we send a readcap over the wire
+we are needlessly sending a start index even when we don't need it anymore. We should
+probably fix this, especially given that our goal is to be as bandwidth efficient as possible.
 
 FUTURE WORK: Forward secrecy. We can add two extensions that allow transmitting public
 keys + stuff encrypted under those public keys. We can also refer to the Reunion protocol
