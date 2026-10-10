@@ -431,15 +431,23 @@ type GroupChatMessage struct {
     Who *Who
     ReplyWho *ReplyWho
 
-    // Acks names acknowledged members by roster index, each with
-    // one BACAP MessageBoxIndex. Absent when there is nothing to acknowledge.
     Acks []byte
 }
 ```
 
+This new `Acks` field is really just a mapping from channel identities to BACAP indexes.
+We define it as a byte slice so that we handle the serialization more efficiently than CBOR.
+Acks is nil when we don't have anything to acknowledge; one of the content fields must not
+be nil.
+
+Throughout this specification we use roster indexes as the channel identities. That is to say,
+Alice simply keeps a list of channels she learns about and refers to them with a 0 index scheme
+ordered by the time she learned of each, e.g. 0 is Bob, 1 is Carol, 2 is George and so on.
+In this manner we accomplish our goal of efficient bandwidth usage.
+
 <div class="itemizedlist">
 
-- Each value is the 104-byte `MessageBoxIndex` of the furthest box newly
+- Each value in the key-value mapping is the 104-byte `MessageBoxIndex` of the furthest box newly
   read on that member's stream. BACAP reading is sequential, so this
   acknowledges every earlier box too.
 - The acknowledging member is whoever's stream carried the message.
@@ -462,14 +470,6 @@ to save bytes on constrained transports such as LoRa.
   each start with all founders in ascending order of read-cap public key. A
   new member starts with a copy of its introducer's roster as of the
   `Introduction` announcing it.
-- **Growing.** No roster index is ever sent. An introducer numbers a new
-  member in its `Introduction`. Other members number it in their first
-  message whose acknowledgement of the introducer's stream reaches or passes
-  that `Introduction`. The new member takes the next free index and may be
-  acknowledged from the sender's following message. When one message numbers
-  several members, those reached through acknowledgements come first,
-  ordered by introducer roster index, then by stream position. A member the
-  message itself introduces comes last.
 - **Watching.** Members follow each other's rosters by recording how far
   each member has acknowledged each stream and applying the rule above. A
   watcher that reads an `Introduction` late adds the member at the place the
@@ -488,19 +488,10 @@ to save bytes on constrained transports such as LoRa.
   Rosters [][]byte
   ```
 
-- **Layout.** `Acks` is the member names followed by their values, in
-  ascending roster index order. Let `n` be the number of members named and
-  `b` the bytes a bitmap needs to reach the highest index. If `n <= b`,
-  names are a list of index bytes in ascending order. Otherwise they are a
-  `b`-byte bitmap where index `i` is bit `i mod 8` (from the most
-  significant) of byte `i div 8`.
-- **Parsing.** Divide the field length by the value size: the quotient is
-  `n`, the remainder is the name length. Remainder equal to `n` means a
-  list, smaller means a bitmap. This relies on a value being longer than
-  the 32-byte maximum name length. A parser MUST ignore the whole field if
-  the remainder exceeds `n`, a list is not strictly ascending, a bitmap's
-  last byte is zero, a bitmap does not have exactly `n` bits set, or a
-  bitmap exceeds 32 bytes.
+- **Layout.** The `Acks` field is in fact expressing the mapping from roster index
+  to BACAP index values. However, for the purposes of an efficient implementation
+  the optimally bandwidth efficient layout of the Acks field involves encoding
+  these roster indexes using a bitmap.
 - **Reading.** Resolve each index against the sender's roster. Skip values
   at unresolved indexes. Roster indexes MUST NOT be compared across
   senders.
@@ -538,6 +529,13 @@ the `Introduction`: a read cap and a start index for every member's stream
 in the introducer's roster, and the rosters the introducer knew about (see
 Reply to a new member). Read caps are sent unchanged; the index travels
 beside them and is advanced separately.
+
+Currently, we have one open problem. Our BACAP API defines a ReadCap type as containing
+the master public key AND the start index. Therefore whenever we send a readcap over the wire
+we are needlessly sending a start index even when we don't need it anymore. We should
+probably fix this, especially given that our goal is to be as bandwidth efficient as possible.
+
+
 
 <div class="itemizedlist">
 
