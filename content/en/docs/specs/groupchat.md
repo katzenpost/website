@@ -152,11 +152,11 @@ The group state consists of:
 
   - a BACAP readcap
 
+  - the index of the next box to read, kept separately from the readcap
+
   - a nickname
 
   </div>
-
-- a `MembershipHash` (a hash over all of the MembershipCaps)
 
 </div>
 
@@ -264,7 +264,7 @@ type Who struct {}
 
 The `ReplyWho` message answers the Who query with an
 `AllOrNothingMessage` BACAP stream containing readcaps for all group chat
-members.
+members, each with the index to start reading at.
 
 ``` programlisting
 type ReplyWho struct {
@@ -287,9 +287,6 @@ type GroupChatMessage struct {
     // Version is used to ensure we can change this message type in the future.
     Version int
 
-    // MembershipHash is the hash of the user's PleaseAdd message.
-    MembershipHash *[32]byte
-    
     TextPayload *TextPayload
     Introduction *Introduction
     FileUpload *FileUpload
@@ -379,7 +376,7 @@ The `Invitation` protocol flow works as follows.
 
         - Because the new member needs existing members' readcaps, the introducer
           replies to the new member with `ReplyWho` message containing readcaps
-          for all existing members.
+          for all existing members, each with the index to start reading at.
 
           <span class="bold">**IMPORTANT:**</span> The content of both replies must
           be sent in the same `AllOrNothingMessage`, despite the
@@ -408,6 +405,310 @@ The `Invitation` protocol flow works as follows.
 
 <div>
 
+### <span id="opportunistic_acks"></span>Opportunistic acknowledgements and backfill
+
+</div>
+
+</div>
+
+</div>
+
+Pigeonhole boxes are garbage-collected after one to two weeks (see
+"Ephemeral" in <a href="/docs/pigeonhole_explained" class="link" target="_top">Understanding
+Pigeonhole</a>). After that, only the author has the content. Acknowledgements
+tell the author what to restore.
+
+Any group message may carry acknowledgements. None is sent on its own.
+`GroupChatMessage` gains one field:
+
+``` programlisting
+type GroupChatMessage struct {
+    Version int
+
+    TextPayload *TextPayload
+    Introduction *Introduction
+    FileUpload *FileUpload
+    Who *Who
+    ReplyWho *ReplyWho
+
+    Acks []byte
+}
+```
+
+This new `Acks` field is a mapping from roster indexes (see Rosters below) to BACAP
+`MessageBoxIndex` values. Its encoding is described in
+<a href="#acks_wire_format" class="link">Acks wire format</a>.
+Acks is nil when we don't have anything to acknowledge; one of the content fields must not
+be nil.
+
+Throughout this specification we use roster indexes as the channel identities. That is to say,
+Alice simply keeps a list of channels she learns about and refers to them with a 0 index scheme
+ordered by the time she learned of each, e.g. 0 is Alice herself, 1 is Bob, 2 is Carol and so on.
+In this manner we accomplish our goal of efficient bandwidth usage.
+
+<div class="itemizedlist">
+
+- Each value in the key-value mapping is the 104-byte `MessageBoxIndex` of the furthest box newly
+  read on that member's stream. BACAP reading is sequential, so this
+  acknowledges every earlier box too.
+- The acknowledging member is whoever's stream carried the message.
+- A stream owner checks each claimed index against its Sent-box records and
+  ignores one matching nothing it wrote.
+
+</div>
+
+**Rosters.** Members are named by one-byte roster indexes, not public keys,
+to save bytes on constrained transports such as LoRa.
+
+<div class="itemizedlist">
+
+- **Roster.** Each member keeps an ordered list of the members it has
+  numbered, itself included. A member's roster index is its position in
+  that list. Entries are never moved or reused, so a roster holds at most
+  256 members ever. Every member keeps a copy of every other member's
+  roster. A member's identity is its read-cap public key.
+- **Starting.** A lone founder's roster holds only itself. Co-founders
+  each start with all founders in ascending order of read-cap public key. A
+  new member starts with a copy of its introducer's roster as of the
+  `Introduction` announcing it.
+- **Growing.** Index assignments are never announced; every reader
+  derives them from the sender's stream. An introducer numbers a new
+  member in the message carrying its `Introduction`. Any other member
+  numbers the new member in its first message whose acknowledgement of the
+  introducer's stream reaches or passes that `Introduction`. Reading is
+  private but acknowledgements are public, so every reader of the sender's
+  stream sees the numbering happen at the same message.
+
+  - The new member is appended, taking the sender's next unused index.
+  - A message's `Acks` are resolved against the sender's roster as it was
+    before that message. A member numbered by a message is therefore first
+    acknowledged in the sender's following message.
+  - When one message numbers several members, they are appended in this
+    order: first those reached through acknowledgements, sorted by each
+    introducer's index in the sender's roster, then by the position of each
+    `Introduction` in its introducer's stream; last, the member the message
+    itself introduces.
+
+- **Watching.** Members follow each other's rosters by recording how far
+  each member has acknowledged each stream and applying the rule above. A
+  watcher that reads an `Introduction` late adds the member at the place the
+  covering acknowledgement gave it. Until then, that index is unresolved.
+- **Repeats.** A member already in a roster is never added again.
+- **Reply to a new member.** The reply carrying the group's read caps, each
+  with its start index (`ReplyWho`, or `WhoReply` in the contact voucher
+  protocol), lists them in
+  the introducer's roster order, so position equals roster index. A
+  removed member's slot is sent empty. The reply also carries every
+  member's roster, as the introducer has followed it, sent once:
+
+  ``` programlisting
+  // Rosters holds each member's roster, in introducer roster order.
+  // Each byte is the introducer's roster index for that entry.
+  Rosters [][]byte
+  ```
+
+- **Reading.** Resolve each index against the sender's roster. Skip values
+  at unresolved indexes. Roster indexes MUST NOT be compared across
+  senders.
+- **Skipped boxes.** A reader that skips a box may miss a numbering and
+  misplace later indexes. The Sent-box check discards the resulting bad
+  acknowledgements.
+- **Removal.** A member may silently stop reading a stream. It keeps the
+  roster entry, MUST NOT acknowledge that index again, and MUST NOT reuse
+  it.
+
+</div>
+
+**Sent-box records.** A stream owner records, for each box it wrote, its
+`MessageBoxIndex`, its position, and its plaintext until every member has
+acknowledged it.
+
+<div class="itemizedlist">
+
+- **Retention.** Once every other active member has acknowledged a box,
+  its plaintext MAY be discarded, but its position is kept. Records MUST be
+  discarded after a bounded window exceeding one replica epoch, so absent
+  members cannot force retention forever.
+- **Backfill.** The owner periodically rewrites every recorded box:
+  unacknowledged boxes with their plaintext, fully acknowledged boxes as
+  tombstones, so the position still reads as written. Rewrites are
+  idempotent since Pigeonhole writes are content-idempotent and BACAP
+  encryption is deterministic. Acknowledgements never trigger a rewrite.
+- **Rate limit.** Implementations SHOULD NOT rewrite a box more than once
+  per replica epoch.
+
+</div>
+
+**Joining.** A new member receives its introducer's view of the group as of
+the `Introduction`: a read cap and a start index for every member's stream
+in the introducer's roster, and the rosters the introducer knew about (see
+Reply to a new member). Read caps are sent unchanged; the index travels
+beside them and is advanced separately.
+
+<div class="itemizedlist">
+
+- **Start positions.** Each start index is the box after the introducer's
+  last published acknowledgement of that stream, and the introducer's own
+  is the `Introduction`. The introducer takes these in the
+  same all-or-nothing commit that writes the `Introduction`.
+- **Retention.** A member that reads an `Introduction` keeps every box of
+  its own stream that the introducer had not acknowledged at that point,
+  until the new member acknowledges it. An `Introduction` takes effect
+  before any `Acks` in the same message.
+- **No race.** Members read the introducer's stream in order, so each sees
+  the `Introduction` before any acknowledgement that would let it discard
+  a box the new member was given.
+- **History.** To give a new member everything since an invitation began,
+  the introducer holds back new acknowledgements until the commit. Older
+  history is sent from the introducer's own copy, never by starting a
+  stream earlier.
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+#### <span id="acks_wire_format"></span>Acks wire format
+
+</div>
+
+</div>
+
+</div>
+
+We encode the `Acks` mapping by hand as a byte slice rather than as a CBOR map. The
+motivation is to let this protocol run over constrained pipes, such as
+LoRa radio links, where every byte counts.
+
+Let `n` be the number of entries. Every value is a
+104-byte `MessageBoxIndex`, so the values cost `104n` bytes in any
+encoding. Only the cost of naming the keys varies.
+
+<div class="itemizedlist">
+
+- **Simplest.** A list of (roster index, value) pairs. The keys cost one
+  byte each, `n` bytes in total.
+- **Bitmap.** A bitmap with one bit per roster index, followed by the
+  values in ascending roster index order. Let `b` be the bytes a bitmap
+  needs to reach the highest acknowledged index; `b` is at most 32. The
+  keys cost `b` bytes. This beats the list when many members are
+  acknowledged at once.
+- **Most compact.** Use whichever of the two key encodings is shorter:
+  `min(n, b)` bytes. No length prefix or type tag is needed, because both
+  can be inferred from the field length (see Parsing). This is the
+  encoding `Acks` uses.
+
+</div>
+
+For example, if the highest acknowledged index is 19, the bitmap is 3
+bytes. Acknowledging 3 members then costs 3 key bytes either way;
+acknowledging 10 costs 10 as a list but only 3 as a bitmap.
+
+The most compact encoding is defined as follows.
+
+<div class="itemizedlist">
+
+- **Layout.** `Acks` is the keys followed by the values in ascending
+  roster index order. If `n <= b`, the keys are a list of `n` index bytes
+  in ascending order. Otherwise they are a `b`-byte bitmap where index `i`
+  is bit `i mod 8`, counting from the most significant bit, of byte
+  `i div 8`.
+- **Parsing.** Divide the field length by 104: the quotient is `n` and the
+  remainder is the key length. A remainder equal to `n` means a list;
+  smaller means a bitmap. This works because keys are at most 32 bytes,
+  shorter than one value. A parser MUST ignore the whole field if the
+  remainder exceeds `n`, a list is not strictly ascending, a bitmap's last
+  byte is zero, a bitmap does not have exactly `n` bits set, or a bitmap
+  exceeds 32 bytes.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="rewrite_and_scan"></span>Rewrite and scan
+
+</div>
+
+</div>
+
+</div>
+
+A reader cannot tell a quiet stream from one stuck behind a
+garbage-collected box: both return `BoxIDNotFound`. An implementation MAY
+show how long a stream has been quiet but MUST NOT scan automatically. The
+user requests a scan, one stream at a time.
+
+<div class="orderedlist">
+
+1.  **Periodic rewrite.** Well within each replica epoch, the stream owner
+    rewrites due boxes (see Backfill), keeping every position populated.
+
+2.  **Scan.** The reader rechecks a short window behind the stuck position,
+    using index values it kept, since BACAP indexes cannot be derived
+    backward. It then probes forward without waiting between positions:
+    data is ingested, a tombstone is skipped, and the first
+    `BoxIDNotFound` becomes the new expected position, ending the scan.
+
+</div>
+
+Two members stuck behind gaps in each other's streams resynchronise once
+both scan, provided they do so within the owner's Sent-box retention window.
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
+### <span id="disappearing_messages"></span>Disappearing messages
+
+</div>
+
+</div>
+
+</div>
+
+Disappearing messages is the feature that causes a user's client to remove messages from the client's state database
+based on a user specified message retention policy. For example, a client's message retention policy could keep
+decrypted plaintext messages from other members for X number of days. Likewise policy could retain sent message
+plaintext for Y number of days.
+
+Once a client makes a message "disappear" as per this feature, then after that point in time
+the client can never retransmit that box. However if required the client may send a tombstone in place of the box's contents.
+The tombstone in place of the box is still very useful for resyncing.
+It can also server to tell other members that they didn't read your message in time before your client's retention policy purged the plaintext data.
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="titlepage">
+
+<div>
+
+<div>
+
 ### <span id="d58e246"></span>Addenda
 
 </div>
@@ -419,6 +720,11 @@ The `Invitation` protocol flow works as follows.
 GOOD QUESTION: If we are adding a lot of people at once,do we really need to upload
 all of
 the members <span class="emphasis">*n*</span> times?
+
+OPEN PROBLEM: Our BACAP API defines a ReadCap type as containing
+the master public key AND the start index. Therefore whenever we send a readcap over the wire
+we are needlessly sending a start index even when we don't need it anymore. We should
+probably fix this, especially given that our goal is to be as bandwidth efficient as possible.
 
 FUTURE WORK: Forward secrecy. We can add two extensions that allow transmitting public
 keys + stuff encrypted under those public keys. We can also refer to the Reunion protocol
