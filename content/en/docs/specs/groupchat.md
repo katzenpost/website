@@ -687,23 +687,17 @@ both scan, provided they do so within the owner's Sent-box retention window.
 
 </div>
 
-A stream owner may tombstone its own boxes before garbage collection. This
-is a local choice, never negotiated. An implementation offering this MUST
-support both policies:
+Disappearing messages is the feature that causes a user's client to remove messages from the client's state database
+based on a user specified message retention policy. For example, a client's message retention policy could keep
+decrypted plaintext messages from other members for X number of days. Likewise policy could retain sent message
+plaintext for Y number of days.
 
-<div class="itemizedlist">
-
-- **Ack-gated.** Tombstone a box once every other active member has
-  acknowledged it or a later box. Slow members delay deletion but never
-  prevent it.
-- **Age-fraction.** Tombstone a box once fraction `f` of the replica epoch
-  has passed since writing, regardless of acknowledgement. Unread messages
-  may be lost. `f` MUST satisfy `0 <= f < 1`, so the tombstone always beats
-  garbage collection.
+Once a client makes a message "disappear" as per this feature, then after that point in time
+the client can never retransmit that box. However if required the client may send a tombstone in place of the box's contents.
+The tombstone in place of the box is still very useful for resyncing.
+It can also server to tell other members that they didn't read your message in time before your client's retention policy purged the plaintext data.
 
 </div>
-
-Which message types these policies apply to is left to implementations.
 
 </div>
 
