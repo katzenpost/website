@@ -496,17 +496,20 @@ to save bytes on constrained transports such as LoRa.
   `Introduction` announcing it.
 - **Numbering.** A member numbers another by appending it to its roster,
   taking its next unused index, and announcing the assignment in the
-  `Numbers` field of a control message. Each entry states the index
-  assigned and the `Introduction` that introduced the member: its
-  introducer's roster index and the `Introduction`'s `MessageBoxIndex`. An
-  introducer numbers the new member in the message carrying its
-  `Introduction`, whose entry states only the index assigned, since that
-  `Introduction` is the message itself. Every other member numbers a new member
-  after reading its `Introduction`, and MUST do so before acknowledging the
-  new member's stream. Entries are in ascending order of index.
+  `Numbers` field of a control message. Members read `Introduction`s on
+  different streams in different orders, so only the member itself knows
+  which index it gave whom; `Numbers` says so. A message numbers members at
+  consecutive indexes and names each by the first 8 bytes of its read-cap
+  public key: enough to tell a group's members apart, and too many for a
+  joiner to choose a key matching another member's. An introducer numbers
+  the new member in the message carrying its `Introduction`, which needs
+  only the index assigned. Every other member numbers a new member after
+  reading its `Introduction`, and MUST do so before acknowledging the new
+  member's stream.
 - **Watching.** A reader learns each sender's roster from that sender's
-  `Numbers`. Until the reader has read the `Introduction` an entry names,
-  the member at that index is unresolved.
+  `Numbers`. Until the reader knows a member whose key begins with an
+  entry's prefix, from an `Introduction` it has read or from the reply that
+  inducted it, the member at that index is unresolved.
 - **Introduced at.** A new member learns where its `Introduction` landed
   by reading its introducer's stream, and its next message after that is a
   control message carrying `IntroducedAt`: its introducer's roster index
@@ -535,10 +538,10 @@ to save bytes on constrained transports such as LoRa.
   - every member's roster, as the introducer has followed it.
   - every `Introduction` the introducer has read: the roster index of the
     member that wrote it, its `MessageBoxIndex`, and the roster index of
-    the member it introduced. A `Numbers` entry names a member by its
-    `Introduction`, and the new member never reads the boxes before its
-    start indexes, so without these it could never resolve an entry
-    naming an `Introduction` written before it joined.
+    the member it introduced. An `IntroducedAt` names an `Introduction`,
+    and the new member never reads the boxes before its start indexes, so
+    without these it could never resolve one naming an `Introduction`
+    written before it joined.
 
   </div>
 
@@ -566,8 +569,8 @@ to save bytes on constrained transports such as LoRa.
   at unresolved indexes. Roster indexes MUST NOT be compared across
   senders.
 - **Skipped boxes.** A reader that skips a box may miss a `Numbers`
-  entry. Every entry states its index, so later entries still land in
-  place, and the missed index stays unresolved.
+  field. Every field states its first index, so later ones still land in
+  place, and the missed indexes stay unresolved.
 - **Removal.** A member may silently stop reading a stream. It keeps the
   roster entry, MUST NOT acknowledge that index again, and MUST NOT reuse
   it. It no longer waits for the removed member's acknowledgements before
@@ -718,13 +721,14 @@ pipes as `Acks`.
 
 <div class="itemizedlist">
 
-- **Numbers.** A sequence of 106-byte entries in ascending order of index.
-  Each entry is the roster index assigned (1 byte), the introducer's
-  roster index in the sender's roster (1 byte), and the `Introduction`'s
-  `MessageBoxIndex` (104 bytes). In a message carrying an `Introduction`,
-  `Numbers` is a single byte: the roster index assigned to the member that
-  `Introduction` introduces. A parser MUST ignore the whole field if its
-  length is neither of these, or its indexes are not strictly ascending.
+- **Numbers.** In a message carrying an `Introduction`, a single byte: the
+  roster index assigned to the member that `Introduction` introduces.
+  Otherwise the first roster index assigned (1 byte), then the first 8
+  bytes of each member's read-cap public key, one per consecutive index
+  from the first: `1 + 8n` bytes. Numbering alice's next two members,
+  erin and dave, takes 17 bytes. A parser MUST ignore the whole field if
+  its length is neither of these, if it would assign an index above 255,
+  or if a prefix appears twice.
 - **IntroducedAt.** One entry without its first byte: 105 bytes.
 
 </div>
