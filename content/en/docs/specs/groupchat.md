@@ -616,6 +616,10 @@ beside them and is advanced separately.
   sends no acknowledgements and numbers no one. Its published
   acknowledgements then stop short of every start index, and its roster
   stays as the reply describes it.
+- **Waiting.** Before building the reply, the introducer waits until
+  every message it has composed has been written. One composed earlier
+  may number a member, taking the index the reply would otherwise give
+  the new member.
 - **Retention.** A member that reads an `Introduction` keeps every box of
   its own stream that the introducer had not acknowledged at that point,
   until the new member acknowledges it or the member's retention policy
