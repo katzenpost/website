@@ -458,9 +458,16 @@ keeps acknowledgements small.
 
 <div class="itemizedlist">
 
-- Each value in the key-value mapping is the 104-byte `MessageBoxIndex` of the furthest box newly
-  read on that member's stream. BACAP reading is sequential, so this
-  acknowledges every earlier box too.
+- Each value in the key-value mapping is the 104-byte `MessageBoxIndex` of
+  a box on that member's stream. It acknowledges that box and every
+  earlier box from where the acknowledging member started reading the
+  stream, so a member acknowledges a box only once it has read it and
+  every box before it: the end of the unbroken run it has read. A box
+  read as a tombstone counts as read, since its plaintext is gone for
+  every reader. A box a scan stepped past without reading (see
+  <a href="#rewrite_and_scan" class="link">Rewrite and scan</a>) is not
+  read until a recheck reads it, and until then the member's
+  acknowledgements of that stream stop just before it.
 - The acknowledging member is whoever's stream carried the message.
 - A stream owner checks each claimed index against its Sent-box records and
   ignores one matching nothing it wrote.
@@ -512,20 +519,48 @@ to save bytes on constrained transports such as LoRa.
   `Introduction`, the new member's roster is unknown and its
   acknowledgements are skipped.
 - **Repeats.** A member already in a roster is never added again.
-- **Reply to a new member.** The reply is built before the new member's
-  read cap or its `Introduction`'s `MessageBoxIndex` is known, so it names
-  the new member only by the index it will take. The reply carrying the
-  group's read caps, each with its start index (`ReplyWho`, or `WhoReply` in
-  the contact voucher protocol), lists them in the introducer's roster
-  order, so a member's place in the list is its roster index. A
-  removed member's slot is sent empty. The reply also carries every
-  member's roster, as the introducer has followed it, sent once:
+- **Reply to a new member.** The introducer hands the new member the
+  group privately, in its last message of the
+  <a href="/docs/specs/voucher/" class="link">contact voucher protocol</a>:
+  the `VoucherReply`, written in the same all-or-nothing commit as the
+  `Introduction`. Its `WhoReply` (`ReplyWho` here) is built before the new
+  member's `Introduction` has a `MessageBoxIndex`, so it names the new
+  member only by the roster index it will take. It carries:
+
+  <div class="itemizedlist">
+
+  - every member's read cap, each with its start index (see Joining), in
+    the introducer's roster order, so a member's place in the list is its
+    roster index. A removed member's slot is sent empty.
+  - every member's roster, as the introducer has followed it.
+  - every `Introduction` the introducer has read: the roster index of the
+    member that wrote it, its `MessageBoxIndex`, and the roster index of
+    the member it introduced. A `Numbers` entry names a member by its
+    `Introduction`, and the new member never reads the boxes before its
+    start indexes, so without these it could never resolve an entry
+    naming an `Introduction` written before it joined.
+
+  </div>
 
   ``` programlisting
   // Rosters holds each member's roster, in introducer roster order.
   // Each byte is the introducer's roster index for that entry.
   Rosters [][]byte
+
+  // Introductions holds each Introduction the introducer has read.
+  Introductions []IntroductionRef
+
+  type IntroductionRef struct {
+      // Introducer is the roster index of the member that wrote it.
+      Introducer byte
+      // Index is the MessageBoxIndex of the box it was written in.
+      Index [104]byte
+      // Member is the roster index of the member it introduced.
+      Member byte
+  }
   ```
+
+  Roster indexes in the reply are the introducer's.
 
 - **Reading.** Resolve each index against the sender's roster. Skip values
   at unresolved indexes. Roster indexes MUST NOT be compared across
@@ -562,16 +597,16 @@ acknowledged it or its retention policy deletes the plaintext (see
 </div>
 
 **Joining.** A new member receives its introducer's view of the group as of
-the `Introduction`: a read cap and a start index for every member's stream
-in the introducer's roster, and the rosters the introducer knew about (see
+the `Introduction`, privately in the introducer's `VoucherReply`: a read cap
+and a start index for every member's stream in the introducer's roster, the
+rosters the introducer knew about, and the `Introduction`s it had read (see
 Reply to a new member). Read caps are sent unchanged; the index travels
 beside them and is advanced separately.
 
 <div class="itemizedlist">
 
 - **Catching up.** Before an invitation begins, the introducer reads every
-  stream to its end, scanning any it is stuck on (see
-  <a href="#rewrite_and_scan" class="link">Rewrite and scan</a>).
+  stream as far as it can.
 - **Start indexes.** Each start index is the index of the next box the
   introducer had to read on that stream when the invitation began, and the
   introducer's own is the next box it writes, no later than the
@@ -711,41 +746,46 @@ pipes as `Acks`.
 </div>
 
 A reader cannot tell a quiet stream from one stuck behind a
-garbage-collected box by reading it: both return `BoxIDNotFound`.
-Acknowledgements tell them apart. If any member has acknowledged a box the
-reader has not yet reached, there is more to read and the reader is stuck.
-The reader finds such a box by stepping its stream forward from the box it
-expects next until it meets that `MessageBoxIndex`.
+garbage-collected box by reading it: both return `BoxIDNotFound`. Nor can it
+tell when a missing box will read again: that happens only once its owner,
+who may be offline, rewrites it. So a client never scans on its own.
 
 <div class="orderedlist">
 
 1.  **Periodic rewrite.** Well within each replica epoch, the stream owner
     rewrites due boxes (see Backfill), keeping every recorded box populated.
 
-2.  **Kept indexes.** A reader keeps the `MessageBoxIndex` of each box it
-    passed without data, a tombstone or a skipped box, for a short window
-    behind the box it expects next. BACAP indexes cannot be derived
-    backward, so an index is kept as it is passed.
+2.  **Kept indexes.** A reader keeps the `MessageBoxIndex` of each box a
+    scan stepped past without reading it, until a recheck reads it. BACAP
+    indexes cannot be derived backward, so an index is kept as it is
+    passed. A reader MAY drop kept indexes to bound what it keeps. A box
+    whose index it drops is lost to it, and its acknowledgements of that
+    stream never pass that box.
 
 3.  **Scan.** The reader rechecks its kept indexes and ingests any box now
-    readable. If members have acknowledged boxes the reader has not yet
-    reached, it jumps to the furthest of them, keeping the indexes it
-    stepped past. It then probes forward without waiting between boxes:
-    data is ingested, a tombstone is skipped, and the first `BoxIDNotFound`
-    becomes the box it expects next, ending the scan.
+    readable, data or tombstone. If members have acknowledged boxes the
+    reader has not yet reached, it steps its stream forward from the box it
+    expects next looking for them, and jumps to the furthest it meets,
+    keeping every index it stepped past. The walk MUST be bounded: an
+    acknowledged index not met within the bound is ignored, and not looked
+    for again. The reader then probes forward without waiting between
+    boxes: data is ingested, a tombstone is skipped, and the first
+    `BoxIDNotFound` becomes the box it expects next, ending the scan.
 
-4.  **When to scan.** An implementation MAY scan automatically when another
-    member has acknowledged a box the reader has not yet reached.
-    Otherwise it MUST NOT scan automatically. It MAY show how long the
-    stream has been quiet, and the user requests a scan, one stream at a
-    time.
+4.  **When to scan.** A scan runs only when the user asks for one, one
+    stream at a time. The client MAY show how long a stream has been quiet,
+    whether other members have acknowledged boxes on it the reader has not
+    reached, and how many boxes a scan stepped past are still unread.
 
 </div>
 
-Two members stuck behind gaps in each other's streams resynchronise once
-both scan, provided they do so within the owner's Sent-box retention window.
-A reader stuck behind boxes that are gone for good resumes at the furthest
-acknowledged box and loses the boxes it skipped.
+A reader's acknowledgements of a stream stop just before the first box it
+has not read, so the owner keeps that box's plaintext and goes on rewriting
+it until its Sent-box record is discarded. A scan the user asks for before
+then delivers it. Two members stuck behind gaps in each other's streams
+resynchronise once both scan within the owners' retention windows. A box
+gone for good is lost to the reader: after a scan it reads on past it, and
+its acknowledgements of that stream stay before it.
 
 </div>
 
