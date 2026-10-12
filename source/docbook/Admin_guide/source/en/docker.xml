@@ -532,7 +532,6 @@
         <info>
             <title xml:id="topology.title">Network topology and components</title>
         </info>
-        
         <para>The Docker image deploys a working mixnet with all components and component groups
             needed to perform essential mixnet functions: </para>
         <itemizedlist>
@@ -556,34 +555,73 @@
         </warning>
         <para>The following diagram illustrates the components and their network interactions. The
             gray blocks represent nodes, and the arrows represent information transfer. </para>
-        <figure><info><title>Test network topology</title></info>
-
+        <figure>
+            <info>
+                <title>Test network topology</title>
+            </info>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="pix/katzenpost-docker.png" scale="65"/>
-                </imageobject>               
-             </mediaobject>
-            
+                    <imagedata fileref="pix/katzenpost-docker-2026.png" scale="100"/>
+                </imageobject>
+            </mediaobject>
         </figure>
-        <para><link xlink:href="&baseURL;docs/admin_guide/pix/katzenpost-docker.png" xlink:show="new"
-                >Enlarge diagram</link></para>
+        <para><link xlink:href="&baseURL;docs/admin_guide/pix/katzenpost-docker-2026.png"
+                xlink:show="new">Enlarge diagram</link></para>
+        <?oxy_insert_start author="dwrob" timestamp="20261010T142915-0700"?>
+        <para>The diagram legend shows types of software entity, each tied to a unique
+            <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>binary<?oxy_custom_end?>. <itemizedlist>
+                <listitem>
+                    <para><emphasis>Mix nodes</emphasis> (including <emphasis>gateway
+                            nodes</emphasis> and <emphasis>service nodes</emphasis>, which differ
+                        only in configuration) form the core of the mix network. Gateway nodes
+                        control data traffic between the Internet and the mixnet. Service nodes
+                        perform automatic or user-driven operations that involve reading, writing,
+                        or processing data. The generic mix nodes are logically logically
+                        distributed across three layers of data mixing, recombination, and random
+                        latency. All three mix-node varieties perform mix operations on the data
+                        traversing them.</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis>Replicas</emphasis> are persistent databases.</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis>Directory authorities</emphasis> track and validate the hosts
+                        running on the mix network. By agreeing on a <emphasis>consensus</emphasis>,
+                        they provide a public key infrastructure (PKI) that enable hosts to find and
+                        authenticate each other.</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis>Clients</emphasis> are applications outside the mix network that
+                        communicate with it through the gateway. Examples include simple tools, such
+                        as the ping utility, as well as more complex applications, such as text or
+                        audio chat programs.</para>
+                </listitem>
+            </itemizedlist></para>
+        <?oxy_insert_end?>
         <para>On the left, the <emphasis role="bold">Client</emphasis> transmits a message (shown by
             purple arrows) through the <emphasis role="bold">Gateway node</emphasis>, across three
-                <emphasis role="bold">mix node</emphasis> layers, to the <emphasis role="bold">Service node</emphasis>. The <emphasis role="bold">Service node</emphasis>
+                <emphasis role="bold">mix node</emphasis> layers, to the <emphasis role="bold"
+                >Service node</emphasis>. The <emphasis role="bold">Service node</emphasis>
             processes the request and responds with a reply (shown by the green arrows) that
             traverses the <emphasis role="bold">mix node</emphasis> layers before exiting the mixnet
-            via the <emphasis role="bold">Gateway node</emphasis> and arriving at the <emphasis role="bold">Client</emphasis>.</para>
+            via the <emphasis role="bold">Gateway node</emphasis> and arriving at the <emphasis
+                role="bold">Client</emphasis>.</para>
         <para>On the right, directory authorities <emphasis role="bold">Dirauth 1</emphasis>,
                 <emphasis role="bold">Dirauth 2</emphasis>, and <emphasis role="bold">Dirauth
-                3</emphasis> provide PKI services. The directory authorities receive <emphasis role="bold">mix descriptors</emphasis> from the other nodes, collate these into a
+                3</emphasis> provide PKI services. The directory authorities receive <emphasis
+                role="bold">mix descriptors</emphasis> from the other nodes, collate these into a
                 <emphasis role="bold">consensus document</emphasis> containing validated network
             status and authentication materials , and make that available to the other nodes. </para>
         <para>The elements in the topology diagram map to the mixnet's component nodes as shown in
             the following table. Note that all nodes share the same IP address (127.0.0.1, i.e.,
             localhost), but are accessed through different ports. Each node type links to additional
-            information in <link xlink:href="&baseURL;docs/admin_guide/components.html"
-                >Components and configuration of the &program_name; mixnet</link><!--<xref linkend="components" endterm="components.title"/>-->.</para>
-        <table frame="all"><info><title>Table 2: Test mixnet hosts</title></info>            
+            information in <link xlink:href="&baseURL;docs/admin_guide/components.html">Components
+                and configuration of the &program_name;
+            mixnet</link><!--<xref linkend="components" endterm="components.title"/>-->.</para>
+        <table frame="all">
+            <info>
+                <title>Table 2: Test mixnet hosts</title>
+            </info>
             <tgroup cols="5">
                 <colspec colname="c1" colnum="1" colwidth="1*"/>
                 <colspec colname="c2" colnum="2" colwidth="1*"/>
@@ -757,17 +795,15 @@
             <info>
                 <title>The test network file tree</title>
             </info>
-            
-            <para>The following <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://manpages.debian.org/bookworm/tree/tree.1.en.html">tree</link>
-                output shows the location, relative to the <filename>katzenpost</filename>
-                repository root, of the files created by the Docker build. During testing and use,
-                you would normally touch only the TOML configuration file associated with each node,
-                as highlighted in the listing. For help in understanding these files and a complete
-                list of configuration options, follow the links in <guilabel>Table 2: Test mixnet
-                    hosts</guilabel>.</para>
-
-
-        <programlisting>katzenpost/docker/voting_mixnet/ (running)
+            <para>The following <link xmlns:xlink="http://www.w3.org/1999/xlink"
+                    xlink:href="https://manpages.debian.org/bookworm/tree/tree.1.en.html"
+                    >tree</link> output shows the location, relative to the
+                    <filename>katzenpost</filename> repository root, of the files created by the
+                Docker build. During testing and use, you would normally touch only the TOML
+                configuration file associated with each node, as highlighted in the listing. For
+                help in understanding these files and a complete list of configuration options,
+                follow the links in <guilabel>Table 2: Test mixnet hosts</guilabel>.</para>
+            <programlisting>katzenpost/docker/voting_mixnet/ (running)
 
 │
 ├── auth1
@@ -1013,9 +1049,12 @@
 │   └── selfcheck.toml
 └── thinclient
 </programlisting>
-        <para>Examples of complete TOML configuration files are provided in <link xlink:href="&baseURL;docs/admin_guide/docker-config-appendix.html"
-                >Appendix: Configuration files from the Docker test mixnet</link><!--<xref linkend="docker-config" endterm="docker-config.title"/>-->.</para>
+            <para>Examples of complete TOML configuration files are provided in <link
+                    xlink:href="&baseURL;docs/admin_guide/docker-config-appendix.html">Appendix:
+                    Configuration files from the Docker test
+                mixnet</link><!--<xref linkend="docker-config" endterm="docker-config.title"/>-->.</para>
         </section>
     </section>
 </article>
+
 <?oxy_options track_changes="on"?>
