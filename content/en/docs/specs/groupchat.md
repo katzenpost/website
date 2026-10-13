@@ -304,8 +304,9 @@ Every message carries the sender's `MembershipHash`: SHA-256 over the
 domain separator `KP:membership:v1` followed by the 32-byte public key of
 each active member's read cap, the sender's own included, without
 repeats and in ascending byte order. An `Introduction` carries the hash of
-the group as it stood before the member it introduces. A reader compares
-the hash with its own before it applies the message, and reports a
+the group as it stood before the member it introduces, and a reader
+compares it with its own view less that member, whether or not it holds the
+member yet: the reader may be the member introduced. A reader reports a
 mismatch; it never drops a message for one. It is the one sign that two
 members disagree about who is in the group.
 
