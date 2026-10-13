@@ -158,6 +158,8 @@ The group state consists of:
 
   </div>
 
+- a `MembershipHash` (a hash over the members' read caps)
+
 </div>
 
 The group chat is completely decentralized. Each member must keep track of every other
@@ -287,6 +289,9 @@ type GroupChatMessage struct {
     // Version is used to ensure we can change this message type in the future.
     Version int
 
+    // MembershipHash is the sender's view of who is in the group.
+    MembershipHash [32]byte
+
     TextPayload *TextPayload
     Introduction *Introduction
     FileUpload *FileUpload
@@ -294,6 +299,13 @@ type GroupChatMessage struct {
     ReplyWho *ReplyWho
 }
 ```
+
+Every message carries the sender's `MembershipHash`: SHA-256 over the
+domain separator `KP:membership:v1` followed by the 32-byte public key of
+each active member's read cap, the sender's own included, without
+repeats and in ascending byte order. A reader compares it with its own and
+reports a mismatch; it never drops a message for one. It is the one sign
+that two members disagree about who is in the group.
 
 </div>
 
@@ -424,6 +436,7 @@ Any group message may carry acknowledgements. None is sent on its own.
 ``` programlisting
 type GroupChatMessage struct {
     Version int
+    MembershipHash [32]byte
 
     TextPayload *TextPayload
     Introduction *Introduction
@@ -438,7 +451,7 @@ type GroupChatMessage struct {
 ```
 
 This new `Acks` field is a mapping from roster indexes (see Rosters below) to BACAP
-`MessageBoxIndex` values. Its encoding is described in
+`Idx64` values. Its encoding is described in
 <a href="#acks_wire_format" class="link">Acks wire format</a>.
 Acks is nil when we don't have anything to acknowledge. `Numbers` and
 `IntroducedAt` keep rosters in step; they are described under Rosters below.
@@ -458,8 +471,8 @@ keeps acknowledgements small.
 
 <div class="itemizedlist">
 
-- Each value in the key-value mapping is the 104-byte `MessageBoxIndex` of
-  a box on that member's stream. It acknowledges that box and every
+- Each value in the key-value mapping is the `Idx64` of a box on that
+  member's stream. It acknowledges that box and every
   earlier box from where the acknowledging member started reading the
   stream, so a member acknowledges a box only once it has read it and
   every box before it: the end of the unbroken run it has read. A box
@@ -469,16 +482,23 @@ keeps acknowledgements small.
   read until a recheck reads it, and until then the member's
   acknowledgements of that stream stop just before it.
 - The acknowledging member is whoever's stream carried the message.
-- A stream owner checks each claimed index against its Sent-box records and
-  ignores one matching nothing it wrote.
+- A stream owner checks each claimed `Idx64` against its Sent-box records
+  and ignores one matching no box it wrote.
 
 </div>
 
-A `MessageBoxIndex` names one box. It is an opaque BACAP value, the whole
-derivation state for that box, not a number: indexes are compared only for
-equality, and an index is moved forward only by BACAP's derivation. Every
-box this specification names, it names by a roster index for the stream and
-a `MessageBoxIndex` for the box.
+A `MessageBoxIndex` is the whole BACAP derivation state for one box. Its
+first 8 bytes, little-endian, are the box's `Idx64`. BACAP's derivation adds
+one to the `Idx64` at each step and never wraps: a stream ends rather than
+reach 2<sup>64</sup>. On one stream an `Idx64` therefore names exactly one
+box, and orders the stream's boxes as they were written. Every member holds
+every member's read cap, and so each stream's first index, from which
+BACAP's `AdvanceIndexTo` derives the box at any later `Idx64`. An
+acknowledgement names a box by its `Idx64`, 8 bytes instead of 104. An
+`Idx64` means nothing without the stream it belongs to, so a reader MUST
+resolve an acknowledgement's roster index before reading its value.
+`IntroducedAt` and the reply to a new member name a box by its whole
+`MessageBoxIndex`.
 
 **Rosters.** Members are named by one-byte roster indexes, not public keys,
 to save bytes on constrained transports such as LoRa.
@@ -573,29 +593,42 @@ to save bytes on constrained transports such as LoRa.
   place, and the missed indexes stay unresolved.
 - **Removal.** A member may silently stop reading a stream. It keeps the
   roster entry, MUST NOT acknowledge that index again, and MUST NOT reuse
-  it. It no longer waits for the removed member's acknowledgements before
+  it. An entry still named only by a key prefix is the removed member's
+  only if the prefix matches no other member it knows. It no longer waits for the removed member's acknowledgements before
   discarding plaintext. The removed member keeps its read caps.
 
 </div>
 
-**Sent-box records.** A stream owner records, for each box it wrote and in
-the order it wrote them, its `MessageBoxIndex` and its plaintext until every member has
-acknowledged it or its retention policy deletes the plaintext (see
+**Sent-box records.** A stream owner records, for each box it wrote and
+under its `Idx64`, its `MessageBoxIndex` and its plaintext until every member
+has acknowledged it or its retention policy deletes the plaintext (see
 <a href="#disappearing_messages" class="link">Disappearing messages</a>).
+How far each member has acknowledged the owner's stream is the `Idx64` of
+the last box it acknowledged.
 
 <div class="itemizedlist">
 
 - **Retention.** Once every other active member has acknowledged a box,
-  its plaintext MAY be discarded, but its record is kept. Records MUST be
-  discarded after a bounded window exceeding one replica epoch, so absent
-  members cannot force retention forever.
-- **Backfill.** The owner periodically rewrites every recorded box:
-  boxes whose plaintext it still has with that plaintext, and the rest as
-  tombstones, so the box still reads as written. Rewrites are
+  its plaintext MAY be discarded, but its record is kept. A record is kept
+  for as long as the retention policy keeps sent content, and for good when
+  the policy keeps it for good, so an acknowledgement that arrives late
+  still finds its box. Under a policy that deletes sent content, a record
+  MUST be discarded after a bounded window exceeding one replica epoch.
+- **Backfill.** Once per replica epoch the owner rewrites every recorded
+  box some active member has not acknowledged: with its plaintext if it
+  still has it, otherwise as a tombstone, so the box still reads as
+  written. A box every member has acknowledged is written once more as a
+  tombstone when its plaintext is gone, to erase it from the replicas, and
+  never again. When nobody is behind, nothing is written. Rewrites are
   idempotent since Pigeonhole writes are content-idempotent and BACAP
   encryption is deterministic. Acknowledgements never trigger a rewrite.
 - **Rate limit.** Implementations SHOULD NOT rewrite a box more than once
   per replica epoch.
+- **Timing.** A client takes the replica epoch from the PKI document, not
+  its clock: the epoch most storage replicas publish envelope keys around.
+  It takes up each epoch at a point in the epoch's first half that only it
+  can work out, so that members do not all rewrite at the same moment, and
+  at once if it has missed a whole epoch.
 
 </div>
 
@@ -655,9 +688,9 @@ We encode the `Acks` mapping by hand as a byte slice rather than as a CBOR map. 
 motivation is to let this protocol run over constrained pipes, such as
 LoRa radio links, where every byte counts.
 
-Let `n` be the number of entries. Every value is a
-104-byte `MessageBoxIndex`, so the values cost `104n` bytes in any
-encoding. Only the cost of naming the keys varies.
+Let `n` be the number of entries. Every value is an 8-byte `Idx64`, so the
+values cost `8n` bytes in any encoding. Only the cost of naming the keys
+varies.
 
 <div class="itemizedlist">
 
@@ -669,32 +702,33 @@ encoding. Only the cost of naming the keys varies.
   keys cost `b` bytes. This beats the list when many members are
   acknowledged at once.
 - **Most compact.** Use whichever of the two key encodings is shorter:
-  `min(n, b)` bytes. No length prefix or type tag is needed, because both
-  can be inferred from the field length (see Parsing). This is the
-  encoding `Acks` uses.
+  `min(n, b)` bytes, the list when they tie. Keys can be longer than one
+  value, so the field length alone no longer says how many values follow:
+  the field begins with one byte holding `n - 1`. This is the encoding
+  `Acks` uses.
 
 </div>
 
 For example, if the highest acknowledged index is 19, the bitmap is 3
 bytes. Acknowledging 3 members then costs 3 key bytes either way;
-acknowledging 10 costs 10 as a list but only 3 as a bitmap.
+acknowledging 10 costs 10 as a list but only 3 as a bitmap, and the whole
+field `1 + 3 + 80` bytes.
 
 The most compact encoding is defined as follows.
 
 <div class="itemizedlist">
 
-- **Layout.** `Acks` is the keys followed by the values in ascending
-  roster index order. If `n <= b`, the keys are a list of `n` index bytes
-  in ascending order. Otherwise they are a `b`-byte bitmap where index `i`
-  is bit `i mod 8`, counting from the most significant bit, of byte
-  `i div 8`.
-- **Parsing.** Divide the field length by 104: the quotient is `n` and the
-  remainder is the key length. A remainder equal to `n` means a list;
-  smaller means a bitmap. This works because keys are at most 32 bytes,
-  shorter than one value. A parser MUST ignore the whole field if the
-  remainder exceeds `n`, a list is not strictly ascending, a bitmap's last
-  byte is zero, a bitmap does not have exactly `n` bits set, or a bitmap
-  exceeds 32 bytes.
+- **Layout.** `Acks` is one byte holding `n - 1`, then the keys, then the
+  values in ascending roster index order, each little-endian. If `n <= b`,
+  the keys are a list of `n` index bytes in ascending order. Otherwise they
+  are a `b`-byte bitmap where index `i` is bit `i mod 8`, counting from the
+  most significant bit, of byte `i div 8`.
+- **Parsing.** The first byte plus one is `n`. The key length is the field
+  length less one, less `8n`. A key length equal to `n` means a list;
+  smaller means a bitmap. A parser MUST ignore the whole field if the key
+  length is negative or exceeds `n`, a list is not strictly ascending, a
+  bitmap's last byte is zero, a bitmap does not have exactly `n` bits set,
+  or a bitmap exceeds 32 bytes.
 
 </div>
 
@@ -772,11 +806,10 @@ who may be offline, rewrites it. So a client never scans on its own.
 
 3.  **Scan.** The reader rechecks its kept indexes and ingests any box now
     readable, data or tombstone. If members have acknowledged boxes the
-    reader has not yet reached, it steps its stream forward from the box it
-    expects next looking for them, and jumps to the furthest it meets,
-    keeping every index it stepped past. The walk MUST be bounded: an
-    acknowledged index not met within the bound is ignored, and not looked
-    for again. The reader then probes forward without waiting between
+    reader has not yet reached, it advances its stream from the box it
+    expects next to the furthest acknowledged `Idx64`, keeping the indexes
+    it passes. The advance MUST be bounded: an acknowledged `Idx64` beyond
+    the bound is ignored, and not looked for again. The reader then probes forward without waiting between
     boxes: data is ingested, a tombstone is skipped, and the first
     `BoxIDNotFound` becomes the box it expects next, ending the scan.
 
