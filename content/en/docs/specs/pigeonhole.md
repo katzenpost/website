@@ -13,6 +13,13 @@ weight: "40"
 version: ""
 ---
 
+{{% pageinfo %}}
+The [directory authority specification](/docs/specs/dirauth#23-services) describes
+how service nodes advertise courier endpoints and how replicas publish descriptors.
+Its [clock and key-retention rules](/docs/specs/dirauth#211-clocks-and-retention)
+distinguish mixnet epochs from storage-replica epochs.
+{{% /pageinfo %}}
+
 <div class="section">
 
 <div class="titlepage">
@@ -414,9 +421,9 @@ Carriage of these messages differs by hop:
 <table class="table" data-border="1">
 <thead>
 <tr class="header">
-<th>Constant</th>
+<th>Key</th>
 <th>Value</th>
-<th>Source</th>
+<th>Explanation</th>
 </tr>
 </thead>
 <tbody>
@@ -442,7 +449,7 @@ Carriage of these messages differs by hop:
 </tr>
 <tr class="odd">
 <td>CTIDH-1024 public key</td>
-<td>160 bytes</td>
+<td>128 bytes</td>
 <td>hpqc/nike/ctidh/ctidh1024</td>
 </tr>
 <tr class="even">
@@ -452,8 +459,8 @@ Carriage of these messages differs by hop:
 </tr>
 <tr class="odd">
 <td>Hybrid CTIDH-1024 × X25519 NIKE public key</td>
-<td>192 bytes</td>
-<td>sum of the above</td>
+<td>160 bytes</td>
+<td>X25519[32], then CTIDH-1024[128]. <a href="https://github.com/katzenpost/hpqc/blob/v0.0.93/nike/hybrid/ctidh.go#L37-L46">Tagged encoding</a>.</td>
 </tr>
 <tr class="even">
 <td>BACAP payload encryption overhead</td>
@@ -497,7 +504,7 @@ The maximum plaintext BACAP payload a single box can carry is derived
 subtracting every layer of framing and cryptographic overhead that sits between the
 Sphinx
 payload and the BACAP plaintext. The authoritative calculation is performed by
-`NewGeometryFromSphinx` in <a href="https://github.com/katzenpost/katzenpost/blob/main/pigeonhole/geo/geometry.go" class="link" target="_top"><code class="code">pigeonhole/geo/geometry.go</code></a>.
+`NewGeometryFromSphinx` in <a href="https://github.com/katzenpost/katzenpost/blob/v0.0.107/pigeonhole/geo/geometry_impl.go#L73-L117" class="link" target="_top"><code class="code">pigeonhole/geo/geometry.go</code></a>.
 
 Informally:
 
@@ -512,14 +519,13 @@ MaxPlaintextPayloadLength
     − ReplicaInnerMessage framing (1 byte: message_type discriminator)
     − ReplicaWrite header (box_id + signature + payload_len = 100 bytes)
     − BACAP AEAD overhead (16 bytes)
-    − BACAP length prefix (4 bytes)  
+    - BACAP length prefix (4 bytes)
+    - ReplicaInnerMessage length prefix (4 bytes)
 ```
 
-With a hybrid CTIDH-1024 × X25519 NIKE, the fixed per-packet overhead between
-`UserForwardPayloadLength` and the BACAP plaintext is on the order of 560
-bytes; the exact figure depends on the configured NIKE scheme and should always be
-obtained
-from `geometry.NewGeometryFromSphinx()` rather than computed by hand.
+With the 160-byte `CTIDH1024-X25519` public key, this write-path overhead is 451 bytes.
+The <a href="https://github.com/katzenpost/katzenpost/blob/v0.0.107/pigeonhole/geo/geometry_impl.go#L73-L117">tagged geometry calculation</a>
+includes both four-byte length prefixes.
 
 </div>
 

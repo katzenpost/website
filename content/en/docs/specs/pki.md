@@ -1,6 +1,7 @@
 ---
 title: ""
 linkTitle: "Public key infrastructure (deprecated)"
+toc_hide: true
 description: ""
 author: ""
 url: ""
