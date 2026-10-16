@@ -230,7 +230,8 @@ interaction: one writer (Alice) and one reader (Bob).
    envelope via `start_resending_encrypted_message`. The daemon
    dispatches the envelope through three mix layers, the courier
    receives it, and the courier writes the box to both of its replicas.
-   Once the call returns Alice advances her local index.
+   The call returns once a replica has confirmed the box is stored, and
+   Alice then advances her local index.
 4. **Bob reads the message.** He calls `encrypt_read` with his copy of
    the read cap and his current index, dispatches the envelope, and
    waits for the daemon to return the decrypted plaintext.
@@ -273,13 +274,19 @@ other client traffic.
 How many mixnet round trips an operation costs depends on what it
 is:
 
-- **A write** costs one round trip. The courier's ACK confirms it
-  has taken custody of the envelope and will dispatch it to both of
-  the box's replicas; the operation completes on that ACK. If the
-  box already exists, the write completes as an idempotent success
-  by default; the `ReturnBoxExists` variant instead spends a second
-  round trip to fetch the replica's answer and reports
-  `BoxAlreadyExists` as an error.
+- **A write** costs two phases, like a read: the courier first ACKs
+  the query, meaning only that it has the envelope and will dispatch
+  it to the box's replicas. The daemon then resends the same query
+  with a fresh SURB to collect the replica's answer, which the
+  courier caches, and the operation completes only once a replica
+  has confirmed the box is stored. If the replicas report a
+  temporary failure (for example, they could not reach the box's
+  storage shards under load), the daemon keeps resending on its
+  Poisson schedule and the courier dispatches the write again, so a
+  write is never reported as done when nothing stored it. If the box
+  already exists, the write completes as an idempotent success by
+  default; the `ReturnBoxExists` variant reports `BoxAlreadyExists`
+  as an error instead.
 
 - **A read** costs two phases: the courier first ACKs the query,
   then the daemon sends a fresh SURB to collect the payload once
