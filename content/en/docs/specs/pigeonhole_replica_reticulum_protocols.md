@@ -42,9 +42,6 @@ A Pigeonhole storage replica can be connected to:
 2. both a Reticulum mesh and a Katzenpost mixnet, or
 3. a Reticulum mesh only.
 
-Replicas on a mesh need no Internet connection. Some are multi-homed, connected to both a mesh
-and the Internet.
-
 Every storage query either reads or writes a box. A box is a fixed size ciphertext blob, a signature
 over that blob, and a Box ID, the database key for the box. The Box ID is also the public key that
 verifies the signature. Writing requires the matching private key; reading and decrypting require
@@ -56,12 +53,14 @@ the read capability, from which the decryption key is derived. See section 4 of 
 The Reticulum integration favours reliability over privacy. A mesh network does not provide the
 traffic analysis resistance of a mix network and this design does not pretend otherwise. Its purposes
 are post quantum security for Reticulum users and a group chat that keeps working under the
-intermittent, partitioned connectivity typical of mesh networks.
+intermittent, partitioned connectivity typical of mesh networks. Interoperability with the Pigeonhole
+storage protocols on a Katzenpost mixnet is a bonus. This design SHOULD NOT require a mixnet.
+The mixnet is optional.
 
 
 ## Storage Domains
 
-There are two storage domains, each with its own replica set:
+There can be two storage domains, each with its own replica set:
 
 1. The mixnet domain: the replicas listed in the Katzenpost PKI document.
 2. The mesh domain: the replicas listed in the mesh directory, a list of replica identity keys signed
