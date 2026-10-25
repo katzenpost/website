@@ -69,6 +69,91 @@ to check the signature. The private key is needed for decryption
 however. See section 4 of our paper.
 
 
+## Design Priorities
+
+The Reticulum integration favours reliability over privacy. A mesh network does
+not provide the traffic analysis resistance of a mix network and this design does
+not pretend otherwise. Its purposes are post quantum security for Reticulum users
+and a group chat that keeps working under the intermittent, partitioned connectivity
+typical of mesh networks. Interoperation with a Katzenpost mix network is a bonus.
+
+
+## Storage Domains
+
+There are two storage domains, each with its own replica set and its own placement:
+
+1. The mixnet domain: the storage replicas listed in the Katzenpost PKI document,
+   placed by the existing hash sharding scheme.
+2. The mesh domain: the storage replicas listed in the mesh roster, a list of replica
+   identity keys signed by the roster root key that clients ship with.
+
+Each domain places a box by rendezvous hashing its Box ID over its own replica set.
+The same Box ID therefore maps to different replicas in each domain. A mesh client
+needs knowledge of every replica in the mesh roster and of no replica on the mixnet.
+Placement never spans the two domains: mesh links cannot carry the mixnet's traffic
+volume, and a mesh partitioned from the Internet must still serve the boxes written
+on it.
+
+### Bridges
+
+A bridge is a multi-homed replica present in both domains. On the mesh side it is
+an ordinary mesh replica; on the mixnet side it is a Katzenpost client sending
+queries through a courier. Bridges carry boxes between the domains:
+
+* Mesh to mixnet is push. A mesh replica that stores a write forwards a copy to a
+  reachable bridge, which writes it into the mixnet domain.
+* Mixnet to mesh is pull. The mixnet never notifies the mesh, so a mesh client
+  registers a watch list with a bridge: the Box IDs it expects to read next on the
+  streams it follows. The bridge polls the mixnet for those boxes and writes each
+  one it finds into the mesh domain.
+* Tombstones cross in both directions like any other box, so a reader that has
+  fallen behind on either side can skip past them.
+
+A bridge learns the Box IDs it forwards and the watch lists it holds, which is
+accepted under the priorities above. Writes are idempotent, so a box forwarded by
+several bridges or several replicas is stored once and bridges need no coordination
+with each other.
+
+
+## Mesh Placement
+
+On the mesh, each replica's score for a box is the hash of its identity key
+concatenated with the Box ID, as in the mixnet scheme. Sorting the roster by score
+gives the box's preference list. The mixnet domain uses only the first two entries
+of that list. The mesh domain uses the whole list, as a sloppy quorum with hinted
+handoff in the manner of Amazon's Dynamo, so that a box remains writable and readable
+while replicas are unreachable.
+
+### Writes
+
+A write goes to the first two reachable replicas in the preference list. When a
+replica among the first two is unreachable, the next reachable replica in the list
+stores the box in its place together with a hint naming the replica it stands in for.
+The write succeeds once two replicas have stored the box.
+
+### Hinted Handoff
+
+A replica holding hinted boxes watches for announces from the replicas named in its
+hints. When a named replica becomes reachable, the stand-in sends it the box and,
+once the box is acknowledged, deletes its copy and the hint. Hinted boxes are
+garbage collected on the same weekly schedule as every other box, so a handoff that
+cannot complete within the box's lifetime ends with the box.
+
+### Reads
+
+A read queries replicas in preference list order, skipping unreachable ones, until
+a replica returns the box or a configured number of replicas have answered that they
+do not hold it. Walking past the first two finds boxes held by stand-ins during a
+partition or before handoff completes.
+
+### Partition Healing
+
+When a partition heals, boxes written on either side reach their owners through
+hinted handoff. Because placement is determined by the Box ID alone, the two sides
+never disagree about where a box belongs, only about whether it has arrived there.
+A tombstone supersedes the box it replaces wherever the two meet.
+
+
 ## Protocol 1: The Authenticated Key Update Protocol
 
 As a reminder, our hash based sharding scheme puts two replicas in each shard.
@@ -84,7 +169,7 @@ Reticulum mesh network clients will use MKEM to encrypt their read or write quer
 they are sending to. The Reticulum based store and forward network of replica nodes will eventually forward their opaque ciphertext query
 to the two correct replicas for that query's destination shard.
 
-In order for this to work clients need to be able to learn the MKEM keys of all the replicas.
+In order for this to work clients need to be able to learn the MKEM keys of all the replicas in the mesh roster.
 All replicas connected to Reticulum form a gossip network to propagate MKEM public keys.
 These replicas that are on a Reticulum mesh network also announce themseleves as a pigeonhole replica.
 Reticulum clients merely have to here an announce packet of a pigeonhole replica? Or maybe they can query
