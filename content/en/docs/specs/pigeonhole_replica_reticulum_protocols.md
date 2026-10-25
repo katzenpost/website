@@ -90,37 +90,13 @@ Replicas store a duplicate write once, so bridges need no coordination with each
 
 ## Mesh Placement
 
-Each mesh replica's score for a box is the hash of its identity key concatenated with the Box ID.
-Sorting the mesh directory by score gives the box's preference list. The mixnet stores a box on the
-first two replicas of its own list. The mesh uses the first N, as a sloppy quorum with hinted handoff
-in the manner of Amazon's Dynamo, so a box stays writable and readable while replicas are unreachable.
+The mesh uses the same scheme as the mixnet: each replica's score for a box is the hash of its
+identity key concatenated with the Box ID, and the two replicas with the lowest scores in the mesh
+directory store the box. A client MKEM-encrypts each query to those two replicas.
 
-A client MKEM-encrypts each query to all N replicas, so whichever of them handles it can decrypt it.
-Each extra recipient adds one encrypted key to the query, which bounds N on a low bandwidth mesh.
-
-### Writes
-
-A write goes to the first two reachable replicas among the N. A replica standing in for an unreachable
-one ahead of it stores the box with a hint naming that replica. The write succeeds once two replicas
-have stored the box.
-
-### Hinted Handoff
-
-A stand-in watches for announces from the replicas named in its hints. When one becomes reachable,
-the stand-in sends it the box and, once acknowledged, deletes its copy and the hint. Hinted boxes
-follow the weekly GC schedule like every other box, so a handoff that cannot complete in time ends
-with the box.
-
-### Reads
-
-A read queries the N replicas in preference list order, skipping unreachable ones, until one returns
-the box. Walking past the first two finds boxes held by stand-ins.
-
-### Partition Healing
-
-When a partition heals, hinted handoff moves each box to its owners. Placement depends only on the
-Box ID, so the two sides never disagree about where a box belongs, only about whether it has arrived.
-A tombstone supersedes the box it replaces wherever the two meet.
+When neither replica is reachable, the replicas carrying the query hold it until one is
+(see Protocol 2). Placement depends only on the Box ID, so after a partition heals every held
+query still goes to the right replicas.
 
 
 ## Protocol 1: The Authenticated Key Update Protocol
@@ -128,7 +104,7 @@ A tombstone supersedes the box it replaces wherever the two meet.
 MKEM, from our paper, is a multi-recipient encryption scheme built from a NIKE and an AEAD rather
 than a KEM. A query is encrypted once and every recipient replica can decrypt it, which saves
 bandwidth. Katzenpost clients use MKEM to reach replicas through a courier; Reticulum clients use it
-to reach the N replicas of a box's preference list.
+to reach the two mesh replicas that store a box.
 
 Clients therefore need the MKEM public keys of every replica in the mesh directory. Each replica
 signs its current MKEM public key with its identity key and announces itself on Reticulum as a
