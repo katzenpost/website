@@ -122,5 +122,77 @@ None of this requires a Katzenpost mixnet, PKI or dirauth.
 ## Protocol 2: The Replica Store and Forward Protocol
 
 MKEM is already a hybrid post quantum construction, so the confidentiality of a query does not rely
-on Reticulum's cryptography. Replicas forward MKEM ciphertexts to each other over Reticulum Links,
-holding each one while its next hop is unreachable, until it reaches a replica able to decrypt it.
+on Reticulum's cryptography.
+
+A client sends each query once, to a single replica: its first hop. The first hop plays the part the
+courier plays on the mixnet. It takes custody of the query, splits it into one message per storage
+replica, forwards each one, and holds the replies until the client collects them. The client's link
+carries one copy of the query rather than one per storage replica, which matters on LoRa and other
+low bandwidth links where the client's link is often the scarcest.
+
+### Choosing the First Hop
+
+The client picks the reachable replica with the fewest hops in its Reticulum path table. When one of
+the query's two storage replicas is as close as any other replica, the client picks it, since it then
+stores the box itself and forwards only one message. When a replica refuses custody or does not answer,
+the client tries the next closest.
+
+### Splitting
+
+A query reaches the first hop as a mesh envelope: one ciphertext and one ephemeral public key shared by
+both storage replicas, one DEK for each of them, and the positions of the two storage replicas in the
+mesh directory. As the courier does, the first hop splits the envelope into two replica messages, each
+carrying the ciphertext, the ephemeral public key, and only the DEK of its own storage replica. A
+replica can decrypt only with its own DEK, so carrying the other would cost 60 bytes on every link the
+message crosses. A first hop that is itself one of the storage replicas handles its own message locally
+and forwards only the other.
+
+Each replica message travels over a Reticulum Link to its storage replica, and Reticulum carries it
+across the hops in between.
+
+A write goes to both storage replicas. A read goes to one of them, and the first hop forwards it to
+the other only when the first is unreachable or does not hold the box.
+
+### Custody
+
+The client keeps a query until a first hop acknowledges it. From then on the first hop is responsible
+for it: it holds each replica message until its storage replica accepts it, retrying while that replica
+is unreachable. Held messages SHOULD survive a restart of the first hop. A first hop discards a held
+message after one week, the GC period. A replica MAY refuse custody when its store of held messages is
+full.
+
+The envelope hash, the hash of the ephemeral public key and the ciphertext, identifies a query. It
+leaves out the DEKs, so both replica messages split from one envelope share it. A replica that receives
+an envelope or a replica message it already holds does not store or forward it again, so a client may
+resend a query to another first hop without coordinating with the first.
+
+### Replies
+
+Storage replicas reply to the first hop, which caches each reply under the envelope hash and the
+position of the storage replica that sent it. If the client's Link to the first hop is still open,
+the first hop sends the reply over it. Otherwise the client collects the reply later with a collection
+request naming the envelope hash and the storage replica, so it never resends the whole query to fetch
+a reply. Replies are encrypted to the client as on the mixnet; the first hop cannot read them.
+
+A write's reply confirms that its storage replica holds the box. Collecting it is optional: a client
+that does not need the confirmation saves the bandwidth.
+
+### Encoding
+
+A mesh envelope contains, in order:
+
+* the positions of the two storage replicas in the mesh directory, one byte each,
+* the epoch of the replica MKEM keys the query was encrypted to, eight bytes,
+* the DEK for the first storage replica, 60 bytes,
+* the DEK for the second storage replica, 60 bytes,
+* the length of the ephemeral public key, two bytes, followed by the key,
+* the length of the ciphertext, four bytes, followed by the ciphertext.
+
+A replica message uses the mixnet replica message encoding: the ephemeral public key, one 60 byte DEK,
+and the ciphertext.
+
+An acknowledgement carries the 32 byte envelope hash. A collection request carries the envelope hash
+and the position, zero or one, of the storage replica whose reply it wants. A reply carries the
+envelope hash, that position, and the encrypted reply.
+
+All integers are big endian.
