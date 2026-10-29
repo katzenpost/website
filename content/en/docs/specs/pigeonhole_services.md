@@ -539,6 +539,24 @@ pub async fn induct<B: Backend>(ph: Arc<B>, voucher: &[u8], display_name: &str, 
 | `motd-service` | pigeonhole_protocols `cmd/motd-service` | a Go service that answers each request with the message of the day, read from a file |
 | `motd` | pigeonhole_protocols `cmd/motd` | fetches the message of the day from a `motd-service` |
 
+### Talking to ELIZA
+
+There are two ways to start a conversation with ELIZA from katzenqt.
+
+- **Use ELIZA's voucher.** ELIZA keeps unused vouchers in its
+  `data_dir/vouchers`. Paste one into katzenqt's *Induct via voucher*.
+- **Send ELIZA your voucher.** Choose *Generate voucher* in katzenqt. Then
+  find ELIZA's service identity, which ELIZA logs at start, among the
+  services that `list` shows, and send it the voucher:
+
+  ```sh
+  pigeonhole-voucher --thin_config thinclient.toml list
+  pigeonhole-voucher --thin_config thinclient.toml send SERVICE_IDENTITY VOUCHER_TOKEN
+  ```
+
+Either way, ELIZA's greeting arrives as the first message of a new
+conversation, and each message you send gets a reply.
+
 ### Running the router and the directory
 
 The voucher router and the service directory run on a service node: a
