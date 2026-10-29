@@ -13,22 +13,43 @@ weight: "16"
 version: "0"
 ---
 
-This document explains how three elements work together to let a client
-reach a pigeonhole service it has never talked to:
+This document explains how three components work together to let a client
+reach a pigeonhole service it has never talked to. Two are programs that
+mixnet operators run; the third is a library for writing pigeonhole services.
 
-- a **pigeonhole service**, the responder side of an initiator–responder
-  protocol over Pigeonhole. It accepts new connections from clients and then
-  speaks its own protocol over each one: a bot that joins group chats, like
-  ELIZA, or a binary protocol no human reads;
-- the **service directory** (capability `service_directory`), a mixnet
-  service that holds a descriptor for each pigeonhole service, saying how to
-  reach it;
-- the **voucher router** (capability `voucher_router`), a mixnet service
-  that relays a client's first message to a pigeonhole service.
+- The **service directory** (capability `service_directory`) holds a
+  descriptor for each pigeonhole service, saying how to reach it. It is the
+  `service-directory` program in
+  [katzenpost](https://github.com/katzenpost/katzenpost), under
+  `cmd/service-directory`, built on the `pigeonservice/directory` package.
+  Operators run it as a plugin on a service node.
+- The **voucher router** (capability `voucher_router`) relays a client's
+  first message to a pigeonhole service. It is the `voucher-router` program
+  in [katzenpost](https://github.com/katzenpost/katzenpost), under
+  `cmd/voucher-router`, built on the `pigeonservice/router` package.
+  Operators run it as a plugin on a service node.
+- The **pigeonhole service library** is for writing pigeonhole services, and
+  the clients that reach them, in Go or Rust. A pigeonhole service is the
+  responder side of an initiator–responder protocol over Pigeonhole: it
+  accepts new connections from clients and then speaks its own protocol over
+  each one, such as a bot that joins group chats, or a binary protocol no
+  human reads. The Go library is the `pigeonservice` package in
+  [katzenpost](https://github.com/katzenpost/katzenpost); the Rust library
+  is the `services` module of the `pigeonhole_protocols` crate in
+  [pigeonhole_protocols](https://github.com/katzenpost/pigeonhole_protocols),
+  which also has ELIZA, a pigeonhole service written with it. The two speak
+  the same wire format.
+
+| Part | Where | Status |
+|---|---|---|
+| This specification | katzenpost/website | [website#246](https://github.com/katzenpost/website/pull/246), in review |
+| Service directory, voucher router, Go library, `pigeonhole-voucher` | katzenpost/katzenpost | [katzenpost#1247](https://github.com/katzenpost/katzenpost/pull/1247), in review |
+| Rust library, ELIZA | katzenpost/pigeonhole_protocols | [pigeonhole_protocols#11](https://github.com/katzenpost/pigeonhole_protocols/pull/11), in review |
+| NIKE keys and sealed boxes in the Rust thin client | katzenpost/thin_client | [thin_client#100](https://github.com/katzenpost/thin_client/pull/100), in review |
 
 A pigeonhole service has no address and no open port; everything it sends
 or receives is a box on the storage replicas. The directory and the router
-bootstrap the first contact, and run as plugins on service nodes.
+bootstrap the first contact.
 
 Many operators should run the directory and the router. If one operator ran
 the only instance of each, that operator would be a single point of failure
@@ -45,11 +66,6 @@ streams, one written by each, and each holds the other's read cap. The
 router and the directory take no further part. Every party reaches the
 mixnet through a client daemon, kpclientd, which does all the cryptography
 that involves keys.
-
-The Go implementation is the `pigeonservice` package in
-[katzenpost](https://github.com/katzenpost/katzenpost); the Rust one is the
-`services` module of
-[pigeonhole_protocols](https://github.com/katzenpost/pigeonhole_protocols). They speak the same wire format.
 
 ## Contact vouchers
 
