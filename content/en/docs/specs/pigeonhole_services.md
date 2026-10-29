@@ -42,10 +42,14 @@ mixnet operators run; the third is a library for writing pigeonhole services.
 
 | Part | Where | Status |
 |---|---|---|
-| This specification | katzenpost/website | [website#246](https://github.com/katzenpost/website/pull/246), in review |
-| Service directory, voucher router, Go library, `pigeonhole-voucher` | katzenpost/katzenpost | [katzenpost#1247](https://github.com/katzenpost/katzenpost/pull/1247), in review |
-| Rust library, ELIZA | katzenpost/pigeonhole_protocols | [pigeonhole_protocols#11](https://github.com/katzenpost/pigeonhole_protocols/pull/11), in review |
-| NIKE keys and sealed boxes in the Rust thin client | katzenpost/thin_client | [thin_client#100](https://github.com/katzenpost/thin_client/pull/100), in review |
+| This specification | `content/en/docs/specs/pigeonhole_services.md`, [website#246](https://github.com/katzenpost/website/pull/246) | in review |
+| Service directory | `github.com/katzenpost/katzenpost/cmd/service-directory`, [katzenpost#1247](https://github.com/katzenpost/katzenpost/pull/1247) | in review |
+| Voucher router | `github.com/katzenpost/katzenpost/cmd/voucher-router`, [katzenpost#1247](https://github.com/katzenpost/katzenpost/pull/1247) | in review |
+| Go library | `github.com/katzenpost/katzenpost/pigeonservice`, [katzenpost#1247](https://github.com/katzenpost/katzenpost/pull/1247) | in review |
+| `pigeonhole-voucher` | `github.com/katzenpost/katzenpost/cmd/pigeonhole-voucher`, [katzenpost#1247](https://github.com/katzenpost/katzenpost/pull/1247) | in review |
+| Rust library | `pigeonhole_protocols::services`, [pigeonhole_protocols#11](https://github.com/katzenpost/pigeonhole_protocols/pull/11) | in review |
+| ELIZA | `pigeonhole_protocols` `src/bin/eliza.rs`, [pigeonhole_protocols#11](https://github.com/katzenpost/pigeonhole_protocols/pull/11) | in review |
+| NIKE keys and sealed boxes in the Rust thin client | `katzenpost_thin_client`, [thin_client#100](https://github.com/katzenpost/thin_client/pull/100) | in review |
 
 A pigeonhole service has no address and no open port; everything it sends
 or receives is a box on the storage replicas. The directory and the router
