@@ -536,6 +536,8 @@ pub async fn induct<B: Backend>(ph: Arc<B>, voucher: &[u8], display_name: &str, 
 | `pigeonhole-voucher` | katzenpost `cmd/pigeonhole-voucher` | `list` the services; `send` a service a voucher |
 | `pigeonhole-echo` | katzenpost `cmd/pigeonhole-echo` | a service that sends back each message |
 | `eliza` | pigeonhole_protocols `src/bin/eliza.rs` | ELIZA, in katzenqt's chat framing |
+| `motd-service` | pigeonhole_protocols `cmd/motd-service` | a Go service that answers each request with the message of the day, read from a file |
+| `motd` | pigeonhole_protocols `cmd/motd` | fetches the message of the day from a `motd-service` |
 
 The plugins run on a service node beside the courier. Each has its own data
 directory and log directory, and reaches the mixnet through a kpclientd
