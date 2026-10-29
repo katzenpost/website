@@ -80,6 +80,23 @@ in [Contact voucher protocol
 narration](/docs/specs/contact_voucher_narration/).
 Here it matters only who mints the voucher and how it travels.
 
+A client could instead send a service a read cap and a write cap directly.
+Vouchers are used because:
+
+- **Forward secrecy.** Routers keep forwarded messages for days, sealed to
+  the service's long-term key. Caps in them would stay valid for anyone who
+  later gets that key; a used voucher is worthless, since its payload is
+  tombstoned and its reply is sealed to a key only the client holds.
+- **Each side makes its own stream.** No one holds a write cap to the other's
+  stream.
+- **The client knows it was accepted.** The voucher reply confirms the
+  connection; with bare caps the client cannot tell an idle service from one
+  that never got them.
+- **One token for every path.** The same short, single-use token is routed,
+  offered, or pasted into a chat app.
+
+The cost is a few extra round trips before the first message.
+
 ## Identity
 
 A service is known by its NIKE keypair, `x25519-ctidh1024`, kept in its data
