@@ -539,17 +539,21 @@ pub async fn induct<B: Backend>(ph: Arc<B>, voucher: &[u8], display_name: &str, 
 
 ### Talking to ELIZA
 
-To talk to ELIZA, dial it from katzenqt. Choose *Generate voucher*, find
-ELIZA's service identity among the services `pigeonhole-voucher list` shows,
-and send ELIZA the voucher token:
+ELIZA can be dialed from any of our chat clients:
+[katzenqt](https://github.com/katzenpost/katzenqt),
+[jam](https://github.com/katzenpost/jam),
+[frank_chat](https://github.com/katzenpost/frank_chat) or
+[hushphone](https://github.com/katzenpost/hushphone). Generate a voucher in
+the client, find ELIZA's service identity among the services
+`pigeonhole-voucher list` shows, and send ELIZA the voucher token:
 
 ```sh
 pigeonhole-voucher --thin_config thinclient.toml list
 pigeonhole-voucher --thin_config thinclient.toml send SERVICE_IDENTITY VOUCHER_TOKEN
 ```
 
-ELIZA inducts katzenqt, and its greeting arrives as the first message of a
-new conversation.
+ELIZA inducts you into a new chat, opens it with a greeting, and answers
+each message you send.
 
 ### Running the router and the directory
 
