@@ -539,9 +539,14 @@ pub async fn induct<B: Backend>(ph: Arc<B>, voucher: &[u8], display_name: &str, 
 | `motd-service` | pigeonhole_protocols `cmd/motd-service` | a Go service that answers each request with the message of the day, read from a file |
 | `motd` | pigeonhole_protocols `cmd/motd` | fetches the message of the day from a `motd-service` |
 
-The plugins run on a service node beside the courier. Each has its own data
-directory and log directory, and reaches the mixnet through a kpclientd
-named by its thin client config:
+### Running the router and the directory
+
+The voucher router and the service directory run on a service node: a
+special kind of mix node in a Katzenpost mix network that delivers Sphinx
+packet payloads to services and sends their answers back in SURB replies.
+The node runs each service as a plugin, beside others such as the courier.
+An operator adds the two plugins to the `[ServiceNode]` section of the
+node's configuration:
 
 ```toml
 [[ServiceNode.CBORPluginKaetzchen]]
@@ -564,3 +569,11 @@ named by its thin client config:
     log_dir = "/var/log/katzenpost/service_directory"
     thin_config = "/etc/katzenpost-servicenode/pigeonservice-thinclient.toml"
 ```
+
+`Capability` is the name the plugin is listed under in the PKI document, and
+`Endpoint` the name a client addresses its requests to. Each plugin has its
+own data directory, for its key and database, and its own log directory.
+Because the router and the directory also read and write Pigeonhole streams,
+each reaches the mixnet through a client daemon, kpclientd, named by its
+thin client configuration. On first start a plugin generates its NIKE
+keypair, and the node publishes the public key in the PKI document.
