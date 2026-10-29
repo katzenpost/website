@@ -13,19 +13,30 @@ weight: "16"
 version: "0"
 ---
 
-A pigeonhole service is the responder side of an initiator–responder
-protocol over Pigeonhole. It accepts new connections from clients and then
-speaks its own protocol over each one: a bot that joins group chats, like
-ELIZA, or a binary protocol no human reads.
+This document explains how three elements work together to let a client
+reach a pigeonhole service it has never talked to:
 
-A service has no address and no open port; everything it sends or receives
-is a box on the storage replicas. Two mixnet services, run as plugins on
-service nodes, bootstrap the first contact:
+- a **pigeonhole service**, the responder side of an initiator–responder
+  protocol over Pigeonhole. It accepts new connections from clients and then
+  speaks its own protocol over each one: a bot that joins group chats, like
+  ELIZA, or a binary protocol no human reads;
+- the **service directory** (capability `service_directory`), a mixnet
+  service that holds a descriptor for each pigeonhole service, saying how to
+  reach it;
+- the **voucher router** (capability `voucher_router`), a mixnet service
+  that relays a client's first message to a pigeonhole service.
 
-- the **service directory** (capability `service_directory`) holds a
-  descriptor for each service, saying how to reach it;
-- the **voucher router** (capability `voucher_router`) relays a client's
-  first message to a service.
+A pigeonhole service has no address and no open port; everything it sends
+or receives is a box on the storage replicas. The directory and the router
+bootstrap the first contact, and run as plugins on service nodes.
+
+Many operators should run the directory and the router. If one operator ran
+the only instance of each, that operator would be a single point of failure
+for every pigeonhole service. With two or more there is none: a pigeonhole
+service registers with every router and advertises in every directory the
+PKI document lists, and a client can look it up in any directory and route through
+any of a service's routers. A pigeonhole service notices when a new PKI
+document lists more routers or directories, and starts using them.
 
 ![The bootstrap of a connection](/docs/specs/pix/pigeonhole_services.svg)
 
