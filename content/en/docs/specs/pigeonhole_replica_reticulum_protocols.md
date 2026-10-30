@@ -126,6 +126,10 @@ identity key and the Box ID, lowest first. The first two replicas in a box's ord
 owners. Box IDs are uniformly random, so every replica owns an equal share, and anyone who
 holds a Box ID can compute its owners from the announces it has heard, without asking.
 
+Placement is what lets the mesh grow. With two copies per box however many replicas there
+are, capacity grows with the number of replicas, and a reader asks two of them instead of all
+of them. Without it every replica would come to hold every box, as propagation nodes do.
+
 Two nodes may have heard different announces, and a partition hides replicas from both. So
 every node applies the order to the replicas it knows and can reach, and the protocol is
 written so that differing views converge instead of conflicting. Sharding is the result when
@@ -142,9 +146,11 @@ unreachable or unknown, a stand-in holds the box in its place and forwards it to
 once it can reach one. Placement depends only on the Box ID and the replicas a node knows, so
 when a partition heals or an announce arrives, every held box moves to the right owners.
 
-A replica stores a box it already holds once, so forwarding needs no coordination, and a
-replica never discards a box it has stored before the retention period ends. Stored boxes
-survive a restart.
+A replica stores a box it already holds once, so forwarding needs no coordination. A
+replica that is not one of a box's owners keeps its copy until both owners have acknowledged
+holding the box, then may drop it. During a partition no acknowledgement comes and nothing is
+dropped; once every replica is reachable the extra copies disappear after one handoff and the
+mesh holds two copies per box. Stored boxes survive a restart.
 
 ### Reading
 
