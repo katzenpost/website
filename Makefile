@@ -2,6 +2,7 @@
 
 ENGINE   ?= podman
 IMAGE    ?= katzenpost-website-render:local
+BROWSER_IMAGE ?= katzenpost-website-browser:local
 PORT     ?= 1313
 BIND     ?= 127.0.0.1
 PREVIEW_URL  ?= http://$(BIND):$(PORT)/
@@ -10,6 +11,7 @@ SITE     := $(CURDIR)
 OUT      ?= $(SITE)/public
 BASEURL  ?= https://katzenpost.network/
 PAGE     ?= content/en/docs/specs/dirauth.md
+ASCII_BASE ?= origin/main
 
 # A named volume keeps node_modules, the Go module cache and the Hugo module
 # cache between runs, so only the first render pays for them.
@@ -28,7 +30,7 @@ RUNFLAGS += --userns=keep-id
 endif
 RUN       = $(ENGINE) run --rm $(RUNFLAGS)
 
-.PHONY: help image deps render serve serve-bg stop diagrams text check shell clean distclean
+.PHONY: help image browser-image browser-check deps render serve serve-bg stop diagrams text check shell clean distclean
 
 help:
 	@printf 'make %-10s %s\n' \
@@ -39,14 +41,26 @@ help:
 	  serve-bg 'the same, detached' \
 	  stop     'stop a detached server' \
 	  diagrams 'parse every mermaid block in $$PAGE' \
-	  text     'ASCII and semicolon checks on $$PAGE' \
+	  text     'ASCII additions and page prose checks' \
 	  check    'diagrams, text, then a production render' \
+	  browser-check 'check desktop and phone diagrams and save screenshots in build/dirauth-browser/' \
 	  shell    'an interactive shell in the image' \
 	  clean    'remove the build output' \
 	  distclean 'also remove the cache volume and the image'
 
 image:
 	$(ENGINE) build -t $(IMAGE) -f Containerfile .
+
+browser-image: image
+	$(ENGINE) build --build-arg RENDER_IMAGE=$(IMAGE) -t $(BROWSER_IMAGE) -f tools/specs/Containerfile.browser .
+
+browser-check: deps browser-image
+	@mkdir -p build/dirauth-browser
+	$(RUN) -v $(SITE)/build/dirauth-browser:/output:z $(BROWSER_IMAGE) sh -ec '\
+	  hugo --minify --baseURL http://127.0.0.1:1313/ --destination /tmp/browser-site; \
+	  python3 -m http.server 1313 --bind 127.0.0.1 --directory /tmp/browser-site >/tmp/http.log 2>&1 & \
+	  chromium --headless --no-sandbox --disable-gpu --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 --user-data-dir=/tmp/browser-profile about:blank >/tmp/chromium.log 2>&1 & \
+	  timeout 180s node tools/specs/check-dirauth-browser.cjs'
 
 # npm ci installs the pinned hugo-extended and the postcss pipeline. Hugo
 # fetches the modules go.mod pins on its own during the build, so nothing
@@ -82,6 +96,7 @@ diagrams: image
 
 text: image
 	$(RUN) $(IMAGE) sh -euc '\
+	  python3 /site/tools/check-added-ascii.py "$(ASCII_BASE)"; \
 	  n=$$(LC_ALL=C grep -c "[^ -~]" $(PAGE) || true); \
 	  echo "non-ASCII bytes: $$n"; [ "$$n" = "0" ]; \
 	  python3 /site/tools/prose-only.py $(PAGE) /tmp/prose.md; \

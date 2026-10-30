@@ -40,6 +40,28 @@ as used by the CI workflow.
 The parser and browser renderer use Mermaid 12.2.0.
 Update its pins in `Makefile` and `hugo.yaml` together.
 
+The text check requires ASCII in all added diff lines.
+It uses the common ancestor with `origin/main` as its base.
+Set `ASCII_BASE` to select another base reference.
+
+The [format checks](tools/specs/README.md) describe their container.
+
+Run the browser checks with:
+
+```sh
+make browser-check
+```
+
+This command builds a Chromium container and renders a separate copy of the site.
+It publishes no host port and can run beside the preview.
+It checks diagrams at desktop and phone widths, then tests rapid width changes.
+Checks include role icons, complete panel borders, labels, tables, and page overflow.
+They also check titles, centering, and text and outline contrast.
+Grayscale screenshots show the diagrams without their colors.
+Overlapping screenshots cover the full width of wide diagrams on phones.
+The report and screenshots appear in `build/dirauth-browser/`.
+The browser needs network access to load the pinned Mermaid renderer.
+
 ## Native preview
 
 Prerequisites: Node.js (>= 22) and a Go toolchain (Hugo fetches the
