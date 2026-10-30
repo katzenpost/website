@@ -179,7 +179,9 @@ it can. Otherwise it asks the reachable replicas in the box's order, owners firs
 returns the first box it is given. It does not stop at the owners: if they do not have the
 box it continues down the order, so a copy held by a stand-in or by another client's entry
 replica is found, and an owner that withholds a box only costs the reader queries. If no
-reachable replica has it, the reply says so, and the client asks again later.
+reachable replica has it and a bridge is reachable, the entry replica asks the bridge, which
+fetches the box from the mixnet if it is there. Otherwise the reply says so, and the client
+asks again later.
 
 Within a partition, the replicas a reader can reach are the ones its neighbours wrote to, so
 a group keeps chatting among the members it can reach. Boxes written on the other side arrive
@@ -196,30 +198,59 @@ A reader that has seen a box's tombstone treats the box as deleted thereafter, s
 another replica may still hold the box until the tombstone reaches it.
 
 
+## Bridges
+
+A bridge joins a mesh to a Katzenpost mixnet so that a group can have members on both without
+either side doing anything. It is one node running two replicas: a mesh replica, and a
+Katzenpost replica that is a member of the mixnet's PKI. The two share a machine and talk over
+a local socket. The mixnet already trusts its replica, so what the bridge brings in is covered
+by that trust; this is why the crossing happens between replicas and not through some new
+door into the mixnet.
+
+Boxes cross in two different ways, because the two networks differ in what a replica can see.
+
+**Out of the mesh, by push.** Every box the mesh replica stores it also hands to its
+Katzenpost replica, which treats it as a replication write from a peer: it verifies the box,
+stores it if it is a shard for that Box ID, and otherwise dispatches it to the shards over the
+replica-to-replica links it already holds. Those links are paced and carry decoys when idle,
+so a pushed box displaces a decoy and the mesh enters the mixnet at the mixnet's own rate.
+
+**Into the mesh, by pull.** Nothing on the mixnet announces a write, and a Katzenpost replica
+sees only the boxes of its own shards, so the mixnet cannot push. But any Katzenpost replica
+can fetch any box: it encapsulates a read to the box's shards and awaits the reply, the path it
+already uses when it proxies a read. So when a mesh read finds nothing on the mesh, the entry
+replica asks a reachable bridge, the bridge asks its Katzenpost replica, the box comes back
+from the mixnet and is stored on the mesh as an ordinary box, forwarded along its order like
+one, and returned to the client. The read is the watch list: no one tells a bridge what to
+look for, and the next reader finds the box on the mesh.
+
+A box from the mixnet appears on the mesh only because a mesh node holding its read
+capability asked for it by ID, which is a group member; the consent is the membership. A mesh
+box pushed into the mixnet shows mixnet replicas nothing the mesh did not already show every
+mesh replica. A bridge between a closed mesh and the mixnet gives up nothing, since both vet
+their replicas. A bridge between a closed mesh and an open one would publish the closed mesh's
+Box IDs and read times to anyone, so there is none.
+
+A bridge announces itself as a replica with one extra bit. A mesh may have several; a box
+pulled or pushed twice is stored once. What a bridge costs is paid by its operator: a mixnet
+round trip, a few seconds, the first time a mixnet box is read on the mesh, and a replication
+write into the mixnet for every box the mesh writes.
+
+
 ## Group chat on the mesh
 
 The group chat protocol depends only on reading and writing boxes. On the mixnet it writes
 several boxes through a temporary stream and a copy command so that a courier sees one
 action; the mesh has no courier to hide from, so a mesh client writes the same boxes directly.
-Readers on either network see identical streams.
-
-A member who is on both networks carries boxes between them: it reads the streams of the
-members it can see on one side and writes those boxes, unchanged, on the other. Nothing else
-is needed for a group to span the two.
-
-Carrying is the carrier's choice, and it moves metadata as well as contents. A box carried
-from a closed mesh to an open one, or to any network whose replicas are not vetted, exposes
-its ID and its read times there. Between a closed mesh and the mixnet nothing is given up,
-since both vet their replicas; between an open mesh and anywhere, nothing was protected to
-begin with. A group that lives on a closed mesh stays there unless every member accepts
-otherwise.
+Readers on either network see identical streams, and a group whose members are on both talks
+through a bridge without knowing it.
 
 
 ## Encoding
 
-On an open mesh a replica's announce carries no application data. On a closed mesh it carries
-the replica's 192 byte hybrid NIKE public key: the 32 byte X25519 key followed by the 160 byte
-CTIDH1024 key.
+A replica's announce carries one byte of application data, one if the replica is a bridge and
+zero otherwise. On a closed mesh the replica's 192 byte hybrid NIKE public key follows: the 32
+byte X25519 key, then the 160 byte CTIDH1024 key.
 
 A query is a Reticulum Link payload on an open mesh and a Noise message payload on a closed
 one:
@@ -235,6 +266,8 @@ A reply is:
   specification,
 * for a found box, the 64 byte signature and the ciphertext.
 
-Replicas exchange boxes with the same write message and reply.
+Replicas exchange boxes with the same write message and reply, and so do the two halves of a
+bridge over their local socket: the mesh replica sends writes to push and reads to pull, and
+the Katzenpost replica answers with the same replies.
 
 All integers are big endian.
