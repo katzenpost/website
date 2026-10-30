@@ -166,6 +166,9 @@ a read of a tombstoned box says so. Replicas keep boxes for the current and prev
 epoch, one week each, and drop older ones; the group chat protocol's acknowledgements and
 backfill cover readers who were away longer.
 
+A reader that has seen a box's tombstone treats the box as deleted thereafter, since
+another replica may still hold the box until the tombstone reaches it.
+
 
 ## Group chat on the mesh
 
