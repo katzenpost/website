@@ -1,6 +1,6 @@
 ---
 title: ""
-linkTitle: "Pigeonhole Storage Replica Reticulum Protocols"
+linkTitle: "Pigeonhole over Reticulum"
 description: ""
 author: "David Stainton"
 url: ""
@@ -15,184 +15,188 @@ version: ""
 
 **Abstract**
 
-Here I present a low bandwidth integration between Katzenpost mix networks and Reticulum mesh networks.
-It offers:
-* Reticulum users a post quantum encrypted group chat.
-* Users of a Katzenpost mix network and users of Reticulum mesh networks the ability to chat
-in the same groups and to use the other protocols built on Pigeonhole, from our
-[Echomix paper](https://arxiv.org/abs/2501.02933).
-* Operation with or without a Katzenpost mixnet. Mix networks need not use any of these features.
+Pigeonhole storage replicas on a Reticulum mesh give Reticulum users a durable, asynchronous
+group chat with post quantum confidentiality, and let them share groups with users of a
+Katzenpost mixnet. The mesh side spends as few bytes as it can. The mixnet side keeps its
+metadata privacy. Neither needs the other to work, and no one has to agree on anything before
+running a replica.
+
+This document assumes the [Echomix paper](https://arxiv.org/abs/2501.02933) and the
+[Pigeonhole specification](/docs/specs/pigeonhole/).
 
 
-## Introduction
+## What crosses over
 
-This document assumes you've read our [paper](https://arxiv.org/abs/2501.02933) and our
-[Pigeonhole explained doc](https://katzenpost.network/docs/pigeonhole_explained/).
+A box is a Box ID, a ciphertext and a signature. The Box ID is the public key that verifies
+the signature, the ciphertext is readable only with the read capability, and consecutive
+boxes of one writer are unlinkable to anyone without it. A replica stores a box because it
+verifies, not because of who brought it. Both networks store this same object at the same
+size, so a box written on one can be carried to the other by anyone who can read it, and it
+arrives as authentic as it left.
 
-Pigeonhole has four layers, each resting on the one before:
-
-1. A cryptographic capability protocol, BACAP.
-2. A ciphertext storage system with a one week GC schedule, for asynchronous communication rather than permanent storage.
-3. A channel abstraction for reading and writing fixed size ciphertext boxes.
-4. A messaging API for one on one and group messaging.
-
-A Pigeonhole storage replica can be connected to:
-
-1. a Katzenpost mixnet only,
-2. both a Reticulum mesh and a Katzenpost mixnet, or
-3. a Reticulum mesh only.
-
-Every storage query either reads or writes a box. A box is a fixed size ciphertext blob, a signature
-over that blob, and a Box ID, the database key for the box. The Box ID is also the public key that
-verifies the signature. Writing requires the matching private key; reading and decrypting require
-the read capability, from which the decryption key is derived. See section 4 of our paper.
+Everything above the box is shared: BACAP, the box size, the group chat message format.
+Everything below it differs, and this document describes the mesh half.
 
 
-## Design Priorities
+## Priorities
 
-The Reticulum integration favours reliability over privacy. A mesh network does not provide the
-traffic analysis resistance of a mix network and this design does not pretend otherwise. Its purposes
-are post quantum security for Reticulum users and a group chat that keeps working under the
-intermittent, partitioned connectivity typical of mesh networks. Interoperability with the Pigeonhole
-storage protocols on a Katzenpost mixnet is a bonus. This design SHOULD NOT require a mixnet.
-The mixnet is optional.
+The mesh carries bytes over LoRa and similar links, so the design pays public key
+cryptography once per session rather than once per query, carries no padding, and hides
+nothing from replicas that the mixnet design hides from couriers. The mixnet makes the
+opposite trade in its own specification.
 
-
-## Storage Domains
-
-There can be two storage domains, each with its own replica set:
-
-1. The mixnet domain: the replicas listed in the Katzenpost PKI document.
-2. The mesh domain: the replicas listed in the mesh directory, a list of replica identity keys signed
-   by the mesh directory key that clients ship with.
-
-Each domain places a box by rendezvous hashing its Box ID over its own replicas, so the same Box ID
-maps to different replicas in each domain. A mesh client must know every replica in the mesh directory
-and none on the mixnet. Placement never spans the two domains: mesh links cannot carry the mixnet's
-traffic, and a mesh cut off from the Internet must still serve the boxes written on it.
-
-### Bridges
-
-A bridge is a multi-homed replica in both domains: an ordinary replica on the mesh, and a Katzenpost
-client sending queries through a courier on the mixnet.
-
-* Mesh to mixnet is push. A mesh replica that stores a write forwards a copy to a reachable bridge,
-  which writes it into the mixnet domain. Boxes a bridge brought in from the mixnet are not pushed back.
-* Mixnet to mesh is pull, because the mixnet never notifies the mesh. A mesh client gives a bridge a
-  watch list of the Box IDs it expects to read next. The bridge polls the mixnet for them and writes
-  each one it finds into the mesh domain.
-* Tombstones cross in both directions like any other box, so lagging readers on either side can skip them.
-
-A bridge learns the Box IDs it forwards and the watch lists it holds, which the priorities above accept.
-Replicas store a duplicate write once, so bridges need no coordination with each other.
+BACAP is already quantum annoying: without the blinding factor an adversary cannot read a box
+or link two of them, quantum computer or not, and the paper states the one thing a quantum
+adversary can do, which is forge a write into a box whose ID it has seen. What BACAP does not
+cover is the traffic that carries it. Box IDs and read patterns in transit, and knowing that
+the replica answering is the one you meant, are protected here by one more layer: a Noise
+session over a hybrid NIKE, X25519 combined with CTIDH1024. Confidentiality must hold against
+an adversary who records traffic now and has a quantum computer later; authentication must
+hold against one who has it now. Both do, and the next section says why without any post
+quantum signature.
 
 
-## Mesh Placement
+## Membership
 
-The mesh uses the same scheme as the mixnet: each replica's score for a box is the hash of its
-identity key concatenated with the Box ID, and the two replicas with the lowest scores in the mesh
-directory store the box. A client MKEM-encrypts each query to those two replicas.
+A replica is a node that announces a Reticulum destination under the Pigeonhole application
+name. There is no list to join. The announce carries the replica's long term hybrid NIKE
+public key, and that key is the replica's identity: boxes are placed by hashing it, and
+sessions authenticate against it. The Reticulum identity that signs the announce is only a
+location, saying where that key can currently be reached. Nothing below rests on it.
 
-When neither replica is reachable, the replicas carrying the query hold it until one is
-(see Protocol 2). Placement depends only on the Box ID, so after a partition heals every held
-query still goes to the right replicas.
+This is what bootstraps post quantum authentication on a classically signed mesh. Noise
+authenticates by Diffie-Hellman, not by signature: a replica proves it holds the private half
+of the announced key, and the key is hybrid. An adversary who breaks the Ed25519 on an
+announce can forge one for a replica's address, but can only put its own key in it. Then it
+has announced a new replica at a stolen address, which anyone may do classically, and a client
+that connects authenticates it as itself, never as the replica it meant.
 
+Each node remembers the key it first saw for a destination and ignores an announce that
+changes it, as Reticulum itself refuses a changed public key for a known destination hash. A
+replica that wants a new key announces it as a new replica. The old key leaves path tables as
+its announces stop, and the boxes it owned move to the new order through the handoff below.
+Noise ephemerals give every session forward secrecy, so a key can live for years.
 
-## Protocol 1: The Authenticated Key Update Protocol
-
-MKEM, from our paper, is a multi-recipient encryption scheme built from a NIKE and an AEAD rather
-than a KEM. A query is encrypted once and every recipient replica can decrypt it, which saves
-bandwidth. Katzenpost clients use MKEM to reach replicas through a courier; Reticulum clients use it
-to reach the two mesh replicas that store a box.
-
-Clients therefore need the MKEM public keys of every replica in the mesh directory. Each replica
-signs its current MKEM public key with its identity key and announces itself on Reticulum as a
-Pigeonhole replica. Replicas gossip these signed keys, so a client can collect them from announces
-or download the whole set from any replica it finds. Keys rotate weekly, so clients download them
-once per week. The client verifies the mesh directory with the mesh directory key it ships with, and
-each MKEM key with the identity key the directory lists.
-
-The Katzenpost PKI signature scheme is too large for this. We need hybrid post quantum security with
-very small signatures, so we propose SQIsign combined with Ed25519.
-See the SQIsign paper: https://eprint.iacr.org/2026/1166
-
-None of this requires a Katzenpost mixnet, PKI or dirauth.
+Because anyone may be a replica, a single operator announcing many keys holds a larger share
+of the box order. That costs the mesh bandwidth, since boxes are forwarded to those keys, and
+nothing else: every replica that handles a box keeps it, and a reader is never limited to the
+owners. A community that wants a closed set of replicas uses Reticulum's own boundaries, an
+interface passphrase or a Network Identity on the interfaces that carry the mesh.
 
 
-## Protocol 2: The Replica Store and Forward Protocol
+## Sessions
 
-MKEM is already a hybrid post quantum construction, so the confidentiality of a query does not rely
-on Reticulum's cryptography.
+All Pigeonhole traffic runs inside a Noise session over a Reticulum Link, with the hybrid
+NIKE as the Diffie-Hellman function, ChaCha20-Poly1305 and BLAKE2s. Reticulum's own link
+encryption carries it but is not relied on.
 
-A client sends each query once, to a single replica: its first hop. The first hop plays the part the
-courier plays on the mixnet. It takes custody of the query, splits it into one message per storage
-replica, forwards each one, and holds the replies until the client collects them. The client's link
-carries one copy of the query rather than one per storage replica, which matters on LoRa and other
-low bandwidth links where the client's link is often the scarcest.
+A client speaks `Noise_NK` to a replica:
 
-### Choosing the First Hop
+```
+NK:
+  <- s
+  ...
+  -> e, es
+  <- e, ee
+```
 
-The client picks the reachable replica with the fewest hops in its Reticulum path table. When one of
-the query's two storage replicas is as close as any other replica, the client picks it, since it then
-stores the box itself and forwards only one message. When a replica refuses custody or does not answer,
-the client tries the next closest.
+The replica's static is known from its announce. The client has no identity to prove, since
+the capability inside its query is the authorisation, and NK keeps it anonymous, as a
+Reticulum link initiator is. The handshake is one round trip, and the client puts its first
+query in the first message, so a query and its reply together cost one round trip. That first
+payload is encrypted to the replica's static alone, so it is replayable and would be exposed
+by a later compromise of that static. A replayed write is idempotent, a replayed read yields
+a reply only the original client can decrypt, and the only thing in the payload is a Box ID
+and a box, which the replica sees in any case. A client that nevertheless wants forward
+secrecy for its first query sends it after the second message, for one more round trip.
+Everything after the handshake has forward secrecy.
 
-### Splitting
+Replicas speak `Noise_KK` to each other. Both statics are known from announces, so the
+handshake transmits only ephemerals and completes in one round trip. These sessions are long
+lived and reopened when a link is lost.
 
-A query reaches the first hop as a mesh envelope: one ciphertext and one ephemeral public key shared by
-both storage replicas, one DEK for each of them, and the positions of the two storage replicas in the
-mesh directory. As the courier does, the first hop splits the envelope into two replica messages, each
-carrying the ciphertext, the ephemeral public key, and only the DEK of its own storage replica. A
-replica can decrypt only with its own DEK, so carrying the other would cost 60 bytes on every link the
-message crosses. A first hop that is itself one of the storage replicas handles its own message locally
-and forwards only the other.
+A Noise message that fits a link packet travels as one; a larger one travels as a Reticulum
+Resource.
 
-Each replica message travels over a Reticulum Link to its storage replica, and Reticulum carries it
-across the hops in between.
 
-A write goes to both storage replicas. A read goes to one of them, and the first hop forwards it to
-the other only when the first is unreachable or does not hold the box.
+## Placement
 
-### Custody
+Rendezvous hashing orders the replicas for every box: each replica's score is the hash of its
+identity key and the Box ID, lowest first. The first two replicas in a box's order are its
+owners. Box IDs are uniformly random, so every replica owns an equal share, and anyone who
+holds a Box ID can compute its owners from the announces it has heard, without asking.
 
-The client keeps a query until a first hop acknowledges it. From then on the first hop is responsible
-for it: it holds each replica message until its storage replica accepts it, retrying while that replica
-is unreachable. Held messages SHOULD survive a restart of the first hop. A first hop discards a held
-message after one week, the GC period. A replica MAY refuse custody when its store of held messages is
-full.
+Two nodes may have heard different announces, and a partition hides replicas from both. So
+every node applies the order to the replicas it knows and can reach, and the protocol is
+written so that differing views converge instead of conflicting. Sharding is the result when
+every replica is reachable; store and forward is what happens in between.
 
-The envelope hash, the hash of the ephemeral public key and the ciphertext, identifies a query. It
-leaves out the DEKs, so both replica messages split from one envelope share it. A replica that receives
-an envelope or a replica message it already holds does not store or forward it again, so a client may
-resend a query to another first hop without coordinating with the first.
+### Writing
 
-### Replies
+A client sends a write to the reachable replica with the fewest hops in its path table, its
+entry replica. The entry replica stores the box and acknowledges. The client is done.
 
-Storage replicas reply to the first hop, which caches each reply under the envelope hash and the
-position of the storage replica that sent it. If the client's Link to the first hop is still open,
-the first hop sends the reply over it. Otherwise the client collects the reply later with a collection
-request naming the envelope hash and the storage replica, so it never resends the whole query to fetch
-a reply. Replies are encrypted to the client as on the mixnet; the first hop cannot read them.
+The entry replica then forwards the box to the first two reachable replicas in the box's
+order. When those are the owners, the box is where every reader looks first. When an owner is
+unreachable or unknown, a stand-in holds the box in its place and forwards it to the owner
+once it can reach one. Placement depends only on the Box ID and the replicas a node knows, so
+when a partition heals or an announce arrives, every held box moves to the right owners.
 
-A write's reply confirms that its storage replica holds the box. Collecting it is optional: a client
-that does not need the confirmation saves the bandwidth.
+A replica stores a box it already holds once, so forwarding needs no coordination, and a
+replica never discards a box it has stored before the retention period ends. Stored boxes
+survive a restart.
 
-### Encoding
+### Reading
 
-A mesh envelope contains, in order:
+A client sends a read to its entry replica. The entry replica answers from its own store if
+it can. Otherwise it asks the reachable replicas in the box's order, owners first, and
+returns the first box it is given. It does not stop at the owners: if they do not have the
+box it continues down the order, so a copy held by a stand-in or by another client's entry
+replica is found, and an owner that withholds a box only costs the reader queries. If no
+reachable replica has it, the reply says so, and the client asks again later.
 
-* the positions of the two storage replicas in the mesh directory, one byte each,
-* the epoch of the replica MKEM keys the query was encrypted to, eight bytes,
-* the DEK for the first storage replica, 60 bytes,
-* the DEK for the second storage replica, 60 bytes,
-* the length of the ephemeral public key, two bytes, followed by the key,
-* the length of the ciphertext, four bytes, followed by the ciphertext.
+Within a partition, the replicas a reader can reach are the ones its neighbours wrote to, so
+a group keeps chatting among the members it can reach. Boxes written on the other side arrive
+when the first stand-in can reach an owner.
 
-A replica message uses the mixnet replica message encoding: the ephemeral public key, one 60 byte DEK,
-and the ciphertext.
+### Deleting and forgetting
 
-An acknowledgement carries the 32 byte envelope hash. A collection request carries the envelope hash
-and the position, zero or one, of the storage replica whose reply it wants. A reply carries the
-envelope hash, that position, and the encrypted reply.
+A tombstone is a write with an empty payload. It replaces the box, is forwarded like one, and
+a read of a tombstoned box says so. Replicas keep boxes for the current and previous replica
+epoch, one week each, and drop older ones; the group chat protocol's acknowledgements and
+backfill cover readers who were away longer.
+
+
+## Group chat on the mesh
+
+The group chat protocol depends only on reading and writing boxes. On the mixnet it writes
+several boxes through a temporary stream and a copy command so that a courier sees one
+action; the mesh has no courier to hide from, so a mesh client writes the same boxes directly.
+Readers on either network see identical streams.
+
+A member who is on both networks carries boxes between them: it reads the streams of the
+members it can see on one side and writes those boxes, unchanged, on the other. Nothing else
+is needed for a group to span the two.
+
+
+## Encoding
+
+A replica's announce carries, as application data, its 192 byte hybrid NIKE public key:
+the 32 byte X25519 key followed by the 160 byte CTIDH1024 key.
+
+A query is a Noise message payload:
+
+* one byte, zero for a read and one for a write,
+* the 32 byte Box ID,
+* for a write, the 64 byte signature and the ciphertext, whose length is fixed by the box
+  size; a tombstone has a zero length ciphertext.
+
+A reply is:
+
+* one byte result: found, not found, tombstone, stored, or an error code from the Pigeonhole
+  specification,
+* for a found box, the 64 byte signature and the ciphertext.
+
+Replicas exchange boxes with the same write message and reply.
 
 All integers are big endian.
