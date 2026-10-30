@@ -7,11 +7,17 @@ url: ""
 date: "2026-06-02T10:58:49.751573055-07:00"
 draft: "false"
 slug: "wireprotocol"
+aliases: ["/docs/specs/wire/"]
 layout: ""
 type: ""
 weight: "65"
 version: ""
 ---
+
+{{% pageinfo %}}
+The [Namenlos profile](#wire-kem-profile) defines the v0.0.107 link KEM, handshake, authentication payloads, and transport keys.
+The [directory wire protocol](/docs/specs/dirauth#222-wire-protocol) defines directory commands and consensus retrieval over direct authority or persistent gateway sessions.
+{{% /pageinfo %}}
 
 <div class="section">
 
@@ -158,12 +164,14 @@ based on <a href="#NOISEHFS" class="link">NOISEHFS</a>.
 Our transport protocol begins with a prologue, Noise handshake, followed by a stream
 of Noise transport messages in a minimal framing layer, over a TCP/IP connection.
 
-Our Noise protocol is configurable via the KEM selection in the TOML configuration
-files, here’s an example PQ Noise protocol string:
+The TOML configuration selects the KEM. This protocol string gives an Xwing example:
 
 ``` programlisting
 Noise_pqXX_Xwing_ChaChaPoly_BLAKE2b
 ```
+
+Namenlos uses the canonical KEM name `Kyber768-X25519` in its [protocol name](#pq-handshake-profile).
+The [baseline KEM profile](#wire-kem-profile) defines its key encodings, adapter, and combiner.
 
 The protocol string is a very condensed description of our protocol. We use the pqXX
 two-way Noise pattern which is described as follows:
@@ -178,15 +186,11 @@ hybrid KEM where the share secret outputs of both X25519 and MLKEM768 are combin
 Finally the `ChaChaPoly_BLAKE2b` parts of the protocol string indicate
 which stream cipher and hash function we are using.
 
-As a non-standard modification to the Noise protocol, the 65535 byte message length
-limit is increased to 1300000 bytes. We send very large messages over our Noise protocol
-because of our using the Sphincs+ signature scheme which has signatures that are about
-49k bytes.
+Katzenpost permits larger transport messages than Noise's 65535-byte default.
+Directory sessions apply the [configured receive size ceiling](/docs/specs/dirauth#receive-size-ceiling).
 
-It is assumed that all parties using the KMNWP protocol have a fixed long or short
-lived `Xwing` keypair <a href="#XWING" class="link">XWING</a>, the public
-component of which is known to the other party in advance. How such keys are distributed
-is beyond the scope of this document.
+Each peer has a static key pair for the configured KEM.
+The [authentication rules](#authentication-payload-profile) determine whether a peer needs a configured key pin.
 
 <div class="section">
 
@@ -207,10 +211,8 @@ is beyond the scope of this document.
 All sessions start in the <span class="emphasis">*handshake phase*</span>, in which an
 anonymous authenticated handshake is conducted.
 
-The handshake is a unmodified Noise handshake, with a fixed prologue prefacing the
-initiator's first Noise handshake message. This prologue is also used as the
-`prologue` input to the Noise HandshakeState
-`Initialize()` operation for both the initiator and responder.
+The [pqXX handshake](#pq-handshake-profile) starts with a fixed prologue before the initiator's first Noise message.
+Both peers also use this byte as the Noise `prologue` input.
 
 The prologue is defined to be the following structure:
 
@@ -277,22 +279,12 @@ Where:
 
 </div>
 
-The initiator MUST send the `AuthenticateMessage` after it has received
-the peer's response (so after `-> s, se` in Noise parlance).
+The responder sends `AuthenticateMessage` in flight 2. The initiator sends it in flight 3.
+The [four-flight profile](#pq-handshake-profile) defines the tokens, payloads, and byte counts.
+The [authentication payload profile](#authentication-payload-profile) defines the padding, integer encoding, and role-specific additional data.
 
-The contents of the optional `additional_data` field is deliberately
-left up to the implementation, however it is RECOMMENDED that implementations pad
-the field to be a consistent length regardless of contents to avoid leaking
-information about the authenticating identity.
-
-To authenticate the remote peer given an `AuthenticateMessage`, the
-receiving peer must validate the `s` component of the Noise handshake
-(the remote peer's long-term public key) with the known value, along with any of the
-information in the `additional_data` field such as the user name, if any.
-
-If the validation procedure succeeds, the peer is considered authenticated. If the
-validation procedure fails for any reason, the session MUST be terminated
-immediately.
+The receiver MUST authenticate the remote static link key and additional data under the [peer's role](#authentication-payload-profile).
+If authentication fails, the receiver MUST terminate the session immediately.
 
 Responders MAY add a slight amount (+- 10 seconds) of random noise to the
 `unix_time` value to avoid leaking precise load information via
@@ -334,7 +326,7 @@ send_packet(2),
 struct {
 Command command;
 uint8_t reserved;    /* MUST be '0x00' */
-uint32_t msg_length; /* 0 <= msg_length <= 1048554) */
+uint32_t msg_length; /* bounded by the session message limit */
 opaque message[msg_length];
 opaque padding[];    /* length is implicit */
 } Message;
@@ -353,11 +345,11 @@ Transport messages, each containing one of the following structures:
 
 ``` programlisting
 struct {
-uint32_t message_length;
+uint32_t ciphertext_length;
 } CiphertextHeader;
 
 struct {
-uint32_t message[ciphertext_length-16];
+opaque message[ciphertext_length-16];
 } Ciphertext;
 ```
 
@@ -592,8 +584,8 @@ the fixed positions of the various public keys.
 
 </div>
 
-It is imperative that implementations use ephemeral keys for every handshake as the
-security properties of the Kyber KEM are totally lost if keys are ever reused.
+Each handshake MUST use a fresh ephemeral key pair. Each KEM encapsulation MUST use fresh randomness.
+Static link keys identify peers under the [authentication rules](#authentication-payload-profile).
 
 Kyber was chosen as the KEM algorithm due to it’s conservative parameterization,
 simplicity of implementation, and high performance in software. It is hoped that the
@@ -681,3 +673,188 @@ For</span>”</span>,
 </div>
 
 </div>
+
+## Appendix: Namenlos wire profile {#wire-kem-profile}
+
+This profile defines the Namenlos link KEM and handshake with Katzenpost v0.0.107. Implementations MUST use these formats with that configuration. The linked primitive specifications define X25519, Kyber, BLAKE2, and ChaCha20-Poly1305. The composition rules below define their use on the wire.
+
+Here, `||` means byte concatenation, `empty` means zero bytes, and `zero[n]` means n zero bytes. `BE32`, `LE32`, and `LE64` encode unsigned integers in the indicated byte order. ASCII literals have no terminating zero.
+
+`H256` means unkeyed BLAKE2b with a 32-byte output. `H512` means unkeyed BLAKE2b with a 64-byte output. Configure BLAKE2b-256 for 32 output bytes. Do not truncate BLAKE2b-512 to produce BLAKE2b-256. Both use the sequential mode in [RFC 7693](https://www.rfc-editor.org/rfc/rfc7693).
+
+### Link key encodings
+
+<div class="key-value-table">
+
+| Key | Value | Explanation |
+| --- | --- | --- |
+| Wire KEM | `Kyber768-X25519` | This is the canonical name used in the Noise protocol name. Configuration lookup also accepts the Namenlos spelling `KYBER768-X25519`. |
+| Public key | 1216 bytes | X25519 public key, 32 bytes, followed by Kyber768 public key, 1184 bytes. |
+| Private key | 2432 bytes | X25519 scalar, 32 bytes, followed by Kyber768 secret key, 2400 bytes. |
+| Ciphertext | 1120 bytes | X25519 adapter ciphertext, 32 bytes, followed by Kyber768 ciphertext, 1088 bytes. |
+| Shared secret | 32 bytes | The combiner output defined below. |
+
+</div>
+
+Keys use raw component encodings without ASN.1, text encoding, or length prefixes. X25519 uses the 32-byte little-endian u-coordinate encoding and scalar operation in [RFC 7748, Section 5](https://www.rfc-editor.org/rfc/rfc7748#section-5). The [scheme definition](https://github.com/katzenpost/hpqc/blob/v0.0.93/kem/schemes/schemes.go#L111-L118) fixes the component order.
+
+The public PEM label is `KYBER768-X25519 PUBLIC KEY`. The private PEM label is `KYBER768-X25519 PRIVATE KEY`. A PEM payload is the base64 encoding of the corresponding raw key. There are no PEM headers or ASN.1 fields. This encoding permits import of reference key files. An implementation can use its own internal storage format.
+
+The [PEM codec](https://github.com/katzenpost/hpqc/blob/v0.0.93/kem/pem/pem.go#L21-L34) wraps raw key bytes.
+
+### Link KEM adapter and combiner
+
+The Kyber component is **Kyber768.CCAKEM from the round 3 specification, version 3.02**, with its public-key, secret-key, and ciphertext encodings. Use [Algorithms 7-9 and the Kyber768 parameters](https://pq-crystals.org/kyber/data/kyber-specification-round3-20210804.pdf). This is the round 3 Kyber KEM, not ML-KEM. The [pinned Kyber implementation](https://github.com/katzenpost/circl/blob/e2d217fd59f5/kem/kyber/kyber768/kyber.go#L1-L38) identifies that primitive and its sizes.
+
+For the X25519 component, let `X_s` be the recipient's public key. Generate a fresh ephemeral scalar `x_e` and its public key `X_e`. Compute:
+
+```text
+Z    = X25519(x_e, X_s)
+ct_X = X_e
+ss_X = BLAKE2Xb(output_length=32, key=Z, message=X_s || X_e)
+```
+
+Reject an all-zero `Z`. Decapsulation computes `Z = X25519(x_s, ct_X)` and uses the same recipient-public-key-first input. The output length supplied to [BLAKE2Xb](https://www.blake2.net/blake2x.pdf) is exactly 32. Its unknown-length mode produces different bytes and MUST NOT be used here. The [adapter](https://github.com/katzenpost/hpqc/blob/v0.0.93/kem/adapter/kem.go#L145-L169) defines the inputs. Its [PRF](https://github.com/katzenpost/hpqc/blob/v0.0.93/kem/adapter/kem.go#L214-L243) selects the fixed-length keyed XOF.
+
+For this invocation, BLAKE2Xb first produces a keyed 64-byte root over `X_s || X_e`. It then produces one unkeyed 32-byte output block over that root. Each BLAKE2 parameter block is 64 bytes and starts with all bytes zero. Set these fields:
+
+<div class="key-value-table">
+
+| Key | Value | Explanation |
+| --- | --- | --- |
+| Root bytes 0-3 | `64, 32, 1, 1` | Digest length, key length, fanout, and depth. The key is `Z`, with standard BLAKE2b key-block padding. |
+| Root bytes 12-15 | `LE32(32)` | XOF output length. |
+| Output byte 0 | `32` | Output digest length. |
+| Output bytes 4-7 | `LE32(64)` | Leaf length. |
+| Output bytes 8-11 | `LE32(0)` | Output block number. |
+| Output bytes 12-15 | `LE32(32)` | XOF output length. |
+| Output byte 17 | `64` | Inner digest length. |
+
+</div>
+
+All unlisted fields, salt, and personalization remain zero. Set the normal final-block flag for each hash. Do not set the last-node flag. The [fixed-output BLAKE2Xb implementation](https://github.com/golang/crypto/blob/v0.58.0/blake2b/blake2x.go#L104-L183) gives these parameter blocks.
+
+Encapsulate independently to each component public key. Let `(ct_X, ss_X)` be the adapter output and `(ct_K, ss_K)` be the Kyber output. Both component shared secrets are 32 bytes. Define:
+
+```text
+T = ASCII("splitprf-v1") || BE32(2)
+    || BE32(32) || ct_X || BE32(1088) || ct_K
+
+k_X = H256(ss_X)
+k_K = H256(ss_K)
+ss  = BLAKE2b-256(key=k_X, message=T)
+      XOR BLAKE2b-256(key=k_K, message=T)
+ct  = ct_X || ct_K
+```
+
+The two keyed hashes use BLAKE2b's native keyed mode. They are not HMAC. XOR is bytewise across all 32 bytes.
+
+Decapsulation splits the 1120-byte ciphertext at byte 32, decapsulates both components, and applies the same formula to the received component ciphertexts. Reject an incorrect total length or an error from either component. Kyber's implicit-rejection behavior remains part of the Kyber primitive. The [combiner definition](https://github.com/katzenpost/hpqc/blob/v0.0.93/kem/combiner/split_prf.go#L37-L122) fixes the label, length fields, prehashes, and XOR.
+
+### PQ Noise handshake {#pq-handshake-profile}
+
+Use the symmetric operations from [Noise revision 34](https://noiseprotocol.org/noise.html), with the KEM token rules below. The exact protocol name is the following 45 ASCII bytes:
+
+```text
+Noise_pqXX_Kyber768-X25519_ChaChaPoly_BLAKE2b
+```
+
+There are no pre-messages or pre-shared keys. Both peers have a static link KEM key pair. An anonymous fetcher generates a fresh link key pair for its connection. The initiator also generates a fresh ephemeral KEM key pair for token `e`. Each KEM encapsulation uses fresh randomness.
+
+Initialize `h` to the protocol name followed by 19 zero bytes. Copy this value to `ck`. Start with no cipher key and nonce zero. Then set `h = H512(h || 0x03)`.
+
+The single byte `0x03` is the Noise prologue and is also sent in clear before the first flight. It is not a token or payload byte. The responder MUST reject any other version byte.
+
+The following rules define the symmetric operations. HMAC uses BLAKE2b-512. For `HKDF(ck, input, count)`, compute:
+
+```text
+prk = HMAC-BLAKE2b-512(key=ck, message=input)
+t1  = HMAC-BLAKE2b-512(key=prk, message=0x01)
+t2  = HMAC-BLAKE2b-512(key=prk, message=t1 || 0x02)
+t3  = HMAC-BLAKE2b-512(key=prk, message=t2 || 0x03)
+```
+
+Return the first `count` values, each 64 bytes. No HKDF info bytes are present.
+
+<div class="key-value-table">
+
+| Key | Value | Explanation |
+| --- | --- | --- |
+| `MixHash(x)` | `h = H512(h \|\| x)` | This operation also runs when `x` is empty. |
+| `MixKey(x)` | `(ck, t) = HKDF(ck, x, 2)` | Set the cipher key to the first 32 bytes of `t`, and reset the nonce to zero. |
+| `MixKeyAndHash(x)` | `(ck, u, t) = HKDF(ck, x, 3)` | Run `MixHash(u)`, set the cipher key to the first 32 bytes of `t`, and reset the nonce to zero. |
+| `EncryptAndHash(p)` | Encrypt `p` with associated data `h`, then run `MixHash(ciphertext)` | Without a cipher key, use `p` unchanged as the ciphertext. |
+| `DecryptAndHash(c)` | Decrypt `c` with associated data equal to the prior `h`, then run `MixHash(c)` | Without a cipher key, the plaintext is `c`. Reject an AEAD failure. |
+
+</div>
+
+Encryption uses [IETF ChaCha20-Poly1305](https://www.rfc-editor.org/rfc/rfc8439), a 32-byte key, and the 12-byte nonce `zero[4] || LE64(n)`. Its 16-byte tag follows the ciphertext. Increase `n` after each keyed encryption or successful keyed decryption. Do not increase it for an unkeyed operation. A normal encryption or decryption MUST fail when `n = 2^64-1`.
+
+The [symmetric-state implementation](https://github.com/katzenpost/nyquist/blob/v0.0.13/symmetricstate.go#L61-L179) defines these operations. The [cipher implementation](https://github.com/katzenpost/nyquist/blob/v0.0.13/cipher/cipher.go#L75-L91) fixes the AEAD and nonce bytes.
+
+Each flight processes its tokens in order, then calls `EncryptAndHash` on its payload. The receiver performs the inverse operations in the same order.
+
+<div class="key-value-table">
+
+| Key | Value | Explanation |
+| --- | --- | --- |
+| `e` | Raw ephemeral public key, 1216 bytes | Send the initiator's ephemeral KEM public key, and run `MixHash` on those bytes. |
+| `ekem` | Raw KEM ciphertext, 1120 bytes | Encapsulate to the peer's ephemeral key. Send the ciphertext, run `MixHash(ciphertext)`, then `MixKey(shared_secret)`. The receiver decapsulates with its ephemeral private key. |
+| `s` | `EncryptAndHash(static_public_key)` | Send the sender's 1216-byte static link public key. The receiver decrypts it and retains it as the peer's static key. |
+| `skem` | `EncryptAndHash(KEM_ciphertext)` | Encapsulate to the peer's static key. Encrypt and hash the ciphertext with the current cipher state, then run `MixKeyAndHash(shared_secret)`. The receiver decrypts, decapsulates with its static private key, then runs `MixKeyAndHash`. |
+
+</div>
+
+The [pqXX pattern](https://github.com/katzenpost/nyquist/blob/v0.0.13/pattern/pq_interactive.go#L96-L105) and [KEM token processing](https://github.com/katzenpost/nyquist/blob/v0.0.13/handshakestate_kem.go#L47-L236) define this order. In particular, `skem` updates both `ck` and `h` after its encrypted ciphertext.
+
+Let `P=1216`, `C=1120`, `A=260`, and `T=16`. Each length below is an exact stream byte count. There is no handshake length prefix or padding outside the stated fields.
+
+<div class="key-value-table">
+
+| Key | Value | Explanation |
+| --- | --- | --- |
+| Flight 1, initiator -> responder | `0x03`, `e`, empty payload. 1217 bytes. | `1+P`. The empty payload emits no bytes but still runs `MixHash(empty)`. |
+| Flight 2, responder -> initiator | `ekem`, `s`, responder authentication. 2628 bytes. | `C + (P+T) + (A+T)`. After `ekem`, the static key and payload use nonces 0 and 1. |
+| Flight 3, initiator -> responder | `skem`, `s`, initiator authentication. 2644 bytes. | `(C+T) + (P+T) + (A+T)`. `skem` uses nonce 2 from flight 2. Its key update resets the nonce, so `s` and the payload use 0 and 1. |
+| Flight 4, responder -> initiator | `skem`, empty payload. 1152 bytes. | `(C+T) + T`. `skem` uses nonce 2 from flight 3. Its key update resets the nonce. The empty payload uses nonce 0 and emits a 16-byte tag. |
+
+</div>
+
+The session uses these [flight lengths](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/wire/session.go#L252-L274) and [payload assignments](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/wire/session.go#L391-L540). The [payload operation](https://github.com/katzenpost/nyquist/blob/v0.0.13/handshakestate.go#L511-L522) runs once after every flight's tokens, including flights 1 and 4.
+
+### Authentication payload {#authentication-payload-profile}
+
+An `AuthenticateMessage` is exactly 260 bytes:
+
+```text
+u8(length(AD)) || AD || zero[255-length(AD)] || BE32(unix_time)
+```
+
+`AD` has 0 to 255 bytes. The timestamp starts at offset 256. The initiator sends timestamp zero. The responder sends its current Unix time in whole seconds, encoded as an unsigned 32-bit value.
+
+Senders MUST set the padding to zero. The v0.0.107 receiver extracts the length, AD, and timestamp. It ignores the padding bytes. The [authentication codec](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/wire/session.go#L120-L154) defines this layout.
+
+<div class="key-value-table">
+
+| Key | Value | Explanation |
+| --- | --- | --- |
+| Authority responder | 32 raw identity-hash bytes | Its static Noise key is its configured link public key. |
+| Authority or node uploading to an authority | 32 raw identity-hash bytes | The identity hash selects the configured peer. Authority peers also require the pinned link key. Node uploads bind the descriptor link key to this session. |
+| Anonymous direct directory fetcher | Empty AD | Use a fresh link key pair. The authority grants the anonymous fetch role. |
+| Client daemon connecting to a gateway | 32 lowercase ASCII hexadecimal bytes | Encode 16 fresh random bytes as two hex characters per byte. This is the gateway queue identifier. It is not a raw identity hash. |
+
+</div>
+
+The [identity signature profile](/docs/specs/certificate#identity-signature-profile) defines identity hashes. The authority's [responder configuration](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/wire_handler.go#L71-L87), [initiator configuration](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/client/client.go#L384-L411), and [peer classification](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/wire_handler.go#L886-L937) distinguish these roles. The [client connection](https://github.com/katzenpost/katzenpost/blob/v0.0.107/client/connection.go#L435-L454) defines the queue identifier.
+
+The initiator authenticates the responder after flight 2. It uses the responder's static key and authentication payload. The responder authenticates the initiator after flight 3.
+
+For an authority responder, the v0.0.107 client requires at least 32 AD bytes. It compares the first 32 bytes with the configured identity hash. It also compares the full static link key with its configured pin. Authority receivers accept only empty or 32-byte initiator AD and apply the role requirements above. Any failed authentication terminates the session. The [authority authenticator](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/client/client.go#L67-L86) implements these requirements.
+
+### Transport keys and framing {#transport-key-profile}
+
+After flight 4's empty payload, compute `(t_I, t_R) = HKDF(ck, empty, 2)`. The first 32 bytes of `t_I` are the initiator-to-responder transport key. The first 32 bytes of `t_R` are the responder-to-initiator key. Each direction starts with nonce zero. Transport encryption uses empty AEAD associated data. It does not continue `EncryptAndHash` or update the handshake hash.
+
+For each command, encrypt `BE32(length(serialized_command)+16)` as a separate 20-byte header. Then encrypt the serialized command with the next nonce. Both operations use the same direction's cipher key. After the body, update that direction's key to the first 32 bytes of `ChaCha20-Poly1305(key, zero[4] || LE64(2^64-1), empty_AD, zero[32])`. Keep the ordinary nonce counter at its value after the two frame operations. The receiver follows the same sequence.
+
+The responder's first transport command MUST be `NoOp`. The initiator MUST receive it before using the session. The session implements [transport sending](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/wire/session.go#L615-L644), [rekeying](https://github.com/katzenpost/nyquist/blob/v0.0.13/cipherstate.go#L164-L186), and [handshake finalization](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/wire/session.go#L544-L577).

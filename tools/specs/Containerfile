@@ -1,0 +1,11 @@
+# Run CDDL validation in a container alongside the website checks.
+FROM katzenpost-website-render:local
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ruby ruby-dev make gcc libc6-dev python3-venv \
+ && gem install cddl --version 0.12.14 --no-document \
+ && python3 -m venv /opt/schema \
+ && /opt/schema/bin/pip install --no-cache-dir abnf==2.9.1 \
+ && rm -rf /var/lib/apt/lists/*
+ENV PATH=/opt/schema/bin:$PATH
+WORKDIR /site
+CMD ["python3", "tools/specs/check-dirauth-schema.py"]

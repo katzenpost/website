@@ -13,6 +13,12 @@ weight: "10"
 version: ""
 ---
 
+{{% pageinfo %}}
+The main text preserves the original certificate design and key-delegation proposals.
+The [identity signature profile](#identity-signature-profile) defines the v0.0.107 hybrid signature and key encodings.
+Current [directory certificate envelopes](/docs/specs/dirauth#27-certificate-envelopes-and-signing) use epoch-based expiration and a map of signatures.
+{{% /pageinfo %}}
+
 <div class="section">
 
 <div class="titlepage">
@@ -337,3 +343,44 @@ L., Schwabe, P., Wilcox O'Hearn, Z.,
 </div>
 
 </div>
+
+## Appendix: Identity signature profile {#identity-signature-profile}
+
+This profile defines identity signatures and key encodings for Namenlos with Katzenpost v0.0.107. Its rules apply to the current [directory certificate envelopes](/docs/specs/dirauth#27-certificate-envelopes-and-signing). The main text above preserves the original certificate design.
+
+Here, `||` means byte concatenation. CBOR fields carry raw public keys as byte strings. The key bytes have no ASN.1 wrapper, length prefix, or text encoding.
+
+<div class="key-value-table">
+
+| Key | Value | Explanation |
+| --- | --- | --- |
+| Signature scheme | `Ed25519 Sphincs+` | Use this exact name in the baseline certificate `KeyType` and document `PKISignatureScheme`. The space is significant. |
+| Public key | 96 bytes | Ed25519 public key, 32 bytes, followed by SPHINCS+ public key, 64 bytes. |
+| Private key | 192 bytes | Ed25519 seed, 32 bytes, Ed25519 public key, 32 bytes, then SPHINCS+ secret key, 128 bytes. |
+| Identity hash | `BLAKE2b-256(identity_public_key)` | Hash the 96 raw public-key bytes. The result is 32 raw bytes. |
+
+</div>
+
+The [signature scheme definition](https://github.com/katzenpost/hpqc/blob/v0.0.93/sign/hybrid/sphincsplus.go#L16-L18) fixes the name and component order. Identity hashes use sequential [BLAKE2b from RFC 7693](https://www.rfc-editor.org/rfc/rfc7693) with a 32-byte output. Do not truncate BLAKE2b-512 to produce BLAKE2b-256.
+
+### Key files
+
+The public PEM label is `ED25519 SPHINCS+ PUBLIC KEY`. The private PEM label is `ED25519 SPHINCS+ PRIVATE KEY`. A PEM payload is the base64 encoding of the corresponding raw key. There are no PEM headers or ASN.1 fields.
+
+The signature private payload is `Ed25519_seed[32] || Ed25519_public[32] || SPHINCS_secret[128]`. This encoding permits import of reference key files. An implementation can use its own internal storage format. The [PEM codec](https://github.com/katzenpost/hpqc/blob/v0.0.93/sign/pem/pem.go#L21-L34) wraps the [raw private bytes](https://github.com/katzenpost/hpqc/blob/v0.0.93/sign/hybrid/hybrid.go#L207-L216).
+
+### Signature algorithm
+
+Use pure [Ed25519 from RFC 8032, Section 5.1](https://www.rfc-editor.org/rfc/rfc8032#section-5.1) and [SPHINCS+ round 3.1](https://sphincs.org/data/sphincs%2B-r3.1-specification.pdf), parameter set `SPHINCS+-SHAKE-256f-robust`. The SPHINCS+ parameters are n=32, h=68, d=17, FORS height=9, FORS trees=35, and Winternitz w=16. Use the `robust` tweakable hashes. The public key is `PUB_SEED[32] || root[32]`. The secret key is `SK_SEED[32] || SK_PRF[32] || PUB_SEED[32] || root[32]`.
+
+Let `M` be the exact byte string to sign. Directory objects use their [specified signing inputs](/docs/specs/dirauth#signed-data-formats). Both component algorithms sign the same `M`:
+
+```text
+signature = Ed25519.Sign(ed_sk, M) || SPHINCS+.Sign(spx_sk, M)
+```
+
+The first signature is 64 bytes. The second is 49856 bytes. The complete signature is 49920 bytes.
+
+The SPHINCS+ signature contains its 32-byte `R`, FORS signature, and hypertree signature in the order defined by the primitive specification. The signer uses fresh 32-byte `optrand` for SPHINCS+. Do not add an external prehash, context, message prefix, or length field. In particular, this profile uses neither Ed25519ph nor SLH-DSA. Verification MUST reject an incorrect signature length. It MUST accept only when both component signatures verify against `M`.
+
+The implementation composes [the two signatures](https://github.com/katzenpost/hpqc/blob/v0.0.93/sign/hybrid/hybrid.go#L60-L79) and [the two public keys](https://github.com/katzenpost/hpqc/blob/v0.0.93/sign/hybrid/hybrid.go#L267-L276) in this order. Its SPHINCS+ selection fixes [SHAKE-256f and `robust` hashing](https://github.com/katzenpost/sphincsplus/blob/v0.0.2/ref/Makefile#L1-L12), [the parameters](https://github.com/katzenpost/sphincsplus/blob/v0.0.2/ref/params/params-sphincs-shake-256f.h#L6-L16), and [the key and signature encodings](https://github.com/katzenpost/sphincsplus/blob/v0.0.2/ref/sign.c#L48-L155).

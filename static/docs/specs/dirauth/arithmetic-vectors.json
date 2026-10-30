@@ -1,0 +1,416 @@
+{
+  "cases": [
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 0
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 0
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 1
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 1
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 2
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3f422ba1c9ea1126",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "3fe62e42fefa39ef",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 2
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 3
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3f60331f5dce8d3e",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "3ff193ea7aad030a",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 3
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 4
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3f722ba1c9ea1126",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "3ff62e42fefa39ef",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 4
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 5
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3f807b0b7ff43169",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "3ff9c041f7ed8d33",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 5
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 6
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3f8a6baa5f6236e5",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "3ffcab0bfa2a2002",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 6
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 7
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3f938710a1af59d7",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "3fff2272ae325a57",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 7
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 8
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3f9b4172aedf19ba",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "4000a2b23f3bab73",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 8
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 10
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3fa79416b2d3a01c",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "40026bb1bbb55516",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 10
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 16
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3fc22ba1c9ea1126",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "40062e42fefa39ef",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 16
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 17
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3fc4f6143123764d",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "4006aa6bc1fa7f7a",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 17
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 31
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3fe51ed23348b1b6",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "400b78ce48912b5a",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 31
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 32
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3fe6b68a3c649570",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "400bb9d3beb8c86b",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 32
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 33
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "3fe85e87c3aff45e",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "400bf8d8f4d5b8d1",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 33
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 63
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "400a4f810a9d5f83",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "40109291e8e3181b",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 63
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 64
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "400b4172aedf19ba",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "4010a2b23f3bab73",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 64
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 65
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "400c3807130212dd",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "4010b29293942975",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 65
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 127
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "402f40b4b59cdee3",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "4013607294602e42",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 127
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 128
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "402fcc5b21599e03",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "4013687a9f1af2b1",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 128
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 129
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "40302ca74a4357a5",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "40137072a9b5b6cb",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 129
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 1024
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "4096b68a3c649570",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "401bb9d3beb8c86b",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 1024
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 65535
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "41622b7bcf4cef68",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "40262e40fef939ef",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 65535
+    },
+    {
+      "gateways": 0,
+      "lambda_g_bits": "3f589374bc6a7efa",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 2147483647
+    },
+    {
+      "gateways": 5,
+      "lambda_g_bits": "43519a44bb52b41c",
+      "lambda_l_bits": "3f40624dd2f1a9fc",
+      "lambda_p_bits": "3f50624dd2f1a9fc",
+      "log_bits": "40357cd0e7006820",
+      "mu_bits": "3f50624dd2f1a9fc",
+      "n": 2147483647
+    }
+  ],
+  "oracle": {
+    "architecture": "amd64",
+    "go_version": "go1.26.10",
+    "source_commit": "6f6b13d4524ec2da68ca3ba18fefe4a181af8a04",
+    "source_path": "authority/voting/server/server.go:133-150"
+  }
+}

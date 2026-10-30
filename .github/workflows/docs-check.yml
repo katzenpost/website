@@ -1,0 +1,74 @@
+name: Render and check the specifications
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # The runner has docker and no podman, so the engine comes from the
+      # variable the Makefile reads.
+      - name: Build the render image
+        run: make image ENGINE=docker
+
+      - name: Parse every diagram
+        run: make diagrams ENGINE=docker
+
+      - name: Render the site
+        run: make render ENGINE=docker
+
+      - name: Check added ASCII text
+        env:
+          ASCII_BASE: ${{ github.event.pull_request.base.sha || github.event.before || 'origin/main' }}
+        run: |
+          docker run --rm -v "$PWD:/site:ro" -w /site katzenpost-website-render:local \
+            python3 tools/check-added-ascii.py "$ASCII_BASE"
+
+      - name: Fail on a non-ASCII byte or a semicolon in prose
+        run: |
+          docker run --rm -v "$PWD:/site:ro" -w /site katzenpost-website-render:local sh -euc '
+            page=content/en/docs/specs/dirauth.md
+            n=$(LC_ALL=C grep -c "[^ -~]" "$page" || true)
+            echo "non-ASCII bytes: $n"
+            test "$n" = "0"
+            python3 tools/prose-only.py "$page" /tmp/prose.md
+            s=$(grep -c ";" /tmp/prose.md || true)
+            echo "semicolons in prose: $s"
+            test "$s" = "0"
+          '
+
+      - name: Check rule references and numbering
+        run: docker run --rm -v "$PWD:/site:ro" -w /site katzenpost-website-render:local python3 tools/check-spec-references.py
+
+      - name: Check rendered specification links and backlinks
+        run: docker run --rm -v "$PWD:/site:ro" -w /site katzenpost-website-render:local python3 tools/check-spec-links.py public
+
+      - name: Check the downloadable grammars
+        run: |
+          docker build -t katzenpost-dirauth-schema:local -f tools/specs/Containerfile .
+          docker run --rm --network=none -v "$PWD:/site:ro" -w /site katzenpost-dirauth-schema:local
+
+      - name: Check directory tables and diagram descriptions
+        run: docker run --rm -v "$PWD:/site:ro" -w /site katzenpost-website-render:local python3 tools/specs/check-dirauth-layout.py
+
+      - name: Upload the rendered specification
+        uses: actions/upload-artifact@v4
+        with:
+          name: dirauth-spec
+          path: public/docs/specs/dirauth/

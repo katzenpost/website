@@ -13,6 +13,13 @@ weight: "25"
 version: ""
 ---
 
+{{% pageinfo %}}
+For distribution of epoch keys and agreement on the packet geometry, see the
+[directory authority specification](/docs/specs/dirauth#24-roles-keys-and-schemes).
+That page distinguishes configured KEM Sphinx networks from the NIKE Sphinx values
+used in its namenlos example.
+{{% /pageinfo %}}
+
 <div class="section">
 
 <div class="titlepage">
