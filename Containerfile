@@ -27,4 +27,6 @@ ENV PATH=/usr/local/go/bin:/site/node_modules/.bin:$PATH \
 # create empty stub directories beside the checkout. Skipping it also keeps
 # the container from writing outside the bind mount.
 
+RUN git config --system --add safe.directory /site
+
 WORKDIR /site
