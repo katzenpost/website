@@ -59,6 +59,12 @@ are encrypted beyond what Reticulum already does. The two do not mix: encrypting
 a mesh that lets anyone be a replica would hide it only from the observers who do not care to
 announce one.
 
+They also differ in what it takes to run one. An open mesh needs nothing but a replica that
+announces. A closed mesh needs its operators to share a secret out of band before anything
+else, and that step, who holds the passphrase, how it reaches a new operator, how it changes
+when one leaves, is the hard part of running any such network and is not specified here. It
+is also what the closed mesh's post quantum guarantees rest on.
+
 ### Open
 
 A replica is any node that announces a Reticulum destination under the Pigeonhole application
@@ -86,6 +92,13 @@ set is now vetted, as it is on the mixnet, and the observers left are outsiders 
 recording traffic for a quantum computer later. This is the mixnet's trust shape in
 Reticulum's idiom: the coordination the mixnet does through directory authorities, the closed
 mesh does through a shared passphrase.
+
+That secret is the trust anchor. An announce that arrives through the boundary came from a
+node holding it, so the hybrid key it carries is trusted on that basis, not on the Ed25519
+that signs the announce. The anchor is symmetric, so a quantum adversary gains nothing against
+it, and the chain from passphrase to session contains no post quantum signature and no
+classical link. A replica on a closed mesh has no interface outside the boundary; its
+announces, its placement and its handoffs never leave the mesh.
 
 Against those observers a closed mesh runs every query inside a Noise session, with the hybrid
 NIKE X25519 combined with CTIDH1024 as the Diffie-Hellman function, ChaCha20-Poly1305 and
@@ -193,6 +206,13 @@ Readers on either network see identical streams.
 A member who is on both networks carries boxes between them: it reads the streams of the
 members it can see on one side and writes those boxes, unchanged, on the other. Nothing else
 is needed for a group to span the two.
+
+Carrying is the carrier's choice, and it moves metadata as well as contents. A box carried
+from a closed mesh to an open one, or to any network whose replicas are not vetted, exposes
+its ID and its read times there. Between a closed mesh and the mixnet nothing is given up,
+since both vet their replicas; between an open mesh and anywhere, nothing was protected to
+begin with. A group that lives on a closed mesh stays there unless every member accepts
+otherwise.
 
 
 ## Encoding
