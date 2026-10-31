@@ -9,56 +9,11 @@ draft: false
 ---
 
 I recently used Claude Code to formalize the Sphinx cryptographic packet format.
-First I'll provide some links to provide some more context about the Sphinx packet format.
-And then I'll discuss details about the formalization.
+Below I'll discuss details about the formalization; links for background on Sphinx are collected at the end.
 
 * https://cryptlib.io
 * https://github.com/katzenpost/cryptlib
 
-
-
-## Sphinx Links
-
-* The original Sphinx paper: [Sphinx: A Compact and Provably Secure Mix Format](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf)
-
-Followup work by other researchers to improve Sphinx and specify stronger security properties:
-
-* [Breaking and (Partially) Fixing Provably Secure Onion Routing](https://arxiv.org/pdf/1910.13772):
-  shows that the security properties the Sphinx proof relies on don't actually imply ideal onion routing,
-  and finds a path length leak in Sphinx's zero padding.
-
-* [Provable Security for the Onion Routing and Mix Network Packet Format Sphinx](https://arxiv.org/pdf/2312.08028):
-  the first security proof for Sphinx that holds, for a slightly adapted Sphinx, under the Gap Diffie-Hellman assumption
-  rather than DDH.
-
-* [EROR: Efficient Repliable Onion Routing with Strong Provable Privacy](https://eprint.iacr.org/2024/020):
-  a packet format that also prevents the payload tagging attack Sphinx allows, at the cost of doubling the payload.
-
-* [Onion Routing with Replies](https://eprint.iacr.org/2021/1178):
-  the formal model for onion routing with replies that EROR builds on.
-
-* [Outfox: a Postquantum Packet Format for Layered Mixnets](https://arxiv.org/abs/2412.19937):
-  a post quantum Sphinx variant for fixed length routes. It cites my
-  [Post Quantum Sphinx](https://eprint.iacr.org/2023/1960) paper as lacking formal security guarantees,
-  which is part of what this work is trying to address.
-
-* [OmniSphinx: Active Mix Networks](https://arxiv.org/abs/2608.13008):
-  packets carry code that determines how mixes process them, so one network can emulate many mix formats.
-
-* [Improving the Sphinx Mix Network](https://www.bartmennink.nl/pubs/16cans.pdf):
-  proposes replacing Sphinx's separate MAC and payload cipher with one authenticated encryption call per hop.
-
-
-Some of my contributions to Sphinx:
-
-* The Katzenpost Specification of the Sphinx packet format: https://katzenpost.network/docs/specs/sphinx/
-
-* The Katzenpost Specification of the KEM Sphinx variant: https://katzenpost.network/docs/specs/kemsphinx/
-
-* The Katzenpost Proverif model of KEM Sphinx: https://github.com/katzenpost/formal_specifications/blob/main/sphinx/kem_sphinx.passive.pv
-
-* The Katzenpost implementation of the Sphinx, originally written by Yawning Angel: https://github.com/katzenpost/katzenpost/tree/main/core/sphinx
-  I later added the KEM Sphinx variant and test vectors which are shared with the Lean implementation.
 
 
 ## Katzenpost's Post Quantum Sphinx
@@ -422,3 +377,46 @@ the way `unwrap_complete` already is:
 It turns out that dependent types are great for writing cryptography libraries!
 Correctness proofs compose for free, and design flaws like the zero padding leak can be ruled out by the type itself.
 The security proofs are the harder part, and that's where the work continues.
+
+## Sphinx Links
+
+* The original Sphinx paper: [Sphinx: A Compact and Provably Secure Mix Format](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf)
+
+Followup work by other researchers to improve Sphinx and specify stronger security properties:
+
+* [Breaking and (Partially) Fixing Provably Secure Onion Routing](https://arxiv.org/pdf/1910.13772):
+  shows that the security properties the Sphinx proof relies on don't actually imply ideal onion routing,
+  and finds a path length leak in Sphinx's zero padding.
+
+* [Provable Security for the Onion Routing and Mix Network Packet Format Sphinx](https://arxiv.org/pdf/2312.08028):
+  the first security proof for Sphinx that holds, for a slightly adapted Sphinx, under the Gap Diffie-Hellman assumption
+  rather than DDH.
+
+* [EROR: Efficient Repliable Onion Routing with Strong Provable Privacy](https://eprint.iacr.org/2024/020):
+  a packet format that also prevents the payload tagging attack Sphinx allows, at the cost of doubling the payload.
+
+* [Onion Routing with Replies](https://eprint.iacr.org/2021/1178):
+  the formal model for onion routing with replies that EROR builds on.
+
+* [Outfox: a Postquantum Packet Format for Layered Mixnets](https://arxiv.org/abs/2412.19937):
+  a post quantum Sphinx variant for fixed length routes. It cites my
+  [Post Quantum Sphinx](https://eprint.iacr.org/2023/1960) paper as lacking formal security guarantees,
+  which is part of what this work is trying to address.
+
+* [OmniSphinx: Active Mix Networks](https://arxiv.org/abs/2608.13008):
+  packets carry code that determines how mixes process them, so one network can emulate many mix formats.
+
+* [Improving the Sphinx Mix Network](https://www.bartmennink.nl/pubs/16cans.pdf):
+  proposes replacing Sphinx's separate MAC and payload cipher with one authenticated encryption call per hop.
+
+
+Some of my contributions to Sphinx:
+
+* The Katzenpost Specification of the Sphinx packet format: https://katzenpost.network/docs/specs/sphinx/
+
+* The Katzenpost Specification of the KEM Sphinx variant: https://katzenpost.network/docs/specs/kemsphinx/
+
+* The Katzenpost Proverif model of KEM Sphinx: https://github.com/katzenpost/formal_specifications/blob/main/sphinx/kem_sphinx.passive.pv
+
+* The Katzenpost implementation of the Sphinx, originally written by Yawning Angel: https://github.com/katzenpost/katzenpost/tree/main/core/sphinx
+  I later added the KEM Sphinx variant and test vectors which are shared with the Lean implementation.
