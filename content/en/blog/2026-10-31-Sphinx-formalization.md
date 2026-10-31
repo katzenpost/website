@@ -3,7 +3,7 @@ title: "Formalizing Sphinx in Lean"
 date: "2026-10-31"
 description: "A Lean formalization of the Sphinx packet format, generic over its cryptographic primitives, and what it does and doesn't prove."
 author: "David Stainton"
-tags: ["sphinx", "lean", "formalization", "formal methods"]
+tags: ["sphinx", "lean", "cryptlib", "formalization", "formal methods"]
 version: ""
 draft: false
 ---
@@ -32,18 +32,6 @@ structure NIKE where
       = groupAction sk₂ ⟨derivePublicKey sk₁, derive_safe sk₁⟩
 ```
 
-Lean programmers may wonder why this is a structure and not a type class, since that is what Mathlib would do. The two
-are closer than they look. As
-[Functional Programming in Lean](https://lean-lang.org/functional_programming_in_lean/Overloading-and-Type-Classes/Type-Classes-and-Polymorphism/)
-puts it, "every type class defines a structure that has a field for each overloaded operation", and the difference is
-that a structure's accessors take the structure value as an explicit parameter while a type class method takes it as
-an instance implicit, which Lean finds by searching on the type. That search works for Mathlib because each type has
-one canonical algebraic structure: there is one `Group ℤ`. Our primitives all operate on `ByteArray`, so there is no
-canonical "the NIKE for ByteArray" to find, and which NIKE or KEM is in play is a runtime value chosen by name, not a
-type. So cryptlib passes the structure explicitly, and its proposition fields travel with the value. The book's
-[chapter on structures](https://lean-lang.org/functional_programming_in_lean/Getting-to-Know-Lean/Structures/) is a
-good starting point if structures with function and proof fields are new to you.
-
 Every NIKE instance must supply a proof of `commutes`, so a NIKE whose group operation is not commutative cannot be
 constructed. The KEM (key encapsulation mechanism) type likewise carries its round trip correctness as a field.
 And these proofs compose: when the hashed ElGamal NIKE-to-KEM adapter builds a KEM from a NIKE, it cannot construct
@@ -67,6 +55,21 @@ that is generic over a NIKE, plus a KEM Sphinx variant that is generic over a KE
 The NIKE and KEM interfaces come from [HPQC](https://github.com/katzenpost/hpqc), our hybrid post quantum cryptography
 library, which also provides a NIKE combiner, a KEM combiner, and a NIKE to KEM adapter (hashed ElGamal construction),
 so that for example X25519 can be combined with ML-KEM into a hybrid KEM. cryptlib started as a Lean model of HPQC.
+
+
+## Why a structure and not a type class
+
+Lean programmers may wonder why NIKE is a structure and not a type class, since that is what Mathlib would do. The two
+are closer than they look. As
+[Functional Programming in Lean](https://lean-lang.org/functional_programming_in_lean/Overloading-and-Type-Classes/Type-Classes-and-Polymorphism/)
+puts it, "every type class defines a structure that has a field for each overloaded operation", and the difference is
+that a structure's accessors take the structure value as an explicit parameter while a type class method takes it as
+an instance implicit, which Lean finds by searching on the type. That search works for Mathlib because each type has
+one canonical algebraic structure: there is one `Group ℤ`. Our primitives all operate on `ByteArray`, so there is no
+canonical "the NIKE for ByteArray" to find, and which NIKE or KEM is in play is a runtime value chosen by name, not a
+type. So cryptlib passes the structure explicitly, and its proposition fields travel with the value. The book's
+[chapter on structures](https://lean-lang.org/functional_programming_in_lean/Getting-to-Know-Lean/Structures/) is a
+good starting point if structures with function and proof fields are new to you.
 
 
 ## How cryptlib got here
@@ -127,17 +130,14 @@ property, "security", together with Sphinx's own requirement that forward and re
 4. security, and indistinguishability of forward and reply messages
 
 
-Firstly, a correctness theorem for Sphinx is very similar to the KEM correctness theorem we discussed above.
+First, correctness. A correctness theorem for Sphinx is very similar to the KEM correctness theorem we discussed above.
 It says that we can fully unwrap Sphinx packets that we create such that the final payload is equal to the original
 encapsulated payload.
 
-Secondly, integrity. The Sphinx paper (Danezis & Goldberg, 2009) talks
-about Sphinx integrity and says that even an adversary who knows every
-mix node's private key can't forge a header that a whole chain of
-honest nodes will accept, except with negligible probability. In
-practice: each hop checks a MAC_i, and the claim is that nobody can
-build a public_key_i, encrypted_header_i, mac_i that passes the MAC check at every one of N =
-r + 1 hops unless it was built honestly.
+Second, integrity. The Sphinx paper says that even an adversary who knows every mix node's private key can't forge
+a header that a whole chain of honest nodes will accept, except with negligible probability. In practice each hop
+checks its own MAC over the header, and the claim is that nobody can build a public key, encrypted header and MAC
+that pass the check at every one of the hops unless the packet was built honestly.
 
 Third, wrap resistance. This means the adversary cannot be given a specific target Sphinx packet and produce
 a new Sphinx packet which unwraps to the target Sphinx packet, even if the adversary gets to choose the mix node's private key.
@@ -156,8 +156,6 @@ indistinguishability is built into the new unlinkability games.
 
 
 ## Sphinx type
-
-Let's briefly look over the Sphinx type definitions and then discuss them below.
 
 Below is our Sphinx type, abridged to its primitives and the two functions the discussion needs. The full definition
 is in [Interface.lean](https://github.com/katzenpost/cryptlib/blob/main/Cryptlib/Protocols/Sphinx/Interface.lean).
@@ -199,10 +197,10 @@ structure Sphinx where
   -- `indistinguishable` and `integrity`: the paper's §4.4 and §4.2 arguments, discussed below.
 ```
 
-Notice that `wrap` and `newSURB` take no filler argument. Earlier versions took the filler for unused hops
+Notice that `wrap` takes no filler argument (nor does `newSURB`, elided above). Earlier versions took the filler for unused hops
 from the caller, and nothing in the type stopped a caller from passing zeros. That is exactly the path length leak
 found in the "Breaking and (Partially) Fixing" paper: a recognizable padding pattern tells the last mix how
-long the path was. The Katzenpost golang implementation already fills these bytes with randomness. The Lean
+long the path was. The Katzenpost Go implementation already fills these bytes with randomness. The Lean
 `wrap` draws the filler from its
 own random `State` instead, so a zero filler can no longer be expressed. That's the dependent type thesis again:
 fix it in the type, and every instance gets the fix.
@@ -221,8 +219,8 @@ So today they record the paper's arguments inside the type, but they don't yet c
   [Gap Diffie-Hellman proof](https://arxiv.org/pdf/2312.08028) shows that once the adversary
   can query it, DDH isn't enough and the Gap Diffie-Hellman assumption is needed.
 
-However I had to make sub-types of the Sphinx type in order to accurately represent the third security property,
-wrap resistance, for only NIKE Sphinx and not for KEM Sphinx. Next I will show you the NIKESphinxScheme and KEMSphinxScheme types:
+We wanted every security property to live in a struct proposition field, and wrap-resistance and envelope
+independence only hold for NIKE Sphinx. So the Sphinx type has two sub-types, and only NIKESphinxScheme carries them:
 
 ```lean
 structure NIKESphinxScheme extends Cryptlib.Protocols.Sphinx.Interface.Sphinx where
@@ -277,10 +275,6 @@ instance's `unwrap` actually does.
 
 
 ## Sphinx Considerations
-
-The reason we have the two sub types NIKESphinxScheme and KEMSphinxScheme is because we wanted
-to embed all the security properties into struct proposition fields, and since wrap-resistance and envelope
-independence only hold for NIKE Sphinx, only NIKESphinxScheme carries them.
 
 I can't think of a reason why Sphinx wrap-resistance would be useful.
 The newer security frameworks seem to agree, in that they no longer state it as a separate property at all.
