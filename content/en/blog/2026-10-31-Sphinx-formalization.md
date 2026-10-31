@@ -190,16 +190,14 @@ structure Sphinx where
   -- ...
   geometry : Geometry.Geometry
 
-  /-- The four cryptographic primitives every Sphinx instance needs besides its NIKE-or-KEM
-  (added by `NIKESphinxScheme`/`KEMSphinxScheme`). Kept abstract so swapping e.g. AEZ for
-  another wide-block cipher needs no change below. -/
+  /-- Wide-block cipher for the payload, MAC for header integrity, KDF for per-hop keys, stream
+  cipher for routing-info encryption. -/
   cipher : Cryptlib.Primitives.WideBlockCipher.WideBlockCipher
   mac    : Cryptlib.Primitives.MAC.MAC
   kdf    : Cryptlib.Primitives.KDF.KDF
   stream : Cryptlib.Primitives.StreamCipher.StreamCipher
 
-  /-- Unused routing-info slots are filled with `drawBytes` from `State`, not supplied by the
-  caller. -/
+  /-- Unused routing-info slots are filled with random bytes drawn from `State`. -/
   wrap : List Types.PathHop → Vector UInt8 geometry.forwardPayloadLength →
     EStateM String State (Vector UInt8 geometry.packetLength)
 
@@ -207,7 +205,8 @@ structure Sphinx where
     Except String (Option ByteArray × Vector UInt8 32 × List Command × Option (Vector UInt8 pkt.size))
   -- ...
 
-  /-- **Completeness**: any packet `wrap` builds, `unwrap` can undo, given a well-formed path. -/
+  /-- Completeness: `unwrap` undoes `wrap` on the forward payload, given no hop's `commands`
+  contains `null` or `nextNodeHop` and the last hop carries no `surbReply`. -/
   unwrap_complete : ∀ (path : List Types.PathHop) (privKeys : List PrivateKey)
       (payload : Vector UInt8 geometry.forwardPayloadLength) (st : State)
       (pkt : Vector UInt8 geometry.packetLength) (st' : State),
@@ -248,26 +247,20 @@ structure NIKESphinxScheme extends Cryptlib.Protocols.Sphinx.Interface.Sphinx wh
   nike : NIKE
   Envelope : Type
   [envelopeDecEq : DecidableEq Envelope]
-  /-- The header's public-key element, read out of a packet. -/
+  /-- The header's group element. -/
   parseEnvelope : Vector UInt8 geometry.packetLength → Envelope
-  /-- The space a fresh blinding factor is drawn from. -/
+  /-- The blinding factor space. -/
   Factor : Type
   [factorFintype : Fintype Factor]
   [factorSampleable : SampleableType Factor]
-  /-- Re-blind an envelope element by a factor. -/
   blind : Factor → Envelope → Envelope
-  /-- **Wrap-resistance**: whenever blinding by `e` is a bijection (the case for any `e` that
-  generates the (sub)group a well-formed header's element lives in), a freshly drawn factor hits
-  a chosen `target` with probability exactly `1/|Factor|`. -/
+  /-- Wrap-resistance (§4.3): if blinding `e` is a bijection, a uniform factor hits `target` with
+  probability `1/|Factor|`. -/
   wrap_resistant : ∀ (e target : Envelope), Function.Bijective (blind · e) →
-      Pr[= true | ($ᵗ Factor) >>= fun b => pure (decide (blind b e = target))] =
+      Pr{let x ← ($ᵗ Factor) >>= fun b => pure (decide (blind b e = target))}[x = true] =
         (Fintype.card Factor : ℝ≥0∞)⁻¹ :=
     fun _ target hbij => uniformHit_eq hbij target
-  /-- **Envelope independence** (§4.4, exact rather than up to some advantage): the envelope
-  depends only on `wrap`'s seed-stream draw, never on path/payload, so two calls sharing a
-  starting `State` produce byte-for-byte identical envelopes — no adversary can learn anything
-  about the session's content from it alone. See `wrapNIKE_envelope_indep` (in
-  `nike_sphinx_theorems.lean`) for why: the envelope is the client's own public key. -/
+  /-- The envelope depends only on the starting `State`, not on the path or payload. -/
   envelope_indep : ∀ (hop0 hop1 : Types.PathHop) (rest0 rest1 : List Types.PathHop)
       (payload0 payload1 : Vector UInt8 geometry.forwardPayloadLength) (st : State)
       (pkt0 pkt1 : Vector UInt8 geometry.packetLength) (st0' st1' : State),
