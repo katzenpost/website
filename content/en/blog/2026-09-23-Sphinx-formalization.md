@@ -311,11 +311,17 @@ the way `unwrap_complete` already is:
 ## What's next for cryptlib
 
 Sphinx is one protocol. We will model and formalize more of them as it benefits the Katzenpost mix network project
-to do so. So far cryptlib also partially formalizes
-[BACAP](https://arxiv.org/abs/2501.02933), the blinded cryptographic capability system from our paper, under
-`Cryptlib/Protocols/BACAP`. Each protocol adds to a vocabulary of cryptographic primitive types and protocol
-components, and once that vocabulary is large enough, modeling our core mixnet protocols becomes much easier: they
-are assembled from parts whose proof obligations are already discharged.
+to do so. So far cryptlib also partially formalizes BACAP, the blinded cryptographic capability system from
+[our paper](https://arxiv.org/abs/2501.02933), under `Cryptlib/Protocols/BACAP`. It also models a few other HPQC
+constructions that Katzenpost uses: our KEM combiner, and MKEM, our multi-recipient KEM-like scheme built on a NIKE.
+
+cryptlib has already paid off outside its own repository. [uproar](https://github.com/katzenpost/uproar) is our
+Noise and PQ Noise framework written in Lean, built on cryptlib's primitive types. That is yet another protocol the
+Katzenpost mix network runs that we can now model in Lean.
+
+Each protocol adds to a vocabulary of cryptographic primitive types and protocol components, and once that vocabulary
+is large enough, modeling our core mixnet protocols becomes much easier: they are assembled from parts whose proof
+obligations are already discharged.
 
 
 ## Conclusion: dependent types for the win
