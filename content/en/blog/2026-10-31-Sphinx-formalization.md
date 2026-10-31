@@ -52,9 +52,6 @@ Correctness is proved once over any choice of those primitives, and a padding le
 Sphinx becomes impossible to express in the type. The security proofs are the harder part, and I'll be honest below about
 what is and isn't proved yet. Links for background on Sphinx are collected at the end.
 
-* https://cryptlib.io
-* https://github.com/katzenpost/cryptlib
-
 
 ## Background: Katzenpost's Sphinx and HPQC
 
@@ -287,15 +284,9 @@ instance's `unwrap` actually does.
 
 
 
-## Sphinx Considerations
-
-I can't think of a reason why Sphinx wrap-resistance would be useful.
-The newer security frameworks seem to agree, in that they no longer state it as a separate property at all.
-
-But I'm biased because I usually only think about Sphinx as it is used with the Katzenpost mixnet.
-KEM Sphinx doesn't get the wrap-resistance properties and that's fine.
-But KEM Sphinx does have a huge downside. It has a large bandwidth overhead with one KEM ciphertext per hop.
-
+I can't think of a reason why wrap-resistance would matter in Katzenpost's deployment of Sphinx, and the newer
+security frameworks seem to agree, since they no longer state it as a separate property at all. So KEM Sphinx losing
+it is fine. The real cost of KEM Sphinx is bandwidth: one KEM ciphertext per hop.
 
 
 ## What's next for formalizing Sphinx
