@@ -291,7 +291,12 @@ But KEM Sphinx does have a huge downside. It has a large bandwidth overhead with
 
 
 
-## What's next
+## What's next for formalizing Sphinx
+
+This work is not finished, and some of it may be wrong. Correctness is proved, but the security fields still rest on
+the hypotheses listed above, and a formalization of a model is only as good as the model. If the games in
+`Integrity.Sys` or `Indistinguishability.Sys` misstate the paper, Lean will happily check a proof about the wrong
+thing. Review is welcome.
 
 The plan is to move cryptlib's security fields from the 2009 four property framework to the properties the
 followup papers showed actually imply secure onion routing, and to tie them to each instance's own `wrap` and `unwrap`
@@ -302,6 +307,15 @@ the way `unwrap_complete` already is:
   That fits cryptlib's generic KEM type well, and it's a path to a post quantum security proof, which the
   Diffie-Hellman based proofs can't give.
 
+
+## What's next for cryptlib
+
+Sphinx is one protocol. We will model and formalize more of them as it benefits the Katzenpost mix network project
+to do so. So far cryptlib also partially formalizes
+[BACAP](https://arxiv.org/abs/2501.02933), the blinded cryptographic capability system from our paper, under
+`Cryptlib/Protocols/BACAP`. Each protocol adds to a vocabulary of cryptographic primitive types and protocol
+components, and once that vocabulary is large enough, modeling our core mixnet protocols becomes much easier: they
+are assembled from parts whose proof obligations are already discharged.
 
 
 ## Conclusion: dependent types for the win
