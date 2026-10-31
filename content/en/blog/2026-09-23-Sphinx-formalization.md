@@ -32,6 +32,18 @@ structure NIKE where
       = groupAction sk₂ ⟨derivePublicKey sk₁, derive_safe sk₁⟩
 ```
 
+Lean programmers may wonder why this is a structure and not a type class, since that is what Mathlib would do. The two
+are closer than they look. As
+[Functional Programming in Lean](https://lean-lang.org/functional_programming_in_lean/Overloading-and-Type-Classes/Type-Classes-and-Polymorphism/)
+puts it, "every type class defines a structure that has a field for each overloaded operation", and the difference is
+that a structure's accessors take the structure value as an explicit parameter while a type class method takes it as
+an instance implicit, which Lean finds by searching on the type. That search works for Mathlib because each type has
+one canonical algebraic structure: there is one `Group ℤ`. Our primitives all operate on `ByteArray`, so there is no
+canonical "the NIKE for ByteArray" to find, and which NIKE or KEM is in play is a runtime value chosen by name, not a
+type. So cryptlib passes the structure explicitly, and its proposition fields travel with the value. The book's
+[chapter on structures](https://lean-lang.org/functional_programming_in_lean/Getting-to-Know-Lean/Structures/) is a
+good starting point if structures with function and proof fields are new to you.
+
 Every NIKE instance must supply a proof of `commutes`, so a NIKE whose group operation is not commutative cannot be
 constructed. The KEM (key encapsulation mechanism) type likewise carries its round trip correctness as a field.
 And these proofs compose: when the hashed ElGamal NIKE-to-KEM adapter builds a KEM from a NIKE, it cannot construct
