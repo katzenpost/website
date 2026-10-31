@@ -161,7 +161,7 @@ Here is the KEM Sphinx unwrap operation at one mix, from my Post Quantum Sphinx 
 (α, β, γ) and a payload δ: α is the KEM ciphertext, β the encrypted routing info, γ the MAC, δ the payload.
 
 <figure>
-<img src="/img/blog/kem-sphinx-unwrap.svg" alt="Circuit diagram of KEM Sphinx unwrap: alpha is decapsulated with the mix private key, the KDF derives keys for MAC verification, SPRP payload decryption and the routing info cipher stream, and the XOR of the padded routing info with the cipher stream yields the next hop's alpha, beta and gamma" style="max-width: 100%; height: auto;">
+{{< inline-svg "static/img/blog/kem-sphinx-unwrap.svg" >}}
 <figcaption>The processing of a KEM Sphinx message ((α, β, γ), δ) into ((α′, β′, γ′), δ′) at mix n.</figcaption>
 </figure>
 
