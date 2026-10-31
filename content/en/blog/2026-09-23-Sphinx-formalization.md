@@ -250,25 +250,25 @@ and
 ```lean
 structure KEMSphinxScheme extends Cryptlib.Protocols.Sphinx.Interface.Sphinx where
   kem : KEM
-  /-- **Not wrap-resistant** — the inverse of `NIKESphinxScheme.wrap_resistant`: a known-key
-  adversary hits any target routing-info block with certainty, not merely `1/N`. See
-  `unwrapKEM_routingInfoBlock_not_wrap_resistant` (in `kem_sphinx_theorems.lean`) for why. Holds
-  for any `stream : StreamCipher`, not just a hardcoded one. -/
-  not_wrap_resistant : ∀ (key iv target : ByteArray),
-      ∃ raw : ByteArray, xorBytes raw (stream.keystream key iv target.size) = target :=
-    fun key iv target => xorBytes_achieves_any_target (stream.keystream key iv target.size) target
 ```
 
-The same caveat applies to `wrap_resistant`: it holds for any `blind` whenever blinding is a bijection, which is
-assumed rather than proved, and nothing yet ties `blind` to what this instance's `unwrap` actually does.
+KEM Sphinx has no blinding step, so it is not wrap-resistant: a holder of the node's private key can decapsulate any
+ciphertext, compute the header keystream, and craft routing info that unwraps to any target. That is a theorem in the
+repository (`unwrapKEM_routingInfoBlock_not_wrap_resistant`), not a field. An earlier version stored it in the type as
+a `not_wrap_resistant` proposition, but a proposition field is a guarantee every instance must prove, and "an attack
+exists" guarantees nothing and constrains no instance. It was documentation in a struct, so it came out.
+
+The caveat about `integrity` and `indistinguishable` also applies to `wrap_resistant`: it holds for any `blind`
+whenever blinding is a bijection, which is assumed rather than proved, and nothing yet ties `blind` to what this
+instance's `unwrap` actually does.
 
 
 
 ## Sphinx Considerations
 
 The reason we have the two sub types NIKESphinxScheme and KEMSphinxScheme is because we wanted
-to embed all the security properties into struct proposition fields, and since the Sphinx wrap-resistance property
-only applies to NIKE Sphinx we therefore needed two Sphinx types to work with.
+to embed all the security properties into struct proposition fields, and since wrap-resistance and envelope
+independence only hold for NIKE Sphinx, only NIKESphinxScheme carries them.
 
 I can't think of a reason why Sphinx wrap-resistance would be useful.
 The newer security frameworks seem to agree, in that they no longer state it as a separate property at all.
