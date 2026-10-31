@@ -279,9 +279,8 @@ structure KEMSphinxScheme extends Cryptlib.Protocols.Sphinx.Interface.Sphinx whe
 
 KEM Sphinx has no blinding step, so it is not wrap-resistant: a holder of the node's private key can decapsulate any
 ciphertext, compute the header keystream, and craft routing info that unwraps to any target. That is a theorem in the
-repository (`unwrapKEM_routingInfoBlock_not_wrap_resistant`), not a field. An earlier version stored it in the type as
-a `not_wrap_resistant` proposition, but a proposition field is a guarantee every instance must prove, and "an attack
-exists" guarantees nothing and constrains no instance. It was documentation in a struct, so it came out.
+repository (`unwrapKEM_routingInfoBlock_not_wrap_resistant`), not a field: a proposition field is a guarantee every
+instance must prove, and "an attack exists" guarantees nothing.
 
 The caveat about `integrity` and `indistinguishable` also applies to `wrap_resistant`: it holds for any `blind`
 whenever blinding is a bijection, which is assumed rather than proved, and nothing yet ties `blind` to what this
