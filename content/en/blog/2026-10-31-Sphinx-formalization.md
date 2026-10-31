@@ -10,6 +10,12 @@ draft: false
 
 <img class="blog-aside-img" src="/img/blog/sphinx.jpg" alt="Engraving of the Great Sphinx of Giza, half buried in sand" width="200" height="200">
 
+*[Lean Weekly News](https://leanweekly.news/section/verification/#2026-10-25-katzenpost-s-lean-library-cryptlib-implements-the-sphinx-cryptog)
+scooped this post. Their verification section already reports that cryptlib's Sphinx packets are binary compatible with
+the Katzenpost Go implementation, hybrid X25519 and ML-KEM-768 KEM Sphinx included, and links to
+[katzenpost/cryptlib](https://github.com/katzenpost/cryptlib), [cryptlib.io](https://cryptlib.io) and the
+[Reservoir package page](https://reservoir.lean-lang.org/@katzenpost/cryptlib). What follows is the longer story.*
+
 In Lean, a field of a structure type can be a proposition. That one feature changes how a cryptography library can be written.
 
 In a language like Rust a trait is an empty husk that only declares function signatures. It's still a useful contract: all
