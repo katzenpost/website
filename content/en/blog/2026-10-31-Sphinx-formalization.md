@@ -157,6 +157,19 @@ indistinguishability is built into the new unlinkability games.
 
 ## Sphinx type
 
+Here is the KEM Sphinx unwrap operation at one mix, from my Post Quantum Sphinx paper. A packet is a header
+(α, β, γ) and a payload δ: α is the KEM ciphertext, β the encrypted routing info, γ the MAC, δ the payload.
+
+<figure>
+<img src="/img/blog/kem-sphinx-unwrap.svg" alt="Circuit diagram of KEM Sphinx unwrap: alpha is decapsulated with the mix private key, the KDF derives keys for MAC verification, SPRP payload decryption and the routing info cipher stream, and the XOR of the padded routing info with the cipher stream yields the next hop's alpha, beta and gamma" style="max-width: 100%; height: auto;">
+<figcaption>The processing of a KEM Sphinx message ((α, β, γ), δ) into ((α′, β′, γ′), δ′) at mix n.</figcaption>
+</figure>
+
+The four circles are exactly the primitive fields of the Sphinx type below. Decapsulate KEM is `kem`, KDF is `kdf`,
+Verify MAC is `mac`, SPRP Decrypt is the wide-block `cipher`, and the cipher stream that is XORed over the routing
+info comes from `stream`. NIKE Sphinx replaces the decapsulation with a Diffie-Hellman operation plus the blinding
+step that derives α′, and is otherwise the same circuit.
+
 Below is our Sphinx type, abridged to its primitives and the two functions the discussion needs. The full definition
 is in [Interface.lean](https://github.com/katzenpost/cryptlib/blob/main/Cryptlib/Protocols/Sphinx/Interface.lean).
 
