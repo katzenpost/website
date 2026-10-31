@@ -343,8 +343,7 @@ Three things, in increasing order of how under-appreciated they are.
 Interactive theorem provers for the win. An LLM wrote most of the proofs in this formalization, and it is good at
 that. It is not yet good at deciding what is worth proving. Every hypothesis in the security fields above is a claim
 about what the Sphinx paper's games actually say, and a human has to check that those are the right statements before
-a proof of them means anything. Lean gives you a partner that never accepts a wrong proof. Deciding which theorems to
-ask for is still your job.
+a proof of them means anything.
 
 High assurance software for the win. Being able to run the same Lean code that the proofs are about, against test
 vectors shared with the Go implementation, and then prove properties of that very code, is very powerful indeed.
