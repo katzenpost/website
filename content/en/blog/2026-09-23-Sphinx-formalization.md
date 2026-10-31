@@ -57,92 +57,50 @@ library, which also provides a NIKE combiner, a KEM combiner, and a NIKE to KEM 
 so that for example X25519 can be combined with ML-KEM into a hybrid KEM. cryptlib started as a Lean model of HPQC.
 
 
-## The cryptlib Theorems
+## How cryptlib got here
 
-A couple of years ago I was very excited to be learning Lean. I started the Lean theorem prover meetup
-at the Noisebridge hacker space in San Francisco, which ran as a weekly study group.
-I was fortunate that some very smart people attended
-the study meetings because I was able to learn a lot from the group.
+A couple of years ago I started the Lean theorem prover meetup at the Noisebridge hacker space in San Francisco, a weekly
+study group with some very smart attendees. On the Lean Zulip I ended up chatting with Mario Carneiro about program
+verification and modeling cryptography in Lean, and at some point he posted
+[a minimal KEM type](https://leanprover.zulipchat.com/#narrow/channel/236449-Program-verification/topic/Lean.20library.20rust.20integration.3F/near/452695059)
+whose struct contains a proposition field with the KEM completeness theorem: everything the KEM encapsulates can be
+decapsulated.
 
-The Lean community on the Lean Zulip was also very enthusiastic to answer my questions and help
-me when I got stuck. Several times I ended up chatting with Mario Carneiro on the Lean Zulip
-and asked him questions about program verification and modeling cryptography in Lean. At some point
-he posted a sort of minimal KEM type definition in Lean whose struct contains
-a proposition field with the KEM completeness theorem. It says that everything the KEM
-encapsulates can be decapsulated:
+At the time I didn't want yet another symbolic modeler for cryptography. I was already using Proverif, which works great
+and automates finding security flaws, and a Lean model would have none of that automation. I didn't yet understand that
+what Mario was showing me is much more than a symbolic model.
 
-https://leanprover.zulipchat.com/#narrow/channel/236449-Program-verification/topic/Lean.20library.20rust.20integration.3F/near/452695059
-
-At the time, I was considering that I didn't really want yet another symbolic modeler for cryptography
-because I was already using Proverif which works great and automates finding security flaws.
-Obviously if I used Lean's type theory to make a symbolic modeler for cryptography protocols, it wouldn't
-have any automated security analysis or any of the features that Proverif or Tamarin have for finding protocol information leaks etc.
-
-I didn't fully understand the implications of what Mario was showing me.
-It's so much more than a symbolic model but we'll come back to that shortly.
-
-So I wrote Lean implementations of a few constructions in HPQC including a NIKE to KEM adapter, the NIKE combiner, the KEM combiner.
-After about two years passed, I started working on cryptlib again, at the Utrecht University Summer Lean Theorem Prover class.
-It was a 5 day Lean workshop with a couple of days devoted to the student chosen projects.
-I was able to write theorems about the HPQC constructs that said:
+So I wrote Lean implementations of a few HPQC constructions: the NIKE to KEM adapter, the NIKE combiner, the KEM combiner.
+About two years later, at the Utrecht University Summer Lean Theorem Prover class, I came back to them and wrote theorems
+the conventional way, as separate statements:
 
 * A NIKE is lawful if its group operation is commutative.
 * A KEM is lawful if it can decapsulate everything it encapsulates.
+* Given a lawful NIKE, the NIKE to KEM adapter produces a lawful KEM.
 
-And then I wrote a theorem that said:
-
-* Given a lawful NIKE, the NIKE to KEM adapter (hashed ElGamal construction) produces a lawful KEM.
-
-
-
-##  Towards A Dependent Type Proclivity
-
-Instead of writing a struct type definition and then separate theorems,
-I realized that some of the theorems about a given cryptographic primitive can be placed inside the type's struct fields,
-where they can talk about the type's other fields. That is where the NIKE's `commutes` field and the KEM's completeness
-field shown in the introduction came from. Once the NIKE to KEM adapter is wired to use these new types, the theorem
-
-* Given a lawful NIKE, the NIKE to KEM adapter (hashed ElGamal construction) produces a lawful KEM.
-
-stops being a separate theorem that someone has to remember to state and apply. The adapter can't even construct its KEM
-without filling in the KEM's completeness field, so the proof is written exactly once, inside the adapter, using the
-NIKE's own "commutes" field. The type system prevents a NIKE implementation from having a group operation
-that is not commutative. Likewise, all KEM instances must satisfy the completeness theorem built into the KEM type, in the struct's proposition field.
-To be clear, these type proposition fields are in fact proof obligations for all type instances of NIKE and KEM.
-The tradeoff is worth it though: we get a type system guarantee that the rules of the type cannot be violated and only
-valid type instances can ever be expressed.
+Then I realized that the first two belong inside the types, as the `commutes` and completeness fields shown in the
+introduction, and that the third then disappears: the adapter cannot construct its KEM without proving completeness
+from the NIKE's `commutes`. Those proposition fields are proof obligations for every instance, which is the point.
+Only valid instances can be expressed at all.
 
 
+## From primitives to Sphinx
 
-## Implicit Proofs are transitive in dependent type composition
+I asked Claude Code to write a Sphinx implementation in Lean, verified against test vectors shared with the Katzenpost
+Sphinx implementation. The formalization went through roughly four phases:
 
-My thesis here is simple:
+1. Implement Sphinx as a static construction with specific primitives.
+2. Try to prove the Sphinx paper's security properties, and fail: the proofs drown in the complexity of the individual
+   primitives.
+3. Rewrite Sphinx over generic dependent types for each primitive in the construction: NIKE/KEM, stream cipher, KDF,
+   MAC, wide-block cipher.
+4. Try again: correctness is now proved outright, over any NIKE or KEM and any choice of the other primitives. The
+   other three properties are formalized, with the steps that aren't proved yet isolated as explicit hypotheses.
 
-"When we use dependent types in composition we get implicit transitive proofs for free."
-
-With the example of the NIKE to KEM adapter, every user of the adapter's KEM gets the completeness proof for free,
-and never has to prove it again.
-I asked Claude Code to write me a Sphinx implementation in Lean which can be verified
-using test vectors shared with the Katzenpost Sphinx implementation.
-
-However, I found that with the Lean implementation of Sphinx, there are additional benefits
-to using dependent types to represent cryptographic primitive functions: The proof obligations
-were reduced and greatly simplified!
-
-I developed this Sphinx formalization in Lean in roughly 4 phases:
-
-1. Implement Sphinx as a static cryptographic construction with specific primitives.
-2. Try to prove the Sphinx paper's security properties: fail because the proofs involve too much complexity from the individual cryptographic primitive functions.
-3. Rewrite our Lean language Sphinx construction to use generic dependent types representing each cryptographic function in the construction: NIKE/KEM, Stream Cipher, KDF, MAC, Wide-block Cipher.
-4. Try again: correctness is now proved outright, over any NIKE or KEM and any choice of the other primitives. The other three properties are formalized, with the steps that aren't proved yet isolated as explicit hypotheses.
-
-In other words, when trying to prove the security properties of the static Sphinx construction using for example the AEZ block cipher,
-I then also have a proof obligation which involves the complexities of AEZ. However, if I replace AEZ with a generic wide-block cipher
-type, a dependent type with an encryption/decryption completeness proposition in one of its struct fields,
-the Sphinx proofs only need that one proposition and never look inside AEZ.
-This greatly simplifies our existing proof obligations.
-
-
+The composition benefit from the introduction showed up at protocol scale as a reduction in proof obligations. Proving
+anything about the static construction with, say, the AEZ wide-block cipher meant also reasoning about AEZ. With a
+generic wide-block cipher type whose struct carries an encryption/decryption completeness proposition, the Sphinx
+proofs only need that one proposition and never look inside AEZ.
 
 
 ## Sphinx Security Properties
