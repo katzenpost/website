@@ -303,6 +303,10 @@ followup papers showed actually imply secure onion routing, and to tie them to e
 the way `unwrap_complete` already is:
 
 * For NIKE Sphinx, the layer unlinkability and tail indistinguishability properties from the Gap Diffie-Hellman proof.
+  That proof is about a cyclic group, so it covers the X25519 half of our hybrid NIKE and nothing more. A post quantum
+  result for the [CTIDH](https://ctidh.isogeny.org/) half needs the group action analogues of the Diffie-Hellman
+  assumptions from the CSIDH and CTIDH papers, the Sphinx proof redone in the group action setting, and the NIKE
+  combiner argument that the hybrid is secure if either component is. None of that exists yet.
 * For KEM Sphinx, the EROR style properties, whose proofs only need an IND-CCA secure KEM, a MAC and a PRF.
   That fits cryptlib's generic KEM type well, and it's a path to a post quantum security proof, which the
   Diffie-Hellman based proofs can't give.
