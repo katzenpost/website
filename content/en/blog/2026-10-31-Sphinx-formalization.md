@@ -1,6 +1,6 @@
 ---
 title: "Formalizing Sphinx in Lean"
-date: "2026-09-23"
+date: "2026-10-31"
 description: "A Lean formalization of the Sphinx packet format, generic over its cryptographic primitives, and what it does and doesn't prove."
 author: "David Stainton"
 tags: ["sphinx", "lean", "formalization", "formal methods"]
