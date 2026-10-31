@@ -214,6 +214,10 @@ Katzenpost replica, which treats it as a replication write from a peer: it verif
 stores it if it is a shard for that Box ID, and otherwise dispatches it to the shards over the
 replica-to-replica links it already holds. Those links are paced and carry decoys when idle,
 so a pushed box displaces a decoy and the mesh enters the mixnet at the mixnet's own rate.
+The mixnet never pulls from the mesh, so a box that reaches no bridge never leaves it. Every
+replica that stores a box therefore also forwards it to one bridge, the first reachable in
+the box's order, and a stand-in keeps its copy until that bridge has acknowledged it, as it
+does for the owners. A box pushed twice is stored once.
 
 **Into the mesh, by pull.** Nothing on the mixnet announces a write, and a Katzenpost replica
 sees only the boxes of its own shards, so the mixnet cannot push. But any Katzenpost replica
