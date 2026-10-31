@@ -159,7 +159,7 @@ indistinguishability is built into the new unlinkability games.
 
 ## Sphinx type
 
-Here is the KEM Sphinx unwrap operation at one mix, from my Post Quantum Sphinx paper. A packet is a header
+Here is the KEM Sphinx unwrap operation at one mix. A packet is a header
 (α, β, γ) and a payload δ: α is the KEM ciphertext, β the encrypted routing info, γ the MAC, δ the payload.
 
 <figure>
