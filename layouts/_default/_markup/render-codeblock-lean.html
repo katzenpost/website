@@ -1,0 +1,11 @@
+{{- /* Chroma has no Lean lexer; tokenize with regexes into Chroma's own classes so Lean blocks match the site's monokai palette. */ -}}
+{{- /* shortcut: keywords inside comments/strings get nested spans (neutralized by the CSS below); nesting breaks only if a comment contains a `-/`. Replace with transform.Highlight once Chroma ships a Lean lexer. */ -}}
+{{- $kw := `\b(structure|class|instance|inductive|def|theorem|lemma|abbrev|example|axiom|opaque|where|extends|deriving|import|open|namespace|section|end|variable|universe|fun|match|with|if|then|else|let|have|show|from|by|do|return|in|at|for|unless|partial|private|protected|noncomputable|mutual|calc|sorry|macro|syntax|notation)\b` -}}
+{{- $s := .Inner | htmlEscape -}}
+{{- $s = replaceRE $kw `<span class="k">${1}</span>` $s -}}
+{{- $s = replaceRE `\b(Type|Prop|Sort)\b` `<span class="kt">${1}</span>` $s -}}
+{{- $s = replaceRE `(→|←|↔|∀|∃|λ|:=|≠|∧|∨|¬|×|⟨|⟩|≤|≥|∈|∉|∘)` `<span class="o">${1}</span>` $s -}}
+{{- $s = replaceRE `(&#34;[^\n]*?&#34;)` `<span class="s2">${1}</span>` $s -}}
+{{- $s = replaceRE `(?s)(/-.*?-/|--[^\n]*)` `<span class="c1">${1}</span>` $s -}}
+{{- if not (.Page.Store.Get "leanhl") }}<style>.chroma .c1 span,.chroma .s2 span{color:inherit}</style>{{ .Page.Store.Set "leanhl" true }}{{ end -}}
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lean" data-lang="lean">{{ $s | safeHTML }}</code></pre></div>
