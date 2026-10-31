@@ -8,6 +8,8 @@ version: ""
 draft: false
 ---
 
+<img class="blog-aside-img" src="/img/blog/sphinx.jpg" alt="Engraving of the Great Sphinx of Giza, half buried in sand" width="200" height="200">
+
 In Lean, a field of a structure type can be a proposition. That one feature changes how a cryptography library can be written.
 
 In a language like Rust a trait is an empty husk that only declares function signatures. It's still a useful contract: all
