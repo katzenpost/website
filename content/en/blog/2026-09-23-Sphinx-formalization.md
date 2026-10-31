@@ -12,7 +12,8 @@ I recently used Claude Code to formalize the Sphinx cryptographic packet format.
 First I'll provide some links to provide some more context about the Sphinx packet format.
 And then I'll discuss details about the formalization.
 
-* https://github.com/katzenpost/CryptWalker
+* https://cryptlib.io
+* https://github.com/katzenpost/cryptlib
 
 
 
@@ -84,7 +85,7 @@ by for example combining X25519 with a post quantum KEM such as MLKEM.
 
 
 
-## The Crypt Walker Theorems
+## The cryptlib Theorems
 
 A couple of years ago I was very excited to be learning Lean. I started the Lean theorem prover meetup
 at the Noisebridge hacker space in San Francisco, which ran as a weekly study group.
@@ -109,7 +110,7 @@ I didn't fully understand the implications of what Mario was showing me.
 It's so much more than a symbolic model but we'll come back to that shortly.
 
 So I wrote Lean implementations of a few constructions in HPQC including a NIKE to KEM adapter, the NIKE combiner, the KEM combiner.
-After about two years passed, I started working on CryptWalker again, at the Utrecht University Summer Lean Theorem Prover class.
+After about two years passed, I started working on cryptlib again, at the Utrecht University Summer Lean Theorem Prover class.
 It was a 5 day Lean workshop with a couple of days devoted to the student chosen projects.
 I was able to write theorems about the HPQC constructs that said:
 
@@ -219,12 +220,13 @@ indistinguishability is built into the new unlinkability games.
 
 Let's briefly look over the Sphinx type definitions and then discuss them below.
 
-Crypt Walker git repo:
+cryptlib website and git repo:
 
-* https://github.com/katzenpost/CryptWalker
+* https://cryptlib.io
+* https://github.com/katzenpost/cryptlib
 
 
-* Below is our Sphinx type definition and here's also a link to Sphinx type definition: https://github.com/katzenpost/CryptWalker/blob/main/CryptWalker/Sphinx/sphinx.lean
+* Below is our Sphinx type definition and here's also a link to Sphinx type definition: https://github.com/katzenpost/cryptlib/blob/main/Cryptlib/Protocols/Sphinx/Interface.lean
 
 
 ```lean
@@ -242,10 +244,10 @@ structure Sphinx where
   (added by `NIKESphinxScheme`/`KEMSphinxScheme`): a wide-block cipher for the payload, a MAC for
   header integrity, a KDF for per-hop keys, a stream cipher for routing-info encryption. Kept
   abstract so swapping e.g. AEZ for another wide-block cipher needs no change below. -/
-  cipher : CryptWalker.WideBlockCipher.WideBlockCipher
-  mac    : CryptWalker.MAC.MAC
-  kdf    : CryptWalker.KDF.KDF
-  stream : CryptWalker.StreamCipher.StreamCipher
+  cipher : Cryptlib.Primitives.WideBlockCipher.WideBlockCipher
+  mac    : Cryptlib.Primitives.MAC.MAC
+  kdf    : Cryptlib.Primitives.KDF.KDF
+  stream : Cryptlib.Primitives.StreamCipher.StreamCipher
 
   /-- Raw bytes — width depends on which NIKE/KEM this scheme wraps, not fixed here. -/
   derivePublicKey : PrivateKey → ByteArray
@@ -336,7 +338,7 @@ However I had to make sub-types of the Sphinx type in order to accurately repres
 wrap resistance, for only NIKE Sphinx and not for KEM Sphinx. Next I will show you the NIKESphinxScheme and KEMSphinxScheme types:
 
 ```lean
-structure NIKESphinxScheme extends CryptWalker.Sphinx.Interface.Sphinx where
+structure NIKESphinxScheme extends Cryptlib.Protocols.Sphinx.Interface.Sphinx where
   nike : NIKE
   Envelope : Type
   [envelopeDecEq : DecidableEq Envelope]
@@ -371,7 +373,7 @@ structure NIKESphinxScheme extends CryptWalker.Sphinx.Interface.Sphinx where
 and
 
 ```lean
-structure KEMSphinxScheme extends CryptWalker.Sphinx.Interface.Sphinx where
+structure KEMSphinxScheme extends Cryptlib.Protocols.Sphinx.Interface.Sphinx where
   kem : KEM
   /-- **Not wrap-resistant** — the inverse of `NIKESphinxScheme.wrap_resistant`: a known-key
   adversary hits any target routing-info block with certainty, not merely `1/N`. See
@@ -404,13 +406,13 @@ But KEM Sphinx does have a huge downside. It has a large bandwidth overhead with
 
 ## What's next
 
-The plan is to move CryptWalker's security fields from the 2009 four property framework to the properties the
+The plan is to move cryptlib's security fields from the 2009 four property framework to the properties the
 followup papers showed actually imply secure onion routing, and to tie them to each instance's own `wrap` and `unwrap`
 the way `unwrap_complete` already is:
 
 * For NIKE Sphinx, the layer unlinkability and tail indistinguishability properties from the Gap Diffie-Hellman proof.
 * For KEM Sphinx, the EROR style properties, whose proofs only need an IND-CCA secure KEM, a MAC and a PRF.
-  That fits CryptWalker's generic KEM type well, and it's a path to a post quantum security proof, which the
+  That fits cryptlib's generic KEM type well, and it's a path to a post quantum security proof, which the
   Diffie-Hellman based proofs can't give.
 
 
