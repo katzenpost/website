@@ -330,9 +330,21 @@ obligations are already discharged.
 
 ## Conclusion: dependent types for the win
 
-It turns out that dependent types are great for writing cryptography libraries!
-Correctness proofs compose for free, and design flaws like the zero padding leak can be ruled out by the type itself.
-The security proofs are the harder part, and that's where the work continues.
+Three things, in increasing order of how under-appreciated they are.
+
+Interactive theorem provers for the win. An LLM wrote most of the proofs in this formalization, and it is good at
+that. It is not yet good at deciding what is worth proving. Every hypothesis in the security fields above is a claim
+about what the Sphinx paper's games actually say, and a human has to check that those are the right statements before
+a proof of them means anything. Lean gives you a partner that never accepts a wrong proof. Deciding which theorems to
+ask for is still your job.
+
+High assurance software for the win. Being able to run the same Lean code that the proofs are about, against test
+vectors shared with the Go implementation, and then prove properties of that very code, is very powerful indeed.
+
+And dependent types for the win. This is the least known and least recognized of the three, and it seems badly
+under-rated. Correctness proofs compose for free, and design flaws like the zero padding leak can be ruled out by the
+type itself. My advice to every Lean programmer is to reach for dependent types whenever you can. You may reap rewards
+you did not expect, and your code will be more beautiful and expressive for it.
 
 ## Sphinx Links
 
