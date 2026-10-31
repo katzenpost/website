@@ -8,36 +8,53 @@ version: ""
 draft: false
 ---
 
-I recently used Claude Code to formalize the Sphinx cryptographic packet format.
-Below I'll discuss details about the formalization; links for background on Sphinx are collected at the end.
+In Lean, a field of a structure type can be a proposition. That one feature changes how a cryptography library can be written.
+
+In a language like Rust a trait is an empty husk that only declares function signatures. It's still a useful contract: all
+instances must define the trait's methods. In Lean we describe a primitive generically with a structure whose fields hold
+functions and data types, which is how Rust or Go would do it too. Dependent types let us go a step further: a field can
+also be a proposition about the other fields. Here is cryptlib's NIKE (non-interactive key exchange) type, abridged:
+
+```lean
+structure NIKE where
+  PrivateKey   : Type
+  PublicKey    : Type
+  SharedSecret : Type
+  -- ...
+  Safe : PublicKey → Prop
+  derivePublicKey : PrivateKey → PublicKey
+  groupAction : PrivateKey → {pk : PublicKey // Safe pk} → SharedSecret
+  -- ...
+  derive_safe : ∀ sk, Safe (derivePublicKey sk)
+  -- ...
+  commutes : ∀ sk₁ sk₂,
+    groupAction sk₁ ⟨derivePublicKey sk₂, derive_safe sk₂⟩
+      = groupAction sk₂ ⟨derivePublicKey sk₁, derive_safe sk₁⟩
+```
+
+Every NIKE instance must supply a proof of `commutes`, so a NIKE whose group operation is not commutative cannot be
+constructed. The KEM (key encapsulation mechanism) type likewise carries its round trip correctness as a field.
+And these proofs compose: when the hashed ElGamal NIKE-to-KEM adapter builds a KEM from a NIKE, it cannot construct
+the KEM without filling in that correctness field, which it does using the NIKE's `commutes`. The theorem "a lawful NIKE
+gives a lawful KEM" never has to be stated separately, and nobody can forget to apply it.
+
+This post is about taking that idea up a level, from primitives to a protocol. I recently used Claude Code to formalize
+the Sphinx packet format in Lean, generic over its NIKE or KEM, stream cipher, KDF, MAC and wide-block cipher.
+Correctness is proved once over any choice of those primitives, and a padding leak that later researchers found in
+Sphinx becomes impossible to express in the type. The security proofs are the harder part, and I'll be honest below about
+what is and isn't proved yet. Links for background on Sphinx are collected at the end.
 
 * https://cryptlib.io
 * https://github.com/katzenpost/cryptlib
 
 
+## Background: Katzenpost's Sphinx and HPQC
 
-## Katzenpost's Post Quantum Sphinx
-
-In the Katzenpost mixnet project we use a golang implementation of the Sphinx packet format which is generic
-over a NIKE interface. This means we can use any NIKE (non-interactive key exchange).
-Our implementation can also use any KEM (key encapsulation mechanism) for the KEM Sphinx variant.
-
-* https://github.com/katzenpost/katzenpost/tree/main/core/sphinx
-
-To be clear, both variations of Sphinx can be hybrid post quantum combining classical and post quantum
-public key primitives together.
-
-
-## HPQC: Katzenpost's hybrid post quantum cryptography library
-
-* https://github.com/katzenpost/hpqc
-
-HPQC defines our KEM and NIKE golang interfaces which we use to genericize cryptographic protocols like Sphinx.
-One interesting contribution of HPQC is that we can use a NIKE combiner and a KEM combiner to make hybrid NIKEs and KEMs
-which mix classical and postquantum primitives together. Also HPQC has a NIKE to KEM adapter (hashed ElGamal construction)
-which allows us to combine a NIKE such as X25519 as if it were a KEM along with MLKEM. This helps us make hybrid KEMs
-by for example combining X25519 with a post quantum KEM such as MLKEM.
-
+The Katzenpost mixnet uses a [Go implementation of Sphinx](https://github.com/katzenpost/katzenpost/tree/main/core/sphinx)
+that is generic over a NIKE, plus a KEM Sphinx variant that is generic over a KEM. Both can be hybrid post quantum.
+The NIKE and KEM interfaces come from [HPQC](https://github.com/katzenpost/hpqc), our hybrid post quantum cryptography
+library, which also provides a NIKE combiner, a KEM combiner, and a NIKE to KEM adapter (hashed ElGamal construction),
+so that for example X25519 can be combined with ML-KEM into a hybrid KEM. cryptlib started as a Lean model of HPQC.
 
 
 ## The cryptlib Theorems
@@ -81,13 +98,9 @@ And then I wrote a theorem that said:
 ##  Towards A Dependent Type Proclivity
 
 Instead of writing a struct type definition and then separate theorems,
-I realized that some of the theorems about a given cryptographic primitive can be placed inside the type's struct field
-and it can say something about the other fields of the struct type. So the NIKE proposition field called "commutes" contains
-a theorem that says the group operation is commutative. That's the whole point of the Diffie Hellman Shared Secret, is that it's
-commutative and therefore both parties can compute the same shared secret by different means, e.g. g^x^y = g^y^x
-
-Likewise I make a completeness proposition field for the KEM type that says the KEM can always decapsulate whatever it encapsulates.
-Once the NIKE to KEM adapter is wired to use these new types, the theorem
+I realized that some of the theorems about a given cryptographic primitive can be placed inside the type's struct fields,
+where they can talk about the type's other fields. That is where the NIKE's `commutes` field and the KEM's completeness
+field shown in the introduction came from. Once the NIKE to KEM adapter is wired to use these new types, the theorem
 
 * Given a lawful NIKE, the NIKE to KEM adapter (hashed ElGamal construction) produces a lawful KEM.
 
@@ -163,7 +176,8 @@ Fourth, security and indistinguishability. An adversary who controls every mix n
 messages, destinations and paths, cannot tell which of two packets entered the honest node, and in particular
 cannot tell whether a packet is a forward message or a reply.
 
-It turns out this four property framework is not the end of the story. The first followup paper listed above
+It turns out this four property framework is not the end of the story.
+[Breaking and (Partially) Fixing Provably Secure Onion Routing](https://arxiv.org/pdf/1910.13772)
 showed that these properties don't actually imply ideal onion routing, so even complete proofs of all four wouldn't
 show that Sphinx is secure. The later papers replace them with layer unlinkability and tail indistinguishability
 properties, which do imply it. Integrity and wrap-resistance no longer appear as separate properties, and forward/reply
@@ -175,102 +189,49 @@ indistinguishability is built into the new unlinkability games.
 
 Let's briefly look over the Sphinx type definitions and then discuss them below.
 
-cryptlib website and git repo:
-
-* https://cryptlib.io
-* https://github.com/katzenpost/cryptlib
-
-
-* Below is our Sphinx type definition and here's also a link to Sphinx type definition: https://github.com/katzenpost/cryptlib/blob/main/Cryptlib/Protocols/Sphinx/Interface.lean
+Below is our Sphinx type, abridged to its primitives and the two functions the discussion needs. The full definition
+is in [Interface.lean](https://github.com/katzenpost/cryptlib/blob/main/Cryptlib/Protocols/Sphinx/Interface.lean).
 
 
 ```lean
-
 structure Sphinx where
   State : Type
   PrivateKey : Type
   Command : Type
-  [stateI : Inhabited State]
-  [privI : Inhabited PrivateKey]
-
+  -- ...
   geometry : Geometry.Geometry
 
   /-- The four cryptographic primitives every Sphinx instance needs besides its NIKE-or-KEM
-  (added by `NIKESphinxScheme`/`KEMSphinxScheme`): a wide-block cipher for the payload, a MAC for
-  header integrity, a KDF for per-hop keys, a stream cipher for routing-info encryption. Kept
-  abstract so swapping e.g. AEZ for another wide-block cipher needs no change below. -/
+  (added by `NIKESphinxScheme`/`KEMSphinxScheme`). Kept abstract so swapping e.g. AEZ for
+  another wide-block cipher needs no change below. -/
   cipher : Cryptlib.Primitives.WideBlockCipher.WideBlockCipher
   mac    : Cryptlib.Primitives.MAC.MAC
   kdf    : Cryptlib.Primitives.KDF.KDF
   stream : Cryptlib.Primitives.StreamCipher.StreamCipher
 
-  /-- Raw bytes — width depends on which NIKE/KEM this scheme wraps, not fixed here. -/
-  derivePublicKey : PrivateKey → ByteArray
-
   /-- Unused routing-info slots are filled with `drawBytes` from `State`, not supplied by the
-  caller (see `fillerLength`). -/
+  caller. -/
   wrap : List Types.PathHop → Vector UInt8 geometry.forwardPayloadLength →
     EStateM String State (Vector UInt8 geometry.packetLength)
 
-  /-- `(payload, replayTag, cmds, forwardPkt)`. -/
   unwrap : PrivateKey → (pkt : ByteArray) →
     Except String (Option ByteArray × Vector UInt8 32 × List Command × Option (Vector UInt8 pkt.size))
+  -- ...
 
-  newSURB : List Types.PathHop →
-    EStateM String State (Vector UInt8 geometry.surbLength × ByteArray)
-
-  newPacketFromSURB : Vector UInt8 geometry.surbLength → ByteArray →
-    Except String (ByteArray × Vector UInt8 32)
-
-  /-- Which starting states are guaranteed not to run into the backing scheme's rare correctness
-  failure over an unbounded run. `True` for every perfect-correctness backing — every NIKE, and
-  any Diffie-Hellman-based KEM (`KEM.KEM.Reliable`'s own default, unchanged) — since neither has a
-  decoding step with a failure mode to name. A KEM-Sphinx instance backed by a lattice-based KEM
-  (e.g. ML-KEM) overrides this with the real per-draw guarantee its own `KEM.Reliable` needs. -/
-  unwrapReliable : State → Prop := fun _ => True
-
-  /-- **Completeness**: any packet `wrap` builds, `unwrap` can undo, given `path` is well-formed —
-  no hop's `commands` already contains `null` or `nextNodeHop` (both wire-level sentinels this
-  port only ever constructs itself, never something a caller supplies), and the last hop carries
-  no `surbReply` (a real command, just one that changes `unwrap`'s terminal-hop behavior — its own
-  completeness is tracked separately). -/
+  /-- **Completeness**: any packet `wrap` builds, `unwrap` can undo, given a well-formed path. -/
   unwrap_complete : ∀ (path : List Types.PathHop) (privKeys : List PrivateKey)
       (payload : Vector UInt8 geometry.forwardPayloadLength) (st : State)
       (pkt : Vector UInt8 geometry.packetLength) (st' : State),
-    path ≠ [] →
-    unwrapReliable st →
-    path.map (·.publicKey) = privKeys.map derivePublicKey →
-    (∀ hop ∈ path, ∀ c ∈ hop.commands, c ≠ .null ∧ (∀ id m, c ≠ .nextNodeHop id m)) →
-    (∀ c ∈ (path[path.length - 1]!).commands, ∀ id, c ≠ .surbReply id) →
+    -- ... well-formedness hypotheses ...
     wrap path payload st = .ok pkt st' →
     unwrapChainAux unwrap privKeys (ofVector pkt) = .ok (some (ofVector payload))
 
-  /-- **Indistinguishability** (§4.4): `Indistinguishability.advantage_le`, closed over every
-  scheme it's about. Free for every instance — see that theorem's own module doc for the games
-  and hardness assumptions it reduces to. -/
-  indistinguishable : ∀ {F G Seed KeyMu KeyPi Beta Gamma Delta : Type}
-      [Field F] [AddCommGroup G] [Module F G] [AddCommGroup Beta]
-      [SampleableType F] [SampleableType Seed] [SampleableType KeyMu] [SampleableType KeyPi]
-      [SampleableType Beta] [SampleableType Gamma] [SampleableType Delta]
-      [SampleableType (Seed × KeyMu × KeyPi)] [Finite F]
-      (S : Indistinguishability.Sys F G Seed KeyMu KeyPi Beta Gamma Delta),
-      Indistinguishability.AdvantageLeType S :=
-    fun S => Indistinguishability.advantage_le S
-
-  /-- **Integrity** (§4.2): `Integrity.integrity_bound`, closed over every scheme it's about.
-  Free for every instance — see that theorem's own module doc for `ProblemP`, its named hardness
-  hypothesis. -/
-  integrity : ∀ {F G Seed Idx Yy Kappa : Type} [Field F] [AddCommGroup G] [Module F G]
-      [Nonempty Yy] (S : Integrity.Sys F G) (hρ : G → Seed) (ρhat0 : Seed → Kappa)
-      (ρ0 : Seed → Idx) (f : Idx → Yy → Kappa),
-      Integrity.IntegrityBoundType S hρ ρhat0 ρ0 f :=
-    fun S hρ ρhat0 ρ0 f => Integrity.integrity_bound S hρ ρhat0 ρ0 f
-
+  -- `indistinguishable` and `integrity`: the paper's §4.4 and §4.2 arguments, discussed below.
 ```
 
 Notice that `wrap` and `newSURB` take no filler argument. Earlier versions took the filler for unused hops
 from the caller, and nothing in the type stopped a caller from passing zeros. That is exactly the path length leak
-found in the "Breaking and (Partially) Fixing" paper above: a recognizable padding pattern tells the last mix how
+found in the "Breaking and (Partially) Fixing" paper: a recognizable padding pattern tells the last mix how
 long the path was. The Katzenpost golang implementation already fills these bytes with randomness. The Lean
 `wrap` draws the filler from its
 own random `State` instead, so a zero filler can no longer be expressed. That's the dependent type thesis again:
@@ -286,7 +247,8 @@ So today they record the paper's arguments inside the type, but they don't yet c
 * **Integrity** assumes the step the paper itself only calls "a careful, but straightforward, calculation", and
   assumes the hardness of the paper's "Problem P".
 * **Indistinguishability** reduces the first hybrid step to DDH, but takes the other two steps as hypotheses, and its
-  game doesn't let the adversary query the honest node. The second followup paper above shows that once the adversary
+  game doesn't let the adversary query the honest node. The
+  [Gap Diffie-Hellman proof](https://arxiv.org/pdf/2312.08028) shows that once the adversary
   can query it, DDH isn't enough and the Gap Diffie-Hellman assumption is needed.
 
 However I had to make sub-types of the Sphinx type in order to accurately represent the third security property,
