@@ -565,3 +565,17 @@ section.td-cover-block {
         padding-bottom: 1rem !important;
     }
 }
+
+/* Small image beside a post's opening paragraphs; stacks on phones. */
+.blog-aside-img {
+    float: right;
+    margin: 0 0 1em 1.5em;
+    border-radius: 4px;
+}
+@media (max-width: 576px) {
+    .blog-aside-img {
+        float: none;
+        display: block;
+        margin: 0 auto 1em;
+    }
+}
