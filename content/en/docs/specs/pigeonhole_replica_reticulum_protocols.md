@@ -89,14 +89,14 @@ Operators who have agreed out of band put their replicas behind one of Reticulum
 boundaries: an interface passphrase, or a Network Identity on the interfaces that carry the
 mesh. Only a node admitted to that network can announce a replica or reach one. The replica
 set is now vetted, as it is on the mixnet, and the observers left are outsiders and anyone
-recording traffic for a quantum computer later. This is the mixnet's trust shape in
-Reticulum's idiom: the coordination the mixnet does through directory authorities, the closed
-mesh does through a shared passphrase.
+recording traffic for a quantum computer later. This is the mixnet's arrangement in
+Reticulum's idiom: the vetting the mixnet does through directory authorities, the closed mesh
+does through a shared passphrase.
 
-That secret is the trust anchor. An announce that arrives through the boundary came from a
-node holding it, so the hybrid key it carries is trusted on that basis, not on the Ed25519
-that signs the announce. The anchor is symmetric, so a quantum adversary gains nothing against
-it, and the chain from passphrase to session contains no post quantum signature and no
+That secret is what admits a node. An announce that arrives through the boundary came from a
+node holding it, so the hybrid key it carries is accepted on that basis, not on the Ed25519
+that signs the announce. The passphrase is symmetric, so a quantum adversary gains nothing
+against it, and the chain from passphrase to session contains no post quantum signature and no
 classical link. A replica on a closed mesh has no interface outside the boundary; its
 announces, its placement and its handoffs never leave the mesh.
 
@@ -203,9 +203,9 @@ another replica may still hold the box until the tombstone reaches it.
 A bridge joins a mesh to a Katzenpost mixnet so that a group can have members on both without
 either side doing anything. It is one node running two replicas: a mesh replica, and a
 Katzenpost replica that is a member of the mixnet's PKI. The two share a machine and talk over
-a local socket. The mixnet already trusts its replica, so what the bridge brings in is covered
-by that trust; this is why the crossing happens between replicas and not through some new
-door into the mixnet.
+a local socket. The Katzenpost replica is already vetted by the mixnet's PKI, so what the
+bridge brings in enters under that replica's name; this is why the crossing happens between
+replicas and not through some new door into the mixnet.
 
 Boxes cross in two different ways, because the two networks differ in what a replica can see.
 
