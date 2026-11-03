@@ -15,10 +15,15 @@ version: ""
 
 ## katzenqt1 chat over Reticulum
 
-katzenqt1 is the group chat protocol of katzenqt, hushphone, jam and katzenrns. On a mesh it
-needs only the boxes of [Pigeonhole protocols over Reticulum](/docs/specs/pigeonhole-protocols-reticulum/);
-this document is what it writes into them. The member state machine, which decides what to
-write and read next, exists in four languages. A new client reuses one or matches it:
+katzenqt1 is the group chat protocol of katzenqt, hushphone, jam and katzenrns. It is CBOR
+messages of a few types, each written as one BACAP box in the writer's own stream. A client
+keeps a read capability and an index for every member and reads each member's next box;
+acknowledgements inside the messages tell it where others have got to. All of that logic is in
+a sans-IO state machine, written once per language, and the same machine runs on the Katzenpost
+mixnet and on a Reticulum mesh. What differs is the transport beneath it: on the mixnet the
+client daemon does BACAP and carries the boxes; on a mesh the transport does BACAP itself and
+sends the boxes of [Pigeonhole protocols over Reticulum](/docs/specs/pigeonhole-protocols-reticulum/).
+So a new mesh client is a transport, or a transport and a state machine that matches these:
 
 | language | repository                                                                       | state machine                                                                                                              |
 |----------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
@@ -27,7 +32,21 @@ write and read next, exists in four languages. A new client reuses one or matche
 | Go       | [katzenpost/pigeonhole_protocols](https://github.com/katzenpost/pigeonhole_protocols) | [go/protocols/katzenqt1/member/](https://github.com/katzenpost/pigeonhole_protocols/tree/main/go/protocols/katzenqt1/member) |
 | Python   | [katzenpost/pigeonhole_protocols](https://github.com/katzenpost/pigeonhole_protocols) | [py/pigeonhole_protocols/katzenqt1/member/](https://github.com/katzenpost/pigeonhole_protocols/tree/main/py/pigeonhole_protocols/katzenqt1/member) |
 
-Its rules, rosters, acknowledgements, backfill, numbering and rewrite, are the
+The transports written so far, one interface per language, which the state machine's engine
+drives:
+
+| transport                               | who does BACAP      | implementations                                                                                                                                                                                                                                                                              |
+|-----------------------------------------|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Katzenpost mixnet, through kpclientd    | the client daemon   | Rust [rust/src/transport/thinclient/](https://github.com/katzenpost/pigeonhole_protocols/tree/main/rust/src/transport/thinclient), Go [go/transport/thinclient/](https://github.com/katzenpost/pigeonhole_protocols/tree/main/go/transport/thinclient), Lean [GroupChatKatzenqt1/Daemon.lean](https://github.com/katzenpost/group_chat_client/blob/main/GroupChatClient/GroupChatKatzenqt1/Daemon.lean) |
+| Reticulum mesh                          | the transport, with hpqc | Python [katzenrns/transport.py](https://github.com/katzenpost/katzenrns/blob/main/katzenrns/transport.py) over [pigeonhole_rns](https://github.com/katzenpost/pigeonhole_rns)                                                                                                      |
+| in memory, for tests                    | the transport       | Rust [sim.rs](https://github.com/katzenpost/pigeonhole_protocols/blob/main/rust/src/transport/sim.rs), Go [go/transport/sim/](https://github.com/katzenpost/pigeonhole_protocols/tree/main/go/transport/sim), Python [transport/sim.py](https://github.com/katzenpost/pigeonhole_protocols/blob/main/py/pigeonhole_protocols/transport/sim.py), Lean [GroupChatKatzenqt1/Sim.lean](https://github.com/katzenpost/group_chat_client/blob/main/GroupChatClient/GroupChatKatzenqt1/Sim.lean) |
+
+The interface itself: Rust [transport/mod.rs](https://github.com/katzenpost/pigeonhole_protocols/blob/main/rust/src/transport/mod.rs),
+Go [transport/transport.go](https://github.com/katzenpost/pigeonhole_protocols/blob/main/go/transport/transport.go),
+Python [transport/base.py](https://github.com/katzenpost/pigeonhole_protocols/blob/main/py/pigeonhole_protocols/transport/base.py),
+Lean [GroupChatKatzenqt1/Backend.lean](https://github.com/katzenpost/group_chat_client/blob/main/GroupChatClient/GroupChatKatzenqt1/Backend.lean).
+
+The protocol's rules, rosters, acknowledgements, backfill, numbering and rewrite, are the
 [Group chat specification](/docs/specs/groupchat/); vouchers are the
 [Contact voucher specification](/docs/specs/contactvoucher/).
 
