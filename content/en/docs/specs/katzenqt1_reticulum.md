@@ -93,8 +93,9 @@ encodings are at the end; a writer emits version 4.
 The newcomer:
 
 1. Makes a stream S and a seal keypair (sk, pk).
-2. Builds VoucherPayload [S's read capability, pk, display name]. voucher = BLAKE2b-256 of
-   its bytes.
+2. Signs [S's read capability, pk, display name], as CBOR, with S's root key (Ed25519), and
+   builds VoucherPayload [S's read capability, pk, display name, signature]. voucher =
+   BLAKE2b-256 of its bytes.
 3. Writes the VoucherPayload to box 0. Gives the voucher away.
 4. Reads box 1, then each next box while the one before began with `C`. NOT_FOUND: wait.
    TOMBSTONE: withdrawn, the join failed. The boxes' bytes after their first byte, joined, are
@@ -105,7 +106,8 @@ The newcomer:
 A member answering the voucher:
 
 1. Derives the voucher stream and reads box 0. NOT_FOUND: wait. TOMBSTONE: withdrawn.
-2. Checks BLAKE2b-256(payload) = voucher. Otherwise stops.
+2. Checks BLAKE2b-256(payload) = voucher, and the signature under the root key in the
+   payload's read capability. Otherwise stops.
 3. Draws a 32 byte salt. The newcomer's live read capability is the payload's read capability
    with its KDF state mutated by the salt. Builds the ReplyWho: every member with the position
    the newcomer starts from, its own stream at the index its Introduction will occupy.
@@ -223,13 +225,13 @@ B − 1 bytes of it. The costs below are measured on the encoders. h is a string
 | each absent field before a present one            | 1                                      |
 | ReplyWho without rosters, places with names of n  | 2 + Σ (139 + h + n)                    |
 | ReplyWho with rosters and p − 1 introductions, names of 10 | 160, 429, 1272, 2797 for p = 1, 2, 5, 10 |
-| VoucherPayload, name of n bytes                   | 301 + h + n                            |
+| VoucherPayload, name of n bytes                   | 367 + h + n                            |
 | sealed VoucherReply                               | WhoReply + 211 + h                     |
 | seal public key, X25519 ‖ CTIDH1024               | 160                                    |
 
 Version 3 cost 70 for the fixed fields, 5 + h + n for a text, 174 + h + n for an introduction,
 451 + h + n for a VoucherPayload and 359 for the seal, so version 4 saves 33 bytes on every
-box, 35 on an introduction, 150 on a voucher and 146 on its reply. With B = 1000: a text is at
+box, 35 on an introduction, 84 on a voucher and 146 on its reply. With B = 1000: a text is at
 most 959 bytes; a control message acknowledges up to 117 members; a sealed reply that fits
 box 1 alone holds a WhoReply of 786 bytes, five places without rosters or three with; a larger
 reply continues in box 2 and on.
@@ -287,7 +289,9 @@ Refused when the indexes would pass 255 or a prefix repeats.
 
 ### Voucher stream
 
-* VoucherPayload, box 0: array [read_cap 136 bytes, seal public key 160 bytes, display_name].
+* VoucherPayload, box 0: array [read_cap 136 bytes, seal public key 160 bytes, display_name,
+  signature 64 bytes]; the signature is Ed25519 by the read cap's root key over the CBOR array
+  of the first three.
 * Voucher: BLAKE2b-256 of the VoucherPayload's bytes.
 * VoucherReply: array [WhoReply, the ReplyWho's CBOR; salt 32 bytes]. Sealed as a sealed box
   to the seal public key: the sender's ephemeral hybrid public key, 160 bytes, then
