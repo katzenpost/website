@@ -1,6 +1,6 @@
 ---
 title: ""
-linkTitle: "Pigeonhole over Reticulum"
+linkTitle: "Pigeonhole replicas over Reticulum"
 description: ""
 author: "David Stainton"
 url: ""
