@@ -74,6 +74,25 @@ The box size is one number per mesh, equal to the mixnet's plaintext payload len
 bridge exists. A client is told it with the mesh.
 
 
+## Geometry
+
+Every size on the mesh follows from the box size B, the plaintext a box carries.
+
+| quantity                               | bytes   |
+|----------------------------------------|---------|
+| plaintext a protocol may put in a box  | B       |
+| padded plaintext                       | B + 4   |
+| ciphertext                             | B + 20  |
+| read query                             | 33      |
+| write query                            | B + 117 |
+| reply to a write, or a miss            | 1       |
+| reply with a box                       | B + 85  |
+| tombstone write                        | 97      |
+
+The reference meshes use B = 1000, which gives a 1020 byte ciphertext and a 1117 byte write
+query. The seal scheme the protocols on top use is the hybrid NIKE `CTIDH1024-X25519` and the
+signature scheme is Ed25519, as on the mixnet.
+
 ## Writing, reading, deleting
 
 | action | send                            | outcome                                                                                                                       |

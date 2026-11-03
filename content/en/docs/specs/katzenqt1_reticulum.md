@@ -100,20 +100,29 @@ A member answers one voucher at a time. Box 0 is left as written; the voucher is
 
 ## ReplyWho
 
-A CBOR map.
+A CBOR map with these fields; absent is `None`.
 
-| key             | value                                                                                   |
-|-----------------|-----------------------------------------------------------------------------------------|
-| `please_adds`   | array, one per place: map `display_name` text, `read_cap` 136 bytes; or null when unknown |
-| `rosters`       | array, one per place: array of `[roster index, place or null]`, or null; absent when unknown |
-| `introductions` | array of `[by, index 104 bytes, member]`, places                                        |
-| `introducer`    | the sender's place                                                                      |
-| `newcomer`      | the newcomer's place, the number of places                                              |
+```rust
+struct ReplyWho {
+    /// One per place: `None` for a member the sender cannot name.
+    please_adds: Vec<Option<PleaseAdd>>,
+    /// One per place, the member's roster; `None` while unknown.
+    rosters: Option<Vec<Option<Vec<RosterEntry>>>>,
+    introductions: Option<Vec<IntroAt>>,
+    /// The sender's place.
+    introducer: Option<usize>,
+    /// The newcomer's place: the number of places.
+    newcomer: Option<usize>,
+}
+struct PleaseAdd { display_name: String, read_cap: [u8; 136] } // key, then the start index
+struct RosterEntry(usize, Option<usize>);                      // [roster index, place]
+struct IntroAt(usize, [u8; 104], usize);                       // [by, index, member]
+```
 
 Without `rosters`, the newcomer takes the places named, the first as introducer, every roster
 unknown. With `rosters`, the reply is refused when `newcomer` is not the number of places,
 `introducer` is not below it, there are 256 places or more, two places share a key, a roster
-names a place that does not exist, or the introducer's place is null.
+names a place that does not exist, or the introducer's place is `None`.
 
 A pigeonhole service that admits a client answers with one place and no rosters.
 
@@ -130,27 +139,71 @@ A pigeonhole service that admits a client answers with one place and no rosters.
 A message fits the box size less one byte. A reader that does not fetch chunks steps past an `I`
 box.
 
-GroupChatMessage, a CBOR map:
+GroupChatMessage, a CBOR map with these fields in this order; absent is `None`:
 
-| key               | value                                                              |
-|-------------------|--------------------------------------------------------------------|
-| `version`         | 3; readers accept 0 to 3                                           |
-| `membership_hash` | 32 bytes                                                           |
-| `msg_type`        | 0 text, 1 introduction, 2 file upload, 3 who, 4 reply who, 10 control; above 10 refused; absent: the type of the field present, text when none |
-| `text`            | text, type 0                                                       |
-| `introduction`    | map `display_name` text of 1 to 30 characters, `read_cap` 136 bytes; type 1 |
-| `file_upload`     | map `payload` bytes, `filetype` text, `basename` text; type 2       |
-| `who`, `reply_who`, `tally` | kept and rewritten as read                               |
-| `acks`            | bytes, layout below; optional                                      |
-| `numbers`         | bytes, layout below; optional                                      |
-| `introduced_at`   | bytes, layout below; optional                                      |
+```rust
+struct GroupChatMessage {
+    version: u64,                        // 3; readers accept 0 to 3
+    membership_hash: [u8; 32],
+    msg_type: u64,                       // see below
+    text: Option<String>,                // type 0
+    introduction: Option<Introduction>,  // type 1
+    file_upload: Option<FileUpload>,     // type 2
+    who: Option<Value>,                  // type 3, kept and rewritten as read
+    reply_who: Option<Value>,            // type 4, kept and rewritten as read
+    tally: Option<Value>,                // kept and rewritten as read
+    acks: Option<Vec<u8>>,               // layout under Encoding
+    numbers: Option<Vec<u8>>,            // layout under Encoding
+    introduced_at: Option<Vec<u8>>,      // layout under Encoding
+}
+struct Introduction { display_name: String, read_cap: [u8; 136] } // 1 to 30 characters
+struct FileUpload { payload: Vec<u8>, filetype: String, basename: String }
+```
 
-Type 10 carries only `acks`, `numbers` and `introduced_at`.
+| `msg_type` | message      | carries                                   |
+|------------|--------------|-------------------------------------------|
+| 0          | text         | `text`                                    |
+| 1          | introduction | `introduction`                            |
+| 2          | file upload  | `file_upload`                             |
+| 3          | who          | `who`                                     |
+| 4          | reply who    | `reply_who`                               |
+| 10         | control      | only `acks`, `numbers`, `introduced_at`   |
+
+A type above 10 is refused. A message without `msg_type` has the type of the field it carries,
+text when none. Any message may carry `acks`, `numbers` and `introduced_at`.
 
 membership_hash = SHA-256(`KP:membership:v1` ‖ the members' keys, each once, in byte order,
 one's own included). The sentinel for an unknown membership is 32 zero bytes; readers also
 accept `TODO` repeated to 32 bytes. Content carries the hash as written; control messages and
 Introductions carry the writer's current membership, or the sentinel.
+
+
+## Geometry
+
+B is the box size of [Pigeonhole protocols over Reticulum](/docs/specs/pigeonhole-protocols-reticulum/).
+A member's box holds B − 1 bytes of GroupChatMessage CBOR; box 1 of a voucher stream holds B
+bytes of sealed reply. The costs below are exact for the field order above. h is a string's
+CBOR header: 1, 2 or 3 bytes below 24, 256 and 65536 bytes.
+
+| field or message                                  | bytes                                  |
+|---------------------------------------------------|----------------------------------------|
+| GroupChatMessage: `version`, `membership_hash`, `msg_type` | 70                            |
+| `text` of n bytes                                 | 5 + h + n                              |
+| `introduction`, name of n bytes                   | 174 + h + n                            |
+| `file_upload`, payload n, type t, name b          | 39 + (h + n) + (h + t) + (h + b)       |
+| `acks` of k members                               | 6 + h + naming + 8k; naming ≤ k        |
+| `numbers` of m prefixes                           | 9 + h + 8m                             |
+| `introduced_at`                                   | 121                                    |
+| ReplyWho without rosters, places with names of n  | 14 + Σ (162 + h + n)                   |
+| ReplyWho with rosters and p − 1 introductions, names of 10 | 236, 527, 1436, 3071 for p = 1, 2, 5, 10 |
+| VoucherPayload, name of n bytes                   | 451 + h + n                            |
+| sealed VoucherReply                               | WhoReply + 359                         |
+| seal public key, X25519 ‖ CTIDH1024               | 160                                    |
+
+With B = 1000: a text is at most 921 bytes; a control message acknowledges at most 113
+members; a sealed reply holds a WhoReply of 641 bytes, three places without rosters or two
+with. A group whose reply does not fit one box cannot admit a newcomer on that mesh, so B is
+chosen with the group sizes wanted in mind.
 
 
 ## Reading
