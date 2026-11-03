@@ -20,12 +20,12 @@ needs only the boxes of [Pigeonhole protocols over Reticulum](/docs/specs/pigeon
 this document is what it writes into them. The member state machine, which decides what to
 write and read next, exists in four languages. A new client reuses one or matches it:
 
-| language | where                                                                       |
-|----------|-----------------------------------------------------------------------------|
-| Lean     | `katzenpost/group_chat_client`, `GroupChatClient/`                          |
-| Rust     | `katzenpost/pigeonhole_protocols`, `rust/src/protocols/katzenqt1/member/`   |
-| Go       | `katzenpost/pigeonhole_protocols`, `go/protocols/katzenqt1/member/`         |
-| Python   | `katzenpost/pigeonhole_protocols`, `py/pigeonhole_protocols/katzenqt1/member/` |
+| language | repository                                                                       | state machine                                                                                                              |
+|----------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| Lean     | [katzenpost/group_chat_client](https://github.com/katzenpost/group_chat_client)  | [GroupChatClient/](https://github.com/katzenpost/group_chat_client/tree/main/GroupChatClient)                               |
+| Rust     | [katzenpost/pigeonhole_protocols](https://github.com/katzenpost/pigeonhole_protocols) | [rust/src/protocols/katzenqt1/member/](https://github.com/katzenpost/pigeonhole_protocols/tree/main/rust/src/protocols/katzenqt1/member) |
+| Go       | [katzenpost/pigeonhole_protocols](https://github.com/katzenpost/pigeonhole_protocols) | [go/protocols/katzenqt1/member/](https://github.com/katzenpost/pigeonhole_protocols/tree/main/go/protocols/katzenqt1/member) |
+| Python   | [katzenpost/pigeonhole_protocols](https://github.com/katzenpost/pigeonhole_protocols) | [py/pigeonhole_protocols/katzenqt1/member/](https://github.com/katzenpost/pigeonhole_protocols/tree/main/py/pigeonhole_protocols/katzenqt1/member) |
 
 Its rules, rosters, acknowledgements, backfill, numbering and rewrite, are the
 [Group chat specification](/docs/specs/groupchat/); vouchers are the
