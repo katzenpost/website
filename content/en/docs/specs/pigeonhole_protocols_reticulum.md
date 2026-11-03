@@ -15,111 +15,87 @@ version: ""
 
 ## Pigeonhole protocols over Reticulum
 
-**Abstract**
-
-A client on a Reticulum mesh reads and writes Pigeonhole boxes through one replica it can
-reach. This document is what such a client does: how it finds a replica, what it sends and
-receives, and how the boxes it handles are made. Every protocol built on boxes, the group chat
-among them, sits on what is here. The replicas' own protocol, placement and bridges to a
-Katzenpost mixnet are in [Pigeonhole over Reticulum](/docs/specs/reticulum/); the box itself is
-BACAP, in the [Echomix paper](https://arxiv.org/abs/2501.02933); the result codes are the
-[Pigeonhole specification](/docs/specs/pigeonhole/)'s.
+A client on a Reticulum mesh reads and writes Pigeonhole boxes through one replica. This is
+what it sends and receives. Replicas, placement and bridges are in
+[Pigeonhole replicas over Reticulum](/docs/specs/reticulum/); BACAP is in the
+[Echomix paper](https://arxiv.org/abs/2501.02933); a protocol on top, such as
+[katzenqt1 chat](/docs/specs/katzenqt1-reticulum/), adds only what it writes into boxes.
 
 
 ## Replicas
 
-A replica announces a Reticulum destination with application name `pigeonhole` and aspect
-`replica`: a single destination whose announce carries one byte of application data, 0, or 1
-when the replica is also a bridge to a mixnet. A client collects these announces. For each
-destination it keeps the first identity it hears and ignores a later announce of the same
-destination under another identity.
+|                           |                                                                        |
+|---------------------------|------------------------------------------------------------------------|
+| destination               | application name `pigeonhole`, aspect `replica`, single                |
+| announce application data | 1 byte: 0, or 1 for a bridge to a mixnet                               |
+| identity                  | the first heard for a destination; a later one for it is ignored       |
+| entry replica             | any announced replica with a path, the fewest hops by preference       |
 
-A client needs one replica, its entry replica: any announced replica it has a path to, by
-preference the one with the fewest hops. It writes to that replica and reads from it, and the
-replica does the rest. It stores and forwards what is written, finds what is read wherever on
-the mesh it is held, and asks a bridge for a box the mesh does not have. A client does no
-placement, and it needs a second replica only when it loses its path to the first.
+A client uses one replica at a time. The replica stores, forwards and finds boxes, and fetches
+from the mixnet through a bridge; the client does none of that.
 
 
 ## Requests
 
-Every query travels as a request on a Link to the replica's destination, to one of two request
-paths, `write` or `read`. The query is the request's data and the reply is the response. The
-first byte of a query says which it is, and a replica refuses a query that disagrees with the
-path it arrived on. A third path, `peek`, is how replicas read from each other; a client does not
-use it.
+A query is a Link request to the replica's destination. One Link per replica, one request at a
+time on it, reopened when it closes; a request above the MTU travels as a Resource.
 
-A client keeps one Link per replica and reuses it, sends one request at a time on it, and opens
-it again when it closes. A request larger than the Link's MTU travels as a Resource, as any
-Reticulum request does. A request that is not answered is not repeated at once: the client asks
-again later, as it does for a box that is not yet written. The reference client allows 20
-seconds to establish a Link and 60 for a request.
+| path    | query       | reply                              |
+|---------|-------------|------------------------------------|
+| `write` | write query | result code                        |
+| `read`  | read query  | result code, and the box when found |
+
+A query whose first byte disagrees with its path is answered INVALID_PAYLOAD. `peek` is replica
+to replica. Reference timeouts: 20 s to establish a Link, 60 s per request; an unanswered
+request is asked again later, not repeated at once.
 
 
 ## Boxes
 
-A box is a Box ID, a signature and a ciphertext, and a replica stores it because it verifies,
-not because of who brought it. The Box ID is 32 bytes, an Ed25519 public key. The signature is
-64 bytes, over the ciphertext, and verifies under the Box ID. How a client gets from a
-capability to those three is BACAP, under the context string `pigeonhole context`.
+BACAP under the context string `pigeonhole context`.
 
-A position in a stream is a MessageBoxIndex of 104 bytes: an 8 byte counter, a 32 byte
-blinding factor, a 32 byte encryption key and a 32 byte KDF state. A read capability is the
-stream's root public key, 32 bytes, followed by a position: 136 bytes. A write capability is the
-root private key, 64 bytes as seed then public key, followed by a position: 168 bytes. The
-position a capability carries is its first box, and each next position is derived from the one
-before it with the KDF, so whoever holds a capability can compute every later Box ID of the
-stream.
+|                                                                              | bytes         |
+|------------------------------------------------------------------------------|---------------|
+| Box ID: a blinded Ed25519 public key                                         | 32            |
+| signature: Ed25519 over the ciphertext, verifying under the Box ID           | 64            |
+| MessageBoxIndex: counter 8, blinding factor 32, encryption key 32, KDF state 32 | 104        |
+| read capability: root public key, MessageBoxIndex                            | 136           |
+| write capability: root private key as seed then public key, MessageBoxIndex  | 168           |
+| ciphertext                                                                   | box size + 20 |
 
-For the context string, the position's blinding factor and encryption key are each passed
-through the KDF with the string as salt. The Box ID is the root public key blinded by the derived
-factor. The ciphertext is AES-GCM-SIV under the derived key, with the first 12 bytes of the Box
-ID as nonce and the whole Box ID as associated data. The signature is made with the root private
-key blinded by the same factor.
+For the context string, the index's blinding factor and encryption key each go through
+HKDF-BLAKE2b-512 with the string as salt. Box ID = root public key blinded by the derived
+factor. Ciphertext = AES-GCM-SIV under the derived key, nonce the first 12 bytes of the Box ID,
+the Box ID as associated data. Signature = root private key blinded by the derived factor, over
+the ciphertext. A capability's index is its first box; each next index derives from the one
+before it.
 
-The plaintext is padded before it is encrypted: a 4 byte length, the data, then zeros, to the
-box size plus 4 bytes. Every ciphertext is therefore the box size plus 20 bytes, and a replica
-refuses one of any other length. The box size is one number for a mesh. Where a bridge joins the
-mesh to a mixnet it equals the mixnet's plaintext payload length, since the same box must be
-storable on both. A client is told the box size with the mesh it joins.
+The box size is one number per mesh, equal to the mixnet's plaintext payload length where a
+bridge exists. A client is told it with the mesh.
 
 
-## Writing, reading and deleting
+## Writing, reading, deleting
 
-A client writes a box to its entry replica and is done when the reply says SUCCESS or
-ALREADY_EXISTS. Both mean the replica holds a box under that Box ID. A replica stores a Box ID
-once: a second write of the same bytes is SUCCESS, a write of different bytes is ALREADY_EXISTS
-and changes nothing. A writer refused that way knows the position is taken and goes on to the
-next.
+| action | send                            | outcome                                                                                                                       |
+|--------|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| write  | write query                     | SUCCESS or ALREADY_EXISTS: the replica holds a box under that ID. Same bytes: SUCCESS. Different bytes: ALREADY_EXISTS, nothing changes; use the next index. |
+| read   | read query                      | SUCCESS with the box: verify, open. NOT_FOUND: not written yet; poll with backoff, reference 2 s doubling to 60 s. TOMBSTONE: deleted. |
+| delete | write query, empty ciphertext   | replaces the box; a box never replaces a tombstone                                                                            |
 
-A client reads a box by its Box ID. SUCCESS carries the signature and ciphertext, which the
-client verifies and opens. NOT_FOUND means not yet: the box a mesh client waits for, the next in
-a stream it follows, usually does not exist yet, and the client polls with a backoff. The
-reference client starts at 2 seconds and doubles to a minute. Whether the replica found the box
-in its own store, on another replica or on the mixnet through a bridge, the client cannot tell
-and does not need to.
-
-A tombstone is a write with an empty ciphertext. It replaces the box under that Box ID, a box
-never replaces a tombstone, and a read of it answers TOMBSTONE and nothing else. A client that
-has seen a tombstone treats the box as deleted from then on, and may answer its own later reads
-of that Box ID without asking, since another replica may hold the box until the tombstone
-reaches it.
+A client that has seen a tombstone treats that Box ID as deleted from then on; other replicas
+may hold the box until the tombstone reaches them.
 
 
 ## Epochs
 
-The mesh carries no epoch. A protocol that keeps time in replica epochs, as the group chat does
-for retention and backfill, computes the Katzenpost replica epoch itself: seven days each,
-counted from 1496275200 in Unix time. Replicas keep boxes for the current and the previous
-epoch, and a bridged box falls in the same epoch on both networks.
+The mesh carries no epoch. Replica epoch = ⌊(now − 1496275200) / 604800⌋, Unix seconds.
+Replicas keep the current and the previous epoch.
 
 
-## Open and closed meshes
+## Closed meshes
 
-On an open mesh the Link is the only encryption around a query, and anyone may announce a
-replica. On a closed mesh the same query and reply bytes travel inside the Noise session that
-[Pigeonhole over Reticulum](/docs/specs/reticulum/) specifies, to a replica whose key is on the
-list the client was given with the mesh. Nothing else in this document changes between the two.
+The same queries and replies, inside the Noise session of Pigeonhole replicas over Reticulum,
+to a replica on the key list the client was given.
 
 
 ## Encoding
@@ -169,7 +145,7 @@ The ciphertext is that plaintext encrypted, with a 16 byte tag: the box size plu
 ### Announce
 
 The application data of a replica's announce is one byte: 0, or 1 for a bridge. On a closed
-mesh the replica's hybrid key follows it, as Pigeonhole over Reticulum specifies.
+mesh the replica's hybrid key follows it, as Pigeonhole replicas over Reticulum specifies.
 
 ### Vectors
 
