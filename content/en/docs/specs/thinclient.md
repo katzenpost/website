@@ -13,6 +13,13 @@ weight: "60"
 version: ""
 ---
 
+{{% pageinfo %}}
+For the application, kpclientd and gateway arrangement, see
+[client software and configuration](/docs/specs/dirauth#28-client-software-and-configuration).
+kpclientd verifies consensus documents using the
+[directory authority protocol](/docs/specs/dirauth#222-wire-protocol).
+{{% /pageinfo %}}
+
 <div class="section">
 
 <div class="titlepage">

@@ -13,6 +13,13 @@ weight: "90"
 version: ""
 ---
 
+{{% pageinfo %}}
+For the v0.0.107 directory protocol, begin with the
+[directory overview](/docs/specs/dirauth#the-current-post-quantum-design).
+Its [roles](/docs/specs/dirauth#24-roles-keys-and-schemes) and
+[epoch definition](/docs/specs/dirauth#29-time) supply the directory-specific context.
+{{% /pageinfo %}}
+
 <div class="section">
 
 <div class="titlepage">
@@ -32,6 +39,17 @@ version: ""
 </div>
 
 <div class="variablelist">
+
+<span id="kem" class="term"><span class="bold">**KEM**</span></span><br />
+Key encapsulation mechanism. See the [wire KEM interface](/docs/specs/wireprotocol#key-encapsulation-mechanism)
+and [KEM Sphinx](/docs/specs/kemsphinx#kemsphinx_introduction).
+
+<span id="nike" class="term"><span class="bold">**NIKE**</span></span><br />
+Non-interactive key exchange. A party combines its private key with another party's
+public key to derive a shared secret. See
+[Sphinx cryptographic primitives](/docs/specs/sphinx#cryptographic-primitives) and
+[directory scheme selection](/docs/specs/dirauth#24-roles-keys-and-schemes).
+
 
 <span class="term"><span class="bold">**BlockSphinxPlaintext**</span></span>  
 The payload structure that is encapsulated by the Sphinx body.
@@ -53,7 +71,8 @@ A client is not considered a node in the
 network for purposes of analysis of the core mnixnet protocols.
 
 <span class="term"><span class="bold">**directory authority system**</span></span>  
-Refers to PKI schemes used by Mixminion and Tor.
+The fixed authorities that publish a signed network directory. See the
+[Katzenpost directory authority protocol](/docs/specs/dirauth).
 
 <span class="term"><span class="bold">**entry mix, entry node**</span></span>  
 A mix node that has some additional features:
@@ -72,12 +91,9 @@ A mix node that has some additional features:
 </div>
 
 <span class="term"><span class="bold">**epoch**</span></span>  
-A fixed-time interval with a current default value of 20 minutes.
-A new PKI document containing public key material
-is published for each epoch and is valid only for that epoch. For more information,
-see
-<a href="https://katzenpost.network/docs/specs/mix_network/#sphinx-mix-and-provider-key-rotation" class="link" target="_top">Sphinx
-mix and provider key rotation</a>.
+A configured time interval, 20 minutes by default, for which authorities publish a
+consensus document. See [directory epochs](/docs/specs/dirauth#29-time) and
+[document retention](/docs/specs/dirauth#211-clocks-and-retention).
 
 <span class="term"><span class="bold">**family**</span></span>  
 Identifier of security domains or entities operating one or more mix nodes in

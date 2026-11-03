@@ -1,0 +1,105 @@
+; Katzenpost v0.0.107: wire data shapes, not the complete validation policy.
+; Canonical encoding, signatures, role/epoch checks and key sizes follow the spec.
+; First rule accepts any top-level directory object. Tests select specific roots.
+directory-object = certificate / signed-upload / signed-replica-upload /
+                   document / mix-descriptor / replica-descriptor / geometry / parameters
+
+hash32 = bstr .size 32
+uint64 = uint .le 18446744073709551615
+uint8 = uint .le 255
+signature = { "PublicKeySum256": hash32, "Payload": bstr }
+certificate = {
+  "Version": 0,
+  "Expiration": uint64,
+  "KeyType": tstr,
+  "Certified": bstr,
+  "Signatures": { * hash32 => signature }
+}
+
+signed-upload = {
+  "Signature": signature / nil,
+  "MixDescriptor": bstr .cbor mix-descriptor,
+  "LoopStats": loop-stats / nil
+}
+signed-replica-upload = {
+  "Signature": signature / nil,
+  "ReplicaDescriptor": replica-descriptor
+}
+loop-stats = {
+  "MixIdentityHash": hash32 / nil,
+  "Epoch": uint64,
+  "SegmentRatios": { * (bstr .size 64) => float } / nil
+}
+
+; Semantic checks select a role, parse scheme-specific keys and check key epochs.
+addresses = { + tstr => [ + tstr ] }
+kaetzchen = { * tstr => { * tstr => any } } / nil
+quic-hashes = bstr .size 32 / bstr .size 64 / bstr .size 96
+mix-descriptor = {
+  "Name": tstr .size (1..32),
+  "Epoch": uint64,
+  "IdentityKey": bstr,
+  "LinkKey": bstr,
+  "MixKeys": { + uint64 => bstr },
+  "Addresses": addresses,
+  "Kaetzchen": kaetzchen,
+  "KaetzchenAdvertizedData": kaetzchen,
+  "IsGatewayNode": bool,
+  "IsServiceNode": bool,
+  "LoadWeight": uint8,
+  "AuthenticationType": tstr,
+  "Version": tstr,
+  ? "SoftwareVersion": tstr .size (1..128),
+  ? "ContactInfo": tstr .size (1..256),
+  ? "QUICKeyHash": quic-hashes
+}
+replica-descriptor = {
+  "Name": tstr .size (1..32),
+  "Epoch": uint64,
+  "IdentityKey": bstr,
+  "LinkKey": bstr,
+  "EnvelopeKeys": { + uint64 => bstr },
+  "Addresses": addresses,
+  "ReplicaID": uint8,
+  ? "SoftwareVersion": tstr .size (1..128),
+  ? "ContactInfo": tstr .size (1..256),
+  ? "QUICKeyHash": quic-hashes
+}
+
+document = {
+  "Epoch": uint64,
+  "GenesisEpoch": uint64,
+  "Mu": float, "LambdaP": float, "LambdaL": float,
+  "LambdaM": float, "LambdaR": float, "LambdaG": float,
+  "Topology": [ * ([ * (bstr .cbor mix-descriptor) ] / nil) ],
+  "GatewayNodes": [ * (bstr .cbor mix-descriptor) ],
+  "ServiceNodes": [ * (bstr .cbor mix-descriptor) ],
+  "StorageReplicas": [ * replica-descriptor ],
+  ? "ConfiguredReplicaIDs": bstr .size (1..18446744073709551615),
+  ? "ConfiguredReplicaIdentityKeys": [ + bstr ],
+  "SharedRandomCommit": { * hash32 => (bstr .cbor certificate) } / nil,
+  "SharedRandomReveal": { * hash32 => (bstr .cbor certificate) } / nil,
+  "SharedRandomValue": hash32,
+  "PriorSharedRandom": [ * bstr ],
+  "SphinxGeometryHash": hash32,
+  "Version": "v1",
+  "PKISignatureScheme": tstr,
+  ? "MinClientVersion": tstr .size (1..32),
+  ? "ClientNotice": tstr .size (1..512)
+}
+
+parameters = {
+  "Mu": float, "LambdaP": float, "LambdaL": float,
+  "LambdaM": float, "LambdaR": float
+}
+
+; Geometry fields are signed Go integers; validation checks their relationships.
+geometry = {
+  "PacketLength": int, "NrHops": int, "HeaderLength": int,
+  "RoutingInfoLength": int, "PerHopRoutingInfoLength": int,
+  "SURBLength": int, "SphinxPlaintextHeaderLength": int,
+  "PayloadTagLength": int, "ForwardPayloadLength": int,
+  "UserForwardPayloadLength": int, "NextNodeHopLength": int,
+  "SPRPKeyMaterialLength": int,
+  "NIKEName": tstr, "KEMName": tstr
+}
