@@ -286,9 +286,7 @@ The [authentication payload profile](#authentication-payload-profile) defines th
 The receiver MUST authenticate the remote static link key and additional data under the [peer's role](#authentication-payload-profile).
 If authentication fails, the receiver MUST terminate the session immediately.
 
-Responders MAY add a slight amount (+- 10 seconds) of random noise to the
-`unix_time` value to avoid leaking precise load information via
-packet queueing delay.
+The responder sends its current time in whole seconds as `unix_time`.
 
 </div>
 
@@ -759,7 +757,7 @@ Use the symmetric operations from [Noise revision 34](https://noiseprotocol.org/
 Noise_pqXX_Kyber768-X25519_ChaChaPoly_BLAKE2b
 ```
 
-There are no pre-messages or pre-shared keys. Both peers have a static link KEM key pair. An anonymous fetcher generates a fresh link key pair for its connection. The initiator also generates a fresh ephemeral KEM key pair for token `e`. Each KEM encapsulation uses fresh randomness.
+There are no pre-messages or pre-shared keys. Both peers have a static link KEM key pair. An anonymous fetcher generates one fresh link key pair per fetch and uses it for every authority connection of that fetch. The initiator also generates a fresh ephemeral KEM key pair for token `e`. Each KEM encapsulation uses fresh randomness.
 
 Initialize `h` to the protocol name followed by 19 zero bytes. Copy this value to `ck`. Start with no cipher key and nonce zero. Then set `h = H512(h || 0x03)`.
 
@@ -840,7 +838,7 @@ Senders MUST set the padding to zero. The v0.0.107 receiver extracts the length,
 | --- | --- | --- |
 | Authority responder | 32 raw identity-hash bytes | Its static Noise key is its configured link public key. |
 | Authority or node uploading to an authority | 32 raw identity-hash bytes | The identity hash selects the configured peer. Authority peers also require the pinned link key. Node uploads bind the descriptor link key to this session. |
-| Anonymous direct directory fetcher | Empty AD | Use a fresh link key pair. The authority grants the anonymous fetch role. |
+| Anonymous direct directory fetcher | Empty AD | Use one fresh link key pair per fetch. The authority grants the anonymous fetch role. |
 | Client daemon connecting to a gateway | 32 lowercase ASCII hexadecimal bytes | Encode 16 fresh random bytes as two hex characters per byte. This is the gateway queue identifier. It is not a raw identity hash. |
 
 </div>

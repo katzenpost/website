@@ -311,7 +311,7 @@ It does not test finiteness ([defaults and validation](https://github.com/katzen
 
 The consensus stores the network description in one signed body. Votes and voting certificates use the same document structure.
 
-The [Document structure](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/document.go#L88-L175)
+The [Document structure](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/document.go#L88-L183)
 defines the [signed fields](#document-field-reference).
 [Document validation](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/document.go#L552-L710)
 verifies them in votes, voting certificates, and the consensus.
@@ -362,7 +362,7 @@ A certificate envelope holds data and the signatures that authenticate it. Sever
 The envelope separates the payload from its signatures. Authorities can add signatures without changing the payload.
 
 A [certificate envelope](/docs/specs/certificate#document-format) holds a payload and its signatures.
-The [implementation](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/cert/cert.go#L61-L99) defines five fields:
+The [implementation](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/cert/cert.go#L103-L127) defines five fields:
 
 - Version, a uint32 that is 0
 - Expiration, an epoch
@@ -959,7 +959,7 @@ with the consensus status code below
 ([gateway handler](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/incoming/incoming_conn.go#L491-L549)).
 
 The client MUST verify [chunk order, totals, and sizes](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/chunking.go#L18-L132) before it decompresses the envelope.
-It MUST verify the [authority signature threshold, requested epoch, and local geometry](https://github.com/katzenpost/katzenpost/blob/v0.0.107/client/connection.go#L689-L735) before using the consensus.
+It MUST verify the [authority signature threshold, requested epoch, and local geometry](https://github.com/katzenpost/katzenpost/blob/v0.0.107/client/pki.go#L455-L524) before using the consensus.
 Chunks carry one document. Gateway commands have separate padding and size bounds from [direct authority sessions](#receive-size-ceiling).
 
 The direct authority fetcher also calls IsDocumentWellFormed before accepting a consensus
@@ -1876,7 +1876,7 @@ Authorities [tally votes](#216-phase_cert-phase_sig-tabulation) for descriptors 
 | R-16-3 | authority / Phase_CERT, Phase_SIG | <span id="r-16-3"></span>An authority MUST adopt a parameter set only with at least threshold votes. It groups the votes by the canonical CBOR map {Mu, LambdaP, LambdaL, LambdaM, LambdaR}, with keys in canonical order and floats as in [R-6-3](#r-6-3). Two sets group together if and only if each rate is bit-identical to its counterpart, or both of that pair are NaN. |
 | R-16-4 | authority / Phase_CERT, Phase_SIG | <span id="r-16-4"></span>dissenters MUST be `floor(A/2)-1`, and it MUST NOT decide any output. An authority logs a parameter set that has fewer than threshold votes and at least dissenters votes. |
 | R-16-5 | authority / Phase_CERT, Phase_SIG | <span id="r-16-5"></span>An authority MUST sort included nodes and replicas by identity-key hash. |
-| R-16-6 | authority / at startup, on reload, on sign | <span id="r-16-6"></span>`Layers` defaults to 3 and `MinNodesPerLayer` defaults to 2. An authority MUST [reject `Layers` above 3](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/config/config.go#L43-L44). At startup and reload, the allow-lists MUST contain at least `Layers * MinNodesPerLayer` mixes, one gateway, and one service node. A fixed topology MUST contain at least `MinNodesPerLayer` mixes per layer. At signing, a topology MUST have non-empty layers, a gateway, and a service node. It does not require `MinNodesPerLayer`. |
+| R-16-6 | authority / at startup, on reload, on sign | <span id="r-16-6"></span>`Layers` defaults to 3 and `MinNodesPerLayer` defaults to 2. An authority MUST [reject `Layers` above 3](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/config/config.go#L181-L187). At startup and reload, the allow-lists MUST contain at least `Layers * MinNodesPerLayer` mixes, one gateway, and one service node. A fixed topology MUST contain at least `MinNodesPerLayer` mixes per layer. At signing, a topology MUST have non-empty layers, a gateway, and a service node. It does not require `MinNodesPerLayer`. |
 | R-16-7 | authority / Phase_SIG, on sign | <span id="r-16-7"></span>An authority MUST refuse to sign a document that is not well formed. |
 | R-16-8 | authority / on document construction | <span id="r-16-8"></span>Each authority MUST derive LambdaG from its configured topology, gateway count, and rates using [gateway rate arithmetic](#gateway-rate-arithmetic). This value is outside the voted parameter key. With gateways present, the tagged document builder requires a fixed topology. |
 
@@ -2011,7 +2011,7 @@ Peers authenticate [QUIC endpoints](#224-quic-transport) with pinned keys.
 | R-24-1 | node, authority / Phase_DESC, on upload | <span id="r-24-1"></span>A descriptor MAY carry QUICKeyHash, a concatenation of zero to three 32-byte hashes. A descriptor omits it when empty, so a TCP-only descriptor does not change. An authority MUST answer DescriptorInvalid to any other length. It verifies the length at upload only, after the link-key verification of [R-23-6](#r-23-6) and before authorization. [R-5-11](#r-5-11) does not remove the field. |
 | R-24-2 | node, authority / at startup | <span id="r-24-2"></span>A QUIC listener's TLS key MUST be an Ed25519 key from a random seed kept on disk, and QUICKeyHash MUST be SHA-256 of its SubjectPublicKeyInfo. |
 | R-24-3 | any party / on dial | <span id="r-24-3"></span>A dialer MUST NOT dial a QUIC address of a peer for which it holds no QUIC key hash. It MUST abort a QUIC connection whose certificate SubjectPublicKeyInfo hash matches none of the hashes it holds. It MUST compare them in constant time. |
-| R-24-4 | authority / at startup, on dial | <span id="r-24-4"></span>An authority entry MAY carry one 32-byte QUICKeyHash, written in hex. A dialer MUST pin it, and MUST NOT dial that authority over QUIC without it. An authority whose own entry carries one MUST refuse to start unless its QUIC key file exists and matches it. |
+| R-24-4 | authority / at startup, on dial | <span id="r-24-4"></span>An authority entry MAY carry one 32-byte QUICKeyHash, written in hex. A dialer MUST pin it, and MUST NOT dial that authority over QUIC without it. An authority that listens on QUIC and whose own entry carries one MUST refuse to start unless its QUIC key file exists and matches it. |
 | R-24-5 | gateway node, authority / on build, at startup | <span id="r-24-5"></span>For common TCP reachability, a gateway MUST advertise a tcp4 or tcp6 map entry with a tcp:// URL. An authority MUST configure tcp:// in its [Server] Addresses and own [[Authorities]] entry. Authority listeners support tcp:// and quic:// only. Gateways MAY advertise onion endpoints for clients. An authority warns about a QUIC gateway descriptor without a TCP or onion alternative. The authority PKI client randomizes addresses, while inter-authority sends use filtered configuration order ([client](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/client/client.go#L328-L333), [peer sends](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/peer_conns.go#L144-L171)). |
 | R-24-6 | node, authority / at startup | <span id="r-24-6"></span>A QUIC listener's stateless reset key MUST derive from its identity private key through HKDF-SHA256. The derivation MUST use no salt and the label "katzenpost quic stateless reset". This preserves reset-key continuity across restarts. |
 | R-24-7 | any party / every connection | <span id="r-24-7"></span>A QUIC connection MUST carry one stream: a listener MUST allow one incoming stream and a dialer none, and a second stream MUST be refused. |
@@ -2119,7 +2119,7 @@ The reference uses `github.com/fxamacker/cbor/v2` v2.9.1 with `DecOptions{}` for
 
 </div>
 
-These settings follow the [decoder options](https://github.com/fxamacker/cbor/blob/v2.9.1/decode.go#L752), [struct field rules](https://github.com/fxamacker/cbor/blob/v2.9.1/decode_map_utils.go#L17), [map decoding](https://github.com/fxamacker/cbor/blob/v2.9.1/decode.go#L2478), [byte conversion](https://github.com/fxamacker/cbor/blob/v2.9.1/decode.go#L3163), and [structural conditions](https://github.com/fxamacker/cbor/blob/v2.9.1/valid.go#L87). The limits apply again when the receiver decodes an embedded byte string as another CBOR object. They do not impose a combined nesting limit across separate decodes of an envelope, its certified payload, and an embedded descriptor.
+These settings follow the [decoder options](https://github.com/fxamacker/cbor/blob/v2.9.1/decode.go#L773), [struct field rules](https://github.com/fxamacker/cbor/blob/v2.9.1/decode_map_utils.go#L17), [map decoding](https://github.com/fxamacker/cbor/blob/v2.9.1/decode.go#L2478), [byte conversion](https://github.com/fxamacker/cbor/blob/v2.9.1/decode.go#L3163), and [structural conditions](https://github.com/fxamacker/cbor/blob/v2.9.1/valid.go#L87). The limits apply again when the receiver decodes an embedded byte string as another CBOR object. They do not impose a combined nesting limit across separate decodes of an envelope, its certified payload, and an embedded descriptor.
 
 The producer encodes a `MixDescriptor` as a byte string containing its CBOR map. The receiver invokes `MixDescriptor.UnmarshalBinary` on that byte string. The default decoder also accepts a direct CBOR map for this destination type. A `ReplicaDescriptor` has no `UnmarshalBinary` method and uses a direct map. Its `Unmarshal` method does not give it the byte-string conversion used for a mix descriptor. [Descriptor methods](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor.go#L102), [replica methods](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor.go#L299).
 
@@ -2250,7 +2250,7 @@ AddressShape(URL, isGateway, allowOnion):
 
 The URL syntax is that of Go `net/url.Parse`, and host-port splitting is that of `net.SplitHostPort`. This is a syntax rule. It does not require a nonempty host, a numeric nonempty port, a particular address family, or equality between the address-map key and the URL scheme. The onion branch omits host-port validation. Additional URL components are not rejected by this validator. [Address validation](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor.go#L207).
 
-`MixShape` permits missing or empty future key values when their epoch lies in the permitted window. It does not require a consecutive set of three keys. It does not verify `d.Epoch`, `d.Version`, key lengths, or key decoding. A service can have nil or empty `Kaetzchen`, and multiple capabilities can use the same endpoint. Other capability parameters and `KaetzchenAdvertizedData` have no additional shape validation here. `ReplicaShape` does not use its epoch argument, does not verify envelope-key epochs, and does not verify `ReplicaID` against configuration. A replica descriptor has no `Version` field. [Mix validation](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor.go#L131), [replica validation](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor.go#L268).
+`MixShape` permits missing or empty future key values when their epoch lies in the permitted window. It does not require a consecutive set of three keys. It does not verify `d.Epoch`, `d.Version`, key lengths, or key decoding. A service can have nil or empty `Kaetzchen`, and multiple capabilities can use the same endpoint. Other capability parameters and `KaetzchenAdvertizedData` have no additional shape validation here. `ReplicaShape` does not use its epoch argument, does not verify envelope-key epochs, and does not verify `ReplicaID` against configuration. A replica descriptor has no `Version` field. [Mix validation](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor.go#L131), [replica validation](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor.go#L319).
 
 ### Live descriptor uploads {#upload-validation}
 
@@ -2556,7 +2556,7 @@ Other rounds preserve history. This update precedes tallying and final document 
 It changes stored state even if a later construction condition fails.
 
 The [tagged constructors](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/state.go#L480-L731) and
-[common builder](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/state.go#L798-L895) implement these steps.
+[common builder](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/state.go#L802-L905) implement these steps.
 
 ### Ordered reconciliation {#ordered-reconciliation}
 
@@ -2688,6 +2688,7 @@ Otherwise, evaluate `(((n * n) * Log(n)) * Mu) / g` from left to right.
 Convert n and g to binary64 first. Mu, LambdaP, and LambdaL are binary64 configuration values.
 
 Round every arithmetic operation to binary64 with nearest-even rounding. Do not fuse multiply-add operations.
+The recorded bit patterns come from separate multiply and add operations. Go can emit fused multiply-add on arm64. On such a platform, evaluate each product and sum separately.
 Parentheses fix evaluation order. The logarithm constants are binary64 bit patterns.
 
 <div class="key-value-table">

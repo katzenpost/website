@@ -367,7 +367,7 @@ The [signature scheme definition](https://github.com/katzenpost/hpqc/blob/v0.0.9
 
 The public PEM label is `ED25519 SPHINCS+ PUBLIC KEY`. The private PEM label is `ED25519 SPHINCS+ PRIVATE KEY`. A PEM payload is the base64 encoding of the corresponding raw key. There are no PEM headers or ASN.1 fields.
 
-The signature private payload is `Ed25519_seed[32] || Ed25519_public[32] || SPHINCS_secret[128]`. This encoding permits import of reference key files. An implementation can use its own internal storage format. The [PEM codec](https://github.com/katzenpost/hpqc/blob/v0.0.93/sign/pem/pem.go#L21-L34) wraps the [raw private bytes](https://github.com/katzenpost/hpqc/blob/v0.0.93/sign/hybrid/hybrid.go#L207-L216).
+The signature private payload is `Ed25519_seed[32] || Ed25519_public[32] || SPHINCS_secret[128]`. This encoding permits import of reference key files. An implementation can use its own internal storage format. The [PEM codec](https://github.com/katzenpost/hpqc/blob/v0.0.93/sign/pem/pem.go#L99-L113) wraps the [raw private bytes](https://github.com/katzenpost/hpqc/blob/v0.0.93/sign/hybrid/hybrid.go#L207-L216).
 
 ### Signature algorithm
 

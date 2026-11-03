@@ -8,7 +8,7 @@ authority-command = noop / get-consensus / consensus / post-descriptor /
                     post-replica-descriptor / descriptor-status /
                     replica-descriptor-status / vote / reveal / cert / sig /
                     vote-status / reveal-status / cert-status / sig-status
-gateway-command = get-consensus2 / consensus2
+gateway-command = get-consensus / consensus / get-consensus2 / consensus2
 
 noop = %x00 zero %x00.00.00.00
 get-consensus = %x12 zero %x00.00.00.08 epoch

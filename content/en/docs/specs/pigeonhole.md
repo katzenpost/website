@@ -504,7 +504,7 @@ The maximum plaintext BACAP payload a single box can carry is derived
 subtracting every layer of framing and cryptographic overhead that sits between the
 Sphinx
 payload and the BACAP plaintext. The authoritative calculation is performed by
-`NewGeometryFromSphinx` in <a href="https://github.com/katzenpost/katzenpost/blob/v0.0.107/pigeonhole/geo/geometry_impl.go#L73-L117" class="link" target="_top"><code class="code">pigeonhole/geo/geometry.go</code></a>.
+`NewGeometryFromSphinx` in <a href="https://github.com/katzenpost/katzenpost/blob/v0.0.107/pigeonhole/geo/geometry_impl.go#L73-L117" class="link" target="_top"><code class="code">pigeonhole/geo/geometry_impl.go</code></a>.
 
 Informally:
 
