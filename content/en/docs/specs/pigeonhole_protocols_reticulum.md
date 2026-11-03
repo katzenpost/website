@@ -13,6 +13,8 @@ weight: "999"
 version: ""
 ---
 
+## Pigeonhole protocols over Reticulum
+
 **Abstract**
 
 A client on a Reticulum mesh reads and writes Pigeonhole boxes through one replica it can

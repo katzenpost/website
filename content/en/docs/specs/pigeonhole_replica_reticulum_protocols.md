@@ -13,6 +13,8 @@ weight: "999"
 version: ""
 ---
 
+## Pigeonhole replicas over Reticulum
+
 **Abstract**
 
 Pigeonhole storage replicas on a Reticulum mesh give Reticulum users a durable, asynchronous
