@@ -51,7 +51,10 @@ The protocol's rules, rosters, acknowledgements, backfill, numbering and rewrite
 [Contact voucher specification](/docs/specs/contactvoucher/).
 
 This document gives version 4 of the wire format. Readers accept version 3 as well, whose
-encodings are at the end; a writer emits version 4.
+encodings are at the end. A client has one setting, the wire version it writes, 3 or 4 (default
+4): it chooses the encoding of the messages and ReplyWho the client writes and the voucher form
+it mints. Answering someone else's voucher always follows that voucher's form. A group can mix
+members writing either version.
 
 
 ## Model
@@ -87,6 +90,7 @@ encodings are at the end; a writer emits version 4.
 | voucher stream | a write capability generated from SHAKE256(voucher): Ed25519 seed 32 bytes, KDF state 32, counter 16 |
 | box 0          | the VoucherPayload, at the stream's first index                                   |
 | boxes 1 on     | the sealed VoucherReply, framed, from the next index                              |
+| forms          | compact, minted under wire version 4; long, the version 3 form, minted under 3     |
 | seal           | sealed box over the hybrid NIKE X25519 then CTIDH1024, `CTIDH1024-X25519`         |
 | salt           | 32 bytes                                                                          |
 

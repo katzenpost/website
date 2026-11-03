@@ -27,7 +27,7 @@ what it sends and receives. Replicas, placement and bridges are in
 |                           |                                                                        |
 |---------------------------|------------------------------------------------------------------------|
 | destination               | application name `pigeonhole`, aspect `replica`, single                |
-| announce application data | 1 byte: 0, or 1 for a bridge to a mixnet                               |
+| announce application data | 1 byte of flags: bit 0 a bridge to a mixnet, bit 1 serves channel mode |
 | identity                  | the first heard for a destination; a later one for it is ignored       |
 | entry replica             | any announced replica with a path, the fewest hops by preference       |
 
@@ -37,8 +37,11 @@ from the mixnet through a bridge; the client does none of that.
 
 ## Requests
 
-A query is a Link request to the replica's destination. One Link per replica, one request at a
-time on it, reopened when it closes; a request above the MTU travels as a Resource.
+A query reaches a replica over a Link to its destination, in one of two modes. One Link per
+replica, reopened when it closes. Both modes carry the same query and reply bytes.
+
+**Request mode**, every replica: the query is a Link request; a request above the MTU travels
+as a Resource. One request at a time per Link.
 
 | path    | query       | reply                              |
 |---------|-------------|------------------------------------|
@@ -48,6 +51,15 @@ time on it, reopened when it closes; a request above the MTU travels as a Resour
 A query whose first byte disagrees with its path is answered INVALID_PAYLOAD. `peek` is replica
 to replica. Reference timeouts: 20 s to establish a Link, 60 s per request; an unanswered
 request is asked again later, not repeated at once.
+
+**Channel mode**, replicas announcing bit 1: the query goes as Channel messages on the Link, for
+Reticulum stacks with Links and Channel but no requests or Resources. The query's first byte
+picks read or write. A query or reply larger than one Channel message is cut into pieces, each
+a frame with its own request id; the reply comes back with its query's request id. Pieces are
+sized from the Link at runtime: on a 500 byte link a Channel message holds 425 bytes, so a frame
+carries 421. A replica drops a request whose pieces do not all arrive within 60 s. Channel mode
+costs about 100 to 150 bytes more per query than request mode, mostly the proof every Channel
+packet gets.
 
 
 ## Boxes
@@ -161,10 +173,23 @@ The plaintext of a box is:
 
 The ciphertext is that plaintext encrypted, with a 16 byte tag: the box size plus 20 bytes.
 
+### Channel frames
+
+Each Channel message has MSGTYPE `0x5048` and carries one frame:
+
+* a 2 byte request id,
+* a 1 byte piece index, from 0,
+* a 1 byte piece count, 1 to 255,
+* the piece: the next slice of the query or reply.
+
+A frame whose count differs from earlier pieces of its request, or whose index is not below its
+count, is dropped with its request. Duplicate pieces are ignored.
+
 ### Announce
 
-The application data of a replica's announce is one byte: 0, or 1 for a bridge. On a closed
-mesh the replica's hybrid key follows it, as Pigeonhole replicas over Reticulum specifies.
+The application data of a replica's announce is one byte of flags: bit 0 set for a bridge, bit 1
+set when the replica serves channel mode. On a closed mesh the replica's hybrid key follows it,
+as Pigeonhole replicas over Reticulum specifies.
 
 ### Vectors
 
