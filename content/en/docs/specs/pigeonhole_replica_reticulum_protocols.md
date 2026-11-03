@@ -60,10 +60,11 @@ a mesh that lets anyone be a replica would hide it only from the observers who d
 announce one.
 
 They also differ in what it takes to run one. An open mesh needs nothing but a replica that
-announces. A closed mesh needs its operators to share a secret out of band before anything
-else, and that step, who holds the passphrase, how it reaches a new operator, how it changes
-when one leaves, is the hard part of running any such network and is not specified here. It
-is also what the closed mesh's post quantum guarantees rest on.
+announces. A closed mesh needs its operators to exchange their replicas' public keys out of
+band before anything else, and that step, how a new operator's key reaches everyone, how a
+key is removed when one leaves, who keeps the list straight, is the hard part of running any
+such network and is not specified here. It is also what the closed mesh's post quantum
+guarantees rest on.
 
 ### Open
 
@@ -85,29 +86,35 @@ What remains post quantum on an open mesh is what BACAP protects: contents and l
 
 ### Closed
 
-Operators who have agreed out of band put their replicas behind one of Reticulum's own
-boundaries: an interface passphrase, or a Network Identity on the interfaces that carry the
-mesh. Only a node admitted to that network can announce a replica or reach one. The replica
-set is now vetted, as it is on the mixnet, and the observers left are outsiders and anyone
-recording traffic for a quantum computer later. This is the mixnet's arrangement in
-Reticulum's idiom: the vetting the mixnet does through directory authorities, the closed mesh
-does through a shared passphrase.
+A closed mesh is a list of replica keys. Each replica has a long term hybrid NIKE key pair,
+X25519 combined with CTIDH1024, and its operators exchange the public halves out of band, by
+whatever means they already have to recognise each other: in person, over a channel they
+share, or signed by keys they exchanged that way earlier. Every replica and bridge holds the
+list, and a client gets it from whoever gave it the mesh. The replica set is now vetted, as it
+is on the mixnet, and the observers left are outsiders and anyone recording traffic for a
+quantum computer later. This is the mixnet's arrangement in Reticulum's idiom: the vetting the
+mixnet does through directory authorities, the closed mesh does through that exchange.
 
-That secret is what admits a node. An announce that arrives through the boundary came from a
-node holding it, so the hybrid key it carries is accepted on that basis, not on the Ed25519
-that signs the announce. The passphrase is symmetric, so a quantum adversary gains nothing
-against it, and the chain from passphrase to session contains no post quantum signature and no
-classical link. A replica on a closed mesh has no interface outside the boundary; its
-announces, its placement and its handoffs never leave the mesh.
+The list is what admits a replica. Announces still carry a replica's key and make it
+reachable, but a node acts only on announces whose hybrid key is on its list: those replicas
+own boxes, receive handoffs and get sessions, and any other announce under the Pigeonhole
+application name is ignored. The Ed25519 that signs an announce proves nothing here, and
+nothing rests on it. The chain from the exchange to a session is a hybrid key handed over out
+of band and then proven by Diffie-Hellman, so it contains no post quantum signature and no
+classical link, and a quantum adversary who records the mesh gains nothing against it.
+Operators may also keep the mesh's interfaces off public networks, with Reticulum's interface
+passphrase or a Network Identity, so that announces, placement and handoffs are not seen from
+outside; that fence hides traffic but admits no one.
 
 Against those observers a closed mesh runs every query inside a Noise session, with the hybrid
 NIKE X25519 combined with CTIDH1024 as the Diffie-Hellman function, ChaCha20-Poly1305 and
 BLAKE2s. The replica's announce carries its long term hybrid NIKE public key, and that key is
 its identity: boxes are placed by hashing it, and sessions authenticate against it. Noise
 authenticates by Diffie-Hellman, so a replica proves it holds the private half of a hybrid
-key, and no post quantum signature is needed anywhere. Each node remembers the key it first
-saw for a destination and ignores an announce that changes it; a replica that wants a new key
-announces it as a new replica, and its boxes move through the handoff below.
+key, and no post quantum signature is needed anywhere. An announce that pairs a listed key
+with a new destination, or a listed destination with another key, is ignored; a replica that
+wants a new key is a new entry on the list, announced as a new replica, and its boxes move
+through the handoff below.
 
 A client speaks `Noise_NK` to a replica:
 
