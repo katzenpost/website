@@ -53,13 +53,20 @@ to replica. Reference timeouts: 20 s to establish a Link, 60 s per request; an u
 request is asked again later, not repeated at once.
 
 **Channel mode**, replicas announcing bit 1: the query goes as Channel messages on the Link, for
-Reticulum stacks with Links and Channel but no requests or Resources. The query's first byte
-picks read or write. A query or reply larger than one Channel message is cut into pieces, each
-a frame with its own request id; the reply comes back with its query's request id. Pieces are
-sized from the Link at runtime: on a 500 byte link a Channel message holds 425 bytes, so a frame
-carries 421. A replica drops a request whose pieces do not all arrive within 60 s. Channel mode
-costs about 100 to 150 bytes more per query than request mode, mostly the proof every Channel
-packet gets.
+Reticulum stacks with Links and Channel but no requests or Resources. A client uses it only with
+replicas that announce bit 1. The query's first byte picks read or write; any other is answered
+INVALID_PAYLOAD. `peek` stays request mode. A query or reply larger than one Channel message is
+cut into pieces, each a frame carrying the query's request id; the reply comes back with the same
+request id. A replica drops a request whose pieces do not all arrive within 60 s. Bytes on the
+air for one box of 1000 bytes, client sent / received:
+
+| link MTU | query | request mode | channel mode |
+|----------|-------|--------------|--------------|
+| 500      | write | 1484 / 297   | 1468 / 428   |
+| 500      | read  | 329 / 1436   | 480 / 1456   |
+
+Channel mode costs about 100 to 150 bytes more per query, mostly the proof every Channel packet
+gets.
 
 
 ## Boxes
@@ -182,8 +189,27 @@ Each Channel message has MSGTYPE `0x5048` and carries one frame:
 * a 1 byte piece count, 1 to 255,
 * the piece: the next slice of the query or reply.
 
-A frame whose count differs from earlier pieces of its request, or whose index is not below its
-count, is dropped with its request. Duplicate pieces are ignored.
+A frame whose count is 0 or differs from earlier pieces of its request, or whose index is not
+below its count, is dropped with its request. Duplicate pieces are ignored.
+
+Piece size is computed from the Link: link MDU = ⌊(MTU − 68) / 16⌋ × 16 − 1, Channel MDU = link
+MDU − 6, piece = Channel MDU − 4. At MTU 500 that is 431, 425 and 421 bytes, so a write of one
+1000 byte box takes three frames.
+
+### Channel messages
+
+A stack that is not RNS must match RNS's Channel on the wire:
+
+* each message is one Link packet with context `CHANNEL` (0x0E), its payload a 6 byte envelope,
+  MSGTYPE, sequence number and length, each 2 bytes, then the message;
+* sequence numbers wrap at 65536; messages are delivered in order, and out-of-order ones
+  buffered up to 48 ahead; duplicates and ones behind are dropped;
+* every Channel packet is acknowledged by the Link's packet proof, and a receiver must prove
+  each one, or the sender retries and then closes the Link;
+* the sender keeps at most its window of unproven packets in flight: 2 at first, one more per
+  delivery, one less per timeout;
+* a packet is resent with the same sequence number up to 5 tries, after
+  1.5^(tries − 1) × max(2.5 × RTT, 0.025 s) × (packets in flight + 1.5).
 
 ### Announce
 
