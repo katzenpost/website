@@ -231,24 +231,6 @@ One application we plan to build on top of Tally is a meeting time scheduler: th
 proposes a set of time slots, and group members publish their availability for each one.
 Clients derive the current schedule by folding all availability events across the group's streams.
 
-## SituationRoom
-
-The SituationRoom protocol provides a decentralized coordination space for managing incidents or
-urgent operational problems within a group. When an incident occurs, a participant creates an
-incident object, and group members publish updates, tasks, and status messages to their own
-streams. Clients reconstruct the current incident state by folding all incident-related events,
-producing a shared view of the timeline, active tasks, and overall status.
-
-Participants may independently add observations, claim or update tasks, and report progress as
-the situation evolves. A final resolution message marks the end of the incident. Because
-resolution events go into a grow-only set, an incident cannot be accidentally un-resolved by
-a concurrent update — once sealed, it stays sealed.
-
-Because all events are append-only and replicated across participants, the system provides a
-durable but temporary record of the coordination process. The record naturally expires once the
-Pigeonhole retention window closes, which is appropriate for incident response — post-mortems
-belong in a permanent system, not here.
-
 ## Conclusion
 
 Pigeonhole is not just a messaging protocol. It is a substrate for a new class of
@@ -260,4 +242,4 @@ The design principle is simple but powerful: give every participant a cryptograp
 owned, single-writer stream, and let clients reconstruct shared state by folding events
 across those streams. Combined with CRDTs, this produces applications where convergence
 is guaranteed, conflicts resolve deterministically, and no central coordinator is ever needed.
-Tally and SituationRoom are two early examples of what becomes possible with this approach.
+Tally is an early example of what becomes possible with this approach.
