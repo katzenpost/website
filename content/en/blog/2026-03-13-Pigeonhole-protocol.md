@@ -55,8 +55,8 @@ ciphertexts within the channel.
 ## Inappropriate Use Cases
 
 - If you need real-time updates then this protocol might not work out so well for your
-use case given that our mixnet adds some latency. Although Pigeonhole protocol could
-in theory be used without a mixnet, we do not elaborate on that here.
+use case given that our mixnet adds some latency. Pigeonhole also runs over a Reticulum
+mesh, with lower latency and weaker metadata privacy; see below.
 
 - Use cases requiring the stored data to be permanent are also not
 appropriate here since the data within Pigeonhole channels is
@@ -81,6 +81,40 @@ for writing. The other group members have the read cap for everyone else's chann
 
 This means there is no global ordering for messages within the "broadcast channel".
 But there is per-author message ordering.
+
+We have written several chat clients that speak this group chat protocol,
+[katzenqt1](https://github.com/katzenpost/pigeonhole_protocols), so they all share groups:
+
+- [katzenqt](https://github.com/katzenpost/katzenqt): Qt desktop client
+- [hushphone](https://github.com/katzenpost/hushphone): Rust and Slint, push-to-talk voice messages, Linux and Android, over the mixnet or a Reticulum mesh
+- [jam](https://github.com/katzenpost/jam): Lean terminal client
+- [frank_chat](https://github.com/katzenpost/frank_chat): Lean 4 client with security oriented dependent types
+- [katzenrns](https://github.com/katzenpost/katzenrns): Python client for a Reticulum mesh
+- [pigeonhole_reticulous](https://github.com/katzenpost/pigeonhole_reticulous): group chat on the LilyGO T-Deck Plus, over a Reticulum mesh
+
+## Pigeonhole over Reticulum
+
+Pigeonhole also works over [Reticulum](https://reticulum.network) mesh networks. Here the
+storage replica is [replica_rns](https://github.com/katzenpost/pigeonhole_rns), a Reticulum
+node that stores BACAP boxes and replicates them to the other mesh replicas it hears. A mesh
+needs at least one of these replicas running. A replica can also act as a bridge to a
+Katzenpost storage replica, joining the mesh to the mixnet.
+
+The performance and privacy characteristics are different from the mixnet. On a local mesh
+latency is lower, and it works with no internet connection at all. But a mesh is not a mixnet:
+it offers no mixnet-grade metadata privacy, and an observer of the mesh can see who talks to
+which replica and when. BACAP still does its job; box contents are encrypted and only holders
+of a read capability can link boxes into a channel.
+
+The interesting part is where the integration happens. The Reticulum transport works at the
+BACAP Box level; it knows nothing of our chat protocol, it just moves boxes. That means ALL of
+our Pigeonhole based protocols come over to Reticulum for free. Any app written on Pigeonhole
+protocols can switch between the Katzenpost mixnet transport and a Reticulum transport, and
+through a bridge, mesh users and mixnet users share the same groups. We have tested exactly
+that: katzenrns users on a mesh chatting with hushphone users on the mixnet through
+the namenlos bridge.
+
+We also suspect that a mesh can link two mixnets together. We are testing that now.
 
 ## The Replicated State Machine Pattern
 
