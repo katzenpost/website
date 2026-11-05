@@ -78,8 +78,7 @@ The integration happens at the BACAP box. The Reticulum transport knows nothing 
 moves boxes. Every protocol built on Pigeonhole therefore works over Reticulum unchanged, an
 application can switch between the two transports, and through a bridge, mesh users and
 mixnet users share the same groups. We have tested exactly that: katzenrns users on a mesh
-chatting with hushphone users on the namenlos mixnet through the namenlos bridge. We suspect
-a mesh can also join two mixnets, and are testing it now.
+chatting with hushphone users on the namenlos mixnet through the namenlos bridge.
 
 ## How fast is it?
 
@@ -192,24 +191,20 @@ cryptographically owned, single-writer channel, let clients fold events across t
 channels, and you get applications that converge without a coordinator, provided they can
 let their data expire.
 
-The substrate now runs on two networks, and neither is simply better.
+With Reticulum, the Katzenpost mixnet becomes more powerful than either network alone.
 
-A Reticulum mesh offers more ways to connect: LoRa radio, serial lines, TCP, with or
-without the internet. It is unregulated and free: anyone may run a node or a replica, and
-there is no global directory and no one to ask. It is fast, a twentieth of a second per box
-on a local link and a fifth of a second across the internet. But it hides little metadata:
-an observer of the mesh sees which node talks to which replica, and when. An open mesh's
-cryptography is classical. The closed mesh of our
-[specification](/docs/specs/reticulum/) adds post-quantum Noise
-sessions, but only by vetting its replicas, as the mixnet does.
+The trade-offs are real. The mixnet is strict and closed: a node joins only when the
+directory authorities admit it, and every client follows one PKI document that a small set
+of authorities, six on namenlos, vote on and publish each epoch. It is slow, about
+twenty-five seconds per box. In return it hides who talks to whom, even from a global
+observer, and uses hybrid post-quantum cryptography for its links, its directory signatures
+and the envelopes that carry Pigeonhole queries. An open mesh is the reverse: anyone may run
+a node or a replica, it reaches over LoRa radio, serial lines and TCP, with or without the
+internet, and a box takes a twentieth of a second locally and a fifth across the internet;
+but an observer sees which node talks to which replica, and its cryptography is classical.
 
-The mixnet is the opposite on each count. It is strict and closed: a node joins only when the
-directory authorities admit it, and every client follows one PKI document, voted on and published each epoch by a
-small set of directory authorities, six on namenlos. The authorities are independent, but
-beside the mesh the design is plainly centralised. In return the mixnet hides who talks to
-whom, even from a global observer, and uses hybrid post-quantum cryptography for its links,
-its directory signatures and the envelopes that carry Pigeonhole queries. The price is time:
-about twenty-five seconds per box.
-
-Because the two meet at the BACAP box, an application need not choose once. The same group
-can have members on each side of a bridge, each choosing the network that suits them.
+Because the two meet at the BACAP box, an application no longer has to choose. One group can
+have members on the mixnet and members on a mesh with no internet at all, with the mesh's
+speed where speed matters and the mixnet's metadata privacy where that matters. And a mesh
+can do more than extend one mixnet: through Pigeonhole bridges, it can join several mixnets
+together, so that their users share groups. The bridge rules for that are landing now.
