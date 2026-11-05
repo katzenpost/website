@@ -108,8 +108,8 @@ application runs on either. On the mesh, the replica is
 | post-quantum | hybrid links, directory signatures and query envelopes; Sphinx packets use X25519 | no; Reticulum's links are classical |
 | replica storage | sharded, two replicas per box | every replica stores every box\* |
 
-\* Full replication is in [pigeonhole_rns PR #6](https://github.com/katzenpost/pigeonhole_rns/pull/6),
-now in review; sharding is kept for the future closed mesh of the
+\* Full replication came with [pigeonhole_rns PR #6](https://github.com/katzenpost/pigeonhole_rns/pull/6),
+now merged; sharding is kept for the future closed mesh of the
 [replica specification](/docs/specs/reticulum/).
 
 We timed bare box operations, with no chat client in the way: write three boxes to a fresh
