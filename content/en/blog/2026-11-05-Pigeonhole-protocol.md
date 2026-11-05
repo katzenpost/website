@@ -8,12 +8,14 @@ version: ""
 draft: false
 ---
 
-Pigeonhole is the storage protocol described in our paper,
-[Echomix: a Strong Anonymity System with Messaging](https://arxiv.org/abs/2501.02933).
-The paper and [Understanding Pigeonhole](/docs/pigeonhole_explained/) have the details.
-This post says what Pigeonhole is, what it is good for, and,
-now that it runs over Reticulum mesh networks as well as the Katzenpost mixnet, what each
-of the two networks gives and what it costs.
+Pigeonhole is a protocol for asynchronous, unlinkable communication. Without a read
+capability, no one can tell which messages belong together. Sender and reader need not be
+online at the same time, and that is the only reason Pigeonhole stores anything: messages
+wait on storage replicas for about a week, then are garbage-collected. Our paper,
+[Echomix: a Strong Anonymity System with Messaging](https://arxiv.org/abs/2501.02933), and
+[Understanding Pigeonhole](/docs/pigeonhole_explained/) have the details. This post says
+what Pigeonhole is, what it is good for, and, now that it runs over Reticulum mesh networks
+as well as the Katzenpost mixnet, what each of the two networks gives and what it costs.
 
 ## Channels made of boxes
 
@@ -24,14 +26,17 @@ and signed, so a channel is confidential and authentic.
 
 Channels are:
 
-- **unidirectional**: one writer, any number of readers;
+- **unidirectional**: one writer, any number of readers; two one-way channels make a two-way one;
 - **replicated** across storage replicas;
 - **ephemeral**: replicas discard boxes after at most two weeks.
 
-They are append-only and immutable, with two qualifications. A writer may compute an index
-further ahead and write there, skipping boxes; and a writer may overwrite a box with a
-tombstone to delete it. Post-compromise security is not built in; it comes from chaining
-channels. Two one-way channels make a two-way one.
+Boxes are immutable, with one exception: tombstones. The holder of the write capability can
+replace a box with a tombstone, an empty ciphertext with a valid signature over it, which
+deletes the box. That is a feature.
+
+Box indexes come from a KDF ratchet, which moves forward but not backward.
+
+Post-compromise security is not built in; it comes from chaining channels.
 
 ## What it is not for
 
