@@ -39,7 +39,7 @@
                 xlink:href="https://github.com/katzenpost/katzenpost/tree/main/authority"
                 >dirauth</link> and <link
                 xlink:href="https://github.com/katzenpost/katzenpost/tree/main/server"
-            >server</link>. Running the <command>dirauth </command>commmand runs a
+            >server</link>. Running the <command>dirauth </command>command runs a
                 <emphasis>directory authority</emphasis> node, or <emphasis>dirauth</emphasis>, that
             functions as part of the mixnet's public-key infrastructure (PKI). Running the
                 <command>server</command> runs either a <emphasis>mix</emphasis> node, a

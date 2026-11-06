@@ -1,0 +1,224 @@
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>title: linkTitle: Run a Katzenpost Mix server in a Docker
+  container description: &quot;&quot; categories: [&quot;&quot;] tags:
+  [&quot;&quot;] author: [] version: 0 draft: false slug:
+  &quot;/run_katzenpost_mixnode_docker/&quot;</title>
+  <para>
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Run a Katzenpost Mix server in a Docker container</title>
+  <section>
+    <title>Prerequisites</title>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>
+          Access to the <literal>namenlos</literal> git repo
+        </para>
+      </listitem>
+    </itemizedlist>
+  </section>
+  <section>
+    <title>Preparing the host filesystem</title>
+    <programlisting language="bash">
+mkdir katzenpost-mix
+cd katzenpost-mix
+mkdir {conf,data}
+chmod 700 data
+</programlisting>
+    <para>
+      All further actions are performed from the
+      <literal>katzenpost-mix</literal> directory.
+    </para>
+  </section>
+  <section>
+    <title>Building the Docker image</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Create <literal>Dockerfile</literal>:
+        </para>
+        <programlisting>
+FROM golang:bookworm AS builder
+
+LABEL authors=&quot;&lt;ops@cryptonymity.net&gt;&quot;
+
+RUN \
+    cd /go &amp;&amp; \
+    git clone https://github.com/katzenpost/katzenpost  &amp;&amp; \
+    cd katzenpost &amp;&amp; \
+    go mod tidy &amp;&amp; \
+    cd cmd/server &amp;&amp; go build
+
+FROM debian:bookworm AS deploy
+
+COPY --from=builder /go/katzenpost/cmd/server/server /usr/bin/server
+
+EXPOSE 8181
+
+ARG uid=1000
+ARG gid=1000
+
+RUN \
+    mkdir -p /home/user &amp;&amp; \
+    echo &quot;user:x:${uid}:${gid}:User,,,:/home/user:/bin/bash&quot; &gt;&gt; /etc/passwd &amp;&amp; \
+    echo &quot;user:x:${uid}:&quot; &gt;&gt; /etc/group
+
+USER user
+ENV HOME=/home/user
+
+ENTRYPOINT [&quot;/usr/bin/server&quot;,&quot;-f&quot;,&quot;/conf/katzenpost.toml&quot;]
+</programlisting>
+      </listitem>
+      <listitem>
+        <para>
+          Build Docker image:
+        </para>
+      </listitem>
+    </itemizedlist>
+    <programlisting language="bash">
+docker build -t katzenpost/mix --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
+</programlisting>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Create <literal>service.sh</literal> (modify to match your
+          port) to manage the server:
+        </para>
+        <programlisting language="bash">
+#!/bin/bash
+
+CMD=${1:-start}
+case ${CMD} in
+    genkeys)
+        MODE=&quot;-ti --rm&quot;
+        EXEC=&quot;/usr/bin/server -g&quot;
+        ;;
+    start)
+        MODE=&quot;-d --restart=unless-stopped&quot;
+        EXEC=&quot;&quot;
+        ;;
+    stop)
+        docker stop katzenpost-mix
+        docker rm katzenpost-mix
+        exit
+        ;;
+    *)
+        echo &quot;unknown command&quot;
+        exit 1
+        ;;
+esac
+
+docker run ${MODE} \
+    --name katzenpost-mix -h katzenpost-mix \
+    -p 0.0.0.0:&lt;port&gt;:8181 \
+    -v $(pwd)/conf:/conf \
+    -v $(pwd)/data:/var/lib/katzenpost \
+    katzenpost/mix ${EXEC}
+</programlisting>
+        <para>
+          Always run this script while in the
+          <literal>katzenpost-mix</literal> directory.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </section>
+  <section>
+    <title>Creating a configuration file</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Create a new file named
+          <literal>&lt;yourname&gt;-pq-mixserver.toml</literal> in
+          <literal>&lt;namenlos.repo&gt;/configs/SSOT/mixes</literal>
+          and adjust <literal>Identifier</literal> and IP/port setting
+          in <literal>Addresses</literal>:
+        </para>
+        <programlisting language="toml">
+[Server]
+Identifier = &quot;&lt;yourname&gt;&quot;
+PKISignatureScheme = &quot;Ed25519 Sphincs+&quot;
+WireKEM = &quot;KYBER768-X25519&quot;
+Addresses = [ &quot;tcp://&lt;public-ipv4&gt;:&lt;port&gt;&quot; ]
+BindAddresses = [ &quot;tcp://0.0.0.0:8181&quot; ]
+DataDir = &quot;/var/lib/katzenpost&quot;
+IsGatewayNode = false
+IsServiceNode = false
+
+[Logging]
+Disable = false
+File = &quot;&quot;
+Level = &quot;NOTICE&quot;
+</programlisting>
+      </listitem>
+      <listitem>
+        <para>
+          Build the configuration file
+          <literal>conf/katzenpost.toml</literal>:
+        </para>
+        <orderedlist numeration="arabic">
+          <listitem>
+            <para>
+              In the <literal>namenlos</literal> repo, change into the
+              <literal>configs</literal> directory and run
+              <literal>make</literal>.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              Copy the generated configuration file:
+            </para>
+          </listitem>
+        </orderedlist>
+        <programlisting>
+cp &lt;namelos.repo&gt;/configs/&lt;yourname&gt;-pq-mixserver.toml conf/katzenpost.toml
+</programlisting>
+      </listitem>
+    </itemizedlist>
+  </section>
+  <section>
+    <title>Generating and extracting keys</title>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>
+          Run the server to generate the keys:
+        </para>
+      </listitem>
+    </itemizedlist>
+    <programlisting>
+./service.sh genkeys
+</programlisting>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>
+          Check that keys (<literal>*.pem</literal>) have been created
+          in the <literal>data/</literal> directory and copy the public
+          identity key to the <literal>namenlos</literal> repo:
+        </para>
+      </listitem>
+    </itemizedlist>
+    <programlisting language="bash">
+cp data/identity.public.pem &lt;namelos.repo&gt;/keys/mixserver-keys/&lt;yourname&gt;_mix_id_pub_key.pem
+</programlisting>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>
+          Update the repo:
+        </para>
+      </listitem>
+    </itemizedlist>
+    <programlisting language="bash">
+cd &lt;namenlos.repo&gt;/configs
+make
+git commit -a
+git push
+</programlisting>
+  </section>
+  <section>
+    <title>Starting/stopping the server</title>
+    <programlisting language="bash">
+cd katzenpost-mix
+./service.sh [start|stop]
+</programlisting>
+  </section>
+</section>

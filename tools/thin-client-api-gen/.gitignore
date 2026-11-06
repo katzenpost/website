@@ -1,0 +1,10 @@
+# Build outputs
+extract-out/
+extract-rust/target/
+extract-rust/Cargo.lock
+
+# Local Python venv
+.venv/
+
+# Editor cruft
+*.swp

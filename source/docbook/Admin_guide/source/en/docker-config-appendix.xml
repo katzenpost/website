@@ -27,7 +27,7 @@
             mixnet</title> <!-- Match to title PI above. -->          
     </info>
         
-    <para>As an aid to adminstrators implementing a Katzenpost mixnet, this appendix provides
+    <para>As an aid to administrators implementing a Katzenpost mixnet, this appendix provides
         lightly edited examples of configuration files for each Katzenpost node type. These
         files are drawn from a built instance of the <link xlink:href="&baseURL;docs/admin_guide/docker.html">Docker test
         mixnet</link>. These code listings are meant to be used as a reference alongside the

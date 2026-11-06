@@ -20,7 +20,7 @@
                     
                     <listitem>
                         <para><emphasis role="bold">WireKEMScheme</emphasis></para>
-                        <para>Specifies the key encapsulation mechanism (KEM) scheme
+                        <para>Specifies the key-encapsulation mechanism (KEM) scheme
                             for the <link xlink:href="https://eprint.iacr.org/2022/539">PQ
                             Noise</link>-based wire protocol (link layer) that nodes use
                             to communicate with each other. PQ Noise is a post-quantum variation of
@@ -70,7 +70,7 @@
                     
                     <listitem>
                         <para><emphasis role="bold">WireKEM</emphasis></para>
-                        <para>WireKEM specifies the key encapsulation mechanism (KEM) scheme
+                        <para>WireKEM specifies the key-encapsulation mechanism (KEM) scheme
                             for the <link xlink:href="https://eprint.iacr.org/2022/539">PQ
                                 Noise</link>-based wire protocol (link layer) that nodes use
                             to communicate with each other. PQ Noise is a post-quantum variation of

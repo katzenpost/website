@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+
+<?title "" ?> <!-- Required ... copy section title here [https://gohugo.io/content-management/front-matter/#title] -->
+<?linkTitle "Thin client" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#linktitle] -->
+<?description "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#description] -->
+<?author "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#params] -->
+<?url "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#url] -->
+<?draft "false" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#draft] -->
+<?slug "thinclient" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#slug] -->
+<?layout "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#layout] -->
+<?type "" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#type] -->
+<?weight "60" ?> <!-- Optional [https://gohugo.io/content-management/front-matter/#weight] -->
+<?version "" ?> <!-- Optional [?] -->
+
+<!DOCTYPE section [
+    <!ENTITY % shared-content SYSTEM "/home/dwrob/git/website/source/docbook/shared-content.ent">
+        %shared-content;
+    <!ENTITY % references SYSTEM "/home/dwrob/git/website/source/docbook/references.ent">
+        %references;
+    <!ENTITY % terms SYSTEM "/home/dwrob/git/website/source/docbook/terms.ent">
+        %terms;    
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+  version="5.1" xml:id="thin_client">
+  <info>
+    <title xml:id="thin_client.title">Thin client specification</title>
+    
+    <authorgroup>
+    <author>
+      <personname>
+        <firstname>David</firstname>
+        <surname>Stainton</surname>
+      </personname>
+    </author>
+  </authorgroup> 
+    <abstract>
+      <para>This document describes the design of the new &program_name; mixnet <emphasis>thin
+      client</emphasis>. In particular we discuss its multiplexing and privilege-separation design
+      elements as well as the protocol used by the thin-client library.</para>
+    </abstract>   
+  </info>
+  <section xml:id="thin_client_intro" xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <info>
+      <title xml:id="thin_client_intro.title">Introduction</title>
+    </info>       
+    <para>A &program_name; mixnet client has several responsibilities at a minimum: </para>
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>composing Sphinx packets </para>
+      </listitem>
+      <listitem>
+        <para>decrypting SURB replies </para>
+      </listitem>
+      <listitem>
+        <para>sending and receiving Noise protocol messages </para>
+      </listitem>
+      <listitem>
+        <para>keeping up to date with the latest PKI document </para>
+      </listitem>
+    </itemizedlist>
+    <para>The thin-client library enables applications to talk with the connector daemon and in that
+      way interact with the mix network. The library itself does not do any mixnet-related
+      cryptography since that is already handled by the thin-client daemon. In particular, the
+      daemon strips cryptographic signatures from the PKI document before passing data to clients
+      using the connector library. Noise- and Sphinx-related cryptography are also handled by the
+      daemon. </para>
+  </section>
+  <section xml:id="library_daemon" xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <info>
+      <title xml:id="library_daemon.title">Thin-client library and daemon protocol </title>
+    </info>
+    <para>The thin-client daemon protocol uses a local network socket, either a Unix domain socket
+      or TCP. </para>
+    <section xml:id="messages"  xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <title xml:id="messages.title">Messages</title>
+      <para>There are two protocol message types, both CBOR encoded. </para>
+      <itemizedlist>
+        <listitem>
+          <para>The client sends <code>Request</code> messages.</para>
+        </listitem>
+        <listitem>
+          <para>The daemon sends <code>Response</code> messages. </para>
+        </listitem>
+      </itemizedlist>
+      <para>Messages are length-prefixed CBOR blobs, that is, a blob is prefixed with a big-endian
+        unsigned four-byte integer (uint32) that encodes the blob length. </para>
+    </section>
+    <section xml:id="protocol" xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <info>
+        <title xml:id="protocol.title">Protocol description</title>
+      </info>
+      <para>The protocol has two phases.</para>
+      <para><emphasis role="bold">Phase 1</emphasis></para>
+      <para>Upon connecting to the daemon socket, the thin client waits for two messages. </para>
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">First message </emphasis></para>
+          <itemizedlist>
+            <listitem>
+              <para>The <code>is_status</code> field must be set to <emphasis role="strong"
+                  >true</emphasis></para>
+            </listitem>
+            <listitem>
+              <para>The <code>is_connected</code> field must indicate whether or not the daemon has
+                a mixnet PQ Noise protocol connection to a mixnet gateway node. </para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">Second message</emphasis></para>
+          <itemizedlist>
+            <listitem>
+              <para>The message contains the PKI document in its <code>payload</code> field. This
+                marks the end of the initial connection sequence. </para>
+            </listitem>
+            <listitem>
+              <para>The PKI document is stripped of cryptographic signatures as noted above. </para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+      <para><emphasis role="bold">Phase 2</emphasis></para>
+      <itemizedlist>
+        <listitem>
+          <para>The thin client may send <code>Request</code> messages to the daemon, which
+            encapsulates the provided payload in a Sphinx packet and sends it to the gateway node.
+          </para>
+        </listitem>
+        <listitem>
+          <para>The daemon may send <code>Response</code> messages to the client at any time during
+            this phase. <code>Response</code> messages may communicate a connection status change, a
+            new PKI document, or a message-sent or message-reply event. </para>
+        </listitem>
+      </itemizedlist>
+    </section>
+  </section>
+</section>

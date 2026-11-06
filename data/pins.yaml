@@ -1,0 +1,8 @@
+# Single source of truth for the pinned release tags advertised across
+# the website's hand-written pages. Rendered via the `pin` shortcode:
+#   {{% pin "katzenpost" %}}
+# The generated API reference pages pin independently via
+# tools/*/pinned-versions.env, enforced by their Makefiles.
+katzenpost: "v0.0.90"
+thin_client: "0.0.23"
+katzenqt: "0.0.2"

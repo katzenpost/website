@@ -1,0 +1,1562 @@
+<para>
+  --- title: linkTitle: &quot;Threat Model&quot; draft: false slug:
+  &quot;/threat_model/&quot; author: [&quot;David Stainton&quot;,
+  &quot;Eva Infeld&quot;] ---
+</para>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="threat-model">
+  <title>Threat Model</title>
+  <para>
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="the-purpose-and-structure-of-this-document">
+  <title>The purpose and structure of this document</title>
+  <para>
+    This threat model document is unique in the privacy technology
+    landscape for its detailed treatment of realistic adversary
+    capabilities. It is not a description of a superficial, theoretical
+    system, but rather of complex, real-life software that is being
+    interrogated and constantly re-designed to provide the best possible
+    security. We examine it from the point of view of both theoretical
+    design, networking choices and practical pitfalls.
+  </para>
+  <para>
+    And still, it is not and will likely never be comprehensive. Various
+    attacks and countermeasure strategies will be added to this document
+    in the future, as it keeps evolving. However, we feel that it
+    already provides a valuable, systematic view of the challenges faced
+    by mixnet technology.
+  </para>
+  <para>
+    There exists a rich body of academic work analyzing how one might
+    disrupt the functioning of a Mixnet or circumvent its security and
+    privacy guarantees. We have endeavored to compile these decades
+    research and summarized these attacks in the table on page 3. The
+    table on page 4 focuses on networking security threats that are
+    specific to Katzenpost protocol choices.
+  </para>
+  <para>
+    We then delve into the countermeasures employed by Katzenpost and
+    discuss their efficacy. A special care is taken to discuss the
+    details of post-quantum cryptographic primitives that we have
+    introduced in several places of the design.
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="introducing-the-adversary">
+  <title>Introducing the adversary</title>
+  <para>
+    It is no longer controversial to say that in the modern world, we
+    face incredibly powerful surveillance adversaries. These could be
+    state, corporate or criminal actors, vying for our information to
+    use as means of making profit, manipulating us and others, gaining
+    leverage, strengthening their authority, or as means of persecution.
+    In many contexts, we have little hope for non-technical solutions
+    due to lack of sufficiently powerful pressure in favor of privacy.
+  </para>
+  <para>
+    And so in a quest for technical solutions, we need equally powerful
+    tools. In the case of communication tools, the Internet’s bread and
+    butter, we would like to allow users to interact and exchange
+    information with reasonable expectation of both the content and
+    metadata of their communication, and personal information such as a
+    user’s social graph, being protected from such adversaries.
+    Therefore, we consider an adversary capable of the following:
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        The adversary can see the connections of the entire global
+        internet and is capable of intricate statistical analysis of
+        gathered data.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The adversary can disable parts of the network.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The adversary can plant or take over some devices in the network
+        to inject malicious code and manipulate the functioning of the
+        network or to gain access to the information available to them.
+        The takeover could happen by technical means or by exercising
+        force outside of the network.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The adversary has very large (but not infinite) computational
+        resources, and is capable of cryptanalysis on par with frontier
+        research.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The adversary has access to a quantum computer, or will have
+        access to a quantum computer in the near future.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The adversary can supplement collected data with rich context of
+        already gathered data on all users from other sources.
+      </para>
+    </listitem>
+  </itemizedlist>
+  <para>
+    If we hope for our work to be relevant in the modern world, we can
+    no longer settle for weak threat models. That is the bar we set for
+    ourselves at Katzenpost.
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="katzenpost-mixnet-threat-model-summary">
+  <title>Katzenpost mixnet threat model summary</title>
+<literallayout>Firstly, assumptions about the user:
+</literallayout>
+  <orderedlist>
+    <listitem>
+      <para>
+        The user acts reasonably and in good faith.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The user obtains an authentic copy of the Katzenpost client and
+        the mixnet client configuration file.
+      </para>
+    </listitem>
+  </orderedlist>
+<literallayout>Secondly, assumptions about the user’s computer:
+</literallayout>
+  <orderedlist>
+    <listitem>
+      <para>
+        The computer operates correctly and is not compromised by
+        malware.
+      </para>
+    </listitem>
+  </orderedlist>
+<literallayout>Thirdly, assumptions about the mixnet:
+</literallayout>
+  <orderedlist>
+    <listitem>
+      <para>
+        The mixnet only provides internal services and does not have any
+        &quot;exit nodes&quot; or anything that resembles a proxy
+        service or VPN.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        All mixnet protocols are protocols which do not force
+        interaction.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        All mixnet protocols are low bandwidth and latency tolerant.
+      </para>
+    </listitem>
+  </orderedlist>
+<literallayout>Finally, assumptions about the world:
+The three core protocols of Katzenpost are configured to use modern cryptographic primitives which are valid and considered impossible to break, for example:</literallayout>
+  <itemizedlist>
+    <listitem>
+      <para>
+        PKI Signature Scheme using Edd25519-Sphincs+
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        NIKE Sphinx using X25519
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        PQ Noise with pqXX pattern using Xwing
+      </para>
+    </listitem>
+  </itemizedlist>
+<literallayout>What the user’s Gateway can achieve keeping in mind that typically a fair sized mixnet will have more than one gateway node:
+</literallayout>
+  <itemizedlist>
+    <listitem>
+      <para>
+        A Gateway node learns when a given client is online.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A Gateway node learns the client’s IP address.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A Gateway node learns how many messages the client sends and
+        receives.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A Gateway node does NOT learn the sent message destinations or
+        the received message origins.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A Gateway node does NOT learn if a given sent or received
+        message is a decoy or not.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A Gateway node can drop or corrupt any sent or received message.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A Gateway node can spam a user with invalid messages.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A Gateway node can duplicate old messages. However duplicate
+        outbound messages will be dropped by the first hop as per Sphinx
+        packet deduplication cache.
+      </para>
+    </listitem>
+  </itemizedlist>
+<literallayout>What a sufficiently global, passive adversary can achieve:
+</literallayout>
+  <itemizedlist>
+    <listitem>
+      <para>
+        A GPA can learn who is using the mixnet and where their Gateway
+        nodes are located.
+      </para>
+    </listitem>
+  </itemizedlist>
+<literallayout>What a local network attacker can achieve:
+</literallayout>
+  <itemizedlist>
+    <listitem>
+      <para>
+        A local network can observe when a user is using Katzenpost.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A local network can block Katzenpost.
+      </para>
+    </listitem>
+  </itemizedlist>
+<literallayout>What a compromise of the user’s computer can achieve:
+After an endpoint device is compromised, an attacker can impersonate that user, receiving and sending messages. The attacker does NOT learn the communication correspondent network locations.</literallayout>
+<literallayout>What a Service Node can achieve:
+A Service Node on the mix network does not know from whence it’s service request message came. Therefore in general, absent some clever attack, the Service Nodes learn nothing about the clients that interact with them.</literallayout>
+<literallayout>What a contact can achieve:
+</literallayout>
+  <itemizedlist>
+    <listitem>
+      <para>
+        A contact can spam a user with messages.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A contact can, to some extent, prove to a third-party that a
+        message came from a user
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A contact can retain messages from a user, forever.
+      </para>
+    </listitem>
+  </itemizedlist>
+<literallayout>What a random person on the Internet can achieve:
+A random person can attempt to DoS the mix network or a specific service on the mixnet.</literallayout>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="a-summary-of-theoretical-security-concerns-in-a-mixnet">
+  <title>A summary of theoretical security concerns in a Mixnet</title>
+  <informaltable>
+    <tgroup cols="3">
+      <colspec align="left" />
+      <colspec align="left" />
+      <colspec align="left" />
+      <thead>
+        <row>
+          <entry>
+            <emphasis role="strong">Mixnet attack type</emphasis>
+          </entry>
+          <entry>
+            <emphasis role="strong">Attack description</emphasis>
+          </entry>
+          <entry>
+            <emphasis role="strong">Necessary adversary
+            capabilities</emphasis>
+          </entry>
+        </row>
+      </thead>
+      <tbody>
+        <row>
+          <entry>
+            Intersection, Statistical Disclosure Attacks
+          </entry>
+          <entry>
+            Over time, adversary can glean statistical information that
+            makes the probability distribution of who Alice is
+            communicating with non-uniform. Law of Large Numbers implies
+            the anonymity set tends to the set of clients with identical
+            probability in the long run to the actual recipient.
+          </entry>
+          <entry>
+            The adversary must typically be able to see messages
+            entering and leaving the network. This is customarily
+            treated as a PGA, despite only requiring a view of the
+            network’s perimeter. The adversary must be able to
+            distinguish messages from dummy traffic, or observe when
+            users are active.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            <emphasis>n</emphasis> − 1 Attack
+          </entry>
+          <entry>
+            The adversary causes the mix to contain only messages sent
+            by the adversary, except one. In the context of continuous
+            time mixing such as with the Poisson mix, this means that
+            the adversary drops or delays other messages until the mix
+            is empty before the target message enters the mix. The
+            adversary sees the target message exit the mix to its next
+            destination.
+          </entry>
+          <entry>
+            The adversary must compromise routers which are upstream
+            from a target mix node so as to be able to block incoming
+            messages, send messages, as well as be able to tell when a
+            target message passes through them.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            Epistemic Attack
+          </entry>
+          <entry>
+            The fact that a client is issued only a subset of the mix
+            nodes’ directory and encryption keys can leak information to
+            the adversary.
+          </entry>
+          <entry>
+            The adversary has knowledge of the target client’s view of
+            the network which distinguishes them among clients. This
+            could happen via a zero day or a design flaw such as not
+            implementing PIR for discovery.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            Denial of Service Attack
+          </entry>
+          <entry>
+            The adversary is able to disrupt the functioning of the
+            service, often by overwhelming its resources.
+          </entry>
+          <entry>
+            The adversary has sufficient network and computational
+            resources to overwhelm the network.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            Sybil Attack
+          </entry>
+          <entry>
+            The adversary plants a large number of malicious nodes, and
+            is therefore able to glean partial or complete information
+            to follow a message through the mix and disrupt the network.
+          </entry>
+          <entry>
+            The adversary has sufficient resources to take over the
+            network, and the network’s design allows for the creation of
+            a large number of malicious nodes.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            Compulsion Attack
+          </entry>
+          <entry>
+            The adversary compels enough honest node operators to
+            disclose information to follow a message through the mix
+            network .
+          </entry>
+          <entry>
+            The adversary has the necessary force to compel a sufficient
+            number of honest actors to do the adversary’s bidding.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            Timing Attack
+          </entry>
+          <entry>
+            An active adversary manipulates the timing of the packets
+            passing through compromised routers, or passive adversary
+            exploits timing information that is leaked despite padding.
+          </entry>
+          <entry>
+            The passive attack could happen via a zero day or design
+            flaw. The efficacy of the active attack needs to be analyzed
+            with respect to the specific design.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            Cryptographic Attacks
+          </entry>
+          <entry>
+            The adversary is able to forge a signature, generate a
+            second hash preimage, decrypt ciphertext or do other damage
+            assumed to be prevented by the use of cryptography.
+          </entry>
+          <entry>
+            The adversary can break the security of one or more
+            cryptographic primitives through a cryptographic zero day or
+            sufficient computational resources, or exploit a flaw in
+            their implementation.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            Endpoint Security Attacks
+          </entry>
+          <entry>
+            The adversary breaches the security of a user’s device via
+            an attack not directly related to the mixnet.
+          </entry>
+          <entry>
+            The adversary is able to exploit a technical flaw in the
+            user’s device or compel the user to grant him access.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            Predecessor Attack
+          </entry>
+          <entry>
+            The adversary compromises at least one mix node in each
+            routing topology layer. Eventually a client will randomly
+            select a bad route where every mix node in the route is
+            compromised.
+          </entry>
+          <entry>
+            The adversary must have the capability to operate or
+            compromise mix nodes, at least one in each routing topology
+            layer. See countermeasure section for more details.
+          </entry>
+        </row>
+        <row>
+          <entry>
+          </entry>
+          <entry>
+          </entry>
+          <entry>
+          </entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </informaltable>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="networking-security-concerns-in-katzenpost">
+  <title>Networking security concerns in Katzenpost</title>
+  <informaltable>
+    <tgroup cols="3">
+      <colspec align="left" />
+      <colspec align="left" />
+      <colspec align="left" />
+      <thead>
+        <row>
+          <entry>
+            <emphasis role="strong">Mixnet attack type</emphasis>
+          </entry>
+          <entry>
+            <emphasis role="strong">Attack description</emphasis>
+          </entry>
+          <entry>
+            <emphasis role="strong">Necessary adversary
+            capabilities</emphasis>
+          </entry>
+        </row>
+      </thead>
+      <tbody>
+        <row>
+          <entry>
+            Tagging Attack
+          </entry>
+          <entry>
+            The adversary exploits some kind of cryptographic
+            malleability property of the Sphinx packet format in order
+            to violate the privacy notions of the mix network.
+          </entry>
+          <entry>
+            The adversary must be able to witness the Sphinx payload
+            decryption to determine if it was tagged or not. This means
+            compromising a Provider for forward packets and compromising
+            a client’s endpoint device for SURB replies.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            Replay Confirmation Attack
+          </entry>
+          <entry>
+            If a Sphinx packet is able to be replayed then the adversary
+            may send the packet many times concurrently in order to
+            observe the traffic burst in another part of the network.
+          </entry>
+          <entry>
+            The mix nodes maintain Sphinx replay caches in order to
+            prevent replays; the attack is therefore only possible if
+            there is a replay cache malfunction.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            SURB Confirmation Attack
+          </entry>
+          <entry>
+            If a client sends many
+            SURBs<link linkend="fn1" id="fnref1" role="footnote-ref"><superscript>1</superscript></link>
+            to another entity on the network, that entity may choose to
+            send out ALL the SURBs at once in order to observe the
+            traffic burst in another part of the network.
+          </entry>
+          <entry>
+            The adversary is a global passive observer of the network
+            and participant in the network; additionally the adversary
+            must be in possession of multiple SURBs created by another
+            entity on the network.
+          </entry>
+        </row>
+        <row>
+          <entry>
+            ARQ Confirmation Attack
+          </entry>
+          <entry>
+            The adversary’s goal is to find a specific
+            ARQ<link linkend="fn2" id="fnref2" role="footnote-ref"><superscript>2</superscript></link>
+            client who is currently interacting on the network by
+            causing targeted outages of entry Providers after the target
+            service receives a protocol message. To start, half of the
+            entry Providers are allowed to receive messages. If the
+            adversary observes a retransmission then it confirms the
+            client is in the group of entry Providers that we blocked
+            messages to. The adversary continues the binary search and
+            finds the client’s entry Provider in log(n) time.
+          </entry>
+          <entry>
+            The adversary must have access to a target mixnet service so
+            as to distinguish a message transmission versus a
+            retransmission. The adversary must also be able block
+            messages from going to specific mixnet nodes, in this
+            example, entry Providers.
+          </entry>
+        </row>
+        <row>
+          <entry>
+          </entry>
+          <entry>
+          </entry>
+          <entry>
+          </entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </informaltable>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="attack-countermeasures">
+  <title>Attack Countermeasures</title>
+  <para>
+    Here we describe the attack countermeasures currently used by the
+    Katzenpost mix network software design.
+  </para>
+  <section xml:id="intersection-attacks">
+    <title>Intersection Attacks</title>
+    <section xml:id="attack-description">
+      <title>Attack description:</title>
+<literallayout>Intersection attacks, also known as long term statistical disclosure attacks have two basic categories:
+</literallayout>
+      <orderedlist>
+        <listitem>
+          <para>
+            The Adversary learns to whom Alice sends messages.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            The Adversary learns who sends Alice messages.
+          </para>
+        </listitem>
+      </orderedlist>
+    </section>
+    <section xml:id="section">
+      <title></title>
+      <para>
+        Statistical disclosure attacks work to some extent on all
+        anonymous communication networks. The Katzenpost client and
+        Katzen messaging protocol is designed to provide partial defense
+        against long-term intersection attacks as well as sufficient
+        defence against short-term timing correlation attacks.
+      </para>
+      <para>
+        The simplest form of this attack assumes a global passive
+        adversary who watches Alice’s interactions with the mix network.
+        Whenever Alice sends a message, a set of potential recipients
+        are noted by observing which clients receive a message shortly
+        after Alice sends her message. After many hours, days or weeks
+        of noting these sets of potential recipients, an intersection
+        among these sets may reveal the set of recipients Alice sends
+        messages to.
+      </para>
+      <para>
+        The classical mix network literature has described intersection
+        attacks in terms of a mix network where a passive network
+        observer can watch individual clients receive messages. This
+        assumption can be otherwise stated that the adversary observes
+        all the inputs and outputs of the mix network and thus receives
+        a high granularity of statistical information.
+      </para>
+    </section>
+    <section xml:id="countermeasure">
+      <title>countermeasure</title>
+      <para>
+        Katzenpost and the Katzen messaging protocol are designed to
+        provide partial defense against intersection attacks. Complete
+        defense is not practical because user behavior is often
+        repetitive and they cannot stay connected to the mixnet forever.
+        Attack success depends largely on the adversary’s ability to
+        predict user behavior. If user’s behavior is overly repetitive
+        this may lead to the success of such attacks.
+      </para>
+<literallayout>Although the Katzenpost continuous time mixing strategy provides defense against short term timing correlation attacks, additional defense mechanisms are required to defend against longer term attacks:
+</literallayout>
+      <orderedlist>
+        <listitem>
+          <para>
+            async message queueing and retrieval at the network edge
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            traffic padded message retrieval
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            loop decoy traffic
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            uniform traffic patterns (all sent messages result in a SURB
+            reply)
+          </para>
+        </listitem>
+      </orderedlist>
+    </section>
+    <section xml:id="section-1">
+      <title></title>
+      <para>
+        The Katzenpost chat protocol known as Katzen, uses an additional
+        network route to provide another indirection to protect the
+        network location of clients. In other words, while Katzen
+        clients connect to the mixnet using a randomly selected entry
+        Provider, they retrieve messages from a different Provider mix
+        node on the network; message retrieval is done by means of a
+        Sphinx SURB, single use reply block which is sent to the
+        messaging queue service so that a reply containing a message
+        payload can be sent back to the client, anonymously. All sent
+        messages result in a SURB reply being sent back to the client.
+      </para>
+      <para>
+        Katzenpost clients periodically send loop decoy messages; these
+        Sphinx packets are sent to a randomly selected Provider whose
+        echo service sends the client’s packet payload back to the
+        client via the attached SURB. However, loop decoy messages are
+        only distinguishable from normal messages to the client that
+        receives them. Passive network observers will not be able to
+        tell the difference. These decoy loops are uniformly distributed
+        among all of the Providers (AKA service/exit mix nodes).
+      </para>
+      <para>
+        Whenever clients retrieve messages from their locally connected
+        entry Provider, they do so using a traffic padded protocol that
+        either sends them 0 or 1 message where both outcomes are
+        indistinguishable from the perspective of a passive network
+        observer.
+      </para>
+    </section>
+  </section>
+  <section xml:id="n-1-attacks">
+    <title><emphasis>n</emphasis> − 1 Attacks</title>
+    <section xml:id="attack-description-1">
+      <title>attack description:</title>
+      <para>
+        An <emphasis>n</emphasis> − 1 attack is a multi stage attack
+        where the adversary observes a target message enter the mixnet
+        and must perform the attack in order to follow the message to
+        the next hop. The <emphasis>n</emphasis> − 1 attack is performed
+        repeatedly for each hop in the route in order to discover the
+        final destination.
+      </para>
+      <para>
+        Although the adversary could simply compromise each mix node in
+        the route starting with the first hop, that is the compulsion
+        attack category and is a distinct attack category from the
+        <emphasis>n</emphasis> − 1 attack category. The
+        <emphasis>n</emphasis> − 1 attack is performed by the adversary
+        compromising upstream routers so that they have the capability
+        of watching messages enter the target mix, blocking any of those
+        messages if they choose to, and sending messages of their own
+        into the target mix node. By using these capabilities the
+        adversary is able to manipulate mix nodes so that they only
+        contain the target message and messages sent by the adversary.
+      </para>
+      <para>
+        For a good introduction to <emphasis>n</emphasis> − 1 attacks,
+        please see . In the context of continuous time mixing strategies
+        like &quot;Stop and Go&quot; and Poisson , the
+        <emphasis>n</emphasis> − 1 attack is performed by the adversary
+        blocking or delaying (although delaying obviously wouldn’t work
+        for Stop and Go) incoming messages ahead of time so that they
+        are reasonably certain the mix is empty before the target
+        message enters the mix.
+      </para>
+      <para>
+        When the target message enters the empty mix, it is artificially
+        delayed by the mixing strategy and then routed to the next hop.
+        The adversary gets to observe where the message is going for
+        it’s next hop because they are reasonably sure that the message
+        exiting the mix, although it is bitwise unlinkable because of
+        the cryptographic transformation, it must be the same message.
+      </para>
+    </section>
+    <section xml:id="countermeasure-1">
+      <title>countermeasure</title>
+      <para>
+        : Katzenpost currently does not have any countermeasures in
+        place for <emphasis>n</emphasis> − 1 attacks. See Future
+        Countermeasures section below.
+      </para>
+    </section>
+  </section>
+  <section xml:id="epistemic-attack-route-fingerprinting">
+    <title>Epistemic Attack: route fingerprinting</title>
+    <section xml:id="attack-description-2">
+      <title>attack description:</title>
+      <para>
+        A route fingerprinting attack is when the adversary is able to
+        identify a client by the specific route being used.
+      </para>
+    </section>
+    <section xml:id="countermeasure-2">
+      <title>countermeasure:</title>
+      <para>
+        Katzenpost doesn’t allow clients to have a partial view of the
+        network. The directory authority system publishes the full
+        network view to be cached by the edge nodes, Providers, so that
+        clients can retrieve them.
+      </para>
+    </section>
+  </section>
+  <section xml:id="denial-of-service">
+    <title>Denial of Service</title>
+    <section xml:id="attack-description-3">
+      <title>attack description:</title>
+      <para>
+        Sending many packets into the mix network can cause the mix
+        nodes to become overwhelmed and begin dropping packets. The
+        logical conclusion to this scenario is that there is effectively
+        a network outage until the adversary stops sending so much
+        traffic.
+      </para>
+    </section>
+    <section xml:id="countermeasure-3">
+      <title>countermeasure:</title>
+      <para>
+        Rate limiting individual clients is the current countermeasure.
+        However this only stops the DOS attack from being conducted by a
+        single client entity. However the adversary could still DOS the
+        network by using many clients to send packets.
+      </para>
+    </section>
+  </section>
+  <section xml:id="sybil-attack">
+    <title>Sybil Attack</title>
+    <section xml:id="attack-description-4">
+      <title>attack description:</title>
+      <para>
+        The adversary plants a large number of malicious nodes, and is
+        therefore able to glean partial or complete information to
+        follow a message through the mix network.
+      </para>
+    </section>
+    <section xml:id="countermeasure-4">
+      <title>countermeasure:</title>
+      <para>
+        We mitigate Sybil attacks by preventing mix nodes from
+        automatically joining the network. A prerequisite for joining
+        the network is to have all the directory authorities add the new
+        mix node’s connection information and public cryptographic key
+        material to their configuration. Please see the Future
+        Countermeasures section below for a discussion of additional
+        directory authority features including a reputation system.
+      </para>
+    </section>
+  </section>
+  <section xml:id="compulsion-attack">
+    <title>Compulsion Attack</title>
+    <section xml:id="attack-description-5">
+      <title>attack description:</title>
+      <para>
+        The adversary compels enough honest node operators to disclose
+        information to follow a message through the mix network.
+      </para>
+    </section>
+    <section xml:id="countermeasure-5">
+      <title>countermeasure:</title>
+      <para>
+        Our current countermeasure for the compulsion attack is frequent
+        mix key rotation, every 20 minutes. See Future Countermeasures
+        section below.
+      </para>
+    </section>
+  </section>
+  <section xml:id="timing-attacks">
+    <title>Timing Attacks</title>
+    <section xml:id="attack-description-6">
+      <title>attack description:</title>
+      <para>
+        An active adversary manipulates the timing of the packets
+        passing through compromised routers, or passive adversary
+        exploits timing information that is leaked despite padding.
+      </para>
+      <para>
+        Currently, there are no known timing attacks against any
+        Katzenpost protocols. Timing correlation attacks are already
+        covered in the intersection attack category. And although all
+        mix network protocols leak statistical information no matter
+        what countermeasures are used, we posit that this leaked
+        statistical information isn’t really the same thing as
+        traditional timing attacks against a cryptographic system. In
+        fact, the mix network is actively preventing timing attacks
+        injecting latency into the system.
+      </para>
+    </section>
+    <section xml:id="countermeasure-6">
+      <title>countermeasure:</title>
+      <para>
+        No known timing attacks and therefore no countermeasure.
+      </para>
+    </section>
+  </section>
+  <section xml:id="cryptographic-attacks">
+    <title>Cryptographic Attacks</title>
+    <section xml:id="attack-description-7">
+      <title>attack description:</title>
+      <para>
+        There are no known cryptographic attacks against Katzenpost core
+        protocols (sphinx, noise, dirauth). However we explore
+        theoretical cryptographic attacks in the Cryptographic Protocols
+        section below.
+      </para>
+    </section>
+    <section xml:id="countermeasure-7">
+      <title>countermeasure:</title>
+      <para>
+        All core Katzenpost protocols make use of hybrid post quantum
+        cryptographic constructions which in theory protect against
+        active quantum adversaries.
+      </para>
+    </section>
+  </section>
+  <section xml:id="endpoint-security-attacks">
+    <title>Endpoint Security Attacks</title>
+    <section xml:id="attack-description-8">
+      <title>attack description:</title>
+      <para>
+        The adversary breaches the security of a user’s device via an
+        attack not directly related to the mixnet.
+      </para>
+    </section>
+    <section xml:id="countermeasure-8">
+      <title>countermeasure:</title>
+      <para>
+        There are no countermeasures provided by Katzenpost for endpoint
+        security because it’s considered an orthogonal concern.
+      </para>
+    </section>
+  </section>
+  <section xml:id="tagging-attack">
+    <title>Tagging Attack</title>
+    <section xml:id="attack-description-9">
+      <title>attack description:</title>
+      <para>
+        The Sphinx cryptographic packet format allows for a one bit
+        tagging attack under certain circumstances. The reason for
+        allowing the design to have this security defect is to allow for
+        the Single Use Reply Block. The Sphinx header is MAC’ed but the
+        packet body is not. Instead, the body is encrypted with a
+        wide-block cipher (an SPRP). This ensures that an expected
+        verification block in the beginning of the plaintext can be used
+        to verify the plaintext in the final decryption. If a bit in the
+        payload ciphertext gets flipped then the payload decryption will
+        yield garbled results and the expected verification block will
+        not be present. Therefore in order to make use of this to
+        perform a tagging attack, the adversary must have access to the
+        result of the payload decryption as well as the ability to tag
+        the packet some number of hops earlier in the route. We call
+        this a one bit tagging attack because it yield one bit of
+        information: Either the verification block was destroyed or not.
+      </para>
+      <para>
+        In Katzenpost there are two ways to use Sphinx to send a
+        payload. Forwards packets and SURB reply packets. Both of these
+        Sphinx packet types are susceptible to a one bit tagging attack:
+      </para>
+    </section>
+    <section xml:id="tagging-attack-against-forward-sphinx-packets">
+      <title>tagging attack against forward Sphinx packets:</title>
+      <para>
+        Clients send forwards Sphinx packets to mixnet services which
+        reply via a SURB in the payload. Let’s say an adversary
+        &quot;tags&quot; a forward Sphinx packet sent by Alice. The
+        adversary would have to compromise or collude with the service
+        Providers on the mixnet in order to witness the forward packet
+        payload decryption failure which indicates the tag.
+      </para>
+    </section>
+    <section xml:id="tagging-attack-against-surb-replay-sphinx-packets">
+      <title>tagging attack against SURB replay Sphinx packets:</title>
+      <para>
+        If an adversary &quot;tags&quot; a SURB reply which a mixnet
+        service sends to a client, then only the client will be able to
+        witness the packet payload decryption failure. The adversary
+        would have to compromise the client’s endpoint device to witness
+        this event (or to compromise the key materials allowing them to
+        compute the failed payload decryption themselves).
+      </para>
+    </section>
+    <section xml:id="countermeasure-9">
+      <title>countermeasure:</title>
+      <para>
+        In the context of a forward Sphinx tagging attack on Katzenpost,
+        the adversary must compromise or collude with the destination
+        service Provider. If that’s the case then attack allows the
+        adversary to learn which Provider node and service the packets
+        was destined for. Although this is valuable information in the
+        context of the current Katzen protocol, see the Future
+        Countermeasures section below for a discussion of how we plan to
+        mitigate intersection attacks in the future because it also
+        carries over to much greater defense against this forward
+        payload tagging attack.
+      </para>
+    </section>
+    <section xml:id="countermeasure-10">
+      <title>countermeasure:</title>
+      <para>
+        We could encode the last hop’s Sphinx routing command, inside
+        the Sphinx payload instead of the header. This would provide
+        short term plausible deniability in the sense that an adversary
+        conducting a tagging attack would be destroying the routing
+        information so that they cannot know if the packet was a decoy
+        or not.
+      </para>
+    </section>
+  </section>
+  <section xml:id="replay-confirmation-attack">
+    <title>Replay Confirmation Attack</title>
+    <section xml:id="attack-description-10">
+      <title>attack description:</title>
+      <para>
+        If a Sphinx packet were allowed to be replayed then the
+        adversary may send the packet many times concurrently in order
+        to observe the traffic burst in another section of the network.
+      </para>
+    </section>
+    <section xml:id="countermeasure-11">
+      <title>countermeasure:</title>
+      <para>
+        Katzenpost mix nodes maintain a relay cache which prevents
+        Sphinx packets from being replayed. This cache doesn’t grow
+        forever since it’s only kept until the end of the epoch which
+        are currently only a 20 minute duration.
+      </para>
+    </section>
+  </section>
+  <section xml:id="surb-confirmation-attack">
+    <title>SURB Confirmation Attack</title>
+    <section xml:id="attack-description-11">
+      <title>attack description:</title>
+      <para>
+        If a client sends many SURBs to another entity on the network,
+        that entity may choose to send out ALL the SURBs at once in
+        order to observe the traffic burst in another part of the
+        network. This works as an entry node discovery attack.
+      </para>
+      <para>
+        Although currently, all Katzenpost protocols only send one SURB
+        at a time, this attack still applies if the adversary
+        accumulates enough SURBs to form a visible traffic burst within
+        the mix network.
+      </para>
+    </section>
+    <section xml:id="countermeasure-12">
+      <title>countermeasure:</title>
+      <para>
+        No countermeasure. See Future Attack Countermeasure section
+        below for the discussion of how to countermeasure this attack.
+      </para>
+    </section>
+  </section>
+  <section xml:id="arq-confirmation-attack">
+    <title>ARQ Confirmation Attack</title>
+    <section xml:id="attack-description-12">
+      <title>attack description:</title>
+      <para>
+        See above table entry for ARQ confirmation attack description.
+      </para>
+    </section>
+    <section xml:id="countermeasure-13">
+      <title>countermeasure:</title>
+      <para>
+        Currently, no countermeasure.
+      </para>
+    </section>
+  </section>
+  <section xml:id="predecessor-attack">
+    <title>Predecessor Attack</title>
+    <section xml:id="attack-description-13">
+      <title>attack description:</title>
+      <para>
+        A bad route is defined as a route in which every node is
+        compromised. The goal of such an attack is to link a given
+        client with a specific destination or service on the destination
+        node. This attack is also known as the Predecessor Attack and is
+        detailed in with many variations for all the different types of
+        anonymous communication networks. In the context of the
+        Katzenpost mixnet, the Predecessor Attack is performed by the
+        adversary compromising at least one node in each routing
+        topology layer. Clients using the mixnet will eventually select
+        a bad route.
+      </para>
+    </section>
+    <section xml:id="countermeasure-14">
+      <title>countermeasure:</title>
+      <para>
+        Fundamentally, we have two choices, either we have clients
+        select a new route for each message sent or they select one
+        route and use that for some time duration. In the former, every
+        time a message is sent, the probability of selecting a bad route
+        is increased. Whilst in the later, if a client selects a bad
+        route they use it many times, but the probability of selecting a
+        bad route is reduced.
+      </para>
+    </section>
+    <section xml:id="section-2">
+      <title></title>
+      <para>
+        Yet another countermeasure is to design the mixnet protocols
+        such that they use a new destination for each message using some
+        kind of private deterministic permutation achieving a uniform
+        distribution of message amongst the destination mixnet nodes and
+        their message slots. We have chosen this last countermeasure for
+        Katzenpost and it will be detailed elsewhere in our literature.
+      </para>
+    </section>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="future-countermeasures">
+  <title>Future Countermeasures</title>
+  <section xml:id="intersection-attacks-1">
+    <title>Intersection Attacks</title>
+    <section xml:id="section-3">
+      <title></title>
+      <para>
+        The new Katzen protocol is sometimes referred to as scatter
+        queue. Two communicating parties each exchange shared secrets
+        which they use to determine a new &quot;mailbox&quot; for each
+        message. To be clear, this new protocol is an improved revision
+        of the previous Katzen protocol where each party chooses their
+        own &quot;mailbox&quot; (queue Provider + queue ID); the
+        difference here is that instead of the two parties exchanging
+        mailbox locations they exchange seeds which are used to
+        deterministically generate mailbox locations for each message.
+      </para>
+      <para>
+        This new protocol still uses all four previously mentioned
+        mechanisms to achieve countermeasure against intersection
+        attacks however the new &quot;scatter queue&quot; design
+        drastically reduces the amount of metadata which can be
+        collected by the operators of the mailbox Provider mix nodes. We
+        think this is a huge improvement to the threat model. But it
+        would be great if we could quantify the improvement using
+        various anonymity metrics. Firstly, Shannon entropy seems
+        applicable here because we can make statements like
+        &quot;compared to the old protocol, scatter queue increases the
+        entropy on Providers where malicious adversaries are trying to
+        correlate communicating party sets with messages arriving at
+        specific mailboxes&quot;; the new protocol makes this
+        infeasible.
+      </para>
+<literallayout>Therefore we can say that the new Katzen messaging protocol mitigates or partially mitigates intersection attacks by means of five mechanisms:
+</literallayout>
+      <orderedlist>
+        <listitem>
+          <para>
+            async message queueing and retrieval at the network edge
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            traffic padded message retrieval
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            loop decoy traffic
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            uniform traffic patterns (all sent messages result in a SURB
+            reply)
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            scatter queue
+          </para>
+        </listitem>
+      </orderedlist>
+    </section>
+  </section>
+  <section xml:id="n-1-attacks-1">
+    <title><emphasis>n</emphasis> − 1 Attacks</title>
+    <section xml:id="section-4">
+      <title></title>
+      <para>
+        Here we will attempt to describe a partial countermeasure
+        wherein clients receive statistical information from the network
+        which is cryptographically signed by it’s authors. Client use
+        this data to decide if there’s an ongoing
+        <emphasis>n</emphasis> − 1 attack, if there is they disconnect
+        from the network and try again later.
+      </para>
+      <para>
+        There are two sources of information about
+        <emphasis>n</emphasis> − 1 attacks:
+      </para>
+      <orderedlist>
+        <listitem>
+          <para>
+            mix loops
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            client loops
+          </para>
+        </listitem>
+      </orderedlist>
+    </section>
+    <section xml:id="mix-loops-vs-client-loops">
+      <title>Mix loops vs client loops</title>
+      <para>
+        In theory mix loops can detect <emphasis>n</emphasis> − 1
+        attacks in the context of a continuous time mix. Such an attack
+        means the adversary is dropping or delaying messages before they
+        enter the mix. Therefore the mix originating loop decoy message
+        can function as a sort of heartbeat protocol that allow the mix
+        to detect <emphasis>n</emphasis> − 1 attacks. Obviously this mix
+        loop decoy message might get dropped by the network for various
+        reasons that have nothing to do with an
+        <emphasis>n</emphasis> − 1 attack. The red green blue heartbeat
+        mixnet paper (by george) suggests the countermeasure of the
+        individual mixes halting their routing of messages temporarily
+        to thwart the <emphasis>n</emphasis> − 1 attacks. This would
+        work but it would also probably create unnecessary outages.
+        Instead we want a system that let’s the client software decide
+        whether or not there is an ongoing <emphasis>n</emphasis> − 1
+        attack. Clients can also detect such attacks with their own end
+        to end loop decoy messages. However we want the mixes to publish
+        a signed certificate containing their mix loop statistics.
+        Client will then download these mix loop statistics from the
+        providers and they will use those statistics along with their
+        own client loop statistics to make decisions with regards to
+        <emphasis>n</emphasis> − 1 network status.
+      </para>
+      <para>
+        <emphasis role="strong">TODO: add detailed description of client
+        heuristics for deciding if there’s an n-1 attack</emphasis>
+      </para>
+    </section>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="core-cryptographic-protocols">
+  <title>Core Cryptographic Protocols</title>
+<literallayout>Katzenpost consists of three cryptographic protocols:
+</literallayout>
+  <orderedlist>
+    <listitem>
+      <para>
+        PKI/Dirauth
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        PQ Noise
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Sphinx
+      </para>
+    </listitem>
+  </orderedlist>
+  <para>
+    Katzenpost is an overlay network meaning that we aren’t trying to
+    replace IP (internet protocol). Overlay means we build protocol
+    layers that sit on top of existing Internet protocols. Currently
+    Katzenpost works over TCP/IP however in the future we plan to
+    support QUIC/IP as an optional transport that can be selected.
+  </para>
+  <para>
+    Katzenpost uses a PQ Noise based protocol known as the Katzenpost
+    wire protocol, which provides point to point transport security and
+    authorization. The wire protocol enforces the mix network’s topology
+    whereby the clients are only allowed to connect to gateway nodes,
+    gateway nodes are only allowed to send packets to layer 1 mixes, and
+    layer 1 mixes are only allowed to send packets to layer 2 mixes etc.
+  </para>
+  <para>
+    Clients use the wire protocol to talk to gateway nodes to whom they
+    send Sphinx packets. These Sphinx packets are encapsulated within
+    the encrypted PQ Noise messages and are therefore never exposed to
+    passive network observers but if they were there wouldn’t in
+    principle be any problem with that. This redundancy in security is
+    often referred to as &quot;defense in depth&quot;.
+  </para>
+  <para>
+    Besides within the mixnet itself, the wire protocol is also used to
+    directly communicate with the directory authorities. Gateway nodes
+    retrieve the latest PKI document from the directory authorities and
+    cache the document for the epoch duration so that clients can
+    download the cached copy. This is a notably different use case
+    because within the mixnet we should have the goal of padding all the
+    wire protocol commands to be the same size. Whereas when gateways
+    nodes download the consensus they are likely receiving PKI documents
+    which are perhaps many times bigger than our Sphinx packet size.
+  </para>
+  <para>
+    The PKI/Directory authority protocol stands apart from the rest
+    because it’s the root of all authority within the mix network. The
+    PKI provides the network participants with all the connection
+    information and key materials they need to use the other two
+    protocols, PQ Noise and Sphinx. It does so by publishing a PKI
+    document every epoch (currently 20 minutes). This is necessary
+    because the mixes destroy their old mix keys and create new mix keys
+    for each new epoch thereby reducing the window for compulsion
+    attacks to the epoch duration.
+  </para>
+  <para>
+    Both the PQ Noise based wire protocol AND our Sphinx protocols are
+    considered to be transport protocols. However the dirauth as the 3rd
+    cryptographic protocol here refers to two aspects:
+  </para>
+  <orderedlist>
+    <listitem>
+      <para>
+        The client and mixnet interactions with the dirauth system; That
+        is, the pki document itself it signed by a majority of the
+        dirauth nodes AND the pki document contains the mix descriptor
+        for each mix node in the network. The document also specifies
+        the topology. Mix nodes and clients verify these cryptographic
+        signatures.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The dirauth’s crash fault consensus cryptographic protocol for
+        publishing new PKI documents every epoch.
+      </para>
+    </listitem>
+  </orderedlist>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="katzenpost-pki-directory-authority">
+  <title>Katzenpost PKI / Directory Authority</title>
+  <section xml:id="section-5">
+    <title></title>
+    <para>
+      The public key infrastructure (PKI) protocol for Katzenpost, also
+      known as the Directory Authority or dirauth, is a decentralized
+      system of nodes which vote for each epoch’s consensus document. If
+      we used a BFT protocol instead then the dirauth system would fail
+      when 1/3 + 1 nodes failed. Therefore we can say that our crash
+      fault tolerant system is more robust because it will fail when 1/2
+      + 1 nodes fail.
+    </para>
+    <para>
+      The Katzenpost PKI is the security root of the entire system
+      because all clients and network nodes will depend on the PKI to
+      sign the consensus document for each epoch. Currently epoch
+      duration is every 20 minutes. The consensus document is
+      essentially a view of the network, it contains all the connection
+      information and all the public cryptographic key materials and
+      signatures. Each mix node signs it’s descriptor and uploads it to
+      the dirauth nodes. Each dirauth node signs the consensus. When
+      clients or nodes download the consensus document they are able to
+      verify the dirauth node signatures on the document.
+    </para>
+    <para>
+      Currently we use a hybrid signature scheme consisting of the
+      classical Ed25519 and the post quantum stateless hash based
+      signature scheme known as Sphincs+ with the parameters:
+      ‘sphincs-shake-256f‘
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="the-katzenpost-noise-protocol-layer">
+  <title>The Katzenpost Noise Protocol Layer</title>
+  <para>
+    Early versions of Katzenpost used the Noise cryptographic protocol
+    framework; however we used an HFS (hybrid forward secret) variation
+    of XX handshake that used a post quantum KEM however it could not
+    resist active quantum adversaries since the initial keys exchanged
+    were classical ECDH public keys. Such constructions offer
+    protections against current classical adversaries that record
+    ciphertext transcripts in hopes of breaking them in the future with
+    a cryptographically relevant quantum computer.
+  </para>
+  <para>
+    More recently, Katzenpost was made to use PQ Noise from the paper,
+    entitled, Post Quantum Noise . The paper shows us that we can
+    algebraically transform existing classical Noise handshake patterns
+    into post quantum handshake patterns by replacing all usages of ECDH
+    with KEM. In some of these transformations there’s additional
+    network interactions implied.
+  </para>
+  <para>
+    Our current, hybrid KEM uses our security preserving KEM combiner
+    and the NIKE to KEM adapter (ad hoc hashed el gamal construction).
+    Our Noise protocol string is:
+  </para>
+  <para>
+    Noise_pqXX_Kyber768X25519_ChaChaPoly_BLAKE2b
+  </para>
+  <para>
+    Which means that our PQ Noise protocol uses the following
+    cryptographic primitives:
+  </para>
+  <orderedlist>
+    <listitem>
+      <para>
+        Hybrid KEM: KEM Combiner + NIKE to KEM adapter + X25519 +
+        Kyber768
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        MAC: Blake2b
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        AEAD: ChaChaPoly
+      </para>
+    </listitem>
+  </orderedlist>
+<literallayout>We use the PQ Noise handshake pattern known as pqXX
+which is expressed in the PQ Noise pattern language like so:</literallayout>
+  <blockquote>
+<literallayout>-&gt; e
+&lt;- ekem, s
+-&gt; skem, s
+&lt;- skem
+</literallayout>
+  </blockquote>
+  <para>
+    Expressed as a sequence diagram, pqXX looks like this:
+  </para>
+  <orderedlist>
+    <listitem>
+      <para>
+        Client sends there ephemeral public key (e).
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Server sends it’s static public key (s), encrypted with the KEM
+        ciphertext (ekem) keyed to client’s public ephemeral key.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Client sends their static public key (s) encapsulated via KEM
+        ciphertext (skem) keyed to server’s static public key.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Server sends a KEM ciphertext (skem) encapsulated using the
+        client’s static public key.
+      </para>
+    </listitem>
+  </orderedlist>
+  <section xml:id="future-improvement-option-1">
+    <title>future improvement, option 1:</title>
+    <para>
+      Remove the &quot;retrieve message&quot; command which client’s use
+      to poll for new messages. Instead the client - server Noise
+      protocol should be designed such that clients periodically receive
+      messages from the server without requesting or polling for them.
+      If no message is present in the message queue on the server then
+      the server will send the client a decoy message.
+    </para>
+  </section>
+  <section xml:id="future-improvement-option-2">
+    <title>future improvement, option 2:</title>
+    <para>
+      Replace the &quot;retrieve message&quot; command with a &quot;send
+      and retrieve&quot; command whereby every time the client sends a
+      message they also receive a message. As per usual, perhaps some of
+      the messages send and received are decoy messages.
+    </para>
+  </section>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="classical-sphinx-and-post-quantum-sphinx">
+  <title>Classical Sphinx and Post Quantum Sphinx</title>
+  <para>
+    The original Sphinx paper introduces the Sphinx nested encrypted
+    packet format using a NIKE
+    <link linkend="fn3" id="fnref3" role="footnote-ref"><superscript>3</superscript></link>.
+    NIKE Sphinx can be a hybrid post quantum construction simply by
+    using a hybrid NIKE. Our Sphinx implementation also can optionally
+    use a KEM
+    <link linkend="fn4" id="fnref4" role="footnote-ref"><superscript>4</superscript></link>
+    instead of a NIKE, however the trade-off is that the packet’s header
+    will take up a lot of overhead because it must store a KEM
+    ciphertext for each hop. Katzenpost has a completely configurable
+    Sphinx geometry which allows for any KEM or NIKE to be used.
+  </para>
+<literallayout>The Sphinx cryptographic packet format also uses these additional cryptographic primitives, the current Katzenpost selection is:
+</literallayout>
+  <itemizedlist>
+    <listitem>
+      <para>
+        stream cipher: CTR-AES256
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        MAC: HMAC-SHA256
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        KDF: HKDF-SHA256
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        SPRP: AEZv5
+      </para>
+    </listitem>
+  </itemizedlist>
+  <para>
+    In Katzenpost the dirauths select the Sphinx geometry, each dirauth
+    must agree with the other dirauths. They publish the hash of the
+    Sphinx Geometry in the PKI document so that the rest of the network
+    entities can validate their Sphinx Geometry. At the time of writing
+    the namenlos network still uses classical Sphinx with the following
+    geometry:
+  </para>
+  <figure>
+    <title></title>
+<literallayout>
+PacketLength = 3082
+NrHops = 5
+HeaderLength = 476
+RoutingInfoLength = 410
+PerHopRoutingInfoLength = 82
+SURBLength = 572
+SphinxPlaintextHeaderLength = 2
+PayloadTagLength = 32
+ForwardPayloadLength = 2574
+UserForwardPayloadLength = 2000
+NextNodeHopLength = 65
+SPRPKeyMaterialLength = 64
+NIKEName = &quot;x25519&quot;
+KEMName = &quot;&quot;
+</literallayout>
+  </figure>
+  <para>
+    In the Katzenpost implementation of Sphinx, we MAC an unencrypted
+    two byte region at the beginning of the Sphinx packet; This
+    additional data region is to be used to match Sphinx version
+    numbers.
+  </para>
+</section>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="mixnet-attack-trees">
+  <title>Mixnet Attack Trees</title>
+  <figure>
+    <title>attacker’s goal is to compromise a mix node</title>
+    <para>
+      Compromise Mix Node physical Access compromise human operator
+      social engineering threat of violence blackmail large money bribe
+      legal action police action military action compromise software
+      remote code execution vulnerability compromise software upgrade
+      pipeline malware USB stick mail interdiction evil maid attack
+    </para>
+  </figure>
+  <para>
+    The above attack tree consists of all OR nodes because each of the
+    leaves are alternative ways to achieve the sub-goal expressed by
+    their branch which in turn, each branch, e.g. physical access,
+    compromise human operator, compromise software are each alternatives
+    to the overall goal of compromising the mix node.
+  </para>
+  <para>
+    ,,,, ,,
+  </para>
+  <orderedlist>
+    <listitem>
+      <para xml:id="fn1">
+        Sphinx Single Use Reply Block is essentially a one-time use
+        privacy preserving delivery
+        token<link linkend="fnref1" role="footnote-back">↩︎</link>
+      </para>
+    </listitem>
+    <listitem>
+      <para xml:id="fn2">
+        Automatic Repeat reQuest is a category network error correction
+        strategies that uses retransmissions and acknowledgement
+        packets<link linkend="fnref2" role="footnote-back">↩︎</link>
+      </para>
+    </listitem>
+    <listitem>
+      <para xml:id="fn3">
+        NIKE: non-interactive key
+        exchange<link linkend="fnref3" role="footnote-back">↩︎</link>
+      </para>
+    </listitem>
+    <listitem>
+      <para xml:id="fn4">
+        KEM: key encapsulation
+        mechanism<link linkend="fnref4" role="footnote-back">↩︎</link>
+      </para>
+    </listitem>
+  </orderedlist>
+</section>
