@@ -38,7 +38,7 @@ drives:
 | transport                               | who does BACAP      | implementations                                                                                                                                                                                                                                                                              |
 |-----------------------------------------|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Katzenpost mixnet, through kpclientd    | the client daemon   | Rust [rust/src/transport/thinclient/](https://github.com/katzenpost/pigeonhole_protocols/tree/main/rust/src/transport/thinclient), Go [go/transport/thinclient/](https://github.com/katzenpost/pigeonhole_protocols/tree/main/go/transport/thinclient), Lean [GroupChatKatzenqt1/Daemon.lean](https://github.com/katzenpost/group_chat_client/blob/main/GroupChatClient/GroupChatKatzenqt1/Daemon.lean) in [katzenpost/group_chat_client](https://github.com/katzenpost/group_chat_client) |
-| Reticulum mesh                          | the transport, with hpqc | Python [katzenrns/transport.py](https://github.com/katzenpost/katzenrns/blob/main/katzenrns/transport.py) over [pigeonhole_rns](https://github.com/katzenpost/pigeonhole_rns)                                                                                                      |
+| Reticulum mesh                          | the transport, with hpqc | Python [transport/reticulum.py](https://github.com/katzenpost/pigeonhole_protocols/blob/main/py/pigeonhole_protocols/transport/reticulum.py) and [katzenrns/transport.py](https://github.com/katzenpost/katzenrns/blob/main/katzenrns/transport.py) over [pigeonhole_rns](https://github.com/katzenpost/pigeonhole_rns), Rust [reticulum_rs.rs](https://github.com/katzenpost/pigeonhole_protocols/blob/main/rust/src/transport/reticulum_rs.rs) on Reticulum-rs and [reticulum_py.rs](https://github.com/katzenpost/pigeonhole_protocols/blob/main/rust/src/transport/reticulum_py.rs) over the Python one |
 | in memory, for tests                    | the transport       | Rust [sim.rs](https://github.com/katzenpost/pigeonhole_protocols/blob/main/rust/src/transport/sim.rs), Go [go/transport/sim/](https://github.com/katzenpost/pigeonhole_protocols/tree/main/go/transport/sim), Python [transport/sim.py](https://github.com/katzenpost/pigeonhole_protocols/blob/main/py/pigeonhole_protocols/transport/sim.py), Lean [GroupChatKatzenqt1/Sim.lean](https://github.com/katzenpost/group_chat_client/blob/main/GroupChatClient/GroupChatKatzenqt1/Sim.lean) |
 
 The interface itself: Rust [transport/mod.rs](https://github.com/katzenpost/pigeonhole_protocols/blob/main/rust/src/transport/mod.rs),
@@ -76,9 +76,10 @@ members writing either version.
 | new stream                                  | a fresh write capability                                          |
 | write box (write capability, index, plaintext) | pad, encrypt, sign, write query; ALREADY_EXISTS is a refusal   |
 | read box (read capability, index)           | read query: NOT_FOUND, TOMBSTONE, or the plaintext                |
+| watch box (read capability, index)          | after a miss, subscribe to its Box ID when the replica serves push; false otherwise |
 | next index                                  | the BACAP derivation                                              |
 | epoch                                       | ⌊(now − 1496275200) / 604800⌋                                     |
-| box size                                    | the mesh's                                                        |
+| box size                                    | the one the group's members pad to                                |
 | voucher mint, derive stream, induct, open   | below                                                             |
 
 
@@ -187,7 +188,7 @@ enum Body {
     Introduction(String, [u8; 136]),                // type 1: [display_name, read_cap]
     FileUpload(Vec<u8>, String, String),            // type 2: [payload, filetype, basename]
     Who(Value), ReplyWho(Value), Tally(Value),      // types 3, 4, 5 to 9: as the app defines
-    None,                                           // type 10
+    None,                                           // types 10 and 11
 }
 ```
 
@@ -200,8 +201,15 @@ enum Body {
 | 4          | reply who    | the app's value                           |
 | 5 to 9     | tally        | the app's value                           |
 | 10         | control      | `None`; only acks, numbers, introduced_at |
+| 11         | ping         | `None`                                    |
 
-A type above 10 is refused. Any message may carry acks, numbers and introduced_at.
+Any message may carry acks, numbers and introduced_at. A ping is content with no body: its readers
+play their ping sound and show that the sender pinged, instead of a line of text.
+
+A reader refuses a message of a version above 4 or a type above 11. When a refused message is
+in the array form and its first three elements are a version, a byte string and a type, the
+client tells the user who sent it, its type and its version, and that the app needs updating,
+rather than dropping it silently.
 
 membership_hash = SHA-256(`KP:membership:v1` ‖ the members' keys, each once, in byte order,
 one's own included). The sentinel for an unknown membership is 32 zero bytes; readers also
@@ -222,7 +230,7 @@ B − 1 bytes of it. The costs below are measured on the encoders. h is a string
 | text of n bytes                                   | h + n                                  |
 | introduction, name of n bytes                     | 139 + h + n                            |
 | file upload, payload n, type t, name b            | 1 + (h + n) + (h + t) + (h + b)        |
-| control body                                      | 1                                      |
+| control or ping body                              | 1                                      |
 | acks of k members                                 | h + 1 + naming + 8k; naming ≤ k        |
 | numbers of m prefixes                             | h + 1 + 8m                             |
 | introduced_at                                     | 107                                    |
@@ -238,15 +246,19 @@ Version 3 cost 70 for the fixed fields, 5 + h + n for a text, 174 + h + n for an
 box, 35 on an introduction, 84 on a voucher and 146 on its reply. With B = 1000: a text is at
 most 959 bytes; a control message acknowledges up to 117 members; a sealed reply that fits
 box 1 alone holds a WhoReply of 786 bytes, five places without rosters or three with; a larger
-reply continues in box 2 and on.
+reply continues in box 2 and on. With B = 267, the mesh size: a text is at most 227 bytes, and a
+sealed reply always spans several boxes.
 
 
 ## Reading
 
 * Each member's stream from the position given: a box or a tombstone advances, NOT_FOUND waits
   with the backoff.
+* On a replica that serves push, a NOT_FOUND also subscribes to that box, and the stream waits
+  for the push instead, reading again every 5 minutes in case the push was lost.
 * acks, numbers and introduced_at let a reader jump and backfill, as the state machine does.
-* Replicas keep two epochs; older boxes are recovered only through acknowledgements.
+* Replicas keep a box for one to two weeks; older boxes are recovered only through
+  acknowledgements.
 
 
 ## Vectors
@@ -323,3 +335,9 @@ VoucherPayload map `SignedPleaseAdd` (its CBOR), `VoucherPubKey`; all canonical 
 VoucherReply is map `WhoReply`, `VoucherSalt`, sealed with hpqc's MKEM to the seal public key
 and written unframed to box 1 alone. A member answers a version 3 payload in this form, with
 the map form of the ReplyWho inside.
+
+
+## Pending
+
+Not merged at the time of writing: packing several queued messages into one box, with receipts
+sent after a delay, as wire version 5 (pigeonhole_protocols#44).
