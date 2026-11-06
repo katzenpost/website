@@ -37,6 +37,7 @@ You wish to build software that integrates with Katzenpost.
 |-----|-------|-------------|
 | 📘  | **[Thin Client API Reference](/docs/thin_client_api_reference/)** | Complete API reference for the Go, Rust, and Python thin client libraries. |
 | 📗  | **[Thin Client How-to Guide](/docs/thin_client_howto/)** | Task-oriented guides for accomplishing common operations with the thin client API. |
+| 🧭  | **[Pigeonhole Protocols How-to Guide](/docs/pigeonhole_protocols_howto/)** | Building your own protocol or mixnet service with the pigeonhole_protocols library: when a plain channel is enough, why most protocols should ride on the group chat protocol, and how services bootstrap through the directory and voucher routers. |
 | 🕊️  | **[Understanding Pigeonhole](/docs/pigeonhole_explained/)** | A high-level introduction to the Pigeonhole anonymous storage protocol for application developers. |
 | 📌  | **[Pinned versions](/docs/build_from_source/#pinned-versions)** | The single source of truth for the mutually compatible set of release tags across the katzenpost, thin_client, and katzenqt repositories. |
 
