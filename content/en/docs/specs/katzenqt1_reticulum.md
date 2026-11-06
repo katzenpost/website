@@ -50,11 +50,12 @@ The protocol's rules, rosters, acknowledgements, backfill, numbering and rewrite
 [Group chat specification](/docs/specs/groupchat/); vouchers are the
 [Contact voucher specification](/docs/specs/contactvoucher/).
 
-This document gives version 4 of the wire format. Readers accept version 3 as well, whose
-encodings are at the end. A client has one setting, the wire version it writes, 3 or 4 (default
-4): it chooses the encoding of the messages and ReplyWho the client writes and the voucher form
-it mints. Answering someone else's voucher always follows that voucher's form. A group can mix
-members writing either version.
+This document gives versions 4 and 5 of the wire format. Version 5 is version 4 with one more
+message type, packed texts. Readers accept version 3 as well, whose encodings are at the end. A
+client has one setting, the wire version it writes, 3, 4 or 5 (default 5): it chooses the
+encoding of the messages and ReplyWho the client writes and the voucher form it mints, compact
+under 4 and 5. Answering someone else's voucher always follows that voucher's form. A group can
+mix members writing any of these versions; a reader of version 4 cannot show packed texts.
 
 
 ## Model
@@ -91,7 +92,7 @@ members writing either version.
 | voucher stream | a write capability generated from SHAKE256(voucher): Ed25519 seed 32 bytes, KDF state 32, counter 16 |
 | box 0          | the VoucherPayload, at the stream's first index                                   |
 | boxes 1 on     | the sealed VoucherReply, framed, from the next index                              |
-| forms          | compact, minted under wire version 4; long, the version 3 form, minted under 3     |
+| forms          | compact, minted under wire versions 4 and 5; long, the version 3 form, minted under 3 |
 | seal           | sealed box over the hybrid NIKE X25519 then CTIDH1024, `CTIDH1024-X25519`         |
 | salt           | 32 bytes                                                                          |
 
@@ -101,7 +102,8 @@ The newcomer:
 2. Signs [S's read capability, pk, display name], as CBOR, with S's root key (Ed25519), and
    builds VoucherPayload [S's read capability, pk, display name, signature]. voucher =
    BLAKE2b-256 of its bytes.
-3. Writes the VoucherPayload to box 0. Gives the voucher away.
+3. Writes the VoucherPayload to box 0, at the smallest allowed box size that holds it, 1549 on a
+   mesh. Gives the voucher away.
 4. Reads box 1, then each next box while the one before began with `C`. NOT_FOUND: wait.
    TOMBSTONE: withdrawn, the join failed. The boxes' bytes after their first byte, joined, are
    the sealed reply: open with sk, giving VoucherReply [WhoReply, salt].
@@ -175,7 +177,7 @@ GroupChatMessage, a CBOR array of four to seven elements; trailing `None`s are l
 
 ```rust
 struct GroupChatMessage(
-    u64,                 // version: 4
+    u64,                 // version: 4 or 5
     [u8; 32],            // membership_hash
     u64,                 // msg_type, below
     Body,                // the type's payload; None for control
@@ -189,6 +191,7 @@ enum Body {
     FileUpload(Vec<u8>, String, String),            // type 2: [payload, filetype, basename]
     Who(Value), ReplyWho(Value), Tally(Value),      // types 3, 4, 5 to 9: as the app defines
     None,                                           // types 10 and 11
+    Packed(Vec<String>),                            // type 12, version 5
 }
 ```
 
@@ -202,11 +205,16 @@ enum Body {
 | 5 to 9     | tally        | the app's value                           |
 | 10         | control      | `None`; only acks, numbers, introduced_at |
 | 11         | ping         | `None`                                    |
+| 12         | packed texts | [text, ...], one or more; version 5 only  |
 
 Any message may carry acks, numbers and introduced_at. A ping is content with no body: its readers
 play their ping sound and show that the sender pinged, instead of a line of text.
 
-A reader refuses a message of a version above 4 or a type above 11. When a refused message is
+A packed box holds several texts in the order they were sent, and reads as that many messages.
+
+A reader refuses a message of a version above its own, of a type above 12, or of type 12 in a
+version below 5; a reader built for version 4 therefore refuses a packed box, with the texts and
+acknowledgements in it. When a refused message is
 in the array form and its first three elements are a version, a byte string and a type, the
 client tells the user who sent it, its type and its version, and that the app needs updating,
 rather than dropping it silently.
@@ -246,7 +254,7 @@ Version 3 cost 70 for the fixed fields, 5 + h + n for a text, 174 + h + n for an
 box, 35 on an introduction, 84 on a voucher and 146 on its reply. With B = 1000: a text is at
 most 959 bytes; a control message acknowledges up to 117 members; a sealed reply that fits
 box 1 alone holds a WhoReply of 786 bytes, five places without rosters or three with; a larger
-reply continues in box 2 and on. With B = 267, the mesh size: a text is at most 227 bytes, and a
+reply continues in box 2 and on. With B = 256, the mesh size: a text is at most 216 bytes, and a
 sealed reply always spans several boxes.
 
 
@@ -261,17 +269,29 @@ sealed reply always spans several boxes.
   acknowledgements.
 
 
+## Sending
+
+* A text sent while the box before it still waits to be written goes into that box, as a packed
+  box, as long as the texts fit the box size. Only a client writing version 5 packs.
+* What a member has read is acknowledged in its next message. When it has sent nothing 30
+  seconds after reading something, a control message carries the acknowledgements alone.
+* A box that carries no content, such as a control message, is not acknowledged on its own, so
+  receipts do not answer receipts.
+
+
 ## Vectors
 
-In `katzenpost/pigeonhole_protocols`: `testdata/katzenqt1/groupchat_wire_vectors_v4.json`
-(messages, written boxes, membership hashes, replies, refused arrays) for version 4,
+In `katzenpost/pigeonhole_protocols`: `testdata/katzenqt1/groupchat_wire_vectors_v5.json` and
+`groupchat_wire_vectors_v4.json` (messages, written boxes, membership hashes, replies, refused
+arrays) for versions 5 and 4,
 `testdata/katzenqt1/groupchat_wire_vectors.json` for version 3, and
 `testdata/katzenqt1/acks_vectors.json`. Voucher vectors are `voucher/testdata/voucher_vectors_v2.json`
 in `katzenpost/hpqc`, beside the version 3 file; BACAP vectors are in the same repository.
 katzenrns is a client of this protocol on meshes: match the above, not its storage or interface.
-Until version 4 is merged, the code that writes it is on the branch `katzenqt1-v4` of
-`hpqc`, `pigeonhole_protocols`, `cryptlib`, `group_chat_client`, `katzenqt` and `katzenrns`;
-the deployed version 3 is the branch `katzenqt1-v3` of each.
+`pigeonhole_protocols` main writes version 5. The compact voucher form is on the branch
+`katzenqt1-v4` of `hpqc` (hpqc#154, not merged), which the Go module of `pigeonhole_protocols` pins; the
+deployed version 3 is the branch `katzenqt1-v3` of `hpqc`, `cryptlib`, `group_chat_client`,
+`katzenqt` and `katzenrns`.
 
 
 ## Encoding
@@ -335,9 +355,3 @@ VoucherPayload map `SignedPleaseAdd` (its CBOR), `VoucherPubKey`; all canonical 
 VoucherReply is map `WhoReply`, `VoucherSalt`, sealed with hpqc's MKEM to the seal public key
 and written unframed to box 1 alone. A member answers a version 3 payload in this form, with
 the map form of the ReplyWho inside.
-
-
-## Pending
-
-Not merged at the time of writing: packing several queued messages into one box, with receipts
-sent after a delay, as wire version 5 (pigeonhole_protocols#44).

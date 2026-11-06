@@ -146,13 +146,14 @@ plaintext with a 4 byte length before it, zero padded, plus a 16 byte AEAD tag.
 
 | profile  | plaintext | ciphertext | write query |
 |----------|-----------|------------|-------------|
-| `mesh`   | 267       | 287        | 384         |
+| `mesh`   | 256       | 276        | 373         |
 | `mixnet` | 1549      | 1569       | 1666        |
 
-`mixnet` is the Katzenpost box, fixed by the Sphinx geometry. `mesh` is the largest box whose
-write, and a replica's forward of it, fit one Link packet at Reticulum's 500 byte MTU in either
-query mode: the 431 byte Link MDU, less request mode's 31 byte msgpack framing (more than
-Channel mode's 11), less the forward's 113 byte head, less the 20 bytes of box overhead.
+`mixnet` is the Katzenpost box, fixed by the Sphinx geometry. `mesh` is the largest multiple of
+16 whose write, and a replica's forward of it, fit one Link packet at Reticulum's 500 byte MTU in
+either query mode: the 431 byte Link MDU, less request mode's 31 byte msgpack framing (more than
+Channel mode's 11), less the forward's 113 byte head, less the 20 bytes of box overhead, is 267,
+rounded down to 256. It is the size clients on Reticulum write.
 
 A replica always takes `mesh` and `mixnet` and up to 8 more sizes its operator lists, none over
 1549. It refuses a box of any other ciphertext size with INVALID_PAYLOAD, and a replica
