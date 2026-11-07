@@ -17,270 +17,337 @@ version: ""
 
 **Abstract**
 
-Pigeonhole storage replicas on a Reticulum mesh give Reticulum users a durable, asynchronous
-group chat with post quantum confidentiality, and let them share groups with users of a
-Katzenpost mixnet. The mesh side spends as few bytes as it can. The mixnet side keeps its
-metadata privacy. Neither needs the other to work.
+Pigeonhole replicas on a Reticulum mesh give Reticulum users asynchronous group communication
+with post quantum confidentiality, and let them share groups with users of a Katzenpost
+mixnet. The mesh side spends as few bytes as it can. The mixnet side keeps its metadata
+privacy. Neither needs the other to work.
 
 This document assumes the [Echomix paper](https://arxiv.org/abs/2501.02933) and the
-[Pigeonhole specification](/docs/specs/pigeonhole/).
+[Pigeonhole specification](/docs/specs/pigeonhole/). The client's side is
+[Pigeonhole protocols over Reticulum](/docs/specs/pigeonhole-protocols-reticulum/). The
+reference implementation is [pigeonhole_rns](https://github.com/katzenpost/pigeonhole_rns),
+a Python replica on RNS and a Rust replica on Reticulum-rs.
 
 
 ## What crosses over
 
 A box is a Box ID, a ciphertext and a signature. The Box ID is the public key that verifies
 the signature, the ciphertext is readable only with the read capability, and consecutive
-boxes of one writer are unlinkable to anyone without it. A replica stores a box because it
-verifies, not because of who brought it. Both networks store this same object at the same
-size, so a box written on one can be carried to the other by anyone who can read it, and it
-arrives as authentic as it left.
+boxes of one writer are unlinkable to anyone without it. A replica keeps a box because it
+verifies, not because of who brought it. Both networks carry this same object, so a box
+written on one can be carried to the other by anyone who can read it, and it arrives as
+authentic as it left.
 
-Everything above the box is shared: BACAP, the box size, the group chat message format.
+Everything above the box is shared: BACAP, the box sizes, the group chat message format.
 Everything below it differs, and this document describes the mesh half.
 
 
 ## Priorities
 
 The mesh carries bytes over LoRa and similar links, so the design pays public key
-cryptography as rarely as it can, carries no padding, and hides nothing from replicas that the
-mixnet design hides from couriers. The mixnet makes the opposite trade in its own
+cryptography as rarely as it can, carries no padding beyond the box, and hides nothing from
+replicas that the mixnet hides from couriers. The mixnet makes the opposite trade in its own
 specification.
 
 BACAP is already quantum annoying: without the blinding factor an adversary cannot read a box
-or link two of them, quantum computer or not, and the paper states the one thing a quantum
-adversary can do, which is forge a write into a box whose ID it has seen. That holds on both
-networks and in every configuration below. What BACAP does not cover is the traffic that
-carries it: which Box IDs are written and read, and when. Whether the mesh protects that, and
-against whom, is decided by one choice.
+or link two of them, quantum computer or not. The one thing a quantum adversary can do is
+forge a write into a box whose ID it has seen. That holds on both networks. What BACAP does
+not cover is the traffic that carries it: which Box IDs are written and read, and when.
 
 
-## Open or closed
+## Open mode
 
-A mesh is run one of two ways. The choice decides who may be a replica and whether queries
-are encrypted beyond what Reticulum already does. The two do not mix: encrypting metadata on
-a mesh that lets anyone be a replica would hide it only from the observers who do not care to
-announce one.
+A mesh runs in open mode. A replica is any node that announces a Reticulum destination under
+application name `pigeonhole`, aspect `replica`. There is no list to join. The replica's
+Reticulum identity is its identity, and the Link a client opens to it is authenticated by it.
 
-They also differ in what it takes to run one. An open mesh needs nothing but a replica that
-announces. A closed mesh needs its operators to exchange their replicas' public keys out of
-band before anything else, and that step, how a new operator's key reaches everyone, how a
-key is removed when one leaves, who keeps the list straight, is the hard part of running any
-such network and is not specified here. It is also what the closed mesh's post quantum
-guarantees rest on.
+Queries travel on that Link as they are. Reticulum's link encryption gives them X25519 forward
+secrecy and Ed25519 authentication of the replica, both classical. There is no post quantum
+authentication of replicas. No session layer is added, because anyone may announce a replica,
+and a replica sees the Box IDs and read times of the boxes it handles, as a replica does on
+the mixnet. What remains post quantum is what BACAP protects: contents and linkage.
 
-### Open
-
-A replica is any node that announces a Reticulum destination under the Pigeonhole application
-name. There is no list to join. The replica's Reticulum identity is its identity: boxes are
-placed by hashing it, and the Reticulum Link a client opens to it is authenticated by it.
-
-A client's queries travel on that Link as they are. Reticulum's link encryption gives them
-X25519 forward secrecy and Ed25519 authentication of the replica, both classical. No session
-layer is added, because it would buy nothing: anyone may announce a replica, and a replica
-sees the Box IDs and read times of every box forwarded to it, exactly as a replica does on the
-mixnet. The difference from the mixnet is only that there the replica operators were admitted
-by the directory authorities, and here anyone is. An operator who announces many identities
-takes a larger share of the box order, which costs the mesh bandwidth and shows that operator
-more metadata, and nothing else: every replica that handles a box keeps a copy until the
-owners hold it, and a reader is never limited to the owners.
-
-What remains post quantum on an open mesh is what BACAP protects: contents and linkage.
-
-### Closed
-
-A closed mesh is a list of replica keys. Each replica has a long term hybrid NIKE key pair,
-X25519 combined with CTIDH1024, and its operators exchange the public halves out of band, by
-whatever means they already have to recognise each other: in person, over a channel they
-share, or signed by keys they exchanged that way earlier. Every replica and bridge holds the
-list, and a client gets it from whoever gave it the mesh. The replica set is now vetted, as it
-is on the mixnet, and the observers left are outsiders and anyone recording traffic for a
-quantum computer later. This is the mixnet's arrangement in Reticulum's idiom: the vetting the
-mixnet does through directory authorities, the closed mesh does through that exchange.
-
-The list is what admits a replica. Announces still carry a replica's key and make it
-reachable, but a node acts only on announces whose hybrid key is on its list: those replicas
-own boxes, receive handoffs and get sessions, and any other announce under the Pigeonhole
-application name is ignored. The Ed25519 that signs an announce proves nothing here, and
-nothing rests on it. The chain from the exchange to a session is a hybrid key handed over out
-of band and then proven by Diffie-Hellman, so it contains no post quantum signature and no
-classical link, and a quantum adversary who records the mesh gains nothing against it.
-Operators may also keep the mesh's interfaces off public networks, with Reticulum's interface
-passphrase or a Network Identity, so that announces, placement and handoffs are not seen from
-outside; that fence hides traffic but admits no one.
-
-Against those observers a closed mesh runs every query inside a Noise session, with the hybrid
-NIKE X25519 combined with CTIDH1024 as the Diffie-Hellman function, ChaCha20-Poly1305 and
-BLAKE2s. The replica's announce carries its long term hybrid NIKE public key, and that key is
-its identity: boxes are placed by hashing it, and sessions authenticate against it. Noise
-authenticates by Diffie-Hellman, so a replica proves it holds the private half of a hybrid
-key, and no post quantum signature is needed anywhere. An announce that pairs a listed key
-with a new destination, or a listed destination with another key, is ignored; a replica that
-wants a new key is a new entry on the list, announced as a new replica, and its boxes move
-through the handoff below.
-
-A client speaks `Noise_NK` to a replica:
-
-```
-NK:
-  <- s
-  ...
-  -> e, es
-  <- e, ee
-```
-
-The client has no identity to prove, since the capability inside its query is the
-authorisation, and NK keeps it anonymous, as a Reticulum link initiator is. The handshake is
-one round trip, and the client puts its first query in the first message, so a query and its
-reply together cost one round trip. That first payload is encrypted to the replica's static
-alone, so it is replayable and would be exposed by a later compromise of that static. A
-replayed write is idempotent, a replayed read yields a reply only the original client can
-decrypt, and the payload holds a Box ID and a box, which the replica sees in any case. A
-client that wants forward secrecy for its first query sends it after the second message, for
-one more round trip. Everything after the handshake has forward secrecy.
-
-Replicas speak `Noise_KK` to each other. Both statics are known from announces, so the
-handshake transmits only ephemerals and completes in one round trip. These sessions are long
-lived and reopened when a link is lost.
-
-A Noise message that fits a link packet travels as one; a larger one travels as a Reticulum
-Resource.
-
-Everything that follows is the same on an open mesh and a closed one.
+Every replica holds every box. There is no placement on the mesh; sharding happens only on the
+Katzenpost side of a bridge, as the mixnet places boxes.
 
 
-## Placement
+## Replication
 
-Rendezvous hashing orders the replicas for every box: each replica's score is the hash of its
-identity key and the Box ID, lowest first. The first two replicas in a box's order are its
-owners. Box IDs are uniformly random, so every replica owns an equal share, and anyone who
-holds a Box ID can compute its owners from the announces it has heard, without asking.
+A replica that newly holds a box, written by a client, forwarded by another replica, pulled
+from a mixnet or fetched for a reader, forwards it to every replica it has heard except the
+one it came from. It retries each with backoff until that replica acknowledges with SUCCESS or
+ALREADY_EXISTS, and stops for one that answers INVALID_SIGNATURE, INVALID_BOX_ID or
+INVALID_PAYLOAD. A box it already held is not passed on again, so a forward is never
+forwarded twice. Forwards to different replicas run at once.
 
-Placement is what lets the mesh grow. With two copies per box however many replicas there
-are, capacity grows with the number of replicas, and a reader asks two of them instead of all
-of them. Without it every replica would come to hold every box, as propagation nodes do.
+Replicas identify themselves on the Links they open to each other, so a receiver knows a
+forward's sender and does not send the box back. A write from an unidentified Link is a
+client's.
 
-Two nodes may have heard different announces, and a partition hides replicas from both. So
-every node applies the order to the replicas it knows and can reach, and the protocol is
-written so that differing views converge instead of conflicting. Sharding is the result when
-every replica is reachable; store and forward is what happens in between.
-
-### Writing
-
-A client sends a write to the reachable replica with the fewest hops in its path table, its
-entry replica. The entry replica stores the box and acknowledges. The client is done.
-
-The entry replica then forwards the box to the first two reachable replicas in the box's
-order. When those are the owners, the box is where every reader looks first. When an owner is
-unreachable or unknown, a stand-in holds the box in its place and forwards it to the owner
-once it can reach one. Placement depends only on the Box ID and the replicas a node knows, so
-when a partition heals or an announce arrives, every held box moves to the right owners.
-
-A replica stores a box it already holds once, so forwarding needs no coordination. A
-replica that is not one of a box's owners keeps its copy until both owners have acknowledged
-holding the box, then may drop it. During a partition no acknowledgement comes and nothing is
-dropped; once every replica is reachable the extra copies disappear after one handoff and the
-mesh holds two copies per box. Stored boxes survive a restart.
+When a replica first hears another, and again after it found it unreachable or either
+restarted, the two sync. The initiator walks the Box ID space in pages of up to 128 Box IDs,
+each with a tombstone flag. The responder answers each page with its own page over the same
+range, cut short when full, and each side enqueues for the other the boxes it lacks. A
+tombstone is sent where the other holds the box it replaces. An unidentified initiator gets
+the answer but no boxes.
 
 ### Reading
 
-A client sends a read to its entry replica. The entry replica answers from its own store if
-it can. Otherwise it asks the reachable replicas in the box's order, owners first, and
-returns the first box it is given. It does not stop at the owners: if they do not have the
-box it continues down the order, so a copy held by a stand-in or by another client's entry
-replica is found, and an owner that withholds a box only costs the reader queries. If no
-reachable replica has it and a bridge is reachable, the entry replica asks the bridge, which
-fetches the box from the mixnet if it is there. Otherwise the reply says so, and the client
-asks again later.
+A client sends a read to one replica, its entry replica. The entry replica answers from its own
+store. Otherwise it asks every reachable replica with `peek`, in the box's order, which answers
+from that replica's store only, a bridge also asking its mixnet. The first box or tombstone found is
+returned, kept and forwarded like a write, so the next reader finds it on the mesh. If none has
+it and the entry replica is itself a bridge, it asks its mixnet. Otherwise the reply is
+NOT_FOUND, and the client asks again later or subscribes to the box.
 
-Within a partition, the replicas a reader can reach are the ones its neighbours wrote to, so
-a group keeps chatting among the members it can reach. Boxes written on the other side arrive
-when the first stand-in can reach an owner.
+A box's order ranks replicas by SHA-256 of the replica's identity hash and the Box ID, lowest
+first; anyone who has heard the same replicas computes the same order.
 
-### Deleting and forgetting
+### Deleting
 
-A tombstone is a write with an empty payload. It replaces the box, is forwarded like one, and
-a read of a tombstoned box says so. Replicas keep boxes for the current and previous replica
-epoch, one week each, and drop older ones; the group chat protocol's acknowledgements and
-backfill cover readers who were away longer.
+A tombstone is a write with an empty ciphertext. It replaces the box and is forwarded and
+synced like one; a box never replaces a tombstone. A read of a tombstoned box answers
+TOMBSTONE. A reader that has seen a box's tombstone treats the box as deleted thereafter, since
+another replica may hold the box until the tombstone reaches it.
 
-A reader that has seen a box's tombstone treats the box as deleted thereafter, since
-another replica may still hold the box until the tombstone reaches it.
+
+## Epochs and garbage collection
+
+Boxes are kept by replica epoch, as on Katzenpost replicas. An epoch is 1200 seconds, a replica
+epoch is 504 epochs, one week, both counted from 2017-06-01 00:00 UTC (Unix 1496275200):
+
+```
+replica epoch = ⌊(now − 1496275200) / 604800⌋
+```
+
+A box is stamped with the replica epoch it arrived in and kept for that epoch and the next, so
+one to two weeks. Collection runs at start and at every replica epoch boundary. Both periods
+are settings; a bridge keeps the defaults, since the bridge socket carries no timing and
+Katzenpost's replica epoch is a week. The group chat protocol's acknowledgements and backfill
+cover readers who were away longer.
+
+
+## Disk limits
+
+A replica keeps every box while there is room. Two limits bound the room: a cap on the box
+database and its write-ahead log (none by default), and a minimum of free space on its
+filesystem (500 MiB by default, as Katzenpost's `MinFreeStorageMiB`). A new box that would
+cross either first evicts the oldest boxes, by replica epoch and then arrival, tombstones only
+after every box, until a sixteenth of the limit is spare. Only when nothing is left to evict
+is the write answered STORAGE_FULL. Evicted pages are returned to the filesystem, so the limits
+measure real disk use.
+
+
+## Box sizes
+
+A replica takes boxes of several sizes at once, since meshes and mixnets joined through
+bridges need not share one. A box's size is its plaintext size; the ciphertext is the
+plaintext with a 4 byte length before it, zero padded, plus a 16 byte AEAD tag.
+
+| profile  | plaintext | ciphertext | write query |
+|----------|-----------|------------|-------------|
+| `mesh`   | 256       | 276        | 373         |
+| `mixnet` | 1549      | 1569       | 1666        |
+
+`mixnet` is the Katzenpost box, fixed by the Sphinx geometry. `mesh` is the largest multiple of
+16 whose write, and a replica's forward of it, fit one Link packet at Reticulum's 500 byte MTU in
+either query mode: the 431 byte Link MDU, less request mode's 31 byte msgpack framing (more than
+Channel mode's 11), less the forward's 113 byte head, less the 20 bytes of box overhead, is 267,
+rounded down to 256. It is the size clients on Reticulum write.
+
+A replica always takes `mesh` and `mixnet` and up to 8 more sizes its operator lists, none over
+1549. It refuses a box of any other ciphertext size with INVALID_PAYLOAD, and a replica
+forwarding such a box drops it. A tombstone is always taken. An operator may instead take any
+size, which on a bridge leaves the check to the Katzenpost replica.
 
 
 ## Bridges
 
 A bridge joins a mesh to a Katzenpost mixnet so that a group can have members on both without
-either side doing anything. It is one node running two replicas: a mesh replica, and a
-Katzenpost replica that is a member of the mixnet's PKI. The two share a machine and talk over
-a local socket. The Katzenpost replica is already vetted by the mixnet's PKI, so what the
-bridge brings in enters under that replica's name; this is why the crossing happens between
-replicas and not through some new door into the mixnet.
+either side doing anything. It is a mesh replica like any other, holding every box and
+syncing, beside a Katzenpost replica that is a member of the mixnet's PKI. The two share a host
+and talk over a unix socket on the Katzenpost replica. What the bridge brings in enters under
+that already vetted replica's name; this is why the crossing happens between replicas and not
+through a new door into the mixnet.
 
-Boxes cross in two different ways, because the two networks differ in what a replica can see.
+A bridge announces the mixnet it serves as an id: the first 16 bytes of SHA-256 of a name its
+operator gives, such as the mixnet's PKI identity, the same on every bridge to that mixnet.
 
-**Out of the mesh, by push.** Every box the mesh replica stores it also hands to its
-Katzenpost replica, which treats it as a replication write from a peer: it verifies the box,
-stores it if it is a shard for that Box ID, and otherwise dispatches it to the shards over the
-replica-to-replica links it already holds. Those links are paced and carry decoys when idle,
-so a pushed box displaces a decoy and the mesh enters the mixnet at the mixnet's own rate.
-The mixnet never pulls from the mesh, so a box that reaches no bridge never leaves it. Every
-replica that stores a box therefore also forwards it to one bridge, the first reachable in
-the box's order, and a stand-in keeps its copy until that bridge has acknowledged it, as it
-does for the owners. A box pushed twice is stored once.
+**Out of the mesh.** A bridge writes each box it holds into its mixnet, where the Katzenpost
+replica treats it as a replication write and dispatches it to the box's shards. Bridges
+serving the same mixnet first ask each other, with `pushed`, whether one has written the box:
+the first in the box's order among them writes, and the others wait up to three retries for
+it and then write themselves. A duplicate write is harmless. A bridge may instead write only
+the boxes clients write to it, while still pulling for reads.
 
-**Into the mesh, by pull.** Nothing on the mixnet announces a write, and a Katzenpost replica
-sees only the boxes of its own shards, so the mixnet cannot push. But any Katzenpost replica
-can fetch any box: it encapsulates a read to the box's shards and awaits the reply, the path it
-already uses when it proxies a read. So when a mesh read finds nothing on the mesh, the entry
-replica asks a reachable bridge, the bridge asks its Katzenpost replica, the box comes back
-from the mixnet and is stored on the mesh as an ordinary box, forwarded along its order like
-one, and returned to the client. The read is the watch list: no one tells a bridge what to
-look for, and the next reader finds the box on the mesh.
+**Into the mesh.** Nothing on the mixnet announces a write, so the mixnet cannot push. A read
+that misses on the mesh reaches the bridges, which ask their Katzenpost replicas; the bridge
+that finds the box keeps it, with its mixnet as the box's origin, and it replicates from
+there. The read is the watch list: no one tells a bridge what to look for.
 
-A box from the mixnet appears on the mesh only because a mesh node holding its read
-capability asked for it by ID, which is a group member; the consent is the membership. A mesh
-box pushed into the mixnet shows mixnet replicas nothing the mesh did not already show every
-mesh replica. A bridge between a closed mesh and the mixnet gives up nothing, since both vet
-their replicas. A bridge between a closed mesh and an open one would publish the closed mesh's
-Box IDs and read times to anyone, so there is none.
+A box carries its origin through replication, as a `forward` prefixed with the mixnet id, so no
+bridge writes a box back into the mixnet it came from, while bridges to other mixnets do. One
+mesh can join several mixnets without loops. A tombstone written directly on a mixnet does not
+cross to the mesh, since the bridge socket returns a tombstone without its signature; one
+written on the mesh reaches every mixnet.
 
-A bridge announces itself as a replica with one extra bit. A mesh may have several; a box
-pulled or pushed twice is stored once. What a bridge costs is paid by its operator: a mixnet
-round trip, a few seconds, the first time a mixnet box is read on the mesh, and a replication
-write into the mixnet for every box the mesh writes.
+A box from the mixnet appears on the mesh only because a mesh node holding its read capability
+asked for it by ID, which is a group member; the consent is the membership. A mesh box written
+into the mixnet shows mixnet replicas nothing the mesh did not already show every mesh
+replica. What a bridge costs is paid by its operator: a mixnet round trip the first time a
+mixnet box is read on the mesh, and a replication write into the mixnet for every box the mesh
+writes.
+
+A bridge carries boxes of every size it takes unchanged.
+
+
+## Query modes
+
+A query reaches a replica over a Link to its destination in one of two modes. Both carry the
+same query and reply bytes, and one destination serves both.
+
+1. **Request mode.** Each query is a Link request to a path; one larger than the Link MDU
+   travels as a Resource.
+2. **Channel mode.** Each query and reply is a run of Channel messages on the Link, for
+   Reticulum stacks with Links and Channel but no Link requests or Resources. The message's
+   first byte picks the handler.
+
+| path          | Channel op | between             |
+|---------------|------------|---------------------|
+| `read`        | 0          | client and replica  |
+| `write`       | 1          | client and replica  |
+| `peek`        | 2          | replicas            |
+| `sync`        | 3          | replicas            |
+| `forward`     | 4          | replicas            |
+| `pushed`      | 5          | bridges             |
+| `subscribe`   | 6          | client and replica  |
+| `unsubscribe` | 7          | client and replica  |
+
+For ops 0 and 1 the op is the query's own first byte. For the others the op byte is followed by
+that path's request bytes and answered with its response bytes.
+
+Replicas ask each other in Channel mode first, when the other announces that it serves the
+replica paths there (or Channel mode at all, for a write), and fall back to a Link request when
+it does not or the Channel query fails. A replica announcing that it serves no Link requests,
+such as the Rust replica, is asked only in Channel mode. The Python replica serves both modes.
+
+A replica handles Channel queries on 2 workers per Link, with up to 16 more queued per Link and
+at most 32 at once across the replica. A query arriving to a full queue is dropped; the asker
+times out and asks again.
+
+
+## Push
+
+A client can subscribe on its Link to the Box IDs it waits for, and the replica pushes each box
+down that Link when it newly holds it: written by a client, arriving by forward or sync, or
+pulled from a mixnet. A client that never subscribes polls.
+
+A Link waits for at most 256 Box IDs. A subscription lasts the granted time, at most an hour;
+the client renews it by subscribing again. A Box ID already held is pushed at once. A push
+consumes the subscription, since a box is written once; the client then subscribes to the
+stream's next Box ID. Closing the Link drops every subscription.
+
+Pushes go only over Channel, also to a Link that subscribed with a Link request. They are best
+effort: a push sent as the Link closes is lost, and one is dropped when 256 wait to be sent on
+its Link, so a client that reconnects reads what it waits for once and subscribes again.
 
 
 ## Group chat on the mesh
 
 The group chat protocol depends only on reading and writing boxes. On the mixnet it writes
-several boxes through a temporary stream and a copy command so that a courier sees one
-action; the mesh has no courier to hide from, so a mesh client writes the same boxes directly.
-Readers on either network see identical streams, and a group whose members are on both talks
-through a bridge without knowing it.
+several boxes through a temporary stream and a copy command so that a courier sees one action;
+the mesh has no courier to hide from, so a mesh client writes the same boxes directly. Readers
+on either network see identical streams, and a group whose members are on both talks through a
+bridge without knowing it.
 
 
 ## Encoding
 
-A replica's announce carries one byte of application data, one if the replica is a bridge and
-zero otherwise. On a closed mesh the replica's 192 byte hybrid NIKE public key follows: the 32
-byte X25519 key, then the 160 byte CTIDH1024 key.
-
-A query is a Reticulum Link payload on an open mesh and a Noise message payload on a closed
-one:
-
-* one byte, zero for a read and one for a write,
-* the 32 byte Box ID,
-* for a write, the 64 byte signature and the ciphertext, whose length is fixed by the box
-  size; a tombstone has a zero length ciphertext.
-
-A reply is:
-
-* one byte result: found, not found, tombstone, stored, or an error code from the Pigeonhole
-  specification,
-* for a found box, the 64 byte signature and the ciphertext.
-
-Replicas exchange boxes with the same write message and reply, and so do the two halves of a
-bridge over their local socket: the mesh replica sends writes to push and reads to pull, and
-the Katzenpost replica answers with the same replies.
-
 All integers are big endian.
+
+### Announce
+
+The application data of a replica's announce is one byte of flags:
+
+| bit | set when the replica                          |
+|-----|-----------------------------------------------|
+| 0   | is a bridge                                   |
+| 1   | serves Channel mode                           |
+| 2   | serves the replica paths in Channel mode too  |
+| 3   | serves no Link requests                       |
+| 4   | serves push                                   |
+
+A bridge follows the byte with its 16 byte mixnet id. A bridge announcing none serves the
+mixnet of the empty name. The Rust replica announces bits 1, 2, 3 and 4.
+
+### Queries and replies
+
+A read query is one byte 0 and the 32 byte Box ID. A write query is one byte 1, the 32 byte Box
+ID, the 64 byte signature and the ciphertext to the end of the message; a tombstone has an
+empty ciphertext. A reply is one result byte, a Pigeonhole replica code, and for a box found
+the 64 byte signature and the ciphertext. The codes and their meaning for a client are in
+[Pigeonhole protocols over Reticulum](/docs/specs/pigeonhole-protocols-reticulum/).
+
+### Replica paths
+
+* `peek`: a read query, answered with a reply.
+* `forward`: the 16 byte mixnet id of the box's origin, then a write query; answered with a
+  reply. The origin is kept only from an identified replica.
+* `sync`: a 32 byte lower bound, exclusive, a 32 byte upper bound, inclusive, then up to 128
+  entries of a 32 byte Box ID and one byte, 1 for a tombstone, in Box ID order. The answer is
+  the 32 byte Box ID where its page ends and up to 128 entries of the same form. A malformed
+  page is answered with nothing.
+* `pushed`: a 32 byte Box ID and one byte, 1 for a tombstone; answered with one byte, 1 when
+  this bridge has written that box or tombstone into its mixnet or pulled it from there.
+
+### Subscribe and unsubscribe
+
+Subscribe, after the op byte in Channel mode or as the `subscribe` request:
+
+```
+ttl u16 seconds | box id 32 | box id 32 | ...
+```
+
+The answer is `0 | taken u16 | ttl u16`. The first `taken` IDs are subscribed; the rest are
+refused because the Link already waits for 256. An ID the Link already waits for is renewed
+and counts as taken. The granted `ttl` is the asked one capped at 3600, 0 asking for 3600. A
+malformed subscribe is answered with the one byte 5, INVALID_PAYLOAD.
+
+Unsubscribe, after op 7 or as the `unsubscribe` request, is a run of 32 byte Box IDs, dropping
+those from the Link, or every one when none is named. The answer is the one byte 0.
+
+### Channel frames
+
+A Channel mode query or reply is one or more Channel messages of MSGTYPE `0x5048`:
+
+```
+request id u16 | piece index u8 | piece count u8 | piece
+```
+
+A query or reply is cut into 1 to 255 pieces of at most the Channel MDU less 4 bytes, the
+Channel MDU being the Link MDU less Channel's 6 byte envelope: 421 bytes on a 500 byte MTU
+link. A reply carries its query's request id. A receiver drops a request whose pieces disagree
+on the count, or that is incomplete after 60 seconds.
+
+A push is a run of Channel messages of MSGTYPE `0x5049`, framed the same way under request ids
+the replica counts per Link. Its bytes are:
+
+```
+box id 32 | reply
+```
+
+the reply as for a read: 0 with the signature and ciphertext, or 11, TOMBSTONE.
+
+### Bridge socket
+
+The two halves of a bridge exchange the same write and read queries and replies over their unix
+socket, each message behind a 4 byte length. The mesh replica sends writes to put boxes into
+the mixnet and reads to pull them out. `testdata/bridge_socket_vectors.json` in
+`pigeonhole_rns`, read by the tests of both implementations, pins the format and what a
+replica answers each box.
+
+
+## Pending
+
+Not merged at the time of writing: Katzenpost replicas holding box sizes besides their
+geometry's (katzenpost#1265), so that a bridged mixnet also takes the `mesh` size.
