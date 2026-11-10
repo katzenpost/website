@@ -13,6 +13,13 @@ weight: "55"
 version: ""
 ---
 
+{{% pageinfo %}}
+Directory authorities publish Sphinx public keys and a hash of the packet geometry.
+See [descriptors](/docs/specs/dirauth#25-descriptors) and
+[geometry hashing](/docs/specs/dirauth#226-byte-identity) in the directory authority
+specification for the v0.0.107 encoding and validation rules.
+{{% /pageinfo %}}
+
 <div class="section">
 
 <div class="titlepage">

@@ -1,0 +1,16 @@
+{
+  "authority": {"icons":["authority"],"tone":"directory"},
+  "network": {"icons":["directory"],"tone":"local"},
+  "mix": {"icons":["mix"],"tone":"link"},
+  "gateway": {"icons":["gateway"],"tone":"link"},
+  "service": {"icons":["service"],"tone":"link"},
+  "replica": {"icons":["replica"],"tone":"link"},
+  "client": {"icons":["client"],"tone":"local"},
+  "publisher": {"icons":["mix","gateway","service","replica"],"tone":"link"},
+  "other-servers": {"icons":["mix","service","replica"],"tone":"link"},
+  "initiator": {"icons":["connection"],"tone":"link"},
+  "clock": {"icons":["clock"],"tone":"local"},
+  "signer": {"icons":["signature"],"tone":"local"},
+  "data": {"icons":["data"],"tone":"local"},
+  "layers": {"icons":["connection"],"tone":"link"}
+}

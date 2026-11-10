@@ -1,0 +1,50 @@
+{{ .Page.Store.Set "hasmermaid" true -}}
+{{ if eq .Page.Params.slug "dirauth" -}}
+{{ $diagram := .Inner -}}
+{{ if strings.Contains $diagram "/docs/specs/dirauth/sphinx-layers.svg" -}}
+  {{ $layers := resources.Get "diagrams/sphinx-layers.svg" | resources.ExecuteAsTemplate "docs/specs/dirauth/sphinx-layers.svg" .Page -}}
+  {{ $diagram = replace $diagram "/docs/specs/dirauth/sphinx-layers.svg" $layers.RelPermalink -}}
+{{ end -}}
+{{ $roles := .Page.Site.Data.dirauth_roles -}}
+{{ $panel := dict -}}
+{{ with findRE `(?m)^\s*%% panel: ([a-z-]+)\s*$` $diagram 1 -}}
+  {{ $key := replaceRE `(?s).*%% panel: ([a-z-]+)\s*` "$1" (index . 0) -}}
+  {{ $panel = index $roles $key -}}
+  {{ if not $panel }}{{ errorf "Unknown directory diagram panel %q" $key }}{{ end -}}
+{{ end -}}
+{{ $actors := dict -}}
+{{ with findRE `(?m)^\s*%% actors: (.+)$` $diagram 1 -}}
+  {{ range findRE `[A-Za-z][A-Za-z0-9]*=[a-z-]+` (index . 0) -}}
+    {{ $pair := split . "=" -}}
+    {{ $role := index $pair 1 -}}
+    {{ if not (index $roles $role) }}{{ errorf "Unknown directory actor role %q" $role }}{{ end -}}
+    {{ $actors = merge $actors (dict (index $pair 0) $role) -}}
+  {{ end -}}
+{{ end -}}
+{{ $title := "Protocol diagram" -}}
+{{ with findRE `(?m)^\s*accTitle: (.+)$` $diagram 1 -}}
+  {{ $title = replaceRE `(?s).*accTitle: (.+)` "$1" (index . 0) | strings.TrimSpace -}}
+{{ end -}}
+{{ if not $panel }}{{ errorf "Directory diagram %q needs a panel" $title }}{{ end -}}
+{{ if strings.HasPrefix (strings.TrimSpace $diagram) "flowchart" -}}
+{{ $diagram = printf "%s\nclassDef directory fill:#48351f,stroke:#f3bd66,color:#ffffff\nclassDef packet fill:#342b4c,stroke:#c3abff,color:#ffffff\nclassDef link fill:#1c3c4c,stroke:#7acee9,color:#ffffff\nclassDef local fill:#34383d,stroke:#c3cbd5,color:#ffffff\n" $diagram -}}
+{{ end -}}
+<figure class="protocol-diagram{{ with $panel }} protocol-tone-{{ .tone }}{{ end }}"{{ with $actors }} data-actor-roles="{{ . | jsonify }}"{{ end }}>
+<figcaption class="diagram-heading">
+  <div class="diagram-title">
+    <span class="diagram-icons">{{ range $panel.icons }}<img src="{{ printf "/docs/specs/dirauth/icons/%s.svg" . | relURL }}" alt="" width="32" height="32">{{ end }}</span>
+    <span>{{ $title }}</span>
+  </div>
+</figcaption>
+<div class="diagram-scroll" role="region" aria-label="{{ $title }}" tabindex="0">
+<pre class="mermaid">
+%%{init: {{ .Page.Site.Data.dirauth_diagrams | jsonify | safeHTML }} }%%
+{{ $diagram }}
+</pre>
+</div>
+</figure>
+{{ else -}}
+<pre class="mermaid">
+  {{- .Inner -}}
+</pre>
+{{ end -}}
