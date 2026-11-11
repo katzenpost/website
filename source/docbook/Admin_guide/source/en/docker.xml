@@ -647,7 +647,7 @@
                         </entry>
                         <entry>auth1</entry>
                         <entry>Dirauth1</entry>
-                        <entry morerows="9">
+                        <entry morerows="14">
                             <para>127.0.0.1 (localhost)</para>
                         </entry>
                         <entry>
@@ -691,7 +691,9 @@
                         <entry>
                             <para>servicenode1</para>
                         </entry>
-                        <entry>Service node</entry>
+                        <entry>Service
+                            node<?oxy_insert_start author="dwrob" timestamp="20261013T141850-0700"?>
+                            1<?oxy_insert_end?></entry>
                         <entry>
                             <para>30006 </para>
                         </entry>
@@ -702,7 +704,8 @@
                             <para>servicenode2</para>
                             <?oxy_insert_end?>
                         </entry>
-                        <entry/>
+                        <entry><?oxy_insert_start author="dwrob" timestamp="20261013T141900-0700"?>Service
+                            node 2<?oxy_insert_end?></entry>
                         <entry/>
                     </row>
                     <row>
@@ -711,7 +714,8 @@
                             <para>servicenode3</para>
                             <?oxy_insert_end?>
                         </entry>
-                        <entry/>
+                        <entry><?oxy_insert_start author="dwrob" timestamp="20261013T141902-0700"?>Service
+                            node 3<?oxy_insert_end?></entry>
                         <entry/>
                     </row>
                     <row>
@@ -751,40 +755,35 @@
                     <row>
                         <entry morerows="4">Replica</entry>
                         <entry>replica1</entry>
-                        <entry/>
-                        <entry/>
+                        <entry>Replica 1</entry>
                         <entry/>
                     </row>
                     <?oxy_insert_end?>
                     <row>
                         <entry><?oxy_insert_start author="dwrob" timestamp="20260902T185134-0700"?>replica2<?oxy_insert_end?></entry>
                         <?oxy_insert_start author="dwrob" timestamp="20260902T184905-0700"?>
-                        <entry/>
-                        <entry/>
+                        <entry>Replica 2</entry>
                         <entry/>
                         <?oxy_insert_end?>
                     </row>
                     <row>
                         <entry><?oxy_insert_start author="dwrob" timestamp="20260902T185132-0700"?>replica3<?oxy_insert_end?></entry>
                         <?oxy_insert_start author="dwrob" timestamp="20260902T184905-0700"?>
-                        <entry/>
-                        <entry/>
+                        <entry>Replica 3</entry>
                         <entry/>
                         <?oxy_insert_end?>
                     </row>
                     <row>
                         <entry><?oxy_insert_start author="dwrob" timestamp="20260902T185137-0700"?>replica4<?oxy_insert_end?></entry>
                         <?oxy_insert_start author="dwrob" timestamp="20260902T184905-0700"?>
-                        <entry/>
-                        <entry/>
+                        <entry>Replica 4</entry>
                         <entry/>
                         <?oxy_insert_end?>
                     </row>
                     <row>
                         <entry><?oxy_insert_start author="dwrob" timestamp="20260902T185138-0700"?>replica5<?oxy_insert_end?></entry>
                         <?oxy_insert_start author="dwrob" timestamp="20260902T184905-0700"?>
-                        <entry/>
-                        <entry/>
+                        <entry>Replica 5</entry>
                         <entry/>
                         <?oxy_insert_end?>
                     </row>
