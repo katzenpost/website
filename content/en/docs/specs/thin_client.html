@@ -1,0 +1,125 @@
+---
+title: "Katzenpost thin client" 
+linkTitle: "" 
+description: "" 
+author: ""  
+url: "" 
+date: "2026-05-20T18:53:33.957763917-07:00"
+draft: "false" 
+slug: "thin_client" 
+layout: "" 
+type: "" 
+weight: "1" 
+version: "" 
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>Katzenpost thin client</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+   </head>
+   <body>
+      <div class="section">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="thin_client"></a>Katzenpost thin client</h2>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <p>This document describes the design of the new Katzenpost mixnet <span class="emphasis"><em>thin
+                  client</em></span>. In particular we discuss its multiplexing and privilege-separation design
+            elements as well as the protocol used by the thin-client library. </p>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="thin_client_intro"></a>Introduction</h3>
+                  </div>
+               </div>
+            </div>
+            <p>A Katzenpost mixnet client has several responsibilities at a minimum: </p>
+            <div class="itemizedlist">
+               <ul class="itemizedlist compact" style="list-style-type: disc; ">
+                  <li class="listitem">
+                     <p>composing Sphinx packets </p>
+                  </li>
+                  <li class="listitem">
+                     <p>decrypting SURB replies </p>
+                  </li>
+                  <li class="listitem">
+                     <p>sending and receiving Noise protocol messages </p>
+                  </li>
+                  <li class="listitem">
+                     <p>keeping up to date with the latest PKI document </p>
+                  </li>
+               </ul>
+            </div>
+            <p>Therefore applications will be integrated with Katzenpost using the connector library
+               known as a thin client library which gives them the capability to talk with the connector
+               daemon and in that way interact with the mix network. The library itself does not
+               do any
+               mixnet-related cryptography since that is already handled by the connector daemon.
+               In
+               particular, the PKI document is stripped by the daemon before it's passed on to clients
+               using
+               the connector library. Likewise, the library doesn't decrypt SURB replies or compose
+               Sphinx
+               packets, with Noise, Sphinx, and PKI related cryptography being handled by the daemon.
+               </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="library_daemon"></a>Connector library and daemon protocol </h3>
+                  </div>
+               </div>
+            </div>
+            <p>The thin-client daemon protocol uses a local network socket, either a Unix domain
+               socket
+               or TCP. </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="messages"></a>Protocol messages</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Note that there are two protocol message types and they are always CBOR encoded. We
+                  send over length prefixed CBOR blobs. That is to say, a length prefix encoded as a
+                  big
+                  endian unsigned four byte integer (uint32). </p>
+               <p>The client sends the <code class="code">Request</code> messages and the daemon sends the
+                  <code class="code">Response</code> messages. </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="protocol"></a>Protocol description</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Upon connecting to the daemon socket the client must wait for two messages. The first
+                  message received must have its <code class="code">is_status</code> field set to <span class="strong"><strong>true</strong></span> and its <code class="code">is_connected</code> field indicating
+                  whether or not the daemon has a mixnet PQ Noise protocol connection to an entry node.
+                  </p>
+               <p>The client then awaits the second message, which contains the PKI document in its
+                  <code class="code">payload</code> field. This marks the end of the initial connection sequence.
+                  Note that this PKI document is stripped of all cryptographic signatures. </p>
+               <p>In the next protocol phase, the client may send <code class="code">Request</code> messages to
+                  the daemon in order to cause the daemon to encapsulate the given payload in a Sphinx
+                  packet
+                  and send it to the gateway node. Likewise the daemon my send the client
+                  <code class="code">Response</code> messages at any time during this protocol phase. These
+                  <code class="code">Response</code> messages may indicate a connection status change, a new PKI
+                  document, or a message-sent or reply event. </p>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>
