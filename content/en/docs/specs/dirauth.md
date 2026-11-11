@@ -17,26 +17,20 @@ version: ""
 
 ## Introduction {#abstract}
 
-[Katzenpost](/docs/specs/mixnet#system-overview) is a project for building mixnets tuned to different uses[^implementation].
-Each network starts with a fixed group of computers called directory authorities (DAs).
-We usually call them dirauths.
-Different parties operate these dirauths, whether or not they trust one another.
-Their shared configuration defines the network and which nodes may join it.
+[Katzenpost](/docs/specs/mixnet#system-overview) is a project for building mixnets tuned to different uses[^implementation]. Each network relies on a fixed group of computers that we call directory authorities or dirauths. These are operated by independent parties who may or may not trust one another. The dirauths arrive at a shared configuration that defines the network and which nodes may join it.
 
-[Namenlos](https://status.namenlos.network), the first public post-quantum hybrid mixnet, is one Katzenpost deployment[^namenlos].
-Operators create other networks by choosing parameters and allowed nodes, then distributing configurations to authorities, other servers, and end users.
+[Namenlos](https://status.namenlos.network), the first public mixnet employing post-quantum hybrid cryptography, is one Katzenpost deployment[^namenlos].
+In general, operators create a mix network by choosing parameters and allowed nodes, then distributing configurations to authorities, other servers, and end users.
 
 The dirauths publish a signed [network consensus document](#26-the-consensus-document), or consensus, for each [epoch](#29-time), a fixed-length time period.
 Publication requires a simple majority to sign the same document and the [network constraints](#22-prerequisites) to be met.
-The consensus gives users the network's agreed view for that epoch.
-It supplies node keys, topology, and traffic rates for [Katzenpost Sphinx packets](/docs/specs/sphinx).
-It is the network's public-key infrastructure (PKI) document.
+The consensus is the network's public-key infrastructure (PKI) document, supplying node keys, topology, and traffic rates for [Katzenpost Sphinx packets](/docs/specs/sphinx).
 
 Nodes submit signed [descriptors](#25-descriptors) that announce their identities, addresses, keys, and roles.
-Authorities accept announcements only from allowed identities and include those that receive enough votes.
+Authorities accept announcements only from allowed identities and include those that receive enough votes in the consensus.
 Applications on one host SHOULD share one local [kpclientd](#28-client-software-and-configuration) daemon.
 The daemon verifies the consensus before it uses the network.
-Nodes renew their announcements, and authorities repeat the process for the next epoch.
+Nodes periodically renew their announcements, and authorities conduct a new vote in each successive epoch.
 
 ### Namenlos network map {#namenlos-network-map}
 
