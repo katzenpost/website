@@ -214,7 +214,7 @@ Receivers MUST apply the [decoding rules](#receiver-decoding).
 
 A descriptor announces one node's identity, addresses, and keys. The node signs its upload so authorities can verify who sent it.
 
-Mixes, gateways, and service nodes post a MixDescriptor. Storage replicas post a ReplicaDescriptor.
+Mix nodes, gateways, and service nodes post a MixDescriptor. Storage replicas post a ReplicaDescriptor.
 
 ##### Descriptor fields
 
@@ -291,7 +291,7 @@ A consumer MUST NOT infer other configured node sets from it. Missing nodes can 
 
 ##### Traffic rates
 
-Traffic rates control packet frequency and mix delays. Authorities vote on the rates that the consensus publishes.
+Traffic rates control packet frequency and mixing delays. Authorities vote on the rates that the consensus publishes.
 
 A [traffic rate](#traffic-rate-reference) measures events per millisecond. Its inverse is the mean waiting time in an exponential distribution.
 Rates use float64 values.
@@ -340,7 +340,7 @@ Producers MUST encode descriptors, documents, and certificate envelopes with [de
 Identity signatures authenticate directory data. Link and Sphinx keys protect different parts of mixnet communication.
 
 Nodes and authorities have identity signing keys and link [key encapsulation mechanism (KEM)](/docs/specs/wireprotocol#key-encapsulation-mechanism) keys.
-Mix nodes also have [Sphinx keys](/docs/specs/sphinx#sphinx-packet-creation) per epoch.
+Mix servers also have [Sphinx keys](/docs/specs/sphinx#sphinx-packet-creation) per epoch.
 Replicas have envelope [non-interactive key exchange (NIKE)](/docs/specs/glossary#nike) keys per [replica epoch](/docs/specs/pigeonhole#epochs).
 Sphinx uses [NIKE](/docs/specs/sphinx) or [KEM](/docs/specs/kemsphinx#kemsphinx_introduction) keys.
 Every network uses the same replica envelope scheme. Parties MUST configure matching [schemes](#reference-4-2).
@@ -809,7 +809,7 @@ A client MAY adjust its clock from the gateway handshake.
 flowchart TB
     %% panel: clock
     accTitle: Independent epoch and key lifetimes
-    accDescr: Mixnet epochs have length P. Mix nodes retain keys N-1 through N+3 and publish N+1 through N+3. Replica epochs always last seven days. Shared-random history rotates every 504 mixnet epochs, except initialization takes precedence.
+    accDescr: Mixnet epochs have length P. Mix servers retain keys N-1 through N+3 and publish N+1 through N+3. Replica epochs always last seven days. Shared-random history rotates every 504 mixnet epochs, except initialization takes precedence.
     subgraph M["<img src='/docs/specs/dirauth/icons/mix.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/gateway.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/service.svg' alt='' width='32' height='32'/><br/>Mix nodes, gateways, and service nodes<br/>Mix keys: epoch length P"]
         direction TB
         MK["Retain mix keys N-1 through N+3"]
@@ -849,14 +849,14 @@ The mix node's [address conversion](https://github.com/katzenpost/katzenpost/blo
 places tcp:// IPv4 addresses under tcp4 and tcp:// IPv6 addresses under tcp6.
 
 
-Mix-node dialing selects map keys tcp4, tcp6, and quic
+Mix-server dialing selects map keys tcp4, tcp6, and quic
 ([transport selectors](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/document.go#L447-L473)).
-A tcp entry alone cannot provide a mix-node destination.
+A tcp entry alone cannot provide a mix-server destination.
 Replicas instead preserve the lowercased URL scheme as the descriptor map key
 ([replica conversion](https://github.com/katzenpost/katzenpost/blob/v0.0.107/replica/pkiworker.go#L99-L108)).
 Their outgoing connections use ClientTransports, which includes tcp
 ([replica dialing](https://github.com/katzenpost/katzenpost/blob/v0.0.107/replica/outgoing_conn.go#L218-L228)).
-Upload validation accepts more URL schemes than mix nodes publish ([R-5-6](#r-5-6)).
+Upload validation accepts more URL schemes than mix servers publish ([R-5-6](#r-5-6)).
 
 Authorities use configured address lists, not descriptors. Their listeners accept tcp:// and quic:// URLs only
 ([listeners](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/server.go#L273-L312)).
@@ -1107,7 +1107,7 @@ Clients trust the configured authority keys. A threshold of authorities can sign
 - A consensus records accepted descriptors, not live node availability.
   Clients can select a failed node from a cached document and lose packets sent to it.
   An [absent descriptor](#26-the-consensus-document) can mean a missing upload, insufficient votes, or removal from the allow-lists.
-- A mix node creates a Sphinx key pair for each epoch and removes expired keys.
+- A mix server creates a Sphinx key pair for each epoch and removes expired keys.
   The [key manager](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/mixkeys/mixkeys.go#L124-L198) maintains this window.
   Forward secrecy depends on erasing expired private keys, including any copies.
   Epoch changes also limit the lifetime of the [replay cache](/docs/specs/packetreplay#epoch-boundaries).
@@ -1378,8 +1378,7 @@ set, with a 64-byte public key and a 49856-byte signature
 The [hybrid implementation](https://github.com/katzenpost/hpqc/blob/v0.0.93/sign/hybrid/hybrid.go#L137-L147)
 adds the component sizes. A verifier MUST verify both
 components ([verification](https://github.com/katzenpost/hpqc/blob/v0.0.93/sign/hybrid/hybrid.go#L65-L79)).
-On Windows the authority default is [Ed25519 alone](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/config/scheme_default_windows.go#L8). A network that mixes
-platforms MUST configure the same signature scheme explicitly.
+On Windows the authority default is [Ed25519 alone](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/config/scheme_default_windows.go#L8). A network with multiple OS platforms MUST configure the same signature scheme explicitly.
 
 
 ### Deterministic CBOR {#cbor-encoding-reference}
@@ -2376,7 +2375,7 @@ Authority message validation starts after wire command decoding and authority-ro
 The session role controls command dispatch ([role dispatch](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/wire_handler.go#L456)):
 
 - A client session can request consensus.
-- A mix, gateway, or service session can request consensus or post a mix descriptor.
+- A mix node, gateway, or service node session can request consensus or post a mix descriptor.
 - A replica session can only post a replica descriptor.
 - An authority session can request consensus or send Vote, Reveal, Cert, or Sig.
 
@@ -2538,8 +2537,8 @@ It copies the configured PKISignatureScheme and geometry hash, the supplied noti
 Configured replica IDs and keys include the full authorized set in [R-26-7](#r-26-7) order.
 Empty optional fields follow the [field reference](#document-field-reference).
 
-Split mix descriptors by flags: gateway first, then service node, then ordinary mix.
-Place ordinary mixes by the configured fixed topology order.
+Split mix descriptors by flags: gateway first, then service node, then ordinary mix node.
+Place ordinary mix nodes by the configured fixed topology order.
 Gateway and service lists retain the supplied descriptor order. Replica descriptors retain their supplied order.
 The vote uses locally collected descriptors. Tallying sorts the included descriptors and replicas for certificate and consensus construction.
 Voting documents therefore need not share one descriptor order across different authors.
@@ -2642,14 +2641,14 @@ Layer indexes start at zero. Each append preserves the layer's order.
 With no prior consensus and no configured fixed topology, an authority MUST:
 
 1. Start a fresh generator keyed by the SRV and draw Perm(number of input mixes).
-2. Read mixes in that permutation order. Append each to successive layers, wrapping
+2. Read mix nodes in that permutation order. Append each to successive layers, wrapping
    from the last layer back to layer zero.
 
 With a prior consensus and no configured fixed topology, an authority MUST:
 
 1. Start one fresh generator keyed by the SRV. Create `Layers` empty output lists and a
-   pending set containing every input mix, keyed by identity hash.
-2. Set target = floor(number of input mixes / `Layers`). Set priorLayers to the smaller
+   pending set containing every input mix node, keyed by identity hash.
+2. Set target = floor(number of input mix nodes / `Layers`). Set priorLayers to the smaller
    of the prior layer count and `Layers`.
 3. Visit prior layers 0 through priorLayers-1 in order. For each layer, draw Perm of
    its full prior list, including absent nodes. Visit entries in that order.
