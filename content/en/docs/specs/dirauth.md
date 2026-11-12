@@ -101,8 +101,8 @@ The authorities' shared allow-lists define which other nodes can enter the conse
 
 #### Node roles {#24-roles-keys-and-schemes}
 
-The [node roles](#reference-4-1) include gateways, which connect clients to the mixnet. Mixes relay packets through layers, and service nodes host application endpoints. Storage replicas support [Pigeonhole](/docs/specs/pigeonhole).
-The topology groups mixes into ordered layers.
+The [node roles](#reference-4-1) include gateways, which connect clients to the mixnet; mix nodes that relay packets through layers; and service nodes that host application endpoints. Gateways and service nodes also perform mixing, and all three may be refered to as mix servers. Storage replicas support [Pigeonhole](/docs/specs/pigeonhole).
+The topology groups mix nodes into ordered layers.
 Node keys follow the [cryptographic schemes](#directory-key-schemes).
 
 
@@ -124,8 +124,8 @@ Let `A` be the number of configured authorities.
 Publication requires `floor(A/2)+1` matching signatures ([threshold](#r-26-1)).
 Replica requirements depend on the storage service ([Pigeonhole](/docs/specs/pigeonhole)).
 
-Namenlos configures six authorities, seven mixes across three layers, four gateways, four service nodes, and four storage replicas.
-Its fixed layers contain two, two, and three mixes.
+Namenlos configures six authorities, seven mix nodes across three layers, four gateways, four service nodes, and four storage replicas.
+Its fixed layers contain two, two, and three mix nodes.
 
 
 #### Client software and configuration {#28-client-software-and-configuration}
@@ -226,7 +226,7 @@ Otherwise, it removes both fields after signature verification, before validatio
 
 ##### Upload encoding and signatures
 
-Mix servers and storage replicas use different upload structures. Each structure binds the descriptor to the node's signature.
+Mix nodes and storage replicas use different upload structures. Each structure binds the descriptor to the node's signature.
 
 The upload types are [SignedUpload](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor_impl.go#L55-L64)
 and [SignedReplicaUpload](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor_impl.go#L197-L203).
@@ -278,7 +278,7 @@ It contains node announcements, traffic rates, notices, and a commitment to a ra
 A [commitment](#215-phase_vote-phase_reveal-commit-and-reveal) fixes the contribution before its reveal.
 A reveal opens that commitment so peers can verify the contribution.
 
-A [voting certificate](#document-construction) carries a tallied document and the matched signed commitment/reveal pairs the sender holds.
+A [voting certificate](#document-construction) carries a tallied document and the matched signed commitment/reveal pairs that the sender holds.
 Peers use these certificates to reconcile contributions before computing the [shared random value](#218-phase_sig-shared-random-value-and-topology).
 
 #### The consensus document {#26-the-consensus-document}
@@ -340,7 +340,7 @@ Producers MUST encode descriptors, documents, and certificate envelopes with [de
 Identity signatures authenticate directory data. Link and Sphinx keys protect different parts of mixnet communication.
 
 Nodes and authorities have identity signing keys and link [key encapsulation mechanism (KEM)](/docs/specs/wireprotocol#key-encapsulation-mechanism) keys.
-Mix servers also have [Sphinx keys](/docs/specs/sphinx#sphinx-packet-creation) per epoch.
+Mix nodes also have [Sphinx keys](/docs/specs/sphinx#sphinx-packet-creation) per epoch.
 Replicas have envelope [non-interactive key exchange (NIKE)](/docs/specs/glossary#nike) keys per [replica epoch](/docs/specs/pigeonhole#epochs).
 Sphinx uses [NIKE](/docs/specs/sphinx) or [KEM](/docs/specs/kemsphinx#kemsphinx_introduction) keys.
 Every network uses the same replica envelope scheme. Parties MUST configure matching [schemes](#reference-4-2).
@@ -439,10 +439,10 @@ sequenceDiagram
     %% panel: network
     %% actors: N=other-servers,D=authority,G=gateway,C=client
     accTitle: Directory round
-    accDescr: Mixes, service nodes, replicas, and gateways upload signed descriptors. Dirauths compare votes, reveal randomness, and collect majority signatures. Servers fetch the signed consensus. Clients fetch it through gateways and verify it before use. Each role follows its configured fetch schedule.
+    accDescr: Mix nodes, service nodes, replicas, and gateways upload signed descriptors. Dirauths compare votes, reveal randomness, and collect majority signatures. Servers fetch the signed consensus. Clients fetch it through gateways and verify it before use. Each role follows its configured fetch schedule.
     autonumber
     box rgb(26,40,48)
-        participant N as Mixes<br/>Service nodes<br/>Replicas
+        participant N as Mix nodes<br/>Service nodes<br/>Replicas
     end
     box rgb(49,38,23)
         participant D as Dirauths
@@ -488,9 +488,9 @@ sequenceDiagram
     %% panel: clock
     %% actors: N=other-servers,D=authority,G=gateway,C=client
     accTitle: Epoch phase schedule
-    accDescr: Node uploads end at 125 seconds during Phase_DESC. Dirauth phases advance at 150-second boundaries. Mixes, gateways, and service nodes fetch at 750 seconds. Couriers, replicas, and clients fetch at 825 seconds. Clients fetch through gateways. Mixes, gateways, and service nodes admit next-epoch peers strictly after 1050 seconds. The next epoch starts at 1200 seconds.
+    accDescr: Node uploads end at 125 seconds during Phase_DESC. Dirauth phases advance at 150-second boundaries. Mix nodes, gateways, and service nodes fetch at 750 seconds. Couriers, replicas, and clients fetch at 825 seconds. Clients fetch through gateways. Mix nodes, gateways, and service nodes admit next-epoch peers strictly after 1050 seconds. The next epoch starts at 1200 seconds.
     box rgb(26,40,48)
-        participant N as Mixes<br/>Service nodes<br/>Replicas
+        participant N as Mix nodes<br/>Service nodes<br/>Replicas
     end
     box rgb(49,38,23)
         participant D as Dirauths
@@ -514,7 +514,7 @@ sequenceDiagram
     D->>D: Build and sign<br/>the consensus<br/>Exchange<br/>signatures
     Note over N,C: 750-1050 s: Phase_PUB
     D->>D: Publish N+1<br/>at threshold
-    N->>D: Mixes and<br/>service nodes:<br/>fetch N+1<br/>from 750 s
+    N->>D: Mix nodes and<br/>service nodes:<br/>fetch N+1<br/>from 750 s
     D-->>N: Consensus N+1
     G->>D: Fetch N+1<br/>from 750 s
     D-->>G: Consensus N+1
@@ -523,7 +523,7 @@ sequenceDiagram
     C->>G: Fetch N+1<br/>from 825 s
     G-->>C: Consensus N+1
     Note over N,C: 1050-1200 s: Phase_TAIL
-    N->>N: Mixes and<br/>service nodes:<br/>admit N+1 peers<br/>strictly after<br/>1050 s
+    N->>N: Mix nodes and<br/>service nodes:<br/>admit N+1 peers<br/>strictly after<br/>1050 s
     G->>G: Admit N+1 peers<br/>strictly after<br/>1050 s
     D->>D: Gone if N+1<br/>is missing
     Note over N,C: 1200 s: Epoch N+1 starts
@@ -662,7 +662,7 @@ The SRV calculation uses the extracted 40-byte reveal, not its envelope.
 
 #### Phase_SIG. Shared random value and topology {#218-phase_sig-shared-random-value-and-topology}
 
-Authorities combine verified random contributions into one shared value. This value controls automatic mix placement and links the round to the previous round.
+Authorities combine verified random contributions into one shared value. This value controls automatic mix node placement and links the round to the previous round.
 
 The authority needs at least a [threshold of voting certificates](#r-18-4) before [reconciliation](#ordered-reconciliation).
 It needs the same threshold of surviving commit/reveal pairs before it computes the SRV.
@@ -809,8 +809,8 @@ A client MAY adjust its clock from the gateway handshake.
 flowchart TB
     %% panel: clock
     accTitle: Independent epoch and key lifetimes
-    accDescr: Mixnet epochs have length P. Mix servers retain keys N-1 through N+3 and publish N+1 through N+3. Replica epochs always last seven days. Shared-random history rotates every 504 mixnet epochs, except initialization takes precedence.
-    subgraph M["<img src='/docs/specs/dirauth/icons/mix.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/gateway.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/service.svg' alt='' width='32' height='32'/><br/>Mixes, gateways, and service nodes<br/>Mix keys: epoch length P"]
+    accDescr: Mixnet epochs have length P. Mix nodes retain keys N-1 through N+3 and publish N+1 through N+3. Replica epochs always last seven days. Shared-random history rotates every 504 mixnet epochs, except initialization takes precedence.
+    subgraph M["<img src='/docs/specs/dirauth/icons/mix.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/gateway.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/service.svg' alt='' width='32' height='32'/><br/>Mix nodes, gateways, and service nodes<br/>Mix keys: epoch length P"]
         direction TB
         MK["Retain mix keys N-1 through N+3"]
         MK --> USE["Unwrap with N-1, N, and N+1"]
@@ -845,22 +845,22 @@ The [direct consensus reply](#direct-consensus-reply) gives the directory encodi
 PQ Noise protects each connection over TCP or QUIC.
 
 [Descriptor map keys and URL schemes](#transport-address-reference) select transports and address protocols.
-The mix server's [address conversion](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/pki/pki.go#L1228-L1284)
+The mix node's [address conversion](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/pki/pki.go#L1228-L1284)
 places tcp:// IPv4 addresses under tcp4 and tcp:// IPv6 addresses under tcp6.
 
 
-Mix-server dialing selects map keys tcp4, tcp6, and quic
+Mix-node dialing selects map keys tcp4, tcp6, and quic
 ([transport selectors](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/document.go#L447-L473)).
-A tcp entry alone cannot provide a mix-server destination.
+A tcp entry alone cannot provide a mix-node destination.
 Replicas instead preserve the lowercased URL scheme as the descriptor map key
 ([replica conversion](https://github.com/katzenpost/katzenpost/blob/v0.0.107/replica/pkiworker.go#L99-L108)).
 Their outgoing connections use ClientTransports, which includes tcp
 ([replica dialing](https://github.com/katzenpost/katzenpost/blob/v0.0.107/replica/outgoing_conn.go#L218-L228)).
-Upload validation accepts more URL schemes than mix servers publish ([R-5-6](#r-5-6)).
+Upload validation accepts more URL schemes than mix nodes publish ([R-5-6](#r-5-6)).
 
 Authorities use configured address lists, not descriptors. Their listeners accept tcp:// and quic:// URLs only
 ([listeners](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/server.go#L273-L312)).
-Mixes, gateways, and service nodes MUST advertise a reachable tcp4 or tcp6 entry.
+Mix nodes, gateways, and service nodes MUST advertise a reachable tcp4 or tcp6 entry.
 Replicas MUST advertise a reachable tcp entry. Authorities MUST advertise a reachable tcp:// endpoint.
 A dialer uses QUIC only with the peer's pinned QUIC key hash ([QUIC transport](#224-quic-transport)).
 
@@ -874,7 +874,7 @@ An authority MUST accept only commands allowed for the sender's role. It MUST dr
 
 #### Wire protocol {#222-wire-protocol}
 
-A command carries one request or response. PQ Noise encrypts each command and its length before it sends them.
+A command carries one request or response. PQ Noise encrypts each command and its length before sending.
 
 Commands travel over the [PQ Noise link](/docs/specs/wireprotocol#core-protocol):
 pattern PqXX, ChaChaPoly, BLAKE2b-512, the
@@ -991,7 +991,7 @@ service data and framing. The 96 covers the signature key hash and framing. The 
 counts a shared-random value. The second authority term includes commit and reveal
 envelopes in a voting certificate. The final factor 2 provides headroom.
 
-An authority uses its configured counts of mixes, gateways, service nodes, replicas, and
+An authority uses its configured counts of mix nodes, gateways, service nodes, replicas, and
 authorities. Before its first consensus, a client [uses 64 nodes and 16 replicas](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/client/client.go#L145-L153).
 A configured MaxConsensusSize above zero replaces the calculated ceiling for that party.
 
@@ -1035,7 +1035,7 @@ The dialer MUST compare SHA-256 of the certificate's SubjectPublicKeyInfo with Q
 For nodes, the hash comes from the descriptor. Authorities use configured hashes.
 Before its first consensus, a client uses its configured gateway hash.
 
-Mixes, service nodes, and replicas rotate TLS keys each epoch. Each key comes from a random Ed25519 seed in DataDir/quic.
+Mix nodes, service nodes, and replicas rotate TLS keys each epoch. Each key comes from a random Ed25519 seed in DataDir/quic.
 Gateways with QUIC listeners and authorities keep one long-term key in DataDir/quic-tls.key.
 The authority's -g option writes this key and quic-tls.hash. TCP-only authorities neither read nor create the key file.
 
@@ -1061,14 +1061,14 @@ An authority MUST reject a reload that would fail startup validation ([R-16-6](#
 #### Mixnet packet paths {#mixnet-packet-paths}
 
 [Sphinx packets](/docs/specs/sphinx#sphinx-packet-creation) protect routing information and payloads through successive hops.
-For a client forward path, Namenlos uses a gateway, three mixes, and a service node.
+For a client forward path, Namenlos uses a gateway, three mix nodes, and a service node.
 Each relay removes one Sphinx layer and forwards the packet over a separately authenticated [PQ Noise link](/docs/specs/wireprotocol#core-protocol).
 
 ```mermaid
 flowchart TB
     %% panel: layers
     accTitle: Protocol encapsulation
-    accDescr: A client-to-gateway PQ Noise connection carries a send_packet command over TCP/IP or QUIC/UDP/IP. The command contains a Sphinx packet with five concentric protection layers around the data. The outer layer belongs to the gateway, followed by three mixes and the service node. Each receiving hop removes its Sphinx layer. Each forwarded packet uses the next neighbor link's independent encryption. Namenlos uses five hops, 3082-byte packets, and up to 2000 bytes of user payload.
+    accDescr: A client-to-gateway PQ Noise connection carries a send_packet command over TCP/IP or QUIC/UDP/IP. The command contains a Sphinx packet with five concentric protection layers around the data. The outer layer belongs to the gateway, followed by three mix nodes and the service node. Each receiving hop removes its Sphinx layer. Each forwarded packet uses the next neighbor link's independent encryption. Namenlos uses five hops, 3082-byte packets, and up to 2000 bytes of user payload.
     PACKET@{img: "/docs/specs/dirauth/sphinx-layers.svg", label: "", w: 244, h: 453, constraint: "on"}
     PACKET -->|"gateway decrypts link command"| UNWRAP["<img src='/docs/specs/dirauth/icons/gateway.svg' alt='' width='32' height='32'/><br/>Gateway removes its<br/>Sphinx layer"]
     UNWRAP -->|"four Sphinx layers remain"| FORWARD["<img src='/docs/specs/dirauth/icons/gateway.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/mix.svg' alt='' width='32' height='32'/><br/>Gateway forwards to Mix 1<br/>over their own PQ Noise link"]
@@ -1107,7 +1107,7 @@ Clients trust the configured authority keys. A threshold of authorities can sign
 - A consensus records accepted descriptors, not live node availability.
   Clients can select a failed node from a cached document and lose packets sent to it.
   An [absent descriptor](#26-the-consensus-document) can mean a missing upload, insufficient votes, or removal from the allow-lists.
-- A mix creates a Sphinx key pair for each epoch and removes expired keys.
+- A mix node creates a Sphinx key pair for each epoch and removes expired keys.
   The [key manager](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/mixkeys/mixkeys.go#L124-L198) maintains this window.
   Forward secrecy depends on erasing expired private keys, including any copies.
   Epoch changes also limit the lifetime of the [replay cache](/docs/specs/packetreplay#epoch-boundaries).
@@ -1211,7 +1211,7 @@ flowchart TB
     %% panel: network
     accTitle: Directory publication
     accDescr: Nodes upload descriptors. Authorities reconcile votes and random contributions, exchange signatures, and serve a threshold-signed consensus.
-    N(["<img src='/docs/specs/dirauth/icons/mix.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/gateway.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/service.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/replica.svg' alt='' width='32' height='32'/><br/>Mixes, gateways,<br/>service nodes, and replicas"])
+    N(["<img src='/docs/specs/dirauth/icons/mix.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/gateway.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/service.svg' alt='' width='32' height='32'/><img src='/docs/specs/dirauth/icons/replica.svg' alt='' width='32' height='32'/><br/>Mix nodes, gateways,<br/>service nodes, and replicas"])
     subgraph D["<img src='/docs/specs/dirauth/icons/authority.svg' alt='' width='32' height='32'/><br/>Dirauths"]
         direction TB
         V["Exchange votes and reveals"] --> C["Reconcile commit and reveal pairs"]
@@ -1232,7 +1232,7 @@ The [network map](#namenlos-network-map) includes all configured node roles.
 
 ### Descriptor fields {#descriptor-field-reference}
 
-Mixes, gateways, and service nodes use [MixDescriptor](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor.go#L32-L88).
+Mix nodes, gateways, and service nodes use [MixDescriptor](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor.go#L32-L88).
 Storage replicas use [ReplicaDescriptor](https://github.com/katzenpost/katzenpost/blob/v0.0.107/core/pki/descriptor.go#L268-L297).
 
 Required fields describe producer output.
@@ -1292,7 +1292,7 @@ The document body contains the topology, traffic rates, and signed directory con
 | GenesisEpoch | unsigned integer | Required, nonzero. |
 | Mu, LambdaP, LambdaL, LambdaM, LambdaR | float | Required. |
 | LambdaG | float | Required. |
-| Topology | array of arrays of byte strings | Required. One entry per layer, mixes only. An empty layer is null, valid only in a vote. |
+| Topology | array of arrays of byte strings | Required. One entry per layer, mix nodes only. An empty layer is null, valid only in a vote. |
 | GatewayNodes, ServiceNodes | array of byte strings | Required, [] when empty. |
 | StorageReplicas | array of descriptor maps | Required, [] when empty. |
 | ConfiguredReplicaIDs | byte string | Omitted when empty. |
@@ -1316,8 +1316,8 @@ Descriptor address maps select link transports and endpoint URLs.
 
 | Key | Value | Explanation |
 | --- | --- | --- |
-| tcp4 | tcp://, Namenlos: every mix, gateway, and service node | TCP over IPv4 for mixes, gateways, and service nodes |
-| tcp6 | tcp://, Namenlos: some mixes, gateways, and service nodes | TCP over IPv6 for mixes, gateways, and service nodes |
+| tcp4 | tcp://, Namenlos: every mix node, gateway, and service node | TCP over IPv4 for mix nodes, gateways, and service nodes |
+| tcp6 | tcp://, Namenlos: some mix nodes, gateways, and service nodes | TCP over IPv6 for mix nodes, gateways, and service nodes |
 | tcp | tcp://, Namenlos: every storage replica | TCP for storage replicas. Also a client transport selector |
 | quic | quic://, Namenlos: none | QUIC over UDP, with a pinned TLS key ([QUIC transport](#224-quic-transport)) |
 | onion | onion://, Namenlos: one gateway | gateway endpoint for clients through Tor |
@@ -1333,9 +1333,9 @@ Directory peers exchange descriptors, votes, reveals, certificates, and signatur
 
 | Key | Value | Explanation |
 | --- | --- | --- |
-| get_consensus | ID 18. BE_uint64(Epoch) | Sent by client, mix, gateway, service node, authority. A replica and a courier send it as clients ([authentication and authorization](#223-authentication-and-authorization)) |
+| get_consensus | ID 18. BE_uint64(Epoch) | Sent by client, mix node, gateway, service node, authority. A replica and a courier send it as clients ([authentication and authorization](#223-authentication-and-authorization)) |
 | consensus | ID 19. ErrorCode (1) \|\| Payload: consensus certificate envelope on success | Sent by authority, gateway |
-| post_descriptor | ID 20. BE_uint64(Epoch) \|\| Payload: SignedUpload CBOR | Sent by mix, gateway, service node |
+| post_descriptor | ID 20. BE_uint64(Epoch) \|\| Payload: SignedUpload CBOR | Sent by mix node, gateway, service node |
 | post_descriptor_status | ID 21. ErrorCode (1) | Sent by authority |
 | post_replica_descriptor | ID 11. BE_uint64(Epoch) \|\| Payload: SignedReplicaUpload CBOR | Sent by replica |
 | post_replica_descriptor_status | ID 10. ErrorCode (1) | Sent by authority |
@@ -1460,7 +1460,7 @@ Epoch and quorum parameters set the voting schedule and signature threshold.
 | `H` | BLAKE2b-256 | Hash function. |
 | identity hash | 32 bytes | `H` of the marshaled identity public key. |
 | `Layers` | 3 | Number of mix layers. |
-| topology mode | fixed: 2, 2, 3 | Mixes in each layer. |
+| topology mode | fixed: 2, 2, 3 | Mix nodes in each layer. |
 | `MinNodesPerLayer` | 1 | Startup minimum per layer. |
 | NumMixKeys | 3 | Sphinx key epochs per descriptor. |
 | Mu | 0.001 | Per-hop mixing delay rate. |
@@ -1489,7 +1489,7 @@ A network's configuration supplies trusted authorities, allowed nodes, cryptogra
 | threshold | 4 of 6 | Each round needs 4 reachable authorities in agreement, or no consensus. |
 | clocks | not specified in these configs | Operators synchronize clocks under the [clock and skew rules](#211-clocks-and-retention). |
 | `EpochDuration` | unset, default 1200 seconds | Select `P` under [R-9-3](#r-9-3). Runtime overrides can change it. |
-| allow-lists | 7 mixes, 4 gateways, 4 service nodes, 4 replicas | Authorities MUST hold identical lists and reload them in the same epoch ([connection bounds and operation](#225-connection-bounds-and-operation)). |
+| allow-lists | 7 mix nodes, 4 gateways, 4 service nodes, 4 replicas | Authorities MUST hold identical lists and reload them in the same epoch ([connection bounds and operation](#225-connection-bounds-and-operation)). |
 | PKISignatureScheme | Ed25519 Sphincs+ | Descriptor and directory signatures ([roles, keys, and schemes](#24-roles-keys-and-schemes)). |
 | WireKEMScheme | KYBER768-X25519 | PQ Noise link key KEM. |
 | SphinxGeometry.NIKEName / KEMName | x25519 / empty | Selects NIKE Sphinx. |
@@ -1522,7 +1522,7 @@ Descriptors identify node roles and their published keys.
 
 | Key | Value | Explanation |
 | --- | --- | --- |
-| mix | MixDescriptor | Listed in Topology layers. |
+| mix node | MixDescriptor | Listed in Topology layers. |
 | gateway node | MixDescriptor with IsGatewayNode | Listed in GatewayNodes. |
 | service node | MixDescriptor with IsServiceNode | Listed in ServiceNodes. |
 | storage replica | ReplicaDescriptor | Listed in StorageReplicas. |
@@ -1577,19 +1577,19 @@ The times below are fractions of the epoch duration `P`. Each phase includes its
 
 </div>
 
-### Phases: Mix, gateway, service node {#reference-10-2}
+### Phases: Mix node, gateway, service node {#reference-10-2}
 
-Mixes, gateways, and service nodes upload next-epoch descriptors before they fetch the next consensus.
+Mix nodes, gateways, and service nodes upload next-epoch descriptors before they fetch the next consensus.
 
 <div class="key-value-table">
 
 | Key | Value | Explanation |
 | --- | --- | --- |
-| Mix, gateway, service node | 0 | Rotate keys and upload for `N+1` until U. |
+| Mix node, gateway, service node | 0 | Rotate keys and upload for `N+1` until U. |
 | Storage replica | Until U | Upload the replica descriptor. |
-| Mix, gateway, service node | 5/8 | Fetch `N+1`. |
+| Mix node, gateway, service node | 5/8 | Fetch `N+1`. |
 | Replica, courier, client | F | Fetch `N+1`. |
-| Mix, gateway, service node | After 7/8 | Admit `N+1` peers. |
+| Mix node, gateway, service node | After 7/8 | Admit `N+1` peers. |
 
 </div>
 
@@ -1606,7 +1606,7 @@ Epoch windows determine key retention, document expiry, and retry timing.
 | authority ahead of a peer | 600 seconds | 4W for a vote. Other messages can receive TooEarly. All four families retry under [authority message delivery](#221-authority-message-delivery) |
 | node behind an authority | 25 seconds | `P`/48, from U to `P`/8 |
 | node ahead of an authority | 112.5 seconds | U minus `P`/96 |
-| mix ahead of every authority, fetching at 5/8 | 300 seconds | 2W with retries |
+| mix node ahead of every authority, fetching at 5/8 | 300 seconds | 2W with retries |
 | client ahead of its gateway | 75 seconds | `P`/16 minus the gateway's fetch latency |
 
 </div>
@@ -1620,7 +1620,7 @@ Authorities retain voting state and limit retries using separate timing settings
 | Key | Value | Explanation |
 | --- | --- | --- |
 | authority | `N-3` to `N` | `N+1` from 5/8 |
-| mix, gateway, service node | `N-2` to `N` | `N+1` from 5/8 |
+| mix node, gateway, service node | `N-2` to `N` | `N+1` from 5/8 |
 | replica, courier | `N-2` to `N` | `N+1` from F |
 | client | `N-1`, `N` | `N+1` from F |
 
@@ -1656,7 +1656,7 @@ The authenticated peer role determines which directory commands the receiver acc
 | kpclientd | gateway node | Commands: get_consensus2 |
 | gateway node | kpclientd | Commands: consensus2 |
 | unauthenticated authority client | authority | Commands: get_consensus |
-| mix, gateway node, service node | authority | Commands: get_consensus, post_descriptor |
+| mix node, gateway node, service node | authority | Commands: get_consensus, post_descriptor |
 | storage replica | authority | Commands: post_replica_descriptor, and get_consensus as a client |
 | courier | authority | Commands: get_consensus as a client |
 | authority | authority | Commands: get_consensus, vote, reveal, cert, sig |
@@ -1704,7 +1704,7 @@ Nodes and clients use the [consensus](#26-the-consensus-document) to select peer
 | R-6-2 | authority / Phase_PUB | <span id="r-6-2"></span>A published consensus MUST carry no commits and no reveals. |
 | R-6-3 | producer / on encode | <span id="r-6-3"></span>Descriptors, documents, and certificate envelopes MUST use the [deterministic CBOR encoding](#cbor-encoding-reference). [Receiver decoding](#receiver-decoding) defines acceptance and re-encoding. |
 | R-6-4 | authority / on build | <span id="r-6-4"></span>Detached signatures MUST NOT be part of the signed body. |
-| R-6-5 | mix, gateway, service node / on packet handling | <span id="r-6-5"></span>Before subtracting queue dwell time, forwarding nodes MUST drop packets whose advertised delay exceeds `P` * NumMixKeys. Mixes and gateways MUST drop packets whose [remaining per-hop delay](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/cryptoworker/crypto_worker.go#L247-L304) exceeds the limit. With service pre-delay enabled, service nodes MUST apply that limit to the advertised last-hop delay ([delay queue](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/service/predelay.go#L63-L70)). The selected cap MUST be SafetyCap(consensus Mu) when nonzero. Otherwise, it MUST be a positive configured fallback, or the built-in SafetyCap(0.001) of 27632 ms if none is positive. The final limit MUST be min(selected cap, `P` * NumMixKeys) ([selection](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/maxdelay/maxdelay.go#L32-L46)). Both paths SHOULD warn if fallback or consensus caps differ from the built-in value by more than a factor of 4 ([scheduler](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/scheduler/scheduler.go#L87-L91), [service](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/service/service.go#L74-L75)). |
+| R-6-5 | mix node, gateway, service node / on packet handling | <span id="r-6-5"></span>Before subtracting queue dwell time, forwarding nodes MUST drop packets whose advertised delay exceeds `P` * NumMixKeys. Mix nodes and gateways MUST drop packets whose [remaining per-hop delay](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/cryptoworker/crypto_worker.go#L247-L304) exceeds the limit. With service pre-delay enabled, service nodes MUST apply that limit to the advertised last-hop delay ([delay queue](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/service/predelay.go#L63-L70)). The selected cap MUST be SafetyCap(consensus Mu) when nonzero. Otherwise, it MUST be a positive configured fallback, or the built-in SafetyCap(0.001) of 27632 ms if none is positive. The final limit MUST be min(selected cap, `P` * NumMixKeys) ([selection](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/maxdelay/maxdelay.go#L32-L46)). Both paths SHOULD warn if fallback or consensus caps differ from the built-in value by more than a factor of 4 ([scheduler](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/scheduler/scheduler.go#L87-L91), [service](https://github.com/katzenpost/katzenpost/blob/v0.0.107/server/internal/service/service.go#L74-L75)). |
 | R-6-6 | consumer / on fetch | <span id="r-6-6"></span>A consumer MUST treat a SphinxGeometryHash mismatch in a threshold-signed consensus as a failed fetch, not a fatal error. |
 | R-6-7 | authority, client / at startup, Phase_CERT, Phase_SIG | <span id="r-6-7"></span>MinClientVersion MUST be at most 32 bytes and ClientNotice at most 512, both printable ASCII 0x20..0x7e. An authority MUST propose its configured pair and reject invalid startup values. It MUST tally the pair separately from rates. It MUST publish a pair present in at least threshold well-formed votes. Otherwise it MUST omit the notice without preventing consensus. It MUST log malformed vote pairs and exclude them from this tally only. Clients MUST NOT act on either field. |
 
@@ -1761,11 +1761,11 @@ The [voting phases](#210-phases) schedule uploads, authority exchanges, and cons
 | R-10-6 | authority / on receive | <span id="r-10-6"></span>An authority MUST apply the state and error precedence in [message acceptance](#message-acceptance). New reveals close in accept_cert and accept_signature. New votes and voting certificates close in accept_signature. The sig handler has no state gate. The stored voting epoch controls its epoch comparisons. State-machine transitions normally place these cuts at 3/8, 4/8, and advancement of `V` at 5/8. |
 | R-10-7 | authority / at 3/8, 4/8, 5/8 | <span id="r-10-7"></span>An authority MUST tally votes at 3/8 for its voting certificate and again at 4/8 for its consensus. It MUST process collected reveals at 3/8, voting certificates at 4/8, and signatures at 5/8. Each action MUST run at the corresponding state-machine wake. |
 | R-10-8 | authority / every send phase | <span id="r-10-8"></span>Each authority MUST start delivery at the corresponding phase wake. Retry-deadline targets are 2/8 for votes, 3/8 for reveals, 4/8 for voting certificates, and 5/8 for signatures. [R-10-1](#r-10-1) applies the buffer. These targets do not guarantee completion before the boundary. |
-| R-10-9 | mix, gateway node, service node / Phase_PUB, from 5/8 | <span id="r-10-9"></span>A mix, a gateway, or a service node MUST first request doc `N+1` at 5/8. It MUST retry every `P`/16 until it holds the document or it receives Gone. While doc `N` is missing it MUST fetch every `P`/96 until it posts its descriptor, and every `P`/16 after that. |
+| R-10-9 | mix node, gateway node, service node / Phase_PUB, from 5/8 | <span id="r-10-9"></span>A mix node, gateway, or service node MUST first request doc `N+1` at 5/8. It MUST retry every `P`/16 until it holds the document or it receives Gone. While doc `N` is missing it MUST fetch every `P`/96 until it posts its descriptor, and every `P`/16 after that. |
 | R-10-10 | courier, storage replica / Phase_PUB, from F | <span id="r-10-10"></span>A courier or a replica MUST first request doc `N+1` at F, and MUST retry every `P`/32 until it holds the document or receives Gone. While doc `N` is missing it MUST fetch every `P`/32. |
 | R-10-11 | client / Phase_PUB, from F | <span id="r-10-11"></span>A client MUST first request doc `N+1` from its gateway at F. It MUST retry every `P`/16 until it receives the document or Gone. While doc `N` is missing it MUST request it every `P`/16, and MUST use doc `N-1` if available. |
-| R-10-12 | mix, gateway, service node, courier, replica, client / every fetch pass | <span id="r-10-12"></span>Mixes, gateways, service nodes, couriers, and replicas MUST use min(3 minutes, `P`/8) for each fetch pass. kpclientd MUST use a separate 30-second timeout per document. Authority bootstrap uses [R-12-2](#r-12-2)'s retry budget. |
-| R-10-13 | mix, gateway, service node / epoch boundary | <span id="r-10-13"></span>At the start of epoch `N` these nodes MUST retain mix keys `N-1` through `N+3`. They MUST publish `N+1` through `N+3` in their descriptors. They MUST unwrap with keys `N-1`, `N`, and `N+1`. |
+| R-10-12 | mix node, gateway, service node, courier, replica, client / every fetch pass | <span id="r-10-12"></span>Mixes, gateways, service nodes, couriers, and replicas MUST use min(3 minutes, `P`/8) for each fetch pass. kpclientd MUST use a separate 30-second timeout per document. Authority bootstrap uses [R-12-2](#r-12-2)'s retry budget. |
+| R-10-13 | mix node, gateway, service node / epoch boundary | <span id="r-10-13"></span>At the start of epoch `N` these nodes MUST retain mix keys `N-1` through `N+3`. They MUST publish `N+1` through `N+3` in their descriptors. They MUST unwrap with keys `N-1`, `N`, and `N+1`. |
 | R-10-14 | client / epoch boundary | <span id="r-10-14"></span>A client MUST wake at the epoch boundary and adopt doc `N+1` there, without refetching a cached document it already verified. |
 
 </div>
@@ -1870,7 +1870,7 @@ Authorities [tally votes](#216-phase_cert-phase_sig-tabulation) for descriptors 
 | R-16-3 | authority / Phase_CERT, Phase_SIG | <span id="r-16-3"></span>An authority MUST adopt a parameter set only with at least threshold votes. It groups the votes by the canonical CBOR map {Mu, LambdaP, LambdaL, LambdaM, LambdaR}, with keys in canonical order and floats as in [R-6-3](#r-6-3). Two sets group together if and only if each rate is bit-identical to its counterpart, or both of that pair are NaN. |
 | R-16-4 | authority / Phase_CERT, Phase_SIG | <span id="r-16-4"></span>dissenters MUST be `floor(A/2)-1`, and it MUST NOT decide any output. An authority logs a parameter set that has fewer than threshold votes and at least dissenters votes. |
 | R-16-5 | authority / Phase_CERT, Phase_SIG | <span id="r-16-5"></span>An authority MUST sort included nodes and replicas by identity-key hash. |
-| R-16-6 | authority / at startup, on reload, on sign | <span id="r-16-6"></span>`Layers` defaults to 3 and `MinNodesPerLayer` defaults to 2. An authority MUST [reject `Layers` above 3](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/config/config.go#L181-L187). At startup and reload, the allow-lists MUST contain at least `Layers * MinNodesPerLayer` mixes, one gateway, and one service node. A fixed topology MUST contain at least `MinNodesPerLayer` mixes per layer. At signing, a topology MUST have non-empty layers, a gateway, and a service node. It does not require `MinNodesPerLayer`. |
+| R-16-6 | authority / at startup, on reload, on sign | <span id="r-16-6"></span>`Layers` defaults to 3 and `MinNodesPerLayer` defaults to 2. An authority MUST [reject `Layers` above 3](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/config/config.go#L181-L187). At startup and reload, the allow-lists MUST contain at least `Layers * MinNodesPerLayer` mix nodes, one gateway, and one service node. A fixed topology MUST contain at least `MinNodesPerLayer` mix nodes per layer. At signing, a topology MUST have non-empty layers, a gateway, and a service node. It does not require `MinNodesPerLayer`. |
 | R-16-7 | authority / Phase_SIG, on sign | <span id="r-16-7"></span>An authority MUST refuse to sign a document that is not well formed. |
 | R-16-8 | authority / on document construction | <span id="r-16-8"></span>Each authority MUST derive LambdaG from its configured topology, gateway count, and rates using [gateway rate arithmetic](#gateway-rate-arithmetic). This value is outside the voted parameter key. With gateways present, the tagged document builder requires a fixed topology. |
 
@@ -2010,7 +2010,7 @@ Peers authenticate [QUIC endpoints](#224-quic-transport) with pinned keys.
 | R-24-6 | node, authority / at startup | <span id="r-24-6"></span>A QUIC listener's stateless reset key MUST derive from its identity private key through HKDF-SHA256. The derivation MUST use no salt and the label "katzenpost quic stateless reset". This preserves reset-key continuity across restarts. |
 | R-24-7 | any party / every connection | <span id="r-24-7"></span>A QUIC connection MUST carry one stream: a listener MUST allow one incoming stream and a dialer none, and a second stream MUST be refused. |
 | R-24-8 | any party / every connection | <span id="r-24-8"></span>A QUIC link MUST select a keepalive period per connection. The default is 45 seconds for nodes and authorities, or 20 seconds for clients, multiplied by 1 +/- 0.25. quic-go limits the period to half the idle timeout. QUIC MaxIdleTimeout defaults to [2 minutes](https://github.com/katzenpost/katzenpost/blob/v0.0.107/quic/common/quic.go#L468-L474). Wire read deadlines can be shorter. The client configures [15 seconds](https://github.com/katzenpost/katzenpost/blob/v0.0.107/client/connection.go#L448-L461). The handshake MUST use the connect deadline. |
-| R-24-9 | mix, service node, storage replica / on build | <span id="r-24-9"></span>A mix, a service node, or a replica with a QUIC listener MUST present one QUIC key for each epoch. In the descriptor for epoch e it MUST publish the hashes of the keys it holds for e-1, e, and e+1. |
+| R-24-9 | mix node, service node, storage replica / on build | <span id="r-24-9"></span>A mix node, a service node, or a replica with a QUIC listener MUST present one QUIC key for each epoch. In the descriptor for epoch e it MUST publish the hashes of the keys it holds for e-1, e, and e+1. |
 | R-24-10 | gateway node, node / at startup, on build | <span id="r-24-10"></span>A gateway with a QUIC listener MUST present one long-term QUIC key. It MUST publish that key's single hash in every descriptor. It MUST refuse to start without that key file. A node without a QUIC listener MUST NOT set QUICKeyHash. |
 | R-24-11 | any party / on dial | <span id="r-24-11"></span>After a pin mismatch a dialer MUST choose one behaviour for the rest of that epoch. Under fallback, the default, it dials that peer at non-QUIC addresses only. Under strict, it dials that peer over pinned QUIC only. A node under strict MUST count the mismatch as final for its upload to that authority in that epoch. |
 | R-24-12 | node / on build | <span id="r-24-12"></span>A node MUST omit QUICKeyHash from its descriptor unless every authority entry in its configuration carries a QUICKeyHash. No authority that drops the field then receives it ([R-26-8](#r-26-8)). |
@@ -2632,7 +2632,7 @@ Skipping it changes all later draws.
 
 ### Layer assignment {#layer-assignment}
 
-The assignment algorithm places accepted mixes into layers. A fixed topology takes precedence over automatic placement.
+The assignment algorithm places accepted mix nodes into layers. A fixed topology takes precedence over automatic placement.
 
 [R-18-5](#r-18-5) uses the following [assignment algorithms](https://github.com/katzenpost/katzenpost/blob/v0.0.107/authority/voting/server/state.go#L1742-L1895).
 Sort input mix descriptors by identity-key hash ([R-16-5](#r-16-5)).
@@ -2763,7 +2763,7 @@ Network operation depends on the packet, transport, client, storage, and certifi
 Conformance testing MUST cover:
 
 1. A named test passes for every protocol requirement.
-2. A mixed network with the reference implementation produces matching, threshold-signed consensuses under successful-round conditions.
+2. A mix network with the reference implementation produces matching, threshold-signed consensuses under successful-round conditions.
    This test includes an epoch divisible by 504.
 
 ```
@@ -2901,9 +2901,9 @@ bbbbbbbbbb6d4d697844657363726970746f7258cbad644e616d65646d697831
 6f6e5479706560774b6165747a6368656e416476657274697a656444617461f6
 ```
 
-Automatic topology assignment starts with this SRV, no prior consensus, six mixes, and `Layers` 3.
-The authority permutes all six mixes and assigns them to successive layers, under the [layer assignment algorithm](#layer-assignment).
-The mix numbers 0 through 5 represent ascending identity-key hash order ([R-16-5](#r-16-5)).
+Automatic topology assignment starts with this SRV, no prior consensus, six mix nodes, and `Layers` 3.
+The authority permutes all six mix nodes and assigns them to successive layers, under the [layer assignment algorithm](#layer-assignment).
+The mix nodes numbers 0 through 5 represent ascending identity-key hash order ([R-16-5](#r-16-5)).
 
 ```
 SRV     702b1bb93f15155761dc058d56edd07d2a5127478566f520366fb4b490a5e8ae
