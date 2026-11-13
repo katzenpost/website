@@ -48,6 +48,7 @@ You wish to contribute code to Katzenpost itself.
 |     | Title | Description |
 |-----|-------|-------------|
 | 🛠️  | **[Design Specifications](/docs/specs/)** | The protocol specifications that the implementation must honour: Sphinx, KEMSphinx, the wire protocol, the directory authority, replay detection, and more. |
+| 📝  | **[Writing READMEs](/docs/writing_readmes/)** | The checklist every Katzenpost repository README follows: audience first, a quick start, then links out to the rest of the documentation. |
 | <i class="fab fa-github"></i>  | **[Source Repository](https://github.com/katzenpost/katzenpost)** | The Katzenpost monorepo on GitHub: server, dirauth, client, courier, replica, and core. Issues, pull requests, and discussions live here. |
 
 ## For academics
