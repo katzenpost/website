@@ -8,11 +8,6 @@ type: "pages"
 
 # Current Funders
 
-* [Wau Holland Stiftung](https://www.wauland.de/en/)
-
-[![WHS logo](/images/whs-logo.svg)](https://www.wauland.de/en/)
-
-
 * [NLNet Foundation](https://nlnet.nl/)
 
 [![NLNet Banner Logo](/images/nlnet_banner-160x60.png)](https://nlnet.nl/)
@@ -38,6 +33,10 @@ type: "pages"
 <BR>
 
 # Past Funders
+
+* [Wau Holland Stiftung](https://www.wauland.de/en/)
+
+[![WHS logo](/images/whs-logo.svg)](https://www.wauland.de/en/)
 
 * [EU Commission Grant project known as the "Panoramix 2020"](https://panoramix-project.eu/)
 
