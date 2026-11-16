@@ -12,3 +12,8 @@ sequenceDiagram
     R->>S: forward sealed voucher
     S-->>C: voucher reply
     Note over C,S: connection: each holds the other's read cap
+    loop every half lease
+        S->>R: renew
+        S->>D: advertise again
+    end
+    S->>D: withdraw, when it stops
