@@ -43,8 +43,8 @@ type: "pages"
 <div class="dl-btns">
 <a class="btn btn-lg btn-primary" href="/downloads/kpclientd_0.0.111_amd64.deb"><i class="fa fa-download" aria-hidden="true"></i>.deb</a>
 </div>
-<p class="dl-meta">SHA-256 <code>ab3fb57b05cd2fc33f9044779a1f82d8b54757d3d85d14542fbd19df14df684d</code></p>
-<p class="dl-meta"><a href="https://github.com/katzenpost/katzenpost/tree/9d877d6c9dc0f8a3c4bfa69bcce311337fb89f6e">source</a></p>
+<p class="dl-meta">SHA-256 <code>067c47a3bcd118cc5734c042b0dda32e07f182a0d31ae7ea0a939961cf5130c0</code></p>
+<p class="dl-meta"><a href="https://github.com/katzenpost/katzenpost/tree/a51103f99bdb293bf9571394863985476b770419">source</a></p>
 <h3>hushphone <span class="dl-ver">v0.3.6</span></h3>
 <div class="dl-btns">
 <a class="btn btn-lg btn-primary" href="https://github.com/katzenpost/hushphone/releases/download/v0.3.6/hushphone-v0.3.6-debian-13-amd64.deb"><i class="fa fa-download" aria-hidden="true"></i>Debian 13 .deb</a>
