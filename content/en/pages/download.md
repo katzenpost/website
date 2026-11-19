@@ -7,8 +7,40 @@ menu: {main: {weight: 60}}
 type: "pages"
 ---
 
-hushphone is a group chat with push-to-talk voice messages. It needs a
-second program, kpclientd, running beside it.
+hushphone is a group chat with push-to-talk voice messages.
+
+## kpclientd
+
+Every app on this page connects to kpclientd running on the same computer
+or phone, over a unix domain socket or TCP. Without kpclientd running, they
+do not work.
+
+| Get it | Download |
+|--------|----------|
+| Android 13 or later, phones | [kpclientd-android-v1.2.0-arm64-v8a.apk](https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/kpclientd-android-v1.2.0-arm64-v8a.apk) |
+| Android 13 or later, emulators | [kpclientd-android-v1.2.0-x86_64.apk](https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/kpclientd-android-v1.2.0-x86_64.apk) |
+| Debian 13 and Ubuntu 24.04, amd64 | [kpclientd_0.0.111_amd64.deb](/downloads/kpclientd_0.0.111_amd64.deb) |
+| From source | [katzenpost](https://github.com/katzenpost/katzenpost) |
+
+SHA-256 of `kpclientd_0.0.111_amd64.deb`:
+`ab3fb57b05cd2fc33f9044779a1f82d8b54757d3d85d14542fbd19df14df684d`.
+Android checksums:
+[SHA256SUMS](https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/SHA256SUMS).
+
+To build from source you need Go and a C compiler:
+
+```
+git clone https://github.com/katzenpost/katzenpost
+cd katzenpost
+make kpclientd
+```
+
+Then run it with the
+[namenlos client config](https://github.com/katzenpost/kno/blob/main/data/networks/namenlos/.generated/configs/client.toml):
+
+```
+cmd/kpclientd/kpclientd -c client.toml
+```
 
 ## Android
 
@@ -51,39 +83,10 @@ Debian 13 or Ubuntu 24.04, on a 64-bit PC.
 Other Linux systems:
 [hushphone-v0.3.6-linux-x86_64.tar.gz](https://github.com/katzenpost/hushphone/releases/download/v0.3.6/hushphone-v0.3.6-linux-x86_64.tar.gz)
 holds the `hushphone` program. Get kpclientd by building it from source,
-below.
+above.
 
 hushphone checksums:
 [SHA256SUMS](https://github.com/katzenpost/hushphone/releases/download/v0.3.6/SHA256SUMS).
-
-## kpclientd
-
-| Get it | Download |
-|--------|----------|
-| Android 13 or later, phones | [kpclientd-android-v1.2.0-arm64-v8a.apk](https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/kpclientd-android-v1.2.0-arm64-v8a.apk) |
-| Android 13 or later, emulators | [kpclientd-android-v1.2.0-x86_64.apk](https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/kpclientd-android-v1.2.0-x86_64.apk) |
-| Debian 13 and Ubuntu 24.04, amd64 | [kpclientd_0.0.111_amd64.deb](/downloads/kpclientd_0.0.111_amd64.deb) |
-| From source | [katzenpost](https://github.com/katzenpost/katzenpost) |
-
-SHA-256 of `kpclientd_0.0.111_amd64.deb`:
-`ab3fb57b05cd2fc33f9044779a1f82d8b54757d3d85d14542fbd19df14df684d`.
-Android checksums:
-[SHA256SUMS](https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/SHA256SUMS).
-
-To build from source you need Go and a C compiler:
-
-```
-git clone https://github.com/katzenpost/katzenpost
-cd katzenpost
-make kpclientd
-```
-
-Then run it with the
-[namenlos client config](https://github.com/katzenpost/kno/blob/main/data/networks/namenlos/.generated/configs/client.toml):
-
-```
-cmd/kpclientd/kpclientd -c client.toml
-```
 
 ## Other chat clients
 
