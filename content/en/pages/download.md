@@ -74,5 +74,6 @@ cmd/kpclientd/kpclientd -c client.toml</pre>
 <div class="col-6 col-md-3"><div class="dl-mini"><h3>katzenqt</h3><span class="dl-norel">no release yet</span><p class="dl-meta"><a href="https://github.com/katzenpost/katzenqt">source</a></p></div></div>
 <div class="col-6 col-md-3"><div class="dl-mini"><h3>katzenrns</h3><span class="dl-norel">no release yet</span><p class="dl-meta"><a href="https://github.com/katzenpost/katzenrns">source</a></p></div></div>
 </div>
-<p class="dl-servers">Servers: build from <a href="https://github.com/katzenpost/katzenpost">source</a> or install with <a href="https://github.com/katzenpost/kno">kno</a>.</p>
+<h2 class="dl-h">Running a mixnet</h2>
+<p class="dl-servers">Build from <a href="https://github.com/katzenpost/katzenpost">source</a> or install with <a href="https://github.com/katzenpost/kno">kno</a>.</p>
 </div>

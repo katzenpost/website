@@ -926,7 +926,7 @@ section.td-cover-block {
         .dl-norel { display: inline-block; font-size: 0.85rem; padding: 0.25rem 0; color: #9aa0aa !important; }
     }
 
-    .dl-servers { margin-top: 3rem; text-align: center; font-size: 0.9rem; color: #9aa0aa !important; }
+    .dl-servers { margin: 0; }
 
     @media (max-width: 576px) {
         .dl-card { padding: 1rem; }
