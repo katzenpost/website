@@ -58,6 +58,7 @@ hushphone</pre>
 </div>
 </div>
 </div>
+<p class="dl-status">Not connecting? See the <a href="https://status.namenlos.network/">network status</a>.</p>
 <details class="dl-source"><summary>Build kpclientd from source</summary>
 <pre class="dl-cmd">git clone --depth 1 https://github.com/katzenpost/katzenpost
 cd katzenpost && make kpclientd

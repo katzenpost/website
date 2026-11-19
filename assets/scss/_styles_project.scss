@@ -903,8 +903,10 @@ section.td-cover-block {
         white-space: pre-wrap;
     }
 
+    .dl-status { margin: 1.5rem 0 0; }
+
     .dl-source {
-        margin: 1.5rem 0 0;
+        margin: 0.75rem 0 0;
         summary { cursor: pointer; }
         pre.dl-cmd { margin: 0.75rem 0 0; }
     }
