@@ -62,7 +62,8 @@ hushphone</pre>
 <details class="dl-source"><summary>Build kpclientd from source</summary>
 <pre class="dl-cmd">git clone --depth 1 https://github.com/katzenpost/katzenpost
 cd katzenpost && make kpclientd
-cmd/kpclientd/kpclientd -c docker/client-configs/namenlos.toml</pre>
+curl -LO https://raw.githubusercontent.com/katzenpost/kno/main/data/networks/namenlos/.generated/configs/client.toml
+cmd/kpclientd/kpclientd -c client.toml</pre>
 <p class="dl-meta">Needs Go 1.26 or later and a C compiler.</p>
 </details>
 <h2 class="dl-h">Experimental chat clients</h2>
