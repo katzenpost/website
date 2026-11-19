@@ -20,7 +20,7 @@ type: "pages"
 <a class="btn btn-lg btn-primary" href="https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/kpclientd-android-v1.2.0-arm64-v8a.apk"><i class="fa fa-download" aria-hidden="true"></i>arm64-v8a</a>
 <a class="btn btn-lg btn-outline-primary" href="https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/kpclientd-android-v1.2.0-x86_64.apk"><i class="fa fa-download" aria-hidden="true"></i>x86_64</a>
 </div>
-<p class="dl-meta">unsigned: <a href="https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/kpclientd-android-v1.2.0-arm64-v8a-unsigned.apk">arm64-v8a</a>, <a href="https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/kpclientd-android-v1.2.0-x86_64-unsigned.apk">x86_64</a> · <a href="https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/SHA256SUMS">checksums</a> · <a href="https://github.com/katzenpost/kpclientd-android/tree/v1.2.0">source</a></p>
+<p class="dl-meta"><a href="https://github.com/katzenpost/kpclientd-android/releases/download/v1.2.0/SHA256SUMS">checksums</a> · <a href="https://github.com/katzenpost/kpclientd-android/tree/v1.2.0">source</a></p>
 </div>
 </div>
 <div class="dl-step">
