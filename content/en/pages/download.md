@@ -8,7 +8,14 @@ type: "pages"
 ---
 
 <div class="downloads">
-<p class="dl-lead">Install and start kpclientd first. Every app here connects to it over a unix domain socket or TCP, and none of them works without it.</p>
+<div class="dl-lead">
+<p>Start with hushphone, the client we recommend today: its groups carry chat, voice messages, polls and files.</p>
+<ul>
+<li>Install and start kpclientd first.</li>
+<li>Every app here connects to it over a unix domain socket or TCP.</li>
+<li>None of them works without it.</li>
+</ul>
+</div>
 <div class="row g-4">
 <div class="col-lg-6">
 <div class="dl-card">
