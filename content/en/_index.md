@@ -51,7 +51,7 @@ Read the [Echomix paper](https://arxiv.org/abs/2501.02933) together with the [th
 
 ### Take part
 
-The [code](https://github.com/katzenpost) is on GitHub under the AGPL-3.0 license. Talk to us in the [chat](/pages/community/).
+The [code](https://github.com/katzenpost) is on GitHub under the AGPL-3.0 license. Talk to us on [Zulip](https://katzenpost.zulipchat.com/).
 
 </div>
 <div class="col-md-6">
