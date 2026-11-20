@@ -926,3 +926,17 @@ section.td-cover-block {
         .dl-btns .btn { flex: 1 1 auto; }
     }
 }
+
+/* Home page link groups: one short block per kind of visitor. */
+.home-paths {
+    margin-top: 2rem;
+
+    h3 {
+        margin-top: 1rem;
+        font-size: 1.25rem;
+    }
+
+    .home-more {
+        margin-top: 1.5rem;
+    }
+}

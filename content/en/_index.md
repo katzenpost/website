@@ -1,62 +1,69 @@
 ---
 title: "Katzenpost"
-description: "A post-quantum mix network providing strong metadata privacy against global passive adversaries."
+description: "Katzenpost is a free software mix network that hides who is talking to whom."
 ---
 
 {{< blocks/cover image_anchor="top" height="auto" color="black" >}}
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.25rem;">
-<img src="/images/logo-friendly-yellow.svg" alt="Katzenpost" style="width: 100%; max-width: 200px; height: auto;">
+<img src="/images/logo-friendly-yellow.svg" alt="" style="width: 100%; max-width: 200px; height: auto;">
 <h1 style="margin: 0;">Katzenpost</h1>
-<p style="max-width: 640px; margin: 0;">A post-quantum mix network providing strong metadata privacy against global passive adversaries.</p>
+<p style="max-width: 640px; margin: 0;">Katzenpost is a free software mix network. It hides who is talking to whom from anyone watching the network, including an adversary who records traffic today to decrypt it later with a quantum computer.</p>
 <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-top: 0.5rem;">
-<a class="btn btn-lg btn-primary" href="https://arxiv.org/abs/2501.02933">Read the paper</a>
+<a class="btn btn-lg btn-primary" href="/pages/download/">Download a client</a>
 <a class="btn btn-lg btn-outline-light" href="/docs/">Documentation</a>
-<a class="btn btn-lg btn-outline-light" href="https://github.com/katzenpost">Source</a>
+<a class="btn btn-lg btn-outline-light" href="https://arxiv.org/abs/2501.02933">Paper</a>
+<a class="btn btn-lg btn-outline-light" href="https://github.com/katzenpost">Code</a>
 </div>
 </div>
 {{< /blocks/cover >}}
 
-## Public letter to the European Parliament
+<div class="row home-paths">
+<div class="col-md-6">
 
-Ahead of Thursday's Chat Control vote:
-[*Chat Control, Thursday: you are about to outlaw what you paid us to build*](/pages/chat-control/).
+### Use it
 
-## What it is
+[Download a client](/pages/download/) for Android or Linux.
+If it does not connect, see the [network status](https://status.namenlos.network/).
 
-Katzenpost is a free and open-source mix network. It hides who is talking
-to whom from network-level observers, including adversaries that record
-traffic today for later decryption on a quantum computer. The design is
-described in [*Echomix: a Strong Anonymity System with Messaging*](https://arxiv.org/abs/2501.02933).
+</div>
+<div class="col-md-6">
 
-Beyond messaging, Katzenpost is a substrate for decentralised applications
-that tolerate ephemeral storage and modest latency: group chat, voting,
-ephemeral collaborative state, and anonymous integration with existing
-systems.
+### Run a mix network
 
-## What we ship
+Start with the [admin guide](/docs/admin_guide/).
 
-### Available now
+</div>
+<div class="col-md-6">
 
-- **Pigeonhole**: anonymous storage protocol with thin clients in Go, Rust, and Python.
-- **katzenqt**: Qt group chat client. Buildable from source today.
-- **kpclientd**: client daemon. Buildable from source today.
+### Build on it
 
-### Coming next
+Read [Understanding Pigeonhole](/docs/pigeonhole_explained/), then the [thin client how-to](/docs/thin_client_howto/) and the [API reference](/docs/thin_client_api_reference/).
 
-- Pre-built packages for **katzenqt** and **kpclientd**.
-- **Namenlos**: a public Katzenpost mix network anyone may use.
+</div>
+<div class="col-md-6">
 
-## Threat model
+### Study the design
 
-The published [Threat Model document](/docs/threat_model/) is an evolving
-work in progress and does not yet incorporate the new designs introduced in
-the paper. To understand the present state of the design, the
-[Echomix paper](https://arxiv.org/abs/2501.02933) and the threat model
-document must be read together.
+Read the [Echomix paper](https://arxiv.org/abs/2501.02933) together with the [threat model](/docs/threat_model/), which does not yet cover the paper's new designs. The [specifications](/docs/specs/) give the protocols in detail.
 
-## Where to go
+</div>
+<div class="col-md-6">
 
-- **[Documentation](/docs/)**: start here. Entry points for users, operators, application developers, core developers, and academics.
-- **[Blog](/blog/)**: design notes and protocol explainers.
-- **[Source](https://github.com/katzenpost)**: the Katzenpost monorepo, the `hpqc` post-quantum cryptography library, thin clients, `katzenqt`, and this website.
-- **[Team](/pages/team/)** · **[Funders](/pages/funders/)** · **[Presentations](/pages/presentations/)**.
+### Take part
+
+The [code](https://github.com/katzenpost) is on GitHub under the AGPL-3.0 license. Talk to us in the [chat](/pages/community/).
+
+</div>
+<div class="col-md-6">
+
+### Support us
+
+[Donate](/pages/donate/), or see our [funders](/pages/funders/) and [team](/pages/team/).
+
+</div>
+<div class="col-12 home-more">
+
+More: the [blog](/blog/), our [presentations](/pages/presentations/), and a [public letter to the European Parliament on Chat Control](/pages/chat-control/).
+
+</div>
+</div>
