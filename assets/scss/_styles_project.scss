@@ -902,6 +902,7 @@ section.td-cover-block {
         font-size: 0.85rem;
         white-space: pre-wrap;
     }
+    .dl-meta + pre.dl-cmd { margin-top: 0.6rem; }
 
     .dl-status { margin: 1.5rem 0 0; }
 
