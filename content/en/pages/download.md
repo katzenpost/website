@@ -65,21 +65,21 @@ type: "pages"
 <p class="dl-meta"><a href="{{< release hushphone "hushphone-TAG-linux-x86_64.tar.gz" >}}">tarball</a> · <a href="{{< release hushphone "SHA256SUMS" >}}">checksums</a> · <a href="https://github.com/katzenpost/hushphone/tree/{{< release hushphone >}}">source</a></p>
 <h3>2. Install</h3>
 <p class="dl-run">Open a terminal in the folder with the downloads and run the line for your system.</p>
-<p class="dl-for">If your computer runs Debian or Ubuntu:</p>
+<p class="dl-for">Debian / Ubuntu</p>
 <pre class="dl-cmd">sudo apt install ./kpclientd_*.deb ./hushphone-*.deb</pre>
 {{< released hushphone "hushphone-TAG-arch-x86_64.pkg.tar.zst" >}}
-<p class="dl-for">If your computer runs Arch Linux:</p>
+<p class="dl-for">Arch Linux</p>
 <pre class="dl-cmd">sudo pacman -U {{< released katzenpost "kpclientd-VERSION-1-x86_64.pkg.tar.zst" >}}./kpclientd-*.pkg.tar.zst {{< /released >}}./hushphone-*.pkg.tar.zst</pre>
 {{< /released >}}
-<p class="dl-for">Only if you already use the Nix package manager or NixOS (most people can skip this):</p>
+<p class="dl-for">NixOS</p>
 <pre class="dl-cmd">{{< nix katzenpost "#kpclientd" >}}
 {{< nix hushphone >}}</pre>
 <h3>3. Start</h3>
 <p class="dl-run">Start the daemon, then hushphone.</p>
-<p class="dl-for">If your computer runs Debian, Ubuntu or Arch Linux:</p>
+<p class="dl-for">Debian / Ubuntu / Arch Linux</p>
 <pre class="dl-cmd">systemctl --user enable --now kpclientd
 hushphone</pre>
-<p class="dl-for">Only if you installed with Nix, in two terminals:</p>
+<p class="dl-for">NixOS, in two terminals</p>
 <pre class="dl-cmd">{{< nix katzenpost "#kpclientd" "run" >}}
 hushphone</pre>
 </div>
