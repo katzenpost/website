@@ -851,12 +851,7 @@ section.td-cover-block {
     max-width: 64rem;
     margin: 0 auto;
 
-    .dl-lead {
-        margin: 0 0 2rem;
-        font-size: 1.05rem;
-        p { margin: 0 0 0.75rem; }
-        ul { margin: 0; padding-left: 1.25rem; }
-    }
+    .dl-lead { margin: 0 0 2rem; font-size: 1.05rem; }
 
     .dl-card, .dl-mini {
         background-color: #23262b;
@@ -867,7 +862,8 @@ section.td-cover-block {
 
     .dl-card {
         padding: 1.75rem;
-        h3 { font-size: 1.1rem; margin: 1.6rem 0 0.6rem; }
+        h3 { font-size: 1.15rem; margin: 1.75rem 0 0.5rem; }
+        h4 { font-size: 1rem; margin: 1.1rem 0 0.5rem; }
     }
 
     .dl-head {
@@ -902,7 +898,8 @@ section.td-cover-block {
         font-size: 0.85rem;
         white-space: pre-wrap;
     }
-    .dl-meta + pre.dl-cmd { margin-top: 0.6rem; }
+    .dl-meta + pre.dl-cmd { margin-top: 0.3rem; }
+    .dl-run + pre.dl-cmd, pre.dl-cmd + .dl-meta { margin-top: 0.75rem; }
 
     .dl-status { margin: 1.5rem 0 0; }
 

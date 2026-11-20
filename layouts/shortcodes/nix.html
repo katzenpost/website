@@ -10,4 +10,4 @@
     {{- $ref = print "/" . -}}
   {{- end -}}
 {{- end -}}
-<pre class="dl-cmd">nix profile install github:katzenpost/{{ $repo }}{{ $ref }}{{ .Get 1 }}</pre>
+nix profile install github:katzenpost/{{ $repo }}{{ $ref }}{{ .Get 1 -}}
