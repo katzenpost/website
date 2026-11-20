@@ -845,3 +845,84 @@ section.td-cover-block {
         margin: 0 auto 1em;
     }
 }
+
+/* Download page: one card per platform, kpclientd first in each. */
+.downloads {
+    max-width: 64rem;
+    margin: 0 auto;
+
+    .dl-lead { margin: 0 0 2rem; font-size: 1.05rem; }
+
+    .dl-card, .dl-mini {
+        background-color: #23262b;
+        border: 1px solid #393d45;
+        border-radius: 6px;
+        height: 100%;
+    }
+
+    .dl-card {
+        padding: 1.75rem;
+        h3 { font-size: 1.15rem; margin: 1.75rem 0 0.5rem; }
+        h4 { font-size: 1rem; margin: 1.1rem 0 0.5rem; }
+    }
+
+    .dl-head {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        > i { font-size: 2.75rem; color: $primary; width: 3rem; text-align: center; }
+        h2 { margin: 0; font-size: 1.5rem; }
+        p { margin: 0; color: #9aa0aa !important; font-size: 0.9rem; }
+    }
+
+    .dl-ver { font-size: 0.85rem; color: #9aa0aa !important; margin-left: 0.4rem; }
+    .dl-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .btn-lg { font-size: 1rem; padding: 0.55rem 1.1rem; }
+    .btn-primary { background-color: $primary !important; border-color: $primary !important; color: #1a1d22 !important; font-weight: 600; }
+    .btn-primary:hover { background-color: darken($primary, 8%) !important; }
+    .btn-outline-primary { background-color: transparent !important; border-color: $primary !important; color: $primary !important; }
+    .btn-outline-primary:hover { background-color: $primary !important; color: #1a1d22 !important; }
+    .btn-lg i { margin-right: 0.5rem; }
+
+    .dl-meta, .dl-meta code { font-size: 0.85rem; color: #9aa0aa !important; }
+    .dl-meta { margin: 0.4rem 0 0; }
+    .dl-meta code { display: block; padding: 0 !important; background: none !important; font-size: 0.7rem; word-break: break-all; }
+    a.dl-meta, .dl-meta a { color: #a8b3ff !important; }
+
+    .dl-run { margin: 0; }
+
+    pre.dl-cmd {
+        margin: 0;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+        white-space: pre-wrap;
+    }
+    .dl-for { margin: 0.9rem 0 0.35rem; font-size: 0.9rem; font-weight: 600; }
+
+    .dl-status { margin: 1.5rem 0 0; }
+
+    .dl-source {
+        margin: 0.75rem 0 0;
+        summary { cursor: pointer; }
+        pre.dl-cmd { margin: 0.75rem 0 0; }
+    }
+
+    .dl-h { margin: 3rem 0 1rem; font-size: 1.35rem; }
+
+    .dl-mini {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.6rem 0.75rem;
+        padding: 1rem;
+        h3 { flex: 0 0 100%; font-size: 1.05rem; margin: 0; }
+        a.dl-meta { margin: 0; }
+    }
+
+    @media (max-width: 576px) {
+        .dl-card { padding: 1rem; }
+        pre.dl-cmd { font-size: 0.72rem; padding: 0.6rem; }
+        .dl-btns .btn { flex: 1 1 auto; }
+    }
+}

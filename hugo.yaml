@@ -199,6 +199,15 @@ params:
 #        icon: fa fa-envelope
 #        desc: Discuss development issues around the project
 
+# layouts/shortcodes/release.html reads GITHUB_TOKEN to stay under the
+# GitHub API rate limit; the first two patterns are Hugo's defaults.
+security:
+  funcs:
+    getenv:
+      - ^HUGO_
+      - ^CI$
+      - ^GITHUB_TOKEN$
+
 module:
   # Uncomment the next line to build and serve using local docsy clone declared in the named Hugo workspace:
   # workspace: docsy.work

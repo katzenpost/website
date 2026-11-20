@@ -1,0 +1,15 @@
+{{- /*
+  The latest release of katzenpost/<.repo>, fetched when the site is built.
+  Returns its tag, its version (the tag without "v") and, when .asset names
+  a file the release has, that file's download URL. In .asset TAG stands
+  for the tag and VERSION for the version.
+*/ -}}
+{{- $rel := partial "github.html" (printf "repos/katzenpost/%s/releases/latest" .repo) -}}
+{{- $tag := $rel.tag_name | default "" -}}
+{{- $version := strings.TrimPrefix "v" $tag -}}
+{{- $name := replace (replace (.asset | default "") "TAG" $tag) "VERSION" $version -}}
+{{- $url := "" -}}
+{{- if where ($rel.assets | default slice) "name" $name -}}
+  {{- $url = printf "https://github.com/katzenpost/%s/releases/download/%s/%s" .repo $tag $name -}}
+{{- end -}}
+{{- return dict "tag" $tag "version" $version "name" $name "url" $url -}}

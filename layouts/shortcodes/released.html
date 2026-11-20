@@ -1,0 +1,10 @@
+{{- /*
+  {{< released REPO "ASSET" >}}…{{< /released >}} renders its body only
+  when katzenpost/REPO's latest release has the asset, with TAG and VERSION
+  in the body replaced as in ASSET. A third argument "not" renders the body
+  only when the release lacks the asset.
+*/ -}}
+{{- $r := partial "release.html" (dict "repo" (.Get 0) "asset" (.Get 1)) -}}
+{{- if ne (ne $r.url "") (eq (.Get 2) "not") -}}
+  {{- replace (replace .Inner "TAG" $r.tag) "VERSION" $r.version | safeHTML -}}
+{{- end -}}

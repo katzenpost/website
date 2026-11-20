@@ -22,6 +22,8 @@ jobs:
         run: docker build -t katzenpost-website-render:local .
 
       - name: Render the site
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          docker run --rm -v "$PWD:/site" -w /site katzenpost-website-render:local \
+          docker run --rm -e GITHUB_TOKEN -v "$PWD:/site" -w /site katzenpost-website-render:local \
             sh -euc 'npm ci --no-audit --no-fund && hugo --gc --minify'

@@ -1,0 +1,19 @@
+{{- /*
+  GET https://api.github.com/<path>, decoded. A 404 returns an empty dict;
+  any other failure fails the build. GITHUB_TOKEN, when set, lifts the
+  anonymous rate limit.
+*/ -}}
+{{- $url := print "https://api.github.com/" . -}}
+{{- $opts := dict -}}
+{{- with getenv "GITHUB_TOKEN" -}}
+  {{- $opts = dict "headers" (dict "Authorization" (print "Bearer " .)) -}}
+{{- end -}}
+{{- $out := dict -}}
+{{- with resources.GetRemote $url $opts -}}
+  {{- with .Err -}}
+    {{- errorf "github: %s: %s" $url . -}}
+  {{- else -}}
+    {{- $out = . | transform.Unmarshal -}}
+  {{- end -}}
+{{- end -}}
+{{- return $out -}}
