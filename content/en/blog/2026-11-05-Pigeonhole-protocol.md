@@ -106,26 +106,27 @@ polling interval.
 
 ## Pigeonhole services
 
-A Pigeonhole service is a hidden service that uses Pigeonhole channels as its transport. It
-has no address and no open port: everything it sends or receives is a box on the storage
-replicas. A client and a service talk as any two parties do on Pigeonhole, over two
-channels, one written by each.
+A Pigeonhole service is a hidden service, similar to the hidden services of the Tor network:
+the device the service runs on is hidden from the users of the service. It has no address
+and no open port. It runs from any location, as a mixnet client does, and everything it
+sends or receives is a box on the storage replicas.
 
-The difficulty is the first contact. Pigeonhole requires prior knowledge: without a
-capability there is nothing to read. A client that has never talked to a service shares
-nothing with it. Mixnet services have no such requirement. They run as plugins on service
-nodes, a mixnet may have many service nodes, and the mixnet's PKI document publishes the
-services each one hosts, so that any client can learn of them and use them.
+Mixnet services are not hidden. They run as plugins on service nodes, a mixnet may have many
+service nodes, and the mixnet's PKI document publishes the services each one hosts, so that
+any client can learn of them and use them with no prior knowledge. Pigeonhole does require
+prior knowledge: without a capability there is nothing to read. We therefore use two mixnet
+services to bootstrap a connection to a Pigeonhole service:
 
-We therefore use two mixnet services to bootstrap a connection to a Pigeonhole service:
+- The **voucher router** receives contact vouchers from ordinary mixnet clients. A
+  Pigeonhole service keeps a two-way Pigeonhole connection with the router, and the router
+  passes each voucher addressed to the service on over it. The voucher is sealed to the
+  service's key, so the router cannot open it.
+- The **service directory** advertises the Pigeonhole services it knows of, with a
+  descriptor for each: the service's public key and the voucher routers it is paired with.
 
-- The **service directory** holds a descriptor for each Pigeonhole service, saying how to
-  reach it.
-- The **voucher router** relays a client's contact voucher, sealed to the service's key, to
-  the service. The router cannot open it.
-
-The service uses the voucher, and from then on the two share a two-way connection in which
-the directory and the router take no part. The
+The service then completes the voucher protocol with the client. The result is a two-way
+connection in which both the client and the service are hidden, and in which the directory
+and the router take no part. The
 [Pigeonhole services](/docs/specs/pigeonhole_services/) specification has the details.
 
 The services written so far are in
