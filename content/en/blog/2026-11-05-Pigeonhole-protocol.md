@@ -1,7 +1,7 @@
 ---
 title: "Introduction to Pigeonhole Protocol"
 date: "2026-11-05"
-description: "Pigeonhole as a network-independent abstraction: what it is, what it guarantees, what we build on it, and the mixnet and Reticulum mesh it runs on, with measured box timings."
+description: "What we have built on Pigeonhole so far: hushphone, a group chat client with voting that runs over the mixnet or a Reticulum mesh, and Pigeonhole services, which are hidden services on the mixnet."
 author: "David Stainton"
 tags: ["research", "mixnet", "reticulum", "apps", "pigeonhole", "protocol"]
 version: ""
@@ -10,107 +10,76 @@ draft: false
 
 Pigeonhole is a protocol for asynchronous, unlinkable communication. Without a read
 capability, no one can tell which messages belong together, and sender and reader need not
-be online at the same time. That second property is the only reason Pigeonhole stores
-anything. Our paper,
+be online at the same time. Our paper,
 [Echomix: a Strong Anonymity System with Messaging](https://arxiv.org/abs/2501.02933), and
-[Understanding Pigeonhole](/docs/pigeonhole_explained/) have the details. This post treats
-Pigeonhole as an abstraction that does not depend on the network beneath it: what it is,
-what it guarantees, what we build with it, and the two networks it now runs on.
+[Understanding Pigeonhole](/docs/pigeonhole_explained/) have the details. This post is about
+the two things we have built on it so far: hushphone, a group chat client, and Pigeonhole
+services, which are hidden services on the mixnet.
 
-## What Pigeonhole is
+## Channels
 
 A Pigeonhole channel is a sequence of *boxes*: fixed-size ciphertexts, each signed and named
 by a Box ID. Two capabilities govern it. The write capability writes boxes and derives the
 read capability; the read capability finds, verifies and decrypts them. A channel has one
-writer and any number of readers, and two one-way channels make a two-way one.
+writer and any number of readers. Storage replicas keep a box for one to two weeks, then
+garbage-collect it.
 
-Boxes are immutable, with one exception: tombstones. The holder of the write capability can
-replace a box with a tombstone, an empty ciphertext with a valid signature over it, which
-deletes the box. That is a feature.
+We always get two-way communication the same way: each party makes a channel of their own,
+and the two exchange read capabilities. We make that exchange with the
+[contact voucher](/docs/specs/contactvoucher/) protocol, in which a single token crosses out
+of band, in one direction only. That keeps the user's part simple, and it has security
+properties that a bare exchange of read capabilities lacks.
 
-Box indexes come from a KDF ratchet, which moves forward but not backward. A read capability
-that starts at index *n* reaches box *n* and every box after it, never one before. You can
-therefore share a channel from now on without sharing its history.
+## hushphone
 
-Storage replicas verify, store and forward boxes; they cannot read them. They keep the
-current and the previous replica epoch, a week each, so a box lives one to two weeks before
-it is garbage-collected. Anything that must last, such as a ticket tracker, a calendar or
-revision control, belongs elsewhere.
+[hushphone](https://github.com/katzenpost/hushphone) is group chat with push-to-talk voice
+messages, for Linux and Android. It speaks katzenqt1, our
+[group chat protocol](/docs/specs/groupchat/), in which every member writes a channel of
+their own and reads everyone else's. Its groups are therefore the same ones
+[katzenqt](https://github.com/katzenpost/katzenqt),
+[jam](https://github.com/katzenpost/jam),
+[frank_chat](https://github.com/katzenpost/frank_chat) and
+[katzenrns](https://github.com/katzenpost/katzenrns) use.
 
-## What it guarantees, and against whom
+### Voting, and where a CRDT belongs
 
-- **Confidential**: only holders of the read capability can decrypt a box.
-- **Authentic**: a box that verifies was written by the holder of the write capability. That
-  is a key, not a person: whoever holds the write capability is the author.
-- **Unlinkable**: without the read capability, no one, the replicas included, can tell which
-  boxes belong to one channel.
+hushphone has voting built in: a member puts a question and its options to the group, the
+others vote and may change their votes, and everyone sees the counts as they change. This is
+katzenqt's tally protocol, which rides on top of the group chat. A vote in progress is a
+Conflict-free Replicated Data Type (CRDT). Each member publishes events on their own channel, and every client
+computes the same thing:
 
-Who learns *which node* wrote or read a box depends on the network. On the mixnet, no one
-does: not the replica, not the courier that relays the query, not a global observer of the
-network. On an open mesh, the replica a node talks to sees which boxes it writes and fetches,
-and when; anyone may run a replica, and a network observer sees which node talks to which
-replica.
-
-BACAP, the scheme beneath the boxes, keeps contents and linkage safe even from a quantum
-adversary, but its signatures are Ed25519, so such an adversary could forge a write into a
-box whose ID it has seen. A channel has no post-compromise security of its own: a leaked
-capability works until the participants move to a fresh channel.
-
-## What we build with it
-
-**Chat.** For one-on-one chat, Alice and Bob each write a channel and give the other its read
-capability. In group chat every member writes their own channel and reads everyone else's;
-messages are ordered per author, with no global order. Our group chat protocol is katzenqt1,
-in [pigeonhole_protocols](https://github.com/katzenpost/pigeonhole_protocols), and these
-clients speak it, so they all share groups:
-
-- [katzenqt](https://github.com/katzenpost/katzenqt): Qt desktop client
-- [hushphone](https://github.com/katzenpost/hushphone): Rust and Slint, push-to-talk voice messages, Linux and Android, over the mixnet or a Reticulum mesh
-- [jam](https://github.com/katzenpost/jam): Lean terminal client
-- [frank_chat](https://github.com/katzenpost/frank_chat): Lean 4 client with security oriented dependent types
-- [katzenrns](https://github.com/katzenpost/katzenrns): Python client for a Reticulum mesh
-- [pigeonhole_reticulous](https://github.com/katzenpost/pigeonhole_reticulous): group chat on the LilyGO T-Deck Plus, over a Reticulum mesh
-
-**Replicated state machines.** Any application that is a fold over append-only events fits:
-each participant publishes events on their own channel, and every client computes
-`state = fold(events)`. Voting, ephemeral shared documents, sensor aggregation and incident
-logs all qualify, provided events are small, order matters only per author, and the data may
-expire. A single-writer channel gives each event exactly one author, which is the actor
-uniqueness that Conflict-free Replicated Data Types (CRDTs) assume, so CRDT state converges
-whatever the order of arrival. A late joiner who cannot replay expired events takes a
-snapshot of an existing member's state over a one-shot channel and merges it; CRDT merges are
-idempotent, so overlap is harmless. Tallying votes looks like this (illustrative only: the
-Rust prototype on the [`crdts`](https://crates.io/crates/crdts) crate has been removed from
-thin_client):
-
-```rust
-let mut tally: Map<SlotId, MVReg<Vote, Actor>, Actor> = Map::new();
-for event in group.receive_from_all_timeout(poll_deadline).await? {
-    tally.apply(event.op); // same result in any order
-}
+```
+state = fold(events)
 ```
 
-## Where it runs
+The events may arrive in any order and the state comes out the same. They may not go
+missing. An operation-based CRDT converges only if every member receives all of the events;
+most of them will not do. A CRDT therefore corrects no errors, and it cannot be the
+fundamental message type of a protocol in the hope that it will. It has to be layered on a
+protocol that already delivers everything.
 
-Pigeonhole meets the network at the box: write a box, read a box, by Box ID. The Katzenpost
-mixnet and [Reticulum](https://reticulum.network) are two bindings of that one interface.
-Everything above it, BACAP and katzenqt1 included, is shared, so every Pigeonhole
-application runs on either. On the mesh, the replica is
-[replica_rns](https://github.com/katzenpost/pigeonhole_rns), and the
-[specification](/docs/specs/pigeonhole-protocols-reticulum/) has the details.
+That is why we made the group chat reliable before we used a CRDT on it. In katzenqt1,
+members acknowledge the boxes they have read, and an author writes again every box that some
+member has not acknowledged
+([acknowledgements and backfill](/docs/specs/groupchat/#opportunistic_acks)). The tally is
+folded over a stream of events that has no gaps.
 
-| | Katzenpost mixnet (namenlos) | Reticulum, open mesh |
-|---|---|---|
-| who may run a node | those the directory authorities admit | anyone |
-| directory | one PKI document per epoch, voted by six authorities | none; replicas announce |
-| connectivity | the internet | LoRa, serial, TCP, with or without the internet |
-| who sees which node reads which box | no one | the replica it talks to |
-| post-quantum | hybrid links, directory signatures and query envelopes; Sphinx packets use X25519 | no; Reticulum's links are classical |
-| replica storage | sharded, two replicas per box | every replica stores every box\* |
+### Mixnet or mesh
 
-\* Full replication came with [pigeonhole_rns PR #6](https://github.com/katzenpost/pigeonhole_rns/pull/6),
-now merged; sharding is kept for the future closed mesh of the
-[replica specification](/docs/specs/reticulum/).
+hushphone reaches Pigeonhole over the Katzenpost mixnet, through the client daemon
+`kpclientd`, or over a [Reticulum](https://reticulum.network) mesh, through a replica's
+address. The groups and the protocol are the same on both. The mixnet hides which node
+writes or reads a box from everyone, a global observer of the network included. On an open
+mesh the replica a node talks to sees which boxes it writes and fetches, and when.
+
+On the mesh, the storage is
+[replica_rns](https://github.com/katzenpost/pigeonhole_rns), a Reticulum node that stores
+boxes and replicates them to the other replicas it hears; the
+[specification](/docs/specs/pigeonhole-protocols-reticulum/) has the details. A replica can
+also be a bridge to a Katzenpost storage replica, so mesh users and mixnet users share
+groups. We have tested exactly that: katzenrns users on a mesh chatting with hushphone users
+on namenlos through the namenlos bridge.
 
 We timed bare box operations, with no chat client in the way: write three boxes to a fresh
 channel one after another, read them back at once (the first read), then read them again.
@@ -135,30 +104,44 @@ same machine and to the namenlos bridge replica, 145 ms away. The mesh figures e
 to 6 seconds Reticulum took to set up the Link, and are rounded up to the client's 50 ms
 polling interval.
 
-A replica can also be a bridge to a Katzenpost storage replica, so mesh users and mixnet users
-share groups. We have tested exactly that: katzenrns users on a mesh chatting with hushphone
-users on namenlos through the namenlos bridge. Since a box is the same object on every
-network, a mesh with bridges to several mixnets joins those mixnets together; the bridge rules
-for that are landing now.
+## Pigeonhole services
 
-## What comes next
+A Pigeonhole service is a hidden service that uses Pigeonhole channels as its transport. It
+has no address and no open port: everything it sends or receives is a box on the storage
+replicas. A client and a service talk as any two parties do on Pigeonhole, over two
+channels, one written by each.
 
-- **Prometheus**: uploading metrics to a Prometheus aggregator anonymously over the mixnet.
-- **NNCP**: sending and receiving files anonymously through existing NNCP infrastructure.
-- **Tally**: transparent voting on the broadcast API. Members publish ballots visible to the
-  group and may change them; since each channel has one writer, no one else can. A CRDT
-  register keeps concurrent ballots side by side rather than dropping one, and katzenqt1
-  already reserves message types for it. A meeting scheduler follows: the options are time
-  slots, the ballots availability.
+The difficulty is the first contact. Pigeonhole requires prior knowledge: without a
+capability there is nothing to read. A client that has never talked to a service shares
+nothing with it. Mixnet services have no such requirement. They run as plugins on service
+nodes, a mixnet may have many service nodes, and the mixnet's PKI document publishes the
+services each one hosts, so that any client can learn of them and use them.
 
-## Conclusion
+We therefore use two mixnet services to bootstrap a connection to a Pigeonhole service:
 
-The abstraction is the point. Pigeonhole is defined at the box, so networks plug in
-underneath it, and every application above, from chat to Tally, works on each of them.
+- The **service directory** holds a descriptor for each Pigeonhole service, saying how to
+  reach it.
+- The **voucher router** relays a client's contact voucher, sealed to the service's key, to
+  the service. The router cannot open it.
 
-That makes the Katzenpost mixnet more powerful with Reticulum than without it. The mixnet
-keeps what only it gives: metadata privacy against a global observer and hybrid post-quantum
-links. Bridged to meshes, it gains reach, to places with radio and no internet, and speed,
-a fifth of a second per box instead of twenty-five seconds, for the members who can accept a
-mesh's weaker metadata privacy. And a mesh can join several mixnets together, so that the
-users of each share groups.
+The service uses the voucher, and from then on the two share a two-way connection in which
+the directory and the router take no part. The
+[Pigeonhole services](/docs/specs/pigeonhole_services/) specification has the details.
+
+The services written so far are in
+[pigeonhole_protocols](https://github.com/katzenpost/pigeonhole_protocols):
+
+- [zulip-bridge](https://github.com/katzenpost/pigeonhole_protocols/tree/main/rust/src/services/zulip)
+  joins a Pigeonhole group chat to a Zulip stream. It is a member of the group and a bot in
+  Zulip, and it relays text both ways.
+- [status-bot](https://github.com/katzenpost/pigeonhole_protocols/blob/main/docs/status-bot.md)
+  reports each epoch on the mixnet it is on: what changed in the PKI document, and which
+  Pigeonhole services the directory lists and whether each answers. Anything else said to it
+  gets an ELIZA answer.
+- [motd](https://github.com/katzenpost/pigeonhole_protocols/tree/main/go/services/motd) is
+  the message of the day, a minimal service to copy from.
+
+A channel also carries a stream.
+[kp-fa](https://github.com/katzenpost/pigeonhole_protocols/blob/main/docs/kp-fa.md)
+broadcasts Ogg/Opus audio into a new channel and prints its read capability; a listener who
+holds it tunes in live or from the start.
