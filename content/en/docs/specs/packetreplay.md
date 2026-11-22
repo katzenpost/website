@@ -13,6 +13,13 @@ weight: "50"
 version: ""
 ---
 
+{{% pageinfo %}}
+For publication of epoch keys and their retention across epoch boundaries, see
+[directory clocks and retention](/docs/specs/dirauth#211-clocks-and-retention).
+The [directory security considerations](/docs/specs/dirauth#227-security-considerations)
+also describe key rotation and node removal.
+{{% /pageinfo %}}
+
 <div class="section">
 
 <div class="titlepage">
@@ -85,7 +92,7 @@ A fixed-time interval with a current default value of 20 minutes.
 A new PKI document containing public key material
 is published for each epoch and is valid only for that epoch. For more information,
 see
-<a href="https://katzenpost.network/docs/specs/mix_network/#sphinx-mix-and-provider-key-rotation" class="link" target="_top">Sphinx
+<a href="/docs/specs/mixnet#sphinx-mix-and-provider-key-rotation" class="link" target="_top">Sphinx
 mix and provider key rotation</a>.
 
 <span class="term"><span class="bold">**group**</span></span>  
@@ -276,7 +283,7 @@ operator’s decision to make since the security and availability of the mix ser
 are
 affected. Since mix networks are vulnerable to various types of compulsion attack
 (see
-<a href="https://katzenpost.network/docs/specs/sphinx_format/#compulsion-threat-considerations" class="link" target="_top">Compulsion Threat Considerations</a> in the <span class="emphasis">*Sphinx cryptographic
+<a href="/docs/specs/sphinx#compulsion-threat-considerations" class="link" target="_top">Compulsion Threat Considerations</a> in the <span class="emphasis">*Sphinx cryptographic
 packet format specification*</span>) there is some advantage to
 <span class="emphasis">*not*</span> persisting the Sphinx routing keys to disk. The mix server
 operator can simply power-off the servers before seizure rather than physically

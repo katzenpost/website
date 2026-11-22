@@ -1,6 +1,7 @@
 ---
 title: ""
-linkTitle: "Public key infrastructure"
+linkTitle: "Public key infrastructure (deprecated)"
+toc_hide: true
 description: ""
 author: ""
 url: ""
@@ -12,6 +13,14 @@ type: ""
 weight: "45"
 version: ""
 ---
+
+{{% pageinfo %}}
+Deprecated. This page describes the original PKI design and it no longer matches
+the current network.
+
+For the current design, see the [Directory authority
+specification](/docs/specs/dirauth).
+{{% /pageinfo %}}
 
 <div class="section">
 

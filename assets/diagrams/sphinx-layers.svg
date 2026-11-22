@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 520" width="280" height="520" role="img" aria-labelledby="title desc">
+  <title id="title">Sphinx packet inside a PQ Noise link</title>
+  <desc id="desc">The first forward link runs from kpclientd to a gateway over PQ Noise and TCP/IP or QUIC/UDP/IP. Its send_packet command carries a Sphinx packet. Five concentric protection layers surround the data: gateway, mix layer 1, mix layer 2, mix layer 3, and service node. Each hop removes its own Sphinx layer. Namenlos uses five-hop, 3082-byte packets with up to 2000 bytes of user payload.</desc>
+  <g stroke-width="1.25" stroke-linejoin="round" font-family="sans-serif" font-size="16" fill="#ffffff">
+    <rect width="280" height="520" fill="#34383d"/>
+    <g transform="translate(14 8) scale(.625)">{{ readFile "static/docs/specs/dirauth/icons/client.svg" | safeHTML }}</g>
+    <text x="40" y="25">kpclientd to gateway</text>
+    <text x="14" y="47">TCP/IP or QUIC/UDP/IP</text>
+    <rect x="10" y="60" width="260" height="446" rx="5" fill="#1c3c4c" stroke="#7acee9" stroke-dasharray="2 3"/>
+    <g transform="translate(20 67) scale(.625)">{{ readFile "static/docs/specs/dirauth/icons/connection.svg" | safeHTML }}</g>
+    <text x="46" y="84">PQ Noise</text>
+    <text x="20" y="106">Wire KEM:</text>
+    <text x="20" y="128">KYBER768-X25519</text>
+    <text x="20" y="150">send_packet command</text>
+    <g id="sphinx-layers" vector-effect="non-scaling-stroke">
+      <circle cx="140" cy="300" r="124" fill="#1c3c4c" stroke="#7acee9"/>
+      <circle cx="140" cy="300" r="105" fill="#342b4c" stroke="#c3abff" stroke-dasharray="8 3"/>
+      <circle cx="140" cy="300" r="86" fill="#48351f" stroke="#f3bd66" stroke-dasharray="2 3"/>
+      <circle cx="140" cy="300" r="67" fill="#153d35" stroke="#73d6b8" stroke-dasharray="8 3 2 3"/>
+      <circle cx="140" cy="300" r="48" fill="#492d38" stroke="#eab2ce" stroke-dasharray="4 3"/>
+      <circle cx="140" cy="300" r="24" fill="#34383d" stroke="#c3cbd5"/>
+    </g>
+    <g transform="translate(96 178) scale(.5)">{{ readFile "static/docs/specs/dirauth/icons/gateway.svg" | safeHTML }}</g>
+    <text x="116" y="193">Gateway</text>
+    <g transform="translate(110 197) scale(.5)">{{ readFile "static/docs/specs/dirauth/icons/mix.svg" | safeHTML }}</g>
+    <text x="130" y="212">Mix 1</text>
+    <g transform="translate(110 216) scale(.5)">{{ readFile "static/docs/specs/dirauth/icons/mix.svg" | safeHTML }}</g>
+    <text x="130" y="231">Mix 2</text>
+    <g transform="translate(110 235) scale(.5)">{{ readFile "static/docs/specs/dirauth/icons/mix.svg" | safeHTML }}</g>
+    <text x="130" y="250">Mix 3</text>
+    <g transform="translate(102 256) scale(.5)">{{ readFile "static/docs/specs/dirauth/icons/service.svg" | safeHTML }}</g>
+    <text x="122" y="271">Service</text>
+    <text x="140" y="306" text-anchor="middle">Data</text>
+    <text x="20" y="449">5 hops, NIKE: x25519</text>
+    <text x="20" y="471">3082-byte packet</text>
+    <text x="20" y="493">2000-byte user payload</text>
+  </g>
+</svg>

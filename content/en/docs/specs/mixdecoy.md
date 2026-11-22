@@ -13,6 +13,13 @@ weight: "30"
 version: ""
 ---
 
+{{% pageinfo %}}
+This page describes the packet-loss statistics design. See
+[directory descriptor uploads](/docs/specs/dirauth#upload-encoding-and-signatures)
+for the current signed upload structure and its LoopStats field.
+At v0.0.107, carrying these statistics does not make them inputs to the directory tally.
+{{% /pageinfo %}}
+
 <div class="section">
 
 <div class="titlepage">
@@ -99,7 +106,7 @@ A fixed-time interval with a current default value of 20 minutes.
 A new PKI document containing public key material
 is published for each epoch and is valid only for that epoch. For more information,
 see
-<a href="https://katzenpost.network/docs/specs/mix_network/#sphinx-mix-and-provider-key-rotation" class="link" target="_top">Sphinx
+<a href="/docs/specs/mixnet#sphinx-mix-and-provider-key-rotation" class="link" target="_top">Sphinx
 mix and provider key rotation</a>.
 
 <span class="term"><span class="bold">**wire protocol**</span></span>  

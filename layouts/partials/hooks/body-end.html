@@ -1,0 +1,47 @@
+{{ if eq .Page.Params.slug "dirauth" -}}
+<script>
+  const protocolRoles = {{ .Site.Data.dirauth_roles | jsonify | safeJS }};
+  function styleProtocolActors() {
+    for (const figure of document.querySelectorAll('[data-actor-roles]')) {
+      const actors = JSON.parse(figure.dataset.actorRoles);
+      const svg = figure.querySelector('.mermaid > svg');
+      if (!svg) continue;
+      for (const rect of svg.querySelectorAll('rect.actor[name]:not([data-protocol-role])')) {
+        const roleKey = actors[rect.getAttribute('name')];
+        const role = protocolRoles[roleKey];
+        if (!role) continue;
+        const x = Number(rect.getAttribute('x'));
+        const y = Number(rect.getAttribute('y'));
+        const width = Number(rect.getAttribute('width'));
+        const height = Number(rect.getAttribute('height'));
+        const center = x + width / 2;
+        const size = role.icons.length > 1 ? 28 : 32;
+        const total = role.icons.length * size + Math.max(0, role.icons.length - 1) * 4;
+        for (const [i, icon] of role.icons.entries()) {
+          const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+          image.setAttribute('href', `/docs/specs/dirauth/icons/${icon}.svg`);
+          image.setAttribute('x', center - total / 2 + i * (size + 4));
+          image.setAttribute('y', y + 8);
+          image.setAttribute('width', size);
+          image.setAttribute('height', size);
+          image.setAttribute('aria-hidden', 'true');
+          image.dataset.actor = rect.getAttribute('name');
+          image.classList.add('protocol-actor-icon');
+          rect.parentNode.append(image);
+        }
+        for (const text of svg.querySelectorAll('text.actor')) {
+          const ty = Number(text.getAttribute('y'));
+          if (Math.abs(Number(text.getAttribute('x')) - center) < 1 && ty >= y && ty <= y + height) {
+            text.classList.add('protocol-actor-label');
+          }
+        }
+        rect.dataset.protocolRole = roleKey;
+        rect.classList.add('protocol-actor', `protocol-tone-${role.tone}`);
+      }
+    }
+  }
+  const actorObserver = new MutationObserver(styleProtocolActors);
+  actorObserver.observe(document.querySelector('.protocol-spec'), {childList:true, subtree:true});
+  styleProtocolActors();
+</script>
+{{ end -}}

@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - main
+  # The Download page prints each app's latest release, so rebuild daily.
+  schedule:
+    - cron: "17 5 * * *"
   workflow_dispatch:
 
 permissions:
@@ -46,6 +49,7 @@ jobs:
         env:
           HUGO_ENVIRONMENT: production
           HUGO_ENV: production
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           hugo \
             --gc \

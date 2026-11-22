@@ -1,0 +1,14 @@
+{{- /*
+  {{< nix REPO >}} or {{< nix REPO "#OUTPUT" >}}: the command that installs
+  katzenpost/REPO with Nix. It pins the latest release when that tag has a
+  flake.nix, and otherwise names the default branch. A third argument
+  replaces "profile install", for example "run".
+*/ -}}
+{{- $repo := .Get 0 -}}
+{{- $ref := "" -}}
+{{- with (partial "github.html" (printf "repos/katzenpost/%s/releases/latest" $repo)).tag_name -}}
+  {{- if partial "github.html" (printf "repos/katzenpost/%s/contents/flake.nix?ref=%s" $repo .) -}}
+    {{- $ref = print "/" . -}}
+  {{- end -}}
+{{- end -}}
+nix {{ .Get 2 | default "profile install" }} github:katzenpost/{{ $repo }}{{ $ref }}{{ .Get 1 -}}

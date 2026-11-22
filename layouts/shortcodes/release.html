@@ -1,0 +1,23 @@
+{{- /*
+  {{< release REPO >}}                 the latest release tag
+  {{< release REPO "ASSET" >}}         the asset's download URL; the build
+                                       fails if the release lacks it
+  {{< release REPO "ASSET" "LABEL" >}} a download button, or nothing while
+                                       the latest release lacks the asset
+  ASSET is a pattern, see partials/release.html.
+*/ -}}
+{{- $repo := .Get 0 -}}
+{{- $label := .Get 2 -}}
+{{- $r := partial "release.html" (dict "repo" $repo "asset" (.Get 1)) -}}
+{{- if and $r.url $label -}}
+  <a class="btn btn-lg btn-primary" href="{{ $r.url }}"><i class="fa fa-download" aria-hidden="true"></i>{{ $label }}</a>
+{{- else if $r.url -}}
+  {{- $r.url -}}
+{{- else if $label -}}
+{{- else if not $r.tag -}}
+  {{- errorf "release: katzenpost/%s has no latest release" $repo -}}
+{{- else if .Get 1 -}}
+  {{- errorf "release: katzenpost/%s %s has no asset %s" $repo $r.tag $r.name -}}
+{{- else -}}
+  {{- $r.tag -}}
+{{- end -}}

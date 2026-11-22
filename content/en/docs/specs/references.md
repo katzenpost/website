@@ -72,6 +72,8 @@ Mix Network Specification</span>”</span>, June 2017,
 
 Angel, Y., Piotrowska, A., Stainton, D., <span class="quote">“<span class="quote">Katzenpost Mix Network Public Key Infrastructure Specification</span>”</span>, December 2017, <a href="https://katzenpost.network/docs/specs/pdf/pki.pdf" class="link" target="_top">https://katzenpost.network/docs/specs/pdf/pki.pdf</a>.
 
+The [Directory authority specification](/docs/specs/dirauth#history) describes the current protocol and its relation to this design.
+
 <span id="KATZMIXWIRE"></span><span class="bold">**KATZMIXWIRE**</span>
 
 Angel, Y., <span class="quote">“<span class="quote">Katzenpost Mix Network Wire Protocol Specification</span>”</span>, June 2017,

@@ -1,0 +1,10 @@
+{{ $panel := index .Page.Site.Data.dirauth_roles (.Get "role") -}}
+<figure class="protocol-example">
+<figcaption class="diagram-heading">
+  <div class="diagram-title">
+    <span class="diagram-icons">{{ range $panel.icons }}<img src="{{ printf "/docs/specs/dirauth/icons/%s.svg" . | relURL }}" alt="" width="32" height="32">{{ end }}</span>
+    <span>{{ .Get "title" }}</span>
+  </div>
+</figcaption>
+{{ .Inner | markdownify }}
+</figure>

@@ -13,6 +13,13 @@ weight: "35"
 version: ""
 ---
 
+{{% pageinfo %}}
+For node descriptors, directory voting and the signed network parameters used by
+clients, see the [directory authority specification](/docs/specs/dirauth).
+Its [client overview](/docs/specs/dirauth#28-client-software-and-configuration) connects
+applications, kpclientd and gateways.
+{{% /pageinfo %}}
+
 <div class="section">
 
 <div class="titlepage">
