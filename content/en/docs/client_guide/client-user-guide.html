@@ -1,0 +1,548 @@
+---
+title: 
+linkTitle: "Katzen chat user guide" 
+description: 
+author:  
+url: "docs/chat_client/user-guide.html" 
+date: "2026-11-25T12:30:02.439641537-08:00"
+draft: "false" 
+slug: "chat" 
+layout: "" 
+type: "" 
+weight: "1" 
+version: 
+---
+<!DOCTYPE HTML>
+<html xmlns:ng="http://docbook.org/docbook-ng">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      <title>Katzenpost chat client guide</title>
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.2">
+   </head>
+   <body>
+      <div class="section">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="client_guide"></a>Katzenpost chat client guide</h2>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <p>This guide text and audio chat clients that use a Katzenpost mixnet to relay
+            communications. Katzenpost chat clients allow you  to share share one-to-one and group
+            messages securely with other client users.  Katzenpost employs cutting-edge encryption
+            at all levels, but its special goal is to provide user anonymity. While encryption
+            protects
+            the <span class="emphasis"><em>content</em></span> of communication, anonymity protects the
+            <span class="emphasis"><em>people</em></span> behind it. </p>
+         <p>For technical information about Katzenpost and mixnets in general, see <a class="link" href="https://web.archive.org/web/20240813022824/https://github.com/katzenpost/docs/blob/master/mixnet_academy/syllabus.rst#mix-network-fundamentals" target="_top">Learn Mix Networks for Great Good</a> and the <a class="link" href="https://katzenpost.network/docs/" target="_top">Katzenpost Documentation</a>. To learn
+            about our motivations for protecting anonymity, see <a class="link" href="sdsdsd" target="_top">Frequently
+               asked questions</a> below.</p>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d58e45"></a>Prerequisites</h3>
+                  </div>
+               </div>
+            </div>
+            <p>For mobile clients, the software decribed in this guide requires a device running
+               Android or an Android derivative on arm64 hardware. We have tested the clients and
+               dependencies on <a class="link" href="https://android.googlesource.com/platform/build/+/refs/heads/android17-release" target="_top">Android 17</a> and on GrapheneOS <a class="link" href="https://grapheneos.org/releases#2026111800" target="_top">2026111800</a>.</p>
+            <p>For desktop clients, the software decribed in this guide requires a computer that
+               supports the Linux operating system on amd64 hardware. We have tested the clients
+               and
+               dependencies on the <a class="link" href="https://www.debian.org/" target="_top">Debian GNU/Linux</a>
+               13.8 and <a class="link" href="https://ubuntu.com/" target="_top">Ubuntu</a> 26.04 Linux
+               distributions.</p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d58e63"></a>Getting ready: The Katzenpost client daemon</h3>
+                  </div>
+               </div>
+            </div>
+            <p>All Katzenpost chat clients require a local daemon to be running,
+               <code class="filename">kpclientd</code>. The daemon acts as a bridge between clients and the
+               mixnet, handling network connections, performing encryption and decryption, and
+               generating dummy network traffic to hide user activity from eavesdroppers. Any number
+               of
+               clients can simultaneously connect to the daemon. </p>
+            <p>The client daemon currently runs against the demonstration
+               <span class="emphasis"><em>namenlos</em></span>, a distributed, real-world implementation of
+               Katzenpostmixnet. The packaged <code class="filename">kpclientd</code> binary embeds gateway
+               IP addresses needed to access the mixnet, allowing client users to connect
+               automatically. For more information about namenlos, see <a class="link" href="dsddds" target="_top">xxxx</a>.</p>
+            <p>Before installing an running any client, first download and install and start the
+               daemon appropriate for your platform.</p>
+            <p><span class="bold"><strong>To install on Android</strong></span></p>
+            <p>Complete the following procedure to get <code class="filename">kpclientd</code> running on your
+               Android device.
+               <div class="procedure">
+                  <ol class="procedure" type="1">
+                     <li class="step">
+                        <p>Download the latest <code class="filename">kpclientd</code>
+                           APK file. On the <a class="link" href="https://katzenpost.network/" target="_top">Katzenpost website homepage</a>, choose <span class="guilabel">Download a
+                              client</span>, find the <span class="guilabel">Android</span> section, find
+                           the <span class="guilabel">kpclientd-android </span>section, and then choose
+                           <span class="guilabel">Phone APK</span>.</p>
+                     </li>
+                     <li class="step">
+                        <p>Locate the downloaded file in <code class="filename">Downloads</code> and tap on it
+                           to install, granting Android system permissions as needed.</p>
+                     </li>
+                     <li class="step">
+                        <p>After installation, start the KP Daemon app, granting Android system
+                           permissions as needed.</p>
+                     </li>
+                     <li class="step">
+                        <p>The app initially displays <span class="guilabel">Daemon is stopped</span>. Tap on
+                           the white triangle to start the daemon.</p>
+                     </li>
+                  </ol>
+               </div>
+            </p>
+            <p>The daemon should now be ready to receive connections. You can tap the expansion
+               widget at the bottom of the screen to observe live logs of the daemon's activity.</p>
+            <p><span class="bold"><strong>To install on the Linux desktop</strong></span></p>
+            <p>Complete the following procedure to get <code class="filename">kpclientd</code> running on your
+               Linux desktop or laptop computer (either Ubuntu or Debian.)
+               <div class="procedure">
+                  <ol class="procedure" type="1">
+                     <li class="step">
+                        <p>Download the latest <code class="filename">kpclientd</code>
+                           DEB file. On the <a class="link" href="https://katzenpost.network/" target="_top">Katzenpost website homepage</a>, choose <span class="guilabel">Download a
+                              client</span>, find the <span class="guilabel">Linux desktop</span> section,
+                           find the <span class="guilabel">kpclientd</span>section, and then choose
+                           <span class="guilabel">.deb</span>.</p>
+                     </li>
+                     <li class="step">
+                        <p>With root permissions, install the downloaded daemon
+                           file.
+                           <pre class="programlisting"><code class="prompt">#</code><span class="command"><strong>dpkg -i kpclientd_0.0.xxx_amd64.deb</strong></span></pre>
+                        </p>
+                     </li>
+                     <li class="step">
+                        <p>After installation, enable and start the
+                           daemon.
+                           <pre class="programlisting"><code class="prompt">#</code><span class="command"><strong>systemctl enable kpclientd</strong></span><code class="prompt">#</code><span class="command"><strong>systemctl start kpclientd</strong></span></pre>
+                        </p>
+                     </li>
+                  </ol>
+               </div>
+            </p>
+            <p>You can observe the activity of the daemon as shown in the following example, which
+               displays a few lines of start-up
+               logging.
+               <pre class="programlisting"><code class="prompt">#</code><span class="command"><strong>journalctl -f -u kpclientd</strong></span>
+Nov 22 16:26:30 xxxx systemd[1]: Started kpclientd.service - Katzenpost thin client daemon.
+Nov 22 16:26:30 xxxx kpclientd[2227868]: 16:26:30.690 NOTI katzenpost/client: Katzenpost client daemon version: 0.0.111
+Nov 22 16:26:30 xxxx kpclientd[2227868]: 16:26:30.690 NOTI katzenpost/client: Katzenpost is still pre-alpha.  DO NOT DEPEND ON IT FOR STRONG SECURITY OR ANONYMITY.
+Nov 22 16:26:30 xxxx kpclientd[2227868]: 16:26:30.690 INFO katzenpost/client: Pyroscope is disabled
+Nov 22 16:26:30 xxxx kpclientd[2227868]: 16:26:30.690 INFO client/listener: Listening on: @katzenpost
+Nov 22 16:26:35 xxxx kpclientd[2227868]: 16:26:35.148 NOTI client/conn: Connected to gateway.</pre>
+            </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d58e162"></a>Installing Hushphone, a text and audio client</h3>
+                  </div>
+               </div>
+            </div>
+            <p>Hushphone is Katzenpost's flagship chat client. It has the following features.
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p>Text chat</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Audio chat</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Unlimited groups</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Group member polls</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Group member ping</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Desktop support on Linux</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Mobile support on Android </p>
+                     </li>
+                     <li class="listitem">
+                        <p>Reticulum mesh support on mobile</p>
+                     </li>
+                  </ul>
+               </div>
+            </p>
+            <p><span class="bold"><strong>To install on Android</strong></span></p>
+            <p>Complete the following procedure to install Hushphone on your Android device.
+               <div class="procedure">
+                  <ol class="procedure" type="1">
+                     <li class="step">
+                        <p>Download the latest <code class="filename">hushphone</code> APK
+                           file. On the <a class="link" href="https://katzenpost.network/" target="_top">Katzenpost
+                              website homepage</a>, choose <span class="guilabel">Download a client</span>,
+                           find the <span class="guilabel">Android</span> section, find the <span class="bold"><strong>hushphone</strong></span> section, and then choose
+                           <span class="guilabel">Phone APK</span>.</p>
+                     </li>
+                     <li class="step">
+                        <p>Locate the downloaded file in <code class="filename">Downloads</code> and tap on it
+                           to install, granting Android system permissions as needed.</p>
+                     </li>
+                  </ol>
+               </div>
+            </p>
+            <p><span class="bold"><strong>To install on the Linux Desktop</strong></span></p>
+            <p>Complete the following procedure to install Hushphone on your Linux system.</p>
+            <p>
+               <div class="procedure">
+                  <ol class="procedure" type="1">
+                     <li class="step">
+                        <p>Download the latest <code class="filename">hushphone</code> DEB
+                           file for your Linux distribution. On the <a class="link" href="https://katzenpost.network/" target="_top">Katzenpost website
+                              homepage</a>, choose <span class="guilabel">Download a client</span>, find the
+                           <span class="guilabel">Linux desktop</span> section, find the
+                           <span class="guilabel">hushphone</span> section, and then
+                           choose the appropriate <span class="guilabel">.deb</span>. button for your
+                           system.</p>
+                     </li>
+                     <li class="step">
+                        <p>With root permissions, install the downloaded client file as in the
+                           following example for
+                           Debian.
+                           <pre class="programlisting"><code class="prompt">#</code><span class="command"><strong>dpkg -i hushphone-v0.xxx.xxx-debian-13-amd64.deb</strong></span></pre>
+                        </p>
+                     </li>
+                  </ol>
+               </div>
+            </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d58e241"></a>Using Hushphone</h3>
+                  </div>
+               </div>
+            </div>
+            <p>For illustrated instructions on using Hushphone, choose the guide for your
+               platform.</p>
+            <p><a class="link" href="android-guide.xml" target="_top"><span class="bold"><strong>Guide to Hushphone on Android</strong></span><span class="inlinemediaobject"><img src="pix/android-head_flat.png" width="108"></span></a></p>
+            <p><a class="link" href="linux-guide.xml" target="_top"><span class="bold"><strong>Guide to Hushphone on
+                        Linux</strong></span><span class="inlinemediaobject"><img src="pix/Tux.png" width="108"></span></a></p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d58e259"></a>Other clients</h3>
+                  </div>
+               </div>
+            </div>
+            <p>The Katzenpost team provides source code for several experimental chat clients.
+               All of these are Linux desktop applications. You can find the following clients on
+               the
+               <a class="link" href="https://katzenpost.network/pages/download/" target="_top">client download
+                  page</a>.
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p><a class="link" href="https://github.com/katzenpost/katzenqt" target="_top">katzenqt</a>
+                           (DEB package available)</p>
+                     </li>
+                     <li class="listitem">
+                        <p><a class="link" href="https://github.com/katzenpost/jam/" target="_top">jam</a></p>
+                     </li>
+                     <li class="listitem">
+                        <p><a class="link" href="https://github.com/katzenpost/frank_chat/" target="_top">frank_chat</a></p>
+                     </li>
+                     <li class="listitem">
+                        <p><a class="link" href="https://github.com/katzenpost/katzenrns" target="_top">katzenrns</a></p>
+                     </li>
+                  </ul>
+               </div>
+            </p>
+            <p>Installation and use instructions for these clients are included in their respective
+               GitHub READMEs.</p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="faq"></a>Frequently asked questions</h3>
+                  </div>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_anonymity"></a>What kind of user needs anonymity
+                           protection?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Here are some examples of users who require anonymity.</p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p>People and groups who are likely to be under surveillance by government
+                           entities, whether dishonest bureaucrats, corrupt police forces, or
+                           intelligence agencies.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>People facing business or government censorship.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Businesses aware of the dangers of leaking internal information to their
+                           local and global competitors or to their own or other governments.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Journalists, and anyone who communicates with a journalist.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Whistle-blowers.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Lawyers and non-profit organizations engaging in advocacy that earns them
+                           enemies with powerful surveillance capabilities.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>People worried about the utter insecurity of personal data stored in both
+                           cloud and on-premises databases that are accessible from the
+                           Internet.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>People who want to use the Internet but dislike being the raw material
+                           that feeds <a class="link" href="https://en.wikipedia.org/wiki/Surveillance_capitalism" target="_top">surveillance capitalism</a>.</p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_metadata"></a>I use an end-to-end encrypted chat service. Is that
+                           good enough?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Not necessarily. Your identity and other <span class="emphasis"><em>metadata</em></span> may be more
+                  interesting to snoops than your <span class="emphasis"><em>data</em></span> (what you say). Your
+                  network of contacts &#x2013; who is talking to whom &#x2013; is often the most valuable
+                  information about you. Legal protections for metadata are weaker than for
+                  communication content. Here are some examples:</p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p>Internet businesses routinely harvest and sell sensitive identity data to
+                           profit from invasively personalized ads and other sources.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Governments, especially law enforcement, will collect and store any data
+                           about your identity, movements, employment, and political views that they
+                           can get their hands on, sacrificing the privacy of millions of innocent
+                           people in hopes of catching a tiny number of suspected criminals.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Actual criminals make daily use of the data they steal from these same
+                           businesses and governments, enabling identity theft, credit-card fraud, and
+                           extortion.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>While the <span class="emphasis"><em>content</em></span> of telephone communication is
+                           shielded by strong limitations on wire-tapping, far weaker rules restrict
+                           the use of <a class="link" href="https://en.wikipedia.org/wiki/Pen_register" target="_top">pen
+                              register / trap and trace devices</a> to capture the identities of
+                           people engaged in private conversations. </p>
+                     </li>
+                     <li class="listitem">
+                        <p>The United States Postal Service routinely photographs and stores the
+                           address information of mail passing through its system. The USPS <a class="link" href="https://www.washingtonpost.com/news/federal-eye/wp/2014/11/20/postal-service-almost-never-denies-mail-surveillance-requests/" target="_top">almost never</a> denies requests for this information from <a class="link" href="https://www.nytimes.com/2013/07/04/us/monitoring-of-snail-mail.html" target="_top">law enforcement and others</a>.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Most dramatically, US intelligence agencies use cell phone metadata
+                           (account data and geolocation) to target suspected terrorists for drone and
+                           missile attacks. As National Security Agency Director Gen. Michael Hayden
+                           famously <a class="link" href="https://abcnews.go.com/blogs/headlines/2014/05/ex-nsa-chief-we-kill-people-based-on-metadata" target="_top">stated</a>, "We kill people based on metadata."</p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_nothingtohide"></a>I am just an ordinary person with nothing to
+                           hide. Why should I worry about being anonymous?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p><span class="emphasis"><em>You</em></span> do not decide if you have something to hide. The
+                  businesses, governments, and individuals snooping into your data decide that. It is
+                  better not to give them the chance.</p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_conversations_and_contacts"></a>How do conversations and contacts
+                           actually work? </h4>
+                     </div>
+                  </div>
+               </div>
+               <p>The Katzenpost system devotes a great deal of engineering effort to prevent
+                  surveillance adversaries from discovering who you are and whom you are talking with.
+                  Importantly, after your initial meeting to hand off an
+                  invitation,
+                  you have no actual contact with your contacts. Instead, users communicate solely
+                  with the Katzenpost mixnet, which serves as a dead-drop for each user's
+                  messages. </p>
+               <p>Here is a very sparse summary of how the pieces fit together to provide usable
+                  communication despite all of the anonymization and indirection.</p>
+               <div class="itemizedlist">
+                  <ul class="itemizedlist" style="list-style-type: disc; ">
+                     <li class="listitem">
+                        <p>Groups are the main organizing principle in a client. </p>
+                     </li>
+                     <li class="listitem">
+                        <p>Contacts are members of a group, and they exist only in the context of a
+                           particular group. Contacts should have no discoverable relation to
+                           real-world identities, or even to repeated instances of themselves. All
+                           names are display names. All display names are arbitrary.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>Groups may have any number of contacts, including just two for one-on-one
+                           conversations.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>The
+                           conversations that you see listed in <span class="bold"><strong>Conversations and
+                                 contacts</strong></span> are ones that you created and named. Your contacts
+                           see their own conversations that they created and named. </p>
+                     </li>
+                     <li class="listitem">
+                        <p>When you create a group, you are also creating a <span class="emphasis"><em>message
+                                 stream</em></span>. A message stream is an address in the distributed
+                           internal storage of the mixnet. It can contain any number of linked, ordered
+                           messages posted there by its owner.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>You have <span class="emphasis"><em>write permissions</em></span> to message streams that
+                           you created. Nobody else does.</p>
+                     </li>
+                     <li class="listitem">
+                        <p>You can share <span class="emphasis"><em>read permissions</em></span> to a message stream
+                           that you created with other users. (And vice versa.)</p>
+                     </li>
+                     <li class="listitem">
+                        <p>The view of a group that you see in your <span class="bold"><strong>Messages</strong></span> pane is a <span class="emphasis"><em>virtual</em></span> message log
+                           collated by Hushphone or whatever client you are using. It is based on
+                           read permissions that you and your contacts have mutually shared in this
+                           specific context. This is how you can all see the same virtual log of
+                           messages when you are each looking at a different conversation. </p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_oob"></a>What is this out-of-band (OOB) secret-sharing
+                           stuff?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>The OOB invitation is the first step in guaranteeing anonymity in the face of
+                  electronic surveillance. It is explicitly <span class="emphasis"><em>not</em></span> electronic. OOB
+                  is a solution to a difficult and fundamental problem of encrypted communications:
+                  <a class="link" href="https://en.wikipedia.org/wiki/Key_exchange" target="_top">key
+                     exchange</a>. A real-world solution recommends itself because almost no
+                  electronic solution protects anonymity. </p>
+               <p>The following diagram details the data exchanges involved in setting up contacts.
+                  For more information, see <a class="link" href="https://katzenpost.network/docs/specs/group_chat.html" target="_top">Katzenpost Group Chat Design</a>.</p>
+               <div class="informalfigure">
+                  <div class="mediaobject"><img src="pix/kp-ladders-vouchers.png" width="270"><div class="caption">
+                        <p><span class="bold"><strong>Figure 16.</strong></span> This diagram illustrates
+                           how Hushphone (and its operators, Max and Moritz) interact with
+                           the Katzenpost mix network. The most distinctive features of this
+                           architecture are the initial out-of-band step to authenticate a user and
+                           the dead-drop structure that allows subsequent electronic communication
+                           that is neither direct nor persistent.</p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_audio_video"></a>Will Katzenpost clients ever support video
+                           chat?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>We do not plan to offer video chat. Mixnet-based communications have high latency
+                  by design. This has little impact on low-bandwidth text communications and highly
+                  compressed audio data, but it is very likely disqualifying for video. For more
+                  information, see <a class="link" href="https://katzenpost.network/docs/audio_eng/" target="_top">Audio
+                     Engineering Considerations for a Modern Mixnet</a>.</p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_legal"></a>Is this legal?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Let's take "this" as meaning end-to-end encryption and metadata minimization. The
+                  answer depends on your legal jurisdiction and the political weather. Countries such
+                  as China and Iran that attempt to exert complete and ruthless control over citizens'
+                  communication would probably forbid and block use of Katzenpost just as they do
+                  Signal and Tor, with a full range of possible punishments for offenders. However,
+                  Western democracies also enforce comprehensive surveillance over their citizens,
+                  particularly as a tool for law enforcement or elastically defined "national
+                  security." The United States, the United Kingdom, and members of the European Union
+                  try constantly to expand legal surveillance and to pass laws mandating backdoors in
+                  encrypted devices, so far being thwarted either by public advocacy or by the
+                  commercial self-interest of technology vendors. Users of surveillance-resistant
+                  communication tools must understand the laws that apply to them, keep in mind the
+                  ways that those laws are stretched and broken by corrupt police, and protect
+                  themselves appropriately. If you plan to violate your local laws while trusting in
+                  clever technology to keep you safe, remember that you must make excellent technology
+                  choices, use the tools perfectly, maintain operational security worthy of a
+                  clandestine agent, have trustworthy partners, and also have very good luck.
+                  <span class="emphasis"><em>In a genuinely threatening environment, the wisest path is often to
+                        avoid technological solutions altogether.</em></span></p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="faq_whois"></a>Who made Katzenpost and its client
+                           applications?</h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Katzenpost was created by a team of programmers, cryptographers,
+                  mathematicians, academics, tech industry veterans, and privacy advocates. Our
+                  current core contributors and past contributors are listed at <a class="link" href="https://katzenpost.network/pages/team/" target="_top">Katzenpost Team</a>,
+                  and you can see who has been doing what by visiting our <a class="link" href="https://github.com/katzenpost" target="_top">GitHub site</a>. </p>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>
