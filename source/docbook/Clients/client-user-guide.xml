@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title?> 
+<?linkTitle "Katzen chat user guide" ?>  <!-- Section menu link text -->
+<?url "docs/chat_client/user-guide.html" ?> <!-- Required to make image links work -->
+<?description?> <!-- Optional -->
+<?draft "false" ?> <!-- Optional -->
+<?slug "chat" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight "1" ?> <!-- Optional -->
+
+<!DOCTYPE article[
+    <!ENTITY % shared-content SYSTEM "../shared-content.ent">
+    %shared-content;
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" xml:id="client_guide">
+    <info>
+        <title xml:id="client_guide.title">&program_name; chat client guide</title>
+        <!-- Match to "title" or "linkTitle" processing instruction above. -->
+    </info>
+    <para>This guide text and audio chat clients that use a &program_name; mixnet to relay
+        communications. &program_name; chat clients allow you  to share share one-to-one and group
+        messages securely with other client users.  &program_name; employs cutting-edge encryption
+        at all levels, but its special goal is to provide user anonymity. While encryption  protects
+        the <emphasis>content</emphasis> of communication, anonymity protects the
+            <emphasis>people</emphasis> behind it. </para>
+    <para>For technical information about &program_name; and mixnets in general, see <link
+            xlink:href="https://web.archive.org/web/20240813022824/https://github.com/katzenpost/docs/blob/master/mixnet_academy/syllabus.rst#mix-network-fundamentals"
+            >Learn Mix Networks for Great Good</link> and the <link
+            xlink:href="https://katzenpost.network/docs/">Katzenpost Documentation</link>. To learn
+        about our motivations for protecting anonymity, see <link xlink:href="sdsdsd">Frequently
+            asked questions</link> below.</para>
+    <section>
+        <title>Prerequisites</title>
+        <para>For mobile clients, the software decribed in this guide requires a device running
+            Android or an Android derivative on arm64 hardware. We have tested the clients and
+            dependencies on <link
+                xlink:href="https://android.googlesource.com/platform/build/+/refs/heads/android17-release"
+                >Android 17</link> and on GrapheneOS <link
+                xlink:href="https://grapheneos.org/releases#2026111800">2026111800</link>.</para>
+        <para>For desktop clients, the software decribed in this guide requires a computer that
+            supports the Linux operating system on amd64 hardware. We have tested the clients and
+            dependencies on the <link xlink:href="https://www.debian.org/">Debian GNU/Linux</link>
+            13.8 and <link xlink:href="https://ubuntu.com/">Ubuntu</link> 26.04 Linux
+            distributions.</para>
+    </section>
+    <section>
+        <title>Getting ready: The &program_name; client daemon</title>
+        <para>All &program_name; chat clients require a local daemon to be running,
+                <filename>kpclientd</filename>. The daemon acts as a bridge between clients and the
+            mixnet, handling network connections, performing encryption and decryption, and
+            generating dummy network traffic to hide user activity from eavesdroppers. Any number of
+            clients can simultaneously connect to the daemon. </para>
+        <para>The client daemon currently runs against the demonstration
+                <emphasis>namenlos</emphasis>, a distributed, real-world implementation of
+            &program_name;mixnet. The packaged <filename>kpclientd</filename> binary embeds gateway
+            IP addresses needed to access the mixnet, allowing client users to connect
+            automatically. For more information about namenlos, see <link xlink:href="dsddds"
+                >xxxx</link>.</para>
+        <para>Before installing an running any client, first download and install and start the
+            daemon appropriate for your platform.</para>
+        <para><emphasis role="bold">To install on Android</emphasis></para>
+        <para>Complete the following procedure to get <filename>kpclientd</filename> running on your
+            Android device.<procedure>
+                <step>
+                    <para>Download the latest <filename>&kpclientd_binary;</filename>
+                        APK file. On the <link xlink:href="https://katzenpost.network/"
+                            >&program_name; website homepage</link>, choose <guilabel>Download a
+                            client</guilabel>, find the <guilabel>Android</guilabel> section, find
+                        the <guilabel>kpclientd-android </guilabel>section, and then choose
+                            <guilabel>Phone APK</guilabel>.</para>
+                </step>
+                <step>
+                    <para>Locate the downloaded file in <filename>Downloads</filename> and tap on it
+                        to install, granting Android system permissions as needed.</para>
+                </step>
+                <step>
+                    <para>After installation, start the KP Daemon app, granting Android system
+                        permissions as needed.</para>
+                </step>
+                <step>
+                    <para>The app initially displays <guilabel>Daemon is stopped</guilabel>. Tap on
+                        the white triangle to start the daemon.</para>
+                </step>
+            </procedure></para>
+        <para>The daemon should now be ready to receive connections. You can tap the expansion
+            widget at the bottom of the screen to observe live logs of the daemon's activity.</para>
+        <para><emphasis role="bold">To install on the Linux desktop</emphasis></para>
+        <para>Complete the following procedure to get <filename>kpclientd</filename> running on your
+            Linux desktop or laptop computer (either Ubuntu or Debian.)<procedure>
+                <step>
+                    <para>Download the latest <filename>&kpclientd_binary;</filename>
+                        DEB file. On the <link xlink:href="https://katzenpost.network/"
+                            >&program_name; website homepage</link>, choose <guilabel>Download a
+                            client</guilabel>, find the <guilabel>Linux desktop</guilabel> section,
+                        find the <guilabel>kpclientd</guilabel>section, and then choose
+                            <guilabel>.deb</guilabel>.</para>
+                </step>
+                <step>
+                    <para>With root permissions, install the downloaded daemon
+                        file.<programlisting><prompt>#</prompt> <command>dpkg -i kpclientd_0.0.xxx_amd64.deb</command></programlisting></para>
+                </step>
+                <step>
+                    <para>After installation, enable and start the
+                        daemon.<programlisting><prompt>#</prompt> <command>systemctl enable kpclientd</command>
+<prompt>#</prompt> <command>systemctl start kpclientd</command></programlisting></para>
+                </step>
+            </procedure></para>
+        <para>You can observe the activity of the daemon as shown in the following example, which
+            displays a few lines of start-up
+            logging.<programlisting><prompt>#</prompt> <command>journalctl -f -u kpclientd</command>
+Nov 22 16:26:30 xxxx systemd[1]: Started kpclientd.service - Katzenpost thin client daemon.
+Nov 22 16:26:30 xxxx kpclientd[2227868]: 16:26:30.690 NOTI katzenpost/client: Katzenpost client daemon version: 0.0.111
+Nov 22 16:26:30 xxxx kpclientd[2227868]: 16:26:30.690 NOTI katzenpost/client: Katzenpost is still pre-alpha.  DO NOT DEPEND ON IT FOR STRONG SECURITY OR ANONYMITY.
+Nov 22 16:26:30 xxxx kpclientd[2227868]: 16:26:30.690 INFO katzenpost/client: Pyroscope is disabled
+Nov 22 16:26:30 xxxx kpclientd[2227868]: 16:26:30.690 INFO client/listener: Listening on: @katzenpost
+Nov 22 16:26:35 xxxx kpclientd[2227868]: 16:26:35.148 NOTI client/conn: Connected to gateway.</programlisting></para>
+    </section>
+    <section>
+        <title>Installing &chat_client;, a text and audio client</title>
+        <para>&chat_client; is &program_name;'s flagship chat client. It has the following features.<itemizedlist>
+                <listitem>
+                    <para>Text chat</para>
+                </listitem>
+                <listitem>
+                    <para>Audio chat</para>
+                </listitem>
+                <listitem>
+                    <para>Unlimited groups</para>
+                </listitem>
+                <listitem>
+                    <para>Group member polls</para>
+                </listitem>
+                <listitem>
+                    <para>Group member ping</para>
+                </listitem>
+                <listitem>
+                    <para>Desktop support on Linux</para>
+                </listitem>
+                <listitem>
+                    <para>Mobile support on Android </para>
+                </listitem>
+                <listitem>
+                    <para>Reticulum mesh support on mobile</para>
+                </listitem>
+            </itemizedlist></para>
+        <para><emphasis role="bold">To install on Android</emphasis></para>
+        <para>Complete the following procedure to install &chat_client; on your Android device.<procedure>
+                <step>
+                    <para>Download the latest <filename>&desktop_chat_client_binary;</filename> APK
+                        file. On the <link xlink:href="https://katzenpost.network/">&program_name;
+                            website homepage</link>, choose <guilabel>Download a client</guilabel>,
+                        find the <guilabel>Android</guilabel> section, find the <emphasis
+                            role="bold">hushphone</emphasis> section, and then choose
+                            <guilabel>Phone APK</guilabel>.</para>
+                </step>
+                <step>
+                    <para>Locate the downloaded file in <filename>Downloads</filename> and tap on it
+                        to install, granting Android system permissions as needed.</para>
+                </step>
+            </procedure></para>
+        <para><emphasis role="bold">To install on the Linux Desktop</emphasis></para>
+        <para>Complete the following procedure to install &chat_client; on your Linux system.</para>
+        <para>
+            <procedure>
+                <step>
+                    <para>Download the latest <filename>&desktop_chat_client_binary;</filename> DEB
+                        file for your Linux distribution. On the <link
+                            xlink:href="https://katzenpost.network/">&program_name; website
+                            homepage</link>, choose <guilabel>Download a client</guilabel>, find the
+                            <guilabel>Linux desktop</guilabel> section, find the
+                            <guilabel>&desktop_chat_client_binary;</guilabel> section, and then
+                        choose the appropriate <guilabel>.deb</guilabel>. button for your
+                        system.</para>
+                </step>
+                <step>
+                    <para>With root permissions, install the downloaded client file as in the
+                        following example for
+                        Debian.<programlisting><prompt>#</prompt> <command>dpkg -i hushphone-v0.xxx.xxx-debian-13-amd64.deb</command></programlisting></para>
+                </step>
+            </procedure>
+        </para>
+    </section>
+    <section>
+        <title>Using Hushphone</title>
+        <para>For illustrated instructions on using Hushphone, choose the guide for your
+            platform.</para>
+        
+<!-- Logos
+            
+Android
+
+Required notice from source https://developer.android.com/distribute/marketing-tools/brand-guidelines:
+                                                 
+"The Android robot is reproduced or modified 
+from work created and shared by Google and used 
+according to terms described in the Creative 
+Commons 3.0 Attribution License."
+
+Linux/Tux
+                                                
+From https://en.wikipedia.org/wiki/Tux_%28mascot%29: 
+"Permission to use and/or modify this image is granted 
+provided you acknowledge me lewing@isc.tamu.edu and The 
+GIMP if someone asks."        
+-->
+            
+        <para>
+            <link xlink:href="android-guide.xml"><emphasis role="bold">Guide to Hushphone on Android</emphasis>
+            <inlinemediaobject>
+                <imageobject>
+                    <imagedata
+                        fileref="pix/android-head_flat.png" scale="20"/>
+                </imageobject>
+            </inlinemediaobject>    
+            </link>
+        </para>
+        <para>
+            <link xlink:href="linux-guide.xml"><emphasis role="bold">Guide to Hushphone on
+                    Linux</emphasis>
+                <inlinemediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/Tux.png" scale="20"/>
+                    </imageobject>
+                </inlinemediaobject>
+            </link>
+        </para>
+            
+            
+            
+
+    </section>
+    <section>
+        <title>Other clients</title>
+        <para>The &program_name; team provides source code for several experimental chat clients.
+            All of these are Linux desktop applications. You can find the following clients on the
+                <link xlink:href="https://katzenpost.network/pages/download/">client download
+                page</link>.<itemizedlist>
+                <listitem>
+                    <para><link xlink:href="https://github.com/katzenpost/katzenqt">katzenqt</link>
+                        (DEB package available)</para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="https://github.com/katzenpost/jam/">jam</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="https://github.com/katzenpost/frank_chat/"
+                            >frank_chat</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="https://github.com/katzenpost/katzenrns"
+                            >katzenrns</link></para>
+                </listitem>
+            </itemizedlist></para>
+        <para>Installation and use instructions for these clients are included in their respective
+            GitHub READMEs.</para>
+    </section>
+    <section xml:id="faq">
+        <title xml:id="faq.title">Frequently asked questions</title>
+        <section xml:id="faq_anonymity">
+            <title xml:id="faq_anonymity.title">What kind of user needs anonymity
+                protection?</title>
+            <para>Here are some examples of users who require anonymity.</para>
+            <itemizedlist>
+                <listitem>
+                    <para>People and groups who are likely to be under surveillance by government
+                        entities, whether dishonest bureaucrats, corrupt police forces, or
+                        intelligence agencies.</para>
+                </listitem>
+                <listitem>
+                    <para>People facing business or government censorship.</para>
+                </listitem>
+                <listitem>
+                    <para>Businesses aware of the dangers of leaking internal information to their
+                        local and global competitors or to their own or other governments.</para>
+                </listitem>
+                <listitem>
+                    <para>Journalists, and anyone who communicates with a journalist.</para>
+                </listitem>
+                <listitem>
+                    <para>Whistle-blowers.</para>
+                </listitem>
+                <listitem>
+                    <para>Lawyers and non-profit organizations engaging in advocacy that earns them
+                        enemies with powerful surveillance capabilities.</para>
+                </listitem>
+                <listitem>
+                    <para>People worried about the utter insecurity of personal data stored in both
+                        cloud and on-premises databases that are accessible from the
+                        Internet.</para>
+                </listitem>
+                <listitem>
+                    <para>People who want to use the Internet but dislike being the raw material
+                        that feeds <link xlink:href="https://en.wikipedia.org/wiki/Surveillance_capitalism">surveillance capitalism</link>.</para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section xml:id="faq_metadata">
+            <title xml:id="faq_metadata.title">I use an end-to-end encrypted chat service. Is that
+                good enough?</title>
+            <para>Not necessarily. Your identity and other <emphasis>metadata</emphasis> may be more
+                interesting to snoops than your <emphasis>data</emphasis> (what you say). Your
+                network of contacts – who is talking to whom – is often the most valuable
+                information about you. Legal protections for metadata are weaker than for
+                communication content. Here are some examples:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Internet businesses routinely harvest and sell sensitive identity data to
+                        profit from invasively personalized ads and other sources.</para>
+                </listitem>
+                <listitem>
+                    <para>Governments, especially law enforcement, will collect and store any data
+                        about your identity, movements, employment, and political views that they
+                        can get their hands on, sacrificing the privacy of millions of innocent
+                        people in hopes of catching a tiny number of suspected criminals.</para>
+                </listitem>
+                <listitem>
+                    <para>Actual criminals make daily use of the data they steal from these same
+                        businesses and governments, enabling identity theft, credit-card fraud, and
+                        extortion.</para>
+                </listitem>
+                <listitem>
+                    <para>While the <emphasis>content</emphasis> of telephone communication is
+                        shielded by strong limitations on wire-tapping, far weaker rules restrict
+                        the use of <link xlink:href="https://en.wikipedia.org/wiki/Pen_register">pen
+                            register / trap and trace devices</link> to capture the identities of
+                        people engaged in private conversations. </para>
+                </listitem>
+                <listitem>
+                    <para>The United States Postal Service routinely photographs and stores the
+                        address information of mail passing through its system. The USPS <link
+                            xlink:href="https://www.washingtonpost.com/news/federal-eye/wp/2014/11/20/postal-service-almost-never-denies-mail-surveillance-requests/"
+                            >almost never</link> denies requests for this information from <link
+                            xlink:href="https://www.nytimes.com/2013/07/04/us/monitoring-of-snail-mail.html"
+                            >law enforcement and others</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>Most dramatically, US intelligence agencies use cell phone metadata
+                        (account data and geolocation) to target suspected terrorists for drone and
+                        missile attacks. As National Security Agency Director Gen. Michael Hayden
+                        famously <link xlink:href="https://abcnews.go.com/blogs/headlines/2014/05/ex-nsa-chief-we-kill-people-based-on-metadata">stated</link>, "We kill people based on metadata."</para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section xml:id="faq_nothingtohide">
+            <title xml:id="faq_nothingtohide.title">I am just an ordinary person with nothing to
+                hide. Why should I worry about being anonymous?</title>
+            <para><emphasis>You</emphasis> do not decide if you have something to hide. The
+                businesses, governments, and individuals snooping into your data decide that. It is
+                better not to give them the chance.</para>
+        </section>
+        <section xml:id="faq_conversations_and_contacts">
+            <title xml:id="faq_conversations_and_contacts.title">How do conversations and contacts
+                actually work? </title>
+            <para>The &program_name; system devotes a great deal of engineering effort to prevent
+                surveillance adversaries from discovering who you are and whom you are talking with.
+                Importantly, after your initial meeting to hand off an
+                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>invitation<?oxy_custom_end?>,
+                you have no actual contact with your contacts. Instead, users communicate solely
+                with the &program_name; mixnet, which serves as a dead-drop for each user's
+                messages. </para>
+            <para>Here is a very sparse summary of how the pieces fit together to provide usable
+                communication despite all of the anonymization and indirection.</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Groups are the main organizing principle in a client. </para>
+                </listitem>
+                <listitem>
+                    <para>Contacts are members of a group, and they exist only in the context of a
+                        particular group. Contacts should have no discoverable relation to
+                        real-world identities, or even to repeated instances of themselves. All
+                        names are display names. All display names are arbitrary.</para>
+                </listitem>
+                <listitem>
+                    <para>Groups may have any number of contacts, including just two for one-on-one
+                        conversations.</para>
+                </listitem>
+                <listitem>
+                    <para><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>The
+                        conversations that you see listed in <emphasis role="bold">Conversations and
+                            contacts</emphasis> are ones that you created and named. Your contacts
+                        see their own conversations that they created and named. </para>
+                </listitem><?oxy_custom_end?>
+                <listitem>
+                    <para>When you create a group, you are also creating a <emphasis>message
+                            stream</emphasis>. A message stream is an address in the distributed
+                        internal storage of the mixnet. It can contain any number of linked, ordered
+                        messages posted there by its owner.</para>
+                </listitem>
+                <listitem>
+                    <para>You have <emphasis>write permissions</emphasis> to message streams that
+                        you created. Nobody else does.</para>
+                </listitem>
+                <listitem>
+                    <para>You can share <emphasis>read permissions</emphasis> to a message stream
+                        that you created with other users. (And vice versa.)</para>
+                </listitem>
+                <listitem>
+                    <para>The view of a group that you see in your <emphasis role="bold"
+                            >Messages</emphasis> pane is a <emphasis>virtual</emphasis> message log
+                        collated by &chat_client; or whatever client you are using. It is based on
+                        read permissions that you and your contacts have mutually shared in this
+                        specific context. This is how you can all see the same virtual log of
+                        messages when you are each looking at a different conversation. </para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section xml:id="faq_oob">
+            <title xml:id="faq_oob.title">What is this out-of-band (OOB) secret-sharing
+                stuff?</title>
+            <para>The OOB invitation is the first step in guaranteeing anonymity in the face of
+                electronic surveillance. It is explicitly <emphasis>not</emphasis> electronic. OOB
+                is a solution to a difficult and fundamental problem of encrypted communications:
+                    <link xlink:href="https://en.wikipedia.org/wiki/Key_exchange">key
+                    exchange</link>. A real-world solution recommends itself because almost no
+                electronic solution protects anonymity. </para>
+            <para>The following diagram details the data exchanges involved in setting up contacts.
+                For more information, see <link xlink:href="https://katzenpost.network/docs/specs/group_chat.html">&program_name; Group Chat Design</link>.</para>
+            <informalfigure>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="pix/kp-ladders-vouchers.png" scale="50"/>
+                    </imageobject>
+                    <caption>
+                        <para><emphasis role="bold">Figure 16.</emphasis> This diagram illustrates
+                            how &chat_client; (and its operators, Max and Moritz) interact with
+                            the &program_name; mix network. The most distinctive features of this
+                            architecture are the initial out-of-band step to authenticate a user and
+                            the dead-drop structure that allows subsequent electronic communication
+                            that is neither direct nor persistent.</para>
+                    </caption>
+                </mediaobject>
+            </informalfigure>
+        </section>
+        <section xml:id="faq_audio_video">
+            <title xml:id="faq_audio_video.title">Will &program_name; clients ever support video
+                chat?</title>
+            <para>We do not plan to offer video chat. Mixnet-based communications have high latency
+                by design. This has little impact on low-bandwidth text communications and highly
+                compressed audio data, but it is very likely disqualifying for video. For more
+                information, see <link xlink:href="https://katzenpost.network/docs/audio_eng/">Audio
+                    Engineering Considerations for a Modern Mixnet</link>.</para>
+        </section>
+        <section xml:id="faq_legal">
+            <title xml:id="faq_legal.title">Is this legal?</title>
+            <para>Let's take "this" as meaning end-to-end encryption and metadata minimization. The
+                answer depends on your legal jurisdiction and the political weather. Countries such
+                as China and Iran that attempt to exert complete and ruthless control over citizens'
+                communication would probably forbid and block use of &program_name; just as they do
+                Signal and Tor, with a full range of possible punishments for offenders. However,
+                Western democracies also enforce comprehensive surveillance over their citizens,
+                particularly as a tool for law enforcement or elastically defined "national
+                security." The United States, the United Kingdom, and members of the European Union
+                try constantly to expand legal surveillance and to pass laws mandating backdoors in
+                encrypted devices, so far being thwarted either by public advocacy or by the
+                commercial self-interest of technology vendors. Users of surveillance-resistant
+                communication tools must understand the laws that apply to them, keep in mind the
+                ways that those laws are stretched and broken by corrupt police, and protect
+                themselves appropriately. If you plan to violate your local laws while trusting in
+                clever technology to keep you safe, remember that you must make excellent technology
+                choices, use the tools perfectly, maintain operational security worthy of a
+                clandestine agent, have trustworthy partners, and also have very good luck.
+                    <emphasis>In a genuinely threatening environment, the wisest path is often to
+                    avoid technological solutions altogether.</emphasis></para>
+        </section>
+        <section xml:id="faq_whois">
+            <title xml:id="faq_whois.title">Who made &program_name; and its client
+                applications?</title>
+            <para>&program_name; was created by a team of programmers, cryptographers,
+                mathematicians, academics, tech industry veterans, and privacy advocates. Our
+                current core contributors and past contributors are listed at <link xlink:href="https://katzenpost.network/pages/team/">&program_name; Team</link>,
+                and you can see who has been doing what by visiting our <link xlink:href="https://github.com/katzenpost">GitHub site</link>. </para>
+        </section>
+    </section>
+</section>

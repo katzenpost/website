@@ -1,0 +1,766 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- The XSL transform inserts these values as Hugo frontmatter. -->
+<!-- Additionally, a "date" timestamp is inserted by the stylesheet. -->
+<?title?> 
+<?linkTitle "Hushphone on Android" ?>  <!-- Section menu link text -->
+<?url "docs/chat_client/android-guide.html" ?> <!-- Required to make image links work -->
+<?description?> <!-- Optional -->
+<?draft "false" ?> <!-- Optional -->
+<?slug "android-chat" ?> <!-- Optional -->
+<?layout "" ?> <!-- Optional -->
+<?type "" ?> <!-- Optional -->
+<?weight "1" ?> <!-- Optional -->
+
+<!DOCTYPE article[
+    <!ENTITY % shared-content SYSTEM "../shared-content.ent">
+    %shared-content;
+    <!ELEMENT xi:include (xi:fallback?) > 
+    <!ATTLIST xi:include 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" 
+    href CDATA #REQUIRED 
+    parse (xml|text) "xml" 
+    xpointer CDATA #IMPLIED 
+    encoding CDATA #IMPLIED 
+    accept CDATA #IMPLIED 
+    accept-charset CDATA #IMPLIED 
+    accept-language CDATA #IMPLIED > 
+    <!ELEMENT xi:fallback ANY > 
+    <!ATTLIST xi:fallback 
+        xmlns:xi CDATA #FIXED "http://www.w3.org/2001/XInclude" > 
+    <!ENTITY % local.preface.class "| xi:include"> 
+    <!ENTITY % local.part.class "| xi:include"> 
+    <!ENTITY % local.chapter.class "| xi:include"> 
+    <!ENTITY % local.divcomponent.mix "| xi:include"> 
+    <!ENTITY % local.para.char.mix "| xi:include"> 
+    <!ENTITY % local.info.class "| xi:include"> 
+    <!ENTITY % local.common.attrib "xml:base CDATA #IMPLIED" >
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1" xml:id="android-clientguide">
+    <info>
+        <title xml:id="android-client-guide.title">Using Hushphone on Android</title>
+        <!-- Match to "title" or "linkTitle" processing instruction above. -->
+    </info>
+    <para>assasas</para>
+    <section>
+        <title>Max and Moritz set up a communication channel on &chat_client;</title>
+        <para>Hushphone users Max and Moritz demonstrate how groups and contacts are set up using
+            the &program_name; voucher system. </para>
+    </section>
+    <section>
+        <title>Max creates a group</title>
+
+        <procedure>
+            <step>
+                <para>Max opens the Hushphone app. Hushphone prompts him to enter a name. This name
+                    is arbitrary, but it cannot be changed later. Max enters his name and taps
+                        <guilabel>Continue</guilabel>.</para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="../../../../../Desktop/Shots%20P1/Screenshot_20261124-135417.png"
+                            scale="40"/>
+                    </imageobject>
+                </mediaobject>
+            </step>
+            <step>
+                <para>Max proceeds to the group options by tapping <guilabel>Create or join a
+                        group</guilabel>.</para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata
+                                fileref="../../../../../Desktop/Shots%20P1/Screenshot_20261124-135427.png"
+                                scale="40"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+            <step>
+                <para>Max chooses the <guilabel>Start a new group</guilabel> workflow by tapping
+                    that option.</para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata
+                                fileref="../../../../../Desktop/Shots%20P1/Screenshot_20261124-135436.png"
+                                scale="40"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+            <step>
+                <para>Max names his group West Group. This is the name that Max will see, not what
+                    anybody else will see. Max can change the name at any time. After entering the
+                    name, he taps <guilabel>Create</guilabel>.</para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata
+                                fileref="../../../../../Desktop/Shots%20P1/Screenshot_20261124-135534.png"
+                                scale="40"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+            <step>
+                <para>Max is done creating the group. Its name is displayed at the top of the
+                    screen, where we see that there are no other members yet. Potential new members
+                    need to create vouchers and submit them to Max out-of-band, as shown in the next
+                    procedure involving Moritz.</para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata
+                                fileref="../../../../../Desktop/Shots%20P1/Screenshot_20261124-135547.png"
+                                scale="40"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+        </procedure>
+        <para/>
+    </section>
+    <section>
+        <title>Moritz prepares to join a group and create a voucher</title>
+ 
+        <procedure>
+            <step>
+                <para>Like Max, the first thing Moritz does is provide an arbitrary but permanent
+                    name.</para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="../../../../../Desktop/Shots%20P2/Screenshot_20261124-132758.png"
+                            scale="40"/>
+                    </imageobject>
+                </mediaobject>
+            </step>
+            <step>
+                <para>Next, Moritz begins group configuration.</para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="../../../../../Desktop/Shots%20P2/Screenshot_20261124-132826.png"
+                            scale="40"/>
+                    </imageobject>
+                </mediaobject>
+            </step>
+            <step>
+                <para>Unlike Max, who chose the <guilabel>Start a new group</guilabel>
+                    workflow,Moritz chooses the <guilabel>Join someone's group</guilabel> workflow
+                    by tapping that option.</para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="../../../../../Desktop/Shots%20P2/Screenshot_20261124-132852.png"
+                            scale="40"/>
+                    </imageobject>
+                </mediaobject>
+            </step>
+            <step>
+                <para>Even though Moritz plans on joining an existing group (as you probably
+                    guessed, that group is Max's West Group), he must create his own local group.
+                    All groups are really local, and owned by their creater, but with a voucher, you
+                    can obtain permissions to see what's happening in other people's groups, and
+                    your local group is a window into that. </para>
+                <para>Moritz names his group East Group and taps <guilabel>Get a
+                    voucher</guilabel>.</para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="../../../../../Desktop/Shots%20P2/Screenshot_20261124-133749.png"
+                            scale="40"/>
+                    </imageobject>
+                </mediaobject>
+            </step>
+            <step>
+                <para>The &program_name; mixnet takes a while to set up Moritz's group and to issue
+                    a voucher.</para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="../../../../../Desktop/Shots%20P2/Screenshot_20261124-133757.png"
+                            scale="40"/>
+                    </imageobject>
+                </mediaobject>
+            </step>
+            <step>
+                <para>When the voucher (which contains an ID and a read permission for East Group)
+                    is ready, Hushphone offers several ways to pass it to Max – as a QR code, as a
+                    string of text, or encoded onto a sound.</para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="../../../../../Desktop/Shots%20P2/Screenshot_20261124-133857.png"
+                            scale="40"/>
+                    </imageobject>
+                </mediaobject>
+            </step>
+        </procedure>
+        <para>The next procedure shows how the voucher gets from Moritz to Max and how Max inducts
+            his new group member.</para>
+    </section>
+
+<section>
+<title> Moritz passes the voucher and Max inducts Moritz</title>
+        <para>Note re: Google Quick Share option<link
+                xlink:href="https://support.google.com/files/answer/15685428?hl=en"/></para>
+        <para/>
+ 
+    <procedure>
+    <step>
+                <para/>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="../../../../../Desktop/Shots%20P2/Screenshot_20261124-133943.png"
+                            scale="40"/>
+                    </imageobject>
+                </mediaobject>
+            </step>
+            <step>
+                <para/>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="../../../../../Desktop/Shots%20P2/Screenshot_20261124-134005.png"
+                            scale="40"/>
+                    </imageobject>
+                </mediaobject>
+            </step>
+            <step>
+                <para/>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="../../../../../Desktop/Shots%20P2/Screenshot_20261124-134021.png"
+                            scale="40"/>
+                    </imageobject>
+                </mediaobject>
+            </step>
+            <step>
+                <para/>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="../../../../../Desktop/Shots%20P2/Screenshot_20261124-134040.png"
+                            scale="40"/>
+                    </imageobject>
+                </mediaobject>
+            </step>
+        </procedure>
+        <para/>
+    </section>
+
+        
+
+
+    <section xml:id="communicating">
+        <title xml:id="communicating.title">Old instructions for KatzenQT</title>
+        <para>This section describes how to configure and use &chat_client; for secure, anonymous
+            communication. </para>
+        <para>Like many other chat clients, &chat_client; exhibits two panes, one for contacts and
+            one for messages, and a number of communication modes such as text chat, file transfer,
+            and voice. </para>
+        <para>The following screen capture shows &chat_client; as it appears when opened for the
+            first time.</para>
+        <figure>
+            <info>
+                <title/>
+            </info>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="pix/1-clip.jpg" scale="60"/>
+                </imageobject>
+                <caption>
+                    <para><emphasis role="bold">Figure 1.</emphasis> This screen capture shows the
+                        elements of the &chat_client; client interface prior to configuration or
+                        use.</para>
+                </caption>
+            </mediaobject>
+        </figure>
+        <para>&chat_client; consists of a menu bar, a toolbar, two panes, and a status bar (not
+            visible). <itemizedlist>
+                <listitem>
+                    <para>The <emphasis role="bold">Conversations and contacts</emphasis> pane
+                        displays existing conversations and the contacts specific to them. </para>
+                </listitem>
+                <listitem>
+                    <para>The <emphasis role="bold">Messages</emphasis> pane displays the title of
+                        the selected conversation (if any), its message log, an <emphasis role="bold">Invite a contact</emphasis> button for adding new
+                        participants, and a text box near the bottom for typing new messages.</para>
+                </listitem>
+                <listitem>
+                    <para>Buttons in the toolbar include <emphasis role="bold">New
+                            conversation</emphasis> (opening a dialog to configure a conversation),
+                            <emphasis role="bold">Accept invitation</emphasis> (opening a dialog to
+                        accept or refuse an invitation from another user), <emphasis role="bold"
+                            >Documentation</emphasis> (activating, once implemented, the internal
+                        help system), and <emphasis role="bold">Quit</emphasis> (which shuts down
+                        the client).</para>
+                </listitem>
+                <listitem>
+                    <para>The tabs at the bottom of the <emphasis role="bold">Messages</emphasis>
+                        pane allow selection of a communication mode.</para>
+                </listitem>
+            </itemizedlist></para>
+        <note>
+            <para>At present, only text chat works. Grayed out elements in the &chat_client;
+                interface are not yet implemented.</para>
+        </note>
+        <section xml:id="contacts">
+            <info>
+                <title xml:id="contacts.title">About contacts</title>
+            </info>
+            <para>Despite appearances, &chat_client;'s emphasis on anonymity means that familiar
+                terms take on new meanings, particularly the idea of a "contact."</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Contact names are arbitrary. Contacts in one conversation are unconnected
+                        with contacts in other conversations. Each chat participant can choose a
+                        unique name for each conversation.</para>
+                </listitem>
+                <listitem>
+                    <para>&chat_client; and &program_name; operate with no information about the
+                        real-world identities behind contacts. There are no e-mail addresses,
+                        telephone numbers, postal addresses, or anything similar. </para>
+                </listitem>
+                <listitem>
+                    <para>Without phone numbers or email as anchors for identity, &chat_client;
+                        users require a real-world encounter to verify who they are and to share
+                        cryptographic secrets. This kind of contact bootstrapping occurs out-of-band
+                        (OOB), that is, without reliance on the primary communication channel, which
+                        is &chat_client;. The concept is similar to the practice of PGP email users
+                        who hold in-person key-signing parties to build a <link
+                            xlink:href="https://en.wikipedia.org/wiki/Web_of_trust">web of
+                            trust</link>. </para>
+                </listitem>
+            </itemizedlist>
+            <section xml:id="conversations">
+                <info>
+                    <title xml:id="conversations.title">Creating conversations</title>
+                </info>
+                <para>The first thing that a new user of &chat_client; must do is create a
+                    conversation. This must happen before you can invite contacts or accept
+                    invitations.</para>
+                <para><emphasis role="bold">To create a conversation</emphasis></para>
+                <para>
+                    <procedure>
+                        <step>
+                            <para>Open &chat_client;. Until a conversation has been created, the
+                                    <emphasis role="bold">Messages</emphasis> pane prompts you to
+                                create one.</para>
+                        </step>
+                        <step>
+                            <para>In the toolbar, click the <emphasis role="bold">New
+                                    conversation</emphasis> button.</para>
+                        </step>
+                        <step>
+                            <para>In the <emphasis role="bold">New conversation</emphasis> window,
+                                type a name in the <emphasis role="bold">Choose conversation
+                                    name</emphasis> field. This name is how you identify the
+                                conversation in your own &chat_client; client. It may differ from
+                                what your contact calls their corresponding conversation. Click
+                                    <emphasis role="bold">OK</emphasis> when finished.</para>
+                            <para>In the following screen capture, the <emphasis role="bold">New
+                                    conversation</emphasis> field is being filled out.</para>
+                            <figure>
+                                <info>
+                                    <title/>
+                                </info>
+                                <mediaobject>
+                                    <imageobject>
+                                        <imagedata fileref="pix/2-clip.jpg" scale="60"/>
+                                    </imageobject>
+                                    <caption>
+                                        <para><emphasis role="bold">Figure 2.</emphasis> In this
+                                            example, a user creates a first conversation called
+                                                <emphasis role="bold">My first
+                                                conversation</emphasis>.</para>
+                                    </caption>
+                                </mediaobject>
+                            </figure>
+                        </step>
+                        <step>
+                            <para>Type a name for yourself in the field labeled <emphasis
+                                    role="bold">Choose (your) name displayed to the other
+                                    user(s)</emphasis>. Your contacts will see this name when they
+                                accept your invitation.</para>
+                            <para>The following screen capture shows a name that was typed in by the
+                                user.</para>
+                            <figure>
+                                <info>
+                                    <title/>
+                                </info>
+                                <mediaobject>
+                                    <imageobject>
+                                        <imagedata fileref="pix/3-clip.jpg" scale="60"/>
+                                    </imageobject>
+                                    <caption>
+                                        <para><emphasis role="bold">Figure 3.</emphasis> The user
+                                            types in "Max" as his name in the context of this
+                                            conversation.</para>
+                                    </caption>
+                                </mediaobject>
+                            </figure>
+                        </step>
+                        <step>
+                            <para>Click <emphasis role="bold">OK</emphasis> when finished.</para>
+                            <para>Now, in the <emphasis role="bold">Conversations and
+                                    contacts</emphasis> pane, the name of your new conversation is
+                                displayed along with your display name. In the <emphasis role="bold"
+                                    >Messages</emphasis> pane, &chat_client; prints a greeting
+                                message.</para>
+                            <para>The final result resembles the following:</para>
+                            <figure>
+                                <info>
+                                    <title/>
+                                </info>
+                                <mediaobject>
+                                    <imageobject>
+                                        <imagedata fileref="pix/4-clip.jpg" scale="60"/>
+                                    </imageobject>
+                                    <caption>
+                                        <para><emphasis role="bold">Figure 4.</emphasis> In the
+                                                <emphasis role="bold">Conversations and
+                                                contacts</emphasis> pane, you can select a
+                                            conversation. The selected conversation will be
+                                            displayed in the <emphasis role="bold">Messages</emphasis> pane. You can use the <emphasis role="bold">Type to filter contacts</emphasis> text
+                                            box to find a specific contact name and the
+                                            conversations that contain it.</para>
+                                    </caption>
+                                </mediaobject>
+                            </figure>
+                        </step>
+                    </procedure>
+                </para>
+                <para>You can create any number of conversations, each one separated completely from
+                    other conversations. </para>
+            </section>
+            <section xml:id="adding_contacts">
+                <info>
+                    <title xml:id="adding_contacts.title">Establishing contacts</title>
+                </info>
+                <para>Once you have a created a conversation, you can begin adding contacts to it.
+                    As a user of &chat_client;, you have no fixed user name or password; instead,
+                    you assign a name of your choosing for each conversation and potentially for
+                    each contact.</para>
+                <para>A user setting up a contact generates an authentication token called a
+                        <emphasis>voucher</emphasis>. The voucher is a Base64-encoded string with
+                    the following contents:<itemizedlist>
+                        <listitem>
+                            <para>a display name </para>
+                        </listitem>
+                        <listitem>
+                            <para>a mixnet storage address that doubles as read permission </para>
+                        </listitem>
+                    </itemizedlist></para>
+                <para>A user who makes a request for a new contact delivers the voucher out-of-band
+                    to one or more recipients, who enter the invitation string into &chat_client;
+                    and, by accepting it, send their own addresses and signed read permissions to
+                    the first user, who publishes the shared read permissions for all group members
+                    to see. When the process is complete, the new contact names display in the list
+                    of contacts for each participant in the conversation. </para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="pix/simple-voucher-handshake.png" scale="60"/>
+                        </imageobject>
+                        <caption>
+                            <para><emphasis role="bold">Figure 5.</emphasis> The diagram illustrates
+                                two important aspects of &program_name; and &chat_client; security.
+                                First, the initial authentication of a contact is done in a
+                                face-to-face meeting rather than electronically. Second, all
+                                messaging consists of queries to the mixnet, which operates somewhat
+                                as a dead-drop. Max and Moritz post materials there, and authorize
+                                each other to read those materials, but there is no direct contact
+                                between them after the initial real-world meeting. </para>
+                        </caption>
+                    </mediaobject>
+                </informalfigure>
+                <important>
+                    <para>We recommend writing the invitation string on a piece paper, and
+                        presenting this physically to the person or persons you are inviting. The
+                        paper bearing the string should be guarded carefully and destroyed after
+                        use.</para>
+                </important>
+                <warning>
+                    <para>It is possible to simply send your invitation through an alternative
+                        electronic channel. However, doing this permanently degrades the
+                        &program_name; anonymity protections to the level of anonymity offered by
+                        the channel that you used.</para>
+                </warning>
+                <para><emphasis role="bold">To request a new contact</emphasis></para>
+                <para>
+                    <procedure>
+                        <step>
+                            <para>Open &chat_client; as described above.</para>
+                        </step>
+                        <step>
+                            <para>With the desired conversation selected, click <emphasis role="bold">Invite a contact</emphasis> in the <emphasis role="bold">Messages</emphasis> pane.</para>
+                        </step>
+                        <step>
+                            <para>In the <emphasis role="bold">Invite contact</emphasis> window,
+                                type your desired display name in the field labeled <emphasis
+                                    role="bold">Choose (your) name displayed to the other
+                                    user</emphasis>, then click <emphasis role="bold"
+                                >OK</emphasis>.</para>
+                            <para>The following screen capture shows the <emphasis role="bold"
+                                    >Invite contact</emphasis> window with "Max" specified as the
+                                issuer. </para>
+                            <figure>
+                                <info>
+                                    <title/>
+                                </info>
+                                <mediaobject>
+                                    <imageobject>
+                                        <imagedata fileref="pix/5-clip.jpg" scale="60"/>
+                                    </imageobject>
+                                    <caption>
+                                        <para><emphasis role="bold">Figure 6.</emphasis> The
+                                            invitation string has "Max" embedded as its creator,
+                                            which is helpful to the recipient in the next
+                                            steps.</para>
+                                    </caption>
+                                </mediaobject>
+                            </figure>
+                        </step>
+                        <step>
+                            <para>A pop-up window displays the Base64 string that was created. Save
+                                this string long enough to copy it to paper or save electronically.<figure>
+                                    <info>
+                                        <title/>
+                                    </info>
+                                    <mediaobject>
+                                        <imageobject>
+                                            <imagedata fileref="pix/6-clip.png" scale="60"/>
+                                        </imageobject>
+                                        <caption>
+                                            <para><emphasis role="bold">Figure 7.</emphasis> The
+                                                voucher's Base64 string is highlighted in the
+                                                illustration. Record it before closing the
+                                                window.</para>
+                                        </caption>
+                                    </mediaobject>
+                                </figure></para>
+                        </step>
+                        <step>
+                            <para>Complete the invitation process by providing the invitation string
+                                out-of-band to your intended contact.</para>
+                        </step>
+                    </procedure>
+                </para>
+                <para><emphasis role="bold">To accept an invitation that you have
+                        received</emphasis></para>
+                <procedure>
+                    <step>
+                        <para>Open &chat_client;. (In the following example, our perspective shifts
+                            to Moritz, who is the user receiving Max's invitation.)</para>
+                    </step>
+                    <step>
+                        <para>In the toolbar, click <emphasis role="bold">Accept
+                                invitation</emphasis>.</para>
+                    </step>
+                    <step>
+                        <para>In the <emphasis role="bold">Accept invitation</emphasis> window, type
+                            or paste the invitation string into the field labeled <emphasis
+                                role="bold">Enter an invitation you received</emphasis>. Your client
+                            should resemble the following:</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/7-clip.jpg" scale="60"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 8.</emphasis> Moritz has
+                                        entered the invitation string into the <emphasis role="bold"
+                                            >Accept invitation</emphasis> window.</para>
+                                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                                </caption><?oxy_custom_end?>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                    <step>
+                        <para>To approve the display name of the new contact, click <emphasis
+                                role="bold">Yes</emphasis>. To cancel the acceptance process, click
+                                <emphasis role="bold">No</emphasis>.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/8-clip.jpg" scale="60"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 9.</emphasis> Moritz can
+                                        either accept or reject Max's display name. Rejecting it
+                                        cancels the acceptance.</para>
+                                    <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>
+                                </caption><?oxy_custom_end?>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                    <step>
+                        <para>Moritz must start the same procedure in reverse. In his selected
+                            conversation, he clicks <emphasis role="bold">Invite contact</emphasis>,
+                            generates a Base64 string, and conveys it to Max. Max clicks <emphasis
+                                role="bold">Accept invitation</emphasis>, types the Base64 string
+                            into his client, and clicks <emphasis role="bold">OK</emphasis>
+                            twice.</para>
+                    </step>
+                </procedure>
+                <para>As shown below, Max and Moritz now appear in each other's contact lists, and
+                    they can begin exchanging messages. The procedures described here can be
+                    generalized to groups of any size.</para>
+                <para>
+                    <note>
+                        <para>When you look at the perspectives of Max and Moritz side-by-side, as
+                            in <emphasis role="bold">Figure 10</emphasis> below, something strange
+                            pops out: Their (shared?) conversation has two different names. This
+                            provides a glimpse into the anonymity architecture behind &chat_client;,
+                            and is explained in the
+                            <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>FAQ:
+                            xxxxxxx<?oxy_custom_end?></para>
+                    </note>
+                </para>
+                <figure>
+                    <info>
+                        <title/>
+                    </info>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="pix/9-clip.png" scale="60"/>
+                        </imageobject>
+                        <caption>
+                            <para><emphasis role="bold">Figure 10.</emphasis> Max and Moritz are
+                                shown with their respective conversations and contact lists. </para>
+                        </caption>
+                    </mediaobject>
+                </figure>
+            </section>
+            <section xml:id="messaging">
+                <title xml:id="messaging.title">Exchanging messages in a conversation</title>
+                <para>&chat_client; resembles other chat programs in its procedure for exchanging
+                    messages. This section provides an example of a conversation between two
+                    participants. </para>
+                <procedure>
+                    <title>To exchange messages between two contacts</title>
+                    <para>This procedure picks up where the previous section, <xref
+                            linkend="adding_contacts"/>, left off. The examples show both sides of
+                        the Max/Moritz conversation.</para>
+                    <step>
+                        <para>Max composes a message to Moritz by typing it in the <emphasis
+                                role="bold">Single-line message</emphasis> box at the bottom of the
+                                <emphasis role="bold">Messages</emphasis> pane, as shown in the
+                            following screen capture.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/10-clip.png" scale="60"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 11.</emphasis> Max can see
+                                        what conversation he is in by looking at the highlighted
+                                        conversation name in <emphasis role="bold">Conversations and
+                                            contacts</emphasis> pane, and at the heading in the
+                                            <emphasis role="bold">Messages</emphasis> pane. </para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                    <step>
+                        <para>When Max is done typing the message, he presses Enter to send
+                            it.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/12-clip.png" scale="60"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 12.</emphasis> Max's sent
+                                        message is visible in his <emphasis role="bold"
+                                            >Messages</emphasis> pane. The in-flight arrow next to
+                                        his name indicates that Moritz has not yet received the
+                                        message, as is apparent in his &chat_client; window.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                    <step>
+                        <para>In the following screen capture, Moritz has received Max's
+                            message.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/13-clip.png" scale="60"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 13.</emphasis> Moritz's
+                                        &chat_client; window now displays Max's message, and the
+                                        in-flight arrow has disappeared from Max's window.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                    <step>
+                        <para>In the next screen capture, Moritz types and sends a reply to
+                            Max.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/15-clip.png" scale="60"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 14.</emphasis> With Moritz's
+                                        message sent, his <emphasis role="bold">Messages</emphasis>
+                                        pane shows the in-flight arrow pending delivery.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                        
+                    </step>
+                    <step>
+                        <para>In this last screen capture, Max has received Moritz's reply and they
+                            continued to converse.</para>
+                        <figure>
+                            <info>
+                                <title/>
+                            </info>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="pix/17-clip.png" scale="60"/>
+                                </imageobject>
+                                <caption>
+                                    <para><emphasis role="bold">Figure 15.</emphasis> Success!
+                                        Several messages have been exchanged and the absence of
+                                        in-flight arrows indicates that no messages are pending at
+                                        the moment.</para>
+                                </caption>
+                            </mediaobject>
+                        </figure>
+                    </step>
+                </procedure>
+            </section>
+        </section>
+    </section>
+</section>
