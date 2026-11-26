@@ -451,13 +451,13 @@ cryptographic primitives be used as described in the Sphinx specification.
 - `MAC(K, M)` - HMAC-SHA256 <a href="#RFC6234" class="link">RFC6234</a>, M_KEY_LENGTH of 32 bytes (256 bits), and MAC_LENGTH of
   32 bytes (256 bits).
 
-- `KDliteralF(SALT, IKM)` - HKDF-SHA256,
+- `KDF(SALT, IKM)` - HKDF-SHA256,
   `HKDF-Expand` only, with SALT used as the info parameter.
 
 - `S(K, IV)` - CTR-AES256 <a href="#SP80038A" class="link">[SP80038A]</a>, S_KEY_LENGTH of 32 bytes (256 bits), and S_IV_LENGTH
-  of 12 bytes (96 bits), using a 32 bit counter.
+  of 16 bytes (128 bits), with the IV used as the initial 16 byte counter block.
 
-- `SPRP_Encrypt(K, M)/SPRP_Decrypt(K, M)` - AEZv5 <a href="#AEZV5" class="link">AEZV5</a>, SPRP_KEY_LENGTH of 48 bytes (384 bits). As
+- `SPRP_Encrypt(K, IV, M)/SPRP_Decrypt(K, IV, M)` - AEZv5 <a href="#AEZV5" class="link">AEZV5</a>, SPRP_KEY_LENGTH of 48 bytes (384 bits). As
   there is a disconnect between AEZv5 as specified and the Sphinx usage, let
   the following be the AEZv5 parameters:
 
@@ -511,8 +511,7 @@ of the Sphinx Packet Format:
 - `NODE_ID_SIZE` - 32 bytes, the size of the Ed25519 public
   key, used as Node identifiers.
 
-- `RECIPIENT_ID_SIZE` - 64 bytes, the maximum size of
-  local-part component in an e-mail address.
+- `RECIPIENT_ID_SIZE` - 32 bytes.
 
 - `SURB_ID_SIZE` - Single Use Reply Block ID size, 16 bytes.
 
@@ -523,7 +522,7 @@ of the Sphinx Packet Format:
   shopping.)
 
 - `KDF_INFO` - The byte string
-  `Katzenpost-kdf-v0-hkdf-sha256`.
+  `katzenpost-kdf-v0-hkdf-sha256`.
 
 </div>
 
