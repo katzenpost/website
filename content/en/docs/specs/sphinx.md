@@ -261,9 +261,10 @@ building blocks for Sphinx:
   `S_IV_LENGTH` byte octet array initialization vector
   `IV` to produce an octet array key stream of arbitrary length.
 
-- `SPRP_Encrypt(K, M)/SPRP_Decrypt(K, M)` – A strong pseudo-random
+- `SPRP_Encrypt(K, IV, M)/SPRP_Decrypt(K, IV, M)` – A strong pseudo-random
   permutation (SPRP) which takes a `SPRP_KEY_LENGTH` byte octet array
-  key `K` and arbitrary length message `M`, and produces the
+  key `K`, a `SPRP_IV_LENGTH` byte octet array initialization vector
+  `IV` and arbitrary length message `M`, and produces the
   encrypted ciphertext or decrypted plaintext respectively.
 
   When used with the default payload authentication mechanism, the SPRP MUST be
@@ -273,14 +274,12 @@ building blocks for Sphinx:
   operation.
 
 - `EXP(X, Y)` – An exponentiation function which takes the
-  `GROUP_ELEMENT_LENGTH` byte octet array group elements
-  `X` and `Y`, and returns `X ^^ Y` as a
+  `GROUP_ELEMENT_LENGTH` byte octet array group element
+  `X` and the private key (a scalar) `Y`, and returns `X ^^ Y` as a
   `GROUP_ELEMENT_LENGTH` byte octet array.
 
   Let `G` denote the generator of the group, and
-  `EXP_KEYGEN()` return a
-  `GROUP_ELEMENT_LENGTH` byte octet array group element
-  usable as private key.
+  `EXP_KEYGEN()` return a scalar usable as private key.
 
   The group defined by `G` and `EXP(X, Y)`
   MUST satisfy the Decision Diffie-Hellman problem.
@@ -288,7 +287,18 @@ building blocks for Sphinx:
 - `EXP_KEYGEN()` – Returns a new "suitable" private key for
   `EXP()`.
 
+- `EXP_KEYGEN_SEEDED(SEED)` – Returns the private key that
+  `EXP_KEYGEN()` generates when all of its randomness is read from the
+  ChaCha20 keystream keyed by the 32 byte octet array `SEED`, with an
+  all-zero 8 byte nonce. The same `SEED` always gives the same private key.
+
 </div>
+
+The lengths `HASH_LENGTH`, `MAC_LENGTH`, `M_KEY_LENGTH`,
+`S_KEY_LENGTH`, `S_IV_LENGTH`, `SPRP_KEY_LENGTH`,
+`SPRP_IV_LENGTH` and `GROUP_ELEMENT_LENGTH` are fixed by the choice of
+primitives. The primitives and lengths used by the Katzenpost mix network are given
+in the [Katzenpost mix network specification](/docs/specs/mixnet#sphinx-cryptographic-primitives).
 
 <div class="section">
 
@@ -317,8 +327,8 @@ struct {
 opaque header_mac[M_KEY_LENGTH];
 opaque header_encryption[S_KEY_LENGTH];
 opaque header_encryption_iv[S_IV_LENGTH];
-opaque payload_encryption[SPRP_KEY_LENGTH]
-opaque blinding_factor[GROUP_ELEMENT_LENGTH];
+opaque payload_encryption[SPRP_KEY_LENGTH];
+opaque blinding_seed[32];
 } SphinxPacketKeys;
 
 Sphinx_KDF( info, shared_secret ) -> packet_keys
@@ -351,6 +361,22 @@ The output packet_keys is calculated as follows:
 kdf_out = KDF( info, shared_secret )
 packet_keys = kdf_out[:LEN( SphinxPacketKeys )]
 ```
+
+The per-hop blinding factor is not taken from the KDF output directly, because
+some groups cannot make a private key from arbitrary bytes: their key generation
+needs a source of randomness. The blinding factor is instead the private key
+generated from the `blinding_seed`:
+
+``` programlisting
+blinding_factor = EXP_KEYGEN_SEEDED( packet_keys.blinding_seed )
+```
+
+In the pseudo-code below, the `blinding_factor` of a SphinxPacketKeys
+denotes this value.
+
+The payload SPRP uses the `payload_encryption` key together with the
+`header_encryption_iv` as its IV, so `SPRP_IV_LENGTH` equals
+`S_IV_LENGTH`.
 
 </div>
 
@@ -551,6 +577,11 @@ opaque MAC[MAC_LENGTH];
   unaltered, implementations MUST take care to ensure that the field cannot be
   used to track individual packets.
 
+  The Katzenpost mix network fixes the additional_data to a 2 byte version
+  value, and its nodes reject any other value; see the
+  [Sphinx packet parameters](/docs/specs/mixnet#sphinx-packet-parameters) of the
+  Katzenpost mix network specification.
+
 - `group_element` – An element of the cyclic group, used to derive
   the per-hop key material required to authenticate and process the rest of
   the SphinxHeader and decrypt a single layer of the Sphinx packet payload
@@ -595,10 +626,16 @@ The structure of the routing information is as follows:
 
 ``` programlisting
 struct {
-RoutingCommand routing_commands<1..2^8-1>; /* PER_HOP_RI_LENGTH bytes */
+opaque routing_commands[PER_HOP_RI_LENGTH];
 opaque encrypted_routing_commands[ROUTING_INFO_LENGTH - PER_HOP_RI_LENGTH];
 } RoutingInformation;
 ```
+
+The `routing_commands` element is a fixed block of exactly
+`PER_HOP_RI_LENGTH` bytes. It holds the <span class="command">**RoutingCommand**</span>s
+for the current hop, concatenated one after another. Neither the block nor any
+command in it carries a length prefix. The commands end at a
+<span class="command">**NullCommand**</span> or at the end of the block.
 
 The structure of a single <span class="command">**RoutingCommand**</span> is as follows:
 
@@ -629,11 +666,17 @@ surb_reply(3),
 } RoutingCommandType;
 ```
 
+The Katzenpost mix network adds a node delay command (`0x80`); see the
+[per-hop routing information extensions](/docs/specs/mixnet#sphinx-per-hop-routing-information-extensions)
+of the Katzenpost mix network specification.
+
 The <span class="command">**NullCommand**</span> structure is as follows:
 
 ``` programlisting
 struct {
-opaque padding<0..PER_HOP_RI_LENGTH-1>;
+/* Zero bytes filling the rest of the routing_commands
+block. This is not a length-prefixed vector. */
+opaque padding[];
 } NullCommand;
 ```
 
@@ -650,7 +693,7 @@ The <span class="command">**RecipientCommand**</span> structure is as follows:
 
 ``` programlisting
 struct {
-opaque recipient[RECIPEINT_ID_LENGTH];
+opaque recipient[RECIPIENT_ID_LENGTH];
 } RecipientCommand;
 ```
 
@@ -662,10 +705,11 @@ opaque id[SURB_ID_LENGTH];
 } SURBReplyCommand;
 ```
 
-While the <span class="command">**NullCommand**</span> padding field is specified as opaque,
-implementations SHOULD zero fill the padding. The choice of `0x00`
+The <span class="command">**NullCommand**</span> padding MUST be zero filled, and a
+node MUST reject a packet in which a <span class="command">**NullCommand**</span> is
+followed by any non-zero byte. The choice of `0x00`
 as the terminal <span class="command">**NullCommand**</span> is deliberate to ease implementation,
-as `ZEROBYTES(N)` produces a valid <span class="command">**NullCommand**</span><span class="command">**RoutingCommand**</span>, resulting in <span class="quote">“<span class="quote">appending zero filled
+as `ZEROBYTES(N)` produces a valid <span class="command">**NullCommand**</span> <span class="command">**RoutingCommand**</span>, resulting in <span class="quote">“<span class="quote">appending zero filled
 padding</span>”</span> producing valid output.
 
 Implementations MUST pad the <span class="command">**RoutingCommands**</span> vector so that it
@@ -674,6 +718,10 @@ is exactly `PER_HOP_RI_LENGTH` bytes, by appending a terminal
 
 Every non-terminal hop’s <span class="command">**RoutingCommands**</span> MUST include a
 <span class="command">**NextNodeHopCommand**</span>.
+
+A hop’s <span class="command">**RoutingCommands**</span> MUST NOT contain more than one
+<span class="command">**NextNodeHopCommand**</span>, nor more than one
+<span class="command">**SURBReplyCommand**</span>. A node MUST reject a packet that does.
 
 </div>
 
@@ -741,7 +789,7 @@ struct {
 routing_commands[0].next_hop specifies that
 information for all non-terminal hops. */
 opaque public_key[GROUP_ELEMENT_LENGTH];
-RoutingCommand routing_commands<1...2^8-1>;
+RoutingCommand routing_commands[]; /* A list, not a wire encoding. */
 } PathHop;
 ```
 
@@ -793,7 +841,7 @@ Outputs:
 
 - `sphinx_header` – The resulting Sphinx packet header.
 
-- `payload_keys` – The vector of SPRP keys used to encrypt the
+- `payload_keys` – The vector of SPRP keys and IVs used to encrypt the
   Sphinx packet payload, in hop order.
 
 </div>
@@ -808,7 +856,7 @@ steps:
 </div>
 
 ``` programlisting
-num_hops = route.len
+num_hops = path.len
 route_keys = [ ]
 route_group_elements = [ ]
 priv_key = EXP_KEYGEN()
@@ -818,15 +866,15 @@ group_element = EXP( G, priv_key )
 route_group_elements += group_element
 shared_secret = EXP( path[0].public_key, priv_key )
 route_keys += Sphinx_KDF( KDF_INFO, shared_secret )
-blinding_factor = keys[0].blinding_factor
+blinding_factor = route_keys[0].blinding_factor
 
 /* Calculate the key material for rest of the hops. */
 for i = 1; i < num_hops; ++i:
 shared_secret = EXP( path[i].public_key, priv_key )
 for j = 0; j < i; ++j:
-shared_secret = EXP( shared_secret, keys[j].blinding_factor )
+shared_secret = EXP( shared_secret, route_keys[j].blinding_factor )
 route_keys += Sphinx_KDF( KDF_INFO, shared_secret )
-group_element = EXP( group_element, keys[i-1].blinding_factor )
+group_element = EXP( group_element, route_keys[i-1].blinding_factor )
 route_group_elements += group_element
 ```
 
@@ -834,7 +882,7 @@ At the conclusion of the derivation process:
 
 <div class="itemizedlist">
 
-- `route_keys` – A vector of per-hop SphinxKeys.
+- `route_keys` – A vector of per-hop SphinxPacketKeys.
 
 - `route_group_elements` – A vector of per-hop group elements.
 
@@ -842,7 +890,7 @@ At the conclusion of the derivation process:
 
 <div class="orderedlist">
 
-1.  Derive the `routing_information` keystream and encrypted
+2.  Derive the `routing_information` keystream and encrypted
     padding for each hop.
 
     ``` programlisting
@@ -859,7 +907,7 @@ At the conclusion of the derivation process:
     if i > 0:
     prev_pad_len = LEN( ri_padding[i-1] )
     padding = padding[:prev_pad_len] ^ ri_padding[i-1] |
-    padding[prev_pad_len]
+    padding[prev_pad_len:]
 
     ri_keystream += keystream[:ks_len]
     ri_padding += padding
@@ -871,12 +919,24 @@ At the conclusion of the derivation process:
     padding.
     ```
 
-2.  Create the <span class="command">**routing_information**</span>
+3.  Create the <span class="command">**routing_information**</span>
     block.
+
+    When the path has fewer than `MAX_HOPS` hops, the unused space after
+    the terminal hop’s routing commands is filled with random bytes. This padding
+    is encrypted with the terminal hop’s keystream and covered by the terminal
+    hop’s MAC, like the rest of the block.
 
     ``` programlisting
     /* Start with the terminal hop, and work backwards. */
     i = num_hops - 1
+
+    /* Fill the space left unused by a path shorter than
+    MAX_HOPS with random padding. */
+    routing_info = [ ]
+    if num_hops < MAX_HOPS:
+    pad_len = (MAX_HOPS - num_hops) * PER_HOP_RI_LENGTH
+    routing_info = RNG( pad_len )
 
     /* Encode the terminal hop's routing commands. As the
     terminal hop can never have a NextNodeHopCommand, there
@@ -885,21 +945,22 @@ At the conclusion of the derivation process:
     ZEROBYTES( PER_HOP_RI_LENGTH - LEN( path[i].routing_commands ) )
 
     /* Encrypt and MAC. */
-    ri_fragment ^= ri_keystream[i]
+    routing_info = ri_fragment | routing_info /* Prepend. */
+    routing_info ^= ri_keystream[i]
+    if i > 0:
     mac = MAC( route_keys[i].header_mac, additional_data |
-    route_group_elements[i] | ri_fragment |
+    route_group_elements[i] | routing_info |
     ri_padding[i-1] )
-    routing_info = ri_fragment
-    if num_hops < MAX_HOPS:
-    pad_len = (MAX_HOPS - num_hops) * PER_HOP_RI_LENGTH
-    routing_info = routing_info | RNG( pad_len )
+    else:
+    mac = MAC( route_keys[i].header_mac, additional_data |
+    route_group_elements[i] | routing_info )
 
     /* Calculate the routing info for the rest of the hops. */
     for i = num_hops - 2; i >= 0; --i:
     cmds_to_encode = [ ]
 
     /* Find and finalize the NextNodeHopCommand. */
-    for j = 0; j < LEN( path[i].routing_commands; j++:
+    for j = 0; j < path[i].routing_commands.len; j++:
     cmd = path[i].routing_commands[j]
     if cmd.command == next_node_hop:
     /* Finalize the NextNodeHopCommand. */
@@ -926,7 +987,7 @@ At the conclusion of the derivation process:
     mac          - The MAC for the 0th hop.
     ```
 
-3.  Assemble the completed Sphinx packet header and Sphinx packet payload SPRP
+4.  Assemble the completed Sphinx packet header and Sphinx packet payload SPRP
     key vector.
 
     ``` programlisting
@@ -934,18 +995,19 @@ At the conclusion of the derivation process:
     SphinxHeader sphinx_header
     sphinx_header.additional_data = additional_data
     sphinx_header.group_element = route_group_elements[0] /* From step 1. */
-    sphinx_header.routing_info = routing_info   /* From step 3. */
-    sphinx_header.mac = mac                     /* From step 3. */
+    sphinx_header.routing_information = routing_info /* From step 3. */
+    sphinx_header.MAC = mac                     /* From step 3. */
 
-    /* Preserve the Sphinx Payload SPRP keys, to return to the
-    caller. */
+    /* Preserve the Sphinx Payload SPRP keys and IVs, to return
+    to the caller. The IV is the hop's header_encryption_iv. */
     payload_keys = [ ]
-    for i = 0; i < nr_hops; ++i:
-    payload_keys += route_keys[i].payload_encryption
+    for i = 0; i < num_hops; ++i:
+    payload_keys += { key: route_keys[i].payload_encryption,
+    iv: route_keys[i].header_encryption_iv }
 
     At the conclusion of the assembly process:
     sphinx_header - The completed sphinx_header, to be returned.
-    payload_keys  - The vector of SPRP keys, to be returned.
+    payload_keys  - The vector of SPRP keys and IVs, to be returned.
     ```
 
 </div>
@@ -982,7 +1044,10 @@ Inputs:
 - `path` – The vector of PathHop structures in hop order,
   specifying the node id, public key, and routing commands for each hop.
 
-- `payload` – The packet payload message plaintext.
+- `payload` – The packet payload message plaintext. It MUST be exactly
+  `PAYLOAD_LENGTH - PAYLOAD_TAG_LENGTH` bytes long: the caller pads a
+  shorter message to this length, and `Sphinx_Create_Packet` returns an
+  error for any other length.
 
 </div>
 
@@ -1006,19 +1071,19 @@ steps:
     Sphinx_Create_Header( additional_data, path )
     ```
 
-2.  Prepend the authentication tag, and append padding to the
-    payload.
+2.  Check the payload length, and prepend the authentication tag.
 
     ``` programlisting
-    payload = ZERO_BYTES( PAYLOAD_TAG_LENGTH ) | payload
-    payload = payload | ZERO_BYTES( PAYLOAD_LENGTH - LEN( payload ) )
+    if LEN( payload ) != PAYLOAD_LENGTH - PAYLOAD_TAG_LENGTH:
+    return ErrorInvalidPayload
+    payload = ZEROBYTES( PAYLOAD_TAG_LENGTH ) | payload
     ```
 
 3.  Encrypt the payload.
 
     ``` programlisting
-    for i = nr_hops - 1; i >= 0; --i:
-    payload = SPRP_Encrypt( payload_keys[i], payload )
+    for i = path.len - 1; i >= 0; --i:
+    payload = SPRP_Encrypt( payload_keys[i].key, payload_keys[i].iv, payload )
     ```
 
 4.  Assemble the completed Sphinx packet.
@@ -1089,7 +1154,7 @@ packet processing, handling authentication, decryption, and modifying the packet
 prior to forwarding it to the next node.
 
 ``` programlisting
-Sphinx_Unwrap( routing_private_key, sphinx_packet ) -> sphinx_packet,
+Sphinx_Unwrap( private_routing_key, sphinx_packet ) -> sphinx_packet,
                   routing_commands,
                   replay_tag
 ```
@@ -1098,9 +1163,8 @@ Inputs:
 
 <div class="itemizedlist">
 
-- `private_routing_key` – A group element
-  `GROUP_ELEMENT_LENGTH` bytes in length that contains the
-  unwrapped content of the mix node’s private key.
+- `private_routing_key` – The mix node’s private key, a scalar as
+  returned by `EXP_KEYGEN()`.
 
 - `sphinx_packet` – A Sphinx packet to unwrap.
 
@@ -1132,6 +1196,9 @@ The `Sphinx_Unwrap` operation consists of the following steps:
     ``` programlisting
     hdr = sphinx_packet.header
     shared_secret = EXP( hdr.group_element, private_routing_key )
+    if shared_secret == ZEROBYTES( LEN( shared_secret ) ):
+    /* MUST abort processing on an all-zero shared secret. */
+    return ErrorInvalidHeader
     replay_tag = H( shared_secret )
     ```
 
@@ -1183,26 +1250,40 @@ The `Sphinx_Unwrap` operation consists of the following steps:
     new_routing_information = B[PER_HOP_RI_LENGTH:]
 
     next_mix_command_idx = -1
+    seen_surb_reply = false
     routing_commands = [ ]
-    for idx = 0; idx < PER_HOP_RI_LENGTH {
+    idx = 0
+    while idx < PER_HOP_RI_LENGTH {
     /* WARNING: Bounds checking omitted for brevity. */
-    cmd_type = b[idx]
+    cmd_type = cmd_buf[idx]
     cmd = NULL
     switch cmd_type {
-    case null: goto done  /* No further commands. */
+    case null:
+    /* No further commands. MUST abort processing if the
+    padding is not zero filled. */
+    if cmd_buf[idx:] != ZEROBYTES( PER_HOP_RI_LENGTH - idx ):
+    return ErrorInvalidCommand
+    goto done
 
     case next_node_hop:
+    if next_mix_command_idx != -1:
+    /* MUST abort processing on a second NextNodeHopCommand. */
+    return ErrorInvalidCommand
     cmd = RoutingCommand( B[idx:idx+1+LEN( NextNodeHopCommand )] )
-    next_mix_command_idx = i /* Save for step 7. */
+    next_mix_command_idx = routing_commands.len /* Save for step 7. */
     idx += 1 + LEN( NextNodeHopCommand )
     break
 
     case recipient:
-    cmd = RoutingCommand( B[idx:idx+1+LEN( FinalDestinationCommand )] )
+    cmd = RoutingCommand( B[idx:idx+1+LEN( RecipientCommand )] )
     idx += 1 + LEN( RecipientCommand )
     break
 
     case surb_reply:
+    if seen_surb_reply:
+    /* MUST abort processing on a second SURBReplyCommand. */
+    return ErrorInvalidCommand
+    seen_surb_reply = true
     cmd = RoutingCommand( B[idx:idx+1+LEN( SURBReplyCommand )] )
     idx += 1 + LEN( SURBReplyCommand )
     break
@@ -1222,7 +1303,8 @@ The `Sphinx_Unwrap` operation consists of the following steps:
 
     ``` programlisting
     payload = sphinx_packet.payload
-    payload = SPRP_Decrypt( key.payload_encryption, payload )
+    payload = SPRP_Decrypt( keys.payload_encryption,
+    keys.header_encryption_iv, payload )
     sphinx_packet.payload = payload 
     ```
 
@@ -1235,9 +1317,12 @@ The `Sphinx_Unwrap` operation consists of the following steps:
     if next_mix_command_idx != -1:
     cmd = routing_commands[next_mix_command_idx]
     hdr.group_element = EXP( hdr.group_element, keys.blinding_factor )
+    if hdr.group_element == ZEROBYTES( GROUP_ELEMENT_LENGTH ):
+    /* MUST abort processing on an all-zero blinded group element. */
+    return ErrorInvalidHeader
     hdr.routing_information = new_routing_information
-    hdr.mac = cmd.MAC
-    sphinx_packet.hdr = hdr
+    hdr.MAC = cmd.MAC
+    sphinx_packet.header = hdr
     ```
 
 </div>
@@ -1369,8 +1454,12 @@ struct {
 SphinxHeader sphinx_header;
 opaque first_hop[NODE_ID_LENGTH];
 opaque payload_key[SPRP_KEY_LENGTH];
+opaque payload_iv[SPRP_IV_LENGTH];
 } SphinxSURB;
 ```
+
+The SURB carries an IV next to the payload key because the SPRP takes both a key
+and an IV.
 
 <div class="section">
 
@@ -1447,10 +1536,10 @@ The `Sphinx_Create_SURB` operation consists of the following steps:
     Sphinx_Create_Header( additional_data, path )
     ```
 
-2.  Create a key for the final layer of encryption.
+2.  Create a key and IV for the final layer of encryption.
 
     ``` programlisting
-    final_key = RNG( SPRP_KEY_LENGTH )
+    final_key = { key: RNG( SPRP_KEY_LENGTH ), iv: RNG( SPRP_IV_LENGTH ) }
     ```
 
 3.  Build the SURB and Decryption
@@ -1460,7 +1549,8 @@ The `Sphinx_Create_SURB` operation consists of the following steps:
     SphinxSURB sphinx_surb;
     sphinx_surb.sphinx_header = sphinx_header
     sphinx_surb.first_hop = first_hop
-    sphinx_surb.payload_key = final_key
+    sphinx_surb.payload_key = final_key.key
+    sphinx_surb.payload_iv = final_key.iv
 
     decryption_token = final_key + payload_keys /* Prepend */
     ```
@@ -1488,8 +1578,8 @@ The `Sphinx_Create_SURB` operation consists of the following steps:
 A Sphinx reply packet that was generated using a SURB is externally
 indistinguishable from a forward Sphinx packet as it traverses the network.
 However, the recipient of the reply has an additional decryption step, the
-packet starts off unencrypted, and accumulates layers of Sphinx packet payload
-decryption as it traverses the network.
+payload starts off encrypted with the SURB’s payload key, and accumulates layers of
+Sphinx packet payload decryption as it traverses the network.
 
 Determining which decryption token to use when decrypting the SURB reply can
 be done via the <span class="command">**SURBReplyCommand**</span>’s id field, if one is
@@ -1503,7 +1593,7 @@ Inputs:
 
 <div class="itemizedlist">
 
-- `decryption_token` – The vector of keys allowing a client to
+- `decryption_token` – The vector of SPRP keys and IVs allowing a client to
   decrypt the reply ciphertext payload. This decryption_token is generated
   when the SURB is created.
 
@@ -1532,13 +1622,15 @@ steps:
 
     ``` programlisting
     for i = LEN( decryption_token ) - 1; i > 0; --i:
-    payload = SPRP_Encrypt( decryption_token[i], payload )
+    payload = SPRP_Encrypt( decryption_token[i].key,
+    decryption_token[i].iv, payload )
     ```
 
 2.  Decrypt and authenticate the message ciphertext.
 
     ``` programlisting
-    message = SPRP_Decrypt( decryption_token[0], payload )
+    message = SPRP_Decrypt( decryption_token[0].key,
+    decryption_token[0].iv, payload )
 
     derived_tag = message[:PAYLOAD_TAG_LENGTH]
     expected_tag = ZEROBYTES( PAYLOAD_TAG_LENGTH )
@@ -1586,7 +1678,9 @@ Inputs:
 - `sphinx_surb` – The `SphinxSURB` structure, decoded
   from the implementation defined wire encoding.
 
-- `payload` – The packet payload message plaintext.
+- `payload` – The packet payload message plaintext. It MUST be exactly
+  `PAYLOAD_LENGTH - PAYLOAD_TAG_LENGTH` bytes long: the caller pads a
+  shorter message to this length.
 
 </div>
 
@@ -1595,19 +1689,18 @@ steps:
 
 <div class="orderedlist">
 
-1.  Prepend the authentication tag, and append padding to the
-    payload.
+1.  Prepend the authentication tag.
 
     ``` programlisting
-    payload = ZERO_BYTES( PAYLOAD_TAG_LENGTH ) | payload
-    payload = payload | ZERO_BYTES( PAYLOAD_LENGTH - LEN( payload ) ) 
+    payload = ZEROBYTES( PAYLOAD_TAG_LENGTH ) | payload
     ```
 
 2.  Encrypt the
     payload.
 
     ``` programlisting
-    payload = SPRP_Encrypt( sphinx_surb.payload_key, payload )
+    payload = SPRP_Encrypt( sphinx_surb.payload_key,
+    sphinx_surb.payload_iv, payload )
     ```
 
 3.  Assemble the completed Sphinx packet.
@@ -1621,7 +1714,7 @@ steps:
 </div>
 
 The completed `sphinx_packet` MUST be sent to the node specified
-via `sphinx_surb.node_id`, as the entire reply
+via `sphinx_surb.first_hop`, as the entire reply
 `sphinx_packet`’s header is pre-generated.
 
 </div>

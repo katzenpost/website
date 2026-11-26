@@ -83,7 +83,7 @@ constant packet size and route length hiding.
 </div>
 
 We’ll express our KEM Sphinx header in pseudo code. The Sphinx body will be exactly
-the same as <a href="#SPHINXSPEC" class="xref">the section called “References”</a> Our basic KEM API has three functions:
+the same as <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a>. Our basic KEM API has three functions:
 
 <div class="itemizedlist">
 
@@ -103,13 +103,16 @@ Additional notation includes:
 
 - `||` = concatenate two binary blobs together
 
-- `PRF` = pseudo random function, a cryptographic hash function,
-  e.g. `Blake2b`.
+- `PRF(key, message)` = pseudo random function, a keyed cryptographic
+  hash function, e.g. keyed `Blake2b`.
+
+- `KEM_CIPHERTEXT_LENGTH` = the size of a KEM ciphertext in bytes
 
 </div>
 
-Therefore we must embed these KEM ciphertexts in the KEMSphinx header, one KEM
-ciphertext per mix hop.
+A KEM ciphertext cannot be blinded and reused from hop to hop the way the Sphinx
+group element is. Therefore we must embed these KEM ciphertexts in the KEMSphinx
+header, one KEM ciphertext per mix hop.
 
 </div>
 
@@ -129,7 +132,7 @@ ciphertext per mix hop.
 
 </div>
 
-Special care must be taken in order correctly compose a hybrid post-quantum KEM that
+Special care must be taken in order to correctly compose a hybrid post-quantum KEM that
 is IND-CCA2 robust.
 
 The hybrid post quantum KEMs found in Cloudflare’s circl library are suitable to be
@@ -158,22 +161,28 @@ preserving KEM combiner.
 </div>
 
 We easily achieve our IND-CCA2 security by means of hashing together the DH shared
-secret along with both of the public keys:
+secret along with both of the public keys. The DH shared secret is the PRF key, and
+the message is the recipient’s public key followed by the ephemeral public key. The
+ephemeral public key is the KEM ciphertext:
 
 ``` programlisting
 func ENCAPSULATE(their_pubkey publickey) ([]byte, []byte) {
 my_privkey, my_pubkey = GEN_KEYPAIR(RNG)
 ss = DH(my_privkey, their_pubkey)
-ss2 = PRF(ss || their_pubkey || my_pubkey)
+ss2 = PRF(ss, their_pubkey || my_pubkey)
 return my_pubkey, ss2
 }
 
-func DECAPSULATE(my_privkey, their_pubkey) []byte {
-s = DH(my_privkey, their_pubkey)
-shared_key = PRF(ss || my_pubkey || their_pubkey)
+func DECAPSULATE(my_privkey, ct []byte) []byte {
+their_pubkey = ct
+my_pubkey = PUBLIC_KEY(my_privkey)
+ss = DH(my_privkey, their_pubkey)
+shared_key = PRF(ss, my_pubkey || their_pubkey)
 return shared_key
 }
 ```
+
+Both functions return an error if the DH shared secret is all zeros.
 
 </div>
 
@@ -193,7 +202,7 @@ return shared_key
 
 </div>
 
-The KEM Combiners paper <a href="#KEMCOMB" class="link">???</a> makes the observation that if a
+The KEM Combiners paper <a href="#KEMCOMB" class="link">KEMCOMB</a> makes the observation that if a
 KEM combiner is not security preserving then the resulting hybrid KEM will not have
 IND-CCA2 security if one of the composing KEMs does not have IND-CCA2 security.
 Likewise the paper points out that when using a security preserving KEM combiner,
@@ -205,20 +214,20 @@ Our KEM combiner uses the split PRF design from the paper when combining two KEM
 shared secrets together we use a hash function to also mix in the values of both KEM
 ciphertexts. In this pseudo code example we are hashing together the two shared
 secrets from the two underlying KEMs, ss1 and ss2. Additionally the two ciphertexts
-from the underlying KEMs, cct1 and cct2, are also hashed together:
+from the underlying KEMs, cct1 and cct2, are also hashed together. Each shared
+secret is the key of a PRF over both ciphertexts:
 
 ``` programlisting
 func SplitPRF(ss1, ss2, cct1, cct2 []byte) []byte {
 cct := cct1 || cct2
-return PRF(ss1 || cct) XOR PRF(ss2 || cct)
+return PRF(ss1, cct) XOR PRF(ss2, cct)
 }
 ```
 
-Which simplifies to:
-
-``` programlisting
-SplitPRF := PRF(ss1 || cct2) XOR PRF(ss2 || cct1)
-```
+In our implementation the PRF is BLAKE2b-256, keyed by the BLAKE2b-256 hash of the
+shared secret. The message is the label `splitprf-v1`, then the number of
+KEMs as a 32 bit big endian integer, then each ciphertext preceded by its length as
+a 32 bit big endian integer.
 
 The Split PRF can be used to combine an arbitrary number of KEMs. Here’s what it
 looks like with three KEMs:
@@ -226,7 +235,7 @@ looks like with three KEMs:
 ``` programlisting
 func SplitPRF(ss1, ss2, ss3, cct1, cct2, cct3 []byte) []byte {
 cct := cct1 || cct2 || cct3
-return PRF(ss1 || cct) XOR PRF(ss2 || cct) XOR PRF(ss3 || cct)
+return PRF(ss1, cct) XOR PRF(ss2, cct) XOR PRF(ss3, cct)
 }
 ```
 
@@ -260,7 +269,7 @@ NIKE Sphinx header elements:
 
 3.  Encrypted per routing commands
 
-4.  MAC for this hop (authenticates header fields 1 thru 4)
+4.  MAC for this hop (authenticates header fields 1 thru 3)
 
 </div>
 
@@ -275,7 +284,7 @@ KEM Sphinx header elements:
 3.  Encrypted per routing commands AND KEM ciphertexts, one for each additional
     hop
 
-4.  MAC for this hop (authenticates header fields 1 through 4)
+4.  MAC for this hop (authenticates header fields 1 through 3)
 
 </div>
 
@@ -289,10 +298,15 @@ hops to express a route:
 
 ``` programlisting
 type PathHop struct {
+id [NODE_ID_LENGTH]byte
 public_key kem.PublicKey
 routing_commands Commands
 }
 ```
+
+The `id` is the node identifier. The header construction uses the
+`id` of the next hop to build each non-terminal hop’s NextNodeHop
+command.
 
 Here’s how we construct a KEMSphinx packet header where path is a list of PathHop,
 and
@@ -310,33 +324,64 @@ route_kems = []
 for i := 0; i < num_hops; i++ {
 kem_ct, ss := ENCAP(path[i].public_key)
 route_kems += kem_ct
-route_keys += ss
+route_keys += Sphinx_KDF(KDF_INFO, ss)
 }
 ```
 
+The KDF is the same as in <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a> and produces the same output. There is no blinding in
+KEMSphinx, so the blinding seed at the end of the KDF output is unused.
+
 <div class="orderedlist">
 
-1.  Derive the routing_information keystream and encrypted padding for each hop.
+2.  Derive the routing_information keystream and encrypted padding for each hop.
 
 </div>
 
-Same as in <a href="#SPHINXSPEC" class="xref">the section called “References”</a> except for the fact that each routing info
-slot is now increased by the size of the KEM ciphertext.
+Same as in <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a> except for the fact that each routing info
+slot is now increased by the size of the KEM ciphertext: `PER_HOP_RI_LENGTH`
+includes the size of one KEM ciphertext.
 
 <div class="orderedlist">
 
-1.  Create the routing_information block.
+3.  Create the routing_information block.
 
 </div>
 
 Here we modify the Sphinx implementation to pack the next KEM ciphertext into each
-routing information block. Each of these blocks is decrypted for each mix mix hop
+routing information block. Each of these blocks is decrypted for each mix hop
 which
 will decrypt the KEM ciphertext for the next hop in the route.
 
+Each hop’s routing information block is `PER_HOP_RI_LENGTH` bytes. The
+routing commands are at the front, followed by zero padding. In every non-terminal
+hop’s block the last `KEM_CIPHERTEXT_LENGTH` bytes hold the next hop’s
+KEM ciphertext. The routing commands of a hop, including the NextNodeHop command,
+MUST therefore fit in the `PER_HOP_RI_LENGTH - KEM_CIPHERTEXT_LENGTH`
+bytes before it:
+
+``` programlisting
+ri_fragment = cmds_to_encode |
+ZEROBYTES( PER_HOP_RI_LENGTH - LEN( cmds_to_encode ) )
+if i < num_hops - 1:
+ri_fragment[PER_HOP_RI_LENGTH - KEM_CIPHERTEXT_LENGTH:] = route_kems[i+1]
+```
+
+The MAC is computed as in <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a>, with the hop’s KEM ciphertext in
+place of the group element. It covers the version, the KEM ciphertext, the routing
+information and, for every hop but the first, the encrypted padding:
+
+``` programlisting
+if i > 0:
+mac = MAC( route_keys[i].header_mac, version | route_kems[i] |
+routing_info | ri_padding[i-1] )
+else:
+mac = MAC( route_keys[i].header_mac, version | route_kems[i] |
+routing_info )
+```
+
 <div class="orderedlist">
 
-1.  Assemble the completed Sphinx Packet Header and Sphinx Packet Payload SPRP
+4.  Assemble the completed Sphinx Packet Header and Sphinx Packet Payload SPRP
     key vector. Same as in <a href="#SPHINXSPEC" class="link">SPHINXSPEC</a> except the
     `kem_element` field is set to the first KEM ciphertext,
     `route_kems[0]`:
@@ -378,6 +423,16 @@ Most of the design here will be exactly the same as in <a href="#SPHINXSPEC" cla
 2.  Next hop’s KEM ciphertext stored in the encrypted routing information.
 
 </div>
+
+The mix decapsulates the header’s `kem_element` to get the shared secret.
+The replay tag is the hash of that KEM ciphertext. The MAC is verified over the
+version, the KEM ciphertext and the routing information.
+
+After decrypting the routing information, the mix parses its routing commands only
+from the first `PER_HOP_RI_LENGTH - KEM_CIPHERTEXT_LENGTH` bytes of its
+block. If there is a NextNodeHop command, the mix copies the last
+`KEM_CIPHERTEXT_LENGTH` bytes of the block into the header’s
+`kem_element` field for the next hop. There is no blinding step.
 
 </div>
 
